@@ -15,7 +15,9 @@ NE programs (Borland Pascal 7 DPMI16, Windows 3.x) run in 16-bit protected mode.
 selector 0x1000 + 8 * (N - 1), the same numbers Ghidra's NE loader uses, so an address from the
 Ghidra export (`1000:0028`, `FUN_1000_0028`) is the address here. Relocations are applied:
 selectors, far pointers and offsets to the program's own segments; imports (by ordinal or name)
-become stubs. DS and SS are the auto data segment, as in a Pascal or Windows program.
+become stubs. DS is the auto data segment; SS:SP come from the NE header (the auto data
+segment when the header says so, as in Windows programs; Borland Pascal 7 DPMI16 programs
+have a stack segment of their own).
 
 MZ programs (real mode) load at segment 0x1000, as in Ghidra, with the PSP at 0x0FF0 and DS = ES
 = PSP as DOS leaves them; SS:SP come from the header.
@@ -52,10 +54,23 @@ REGS = {'ax': UC_X86_REG_AX, 'bx': UC_X86_REG_BX, 'cx': UC_X86_REG_CX, 'dx': UC_
         'ds': UC_X86_REG_DS, 'es': UC_X86_REG_ES, 'ss': UC_X86_REG_SS, 'cs': UC_X86_REG_CS,
         'ip': UC_X86_REG_EIP, 'flags': UC_X86_REG_FLAGS}
 FIRST_SELECTOR = 0x1000
-GDT_BASE = 0x10000
+GDT_BASE = 0x120000            # above the real-mode first megabyte (mapped for NE programs too)
 TRAP = 0xFFF0                      # the return trap's offset in the stub segment
 MZ_LOAD = 0x1000                   # where Ghidra and this emulator load an MZ image
 MZ_STUBS, MZ_HEAP = 0xF000, 0x8000
+# Windows/DPMI16 KERNEL exports whose value is a constant, not a function: a selector for a
+# fixed linear address, or a number. Borland Pascal 7 DPMI16 and Windows 3.x programs use them.
+CONSTANT_IMPORTS = {
+    'KERNEL.114': ('value', 8),          # __AHINCR: the selector step of huge (tiled) memory
+    'KERNEL.174': ('linear', 0xA0000),   # __A000H: VGA graphics memory
+    'KERNEL.181': ('linear', 0xB0000),   # __B000H: monochrome text memory
+    'KERNEL.182': ('linear', 0xB8000),   # __B800H: colour text memory
+    'KERNEL.193': ('linear', 0x00400),   # __0040H: the BIOS data area
+}
+
+
+class ProgramStopped(Exception):
+    """The program asked to stop (emu.stop, for example its exit call); .args[0] is the value."""
 
 
 class Long(int):
@@ -98,6 +113,8 @@ class DosEmu:
         self.error = None
         self.pending = None
         self.traces = []
+        self.slice = None        # run in slices of this many instructions (for timers)
+        self.on_slice = None     # called between slices with the emulator
         lfanew, = struct.unpack_from('<I', self.data, 0x3C) if len(self.data) > 0x40 else (0,)
         reloc_at, = struct.unpack_from('<H', self.data, 0x18)
         if reloc_at >= 0x40 and lfanew + 2 <= len(self.data) and self.data[lfanew:lfanew + 2] == b'NE':
@@ -121,8 +138,28 @@ class DosEmu:
 
     def linear(self, seg, off=0):
         if self.kind == 'NE':
-            return ((seg >> 3) << 16) + off
+            base = self.bases.get(seg & 0xFFF8) if hasattr(self, 'bases') else None
+            return (((seg >> 3) << 16) if base is None else base) + off
         return (seg << 4) + off
+
+    def set_descriptor(self, sel, base, limit=0xFFFF, access=0x92):
+        """NE only: point selector `sel` at a linear base (mapping 64 KB there if needed)."""
+        self.bases[sel & 0xFFF8] = base
+        page = base & ~0xFFF
+        try:
+            self.uc.mem_map(page, ((base + 0x10000 + 0xFFF) & ~0xFFF) - page)
+        except UcError:
+            pass   # already mapped (low memory, or another selector's block)
+        self.uc.mem_write(GDT_BASE + (sel & 0xFFF8), descriptor(base, limit, access))
+
+    def new_selector(self, base=None, access=0x92):
+        """NE only: a fresh selector, with its own 64 KB, or pointing at `base`."""
+        if base is None:
+            return self._new_selector(access)
+        sel = self.next_sel
+        self.next_sel += 8
+        self.set_descriptor(sel, base, access=access)
+        return sel
 
     def _new_selector(self, access, size=0x10000):
         sel = self.next_sel
@@ -132,9 +169,19 @@ class DosEmu:
         self.uc.mem_write(GDT_BASE + sel, descriptor(base, size - 1, access))
         return sel
 
+    def _selector_at(self, linear):
+        """A data selector whose base is a fixed linear address (low memory is mapped)."""
+        sel = self.next_sel
+        self.next_sel += 8
+        self.bases[sel] = linear
+        self.uc.mem_write(GDT_BASE + sel, descriptor(linear, 0xFFFF, 0x92))
+        return sel
+
     def _load_ne(self, ne):
         d = self.data
         self.uc = Uc(UC_ARCH_X86, UC_MODE_32)
+        self.uc.mem_map(0, 0x110000)          # real-mode memory: BIOS data, VGA, text screens
+        self.bases = {}                        # selectors whose base is not (sel >> 3) << 16
         self.uc.mem_map(GDT_BASE, 0x10000)
         self.uc.reg_write(UC_X86_REG_GDTR, (0, GDT_BASE, 0xFFFF, 0))
         h = lambda fmt, off: struct.unpack_from(fmt, d, ne + off)
@@ -158,6 +205,7 @@ class DosEmu:
         self.uc.mem_write(self.linear(self.stub_seg, TRAP), b'\xf4')
         self.next_stub = 0
         self.heap_seg, self.heap_top = self._new_selector(0x92), 0
+        self.constants = {}   # import key -> (selector or value), for CONSTANT_IMPORTS
         self.modules = []
         for i in range(nmod):
             o, = h('<H', modtab + 2 * i)
@@ -196,6 +244,10 @@ class DosEmu:
         size = min(0x10000, self.segments[self.autodata - 1][3] + heap + stack) if self.autodata else 0x10000
         self.regs = {'ds': ds, 'es': ds, 'ss': ds, 'sp': (size - 2) & 0xFFFE}
         ip, cs, sp, ss = h('<HHHH', 0x14)
+        if ss and ss != self.autodata:
+            # The program has its own stack segment (Borland Pascal 7 DPMI16 does): use it,
+            # or local variables land on top of the data segment's globals.
+            self.regs.update(ss=self.selector(ss), sp=sp or 0xFFFE)
         self.entry = FarPtr(self.selector(cs), ip) if cs else None
 
     def _relocate_ne(self, segno, at, ne, imptab):
@@ -214,7 +266,13 @@ class DosEmu:
                 mod, what = struct.unpack_from('<HH', d, at + 2 + 8 * i + 4)
                 module = self.modules[mod - 1]
                 key = f'{module}.{what}' if kind == 1 else f'{module}.{self._pstr(ne + imptab + what)}'
-                sel, target = self.stub_seg, self._stub_for(key)
+                if key in CONSTANT_IMPORTS:
+                    if key not in self.constants:
+                        how, v = CONSTANT_IMPORTS[key]
+                        self.constants[key] = v if how == 'value' else self._selector_at(v)
+                    sel = target = self.constants[key]
+                else:
+                    sel, target = self.stub_seg, self._stub_for(key)
             else:              # OS fixup (floating-point emulator): left as it is
                 continue
             while True:
@@ -407,16 +465,27 @@ class DosEmu:
     def _run(self, ptr):
         self.error = None
         cs, ip = ptr
+        budget = self.max_steps
         while True:
             self.pending = None
             self.set(cs=cs)
+            count = min(budget, self.slice) if self.slice else budget
             try:
-                self.uc.emu_start(ip, 0, count=self.max_steps)
+                self.uc.emu_start(ip, 0, count=count)
             except UcError as e:
                 raise RuntimeError(self.error or f'{e} at {self.reg("cs"):04x}:{self.reg("ip"):04x}') from None
             if self.error:
                 raise RuntimeError(self.error)
+            if self.pending == 'stop':
+                raise ProgramStopped(self.stop_value)
             if self.pending is None:
+                budget -= count
+                if self.slice and budget > 0:
+                    # A slice ended: let the environment act (a timer interrupt), go on.
+                    if self.on_slice:
+                        self.on_slice(self)
+                    cs, ip = self.reg('cs'), self.reg('ip')
+                    continue
                 raise RuntimeError(f'stopped after {self.max_steps} instructions at '
                                    f'{self.reg("cs"):04x}:{self.reg("ip"):04x} (an endless loop, '
                                    f'or raise max_steps)')
@@ -431,6 +500,27 @@ class DosEmu:
             pop = handler(self) or 0
             ip, cs = self.pop(), self.pop()
             self.set(sp=(self.reg('sp') + pop) & 0xFFFF)
+
+    def interrupt(self, seg, off):
+        """Deliver a hardware interrupt now, as the CPU does: push FLAGS, CS, IP, clear IF and
+        TF, and continue at seg:off (the handler ends with IRET). Call it between slices
+        (on_slice); it does nothing while interrupts are disabled (returns False)."""
+        flags = self.reg('flags')
+        if not flags & 0x200:
+            return False
+        self.push(flags)
+        self.push(self.reg('cs'))
+        self.push(self.reg('ip'))
+        self.set(flags=flags & ~0x300)
+        self.set(cs=seg, ip=off)
+        return True
+
+    def stop(self, value=None):
+        """From a handler: end the current run (call or run_range raises ProgramStopped with
+        `value`), for example when the program exits through INT 21h AH=4Ch."""
+        self.pending = 'stop'
+        self.stop_value = value
+        self.uc.emu_stop()
 
     def _on_stub(self, uc, address, size, _):
         off = address - self.linear(self.stub_seg)

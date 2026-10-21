@@ -143,6 +143,32 @@ emu.trace({'1040:0a12': 'Random'}, args=1)     # record calls (the random draws)
 - Not emulated: DOS itself, DPMI services, timers, VGA, sound, the x87 (Borland's FPU
   emulator fixups are left alone). Code that needs them runs in DOSBox-X instead.
 
+## 5b. Running the whole program headless: dos_env
+
+`tools/emu/dos_env.py` gives `dos_emu` a small DOS, BIOS, DPMI host and PC, so a whole Borland
+Pascal 7 DPMI16 program can start and run, with no DOSBox and no window:
+
+```python
+from dos_emu import DosEmu, ProgramStopped
+from dos_env import DosEnv
+emu = DosEmu('target/game/GAME.EXE', max_steps=2_000_000_000)
+env = DosEnv(emu, root='target/game', overlay='derived/run', program='C:\\GAME\\GAME.EXE')
+emu.run_range(emu.entry, '1000:ca59')            # start-up, until the main loop
+env.save_screen('derived/run/frame.png')         # VGA memory + the DAC palette
+```
+
+- Files come from `root` (names without case); writes go to `overlay`. `env.log` lists what
+  the program asked for, in order: compare it with DOSBox-X's file log.
+- The timer: IRQ 0 reaches the program's INT 8 handler at the rate it programs on the PIT,
+  counted in instructions (`ips`, default 25 million per second), so frame-paced loops run.
+- Keys: `env.keys` (scan << 8 | ascii). A read with none queued stops the run and says so.
+- Each stop names what is missing (an interrupt, a DPMI call, an import): add it to dos_env,
+  with a test against the sample. Things it needed for a real game: the NE header's own stack
+  segment, a PSP with an environment, the BIOS data area (CRT port, mode, columns), a BIOS
+  tick that advances, a PIT counter that counts, Borland RTM's memory calls (RTM.5/6/21).
+- Then capture state frame by frame: `emu.read((0x1048, 0), 0x10000)` is the data segment
+  for `Globals::load`; any segment a pointer names can be dumped the same way.
+
 ## 6. Running the original: DOSBox-X
 
 A store release usually ships its own DOSBox configuration (GOG: `__support/app/*.conf`). Start

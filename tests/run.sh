@@ -98,7 +98,7 @@ expect "dosinfo gives Ghidra's selector per segment" "2  1008  file" "$PYTHON" t
 expect "dosinfo lists imports by ordinal" "KERNEL.3" "$PYTHON" tools/dos/dosinfo.py $D/sample.exe --imports
 expect "dosinfo lists exports at seg:off" "1000:0028  RNG_NEXT" "$PYTHON" tools/dos/dosinfo.py $D/sample.exe --exports
 expect "dosinfo finds Pascal strings with their address" "1008:0011  [12] 'DOS SAMPLE 1'" "$PYTHON" tools/dos/dosinfo.py $D/sample.exe --pstrings 5
-expect "dosinfo reads a real-mode MZ" "2 relocations" "$PYTHON" tools/dos/dosinfo.py $D/sample-mz.exe
+expect "dosinfo reads a real-mode MZ" "3 relocations" "$PYTHON" tools/dos/dosinfo.py $D/sample-mz.exe
 expect "dosinfo finds Turbo Debugger symbols" "debug symbols: Turbo Debugger" "$PYTHON" tools/dos/dosinfo.py $D/sample-td.exe
 expect "readseg reads a typed constant" "1008:0000  4660" "$PYTHON" tools/dos/readseg.py $D/sample.exe u32 DAT_1008_0000
 expect "readseg reads a Pascal string" "'DOS SAMPLE 1'" "$PYTHON" tools/dos/readseg.py $D/sample.exe pstr 1008:0010
@@ -164,11 +164,30 @@ expect "an unhandled interrupt names itself" "unhandled interrupt 21h (AH=30h) a
 import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu
 try: DosEmu('$D/sample.exe').call('DOS_VERSION')
 except RuntimeError as e: print(e)"
-expect "dos_emu runs real-mode MZ code at Ghidra's addresses" "100a [722, 842, 312]" "$PYTHON" -c "
-import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu, Long
+expect "dos_emu runs real-mode MZ code at Ghidra's addresses (data after the code)" "True [722, 842, 312]" "$PYTHON" -c "
+import sys, os; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu, Long
 m = DosEmu('$D/sample-mz.exe'); ds = m.call('1000:0088')
+code_paras = -(-(int(open('$D/symbols.tsv').read().split('get_key')[1].split()[1], 16) + 3) // 16)
 m.call('1000:000f', Long(1234), regs={'ds': ds})
-print(f'{ds:04x}', [m.call('1000:0028', 1000, regs={'ds': ds}) for _ in range(3)])"
+print(ds == 0x1000 + code_paras, [m.call('1000:0028', 1000, regs={'ds': ds}) for _ in range(3)])"
+
+echo "Headless DOS environment (dos_env)"
+printf 'HELLO DOS ENV\n' > $D/SAMPLE.TXT
+expect "dos_env serves DOS file reads from a folder (names without case)" "14 b'HELLO DOS ENV'" "$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu; from dos_env import DosEnv
+e = DosEmu('$D/sample.exe'); env = DosEnv(e, root='$D'); print(e.call('READ_FILE'), e.read((0x1008, 0x90), 13))"
+expect "dos_env delivers timer interrupts to the program's own INT 8 handler" "3 3" "$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu; from dos_env import DosEnv
+e = DosEmu('$D/sample.exe'); env = DosEnv(e, root='$D'); print(e.call('WAIT_TICKS'), env.irq0_count)"
+expect "dos_env types queued keys and stops when none is left" "0x1c0d the program waits for a key" "$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu; from dos_env import DosEnv
+e = DosEmu('$D/sample.exe'); env = DosEnv(e, root='$D'); env.keys = [0x1C0D]; k = e.call('GET_KEY')
+try: e.call('GET_KEY')
+except RuntimeError as x: print(hex(k), x)"
+expect "dos_env's DPMI gives selectors at a base, and the constant selectors point at VGA" "a0000 b8123" "$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu; from dos_env import DosEnv
+e = DosEmu('$D/sample.exe'); env = DosEnv(e, root='$D'); s = e.new_selector(base=0xB8123)
+print(hex(e.linear(e.new_selector(base=0xA0000)))[2:], hex(e.linear(s))[2:])"
 
 echo "DOSBox-X runtime"
 log="$(mktemp)"

@@ -27,7 +27,8 @@ import sys
 import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-EXPORTS = ['rng_seed', 'rng_next', 'sum_draws', 'checksum', 'get_data_seg', 'ask_host', 'dos_version', 'field_read']
+EXPORTS = ['rng_seed', 'rng_next', 'sum_draws', 'checksum', 'get_data_seg', 'ask_host', 'dos_version', 'field_read',
+           'read_file', 'wait_ticks', 'get_key']
 DESCRIPTION = b'DOS sample for the reverse-engineer-games harness'
 MESSAGE = b'\x0cDOS SAMPLE 1'   # a Pascal string: length byte first
 
@@ -68,6 +69,9 @@ def data_segment():
     d = bytearray(0x10)
     d[0:4] = struct.pack('<I', 0x1234)       # RandSeed's initial value
     d += MESSAGE + b'\0' + DESCRIPTION + b'\0'
+    d += bytes(0x80 - len(d))
+    d += b'sample.txt\0'                     # FileName at 0x80 (read_file)
+    d += bytes(0xA0 - len(d))                # FileBuf at 0x90
     return bytes(d)
 
 
@@ -80,6 +84,7 @@ def build_ne(code, syms, data):
     align = 4  # segment data aligned to 16 bytes
     # Relocations of segment 1 (8 bytes each). The word at each location is 0xffff (end of chain).
     relocs = [
+        struct.pack('<BBHBBH', 2, 0, syms['fix_tick_ds'], 2, 0, 0),         # selector of segment 2
         struct.pack('<BBHBBH', 2, 0, syms['fix_entry_ds'] + 1, 2, 0, 0),   # selector of segment 2
         struct.pack('<BBHBBH', 2, 0, syms['fix_dataseg'] + 1, 2, 0, 0),    # selector of segment 2
         struct.pack('<BBHHH', 3, 1, syms['fix_import'], 1, 3),            # far pointer: KERNEL.3
@@ -107,7 +112,7 @@ def build_ne(code, syms, data):
     seg1_file = (nonres_file + len(nonres) + 15) & ~15
     reloc_blob = struct.pack('<H', len(relocs)) + b''.join(relocs)
     seg2_file = (seg1_file + len(code) + len(reloc_blob) + 15) & ~15
-    for off in (syms['fix_entry_ds'] + 1, syms['fix_dataseg'] + 1, syms['fix_import']):
+    for off in (syms['fix_entry_ds'] + 1, syms['fix_dataseg'] + 1, syms['fix_import'], syms['fix_tick_ds']):
         code[off:off + 2] = b'\xff\xff'
     segtab = struct.pack('<HHHH', seg1_file >> align, len(code), 0x0100 | 0x0c00, len(code))
     segtab += struct.pack('<HHHH', seg2_file >> align, len(data), 0x0001 | 0x0c00, 0x4000)
@@ -149,7 +154,7 @@ def build_mz(code, syms, data):
     code = bytearray(code)
     code_paras = (len(code) + 15) // 16
     relocs = []
-    for off in (syms['fix_entry_ds'] + 1, syms['fix_dataseg'] + 1):
+    for off in (syms['fix_entry_ds'] + 1, syms['fix_dataseg'] + 1, syms['fix_tick_ds']):
         code[off:off + 2] = struct.pack('<H', code_paras)
         relocs.append(struct.pack('<HH', off, 0))
     code[syms['fix_import']:syms['fix_import'] + 4] = b'\0\0\0\0'   # no imports in real mode

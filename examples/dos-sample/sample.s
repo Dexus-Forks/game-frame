@@ -111,3 +111,60 @@ dos_version:
 field_read:
 	movw 4(%si), %ax
 	lretw
+
+# function read_file: word    opens the file named at DS:0x0080 (DOS), reads up to 16 bytes into
+# DS:0x0090, closes it, returns the count (or 0xFFFF when it cannot be opened). Tests dos_env.
+	.set FileName, 0x0080
+	.set FileBuf, 0x0090
+	.set Ticks, 0x0008
+read_file:
+	movw $0x3d00, %ax
+	movw $FileName, %dx
+	int $0x21
+	jc 1f
+	movw %ax, %bx
+	movb $0x3f, %ah
+	movw $16, %cx
+	movw $FileBuf, %dx
+	int $0x21
+	pushw %ax
+	movb $0x3e, %ah
+	int $0x21
+	popw %ax
+	lretw
+1:	movw $0xffff, %ax
+	lretw
+
+# function wait_ticks: word    installs tick_handler on INT 8 (DOS AH=25h), waits until it has
+# run 3 times (the timer interrupt), returns the count. Tests dos_env's timer.
+wait_ticks:
+	movw $0, Ticks
+	pushw %ds
+	pushw %cs
+	popw %ds
+	movw $0x2508, %ax
+	movw $(tick_handler - entry), %dx   # an offset: entry is at 0 (no relocation)
+	int $0x21
+	popw %ds
+	sti
+1:	cmpw $3, Ticks
+	jb 1b
+	movw Ticks, %ax
+	lretw
+tick_handler:
+	pushw %ds
+	pushw %ax
+	movw %cs:(fix_tick_ds - entry), %ax
+	movw %ax, %ds
+	incw Ticks
+	popw %ax
+	popw %ds
+	iret
+fix_tick_ds:
+	.word 0xffff
+
+# function get_key: word    INT 16h AH=00h: waits for a key, returns it (scan << 8 | ascii).
+get_key:
+	movb $0, %ah
+	int $0x16
+	lretw
