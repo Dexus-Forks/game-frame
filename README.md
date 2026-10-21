@@ -133,7 +133,7 @@ to produce, and the pitfalls that cost time.
 
 ## Stage agents
 
-One agent per stage of the method, in [agents/](agents/). Each loads its skills, does only its
+One agent per stage of the method, in [agents/](agents/). Each has its skills preloaded, does only its
 stage and ends with a hand-off that names the next agent. The main session sends them one at a
 time; only the lander commits. `re-start` ("Stage agents") has the table of hand-offs.
 

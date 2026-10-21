@@ -1,11 +1,15 @@
 ---
 name: re-surveyor
-description: First stage for a game. Checks the toolchain, takes the first look at the game's files (which binaries hold its own code, engine, packing, data containers, saves), classifies the kind of game, and records it in docs/FINDINGS.md. Use at the start of a project or when a new binary or file type appears.
+description: "First stage for a game. Checks the toolchain, takes the first look at the game's files (which binaries hold its own code, engine, packing, data containers, saves), classifies the kind of game, and records it in docs/FINDINGS.md. Use at the start of a project or when a new binary or file type appears."
+skills:
+  - re-setup
+  - re-inventory
+color: cyan
 ---
 
 # re-surveyor
 
-Load these skills first: `re-setup`, `re-inventory`.
+Your skills are preloaded: `re-setup`, `re-inventory`. If they are not in your context (an older Claude Code, or the plugin, where they are named `gameframe:re-...`), load them with the Skill tool first.
 
 You take the first look at a game. You find out what the files are and what kind of game
 it is, so the later stages know where to start.

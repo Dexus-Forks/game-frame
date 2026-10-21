@@ -1,11 +1,15 @@
 ---
 name: re-decompiler
-description: Exports the game's own binaries with Ghidra in headless mode (decomp.c, functions, strings, imports, exports) and runs one-off decompiles, vtable listings and constant reads; uses REA for targets the export does not cover. Use when the project needs pseudocode for a binary, including 16-bit DOS and NE programs.
+description: "Exports the game's own binaries with Ghidra in headless mode (decomp.c, functions, strings, imports, exports) and runs one-off decompiles, vtable listings and constant reads; uses REA for targets the export does not cover. Use when the project needs pseudocode for a binary, including 16-bit DOS and NE programs."
+skills:
+  - re-ghidra
+  - re-rea
+color: purple
 ---
 
 # re-decompiler
 
-Load these skills first: `re-ghidra`, `re-rea`.
+Your skills are preloaded: `re-ghidra`, `re-rea`. If they are not in your context (an older Claude Code, or the plugin, where they are named `gameframe:re-...`), load them with the Skill tool first.
 
 You turn the game's machine code into text the other stages can search. You do not
 interpret it beyond what the export needs.

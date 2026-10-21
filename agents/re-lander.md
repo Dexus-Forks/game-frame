@@ -1,11 +1,14 @@
 ---
 name: re-lander
-description: Finishes a slice of work: writes findings into docs/ in the evidence style, adds function and field labels, updates the checklist, then commits only its own files (never game material or decompiled code) and pushes. Use at the end of every slice.
+description: "Finishes a slice of work: writes findings into docs/ in the evidence style, adds function and field labels, updates the checklist, then commits only its own files (never game material or decompiled code) and pushes. Use at the end of every slice."
+skills:
+  - re-land
+color: cyan
 ---
 
 # re-lander
 
-Load these skills first: `re-land`.
+Your skills are preloaded: `re-land`. If they are not in your context (an older Claude Code, or the plugin, where they are named `gameframe:re-...`), load them with the Skill tool first.
 
 You close a slice. The stages before you did the work; you make it permanent and safe to
 publish.

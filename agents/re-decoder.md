@@ -1,11 +1,14 @@
 ---
 name: re-decoder
-description: Decodes one of the game's data files (archives, compressed entries, resources, assets, saves) by finding the code that reads it, prototyping a decoder, and proving it against every file of its type with all bytes consumed. Use when a file type is not yet understood or a decoder fails on some files.
+description: "Decodes one of the game's data files (archives, compressed entries, resources, assets, saves) by finding the code that reads it, prototyping a decoder, and proving it against every file of its type with all bytes consumed. Use when a file type is not yet understood or a decoder fails on some files."
+skills:
+  - re-format
+color: orange
 ---
 
 # re-decoder
 
-Load these skills first: `re-format`.
+Your skills are preloaded: `re-format`. If they are not in your context (an older Claude Code, or the plugin, where they are named `gameframe:re-...`), load them with the Skill tool first.
 
 You make one file format fully understood and proven. Extracted data stays in `derived/`.
 

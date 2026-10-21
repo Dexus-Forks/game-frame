@@ -319,8 +319,14 @@ for a in agents:
     front = re.match(r'---\n(.*?)\n---\n', text, re.S).group(1)
     assert re.search(rf'^name: {a.stem}$', front, re.M), f'{a}: name matches the file'
     assert re.search(r'^description: .{40,}', front, re.M), f'{a}: has a description'
-    for s in re.findall(r'`(re-[a-z]+)`', text.split('## Where it ends')[0].split('Load these skills first:')[1].split('\n')[0]):
+    desc = re.search(r'^description: (.*)$', front, re.M).group(1)
+    assert desc.startswith('"') or ': ' not in desc, f'{a}: an unquoted description with ": " is not valid YAML'
+    listed = re.findall(r'^  - (re-[a-z]+)$', front.split('skills:')[1], re.M) if '\nskills:' in '\n' + front else []
+    assert listed, f'{a}: no skills to preload'
+    for s in listed:
         assert s in skills, f'{a}: no skill {s}'
+    body_skills = re.findall(r'`(re-[a-z]+)`', text.split('Your skills are preloaded:')[1].split('\n')[0])
+    assert body_skills == listed, f'{a}: the body names {body_skills}, the front matter preloads {listed}'
     for n in re.findall(r'`(re-[a-z]+er)`', text):
         assert pathlib.Path('agents', n + '.md').is_file(), f'{a}: hands off to a missing agent {n}'
     assert f'Stage: {a.stem}' in text and '## Hand-off' in text, f'{a}: ends with a hand-off'
