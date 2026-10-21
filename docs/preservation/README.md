@@ -16,8 +16,8 @@ its limits are.
    by their makers, lost at the source.
 2. [What the harness does](what-the-harness-does.md): a record of how the game worked,
    checked against the original, and what the harness cannot do.
-3. [Your own copy and the law](the-law.md): the rules in the US, the EU and the UK, the myth
-   of "abandonware", and what takedowns have shown.
+3. [Your own copy and the law](law/README.md): what 35 countries allow and forbid, with one
+   page per region, the myth of "abandonware", and what takedowns have shown.
 4. [AI and reverse engineering](ai.md): the concern about AI copying games, and how the
    harness answers it.
 5. [Built on others' work](others-work.md): the projects and institutions this harness learns

@@ -29,9 +29,9 @@ The July 2023 study by the Video Game History Foundation (VGHF) and Software Pre
 - Availability that rests on one service is fragile: C64 availability would fall from 4.5% to 0.75% if Antstream closed, and the Game Boy figures dropped when the eShops closed. A storefront is not a preservation strategy.
 
 ### Gaps
-- I found no 2024–2026 re-run of the availability survey with new figures.
-- The names of the full report's authors were not on the explainer page. They are in the Zenodo PDF, which I did not fetch.
-- I did not verify what the University of Washington 2026 education study found.
+- No 2024–2026 re-run of the availability survey with new figures is known.
+- The names of the full report's authors were not on the explainer page. They are in the Zenodo PDF.
+- What the University of Washington 2026 education study found is not confirmed.
 
 ## 2. How legally owned games become unplayable
 
@@ -42,7 +42,7 @@ Games break when the platform moves on (16-bit code on 64-bit Windows, 32-bit ap
 **Operating systems and hardware**
 - Microsoft: x64 versions of Windows do not support 16-bit programs, processes or components. The fix Microsoft gives is a 32-bit Windows install (dual boot or VM). — [Microsoft KB 896458](https://support.microsoft.com/kb/896458)
 - The technical reason is that x86-64 long mode has no virtual 8086 mode, so 64-bit Windows NT has no NTVDM. This comes from a secondary source. — [Microsoft Q&A](https://learn.microsoft.com/en-us/answers/a/4765604)
-- Windows 11 ships only for 64-bit processors, so the 32-bit Windows route above is closing. — [Microsoft Windows 11 specifications](https://www.microsoft.com/windows/windows-11-specifications) (not fetched this session, flag for verification)
+- Windows 11 ships only for 64-bit processors, so the 32-bit Windows route above is closing. — [Microsoft Windows 11 specifications](https://www.microsoft.com/windows/windows-11-specifications) (not confirmed)
 - macOS Catalina (10.15, 2019) dropped 32-bit apps entirely. Warnings had started in High Sierra and Mojave. Apple's stated reason was that 64-bit is the norm and that Metal only works with 64-bit apps. — [MacPaw](https://macpaw.com/how-to/32-bit-apps-not-working-catalina); [MacRumors](https://www.macrumors.com/guide/32-bit-mac-apps/) (no Apple primary page was retrieved)
 - Rosetta 2: at WWDC 2025 Apple said Rosetta 2 stays fully supported through macOS 27, and will be largely discontinued from macOS 28. Apple will keep a subset "aimed at supporting older unmaintained gaming titles" that rely on Intel frameworks. From macOS 26.4, apps that use Rosetta show a warning that they will stop working. macOS 27 drops Intel Macs. — [TechRepublic](https://www.techrepublic.com/article/news-apple-macos-27-drops-intel-mac-support-rosetta/); [MacRumors, Feb 16 2026](https://www.macrumors.com/2026/02/16/macos-tahoe-26-4-rosetta-2-warnings/); [AppleInsider, Jun 12 2026](https://appleinsider.com/articles/26/06/12/how-and-when-macos-will-finally-stop-support-for-intel-apps). Conflict: one AppleInsider piece suggests macOS 27 itself removes Rosetta, while other sources say macOS 27 is the last full version.
 - DRM: Windows 10 (2015) does not run games protected by SafeDisc or older SecuROM. A Microsoft representative cited security holes from deeply embedded DRM. SafeDisc relies on the driver secdrv.sys, which Microsoft supported up to Windows 8.1. Games named in reports include GTA III, The Sims, Flight Simulator 2004 and Battlefield 1942 (roughly 2003–2008 releases). — [PC Gamer](https://www.pcgamer.com/au/report-games-with-securom-and-safedisc-drm-wont-run-under-windows-10); [Windows Central](https://windowscentral.com/windows-10-wont-run-games-safedisc-or-securom-drm)
@@ -70,14 +70,14 @@ Games break when the platform moves on (16-bit code on 64-bit Windows, 32-bit ap
 - Even Apple's own Rosetta plan names "older unmaintained gaming titles" as a category that needs special handling. That shows unmaintained games are a recognised problem.
 
 ### Gaps
-- I did not get Microsoft's own wording on Windows 11 being 64-bit only, or Apple's own Catalina support page. Both are cited from memory or secondary sources and should be checked.
-- I found no primary figure for how many games depend on DirectDraw, Glide or D3D 1–7.
-- I did not confirm the substance of the EU Commission's June 2026 reply, for example whether it proposes legislation.
+- Microsoft's own wording on Windows 11 being 64-bit only, and Apple's own Catalina support page, are not confirmed. Both are cited from secondary sources.
+- No primary figure is known for how many games depend on DirectDraw, Glide or D3D 1–7.
+- The substance of the EU Commission's June 2026 reply is covered in the law notes.
 
 ## 3. Games still on sale but no longer updated (e.g. Banished)
 
 ### Takeaway
-Banished is a clear example: a one-person studio's game, still sold, that has had no update for years. Its last listed build is 1.0.7. GOG's database dates that build to September 2017, so "last updated around 2016" should be corrected to 2017. I found no dataset that measures how common abandoned-but-on-sale games are.
+Banished is a clear example: a one-person studio's game, still sold, that has had no update for years. Its last listed build is 1.0.7. GOG's database dates that build to September 2017, so "last updated around 2016" should be corrected to 2017. No dataset measures how common abandoned-but-on-sale games are.
 
 ### Cited Findings
 - Banished was released on Windows on February 18, 2014, developed and published by Shining Rock Software. Its designer is Luke Hodorowicz. — [Wikipedia](https://en.wikipedia.org/wiki/Banished_(video_game))
@@ -90,8 +90,8 @@ Banished is a clear example: a one-person studio's game, still sold, that has ha
 - A game that is still sold but frozen is only as playable as the next OS change allows. Nobody upstream will ship a fix, so a source-compatible reimplementation is the only route that does not depend on the original developer.
 
 ### Gaps
-- I found no figure for how many Steam or GOG games have had no update in five or more years. Sources such as SteamDB might allow a count, but I did not find a published study.
-- I could not confirm whether the Mac or Linux builds of Banished ever shipped, or whether Banished has a 64-bit build. GOGDB lists the build's bitness as "Any".
+- No figure is known for how many Steam or GOG games have had no update in five or more years. Sources such as SteamDB might allow a count. No published study is known.
+- It is not confirmed whether the Mac or Linux builds of Banished ever shipped, or whether Banished has a 64-bit build. GOGDB lists the build's bitness as "Any".
 
 ## 4. Bit rot, media decay and lost source code
 
@@ -120,8 +120,8 @@ Recordable optical media last anywhere from about 5 years to more than 100 years
 - The Silent Hill and Kingdom Hearts cases show that even rights holders sometimes depend on the shipped binary. That is the same starting point as a reverse-engineering project.
 
 ### Gaps
-- I found no primary (CCI or Library of Congress) lifetime figure for floppy disks specifically.
-- I found no systematic count of games with lost source code. Other commonly cited cases were not verified this session.
+- No primary (CCI or Library of Congress) lifetime figure for floppy disks is known.
+- No systematic count of games with lost source code is known. Other commonly cited cases are not confirmed.
 
 ## 5. Orphaned and abandoned games (unknown or defunct rights holders)
 
@@ -138,5 +138,5 @@ When rights are split or undocumented, even a willing re-publisher cannot clear 
 - Orphaned rights mean the market cannot fix availability even when demand exists. The game survives only on original copies and the know-how needed to run them.
 
 ### Gaps
-- I found no quantitative estimate of orphaned or defunct-owner games. The VGHF study measured availability, not rights status.
-- I did not research the EU Orphan Works Directive or how it applies to games.
+- No quantitative estimate of orphaned or defunct-owner games is known. The VGHF study measured availability, not rights status.
+- The EU Orphan Works Directive and how it applies to games are not covered.

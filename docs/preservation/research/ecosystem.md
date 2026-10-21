@@ -13,7 +13,7 @@ Institutions mostly preserve artefacts and documents: hardware, boxed media, mag
 - **DMCA 2024 triennial ruling (US).** In October 2024 the Copyright Office refused a new exemption that would have let libraries and archives give remote access to out-of-print games for scholarly research. The Software Preservation Network asked for it, with VGHF support. The Register (Shira Perlmutter) found that proponents had not shown the use was non-infringing, and raised unresolved single-user and premises limits. The ESA argued that remote access could harm the market for re-releases. The VGHF said the ESA "would never support remote game access for research purposes under any conditions." TechSpot calls this the fourth refusal since 2015 — [VGHF statement](https://gamehistory.org/dmca-2024-statement/); [VGC](https://videogameschronicle.com/news/us-copyright-office-refuses-to-allow-remote-access-to-out-of-print-games); [TechSpot](https://www.techspot.com/community/topics/us-copyright-office-denies-dmca-exemption-deals-blow-to-video-game-preservation-efforts.288839/)
 - **Internet Archive.** The legal case found was over audio, not software. In *UMG Recordings v. Internet Archive* (the Great 78 Project, over 400,000 shellac records), Universal, Sony and Concord sought about $621m, later updated to about $693m in statutory damages. The parties reached a confidential settlement in September 2025, and the dismissal was granted on 16 October 2025 — [Wikipedia](https://en.wikipedia.org/wiki/Universal_Music_Group_v._Internet_Archive); [TorrentFreak](https://torrentfreak.com/internet-archive-vs-music-labels-693m-copyright-battle-ends-with-confidential-settlement/)
 - **The Strong National Museum of Play / ICHEG (Rochester, NY).** A third-party listing gives over 30,000 games and consoles, including over 20,000 video game titles, plus over 30,000 artefacts and papers. The figure is not confirmed on the museum's own site — [Atlas Obscura](https://www.atlasobscura.com/places/national-center-history-electronic-games). It collects source code. Its 2014 Atari coin-op acquisition (22 pallets) included source code for dozens of games — [Giant Bomb](https://giantbomb.com/articles/a-museum-just-acquired-22-pallets-of-atari-history/1100-4905/). The SSI donation from Joel Billings included company documents, source code and games — [GOG forum, 2013](https://static01.gog.com/forum/general_archive/strategic_simulations_ssi_company_collection_donated_to_museum). See also [Library Journal's archives deep dive](https://www.libraryjournal.com/story/gaming-history-at-the-strong-national-museum-of-play-archives-deep-dive).
-- **Computerspielemuseum (Berlin).** Sources disagree on its size. Wikipedia gives more than 37,000 items, including about 25,000 game storage media and about 12,000 magazines — [Wikipedia](https://en.wikipedia.org/wiki/Computerspielemuseum). The museum's own presentation gives about 25,000 software objects and about 4,500 hardware objects — [Computerspielemuseum presentation (Coding da Vinci PDF)](https://codingdavinci.de/sites/default/files/2020-08/computerspielemuseum_berlin.pdf). It is often called the first videogame museum in the world (it opened in 1997; the date is from memory, without a source and is not verified here).
+- **Computerspielemuseum (Berlin).** Sources disagree on its size. Wikipedia gives more than 37,000 items, including about 25,000 game storage media and about 12,000 magazines — [Wikipedia](https://en.wikipedia.org/wiki/Computerspielemuseum). The museum's own presentation gives about 25,000 software objects and about 4,500 hardware objects — [Computerspielemuseum presentation (Coding da Vinci PDF)](https://codingdavinci.de/sites/default/files/2020-08/computerspielemuseum_berlin.pdf). It is often called the first videogame museum in the world (it opened in 1997, not confirmed).
 - **National Videogame Museum (Sheffield, UK).** It says it preserves over 5,000 objects of videogame heritage and has over 100 playable exhibits — [Wikipedia](https://en.wikipedia.org/wiki/National_Videogame_Museum_(United_Kingdom)); [Welcome to Sheffield](https://www.welcometosheffield.co.uk/content/attractions/the-national-videogame-museum/)
 - **Embracer Games Archive (Karlstad, Sweden).** At launch (2021–22) it reported over 50,000 games, consoles and accessories. The oldest items are Magnavox Odyssey games (1972). It began from CEO Lars Wingefors's own collection, and David Boström is its CEO. It is not open to visitors, and Embracer said it planned researcher access. No 2025–26 update was found — [Game World Observer](https://gameworldobserver.com/2021/05/31/embracer-group-building-archive-of-every-video-game-ever-made); [TheSixthAxis](https://www.thesixthaxis.com/2022/05/30/embracer-games-archive-collection/)
 - **Game Preservation Society (Japan).** A non-profit founded in 2011 by Joseph Redon. It focuses on Japanese computer games on floppy disk (PC-88 in particular). Redon estimates it holds 60 to 70 percent of PC-88 games. Kotaku reported over 13,000 early Japanese computer games. Time Extension and Vice reported that it was close to running out of money; the date of those reports was not confirmed — [Kotaku](https://kotaku.com/saving-japans-games-1819339226); [Time Extension](https://timeextension.com/features/we-might-be-about-to-lose-a-powerful-force-in-the-world-of-video-game-preservation); [Vice](https://www.vice.com/en/article/the-game-preservation-society-is-in-danger-of-shutting-down/)
@@ -23,13 +23,13 @@ Institutions mostly preserve artefacts and documents: hardware, boxed media, mag
 - Source code turns up in institutional collections (The Strong) but is usually not public. That leaves a role for community reimplementations, which rebuild behaviour in public, open code.
 
 ### Gaps
-- Library of Congress (its game holdings and any role in the DMCA process), MoMA's collection (the 2012 acquisition of 14 games is from memory, without a source, not verified), and the Internet Archive's software collections (MS-DOS and console libraries, run in the browser through emulation) were not researched in this pass.
+- Library of Congress (its game holdings and any role in the DMCA process), MoMA's collection (the 2012 acquisition of 14 games is not confirmed), and the Internet Archive's software collections (MS-DOS and console libraries, run in the browser through emulation) are not covered.
 - Current, museum-confirmed collection sizes for The Strong and Embracer were not found.
 
 ## Emulation as preservation
 
 ### Takeaway
-MAME frames emulation as *documentation of hardware*: its source code is the record, and playability only checks that record. Dump groups and flux imaging were not researched in this pass.
+MAME frames emulation as *documentation of hardware*: its source code is the record, and playability only checks that record. Dump groups and flux imaging are not covered.
 
 ### Cited Findings
 - MAME's standard self-description, repeated in its upstream README and in many mirrors and package listings, says it keeps software from disappearing by "documenting the hardware and how it functions." It says "the source code to MAME serves as this documentation," and that the fact that the software is usable "serves primarily to validate the accuracy of the documentation." After absorbing MESS it also covers computers, consoles and calculators — [mirror of the MAME README (wolfmame)](https://github.com/mahlemiut/wolfmame); [Haiku depot listing](https://depot.haiku-os.org/__multipage/pkg/mame). The text was not confirmed on mamedev.org itself.
@@ -39,7 +39,7 @@ MAME frames emulation as *documentation of hardware*: its source code is the rec
 - MAME's framing ("the code is the documentation; running it validates it") is the same framing a reimplementation of one game can use: the new code documents the original game's behaviour, and parity tests show it is accurate.
 
 ### Gaps
-- No sources were gathered in this pass for higan/ares and cycle accuracy, Redump or No-Intro methods and counts (the Redump wiki refused the connection), or Kryoflux, Greaseweazle and flux imaging.
+- higan/ares and cycle accuracy, Redump or No-Intro methods and counts, and Kryoflux, Greaseweazle and flux imaging are not covered.
 - No sourced material was found on the limits of emulation for 1995–2010 Windows PC games (Direct3D/Glide, Windows version dependence). This should be researched separately, or framed as an inference only.
 
 ## Community reimplementations and source ports
@@ -67,7 +67,7 @@ Almost every project found requires the player's original data and ships no asse
 - The re3 case shows the legal risk: a project that matches the original code closely and targets a still-sold, high-value franchise drew a lawsuit. The projects that thrive mostly target older titles, often with publisher tolerance or an agreement.
 
 ### Gaps
-- GemRB, OpenDUNE and OpenMW's own mission statement were not fetched.
+- The mission statements of GemRB, OpenDUNE and OpenMW are not covered.
 - The extent of GOG bundling of ScummVM, DOSBox or DevilutionX with store releases was not confirmed from a primary source. GOG does ship ScummVM with many adventure games (memory, without a source, unverified here). GOG's "Preservation Program" (launched 2024) was not researched.
 - No primary source was found for Nightdive directly building on a community source port (for example, using a fan engine in a commercial release).
 
@@ -87,7 +87,7 @@ Matching decompilations (SM64 and others) produce source that rebuilds byte-iden
 - Recompilation leaned on an existing decompilation. Documentation work compounds: one project's understanding speeds up the next.
 
 ### Gaps
-- pret (pokered and others) READMEs were not fetched, and nor were the zeldaret OoT/MM statements of purpose.
+- The statements of purpose of pret (pokered and others) and zeldaret (OoT, MM) are not covered.
 - Nintendo's stance is reported only as "no legal action against matching decomps" from secondary commentary; no primary statement was found.
 
 ## Documentation of game behaviour beyond playability

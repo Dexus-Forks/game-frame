@@ -31,6 +31,10 @@ EU Software Directive, and US case law such as Sega v. Accolade and Sony v. Conn
 limits. A game's end-user licence may say otherwise; whether such a clause holds depends on the
 country.
 
+The rules differ a great deal between countries. Some allow decompiling only for
+interoperability, and some give it no express cover. [Your own copy and the law](preservation/law/README.md)
+summarises 35 countries, with one page per region.
+
 ## Clean room, or not
 
 A *clean-room* reimplementation separates the people who study the original from the people

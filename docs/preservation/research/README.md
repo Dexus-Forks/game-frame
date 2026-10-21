@@ -1,6 +1,6 @@
 # Sources and notes
 
-The report and the four sets of notes below give the sources for the
+The reports and notes below give the sources for the
 [preservation chapters](../README.md). Every finding links to its source. The notes keep cited
 findings apart from inferences, and each lists its gaps. A finding marked "(search snippet)"
 comes from a search result, because the page itself could not be fetched.
@@ -15,6 +15,22 @@ comes from a search result, because the page itself could not be fetched.
    reimplementations, decompilation.
 5. [Notes: how preservation projects describe their work](messaging.md): mission statements,
    words to use and avoid, critiques, the concern about AI.
+
+## The law worldwide
+
+The [law chapter](../law/README.md) rests on these.
+
+1. [Report: game preservation law worldwide](law-worldwide.md): treaties, 35 countries, a
+   comparison table, and what this means for the harness's rules.
+2. [Notes: international frameworks](law-international.md): Berne, TRIPS, the WIPO treaties, US
+   trade agreements, WIPO's library work, UNESCO, hosting across borders.
+3. [Notes: East Asia](law-east-asia.md): Japan, China, South Korea, Taiwan, Hong Kong.
+4. [Notes: South and Southeast Asia and Oceania](law-asia-pacific.md): India, Singapore,
+   Malaysia, Indonesia, the Philippines, Thailand, Vietnam, Australia, New Zealand.
+5. [Notes: the Americas](law-americas.md): Canada, Mexico, Brazil, Argentina, Chile, Colombia.
+6. [Notes: Africa, the Middle East and wider Europe](law-africa-middle-east-europe.md): South
+   Africa, Nigeria, Kenya, Egypt, Israel, Turkey, the UAE, Saudi Arabia, Russia, Ukraine,
+   Switzerland, Norway.
 
 ## Facts checked against primary sources
 
@@ -36,6 +52,12 @@ comes from a search result, because the page itself could not be fetched.
 - What preservation groups asked for in the 2027 US rulemaking (docket COLC-2026-0100) was not
   found.
 - No developer or publisher statement about this harness, or about Un-Banished, was found.
+- Many article numbers outside the US, the EU and the UK are marked "(not confirmed)". The most
+  important are Japan's lock and term articles, Australia's ss.47D and 47H, and the South
+  African, Egyptian, Israeli, Turkish, Swiss, Norwegian and Russian articles.
+- No worldwide count exists of countries with a decompilation exception.
+- No court decisions on emulators, ROM sites or mod chips are known in Latin America, Africa or
+  the Middle East.
 
 ## Quotations
 
