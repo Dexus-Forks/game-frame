@@ -5,3 +5,5 @@
 .venv/
 .env
 __pycache__/
+# The DOS sample build
+/examples/dos-sample/build/

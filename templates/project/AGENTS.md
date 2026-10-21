@@ -42,9 +42,14 @@ loader". Say what "done" means and how exact it must be.
 | `docs/CHECKLIST.md` | What is traced, measured and reimplemented, and what is next |
 | `labels/names.tsv`, `labels/fields.tsv` | Names for original functions and struct fields, read by the tools |
 | `tools/`, `scripts/` | The harness's tools: https://github.com/tanepiper/reverse-engineer-games |
+| `docs/DOS.md`, `docs/ABI.md`, `docs/GAME-PATTERNS.md` | The harness's reference documents (DOS games: start with DOS.md) |
+| `.mcp.json` | MCP servers for the agent: REA, and `dosbox` (DOSBox-X's debugger, for DOS games) |
 
 ## The loop
 
 inventory → decompile → trace → (format) → emulate → reimplement → verify → land. Start each
 session by reading `docs/CHECKLIST.md` and searching `docs/` and `labels/` for the addresses
 and names you are about to work on.
+
+When something here would help any game (a tool fix, a new format reader, a pitfall), add it
+to the harness too, with a test against its own samples.

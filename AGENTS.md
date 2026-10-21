@@ -14,7 +14,8 @@ be mentioned and linked, but examples and advice must stay general.
 
 1. **No game material, ever.** No game binaries, data, assets, saves, decompiled code or
    disassembly from any commercial game. The only binaries the tests use are built from
-   `examples/sample-game/` (our own C code) into its ignored `build/` folder.
+   `examples/sample-game/` and `examples/dos-sample/` (our own code) into their ignored
+   `build/` folders.
 2. **Every tool is tested.** A new or changed tool gets a check in `tests/run.sh` against the
    sample game, and `tests/run.sh --ghidra` passes before you commit.
 3. **Every tool documents itself.** A module docstring or header comment with usage, inputs,
@@ -26,7 +27,10 @@ be mentioned and linked, but examples and advice must stay general.
    agents and translated by people.
 6. **Dependencies stay small.** Python tools use the standard library plus `requirements.txt`
    (unicorn, pefile, capstone). Shell scripts use bash and the tools `scripts/setup.sh` installs.
-7. **Stage only your own files** (`git add path`), never `git add -A`, and push after each
+7. **Improve the harness from real games.** When a game project hits something generic (a
+   tool crash, a missing format, a pitfall), fix it here with a test against our own samples,
+   and keep the game-specific part in the game's repository.
+8. **Stage only your own files** (`git add path`), never `git add -A`, and push after each
    verified change.
 
 ## Layout
@@ -35,9 +39,10 @@ be mentioned and linked, but examples and advice must stay general.
 |---|---|
 | `.claude/skills/re-*/SKILL.md` | One skill per step of the method |
 | `scripts/` | setup, new-project, ghidra-export, ghidra-run, and `lib.sh` (paths and `.env`) |
-| `tools/pe`, `tools/triage`, `tools/emu`, `tools/formats`, `tools/verify`, `tools/ghidra` | The tools |
+| `tools/pe`, `tools/dos`, `tools/triage`, `tools/emu`, `tools/formats`, `tools/verify`, `tools/ghidra` | The tools |
 | `templates/project/` | What `new-project.sh` writes into a game's repository |
 | `examples/sample-game/` | The test target: C sources, build script, ground truth, a port, a decoder |
+| `examples/dos-sample/` | The 16-bit test target: assembly, our own NE/MZ linker, Borland-style debug symbols |
 | `tests/run.sh` | The checks |
 | `docs/` | ABI, game patterns, legal notes, setup, the case study |
 | `.mcp.json` | REA for Claude Code, reading `GHIDRA_INSTALL_DIR` and `JAVA_HOME` |

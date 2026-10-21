@@ -1,6 +1,6 @@
 ---
 name: re-ghidra
-description: Decompile a game's binaries with Ghidra in headless mode and work with the result as text - the full export (decomp.c, functions, strings, imports, exports), queries with decomp_query.py, one-off decompiles of functions Ghidra missed, vtable and reference listings, constants read from the binary, and checks against the disassembly. Use whenever you need pseudocode for a native binary.
+description: Decompile a game's binaries with Ghidra in headless mode and work with the result as text - the full export (decomp.c, functions, strings, imports, exports), queries with decomp_query.py, one-off decompiles of functions Ghidra missed, vtable and reference listings, constants read from the binary, and checks against the disassembly. Use whenever you need pseudocode for a native binary, including 16-bit DOS (MZ) and NE programs.
 ---
 
 # Decompile with Ghidra
@@ -16,6 +16,15 @@ Import the game's own binaries **together**, so calls between the EXE and its DL
 
 ```bash
 scripts/ghidra-export.sh target/Game.exe target/GameEngine.dll
+```
+
+If you have names for functions and globals (debug symbols, a map file, earlier labels), give
+them to the export: Ghidra names everything and creates the functions it missed.
+
+```bash
+python3 tools/dos/tdinfo.py target/GAME.EXE labels > analysis/td-labels.tsv   # DOS: Borland symbols
+scripts/ghidra-export.sh --labels analysis/td-labels.tsv target/GAME.EXE
+scripts/ghidra-run.sh GAME.EXE labels analysis/notes/labels.txt labels/names.tsv  # an existing project
 ```
 
 It writes, per binary, into `analysis/export/<binary>/` (ignored by git):
@@ -112,3 +121,21 @@ games, which compute in 80-bit precision until stored; `imul`/`idiv` (signed) ag
   disassembly at the call site settle it.
 - **32-bit games** pass arguments on the stack (cdecl, stdcall) and `this` in ecx (thiscall);
   see `docs/ABI.md`.
+
+## 16-bit programs (DOS MZ, NE)
+
+The same export works. Addresses are `seg:off`: NE segment N is `1000 + 8 * (N - 1)`
+(`1000:873a`, `FUN_1000_873a`, `DAT_1048_12de`); an MZ image starts at `1000:0000`.
+`decomp_query.py` accepts these addresses and labels. Pitfalls (details in docs/DOS.md):
+
+- The export passes `-loader-libraryLoadDepth 0`: Ghidra's library search crashed on an NE
+  program whose imported module (`RTM`) had a plain DOS file of that name next to it.
+- Ghidra does not know `INT 21h AH=4Ch` or Pascal's `Halt` never return: the next function is
+  glued onto the caller. Create the function at the right address (labels, or `decompile`).
+- Pascal procedures pop their own arguments and take them left to right: Ghidra's `param_1` is
+  the *last* source argument. Count from `[bp+6]` upwards, the first argument highest.
+- Pascal strings (length byte first) are missing from `strings.txt`: use
+  `tools/dos/dosinfo.py BINARY --pstrings 6` and `tools/dos/readseg.py BINARY pstr ADDR`.
+- Constants: `tools/dos/readseg.py BINARY TYPE ADDR` reads typed values at `seg:off`
+  (`u16`, `i32`, `ptr`, `real48` for Turbo Pascal's 6-byte Real, `pstr`, `hex`).
+

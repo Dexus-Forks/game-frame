@@ -32,6 +32,21 @@ Guessing a format from bytes alone is slow and fragile. Find the code that reads
 
 Write down each read in order: offset, type, meaning, and the condition under which it is read.
 
+### Measure the reads (DOS games)
+
+Run the original under DOSBox-X with the file log, then map the reads per file:
+
+```bash
+scripts/dosbox-run.sh --fileio --time 30 target/game GAME.EXE
+python3 tools/dos/fileio_trace.py analysis/dosbox/dosbox.log --game target/game --file LEVELS.DAT
+```
+
+A program that reads a file field by field shows its record layout in the read sizes:
+`[2, 1, 4] x 120 (stride 7)` is 120 records of a word, a byte and a longint. A 1-byte read
+followed by a read of varying length is a Pascal string. This is *measured* evidence; name the
+run (program, inputs, time). With Borland debug symbols, `tools/dos/tdinfo.py BINARY types NAME`
+gives the record type the reader fills, field by field.
+
 ## 3. Containers and compression
 
 Most games pack files into an archive: a header, a table of entries (name or hash, offset, size,

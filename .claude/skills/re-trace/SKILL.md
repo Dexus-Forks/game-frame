@@ -17,6 +17,11 @@ grep -rn "1400be770\|SaveGame" docs/ labels/ | head
 
 ## 1. Find an entry point
 
+For a DOS game, look for debug symbols first (`tools/dos/tdinfo.py BINARY summary`): with
+them, the entry point is a name (`tdinfo.py BINARY procs enemy`), with its parameters, locals
+and the source line of each address (`tdinfo.py BINARY lines UNIT.PAS`).
+
+
 Work outward from something you can see. In rough order of usefulness:
 
 1. **Strings.** File paths (`"Saves/"`, `"data/units.xml"`), format strings (`"%d citizens"`),

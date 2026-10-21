@@ -31,6 +31,12 @@ Turn this into a test in the reimplementation's test suite: it loads the ground-
 **skips with a clear message when `derived/` is missing** (other machines and CI have no game
 files), compares exactly, and on failure reports the first mismatching index and the count.
 
+For a DOS game, also compare against the whole original running in DOSBox-X: its exit code
+(`scripts/dosbox-run.sh`), its file reads (`--fileio`), or memory read with the debugger at a
+breakpoint (`tools/dos/dbx_control.py`). Fix the CPU speed (`--cycles N`) for any comparison
+that depends on timing. Recorded demos (a file of inputs the game replays) are the best
+end-to-end check: the reimplementation must replay them to the same frames.
+
 ## 2. Random draw order
 
 ```bash

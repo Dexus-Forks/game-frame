@@ -13,7 +13,8 @@ Commands:
   biggest [N]           the N largest functions not yet labelled (where the work is)
   stats                 functions, labelled share by count and by size
 
-ADDR is an address as Ghidra prints it (1400be770, 0x1400be770 or FUN_1400be770). NAME is a
+ADDR is an address as Ghidra prints it (1400be770, 0x1400be770 or FUN_1400be770; for 16-bit
+programs seg:off, 1000:873a or FUN_1000_873a). NAME is a
 Ghidra name or one of your labels. Labels come from labels/names.tsv (address<TAB>label<TAB>
 evidence): add a row every time you identify a function, and every later answer is easier to
 read. `--binary` picks a binary when the export holds several (default: the only one, or the
@@ -24,7 +25,24 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-HEADER = re.compile(r'^// ==== ([0-9a-fA-F]+) (.*)$')
+HEADER = re.compile(r'^// ==== ([0-9a-fA-F:]+) (.*)$')
+FUN = re.compile(r'FUN_([0-9a-fA-F]+)(?:_([0-9a-fA-F]{4}))?')
+
+
+def parse_addr(text):
+    """An address as an int: flat (0x1400be770) or segmented (1000:873a -> 0x1000873a)."""
+    t = text.lower().removeprefix('fun_').removeprefix('0x').replace('_', ':')
+    if ':' in t:
+        seg, off = t.split(':')
+        return (int(seg, 16) << 16) | int(off, 16)
+    return int(t, 16)
+
+
+def fun_addr(m):
+    """The address in a FUN_ match: FUN_1400be770 or FUN_1000_873a."""
+    if m.group(2):
+        return (int(m.group(1), 16) << 16) | int(m.group(2), 16)
+    return int(m.group(1), 16)
 
 
 class Export:
@@ -39,9 +57,11 @@ class Export:
         self.binary = binary
         self.labels = load_labels()
         self.functions = {}   # addr -> (name, size)
+        self.segmented = False
         for line in open(os.path.join(self.dir, 'functions.tsv'), encoding='utf-8', errors='replace'):
             cols = line.rstrip('\n').split('\t')
-            self.functions[int(cols[0], 16)] = (cols[2], int(cols[1]))
+            self.segmented = self.segmented or ':' in cols[0]
+            self.functions[parse_addr(cols[0])] = (cols[2], int(cols[1]))
         self.bodies = {}      # addr -> pseudocode
         current, buf = None, []
         for line in open(os.path.join(self.dir, 'decomp.c'), encoding='utf-8', errors='replace'):
@@ -49,19 +69,30 @@ class Export:
             if m:
                 if current is not None:
                     self.bodies[current] = ''.join(buf)
-                current, buf = int(m.group(1), 16), []
+                current, buf = parse_addr(m.group(1)), []
             else:
                 buf.append(line)
         if current is not None:
             self.bodies[current] = ''.join(buf)
+        self.by_name = {}
+        for a, (n, _) in self.functions.items():
+            if not n.startswith('FUN_'):
+                self.by_name.setdefault(n, a)
+                self.by_name.setdefault(n.split('::')[-1], a)
+
+    def fmt(self, addr):
+        return f'{addr >> 16:04x}:{addr & 0xFFFF:04x}' if self.segmented else f'{addr:#x}'
+
+    def fun(self, addr):
+        return f'FUN_{addr >> 16:04x}_{addr & 0xFFFF:04x}' if self.segmented else f'FUN_{addr:x}'
 
     def name(self, addr):
-        return self.labels.get(addr) or self.functions.get(addr, (f'FUN_{addr:x}', 0))[0]
+        return self.labels.get(addr) or self.functions.get(addr, (self.fun(addr), 0))[0]
 
     def resolve(self, text):
         t = text.lower().removeprefix('fun_').removeprefix('0x')
-        if re.fullmatch(r'[0-9a-f]+', t):
-            addr = int(t, 16)
+        if re.fullmatch(r'[0-9a-f]+|[0-9a-f]{4}[:_][0-9a-f]{4}', t):
+            addr = parse_addr(t)
             if addr in self.functions:
                 return addr
             starts = [a for a in self.functions if a <= addr]
@@ -78,7 +109,7 @@ class Export:
     def refs(self, addr):
         """The spellings by which pseudocode refers to a function."""
         name = self.functions.get(addr, ('', 0))[0]
-        out = {f'FUN_{addr:x}', f'FUN_{addr:08x}'}
+        out = {self.fun(addr)} if self.segmented else {f'FUN_{addr:x}', f'FUN_{addr:08x}'}
         if name and not name.startswith('FUN_'):
             out.add(name.split('::')[-1])
         return out
@@ -86,10 +117,9 @@ class Export:
     def label(self, text):
         """Pseudocode with FUN_ names replaced by labels (kept in a comment)."""
         def sub(m):
-            addr = int(m.group(1), 16)
-            label = self.labels.get(addr)
+            label = self.labels.get(fun_addr(m))
             return f'{label}/*{m.group(0)}*/' if label else m.group(0)
-        return re.sub(r'FUN_([0-9a-fA-F]+)', sub, text)
+        return FUN.sub(sub, text)
 
 
 def load_labels():
@@ -101,7 +131,7 @@ def load_labels():
                 continue
             cols = line.rstrip('\n').split('\t')
             try:
-                labels[int(cols[0].lower().removeprefix('0x'), 16)] = cols[1]
+                labels[parse_addr(cols[0])] = cols[1]
             except (ValueError, IndexError):
                 pass
     return labels
@@ -124,7 +154,7 @@ def main(argv):
 
     if cmd == 'fn':
         addr = ex.resolve(args[0])
-        print(f'// {addr:#x} {ex.name(addr)} ({ex.functions[addr][1]} bytes) in {ex.binary}')
+        print(f'// {ex.fmt(addr)} {ex.name(addr)} ({ex.functions[addr][1]} bytes) in {ex.binary}')
         print(ex.label(ex.bodies.get(addr, '// not decompiled (a thunk, or missing: '
                                      'scripts/ghidra-run.sh BINARY decompile OUT ADDR)\n')))
     elif cmd == 'callers':
@@ -132,23 +162,29 @@ def main(argv):
         refs = ex.refs(addr)
         hits = [a for a, body in ex.bodies.items() if a != addr and any(r in body for r in refs)]
         for a in sorted(hits):
-            print(f'{a:#x}  {ex.name(a)}')
+            print(f'{ex.fmt(a)}  {ex.name(a)}')
         print(f'{len(hits)} functions refer to {ex.name(addr)}', file=sys.stderr)
     elif cmd == 'callees':
         addr = ex.resolve(args[0])
         seen = []
-        for m in re.finditer(r'FUN_([0-9a-fA-F]+)', ex.bodies.get(addr, '')):
-            a = int(m.group(1), 16)
+        body = ex.bodies.get(addr, '')
+        for m in FUN.finditer(body):
+            a = fun_addr(m)
             if a not in seen and a != addr:
                 seen.append(a)
+        # Functions Ghidra already shows by name (exports, symbols, applied labels).
+        for m in re.finditer(r'\b([A-Za-z_][\w:]*)\s*\(', body):
+            a = ex.by_name.get(m.group(1))
+            if a is not None and a not in seen and a != addr:
+                seen.append(a)
         for a in sorted(seen, key=lambda a: (a not in ex.labels, -ex.functions.get(a, ('', 0))[1])):
-            print(f'{a:#x}  {ex.functions.get(a, ("", 0))[1]:6d} bytes  {ex.name(a)}')
+            print(f'{ex.fmt(a)}  {ex.functions.get(a, ("", 0))[1]:6d} bytes  {ex.name(a)}')
     elif cmd == 'find':
         needle = ' '.join(args)
         for a, body in sorted(ex.bodies.items()):
             if needle in body:
                 line = next(l.strip() for l in body.splitlines() if needle in l)
-                print(f'{a:#x}  {ex.name(a):<40}  {line[:100]}')
+                print(f'{ex.fmt(a)}  {ex.name(a):<40}  {line[:100]}')
     elif cmd == 'strings':
         needle = ' '.join(args).lower()
         for line in open(os.path.join(ex.dir, 'strings.txt'), encoding='utf-8', errors='replace'):
@@ -162,13 +198,13 @@ def main(argv):
         pat = re.compile(r'\+ (0x%x|%d)\) = ' % (off, off))
         for a, body in sorted(ex.bodies.items()):
             if pat.search(body):
-                print(f'{a:#x}  {ex.name(a)}')
+                print(f'{ex.fmt(a)}  {ex.name(a)}')
     elif cmd == 'biggest':
         n = int(args[0]) if args else 30
         todo = sorted(((size, a) for a, (_, size) in ex.functions.items()
                        if a not in ex.labels and a in ex.bodies), reverse=True)
         for size, a in todo[:n]:
-            print(f'{a:#x}  {size:7d} bytes  {ex.name(a)}')
+            print(f'{ex.fmt(a)}  {size:7d} bytes  {ex.name(a)}')
     elif cmd == 'stats':
         total = sum(size for _, size in ex.functions.values())
         done = sum(ex.functions[a][1] for a in ex.labels if a in ex.functions)

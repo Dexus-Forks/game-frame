@@ -57,7 +57,21 @@ If REA tools do not appear: restart the agent (MCP servers start with the sessio
 `npx -y rea-agents@6.4.0 doctor --client claude_code --json`. A tool that reports
 `provider_unavailable` usually means Ghidra or Java is not where `.env` says.
 
+## 4. DOS games: DOSBox-X and its debugger
+
+- DOSBox-X: `scripts/setup.sh --install` (on macOS the formula, `brew install --formula
+  dosbox-x`; the cask is disabled for failing Gatekeeper). Homebrew's build has the heavy
+  debugger; `brew install --HEAD --formula dosbox-x` adds the newest commands (`STEPIN`). Check:
+  `scripts/dosbox-run.sh` on the DOS sample prints `exit code 23` (tests/run.sh does this).
+- The debugger MCP server for agents (ask the user first: it is a download and a build):
+  `cargo install --git https://github.com/caiiiycuk/dosbox-x-mcp-server --tag v0.1.2 --locked`.
+  `.mcp.json` registers it as `dosbox` (set `DOSBOX_X_MCP_SERVER` to its path if it is not on
+  PATH). Restart the agent session so the tools load, ask `dosbox_mcp_port`, then run
+  `scripts/dosbox-run.sh --mcp PORT ...`.
+
 ## Common problems
+
+- `dosbox-x not found` after `brew install --HEAD`: run `brew link dosbox-x`.
 
 | Symptom | Cause and fix |
 |---|---|

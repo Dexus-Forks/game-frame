@@ -63,9 +63,10 @@ A small task may use only two or three steps. Do not skip `land`.
 2. If the project has no repository yet: `scripts/new-project.sh DIR "Game Name" PATH/TO/GAME`.
 3. Read `AGENTS.md`, `docs/CHECKLIST.md` and `docs/FINDINGS.md` if they exist. Search `docs/` and
    `labels/` for anything you are about to touch: earlier sessions may have traced it.
-4. `re-inventory`: run `tools/pe/peinfo.py` on every binary; decide which hold the game's own
+4. `re-inventory`: run `tools/pe/peinfo.py` (Windows) or `tools/dos/dosinfo.py` (DOS) on every binary; decide which hold the game's own
    code, and whether the game is native C/C++ (this harness), managed (.NET, IL2CPP, Mono),
-   scripted (Lua, Python, GameMaker) or packed (unpack first).
+   scripted (Lua, Python, GameMaker), packed (unpack first), or 16-bit DOS (docs/DOS.md; check
+   for debug symbols with `tools/dos/tdinfo.py`).
 5. `re-ghidra`: export the game's own binaries (`scripts/ghidra-export.sh`).
 6. Pick the foundations first: the random number generator, the maths helpers, the game clock
    and the data container. Everything else depends on them, and they are small enough to

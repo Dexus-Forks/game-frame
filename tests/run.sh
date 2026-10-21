@@ -2,8 +2,10 @@
 # Prove every tool in the harness against the sample game. Run after changing any tool.
 #
 #   tests/run.sh            the fast checks (about 20 s): PE tools, emulator, call traces,
-#                           ground truth against the port, format validation, project scaffold
-#   tests/run.sh --ghidra   also the Ghidra export and decomp_query (about a minute more)
+#                           ground truth against the port, format validation, the 16-bit DOS
+#                           tools and emulator, project scaffold
+#   tests/run.sh --ghidra   also the Ghidra exports (Windows x64 and 16-bit NE), labels and
+#                           decomp_query (about a minute more)
 #
 # Needs scripts/setup.sh --install (and zig, to build the sample game).
 set -uo pipefail
@@ -88,10 +90,112 @@ printf 'SMPL\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x3f\x03oakEXTRA' > $B/b
 expect "validate fails a file with unread bytes" "5 bytes left unread" "$PYTHON" tools/formats/validate.py $S/decode_sample.py $B/broken.dat
 rm -f $B/broken.dat
 
+echo "16-bit DOS tools (examples/dos-sample)"
+D=examples/dos-sample/build
+python3 examples/dos-sample/make_exe.py $D >/dev/null 2>&1 && ok "DOS sample builds (zig, .code16; our own NE and MZ linker)" || bad "DOS sample builds"
+expect "dosinfo reads the NE header" "NE: module 'DOSSAMPL'" "$PYTHON" tools/dos/dosinfo.py $D/sample.exe
+expect "dosinfo gives Ghidra's selector per segment" "2  1008  file" "$PYTHON" tools/dos/dosinfo.py $D/sample.exe
+expect "dosinfo lists imports by ordinal" "KERNEL.3" "$PYTHON" tools/dos/dosinfo.py $D/sample.exe --imports
+expect "dosinfo lists exports at seg:off" "1000:0028  RNG_NEXT" "$PYTHON" tools/dos/dosinfo.py $D/sample.exe --exports
+expect "dosinfo finds Pascal strings with their address" "1008:0011  [12] 'DOS SAMPLE 1'" "$PYTHON" tools/dos/dosinfo.py $D/sample.exe --pstrings 5
+expect "dosinfo reads a real-mode MZ" "2 relocations" "$PYTHON" tools/dos/dosinfo.py $D/sample-mz.exe
+expect "dosinfo finds Turbo Debugger symbols" "debug symbols: Turbo Debugger" "$PYTHON" tools/dos/dosinfo.py $D/sample-td.exe
+expect "readseg reads a typed constant" "1008:0000  4660" "$PYTHON" tools/dos/readseg.py $D/sample.exe u32 DAT_1008_0000
+expect "readseg reads a Pascal string" "'DOS SAMPLE 1'" "$PYTHON" tools/dos/readseg.py $D/sample.exe pstr 1008:0010
+expect "readseg decodes a Turbo Pascal Real" "[1.0, -2.5, 0.0]" "$PYTHON" - <<'PY'
+import sys; sys.path.insert(0, 'tools/dos')
+from readseg import real48
+print([real48(b) for b in (bytes([129, 0, 0, 0, 0, 0]), bytes([130, 0, 0, 0, 0, 0xA0]), bytes(6))])
+PY
+expect "tdinfo lists procedures with sizes and parameters" "param     [bp+6] range: Word" "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe procs rng_next
+expect "tdinfo lays out a record" "+0x0004  total: Word  (2)" "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe types
+expect "tdinfo writes labels" "1008:0000	RandSeed" "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe labels
+expect "tdinfo maps code to source lines" "1000:0028	SAMPLE.S:11" "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe lines
+
+echo "16-bit emulator"
+expect "dos_emu runs the NE random generator (matches the reference)" "True [722, 842, 312, 2, 309]" "$PYTHON" - <<'PY'
+import sys; sys.path.insert(0, 'tools/emu')
+from dos_emu import DosEmu, Long
+ref, seed = [], 1234
+for _ in range(5):
+    seed = (seed * 0x08088405 + 1) & 0xFFFFFFFF
+    ref.append(((seed >> 16) * 1000) >> 16)
+emu = DosEmu('examples/dos-sample/build/sample.exe')
+emu.call('RNG_SEED', Long(1234))
+got = [emu.call('1000:0028', 1000) for _ in range(5)]
+print(got == ref, got)
+PY
+expect "dos_emu applies selector relocations (Ghidra's numbering)" "0x1008" "$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu
+print(hex(DosEmu('$D/sample.exe').call('GET_DATA_SEG')))"
+expect "dos_emu passes far pointers" "532" "$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu
+e = DosEmu('$D/sample.exe'); print(e.call('CHECKSUM', e.bytes_in(b'hello'), 5))"
+expect "dos_emu traces random draws with call sites" "rng_next(50)	1000:005d" "$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu, Long
+e = DosEmu('$D/sample.exe'); e.call('RNG_SEED', Long(99)); e.trace({'RNG_NEXT': 'rng_next'}, args=1)
+e.call('SUM_DRAWS', 4, 50); print(e.traces[0])"
+expect "an unhandled import names itself" "unhandled import KERNEL.3 called from 1000:0091" "$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu
+try: DosEmu('$D/sample.exe').call('ASK_HOST')
+except RuntimeError as e: print(e)"
+expect "import stubs and interrupt handlers run" "0xa03 5" "$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu
+e = DosEmu('$D/sample.exe', stubs={'KERNEL.3': lambda m: m.set(ax=0x0a03)}, interrupts={0x21: lambda m: m.set(ax=5)})
+print(hex(e.call('ASK_HOST')), e.call('DOS_VERSION'))"
+expect "an unhandled interrupt names itself" "unhandled interrupt 21h (AH=30h) at 1000:0094" "$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu
+try: DosEmu('$D/sample.exe').call('DOS_VERSION')
+except RuntimeError as e: print(e)"
+expect "dos_emu runs real-mode MZ code at Ghidra's addresses" "100a [722, 842, 312]" "$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu, Long
+m = DosEmu('$D/sample-mz.exe'); ds = m.call('1000:0088')
+m.call('1000:000f', Long(1234), regs={'ds': ds})
+print(f'{ds:04x}', [m.call('1000:0028', 1000, regs={'ds': ds}) for _ in range(3)])"
+
+echo "DOSBox-X runtime"
+log="$(mktemp)"
+cat > "$log" <<'LOG'
+      10 DEBUG FILES:file open command 2 file C:\GAME\DATA.DAT
+      11 DEBUG FILES:Reading 4 bytes from DATA.DAT
+      12 DEBUG FILES:Reading 2 bytes from DATA.DAT
+      13 DEBUG FILES:Reading 1 bytes from DATA.DAT
+      14 DEBUG FILES:Reading 2 bytes from DATA.DAT
+      15 DEBUG FILES:Reading 1 bytes from DATA.DAT
+      16 DEBUG FILES:Reading 2 bytes from DATA.DAT
+      17 DEBUG FILES:Reading 1 bytes from DATA.DAT
+      18 DEBUG FILES:Seeking to 100 bytes from position type (0) in DATA.DAT
+      19 DEBUG FILES:Reading 16 bytes from DATA.DAT
+LOG
+expect "fileio_trace groups a table of records" "0x000004: [2, 1] x 3 (stride 3)" "$PYTHON" tools/dos/fileio_trace.py "$log"
+expect "fileio_trace follows seeks" "0x000064: 16" "$PYTHON" tools/dos/fileio_trace.py "$log" --file data.dat
+rm -f "$log"
+if command -v dosbox-x >/dev/null; then
+  g="$(mktemp -d)"; cp $D/sample-mz.exe "$g/SAMPLEMZ.EXE"
+  expect "dosbox-run runs a DOS program and reads its exit code (= dos_emu's first draw)" "exit code 23" \
+    scripts/dosbox-run.sh --out "$g/out" --time 20 "$g" SAMPLEMZ.EXE
+  expect "dbx_control drives the debugger: break at exit, read AL and the new seed" "AL=23 seed=3b032b05" "$PYTHON" - "$g" <<'PY'
+import os, sys; sys.path.insert(0, 'tools/dos')
+from dbx_control import Debugger
+g = sys.argv[1]
+with Debugger(port=58993, timeout=30) as d:
+    d.launch([os.path.abspath('scripts/dosbox-run.sh'), '--out', g + '/dbx', '--time', '40', '--break', '--mcp', '58993', g, 'SAMPLEMZ.EXE'])
+    d.wait_connected(); d.wait_break()          # DEBUGBOX: stopped at the first instruction
+    d.exec('BPINT 21 4C'); d.run()
+    regs = d.wait_break()                       # stopped at INT 21h AH=4Ch (exit)
+    seed = int.from_bytes(d.memdump('DS', 0, 4), 'little')
+    d.run()
+print(f'AL={regs["STEP_AX"] & 0xFF} seed={seed:08x}')
+PY
+  rm -rf "$g"
+else
+  echo "  skip  dosbox-run (dosbox-x is not installed: scripts/setup.sh --install)"
+fi
+
 echo "Project scaffold"
 tmp="$(mktemp -d)/re-test"
 scripts/new-project.sh "$tmp" "Test Game" $B >/dev/null 2>&1
-[[ -f "$tmp/AGENTS.md" && -f "$tmp/.claude/skills/re-start/SKILL.md" && -f "$tmp/target/game.exe" && -d "$tmp/.git" ]] \
+[[ -f "$tmp/AGENTS.md" && -f "$tmp/docs/DOS.md" && -f "$tmp/.claude/skills/re-start/SKILL.md" && -f "$tmp/target/game.exe" && -d "$tmp/.git" ]] \
   && grep -q "Test Game" "$tmp/AGENTS.md" && ! (cd "$tmp" && git ls-files | grep -q '^target/') \
   && ok "new-project creates a repository, keeps target/ out of git" || bad "new-project scaffold" "$(ls -la "$tmp" 2>&1)"
 
@@ -102,6 +206,13 @@ if [[ "${1:-}" == --ghidra ]]; then
   expect "decomp_query finds string users" "main" "$PYTHON" tools/triage/decomp_query.py --binary game.exe strings "after 10"
   scripts/ghidra-run.sh game.exe decompile analysis/notes/test.txt 0x140001090 >/dev/null 2>&1
   expect "ghidra-run decompiles by address" "FUNCTION 140001090 simulate" cat analysis/notes/test.txt
+  "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe labels > analysis/notes/dos-labels.tsv
+  scripts/ghidra-export.sh --project analysis/ghidra-dos --out analysis/export-dos --labels analysis/notes/dos-labels.tsv \
+    $D/sample-td.exe $D/sample-mz.exe >/dev/null 2>&1 && ok "ghidra-export exports a 16-bit NE and an MZ" || bad "ghidra-export (16-bit)"
+  expect "Ghidra numbers NE segments 1000, 1008" "1000:0028" cat analysis/export-dos/sample-td.exe/functions.tsv
+  expect "ApplyLabels creates a function Ghidra missed" "1000:0092	5	dos_version" cat analysis/export-dos/sample-td.exe/functions.tsv
+  expect "decomp_query reads seg:off exports with labels" "RandSeed" "$PYTHON" tools/triage/decomp_query.py --export analysis/export-dos --binary sample-td.exe fn 1000:0028
+  expect "decomp_query lists callees by seg:off" "1000:0028" "$PYTHON" tools/triage/decomp_query.py --export analysis/export-dos --binary sample-td.exe callees sum_draws
 fi
 
 echo

@@ -1,6 +1,6 @@
 ---
 name: re-inventory
-description: First look at a game's files - which binaries hold the game's own code, which engine and middleware it uses, whether it is native, managed, scripted or packed, which data containers and save files exist - and record it in docs/FINDINGS.md. Use at the start of a project, or when a new binary or file type turns up.
+description: First look at a game's files (Windows PE, or DOS MZ/NE/LE executables) - which binaries hold the game's own code, which engine and middleware it uses, whether it is native, managed, scripted or packed, which data containers and save files exist - and record it in docs/FINDINGS.md. Use at the start of a project, or when a new binary or file type turns up.
 ---
 
 # Inventory a game
@@ -38,6 +38,29 @@ Havok, Steam/GOG SDKs): document what they are and move on.
 Engines often ship a runtime DLL that exports C++ class names (`?Rand@Random@System@@...`). Its
 exports are free, accurate names: decompile it together with the EXE.
 
+### DOS and 16-bit programs
+
+`file` saying "MS-DOS executable" (or peinfo refusing the file) means a DOS program. Use:
+
+```bash
+for b in target/*.EXE target/*.exe target/*.OVL; do python3 tools/dos/dosinfo.py "$b"; echo; done
+```
+
+It names the format (`MZ` real mode, `NE` 16-bit protected mode, `LE`/`LX` 32-bit extender),
+gives Ghidra's selector for every NE segment, lists imports and exports, and fingerprints the
+compiler, extender, packer and sound libraries. Two lines matter most:
+
+- **`debug symbols: Turbo Debugger`**: the original names of every procedure, global and type
+  are in the file. Run `python3 tools/dos/tdinfo.py BINARY summary` now; see docs/DOS.md
+  section 3. This can save weeks.
+- **A packer** (LZEXE, PKLITE, EXEPACK, DIET): unpack before anything else.
+
+Launchers are common: a small MZ that runs the real program (`tyrian.exe` running
+`file0001.exe`). The DOSBox-X file log (`scripts/dosbox-run.sh --fileio`) shows which program
+and which data files are opened, in order. Runtime files (`RTM.EXE`, `DPMI16BI.OVL`,
+`DOS4GW.EXE`) are the compiler's DOS extender, not game code. The whole DOS route is in
+docs/DOS.md.
+
 ## 3. Choose the route
 
 | What peinfo shows | What it means | Route |
@@ -48,6 +71,8 @@ exports are free, accurate names: decompile it together with the EXE.
 | `UE4`/`UnrealEngine` strings, `.pak` files | Unreal Engine | Most logic is in the EXE plus Blueprint bytecode in `.uasset`; tools such as FModel and UE4SS read the assets |
 | `lua_pcall`, `.lua`/`.luac` files | Lua scripting on a native engine | Decompile the scripts (unluac, luadec) for game rules; the native side is the engine |
 | GameMaker / RPG Maker / Godot strings | A known engine with its own format | Use the engine's community tools for the data; the native binary is the stock runtime |
+| dosinfo: `MZ` or `NE`, Borland/Microsoft/Watcom runtime | 16-bit DOS or Windows 3.x code | This harness's DOS route: `dosinfo.py`, `tdinfo.py`, Ghidra, `dos_emu.py`, DOSBox-X (docs/DOS.md) |
+| dosinfo: `LE`/`LX` (DOS/4GW, PMODE/W) | 32-bit DOS-extender program | Ghidra with an LE/LX loader extension; run it in DOSBox-X |
 | High-entropy executable section, `.vmp0`, `.themida`, UPX | Packed or protected | Stop. Unpack first (UPX: `upx -d`), or work from a memory dump with the user's agreement; Denuvo and VMProtect are out of scope for static analysis |
 
 For an Android or iOS game, an Electron or browser game, or an archive you cannot identify, use
@@ -70,6 +95,7 @@ decode it with `re-format`.
 
 ## 5. Record
 
-Fill `docs/FINDINGS.md`: the binaries table (file, role, architecture, compiler, notes), the
+Fill `docs/FINDINGS.md` (correct any first-look numbers the tools overturn, such as an NE
+segment with no bytes in the file, which is uninitialised data): the binaries table (file, role, architecture, compiler, notes), the
 engine and middleware with the evidence for each (the import or string that showed it), the
 data containers, and the open questions. Add the first lines to `docs/CHECKLIST.md`.

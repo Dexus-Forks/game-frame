@@ -1,6 +1,6 @@
 ---
 name: re-emulate
-description: Run individual functions from a game's Windows x64 binaries under the Unicorn emulator (tools/emu/pe_emu.py) to capture exact ground truth for chosen inputs, and record the calls they make (random draws) with call_trace.py. Use for anything a reimplementation must match bit for bit - random number generators, maths, procedural generation, simulation steps, pathfinding, parsers - instead of trusting the pseudocode.
+description: Run individual functions from a game's Windows x64 binaries (tools/emu/pe_emu.py) or 16-bit DOS/NE programs (tools/emu/dos_emu.py) under the Unicorn emulator to capture exact ground truth for chosen inputs, and record the calls they make (random draws) with call_trace.py. Use for anything a reimplementation must match bit for bit - random number generators, maths, procedural generation, simulation steps, pathfinding, parsers - instead of trusting the pseudocode.
 ---
 
 # Emulate original code for ground truth
@@ -77,3 +77,28 @@ emu = Emu('target/Game.exe', ['target/Engine.dll'])  # loads, relocates, links i
   r9; floats in xmm0-7).
 - **Floating point state**: the emulator starts with the default MXCSR (round to nearest). If the
   game changes the rounding mode or enables flush-to-zero, set it the same way.
+
+## 16-bit DOS and NE programs: dos_emu.py
+
+```python
+import sys; sys.path.insert(0, 'tools/emu')
+from dos_emu import DosEmu, Long, FarPtr
+emu = DosEmu('target/GAME.EXE')                  # NE: 16-bit protected mode; MZ: real mode
+emu.call('1000:873a', 5, Long(100000))            # Ghidra's address or an export name; AX
+emu.call_long('RANDOM_LONG', 1000)                # DX:AX as one 32-bit value
+p = emu.bytes_in(open('target/LEVEL.DAT', 'rb').read(512)); emu.call('LOADLEVEL', p, 512)
+emu.u16(FarPtr(0x1048, 0x12de))                   # read a global afterwards
+emu.trace({'1040:0a12': 'Random'}, args=1); emu.write_trace('derived/rng.trace')
+```
+
+- Addresses are Ghidra's: NE segment N is selector `1000 + 8 * (N - 1)`, MZ loads at `1000`.
+  The emulator uses the same numbers, so pseudocode addresses work unchanged.
+- Arguments go in the **Pascal** order by default (left to right, callee pops). An int is a
+  word, `Long(v)` two words, `FarPtr`/(seg, off) a far pointer. `conv='cdecl'` for C code.
+- DS = SS = the auto data segment, as in a Pascal program; override with `regs={'ds': ...}`.
+- An import or interrupt with no handler stops with its name and caller: add
+  `stubs={'KERNEL.3': fn}` (handler returns the bytes to pop) or `interrupts={0x21: fn}`.
+- For a function that needs DOS, timers, VGA or sound, run the whole program in DOSBox-X
+  (`scripts/dosbox-run.sh`) and read memory with the debugger (`tools/dos/dbx_control.py`):
+  docs/DOS.md sections 6 and 7.
+
