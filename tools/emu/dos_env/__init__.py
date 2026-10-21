@@ -6,6 +6,7 @@
     env = DosEnv(emu, root='target/game', overlay='derived/run')   # files, KERNEL, ports, BIOS
     try:
         emu.run_range(emu.entry, '1000:ca59')      # from the program's entry to a chosen point
+        emu.run_to('1000:ca59')                    # then carry on (run_range resets the stack)
     except ProgramStopped as stop:
         print('exit code', stop.args[0])
     print(env.log[-20:])                           # what the program asked of DOS, in order

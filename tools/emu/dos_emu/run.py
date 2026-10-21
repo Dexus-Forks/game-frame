@@ -35,13 +35,23 @@ class Runner:
     def run_range(self, start, end, regs=None):
         """Run the code from `start` until execution reaches `end` (both as for call): for a
         fragment inside a big procedure, such as inline drawing code in a main loop. Imports
-        and interrupts are handled as in call. `regs` sets registers first; the stack is the
-        default one, so the fragment must leave it balanced (or set ss/sp/bp in `regs`)."""
-        ptr, stop = self.addr(start), self.addr(end)
+        and interrupts are handled as in call. It starts afresh: SS:SP, DS and ES are set to the
+        start-up values, then `regs` (so set ss/sp/bp in `regs` for a fragment that uses its
+        procedure's frame). To carry on a program that is already running (frame after frame
+        of a headless run), use run_to: run_range would move the stack back to its start."""
         state = dict(self.regs)
         state.update(regs or {})
         for name, value in state.items():
             self.set(**{name: value})
+        self._run_until(self.addr(start), end)
+
+    def run_to(self, end):
+        """Carry on from the current CS:IP, with every register as it is, until execution
+        reaches `end`. For a running program: run_range(entry, a), then run_to(b), run_to(a)..."""
+        self._run_until((self.reg('cs'), self.reg('ip')), end)
+
+    def _run_until(self, ptr, end):
+        stop = self.addr(end)
         at = self.linear(*stop)
         def on_end(uc, address, size, _):
             self.pending = 'return'

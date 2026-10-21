@@ -108,6 +108,8 @@ emu.trace({'1040:0a12': 'Random'}, args=1); emu.write_trace('derived/rng.trace')
   `emu.run_range('1000:cab1', '1000:ccac')` runs from one address until execution reaches the
   other. Pick a fragment that leaves the stack balanced and uses globals, not the enclosing
   procedure's locals (or set `bp` in `regs`). Near procedures end in `ret`: stop at its address.
+  `run_range` starts on the start-up stack; to carry on a program that is running (the next
+  frame), use `emu.run_to(address)`, which keeps every register.
 - **The whole program, headless**: `tools/emu/dos_env/` adds DOS files, the BIOS, a DPMI
   host, timer interrupts and a key queue, so a DOS game starts and runs in dos_emu, frame by
   frame, with its memory open to you (docs/DOS.md section 5b). When it stops on something

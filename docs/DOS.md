@@ -169,7 +169,14 @@ emu = DosEmu('target/game/GAME.EXE', max_steps=2_000_000_000)
 env = DosEnv(emu, root='target/game', overlay='derived/run', program='C:\\GAME\\GAME.EXE')
 emu.run_range(emu.entry, '1000:ca59')            # start-up, until the main loop
 env.save_screen('derived/run/frame.png')         # VGA memory + the DAC palette
+emu.run_to('1000:ca59')                          # the next frame: carry on as it is
 ```
+
+- **Carry on with `run_to`, never `run_range`.** `run_range(start, end)` starts afresh: it
+  puts SS:SP back at the start-up stack. Used to continue a running program, every call
+  moves the stack above the live frames, and deep calls then overwrite the main procedure's
+  locals and return address (seen as stray file names in a local array, and the program
+  "exiting" after some thousands of frames). `run_to(end)` keeps every register.
 
 - Files come from `root` (names without case); writes go to `overlay`. `env.log` lists what
   the program asked for, in order: compare it with DOSBox-X's file log.

@@ -148,6 +148,12 @@ import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu
 e = DosEmu('$D/sample.exe'); f = int(open('$D/symbols.tsv').read().split('field_read')[1].split()[1], 16)
 s = e.new_segment(b'....' + bytes([42, 0]))
 e.run_range(f'1000:{f:04x}', f'1000:{f + 3:04x}', regs={'ds': s, 'si': 0}); print(f'ax={e.reg(\"ax\")}')"
+expect "run_to carries on with the registers as they are (run_range resets the stack)" "ax=42 sp=1234" "$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu
+e = DosEmu('$D/sample.exe'); f = int(open('$D/symbols.tsv').read().split('field_read')[1].split()[1], 16)
+s = e.new_segment(b'....' + bytes([42, 0]))
+e.run_range(f'1000:{f:04x}', f'1000:{f:04x}', regs={'ds': s, 'si': 0, 'sp': 0x1234})
+e.run_to(f'1000:{f + 3:04x}'); print(f'ax={e.reg(\"ax\")} sp={e.reg(\"sp\"):04x}')"
 expect "dos_emu passes far pointers" "532" "$PYTHON" -c "
 import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu
 e = DosEmu('$D/sample.exe'); print(e.call('CHECKSUM', e.bytes_in(b'hello'), 5))"
