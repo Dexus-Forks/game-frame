@@ -135,6 +135,9 @@ PY
 expect "dos_emu applies selector relocations (Ghidra's numbering)" "0x1008" "$PYTHON" -c "
 import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu
 print(hex(DosEmu('$D/sample.exe').call('GET_DATA_SEG')))"
+expect "dos_emu gives scripts whole segments" "1020 104" "$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu
+e = DosEmu('$D/sample.exe'); s = e.new_segment(b'hello'); print(f'{s:04x}', e.call('CHECKSUM', (s, 0), 1))"
 expect "dos_emu passes far pointers" "532" "$PYTHON" -c "
 import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu
 e = DosEmu('$D/sample.exe'); print(e.call('CHECKSUM', e.bytes_in(b'hello'), 5))"

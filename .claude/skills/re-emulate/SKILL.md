@@ -98,6 +98,12 @@ emu.trace({'1040:0a12': 'Random'}, args=1); emu.write_trace('derived/rng.trace')
 - DS = SS = the auto data segment, as in a Pascal program; override with `regs={'ds': ...}`.
 - An import or interrupt with no handler stops with its name and caller: add
   `stubs={'KERNEL.3': fn}` (handler returns the bytes to pop) or `interrupts={0x21: fn}`.
+- **Drawing routines** (DOS games write straight into video memory): give the routine a
+  screen with `screen = emu.new_segment()`, put its selector in the global the code loads into
+  ES (`VgaScreenSeg`), fill the screen with a sentinel byte (0xEE) so skipped transparent
+  pixels show, set the globals, call, and compare all 64 KB with the port's output. Load the
+  data blocks it reads (`megadata`, sprite banks) the same way, built by the port's own loader,
+  so one test checks the loader's layout and the renderer together.
 - For a function that needs DOS, timers, VGA or sound, run the whole program in DOSBox-X
   (`scripts/dosbox-run.sh`) and read memory with the debugger (`tools/dos/dbx_control.py`):
   docs/DOS.md sections 6 and 7.

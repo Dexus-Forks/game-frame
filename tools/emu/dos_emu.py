@@ -9,6 +9,7 @@ its exact result (ground truth for a reimplementation), without DOS, DOSBox or t
     print(emu.call('1000:0028', 100))              # AX; call_long() returns DX:AX
     buf = emu.bytes_in(b'abc')                     # a FarPtr into emulated memory
     emu.call('CHECKSUM', buf, 3)
+    screen = emu.new_segment()                     # a whole 64 KB segment at offset 0
 
 NE programs (Borland Pascal 7 DPMI16, Windows 3.x) run in 16-bit protected mode. Segment N gets
 selector 0x1000 + 8 * (N - 1), the same numbers Ghidra's NE loader uses, so an address from the
@@ -312,6 +313,23 @@ class DosEmu:
         self.heap_top = (self.heap_top + n + 15) & ~15
         self.write(ptr, b'\0' * n)
         return ptr
+
+    def new_segment(self, data=b''):
+        """A fresh 64 KB segment (NE: a new data selector; MZ: 4096 paragraphs from the heap)
+        holding `data` at offset 0, as a protected-mode GetMem of a large block returns it.
+        Returns the selector or segment; use it as a FarPtr (seg, 0) or store it in a global."""
+        if len(data) > 0x10000:
+            raise ValueError('a segment holds at most 64 KB')
+        if self.kind == 'NE':
+            seg = self._new_selector(0x92)
+        else:
+            self.heap_seg += 0x1000
+            seg = self.heap_seg
+            self.heap_top = 0x10000   # the next malloc starts a new heap segment
+        self.write(FarPtr(seg, 0), b'\0' * 0x10000 if self.kind == 'NE' else b'\0' * 0xFFFF)
+        if data:
+            self.write(FarPtr(seg, 0), data)
+        return seg
 
     def bytes_in(self, data):
         ptr = self.malloc(len(data))
