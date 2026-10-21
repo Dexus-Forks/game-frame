@@ -379,6 +379,26 @@ class DosEmu:
         self._run(ptr)
         return self.reg('ax')
 
+    def run_range(self, start, end, regs=None):
+        """Run the code from `start` until execution reaches `end` (both as for call): for a
+        fragment inside a big procedure, such as inline drawing code in a main loop. Imports
+        and interrupts are handled as in call. `regs` sets registers first; the stack is the
+        default one, so the fragment must leave it balanced (or set ss/sp/bp in `regs`)."""
+        ptr, stop = self.addr(start), self.addr(end)
+        state = dict(self.regs)
+        state.update(regs or {})
+        for name, value in state.items():
+            self.set(**{name: value})
+        at = self.linear(*stop)
+        def on_end(uc, address, size, _):
+            self.pending = 'return'
+            uc.emu_stop()
+        h = self.uc.hook_add(UC_HOOK_CODE, on_end, begin=at, end=at)
+        try:
+            self._run(ptr)
+        finally:
+            self.uc.hook_del(h)
+
     def call_long(self, target, *args, **kw):
         """Like call, for a routine that returns a 32-bit value in DX:AX."""
         ax = self.call(target, *args, **kw)

@@ -138,6 +138,11 @@ print(hex(DosEmu('$D/sample.exe').call('GET_DATA_SEG')))"
 expect "dos_emu gives scripts whole segments" "1020 104" "$PYTHON" -c "
 import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu
 e = DosEmu('$D/sample.exe'); s = e.new_segment(b'hello'); print(f'{s:04x}', e.call('CHECKSUM', (s, 0), 1))"
+expect "dos_emu runs a fragment between two addresses" "ax=42" "$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu
+e = DosEmu('$D/sample.exe'); f = int(open('$D/symbols.tsv').read().split('field_read')[1].split()[1], 16)
+s = e.new_segment(b'....' + bytes([42, 0]))
+e.run_range(f'1000:{f:04x}', f'1000:{f + 3:04x}', regs={'ds': s, 'si': 0}); print(f'ax={e.reg(\"ax\")}')"
 expect "dos_emu passes far pointers" "532" "$PYTHON" -c "
 import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu
 e = DosEmu('$D/sample.exe'); print(e.call('CHECKSUM', e.bytes_in(b'hello'), 5))"

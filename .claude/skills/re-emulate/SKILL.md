@@ -104,6 +104,10 @@ emu.trace({'1040:0a12': 'Random'}, args=1); emu.write_trace('derived/rng.trace')
   pixels show, set the globals, call, and compare all 64 KB with the port's output. Load the
   data blocks it reads (`megadata`, sprite banks) the same way, built by the port's own loader,
   so one test checks the loader's layout and the renderer together.
+- **Inline code inside a big procedure** (a main loop draws a layer itself):
+  `emu.run_range('1000:cab1', '1000:ccac')` runs from one address until execution reaches the
+  other. Pick a fragment that leaves the stack balanced and uses globals, not the enclosing
+  procedure's locals (or set `bp` in `regs`). Near procedures end in `ret`: stop at its address.
 - For a function that needs DOS, timers, VGA or sound, run the whole program in DOSBox-X
   (`scripts/dosbox-run.sh`) and read memory with the debugger (`tools/dos/dbx_control.py`):
   docs/DOS.md sections 6 and 7.
