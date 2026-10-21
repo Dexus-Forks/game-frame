@@ -71,7 +71,9 @@ A deviation is a decision; an accidental difference is a bug.
 
 1. List the functions to reimplement, from the topic document.
 2. Do the smallest end-to-end slice first, and test it against ground truth before the rest.
-3. Build and test often; commit each verified slice (`re-land`).
+3. After that, port a whole subsystem at a time (all of a routine's callees too), then verify
+   it with one capture and one test (`re-verify` section 0 says how deep).
+4. Build and test often; commit each verified subsystem (`re-land`).
 
 `examples/sample-game/port.py` is a complete small example: a reimplementation that matches the
 original bit for bit, and a `--naive` mode that makes mistake 1 to show what the checks catch.

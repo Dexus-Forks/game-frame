@@ -72,6 +72,26 @@ A small task may use only two or three steps. Do not skip `land`.
    and the data container. Everything else depends on them, and they are small enough to
    emulate and verify in one session.
 
+## Spend effort where it pays
+
+A full reimplementation is long. Most of the cost is verification and reading assembly, so
+choose how deep to go for each piece:
+
+- **Verify by risk, not by habit.** Fuzz only code with arithmetic, random draws, or many
+  branches a recording never takes. Check simple code (menus, drawing, plain state changes)
+  against recorded frames only. `re-verify` has the table.
+- **Port in subsystems.** Read, port and verify a whole subsystem (the player, a menu, the
+  level loader) before committing, not one small routine at a time. One capture and one
+  test then cover many routines.
+- **Keep to the path.** When a side need appears (a format a routine reads, a missing
+  tool), do only what the current subsystem needs and note the rest in `docs/CHECKLIST.md`.
+- **Batch harness changes.** Note generic lessons as you go; fix the harness and its tests
+  once per subsystem, not after every finding.
+- **Split mechanical work off.** Long but simple pieces (menus, text tables, generated
+  types) can go to a separate, cheaper session with an exact brief; keep the hard maths here.
+- **Read the decompiler with care.** For 16-bit Pascal, Ghidra prints arguments in reverse
+  order and loses Real (6-byte float) arithmetic: take those parts from the disassembly.
+
 ## Before you finish any session
 
 - Every new finding is in `docs/` with its evidence label.

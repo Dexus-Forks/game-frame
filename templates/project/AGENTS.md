@@ -56,5 +56,9 @@ inventory → decompile → trace → (format) → emulate → reimplement → v
 session by reading `docs/CHECKLIST.md` and searching `docs/` and `labels/` for the addresses
 and names you are about to work on.
 
+Work a subsystem at a time and verify by risk (`re-start`, "Spend effort where it pays";
+`re-verify` section 0): fuzz only maths, random draws and branchy code; check the rest
+against recorded frames.
+
 When something here would help any game (a tool fix, a new format reader, a pitfall), add it
 to the harness too, with a test against its own samples.

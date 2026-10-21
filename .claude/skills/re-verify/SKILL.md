@@ -8,6 +8,20 @@ description: Prove that a reimplementation matches the original - bit-exact pari
 Report only what you ran and looked at: test names with pass and skip counts, files compared,
 pictures opened. "It builds" is not verification.
 
+## 0. How much to verify
+
+Match the effort to the risk. Every slice gets at least the first row.
+
+| Code | Check |
+|---|---|
+| Any ported routine | Recorded frames (a demo or a session) through the port, compared with the original's state after |
+| Arithmetic, float or fixed-point maths, random draws, physics | Also direct calls on random inputs (`re-emulate`), thousands of them |
+| Many branches, modes or record types that a recording misses | Also fuzz from real states (below) |
+| Menus, text, plain drawing | Recorded frames and pictures only; no fuzz |
+
+Run a big fuzz once when the slice is done, not after each change: a few dozen cases are
+enough while you work.
+
 ## 1. Bit-exact parity with ground truth
 
 Write the reimplementation's output in the same raw format as the emulator's (`re-emulate`),
