@@ -62,5 +62,5 @@ The [law chapter](../law/README.md) rests on these.
 ## Quotations
 
 The notes quote short passages from the sources they link, so that each claim can be checked.
-Each quotation belongs to its author. The notes and the report are otherwise CC BY 4.0, like the
+Each quotation belongs to its author. The notes and the report are otherwise CC0 1.0, like the
 rest of the documentation.

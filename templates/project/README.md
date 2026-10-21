@@ -21,7 +21,6 @@ README with the full instructions.
 ## Licence
 
 The code is licensed under the [Apache License 2.0](LICENSE-APACHE). The documentation and
-other prose (`docs/`, the READMEs, `AGENTS.md`, the skills) are licensed under
-[Creative Commons Attribution 4.0](LICENSE-CC-BY-4.0): adapt and share them for any purpose,
-with credit. GAME_NAME's files are © their owners: they are not part of this repository, and
+other prose (`docs/`, the READMEs, `AGENTS.md`, the skills) are dedicated to the public domain
+under [CC0 1.0](LICENSE-CC0-1.0). Anyone may use them for any purpose without giving credit. GAME_NAME's files are © their owners: they are not part of this repository, and
 screenshots of the game's art are under neither licence.

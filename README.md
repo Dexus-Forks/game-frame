@@ -211,15 +211,15 @@ Two licences, one for each kind of work:
 | What | Licence |
 |---|---|
 | **Code**: `tools/`, `scripts/`, `tests/`, `examples/`, `templates/`, `site/` (its configuration and code), `.claude-plugin/`, the Ghidra scripts | [Apache License 2.0](LICENSE-APACHE) |
-| **Content**: the documentation (`docs/`), the skills (`.claude/skills/`), the agents (`agents/`), the READMEs and `AGENTS.md`, and the website's text | [Creative Commons Attribution 4.0](LICENSE-CC-BY-4.0) (CC BY 4.0) |
+| **Content**: the documentation (`docs/`), the skills (`.claude/skills/`), the agents (`agents/`), the READMEs and `AGENTS.md`, and the website's text | [CC0 1.0](LICENSE-CC0-1.0), dedicated to the public domain |
 
-CC BY 4.0 lets anyone copy, adapt, translate and remix the content for any purpose, commercial
-included, as long as they credit it: for example "Based on *GameFrame* by Tane
-Piper (CC BY 4.0)", with a link to the repository and a note of what changed.
+CC0 1.0 gives up all copyright in the content, as far as the law allows. Anyone may copy,
+adapt, translate and remix it for any purpose, commercial included, without asking and without
+giving credit.
 
 The screenshots in `docs/assets/case-studies/` show the games' own art. That art belongs to
 the games' rights holders, is shown to illustrate the case studies, and is under neither
 licence.
 
 Projects made with `scripts/new-project.sh` start with the same two licences: Apache 2.0 for
-their code and CC BY 4.0 for their documentation.
+their code and CC0 1.0 for their documentation.

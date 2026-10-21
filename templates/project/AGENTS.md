@@ -49,8 +49,8 @@ user may change any of them.
    `git add -A`, and never revert work you did not do.
 8. **Ask before downloading** anything; say the file, the source and the size.
 9. **Licence and instructions.** Our code is Apache 2.0 (LICENSE-APACHE; `license =
-   "Apache-2.0"` in manifests); documentation and other prose are CC BY 4.0
-   (LICENSE-CC-BY-4.0). Every part (core, player,
+   "Apache-2.0"` in manifests); documentation and other prose are CC0 1.0,
+   dedicated to the public domain (LICENSE-CC0-1.0). Every part (core, player,
    viewer, tools) has build and run instructions in its README and a row in README.md.
 10. **Keep files small and modular.** One concern per module; split a file before it passes a
    few hundred lines, generated code included (one file per original unit or table).

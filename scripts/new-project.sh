@@ -5,7 +5,7 @@
 #
 # Creates DIR as a git repository with:
 #   AGENTS.md (+ CLAUDE.md)   the rules, with the game's name; edit the goal paragraph first
-#   README.md, LICENSE-APACHE, LICENSE-CC-BY-4.0   front page (build/run per part); code Apache 2.0, content CC BY 4.0
+#   README.md, LICENSE-APACHE, LICENSE-CC0-1.0   front page (build/run per part); code Apache 2.0, content CC0 1.0
 #   .claude/skills/           the re-* skills (every step of the method)
 #   .claude/agents/           the stage agents (re-surveyor ... re-lander), which hand off to each other
 #   tools/, scripts/          the harness's tools, requirements.txt, .mcp.json (REA)
@@ -26,8 +26,8 @@ cp -R "$ROOT/tools" "$ROOT/scripts" "$dir/"
 cp -R "$ROOT/.claude/skills" "$dir/.claude/"
 cp -R "$ROOT/agents" "$dir/.claude/agents"
 cp "$ROOT/requirements.txt" "$ROOT/.mcp.json" "$ROOT/gameframe" "$dir/"
-# Code is Apache 2.0; documentation and other prose are CC BY 4.0 (as in the harness).
-cp "$ROOT/templates/project/licences/LICENSE-APACHE" "$ROOT/templates/project/licences/LICENSE-CC-BY-4.0" "$dir/"
+# Code is Apache 2.0; documentation and other prose are CC0 1.0 (as in the harness).
+cp "$ROOT/templates/project/licences/LICENSE-APACHE" "$ROOT/templates/project/licences/LICENSE-CC0-1.0" "$dir/"
 # The reference documents the skills point to (docs/DOS.md, docs/ABI.md, ...).
 for f in ABI GAME-PATTERNS DOS LEGAL OUTPUTS SETUP; do cp "$ROOT/docs/$f.md" "$dir/docs/"; done
 for d in games observe engines hardware consoles working case-studies; do cp -R "$ROOT/docs/$d" "$dir/docs/"; done

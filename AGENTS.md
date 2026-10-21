@@ -51,7 +51,7 @@ These rules are for changes to the harness itself, which is a public repository.
    tool crash, a missing format, a pitfall), fix it here with a test against our own samples,
    and keep the game-specific part in the game's repository.
 9. **Two licences.** Code is Apache 2.0 (`LICENSE-APACHE`); documentation, skills and other
-   prose are CC BY 4.0 (`LICENSE-CC-BY-4.0`). A new file takes the licence of its kind; the
+   prose are CC0 1.0, dedicated to the public domain (`LICENSE-CC0-1.0`). A new file takes the licence of its kind; the
    README's Licence section lists which folders are which.
 10. **Stage only your own files** (`git add path`), never `git add -A`, and push after each
    verified change.
