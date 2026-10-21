@@ -1,4 +1,4 @@
-# Africa, the Middle East, Russia and Ukraine
+# Africa, the Middle East, Other Nations
 
 This page is not legal advice. The law that applies is the law where you live.
 
@@ -108,4 +108,4 @@ unconfirmed text, Russia and Turkey. In South Africa, Egypt and the UAE, decompi
 express cover, and observing the running game has the firmest footing. Most of these countries
 ban breaking locks.
 
-Sources: [Notes: Africa, the Middle East and wider Europe](../research/law-africa-middle-east-europe.md).
+Sources: [Notes: Africa, the Middle East, Other Nations](../research/law-africa-middle-east-europe.md).

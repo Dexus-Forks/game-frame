@@ -166,9 +166,9 @@ Chile's art. 71 Ñ, from 2010, is the broadest software exception in the region.
 
 Colombia applies Andean Decision 351. It allows a copy or adaptation indispensable for use, and loading into memory for personal use ([CERLALC jurisprudence 477](https://cerlalc.org/wp-content/uploads/dar/jurisprudencia/477.pdf); [CERLALC 478](https://cerlalc.org/wp-content/uploads/dar/jurisprudencia/478.pdf)). Ley 1915 of 2018 makes circumvention a civil wrong in art. 12. **Art. 13(a) excuses reverse engineering for interoperability** of an independently created program. Art. 13(g) lets the DNDA add exceptions every three years. Art. 15 ties lock disclosure to consumer law. Art. 16 allows library lending and on-site terminals. Arts. 18 to 21 create an orphan-works scheme for institutions, which names audiovisual works but not software. Company works run 70 years from publication ([Secretaría del Senado, Ley 1915 de 2018](http://www.secretariasenado.gov.co/senado/basedoc/ley_1915_2018.html)). The term for natural persons is believed to be life plus 80 (not confirmed).
 
-## Africa, the Middle East and wider Europe mostly copy the EU model
+## Africa, the Middle East, Other Nations
 
-Ten of these twelve countries have a software exception. Several of the article numbers below are not confirmed against the official text.
+Most of these countries copy the EU model. Ten of these twelve have a software exception. Several of the article numbers below are not confirmed against the official text.
 
 ### South Africa
 

@@ -28,7 +28,7 @@ The [law chapter](../law/README.md) rests on these.
 4. [Notes: South and Southeast Asia and Oceania](law-asia-pacific.md): India, Singapore,
    Malaysia, Indonesia, the Philippines, Thailand, Vietnam, Australia, New Zealand.
 5. [Notes: the Americas](law-americas.md): Canada, Mexico, Brazil, Argentina, Chile, Colombia.
-6. [Notes: Africa, the Middle East and wider Europe](law-africa-middle-east-europe.md): South
+6. [Notes: Africa, the Middle East, Other Nations](law-africa-middle-east-europe.md): South
    Africa, Nigeria, Kenya, Egypt, Israel, Turkey, the UAE, Saudi Arabia, Russia, Ukraine,
    Switzerland, Norway.
 

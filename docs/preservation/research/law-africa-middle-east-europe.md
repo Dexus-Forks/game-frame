@@ -1,4 +1,4 @@
-# Notes: Africa, the Middle East and wider Europe
+# Notes: Africa, the Middle East, Other Nations
 
 Scope: South Africa, Nigeria, Kenya, Egypt, Israel, Turkey, UAE, Saudi Arabia, Russia, Ukraine, Switzerland, Norway. This is not legal advice.
 

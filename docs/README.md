@@ -21,16 +21,19 @@ the order of this page and of each folder's `README.md` is the order of the site
 - [A taxonomy of games](games/README.md): who drives, the axes, the families, the
   connections between them.
 
-## Engines, hardware, computers and consoles
+## Platforms
 
-- [Software engines and middleware](engines/README.md): recognising an engine, the id and
-  Build engines, Unreal, other licensed engines, studio engines, middleware.
-- [Hardware of the era](hardware/README.md): CPUs and floating point, 2D graphics, 3D
-  accelerators, sound, memory, storage, input and networks.
 - [Home computers and the PC](computers/README.md): the CPU families, the 8-bit and 16-bit
   home computers, the PC eras and the Mac, with the tools and timing for each.
-- [Console games](consoles/README.md): the platforms, the tools, the routes to a port, and
-  matching decompilation.
+- [Console games](consoles/README.md): the consoles and handhelds by generation, the tools,
+  the routes to a port, and matching decompilation.
+
+## Technology of the era
+
+- [Hardware of the era](hardware/README.md): CPUs and floating point, 2D graphics, 3D
+  accelerators, sound, memory, storage, input and networks.
+- [Software engines and middleware](engines/README.md): recognising an engine, the id and
+  Build engines, Unreal, other licensed engines, studio engines, middleware.
 
 ## Crates
 

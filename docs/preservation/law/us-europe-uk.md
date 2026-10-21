@@ -93,4 +93,4 @@ countries. Sharing the game and breaking locks are not covered. New code that co
 expression stays on the safe side of the EU and UK rules.
 
 Sources: [Notes: law and policy](../research/law-and-policy.md) and
-[Notes: Africa, the Middle East and wider Europe](../research/law-africa-middle-east-europe.md).
+[Notes: Africa, the Middle East, Other Nations](../research/law-africa-middle-east-europe.md).

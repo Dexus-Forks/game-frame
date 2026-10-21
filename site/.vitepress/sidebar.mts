@@ -1,8 +1,10 @@
 // The site's menu, read from the documentation's own structure.
 //
 // docs/README.md has one "## Section" per menu group, each with a list of links. A link to a
-// folder's README.md opens into that folder's pages, in the order of the links in that README,
-// and a subfolder's README linked from it opens into its pages too.
+// folder's README.md opens into that folder's pages, in the order of the links in that README.
+// A section with several folders shows each as its own group; a folder README whose page list
+// is split under "## " headings shows those headings as groups; a subfolder's README linked
+// from it opens into its pages too.
 // The skills follow, in the order of the README's skills table, then the examples.
 import fs from 'node:fs'
 import path from 'node:path'
@@ -21,22 +23,17 @@ export function sidebar(): Item[] {
   }]
   for (const section of sections('docs/README.md')) {
     const items: Item[] = []
+    const nest = section.links.length > 1
     for (const { target, text } of section.links) {
-      items.push({ text, link: pageUrl(target)! })
+      const link = pageUrl(target)!
       const folderReadme = /\/README\.md$/.test(target) && target !== 'docs/README.md'
-      if (!folderReadme) continue
-      for (const child of links(target)) {
-        if (path.dirname(child.target) === path.dirname(target)
-          || /^crates\/[^/]+\/README\.md$/.test(child.target)) {
-          items.push({ text: child.text, link: pageUrl(child.target)! })
-        } else if (path.dirname(path.dirname(child.target)) === path.dirname(target)
-          && /\/README\.md$/.test(child.target)) {
-          // A subfolder's README opens into its own pages, one level deep.
-          const sub = links(child.target)
-            .filter(c => path.dirname(c.target) === path.dirname(child.target))
-            .map(c => ({ text: c.text, link: pageUrl(c.target)! }))
-          items.push({ text: child.text, link: pageUrl(child.target)!, collapsed: true, items: sub })
-        }
+      if (!folderReadme) {
+        items.push({ text, link })
+      } else if (nest) {
+        // Several folders in one section: each folder is its own collapsible group.
+        items.push({ text, link, collapsed: true, items: folderItems(target) })
+      } else {
+        items.push({ text, link }, ...folderItems(target))
       }
     }
     groups.push({ text: section.name, collapsed: true, items })
@@ -59,13 +56,48 @@ export function sidebar(): Item[] {
 
 type Link = { target: string, text: string }
 
-/** The "## " sections of a Markdown file, each with the pages it links to. */
-function sections(repoPath: string): { name: string, links: Link[] }[] {
+/**
+ * A folder's pages, from its README. When the README lists its pages under two or more "## "
+ * headings, each heading becomes a collapsible group; otherwise the pages are listed in order.
+ * A subfolder's README opens into its own pages, one level deep.
+ */
+function folderItems(readme: string): Item[] {
+  const dir = path.dirname(readme)
+  const own = (t: string) => path.dirname(t) === dir || /^crates\/[^/]+\/README\.md$/.test(t)
+  const sub = (t: string) => path.dirname(path.dirname(t)) === dir && /\/README\.md$/.test(t)
+  const item = (c: Link): Item => sub(c.target)
+    ? {
+        text: c.text,
+        link: pageUrl(c.target)!,
+        collapsed: true,
+        items: links(c.target)
+          .filter(s => path.dirname(s.target) === path.dirname(c.target))
+          .map(s => ({ text: s.text, link: pageUrl(s.target)! })),
+      }
+    : { text: c.text, link: pageUrl(c.target)! }
+  const grouped = sections(readme, true)
+    .map(s => ({ name: s.name, links: s.links.filter(c => own(c.target) || sub(c.target)) }))
+    .filter(s => s.links.length > 0)
+  if (grouped.length >= 2) {
+    // A heading with a single page shows the page itself, not a group of one.
+    return grouped.map(g => g.links.length === 1
+      ? item(g.links[0])
+      : { text: g.name, collapsed: true, items: g.links.map(item) })
+  }
+  return links(readme).filter(c => own(c.target) || sub(c.target)).map(item)
+}
+
+/** The "## " sections of a Markdown file, each with the pages it links to (only from list
+ * items that start with a link, when `listOnly` is set). */
+function sections(repoPath: string, listOnly = false): { name: string, links: Link[] }[] {
   const text = fs.readFileSync(path.join(ROOT, repoPath), 'utf8')
   const out: { name: string, links: Link[] }[] = []
   for (const block of text.split(/^## /m).slice(1)) {
     const name = block.split('\n', 1)[0].trim()
-    out.push({ name, links: mdLinks(repoPath, block) })
+    const body = listOnly
+      ? block.split('\n').filter(l => /^\s*(?:[-*]|\d+\.)\s+\[/.test(l)).join('\n')
+      : block
+    out.push({ name, links: mdLinks(repoPath, body) })
   }
   return out
 }

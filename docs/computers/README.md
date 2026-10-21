@@ -6,10 +6,13 @@ depends on three facts. The first is the CPU family and its arithmetic quirks. T
 the memory and banking state that was live when the code ran. The third is the timing the game
 was written against. On 8-bit machines that timing is part of the game logic.
 
-## Pages
+## Across all machines
 
 - [CPU families](cpu-families.md): the eleven CPU families, their byte order, Ghidra, Unicorn
   and Capstone support, small cores for ground truth, and the arithmetic traps.
+
+## 8-bit home computers
+
 - [Sinclair ZX81 and ZX Spectrum](sinclair.md): paging ports, contended memory per model,
   frame lengths, TZX and the snapshot formats, SkoolKit.
 - [BBC Micro and Acorn Electron](acorn-8bit.md): sideways ROMs, the 8271 and 1770 disk
@@ -23,6 +26,9 @@ was written against. On 8-bit machines that timing is part of the game logic.
   PORTB banking, ATR, XEX and ATX, Altirra.
 - [Apple II](apple-ii.md): soft switches, the language card, GCR disk protection, WOZ.
 - [Other 8-bit computers](other-8bit.md): the Dragon and CoCo, the Oric, the TI-99/4A.
+
+## 16-bit and 32-bit home computers
+
 - [Commodore Amiga](amiga.md): OCS, ECS and AGA, the Copper, Blitter and Paula, takeover
   games, ADF and IPF, Copylock, ghidra-amiga, WinUAE.
 - [Atari ST family](atari-st.md): the Shifter, the STE additions, ST, MSA and STX images, the
@@ -30,6 +36,9 @@ was written against. On 8-bit machines that timing is part of the game logic.
 - [Acorn Archimedes and Risc PC](acorn-32bit.md): 26-bit ARM2 and ARM3 code, MEMC, VIDC and
   IOC, the ARMv4 floor in Ghidra.
 - [Japanese 16-bit and 32-bit computers](japan-16-32bit.md): the X68000, PC-98 and FM Towns.
+
+## The PC and the Mac
+
 - [The IBM PC and compatibles](ibm-pc.md): the eras and their executable formats, Tandy
   paths, compiler fingerprints, copy protection, what runs where today.
 - [The Macintosh](macintosh.md): 68k resource forks and the A5 world, PEF, Mach-O, Rosetta,
@@ -109,3 +118,7 @@ The Sinclair QL (68008) and the SAM Coupé (Z80B) belong with these machines. Th
 still need sources.
 
 Sources: [Report: game platforms and CPUs](research/report.md).
+
+## Sources
+
+- [Sources and notes](research/README.md): the report and the notes behind these pages.

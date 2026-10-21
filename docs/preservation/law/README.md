@@ -85,7 +85,7 @@ that anyone can check it.
 4. [South and Southeast Asia and Oceania](asia-pacific.md): India, Singapore, Malaysia,
    Indonesia, the Philippines, Thailand, Vietnam, Australia, New Zealand.
 5. [The Americas](americas.md): Canada, Mexico, Brazil, Argentina, Chile, Colombia.
-6. [Africa, the Middle East, Russia and Ukraine](africa-middle-east.md): South Africa, Nigeria,
+6. [Africa, the Middle East, Other Nations](africa-middle-east.md): South Africa, Nigeria,
    Kenya, Egypt, Israel, Turkey, the UAE, Saudi Arabia, Russia, Ukraine.
 7. [35 countries compared](compared.md): one table.
 

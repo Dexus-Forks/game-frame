@@ -21,10 +21,13 @@ Knowing the engine helps in several ways.
 - Middleware code is not the game. Identify it early and leave it out of your analysis.
   Replace it in the port with a library that does the same job.
 
-## Pages
+## Finding the engine
 
 - [Recognising an engine](recognising.md): strings, file names, magic numbers, libraries and
   debug paths that identify an engine or a library.
+
+## Engine families
+
 - [The id Software engines](id-tech.md): Wolfenstein 3D, Doom, Quake, Quake II, Quake III, and
   the engines built from them.
 - [Build, Jedi and other 2.5D engines](build-2-5d.md): sector engines with a flat world and
@@ -34,6 +37,9 @@ Knowing the engine helps in several ways.
   RenderWare.
 - [Studio engines for 2D and isometric games](studio-2d.md): Westwood, Blizzard, the Infinity
   Engine, the Fallout engine, the adventure engines.
+
+## Libraries
+
 - [Middleware](middleware.md): video, sound, physics, compression, scripting and online
   libraries, and what to do with each.
 

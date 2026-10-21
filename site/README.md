@@ -26,7 +26,14 @@ skills, the examples or the site, and publishes it to GitHub Pages
 To add a page, write the Markdown file in `docs/` and link it from its folder's `README.md`
 (or from `docs/README.md`): it appears in the menu in that place. A subfolder's `README.md`
 linked from a folder's `README.md` becomes a group of its own, one level deep
-(`docs/preservation/research/`). Links between files stay
+(`docs/preservation/research/`).
+
+To group a folder's pages in the menu, list them in its `README.md` under two or more `## `
+headings, one list item per page (as `docs/computers/README.md` does). Each heading becomes a
+group; a heading with one page shows that page. A `docs/README.md` section that links several
+folders shows each folder as its own group.
+
+Links between files stay
 relative, as GitHub needs them; the site turns them into page URLs, and links to tools and
 scripts into links to GitHub (`.vitepress/links.mts`). The build fails on a link to a page
 that does not exist.
