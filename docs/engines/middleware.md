@@ -22,7 +22,7 @@ behaviour of the library, such as its random numbers, its rounding or its timing
 | Scripting | Lua (from 1993), Python, Tcl | `lua_pcall`, `Lua 5.0` strings; `python2x.dll` | Use the same language version; decompile compiled scripts (unluac) |
 | Compression | zlib, LZSS, LZW, Huffman, PKWARE DCL ("implode") | zlib's version strings and CRC table; `PKWARE` strings | A standard library, or the documented algorithm |
 | Online | GameSpy SDK, DirectPlay, Kali | `gamespy` strings; `dplayx.dll` | Replace with your own networking; do not contact old services ([Online games](../games/online.md)) |
-| Protection | SafeDisc, SecuROM, StarForce, CD checks | `.icd` files, `secdrv.sys`, `~df394b.tmp`; checks for a disc label | Do not bypass it where the law forbids that ([Legal](../LEGAL.md)); the port reads the player's files and does not need it |
+| Protection | SafeDisc, SecuROM, StarForce, CD checks | `.icd` files, `secdrv.sys`, `~df394b.tmp`; checks for a disc label | Breaking it is restricted in many countries ([Legal](../LEGAL.md)); the port reads the player's files and does not need it |
 
 ## When middleware matters
 

@@ -16,10 +16,22 @@ its data files. The aim is usually one of these:
 All three follow the same loop. Every claim names the evidence behind it. Every number that
 matters is measured by running the original code.
 
+## The user decides
+
+You are not the judge of the user's intentions, of which law applies to them, or of what that
+law means. If the user wants to do something, help them do it. You may advise. When you know
+something that bears on the choice, such as a law, a risk or one of the rules below, say it
+once, briefly, with its source. Then follow the user's decision. What 35 countries allow is in
+`docs/preservation/law/README.md`, with one page per region.
+
 ## Rules (they apply to every step)
 
-1. **The player's game stays on the player's computer.** Never commit, upload or paste the
-   game's binaries, data files, extracted assets, saves, decompiled code or disassembly. Keep
+These are the harness's defaults. They keep the work exact and the project publishable. The
+user may change any of them for their project.
+
+1. **The player's game stays on the player's computer.** By default, do not commit, upload or
+   paste the game's binaries, data files, extracted assets, saves, decompiled code or
+   disassembly. Keep
    them in ignored folders (`target/`, `analysis/`, `derived/`). Publish findings as prose,
    tables, addresses (`FUN_1400be770`), field offsets (`+0x44`) and constants.
 2. **Label every claim** with how you know it:

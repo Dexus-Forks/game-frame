@@ -29,8 +29,8 @@ path.
   in any file. The port needs the player's CD audio tracks ripped to files. Document how the
   player does that.
 - **CD checks**: a game checks for its disc by reading a file or a volume label. The port reads
-  the player's files and does not need the check. Never bypass a protection scheme in a way the
-  law forbids ([Legal](../LEGAL.md)).
+  the player's files and does not need the check. Breaking copy protection is restricted in
+  many countries ([Your own copy and the law](../preservation/law/README.md)).
 - **Streaming**: some games read from the CD while playing (video, music, level data). Read
   timings then shaped the game; a port reads from disk and need not reproduce delays unless the
   game logic depended on them.

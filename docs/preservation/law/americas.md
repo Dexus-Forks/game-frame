@@ -102,7 +102,8 @@ Argentina have no decompilation exception.
 ## What this means for a project
 
 Study is covered in Canada and Chile, and through lock exceptions in Mexico and Colombia. In
-Brazil and Argentina, decompiling has no express cover, so rely on observing the running game
-and on new code that copies no expression. In Mexico, breaking a lock for profit is a crime.
+Brazil and Argentina, decompiling has no express cover. Observing the running game and writing
+new code that copies no expression have the firmest footing there. In Mexico, breaking a lock
+for profit is a crime.
 
 Sources: [Notes: the Americas](../research/law-americas.md).

@@ -81,5 +81,7 @@ nothing else. `docs/observe/object-model.md` has the rules and examples from thr
 - A compressed video stream is not pixel-exact: compare layout, and use blurred image
   differences with a threshold.
 - The clock and the random seed are inputs too. A second run that differs usually read one.
-- Never test against a live online service without its owner's permission, and never bypass
-  protection where the law forbids it (`docs/LEGAL.md`).
+- A live online service belongs to someone else, and its terms usually forbid testing against
+  it. Breaking copy protection is restricted in many countries. If the user's plan touches
+  either, say so once with the source (`docs/LEGAL.md`, `docs/preservation/law/`), then follow
+  the user's decision.

@@ -89,8 +89,8 @@ Norway applies the EU Software Directive through the European Economic Area.
 ## What this means for a project
 
 Observing the running game and decompiling it for interoperability are both covered in these
-countries. A project must still write new code, share nothing from the game and leave locks
-alone.
+countries. Sharing the game and breaking locks are not covered. New code that copies no
+expression stays on the safe side of the EU and UK rules.
 
 Sources: [Notes: law and policy](../research/law-and-policy.md) and
 [Notes: Africa, the Middle East and wider Europe](../research/law-africa-middle-east-europe.md).

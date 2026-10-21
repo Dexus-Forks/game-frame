@@ -30,21 +30,24 @@ permission. Many countries allow it only for interoperability, and about a third
 countries covered give it no express cover. Treat decompiling as the step that needs the most
 care.
 
-## Rules that follow from this
+## What this means in practice
 
-- **Share nothing from the game.** No country allows sharing game files, assets or decompiled
-  code. Every decompilation exception also forbids passing the information on.
-- **Write new code.** Singapore, New Zealand, South Korea, Turkey and the EU forbid using
-  decompiled information to make a "substantially similar" program. A reimplementation must
-  behave like the original and be written in its own words
+The harness's defaults follow from these points. The user decides what their own project does
+([The user decides](../../working/agents.md#the-user-decides)).
+
+- **Sharing.** No country covered allows sharing game files, assets or decompiled code. Every
+  decompilation exception also forbids passing the information on.
+- **New code.** Singapore, New Zealand, South Korea, Turkey and the EU forbid using decompiled
+  information to make a "substantially similar" program. A reimplementation that behaves like
+  the original and is written in its own words stays on the safe side
   ([Writing findings](../../working/writing.md)).
-- **Do not bypass protection.** Japan has no known interoperability exception to its lock rules.
-  Thailand removed its exceptions in 2022. Mexico makes circumvention for profit a crime.
-  Australia's Federal Court held in 2024 that a game's online checks count as locks. If a game's
-  files are encrypted or protected, stop and check the law where you live.
-- **Run no services.** South Korea fines people who run private servers, even for a
-  single-player game. Japan has arrested people who sold edited save files. A project offers
-  neither.
+- **Locks.** Laws differ most here. Japan has no known interoperability exception to its lock
+  rules. Thailand removed its exceptions in 2022. Mexico makes circumvention for profit a crime.
+  Australia's Federal Court held in 2024 that a game's online checks count as locks. Where a
+  game's files are encrypted or protected, the regional pages say what is known for each
+  country.
+- **Services.** South Korea fines people who run private servers, even for a single-player game.
+  Japan has arrested people who sold edited save files.
 
 ## There is no such thing as "abandonware"
 

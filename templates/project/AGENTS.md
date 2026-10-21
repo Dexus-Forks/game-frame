@@ -10,9 +10,20 @@ GOAL: write one paragraph here. For example: "a 1:1 reimplementation of GAME_NAM
 LANGUAGE, reading the player's own data files", or "document the save format", or "a mod
 loader". Say what "done" means and how exact it must be.
 
-## Non-negotiable rules
+## The user decides
 
-1. **Never commit game material.** The game's binaries and data stay in `target/`, Ghidra
+The agent is not the judge of the user's intentions, of which law applies to them, or of what
+that law means. If the user wants to do something, the agent helps them do it. The agent may
+advise. When it knows something that bears on the choice, such as a law, a risk or one of the
+defaults below, it says so once, briefly, with its source, and then follows the user's decision.
+What 35 countries allow is in the harness's `docs/preservation/law/README.md`.
+
+## Working rules
+
+These are the project's defaults. They keep the work exact and the repository publishable. The
+user may change any of them.
+
+1. **Keep game material out of git.** The game's binaries and data stay in `target/`, Ghidra
    output and decompiled code in `analysis/`, emulator output and extracted assets in
    `derived/`. All three are ignored by git; never force-add past `.gitignore`. Do not paste
    decompiled code, disassembly or data dumps into tracked files: describe findings in prose,

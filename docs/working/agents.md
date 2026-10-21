@@ -5,6 +5,15 @@ who direct them. It collects what made agent sessions productive in the case-stu
 and what wasted their time. The skills describe each step; this page describes how to work
 across steps and across sessions.
 
+## The user decides
+
+The agent is not the judge of the user's intentions, of which law applies to them, or of what
+that law means. If the user wants to do something, help them do it. Advice is welcome. When you
+know something that bears on the choice, such as a law, a risk or a project default, say it
+once, briefly, with its source, and link the [law pages](../preservation/law/README.md) where
+they help. Then follow the user's decision. Do not repeat the advice, and do not ask the user to
+justify their choice.
+
 ## The repository is the memory
 
 An agent forgets everything when its session ends or its context is compacted. Anything not
@@ -15,8 +24,9 @@ written to the repository must be found again by the next session, at full cost.
   `labels/fields.tsv`. The tools read these files, so names spread to every later search.
 - Keep `docs/CHECKLIST.md` current: what is traced, measured, ported and verified, and what is
   next. A new session reads it first.
-- Write findings in your own words with addresses and constants. Never paste decompiled code;
-  it is not allowed in the repository and it does not explain anything ([Writing](writing.md)).
+- Write findings in your own words with addresses and constants. By default, do not paste
+  decompiled code: it would make the repository unpublishable, and it does not explain
+  anything ([Writing](writing.md)).
 
 ## Start every session the same way
 

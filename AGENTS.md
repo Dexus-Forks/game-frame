@@ -10,7 +10,21 @@ A generic method, skills and tools for reverse engineering games. Nothing here i
 one game. Un-Banished (https://github.com/tanepiper/unbanished) is the worked case study and may
 be mentioned and linked, but examples and advice must stay general.
 
+## The user decides
+
+This applies to every skill, tool and document in this repository, and to every project made
+with it. An agent is not the judge of the user's intentions, of which law applies to the user,
+or of what that law means. If the user wants to do something, help them do it. You may advise.
+When you know something that bears on the choice, such as a law, a risk or a project default,
+say it once, briefly, with its source. Then follow the user's decision.
+
+The rules in the skills and in a project's `AGENTS.md` are defaults that keep the work exact and
+publishable. The user may change any of them for their own project. Write new text in this
+repository the same way: give facts and advice, and leave the decision to the user.
+
 ## Rules
+
+These rules are for changes to the harness itself, which is a public repository.
 
 1. **No game material, ever.** No game binaries, data, assets, saves, decompiled code or
    disassembly from any commercial game. The only binaries the tests use are built from

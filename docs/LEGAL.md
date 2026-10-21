@@ -3,6 +3,10 @@
 This is practical guidance, not legal advice. Laws differ between countries; if a project
 matters, ask a lawyer who knows software law where you live.
 
+These are the harness's defaults and the reasons for them. The user decides what their own
+project does. An agent gives this advice when it bears on a choice, and then follows the user's
+decision ([The user decides](working/agents.md#the-user-decides)).
+
 ## What this harness assumes
 
 - **You own a legitimate copy of the game**, and you analyse it on your own computer.
@@ -14,15 +18,15 @@ matters, ask a lawyer who knows software law where you live.
 - **Players bring their own copy.** A reimplementation reads the player's game files at run
   time, as projects such as OpenRCT2, OpenMW, DevilutionX and Un-Banished do.
 
-## Why each rule exists
+## Why each default exists
 
-| Rule | Reason |
+| Default | Reason |
 |---|---|
-| Never commit game files or extracted assets | They are the copyright holder's work; distributing them is infringement, whatever the purpose |
-| Never commit decompiled code or disassembly | Decompiled code is a derivative of the original program; publishing it can infringe, and it is unreadable anyway |
+| Keep game files and extracted assets out of git | They are the copyright holder's work; distributing them is infringement, whatever the purpose |
+| Keep decompiled code and disassembly out of git | Decompiled code is a derivative of the original program; publishing it can infringe, and it is unreadable anyway |
 | Describe behaviour in your own words | Facts about how a program behaves (a formula, a file layout, a constant) are generally not protected the way expression is; describing them in your own words keeps the line clear |
 | Cite the original function for every finding | It makes the work checkable, and it shows the reimplementation came from analysis rather than a leak |
-| Do not bypass protection or online services | Circumventing copy protection is restricted in many places (for example the DMCA in the US and the EU Copyright Directive), even when the purpose is lawful; online services also have terms you agreed to |
+| Leave protection and online services alone | Circumventing copy protection is restricted in many places (for example the DMCA in the US and the EU Copyright Directive), even when the purpose is lawful; online services also have terms you agreed to |
 
 ## Interoperability
 

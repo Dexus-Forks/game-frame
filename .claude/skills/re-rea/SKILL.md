@@ -45,8 +45,9 @@ targeted questions and evidence, the export for broad search.
 - REA's evidence labels match ours: observations, inferences and unknowns stay separate; static
   analysis never proves run-time behaviour.
 - Do not repeat an identical REA call; page large results with `inspect_analysis_view` instead.
-- REA's runtime tools run the target: use them only on the user's own target and with their
-  agreement, and never on a game's online service.
+- REA's runtime tools run the target: run them on the target the user chose, with their
+  agreement. A game's online service belongs to someone else; if the user points REA at one,
+  mention its terms once, then follow the user's decision.
 - Decompiled output from REA is still decompiled code: it stays out of tracked files.
 
 ## When REA is not connected

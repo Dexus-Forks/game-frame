@@ -11,9 +11,10 @@ you find yourself inventing a rule while writing code, stop and trace it.
 ## Write new code
 
 Read the pseudocode to understand the behaviour, then write the new code from your notes, with
-clear names and the target language's own types and structure. Never paste decompiled code into
-the new code base: it is the original author's work, and it is also unreadable. This is the line
-between a reimplementation and a copy; keep it visible (see `docs/LEGAL.md`).
+clear names and the target language's own types and structure. By default, do not paste
+decompiled code into the new code base: it is the original author's work, and it is also
+unreadable. This is the line between a reimplementation and a copy; keep it visible (see
+`docs/LEGAL.md`). If the user chooses otherwise, say this once and follow their decision.
 
 ## Mirror the original's shape
 

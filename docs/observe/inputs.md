@@ -62,7 +62,7 @@ the port must model.
 | Saves | read when the player loads | An input like a command: "load this file" |
 | Command line and environment | `PSP` command tail, `GetCommandLine`, `getenv` (`BLASTER` for the Sound Blaster) | An input at start |
 | Hardware detection | video card, sound card, memory size (EMS, XMS), CPU type | Usually changes only drivers and quality. If the rules read it (detail levels that change the simulation), record it |
-| CD audio and CD checks | `MSCDEX` (`INT 2Fh` function `15h`), `mciSendCommand` | Usually not rules; copy protection must not be bypassed where the law forbids it ([Legal](../LEGAL.md)) |
+| CD audio and CD checks | `MSCDEX` (`INT 2Fh` function `15h`), `mciSendCommand` | Usually not rules; breaking copy protection is restricted in many countries ([Legal](../LEGAL.md)) |
 
 ### The operating system and the window
 
