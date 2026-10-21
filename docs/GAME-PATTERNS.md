@@ -68,6 +68,19 @@ Games keep time as integer ticks (milliseconds or microseconds) or as float seco
 calendar of a simulation (days, seasons, years) is derived from it. Float time accumulates
 error: if the original does that, the reimplementation must too.
 
+Use the game's own calendar and its own names. A game's year may have twelve "months" that are
+seasons (Early Spring to Late Winter), or eight, or none; its tenth month is not October. Read
+the names from the game's string tables, and write docs, tests and examples in them.
+
+## Messages and text
+
+Event logs, notifications and tooltips usually store a message type and its arguments (a
+person, a building, a number), and format the text from a string table when it is shown. Saves
+may keep only the formatted text. A reimplementation that keeps the arguments formats the text
+the same way; one that loads a save shows the stored text as it is. Text in the player's
+language comes from data, so never hard-code an English string where the original reads a
+table.
+
 ## Saves
 
 A save is the serialized world: often the same serializers as the data files, plus the random
@@ -90,3 +103,9 @@ exercises every system's state.
 Messages are usually serialized with the same stream classes as saves. Lockstep games send only
 inputs and depend on exact determinism; client-server games send state. Never test against a
 live service without its owner's permission.
+
+If you add lockstep multiplayer to a single-player game, look for state that belongs to one
+player but is read by the simulation: settings, unlocked achievements, difficulty options, the
+local clock, the window size. Two players with different values then compute different worlds.
+Give every player the same values for a shared game (for example, count achievements from none
+in multiplayer), and check with digests that two players stay identical.

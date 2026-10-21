@@ -1,6 +1,6 @@
 ---
 name: re-port
-description: Reimplement traced game behaviour in new code that behaves exactly like the original - mirroring its structure, numeric types and order of operations, random draw order, iteration order and integer semantics, citing the original function on every item and marking every intentional difference as a Deviation. Use when writing the reimplementation of anything traced (re-trace) and measured (re-emulate).
+description: Reimplement traced game behaviour in new code that behaves exactly like the original - mirroring its structure, numeric types and order of operations, random draw order, iteration order and integer semantics, citing the original function on every item and marking every intentional difference as a Deviation. Also how to shape the reimplementation (an exact core, commands, digests, a headless runner) and keep additions such as multiplayer or mod code apart from it. Use when writing the reimplementation of anything traced (re-trace) and measured (re-emulate).
 ---
 
 # Reimplement, exactly
@@ -25,6 +25,54 @@ between a reimplementation and a copy; keep it visible (see `docs/LEGAL.md`).
 - Every reimplemented item names its original in a comment or doc comment, in one consistent
   form the tools can search, for example ``Original: `FUN_1400be680` ``. Mark guesses
   *inferred*.
+
+## Build it so it can be checked
+
+Decide the shape of the reimplementation early: these are cheap on day one and expensive to add
+after a year.
+
+- **An exact core with nothing else in it.** Put everything that decides what happens (the
+  world, its rules, the clock, the random generators, loading and writing saves) in one module or
+  library that does not draw, play sound, open windows or use the network. It then runs headless,
+  in tests, on a server and on every platform. Add a test that fails if the core starts to depend
+  on a drawing, window, sound or network library.
+- **Every player action is a command.** Input becomes a small value ("place building X at Y",
+  "set speed 3") that the core carries out at the exact point where the original reacts to the
+  input, so the random draws stay in order. One command type gives you recording and replay,
+  scripted tests and lockstep multiplayer from the same code.
+- **A digest of the state.** A function that hashes the core's whole state (or the bytes of a
+  save) lets two runs, two builds or two computers compare themselves cheaply at every
+  checkpoint, and find the first step where they differ.
+- **A headless runner.** A command-line mode that loads a save or starts a seeded game, runs a
+  fixed number of updates or seconds with scripted input at fixed times, then prints digests or
+  writes a save and a picture. Every whole-system check in `re-verify` is built on it.
+- **A query layer for tests.** A way to ask the running program what it shows (interface
+  elements by name or text, the world's counts) and to press things by name. Tests that find a
+  button by its name survive layout changes; tests that click pixel positions or wait fixed
+  times do not.
+
+## Additions the original does not have
+
+Most reimplementations add things: multiplayer, a server, mod support, a debug probe, a new
+camera, a browser version. Keep each one apart from the core:
+
+- it lives in its own files, behind a build option, and the program builds and plays exactly
+  the same without it (a test builds with every addition off and compares results with the full
+  build);
+- it reaches the core only through a few small, named entry points (commands, events after each
+  step, read-only queries), never by editing the core's code paths;
+- a run-time switch (for example `--pure`) turns every addition off for one run, so a player
+  can always get the original game;
+- anything that changes results is marked `Deviation:` and happens only when that addition is in
+  use.
+
+**Mod code that changes rules** (scripts or plugins run inside the simulation) must give the
+same result on every computer, or replays and multiplayer break. Run it in a sandbox: integers
+only (no floating point), no access to files, the clock or the network, random numbers only
+from the game's own generator, a fixed instruction budget per call (a plugin that runs out
+stops at the same instruction everywhere), a fixed order between plugins, and a fingerprint of
+the loaded plugins that multiplayer players must share. A WebAssembly interpreter with fuel
+metering and floats switched off does all of this.
 
 ## Generated record types (Borland programs with debug symbols)
 
@@ -63,9 +111,15 @@ These are the details that make a reimplementation drift, in order of how often 
 
 ## Deviations
 
-Any intentional difference (a platform difference, a fix the project decided on, an unported
-piece) gets a comment containing `Deviation:` and the reason, so a script can list them all.
-A deviation is a decision; an accidental difference is a bug.
+Any intentional difference (a platform difference, a fix the project decided on, an addition)
+gets a comment containing `Deviation:` and the reason; a piece left out gets `not ported`.
+`tools/triage/deviations.py --out docs/DEVIATIONS.md src/` lists them all in one ledger, and
+`--check` fails a test when the ledger is out of date. A deviation is a decision; an accidental
+difference is a bug.
+
+`tools/triage/coverage.py SOURCE_DIR` reads the `Original:` citations and says how much of the
+original's code (by count and by size) the reimplementation has ported from, with the largest
+functions nobody cites yet.
 
 ## Workflow
 

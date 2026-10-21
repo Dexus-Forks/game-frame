@@ -23,17 +23,23 @@ loader". Say what "done" means and how exact it must be.
 3. **Measure before claiming exactness.** Numeric, random or procedural code is checked against
    the original under the emulator (`re-emulate`), bit for bit.
 4. **Mark every intentional difference** from the original in a code comment containing
-   `Deviation:`.
-5. **Write it down.** Findings go into `docs/`, function names into `labels/names.tsv`, struct
+   `Deviation:` (and a piece left out with `not ported`), then regenerate the ledger:
+   `tools/triage/deviations.py --out docs/DEVIATIONS.md SOURCE_DIR`.
+5. **Keep the core exact and the additions apart.** The part that decides what happens (rules,
+   clock, random numbers, saves) does not draw, play sound or use the network. Anything the
+   original does not have (multiplayer, mod code, debug tools) is an addition behind a build
+   option, reaches the core only through commands, events and queries, and can be switched off
+   for a run (`re-port`, "Additions the original does not have").
+6. **Write it down.** Findings go into `docs/`, function names into `labels/names.tsv`, struct
    fields into `labels/fields.tsv`, progress into `docs/CHECKLIST.md`. An undocumented finding
    is re-derived by the next session.
-6. **Several sessions may work at once.** Stage only your own files (`git add path`), never
+7. **Several sessions may work at once.** Stage only your own files (`git add path`), never
    `git add -A`, and never revert work you did not do.
-7. **Ask before downloading** anything; say the file, the source and the size.
-8. **Licence and instructions.** Our code is dual-licensed MIT OR Apache-2.0 (LICENSE-MIT,
+8. **Ask before downloading** anything; say the file, the source and the size.
+9. **Licence and instructions.** Our code is dual-licensed MIT OR Apache-2.0 (LICENSE-MIT,
    LICENSE-APACHE; `license = "MIT OR Apache-2.0"` in manifests). Every part (core, player,
    viewer, tools) has build and run instructions in its README and a row in README.md.
-9. **Keep files small and modular.** One concern per module; split a file before it passes a
+10. **Keep files small and modular.** One concern per module; split a file before it passes a
    few hundred lines, generated code included (one file per original unit or table).
 
 ## Where things are

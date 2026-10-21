@@ -74,6 +74,10 @@ A small task may use only two or three steps. Do not skip `land`.
 
 ## Spend effort where it pays
 
+- **Shape the reimplementation on day one** (`re-port`, "Build it so it can be checked"): an
+  exact core with no drawing or network, every player action as a command, a state digest and
+  a headless runner. They cost little at the start and a great deal to add later.
+
 A full reimplementation is long. Most of the cost is verification and reading assembly, so
 choose how deep to go for each piece:
 

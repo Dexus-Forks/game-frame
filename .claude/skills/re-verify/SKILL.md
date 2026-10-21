@@ -1,6 +1,6 @@
 ---
 name: re-verify
-description: Prove that a reimplementation matches the original - bit-exact parity tests against emulator ground truth (bitcompare.py), random-draw order (seqdiff.py), determinism of two identical runs, round trips of real save files, picture comparison against the original game, and comparison between two versions of the reimplementation. Use after every reimplemented slice and before committing it.
+description: Prove that a reimplementation matches the original - bit-exact parity tests against emulator ground truth (bitcompare.py), random-draw order (seqdiff.py), determinism of two identical runs with digests at checkpoints and on every platform, recordings and replays, round trips of real save files, picture comparison against the original game, comparison between two versions of the reimplementation, and test tiers. Use after every reimplemented slice and before committing it.
 ---
 
 # Verify against the original
@@ -101,6 +101,20 @@ Run the reimplementation twice with the same seed and inputs and compare everyth
 map order, uninitialised memory, threads, or a random generator seeded from the clock. This
 check needs no original at all, so run it on every change.
 
+Compare **digests at checkpoints**, not only the end: print a hash of the whole state every N
+updates (`re-port`, "Build it so it can be checked"). The first checkpoint that differs narrows
+the search to N updates; halve N until you have the step, then compare the state field by field.
+
+**Every platform the reimplementation runs on** must give the same digests: native builds on
+different CPUs, a 32-bit build, the browser (WebAssembly). Run one seeded game on each and
+compare. Differences usually come from the platform's maths library, from fused multiply-add
+on one target only, or from a different iteration order of a hash map.
+
+**Recordings.** Record a game's commands with the digest at each checkpoint, then replay the
+recording and check every digest. A recording made today is a regression test for every later
+change, and it is how a lockstep multiplayer game is checked: two players are two replays of
+the same commands.
+
 ## 4. Real saves
 
 Load saves made by the original game (several sizes and ages) and check every value you decode;
@@ -116,6 +130,10 @@ of differing pixels, where they are), not by eye. A heat map of differences show
 wrong. If the original only runs on another machine, stream it (Steam Remote Play, Parsec) and
 capture there.
 
+Make the reimplementation's pictures with its headless runner (a save, scripted input at fixed
+times, a capture at a fixed time), never by hand, so the same picture can be made again after
+every change. The same runner makes the screenshots and short videos for documentation.
+
 ## 6. Version against version
 
 When you optimise or restructure the reimplementation, the results must not change: run fixed
@@ -123,6 +141,21 @@ scenarios with the old and the new build, compare saves and frames, and also run
 against itself to know what "identical" looks like on this machine. Any difference needs an
 exact cause before the change goes in.
 
-## 7. The harness itself
+**Frames that differ while the state does not.** GPU drivers are not always deterministic: a
+large scene can differ by a level or two on a few pixels between two runs of the same build.
+When saves are identical and only a frame differs slightly, run that scenario again a few times
+with both builds. If each build also differs from itself, it is the driver; record the case
+(how often, how large) so the next person does not chase it. If the difference repeats every
+time, it is real.
+
+## 7. Test tiers
+
+Group the checks by cost and run them by tier: a quick tier on every change (unit tests,
+formats, a few headless scenarios against recorded baselines), a standard tier before a commit
+that touches the game (determinism, pictures, builds without additions), and a long tier before
+a release (replays, multiplayer, version against version). A baseline that changes is a change
+in behaviour: find the cause, and record a new baseline only when the change is intended.
+
+## 8. The harness itself
 
 `tests/run.sh` proves the harness's tools against the sample game; run it after changing a tool.

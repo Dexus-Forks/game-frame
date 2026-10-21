@@ -29,6 +29,13 @@ Direct3D 9 and 11 shaders, and a data-driven interface. Every step of the loop w
   seed give identical frames; screenshots of the original (streamed from a Windows PC) are
   compared with an image-difference tool; every optimisation must leave saves and frames
   identical between versions.
+- **A core and its additions:** after the reimplementation matched, the project split it into
+  an exact core (the town, its rules, saves and player commands, with no drawing, sound or
+  network) and additions built around it: multiplayer with a server, recordings, a test probe,
+  mod sites and rule hooks for mods (WebAssembly plugins with no floats and a fixed budget).
+  Each addition is a build option; a test builds the game without any of them and checks that
+  it plays exactly as the full build; `--pure` turns them all off for one run. Doing this earlier
+  would have been cheaper: see `re-port`, "Build it so it can be checked".
 - **The harness grew with the work:** each slow step or mistake became a tool or a rule
   (labels files, a readable-decompile tool, random-draw tracing and diffing, a deviations
   ledger, version comparison). Its "How it was made" page tells the story:
@@ -46,6 +53,7 @@ by size); 170 of 170 resource types; around 45 documented deviations.
 | `AGENTS.md` | `templates/project/AGENTS.md` |
 | `.claude/skills/banished-*` | `.claude/skills/re-*` |
 | `tools/ghidra/`, `tools/emu/pe_emu.py` | `tools/ghidra/`, `tools/emu/pe_emu.py` (generalised) |
-| `tools/triage/` (`decomp.py`, `fnindex.py`, `rngdiff.py`) | `tools/triage/decomp_query.py`, `tools/verify/seqdiff.py` |
-| `tools/compat/` | `re-verify` section 6 |
+| `tools/triage/` (`decomp.py`, `fnindex.py`, `rngdiff.py`, `deviations.py`, `coverage.py`) | `tools/triage/decomp_query.py`, `tools/verify/seqdiff.py`, `tools/triage/deviations.py`, `tools/triage/coverage.py` |
+| `tools/compat/`, `tools/test/run.py` | `re-verify` sections 3, 6 and 7 |
+| `crates/sim`, the cargo features, `--pure` | `re-port`, "Build it so it can be checked" and "Additions the original does not have" |
 | `docs/` (findings in evidence style) | `templates/project/docs/`, `re-land` |
