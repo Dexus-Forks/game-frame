@@ -8,7 +8,7 @@
 //! The addresses in the comments are the routines in the System unit as linked into Tyrian 2000
 //! (segment 1040). In the Tyrian 2026 project every routine here matches the original on 40,000
 //! random operands, and multiplication and `Round` on every 16-bit integer times the game's
-//! constants (*measured* under the harness's DOS emulator). `div` is measured only for divisors
+//! constants (*measured* under GameFrame's DOS emulator). `div` is measured only for divisors
 //! of 2.0; for other divisors its rounding is *inferred* from the multiply's.
 //!
 //! ```

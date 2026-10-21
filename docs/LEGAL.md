@@ -3,11 +3,11 @@
 This is practical guidance, not legal advice. Laws differ between countries; if a project
 matters, ask a lawyer who knows software law where you live.
 
-These are the harness's defaults and the reasons for them. The user decides what their own
+These are GameFrame's defaults and the reasons for them. The user decides what their own
 project does. An agent gives this advice when it bears on a choice, and then follows the user's
 decision ([The user decides](working/agents.md#the-user-decides)).
 
-## What this harness assumes
+## What GameFrame assumes
 
 - **You own a legitimate copy of the game**, and you analyse it on your own computer.
 - **Nothing from the game is redistributed.** Binaries, data files, extracted art, sound, text,

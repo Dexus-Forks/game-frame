@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""gameframe: help and discovery for the GameFrame harness. Run `./gameframe help`.
+"""gameframe: help and discovery for GameFrame. Run `./gameframe help`.
 
 The launcher for tools/gameframe/ (see its __main__.py for the commands). Standard library only.
 """

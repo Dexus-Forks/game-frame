@@ -2,7 +2,7 @@
 
 [Un-Banished](https://github.com/tanepiper/unbanished) is a 1:1 reimplementation of the
 city-building game Banished (Shining Rock Software, 2014) in Rust, running on Windows, macOS,
-Linux and in the browser on the player's own game files. This harness was extracted from it:
+Linux and in the browser on the player's own game files. GameFrame was extracted from it:
 the skills, the Ghidra scripts and the emulator began there and were made generic here.
 
 ![A town in Un-Banished with the Town Hall window open on its Inventory tab](../assets/case-studies/banished-town-hall.webp)
@@ -46,7 +46,7 @@ Direct3D 9 and 11 shaders, and a data-driven interface. Every step of the loop w
 - **Releases:** each version is tagged by one workflow, which also builds the game on Windows,
   macOS and Linux runners and attaches a zip for each (`docs/OUTPUTS.md`), and rebuilds the
   website with the browser version.
-- **The harness grew with the work:** each slow step or mistake became a tool or a rule
+- **GameFrame grew with the work:** each slow step or mistake became a tool or a rule
   (labels files, a readable-decompile tool, random-draw tracing and diffing, a deviations
   ledger, version comparison). Its "How it was made" page tells the story:
   https://github.com/tanepiper/unbanished/blob/main/docs/PROCESS.md

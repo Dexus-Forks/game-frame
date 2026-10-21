@@ -1,7 +1,9 @@
 # AGENTS.md: reverse engineering GAME_NAME
 
 Rules for every agent (Claude Code, Codex, Cursor and others) and every person working here.
-The method and the tools come from the GameFrame harness; its skills are in
+The method and the tools come from GameFrame. GameFrame is an agentic framework for reverse
+engineering games. Its playbook of skills and agents runs inside your coding agent, and its
+toolkit of tested tools checks every result against the original. Its skills are in
 `.claude/skills/` (agents without skill support: read each `SKILL.md`). Its stage agents are
 in `.claude/agents/`: each does one step and hands off to the next (`re-start`, "Stage agents").
 
@@ -17,7 +19,7 @@ The agent is not the judge of the user's intentions, of which law applies to the
 that law means. If the user wants to do something, the agent helps them do it. The agent may
 advise. When it knows something that bears on the choice, such as a law, a risk or one of the
 defaults below, it says so once, briefly, with its source, and then follows the user's decision.
-What 35 countries allow is in the harness's `docs/preservation/law/README.md`.
+What 35 countries allow is in GameFrame's `docs/preservation/law/README.md`.
 
 ## Working rules
 
@@ -65,10 +67,10 @@ user may change any of them.
 | `docs/FINDINGS.md` | The overview: binaries, engine, formats, systems, with links |
 | `docs/CHECKLIST.md` | What is traced, measured and reimplemented, and what is next |
 | `labels/names.tsv`, `labels/fields.tsv` | Names for original functions and struct fields, read by the tools |
-| `tools/`, `scripts/` | The harness's tools: https://github.com/tanepiper/game-frame |
+| `tools/`, `scripts/` | GameFrame's toolkit: https://github.com/tanepiper/game-frame |
 | `./gameframe` | Help on the method and the tools: `steps`, `skills`, `skill NAME`, `tools`, `tool NAME`, `run NAME ARGS`, `find WORD`, `doctor` |
-| `docs/DOS.md`, `docs/ABI.md`, `docs/GAME-PATTERNS.md`, `docs/OUTPUTS.md` | The harness's reference documents (DOS games: start with DOS.md; what to ship: OUTPUTS.md) |
-| `docs/games/`, `docs/observe/`, `docs/engines/`, `docs/hardware/`, `docs/consoles/`, `docs/working/` | The harness's taxonomy of games (with this game's family and its rule set) and how to observe the original: inputs, interface, object model |
+| `docs/DOS.md`, `docs/ABI.md`, `docs/GAME-PATTERNS.md`, `docs/OUTPUTS.md` | GameFrame's reference documents (DOS games: start with DOS.md; what to ship: OUTPUTS.md) |
+| `docs/games/`, `docs/observe/`, `docs/engines/`, `docs/hardware/`, `docs/consoles/`, `docs/working/` | GameFrame's taxonomy of games (with this game's family and its rule set) and how to observe the original: inputs, interface, object model |
 | `.mcp.json` | MCP servers for the agent: REA, and `dosbox` (DOSBox-X's debugger, for DOS games) |
 
 ## The loop
@@ -83,4 +85,4 @@ Work a subsystem at a time and verify by risk (`re-start`, "Spend effort where i
 against recorded frames.
 
 When something here would help any game (a tool fix, a new format reader, a pitfall), add it
-to the harness too, with a test against its own samples.
+to GameFrame too, with a test against its own samples.

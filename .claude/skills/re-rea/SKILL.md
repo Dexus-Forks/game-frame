@@ -1,6 +1,6 @@
 ---
 name: re-rea
-description: When and how to use REA (Reverse Engineer Anything, the rea-agents MCP server) alongside this harness - quick evidence-backed inspection of binaries, archives, Android/iOS/.NET/Electron/browser targets, focused decompilation and call graphs through Ghidra, and runtime observation. Use for targets the text export does not cover, for a fast first answer about one function, or when a claim needs a citable Evidence record.
+description: When and how to use REA (Reverse Engineer Anything, the rea-agents MCP server) alongside GameFrame - quick evidence-backed inspection of binaries, archives, Android/iOS/.NET/Electron/browser targets, focused decompilation and call graphs through Ghidra, and runtime observation. Use for targets the text export does not cover, for a fast first answer about one function, or when a claim needs a citable Evidence record.
 ---
 
 # Investigate with REA
@@ -9,11 +9,11 @@ REA (https://github.com/morluto/rea) is an MCP server that gives the agent rever
 tools and records every result as Evidence with an ID, coverage and limits. Its own skill,
 `reverse-engineer-anything`, documents each tool in detail: install it with REA's setup
 (`re-setup`) and read it before a large REA investigation. This skill says how REA fits into
-the harness's loop.
+the playbook's loop.
 
 ## REA or the text export?
 
-| Use REA (`mcp__rea__*`) when | Use the harness's Ghidra export (`re-ghidra`) when |
+| Use REA (`mcp__rea__*`) when | Use GameFrame's Ghidra export (`re-ghidra`) when |
 |---|---|
 | The target is not a plain native binary: an APK/IPA, a .NET assembly, an Electron app or ASAR, a browser page, firmware, an archive | You need to search the whole program as text, many times (grep is instant) |
 | You want a quick, cited answer about one function: `open_binary` then `analyze_function`, `procedure_callers`, `xrefs` | You trace a system across hundreds of functions over several sessions |
@@ -35,7 +35,7 @@ targeted questions and evidence, the export for broad search.
    `search_strings`, `search_procedures`, `analyze_function`, `procedure_callers`,
    `procedure_callees`, `xrefs`, `procedure_pseudo_code`.
 3. **Name what you learn in the session**: `set_address_name` and `set_comment` keep labels in
-   REA's database; also copy each label into `labels/names.tsv` so the harness's tools see it.
+   REA's database; also copy each label into `labels/names.tsv` so GameFrame's tools see it.
 4. **Keep the Evidence IDs** in your notes; cite them in the finding's document next to the
    address ("observed: FUN_1400be770 writes +0x44 (REA evidence ev_...)").
 5. **Close** native sessions with `close_binary` when done.
@@ -53,5 +53,5 @@ targeted questions and evidence, the export for broad search.
 ## When REA is not connected
 
 No `mcp__rea__*` tools in the session means the MCP server is not registered or did not start.
-Follow `re-setup` section 3. Meanwhile, continue with the harness's own tools: Ghidra export,
+Follow `re-setup` section 3. Meanwhile, continue with GameFrame's own tools: Ghidra export,
 `decomp_query.py`, `ghidra-run.sh` and the emulator cover native binaries completely.

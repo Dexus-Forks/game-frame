@@ -1,7 +1,7 @@
 {
   "name": "gameframe",
   "version": "0.1.0",
-  "description": "Reverse engineer games and rebuild them exactly: the GameFrame method as skills (re-start, re-inventory, re-trace, re-port, re-verify and more) and stage agents that hand off to each other. The tools come from a clone of the harness or a project made with it.",
+  "description": "Reverse engineer games and rebuild them exactly: GameFrame's playbook as skills (re-start, re-inventory, re-trace, re-port, re-verify and more) and stage agents that hand off to each other. The toolkit comes from a clone of GameFrame or a project made with it.",
   "author": {
     "name": "Tane Piper",
     "url": "https://github.com/tanepiper"

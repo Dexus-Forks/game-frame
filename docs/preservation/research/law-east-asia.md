@@ -39,8 +39,8 @@ Korea has the clearest statute: a decompilation exception limited to interoperab
 - The Agency for Cultural Affairs' 2019 explanatory guidance on the flexible exceptions lists program analysis (reverse engineering) as an example of non-enjoyment use under Art. 30-4. (not confirmed)
 
 ### Inferences
-- For the harness's use case (study a game you own, record behaviour, write new code), China Art. 17 and Korea Art. 101-3(1)(6) cover observing and running the program. Decompilation beyond interoperability is less clearly covered in China and Korea. Taiwan and Hong Kong rely on general fair use or fair dealing, so outcomes depend on facts.
-- Korea's Art. 101-4 and China's trade-secret rule both protect the information gained, but neither permits sharing decompiled code. This fits a harness that never distributes code.
+- For GameFrame's use case (study a game you own, record behaviour, write new code), China Art. 17 and Korea Art. 101-3(1)(6) cover observing and running the program. Decompilation beyond interoperability is less clearly covered in China and Korea. Taiwan and Hong Kong rely on general fair use or fair dealing, so outcomes depend on facts.
+- Korea's Art. 101-4 and China's trade-secret rule both protect the information gained, but neither permits sharing decompiled code. This fits a framework that never distributes code.
 - Japan's Art. 30-4 is the broadest in theory, but it is tied to "non-enjoyment"; playing the game is enjoyment, analysing its code is not.
 
 ### Gaps
@@ -83,7 +83,7 @@ All five jurisdictions ban dealing in circumvention tools, and most ban the act 
 - IIPA (rights-holder group) supported confining any added exceptions to the act of circumvention, not to dealing in devices. — [IIPA comments](https://iipa.org/files/uploads/2018/01/HongKongCommentsonTPMConsultationPapers.pdf)
 
 ### Inferences
-- The harness reads the owner's own files and does not ship circumvention tools. Where a game's data is encrypted, China (Art. 50(5)), Korea (Art. 104-2 statutory exceptions), Taiwan (Art. 80-2(3)(8)) and Hong Kong (s.273D interoperability) all have a reverse engineering or interoperability path for the act itself. None permits giving tools to others.
+- GameFrame reads the owner's own files and does not ship circumvention tools. Where a game's data is encrypted, China (Art. 50(5)), Korea (Art. 104-2 statutory exceptions), Taiwan (Art. 80-2(3)(8)) and Hong Kong (s.273D interoperability) all have a reverse engineering or interoperability path for the act itself. None permits giving tools to others.
 - Japan is the riskiest place for tools or services that change game data or bypass console protections, because the UCPA covers services and is criminally enforced.
 
 ### Gaps
@@ -107,7 +107,7 @@ Each jurisdiction lets libraries copy items for preservation. China names museum
 - **Hong Kong**: Cap. 528 ss.46-53 are the library and archive provisions (s.51 replacement copies). (not confirmed)
 
 ### Inferences
-- Deposit libraries (NDL) preserve physical media but not necessarily playability. No jurisdiction gives private individuals a preservation exception; the harness's model (owner studies own copy) sits under the software and fair-use exceptions in section 1, not under library rules.
+- Deposit libraries (NDL) preserve physical media but not necessarily playability. No jurisdiction gives private individuals a preservation exception; GameFrame's model (owner studies own copy) sits under the software and fair-use exceptions in section 1, not under library rules.
 
 ### Gaps
 - Current Korean Art. 31 text (amended several times since 2006).
@@ -127,7 +127,7 @@ Japan and Korea are on 70 years; China, Taiwan and Hong Kong are on 50. Most com
 - **Hong Kong**: life plus 50; computer-generated works 50 years from creation. (not confirmed)
 
 ### Inferences
-- A corporate Japanese game published in 1980 is protected to the end of 2050 (70 years after publication). A Chinese or Taiwanese corporate game from 1980 would be protected to the end of 2030. The harness should not assume any 1980s commercial game is out of copyright.
+- A corporate Japanese game published in 1980 is protected to the end of 2050 (70 years after publication). A Chinese or Taiwanese corporate game from 1980 would be protected to the end of 2030. GameFrame should not assume any 1980s commercial game is out of copyright.
 
 ### Gaps
 - Japan, Korea and Hong Kong term articles: not confirmed against the official text.
@@ -203,7 +203,7 @@ China requires a game publishing licence (ISBN) from the National Press and Publ
 - **Taiwan**: Game Software Rating Management Regulations require age ratings. (not confirmed)
 
 ### Inferences
-- China's licensing makes a lawful re-release slow and dependent on a local publisher; this pushes preservation in China toward private study. A harness that redistributes nothing avoids publication licensing.
+- China's licensing makes a lawful re-release slow and dependent on a local publisher; this pushes preservation in China toward private study. A framework that redistributes nothing avoids publication licensing.
 - Korea's shutdown rules protect money spent, not continued access; none of the five gives a right to keep playing a closed online game.
 
 ### Gaps

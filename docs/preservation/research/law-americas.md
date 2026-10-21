@@ -1,6 +1,6 @@
 # Notes: the Americas
 
-Scope: Canada, Mexico, Brazil, Argentina, Chile and Colombia. This is not legal advice. Read "the harness" as: a person studies a game they own and writes new code that reads their own original files; nothing is distributed.
+Scope: Canada, Mexico, Brazil, Argentina, Chile and Colombia. This is not legal advice. Read "GameFrame" as: a person studies a game they own and writes new code that reads their own original files; nothing is distributed.
 
 ## 1. Statutory exceptions for reverse engineering, decompiling, studying or testing software for interoperability
 
@@ -227,7 +227,7 @@ Brazil has a live bill, PL 3612/2026 ("PL dos Games Vivos"), inspired by Stop Ki
 - Colombia Ley 1915 art. 15: whoever uses a TPM must disclose its existence and scope, under the Consumer Statute (Ley 1480 de 2011). — [Secretaría del Senado, Ley 1915](http://www.secretariasenado.gov.co/senado/basedoc/ley_1915_2018.html)
 
 ### Inferences
-- If enacted, PL 3612/2026 would be one of the first national laws to make an offline mode or community server tools a remedy for shutdowns. Those remedies line up directly with the harness's aim of keeping owned games playable.
+- If enacted, PL 3612/2026 would be one of the first national laws to make an offline mode or community server tools a remedy for shutdowns. Those remedies line up directly with GameFrame's aim of keeping owned games playable.
 
 ### Gaps
 - No Procon, Senacon, PROFECO (Mexico), SERNAC (Chile), SIC (Colombia) or Argentine consumer-agency action on a game shutdown is known.

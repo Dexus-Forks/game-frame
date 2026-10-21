@@ -106,7 +106,7 @@ Lessons from porting a DOS game's main loop, true of many games:
 | Method | Gives | Tools |
 |---|---|---|
 | The game's own demo or replay files | the exact input record the game itself uses | read the format with `re-format`; play it in the original and the port |
-| Breakpoints on the reads | the value at every read, in order | DOSBox-X debugger (`BPINT 16`, memory breakpoints on the key table); x64dbg; the harness's emulators (`call_trace.py`, `dos_env`) |
+| Breakpoints on the reads | the value at every read, in order | DOSBox-X debugger (`BPINT 16`, memory breakpoints on the key table); x64dbg; GameFrame's emulators (`call_trace.py`, `dos_env`) |
 | Hooks on the API | every Windows input call and its result | Frida, API Monitor, a proxy DLL (on your own copy only) |
 | Recording the host's input | keys and mouse as the player gave them | a capture script driving the original through an emulator or a remote stream ([Running the original](running-the-original.md)) |
 

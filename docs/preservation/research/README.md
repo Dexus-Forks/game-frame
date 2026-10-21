@@ -5,7 +5,7 @@ The reports and notes below give the sources for the
 findings apart from inferences, and each lists its gaps. A finding marked "(search snippet)"
 comes from a search result, because the page itself could not be fetched.
 
-1. [Report: presenting the harness as game preservation](report.md): the summary of the notes, with
+1. [Report: presenting GameFrame as game preservation](report.md): the summary of the notes, with
    draft wording for the site.
 2. [Notes: why games disappear](why-games-vanish.md): the 2023 availability study, games that
    stop running, games still on sale but frozen, lost source code and media.
@@ -21,7 +21,7 @@ comes from a search result, because the page itself could not be fetched.
 The [law chapter](../law/README.md) rests on these.
 
 1. [Report: game preservation law worldwide](law-worldwide.md): treaties, 35 countries, a
-   comparison table, and what this means for the harness's rules.
+   comparison table, and what this means for GameFrame's rules.
 2. [Notes: international frameworks](law-international.md): Berne, TRIPS, the WIPO treaties, US
    trade agreements, WIPO's library work, UNESCO, hosting across borders.
 3. [Notes: East Asia](law-east-asia.md): Japan, China, South Korea, Taiwan, Hong Kong.
@@ -51,7 +51,7 @@ The [law chapter](../law/README.md) rests on these.
   collections in depth.
 - What preservation groups asked for in the 2027 US rulemaking (docket COLC-2026-0100) was not
   found.
-- No developer or publisher statement about this harness, or about Un-Banished, was found.
+- No developer or publisher statement about GameFrame, or about Un-Banished, was found.
 - Many article numbers outside the US, the EU and the UK are marked "(not confirmed)". The most
   important are Japan's lock and term articles, Australia's ss.47D and 47H, and the South
   African, Egyptian, Israeli, Turkish, Swiss, Norwegian and Russian articles.

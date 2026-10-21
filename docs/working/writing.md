@@ -1,8 +1,8 @@
 # Writing findings and documents
 
-Everything in this harness is written to be read by agents and people, and to be translated.
+Everything in GameFrame is written to be read by agents and people, and to be translated.
 This page sets the style for findings, documents, skills, commit messages and posts. Follow it
-in every project made with the harness.
+in every project made with GameFrame.
 
 ## Plain English
 

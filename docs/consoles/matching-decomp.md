@@ -50,9 +50,9 @@ explains how these projects work and when the route is worth its cost.
 | The game is mostly hand-written assembly (most 8-bit and 16-bit games) | Matching is less meaningful; disassemble, document and reimplement |
 | You want new code you can publish freely | Reimplementation, using decompilation projects' documents as references |
 
-## How the harness fits in
+## How GameFrame fits in
 
-The harness's steps apply to every route. Its tools help a matching project with tasks the
+GameFrame's steps apply to every route. Its tools help a matching project with tasks the
 matching tools do not cover:
 
 - `decomp_query.py` and the Ghidra export for searching the whole program as text.

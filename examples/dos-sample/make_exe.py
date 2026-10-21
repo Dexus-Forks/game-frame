@@ -4,7 +4,7 @@
 Usage: make_exe.py OUT_DIR
 
 Assembles sample.s with `zig cc` (LLVM's assembler, .code16) and then links the result itself,
-so the harness needs no 16-bit compiler or linker:
+so GameFrame needs no 16-bit compiler or linker:
 
   OUT_DIR/sample.exe   NE (16-bit protected mode), like a Borland Pascal 7 DPMI16 or Windows 3.x
                        program: segment 1 code, segment 2 data (the auto data segment), named
@@ -32,7 +32,7 @@ EXPORTS = ['rng_seed', 'rng_next', 'sum_draws', 'checksum', 'get_data_seg', 'ask
            'read_file', 'wait_ticks', 'get_key', 'write_file']
 # Labels inside main_loop, written to symbols.tsv for the fragments.py test
 LABELS = ['main_loop', 'frame_top', 'draw', 'draw_even_end', 'draw_odd_end', 'event', 'event_end']
-DESCRIPTION = b'DOS sample for the GameFrame harness'
+DESCRIPTION = b'DOS sample for GameFrame'
 MESSAGE = b'\x0cDOS SAMPLE 1'   # a Pascal string: length byte first
 
 

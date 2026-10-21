@@ -161,7 +161,7 @@ From the Xbox 360 onward an emulator, loader or recompiler needs decrypted execu
 - Recompilation projects (Unleashed Recompiled, BotW decomp, GoldenEye 360 recomp) ship no game files and require the user's own copy. — [Unleashed Recompiled README](https://cdn.jsdelivr.net/gh/hedge-dev/unleashedrecomp@main/README.md); [tbreak](https://tbreak.com/goldeneye-007-xbox-360-pc-recompilation/)
 
 ### Inferences
-- The harness's existing rule (no game material in the repository) maps directly onto these projects' practice: tools and source only, with the user supplying files and keys from hardware they own.
+- GameFrame's existing rule (no game material in the repository) maps directly onto these projects' practice: tools and source only, with the user supplying files and keys from hardware they own.
 
 ### Gaps
 - No court ruling (as opposed to settlement) on console emulator legality in 2024–2026 is known. Jurisdiction-specific circumvention rules are outside this note.

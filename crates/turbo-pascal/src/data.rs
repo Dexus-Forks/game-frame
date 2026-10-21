@@ -2,7 +2,7 @@
 //! `BlockWrite`: little-endian integers, a one-byte `Boolean`, the 6-byte `Real`, and
 //! `string[N]` as a length byte followed by N bytes.
 //!
-//! The harness's `tools/dos/tdinfo.py rust-reader` generates this code for a project; this
+//! GameFrame's `tools/dos/tdinfo.py rust-reader` generates this code for a project; this
 //! module is the same reader and writer as a dependency.
 
 use crate::real48::Real48;

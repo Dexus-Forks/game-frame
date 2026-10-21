@@ -1,7 +1,7 @@
 # AI and reverse engineering
 
-This harness is written for AI agents working with people. Many people who reverse engineer
-games by hand are worried about AI. This chapter names that worry and says how the harness
+GameFrame is written for AI agents working with people. Many people who reverse engineer
+games by hand are worried about AI. This chapter names that worry and says how GameFrame
 answers it.
 
 ## The concern
@@ -18,9 +18,9 @@ without behaving like it. It can also be a way to copy a game that is still on s
 
 We share these concerns. An AI agent can read old code quickly. Speed alone preserves nothing.
 
-## How the harness answers it
+## How GameFrame answers it
 
-The harness asks an agent for evidence at every step.
+GameFrame asks an agent for evidence at every step.
 
 - **The original is required.** Every project starts from the owner's own copy. The agent reads
   that program. It has no other source.
@@ -40,9 +40,9 @@ same copy of the game can run the same tests and get the same answers.
 
 ## Credit to the people who did this first
 
-The methods in this harness come from people who did this work by hand for decades: the
+The methods in GameFrame come from people who did this work by hand for decades: the
 ScummVM developers, the decompilation communities, the authors of OpenRCT2, OpenTTD,
 DevilutionX and many more ([Built on others' work](others-work.md)). Their documents are the
-references the harness tells agents to read.
+references the playbook tells agents to read.
 
 Sources: [Notes: how preservation projects describe their work](research/messaging.md).

@@ -1,6 +1,6 @@
 # DOS sample
 
-A tiny 16-bit program for testing the harness's DOS tools. It is our own code: no game is
+A tiny 16-bit program for testing GameFrame's DOS tools. It is our own code: no game is
 involved.
 
 - `sample.s`: routines in the style of a Borland Pascal program (FAR, Pascal calling

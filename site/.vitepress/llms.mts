@@ -65,7 +65,7 @@ export function writeLlmsFiles(config: SiteConfig) {
   const index = [
     `# ${site.title}`, '',
     `> ${site.description}`, '',
-    `${site.title} is a generic harness for reverse engineering old games from the copy you own and`
+    `${site.title} is an agentic framework for reverse engineering old games from the copy you own and`
     + ' rebuilding them exactly in new code. It gives a method in steps, one skill per step for AI'
     + ' coding agents, and tested tools around Ghidra, Unicorn and REA. It ships no game material.'
     + ' Every page below is plain Markdown. All of them together are in'

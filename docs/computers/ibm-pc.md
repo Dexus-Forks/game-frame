@@ -3,7 +3,7 @@
 On the PC the CPU barely changes the method. The executable format does. Each PC era has its
 own executable format and tool chain. DOS used COM and MZ, Win16 used NE, DOS extenders used LE
 and LX, Win32 used PE32 and x64 uses PE32+. Check the magic first: MZ, then the header at
-`e_lfanew` for NE, LE, LX or PE. The harness's `tools/triage` and `tools/dos` already cover MZ
+`e_lfanew` for NE, LE, LX or PE. GameFrame's `tools/triage` and `tools/dos` already cover MZ
 and NE ([re-inventory](../../.claude/skills/re-inventory/SKILL.md)). The x86 CPUs and the PC's
 hardware are on [CPUs and floating point](../hardware/cpus.md) and
 [Hardware of the era](../hardware/README.md).
@@ -57,7 +57,7 @@ COM and MZ executables. The 16-bit details are on [DOS games](../DOS.md).
 
 ### Tools
 
-DOSBox and DOSBox-X run these programs. The harness's `tools/dos` and its DOS emulators cover
+DOSBox and DOSBox-X run these programs. GameFrame's `tools/dos` and its DOS emulators cover
 MZ programs ([DOS games](../DOS.md), [re-emulate](../../.claude/skills/re-emulate/SKILL.md)).
 
 ### Projects to learn from
@@ -124,7 +124,7 @@ LE for DOS/4GW. COFF behind a go32 stub for DJGPP (not confirmed).
 ### Tools
 
 DOSBox runs these programs. Ghidra needs a community extension for LE and LX (not confirmed).
-The harness's DPMI support is described on [DOS games](../DOS.md).
+GameFrame's DPMI support is described on [DOS games](../DOS.md).
 
 ### Projects to learn from
 
@@ -150,7 +150,7 @@ among the games listed as using it ([WinG](https://en.wikipedia.org/wiki/WinG)).
 
 ### Media and image formats
 
-NE executables. The harness's `tools/dos` covers NE ([DOS games](../DOS.md)).
+NE executables. GameFrame's `tools/dos` covers NE ([DOS games](../DOS.md)).
 
 ### Tools
 
@@ -188,7 +188,7 @@ PE32 executables. Disc protection is described [below](#copy-protection-over-the
 
 ### Tools
 
-Windows and Wine run these programs. The harness's PE tools and emulator cover them
+Windows and Wine run these programs. GameFrame's PE tools and emulator cover them
 ([re-inventory](../../.claude/skills/re-inventory/SKILL.md),
 [re-emulate](../../.claude/skills/re-emulate/SKILL.md)).
 

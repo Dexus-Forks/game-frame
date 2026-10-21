@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Start a reverse-engineering project for one game, with this harness's tools and skills.
+# Start a reverse-engineering project for one game, with GameFrame's toolkit and playbook.
 #
 #   scripts/new-project.sh DIR "Game Name" [PATH/TO/GAME]
 #
@@ -8,7 +8,7 @@
 #   README.md, LICENSE-APACHE, LICENSE-CC0-1.0   front page (build/run per part); code Apache 2.0, content CC0 1.0
 #   .claude/skills/           the re-* skills (every step of the method)
 #   .claude/agents/           the stage agents (re-surveyor ... re-lander), which hand off to each other
-#   tools/, scripts/          the harness's tools, requirements.txt, .mcp.json (REA)
+#   tools/, scripts/          GameFrame's toolkit, requirements.txt, .mcp.json (REA)
 #   gameframe                 the help and discovery command (./gameframe help)
 #   docs/FINDINGS.md, docs/CHECKLIST.md, labels/names.tsv, labels/fields.tsv
 #   docs/DOS.md, ABI.md, GAME-PATTERNS.md, LEGAL.md, OUTPUTS.md, SETUP.md   the reference documents
@@ -26,7 +26,7 @@ cp -R "$ROOT/tools" "$ROOT/scripts" "$dir/"
 cp -R "$ROOT/.claude/skills" "$dir/.claude/"
 cp -R "$ROOT/agents" "$dir/.claude/agents"
 cp "$ROOT/requirements.txt" "$ROOT/.mcp.json" "$ROOT/gameframe" "$dir/"
-# Code is Apache 2.0; documentation and other prose are CC0 1.0 (as in the harness).
+# Code is Apache 2.0; documentation and other prose are CC0 1.0 (as in GameFrame).
 cp "$ROOT/templates/project/licences/LICENSE-APACHE" "$ROOT/templates/project/licences/LICENSE-CC0-1.0" "$dir/"
 # The reference documents the skills point to (docs/DOS.md, docs/ABI.md, ...).
 for f in ABI GAME-PATTERNS DOS LEGAL OUTPUTS SETUP; do cp "$ROOT/docs/$f.md" "$dir/docs/"; done

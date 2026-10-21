@@ -97,7 +97,7 @@ constants into instructions before running a loop (for example a texture's width
 - Find writes to code addresses: in the Ghidra export, look for stores whose target is in a
   code section.
 - Read the patched value from the writer, and treat it as a variable in the port.
-- The harness's emulators run self-modifying code correctly, so ground truth from them is
+- GameFrame's emulators run self-modifying code correctly, so ground truth from them is
   still exact.
 
 ## Checklist for arithmetic

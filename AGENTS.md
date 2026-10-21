@@ -1,13 +1,16 @@
-# AGENTS.md: working on the GameFrame harness
+# AGENTS.md: working on GameFrame
 
-This file is for agents and people who change **the harness itself**. To reverse engineer a
+This file is for agents and people who change **GameFrame itself**. To reverse engineer a
 game *with* it, create a project (`scripts/new-project.sh`): the project gets its own `AGENTS.md`
 from `templates/project/`, and the skills in `.claude/skills/` (start with `re-start`).
 
 ## What this repository is
 
-A generic method, skills and tools for reverse engineering games. Nothing here is specific to
-one game. Un-Banished (https://github.com/tanepiper/unbanished) is the worked case study and may
+GameFrame is an agentic framework for reverse engineering games. Its playbook of skills and
+agents runs inside your coding agent, and its toolkit of tested tools checks every result
+against the original. The playbook is the method, the skills in `.claude/skills/re-*`, the
+agents in `agents/` and these rules. The toolkit is `tools/` and `scripts/`. Nothing here is
+specific to one game. Un-Banished (https://github.com/tanepiper/unbanished) is the worked case study and may
 be mentioned and linked, but examples and advice must stay general.
 
 ## The user decides
@@ -24,7 +27,7 @@ repository the same way: give facts and advice, and leave the decision to the us
 
 ## Rules
 
-These rules are for changes to the harness itself, which is a public repository.
+These rules are for changes to GameFrame itself, which is a public repository.
 
 1. **No game material, ever.** No game binaries, data, assets, saves, decompiled code or
    disassembly from any commercial game. The only binaries the tests use are built from
@@ -47,7 +50,7 @@ These rules are for changes to the harness itself, which is a public repository.
    (`tdinfo.py rust-globals` writes one file per Pascal unit). Keep import paths stable.
 7. **Dependencies stay small.** Python tools use the standard library plus `requirements.txt`
    (unicorn, pefile, capstone). Shell scripts use bash and the tools `scripts/setup.sh` installs.
-8. **Improve the harness from real games.** When a game project hits something generic (a
+8. **Improve GameFrame from real games.** When a game project hits something generic (a
    tool crash, a missing format, a pitfall), fix it here with a test against our own samples,
    and keep the game-specific part in the game's repository.
 9. **Two licences.** Code is Apache 2.0 (`LICENSE-APACHE`); documentation, skills and other

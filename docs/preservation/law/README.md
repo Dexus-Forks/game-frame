@@ -8,8 +8,8 @@ project follows, read [Legal](../../LEGAL.md).
 ## The rule that holds everywhere
 
 Most countries let a person who owns a game study how it works. No country lets that person
-share the game. Every project made with the harness starts from a copy that the person owns.
-Where the game is still sold, buy it from the store. The harness never links to download sites
+share the game. Every project made with GameFrame starts from a copy that the person owns.
+Where the game is still sold, buy it from the store. GameFrame never links to download sites
 for games.
 
 ## Three groups of countries
@@ -23,7 +23,7 @@ Most countries follow one of three patterns.
 | Back-up and research only | A back-up copy, sometimes a research copy. No express permission to decompile | Brazil, Argentina, Egypt, Indonesia, Thailand, Vietnam, Malaysia, the UAE, South Africa under its current Act |
 
 Observing a program while it runs is the widest permission. It covers running the original,
-capturing frames and state, and recording calls. These are the harness's observe and emulate
+capturing frames and state, and recording calls. These are the playbook's observe and emulate
 steps ([re-observe](../../../.claude/skills/re-observe/SKILL.md),
 [re-emulate](../../../.claude/skills/re-emulate/SKILL.md)). Decompiling is the narrowest
 permission. Many countries allow it only for interoperability, and about a third of the
@@ -32,7 +32,7 @@ care.
 
 ## What this means in practice
 
-The harness's defaults follow from these points. The user decides what their own project does
+GameFrame's defaults follow from these points. The user decides what their own project does
 ([The user decides](../../working/agents.md#the-user-decides)).
 
 - **Sharing.** No country covered allows sharing game files, assets or decompiled code. Every

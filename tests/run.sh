@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Prove every tool in the harness against the sample game. Run after changing any tool.
+# Prove every tool in GameFrame's toolkit against the sample game. Run after changing any tool.
 #
 #   tests/run.sh            the fast checks (about 20 s): PE tools, emulator, call traces,
 #                           ground truth against the port, format validation, the 16-bit DOS

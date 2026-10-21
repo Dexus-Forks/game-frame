@@ -33,7 +33,7 @@ through a door; nothing reaches into the game's internals around them.
 | **Trace** | Report random draws, calls, events, as they happen | random-draw traces compared with `seqdiff.py` |
 | **Capture** | Frames, sound, the interface tree as data | headless frame capture; OPL register logs |
 
-The same doors in the original are built from the harness's tools: memory reads in the
+The same doors in the original are built from GameFrame's tools: memory reads in the
 emulator or the debugger for **query** and **state**, scripted key presses for **input**,
 breakpoints for **trace**, video memory for **capture**.
 

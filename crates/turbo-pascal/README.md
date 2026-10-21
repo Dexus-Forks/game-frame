@@ -11,7 +11,7 @@ rebuilt in Rust so a port gives the same numbers as the original program.
 
 It comes from Tyrian 2026, the clean-room reimplementation of Tyrian 2000. There every `Real`
 routine here matches the original program on 40,000 random operands, and 90,000 random draws
-match bit for bit (*measured* under the harness's DOS emulator). `div` is measured only for
+match bit for bit (*measured* under GameFrame's DOS emulator). `div` is measured only for
 divisors of 2.0.
 
 ## Use it
@@ -41,7 +41,7 @@ Turbo Pascal 5.5, 6.0 and 7.0 and Borland Pascal 7 share these algorithms, but c
 1. Find the System unit's routines in the decompile. With Turbo Debugger symbols,
    `tools/dos/tdinfo.py` names them; otherwise look for the `Real` routines that work on
    `DX:BX:AX` and `CX:SI:DI`.
-2. Run them under the harness's DOS emulator on many inputs (`re-emulate`, `dos_emu`).
+2. Run them under GameFrame's DOS emulator on many inputs (`re-emulate`, `dos_emu`).
 3. Compare with this crate bit for bit.
 
 Programs compiled with `{$N+}` use the 8087 (or its emulator) for `Single`, `Double` and

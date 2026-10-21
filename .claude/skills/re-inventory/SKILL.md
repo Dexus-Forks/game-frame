@@ -85,13 +85,13 @@ docs/DOS.md.
 
 | What peinfo shows | What it means | Route |
 |---|---|---|
-| Native x64/x86, MSVC or MinGW, no packer | Ordinary compiled C/C++ | This harness: `re-ghidra`, `re-trace`, `re-emulate` |
+| Native x64/x86, MSVC or MinGW, no packer | Ordinary compiled C/C++ | GameFrame: `re-ghidra`, `re-trace`, `re-emulate` |
 | `mscoree.dll` / `_CorExeMain`, or `Assembly-CSharp.dll` | .NET managed code (XNA, MonoGame, Unity Mono) | Decompile C# with ILSpy or dnSpyEx, or REA `inspect_managed_artifact`; the game logic is in the managed DLLs |
 | `GameAssembly.dll` + `global-metadata.dat` | Unity IL2CPP: C# compiled to C++ | Recover names with Il2CppDumper (or Cpp2IL), then Ghidra with the generated script |
 | `UE4`/`UnrealEngine` strings, `.pak` files | Unreal Engine | Most logic is in the EXE plus Blueprint bytecode in `.uasset`; tools such as FModel and UE4SS read the assets |
 | `lua_pcall`, `.lua`/`.luac` files | Lua scripting on a native engine | Decompile the scripts (unluac, luadec) for game rules; the native side is the engine |
 | GameMaker / RPG Maker / Godot strings | A known engine with its own format | Use the engine's community tools for the data; the native binary is the stock runtime |
-| dosinfo: `MZ` or `NE`, Borland/Microsoft/Watcom runtime | 16-bit DOS or Windows 3.x code | This harness's DOS route: `dosinfo.py`, `tdinfo.py`, Ghidra, `dos_emu`, DOSBox-X (docs/DOS.md) |
+| dosinfo: `MZ` or `NE`, Borland/Microsoft/Watcom runtime | 16-bit DOS or Windows 3.x code | GameFrame's DOS route: `dosinfo.py`, `tdinfo.py`, Ghidra, `dos_emu`, DOSBox-X (docs/DOS.md) |
 | dosinfo: `LE`/`LX` (DOS/4GW, PMODE/W) | 32-bit DOS-extender program | Ghidra with an LE/LX loader extension; run it in DOSBox-X |
 | A ROM or disc image for a console (`.nes`, `.sfc`, `.md`, `.z64`, `.bin`/`.cue`, `.iso`) | Console code at fixed addresses, often banked, no OS | The console route: `docs/consoles/` (platforms, tools, routes to a port) |
 | An engine's archives or DLLs (`.WAD`, `.PAK`, `.GRP`, `.u`, `.MPQ`, `glide2x.dll`, `Engine.dll`) | A known engine or library | Read `docs/engines/recognising.md`; use the engine's documented formats and released source where it exists |

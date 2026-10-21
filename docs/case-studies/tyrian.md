@@ -2,7 +2,7 @@
 
 Tyrian 2026 is a clean-room, 1:1 reimplementation of **Tyrian 2000** (version 3.0, DOS, 1999)
 in Rust, for Windows, macOS, Linux and the browser. It reads the player's own copy of the game.
-The repository is private while the work is in progress. It is the harness's main test of the
+The repository is private while the work is in progress. It is GameFrame's main test of the
 16-bit DOS tools: most of `tools/dos/` and `tools/emu/dos_env/` came from it.
 
 ![The asset viewer showing a sheet of level tiles from one of the game's tile files](../assets/case-studies/tyrian-viewer-tiles.webp)
@@ -51,9 +51,9 @@ music driver, Turbo Pascal's 6-byte `Real` arithmetic, and its own drawing to VG
 
 | Need | Tool |
 |---|---|
-| Names and types from Borland debug symbols | `tdinfo.py`, `td_rust.py` (in the harness) |
-| One routine, run headless | `dos_emu` (in the harness) |
-| The whole program, run headless, frame by frame | `dos_env` (in the harness), and the project's `truth/fragment.py` |
+| Names and types from Borland debug symbols | `tdinfo.py`, `td_rust.py` (in GameFrame) |
+| One routine, run headless | `dos_emu` (in GameFrame) |
+| The whole program, run headless, frame by frame | `dos_env` (in GameFrame), and the project's `truth/fragment.py` |
 | The program with a window and a debugger | DOSBox-X, driven over its debugger channel (`dbx_control.py`) |
 | File formats measured from the original's reads | `fileio_trace.py` on DOSBox-X file logs |
 | An asset viewer for every format, native and in the browser | the project's `apps/viewer` |

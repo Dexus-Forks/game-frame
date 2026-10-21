@@ -1,6 +1,6 @@
-# What the harness does
+# What GameFrame does
 
-The harness helps one person study a game they own and rebuild it in new code. The new code
+GameFrame helps one person study a game they own and rebuild it in new code. The new code
 runs on current computers. It reads the owner's original game files when it runs. It must give
 the same results as the original, measured on the original's own code.
 
@@ -8,7 +8,7 @@ the same results as the original, measured on the original's own code.
 
 MAME, the arcade emulator, describes its own source code as documentation of the machines it
 emulates. Being able to play a game mainly proves that the documentation is right
-([MAME](https://github.com/mamedev/mame)). This harness takes the same view of one game.
+([MAME](https://github.com/mamedev/mame)). GameFrame takes the same view of one game.
 
 - The findings are written down as documents, with the address in the original that each claim
   comes from ([Writing findings](../working/writing.md)).
@@ -32,7 +32,7 @@ Different people keep different parts of a game alive.
 | Matching decompilations (Super Mario 64, Ocarina of Time) | Source code that compiles to the identical original program |
 | Reimplementations (ScummVM, OpenRCT2, DevilutionX) | New code that runs the original game's data on current systems |
 
-This harness belongs to the last group. It adds two things to it. It turns the method into
+GameFrame belongs to the last group. It adds two things to it. It turns the method into
 skills an agent can follow step by step. It checks the new code against the original's own
 code, function by function.
 
@@ -48,7 +48,7 @@ code, function by function.
 
 ## What a project ships
 
-A project made with the harness may publish its own new code and its documents. It never
+A project made with GameFrame may publish its own new code and its documents. It never
 publishes the game's files, extracted assets or decompiled code. Players bring their own copy
 of the game ([What a project can ship](../OUTPUTS.md)).
 

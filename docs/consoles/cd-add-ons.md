@@ -33,7 +33,7 @@ size of the backup RAM is not confirmed.
 Ghidra builds in the 68000. Its default 68000 language is a 68040 superset, which accepts
 instructions a real 68000 would fault on. Unicorn emulates the 68000, so a function that runs
 only on the CPU can be run headless with stubs for the custom chips
-([Tools](tools.md#the-harness-s-unicorn-emulator)). Genesis Plus GX, PicoDrive, ares and MAME
+([Tools](tools.md#gameframe-s-unicorn-emulator)). Genesis Plus GX, PicoDrive, ares and MAME
 run the add-on (not confirmed).
 
 ### For an exact reimplementation

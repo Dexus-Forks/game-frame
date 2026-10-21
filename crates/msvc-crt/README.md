@@ -14,7 +14,7 @@ functions already match them.
 
 It comes from [Un-Banished](https://github.com/tanepiper/unbanished). There the float functions
 match Banished's copies of the runtime on 200,000 calls each, and the sort matches the original's
-order of equal elements on recorded sorts (*measured* with the harness's emulator).
+order of equal elements on recorded sorts (*measured* with GameFrame's emulator).
 
 ## Use it
 
@@ -41,7 +41,7 @@ crate, compare it with your game's own copy:
 
 1. Find the game's `sinf` (or the others) in the decompile: the import from `msvcrt.dll` or
    `ucrtbase.dll`, or a statically linked copy.
-2. Run it under the harness's emulator on many inputs (`re-emulate`).
+2. Run it under GameFrame's emulator on many inputs (`re-emulate`).
 3. Compare the results with this crate bit for bit. If they differ, the game uses another
    version, and its algorithm must be traced.
 

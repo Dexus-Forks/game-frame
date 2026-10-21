@@ -1,4 +1,4 @@
-"""gameframe: help and discovery for the GameFrame harness, for people and agents.
+"""gameframe: help and discovery for GameFrame, for people and agents.
 
 Usage: gameframe COMMAND [ARGS]       (or: python3 tools/gameframe COMMAND [ARGS])
 
@@ -11,7 +11,7 @@ Commands:
       --sections        only the headings
   tools                 every tool and script, grouped by folder, with its one-line summary
   tool NAME             the tool's own help (its docstring or header comment), unchanged
-  run NAME [ARGS]       run a tool or script: Python tools with the harness's .venv
+  run NAME [ARGS]       run a tool or script: Python tools with GameFrame's .venv
   find WORD             which skills and tools mention WORD, line by line
       --max N           lines shown per skill or tool (default 3)
   doctor [ARGS]         check the toolchain (scripts/setup.sh; ARGS such as --install pass on)
@@ -26,7 +26,7 @@ Examples:
   gameframe find vtable
 
 Inputs: the skills (.claude/skills/re-*/SKILL.md), the tools (tools/, scripts/) and their own
-help, read from the files. The same command works in the harness and in a project made by
+help, read from the files. The same command works in GameFrame and in a project made by
 scripts/new-project.sh. Standard library only; it needs no .venv itself.
 
 It does not change any file, install anything, or keep its own copy of the skills or the help:

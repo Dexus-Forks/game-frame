@@ -1,6 +1,6 @@
 # The sample game
 
-A tiny Windows x64 game, written in C for this harness, to practise on and to test the tools.
+A tiny Windows x64 game, written in C for GameFrame, to practise on and to test the tools.
 It has the parts a real game has: an engine DLL with a random number generator and an
 allocator, a fixed-step simulation, a constant table, an object with a table of functions (a
 vtable), and a data file loader.

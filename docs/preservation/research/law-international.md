@@ -129,7 +129,7 @@ UNESCO treats software as heritage in three non-binding texts: the 2003 Charter 
 
 ### Inferences
 - These texts support the site's framing that software, including games, is cultural heritage, and that obsolescence of hardware and software is the threat. They do not give individuals any legal permission.
-- Software Heritage archives published source code; it is not a home for decompiled commercial code, which matches the harness rule of never distributing decompiled code.
+- Software Heritage archives published source code; it is not a home for decompiled commercial code, which matches GameFrame's rule of never distributing decompiled code.
 
 ### Gaps
 - The operative paragraphs of the 2015 Recommendation that mention copyright exceptions are not quoted here.

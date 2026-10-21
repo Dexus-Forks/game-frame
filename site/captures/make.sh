@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Remake the terminal pictures in docs/assets/captures/ from the harness's own tools, run on
+# Remake the terminal pictures in docs/assets/captures/ from GameFrame's own tools, run on
 # the sample game. Nothing here touches a commercial game.
 #
 #   site/captures/make.sh

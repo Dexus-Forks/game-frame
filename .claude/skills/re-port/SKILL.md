@@ -17,7 +17,7 @@ unreadable. This is the line between a reimplementation and a copy; keep it visi
 `docs/LEGAL.md`). If the user chooses otherwise, say this once and follow their decision.
 
 Before you write a sound chip, a codec or a language runtime yourself, check `docs/crates/`:
-the harness may already have a checked implementation (OPL2, WMA v2, the MSVC maths functions,
+GameFrame may already have a checked implementation (OPL2, WMA v2, the MSVC maths functions,
 Turbo Pascal's `Real`). Compare it with your game's version before you rely on it.
 
 ## Mirror the original's shape
@@ -84,7 +84,7 @@ metering and floats switched off does all of this.
 `python3 tools/dos/tdinfo.py BINARY rust TYPE ...` writes Rust structs and readers for Pascal
 record types in the original's field order (with `rust-reader` for the `PascalReader` they
 use). Generate, do not hand-copy, and keep the generated file unedited: regenerate it when the
-harness improves. Rust projects made by new-project.sh build into `build/`: `target/` holds the
+toolkit improves. Rust projects made by new-project.sh build into `build/`: `target/` holds the
 game, and `cargo clean` would delete it.
 
 ## Exactness checklist

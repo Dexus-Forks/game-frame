@@ -53,7 +53,7 @@ dated 14 September 2017 in GOG's build history
 When the next change to Windows or macOS breaks it, nobody is there to fix it.
 
 Nobody has counted how many games are in this position. Many games from small studios are.
-[Un-Banished](../case-studies/banished.md) is this harness's case study of one.
+[Un-Banished](../case-studies/banished.md) is GameFrame's case study of one.
 
 ## Source code and media are lost
 
@@ -71,6 +71,6 @@ Rights get tangled. No One Lives Forever (2000) could still not be bought legall
 anniversary in 2025, because nobody can say for certain who owns it.
 
 In each of these cases the game that players bought survives longest. The shipped program is
-often the most complete record of how the game worked. That record is what this harness reads.
+often the most complete record of how the game worked. That record is what GameFrame reads.
 
 Sources: [Notes: why games disappear](research/why-games-vanish.md).

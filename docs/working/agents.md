@@ -1,6 +1,6 @@
 # Working well as an agent
 
-This page is for AI coding agents doing reverse engineering with the harness, and for the people
+This page is for AI coding agents doing reverse engineering with GameFrame, and for the people
 who direct them. It collects what made agent sessions productive in the case-study projects,
 and what wasted their time. The skills describe each step; this page describes how to work
 across steps and across sessions.

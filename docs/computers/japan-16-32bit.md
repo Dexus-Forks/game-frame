@@ -81,7 +81,7 @@ Sources: [libretro: Neko Project II Kai](https://docs.libretro.com/library/neko_
 ### Tools
 
 - **Neko Project II Kai** emulates the PC-98. It needs BIOS, font and sound ROMs.
-- The harness's DOS tools help with the CPU and DOS layer ([DOS games](../DOS.md)). The
+- GameFrame's DOS tools help with the CPU and DOS layer ([DOS games](../DOS.md)). The
   hardware layer needs its own notes.
 - Ghidra has x86 real mode built in. Unicorn runs x86 16-bit code
   ([re-emulate](../../.claude/skills/re-emulate/SKILL.md)).

@@ -23,7 +23,7 @@ Mission statements are short and positive. They use verbs like preserve, celebra
 
 ### Inferences
 - The site could follow this pattern: verb + object + who it is for. For example: "Keep the games you own playable, and document how they worked." Lead with what the project keeps alive. Leave technique to later on the page.
-- Two families of framing exist. Institutions (VGHF, Strong, Software Heritage, DPC) talk about history, heritage and study. Projects and stores (GOG, OpenRCT2, DevilutionX) talk about modern systems and playability. A harness can use both: "playable on modern systems" for players, "documented for study" for researchers.
+- Two families of framing exist. Institutions (VGHF, Strong, Software Heritage, DPC) talk about history, heritage and study. Projects and stores (GOG, OpenRCT2, DevilutionX) talk about modern systems and playability. A framework can use both: "playable on modern systems" for players, "documented for study" for researchers.
 - Stop Killing Games is adversarial ("We fight back"). A tool project that wants goodwill from rights holders should avoid that tone, though it can cite the consumer-rights problem.
 
 ### Gaps
@@ -74,7 +74,7 @@ The standard pattern is one short sentence near the top: the project needs the o
 
 ### Inferences
 - The page should copy the ScummVM/OpenRCT2 pattern: "You need your own copy of the game. Buy it here: [GOG] [Steam]." Then: "We ship no game files, code or assets."
-- The re3 case shows that projects tied to a big, still-earning franchise carry risk. The harness distributes no per-game output, which sets it apart. The page could say plainly that the harness ships tools and a method, tested only on its own sample programs.
+- The re3 case shows that projects tied to a big, still-earning franchise carry risk. GameFrame distributes no per-game output, which sets it apart. The page could say plainly that GameFrame ships tools and a method, tested only on its own sample programs.
 - A visible contact for rights holders (a takedown or concerns address) is a reasonable step. No source confirms that ScummVM or OpenRCT2 shows one on its front page, so it should be presented as good practice, not as what they do.
 - Linking to the store where the game is still sold (e.g. Banished on Steam/GOG) shows the project helps sales instead of replacing them.
 
@@ -99,7 +99,7 @@ Clear, sourced praise is rarer than people assume. The strongest documented adop
 - Publisher pushback: Take-Two v. re3/reVC (see the section above).
 
 ### Inferences
-- The page should not claim that developers endorse the harness or reimplementations in general. It can cite specific, sourced cases (GOG distributing DevilutionX; Nightdive using reverse engineering under licence).
+- The page should not claim that developers endorse GameFrame or reimplementations in general. It can cite specific, sourced cases (GOG distributing DevilutionX; Nightdive using reverse engineering under licence).
 - For Banished, the honest framing is: the developer supported modding and the game is still on sale, so the case study respects that by requiring a purchased copy and shipping no assets. No Shining Rock statement about Un-Banished was found, so the page should not imply one.
 
 ### Gaps
@@ -126,8 +126,8 @@ The arguments that resonate are scale of loss (87% out of print), cultural herit
 
 ### Inferences
 - The strongest answer to "preservation is cover for piracy" is structural, not rhetorical. Show it: no game files distributed, the player's own copy required, store links, tests only on the project's own sample programs. These match the "specific safeguards" the Copyright Office said were missing.
-- For the harness, the fitting arguments are: (1) longevity of purchases (games still sold but not updated, e.g. Banished, that may stop running on new systems); (2) documentation of how games worked (research and education, which is less exposed than "recreation"); (3) accessibility and modern platforms (OpenRCT2/DevilutionX framing); (4) cultural heritage (the VGHF and Software Heritage framing).
-- Avoid claiming that the harness solves the 87% problem. Reimplementation helps only players who already have a copy, so the page should say that honestly.
+- For GameFrame, the fitting arguments are: (1) longevity of purchases (games still sold but not updated, e.g. Banished, that may stop running on new systems); (2) documentation of how games worked (research and education, which is less exposed than "recreation"); (3) accessibility and modern platforms (OpenRCT2/DevilutionX framing); (4) cultural heritage (the VGHF and Software Heritage framing).
+- Avoid claiming that GameFrame solves the 87% problem. Reimplementation helps only players who already have a copy, so the page should say that honestly.
 
 ### Gaps
 - No GDC preservation talk is covered.
@@ -147,10 +147,10 @@ A long-running human decompilation community (decomp.dev) shut down on 15 Octobe
 - Academic work in 2026 questions how faithful LLM decompilers are, e.g. "When LLM Decompilers Recompile More and Preserve Less" (title only; not read) — [arXiv 2609.05370](https://arxiv.org/pdf/2609.05370)
 
 ### Inferences
-- The page should name the concern openly: AI makes copying easier. Then it should state what the harness does differently: it requires the player's own copy, distributes nothing, checks every result against the original (bit-exact tests, which are the opposite of a loose "vibe" clone), cites evidence, and keeps humans reviewing the work.
-- The harness's case for being "preservation, not cloning" is its verification and documentation. It rebuilds the same game exactly and records how it worked. It does not invent a knock-off. Say this in concrete terms rather than as a slogan.
-- Credit to human reverse-engineering communities (ScummVM, OpenRCT2, decomp projects) and respect for their norms would answer the decomp.dev concern. One option is a statement that the harness's methods are meant to support documented, reviewed work.
-- REA is used by this harness and is named in the Naavik piece. The page should be ready for readers who link the harness to that coverage.
+- The page should name the concern openly: AI makes copying easier. Then it should state what GameFrame does differently: it requires the player's own copy, distributes nothing, checks every result against the original (bit-exact tests, which are the opposite of a loose "vibe" clone), cites evidence, and keeps humans reviewing the work.
+- GameFrame's case for being "preservation, not cloning" is its verification and documentation. It rebuilds the same game exactly and records how it worked. It does not invent a knock-off. Say this in concrete terms rather than as a slogan.
+- Credit to human reverse-engineering communities (ScummVM, OpenRCT2, decomp projects) and respect for their norms would answer the decomp.dev concern. One option is a statement that GameFrame's methods are meant to support documented, reviewed work.
+- REA is used by GameFrame and is named in the Naavik piece. The page should be ready for readers who link GameFrame to that coverage.
 
 ### Gaps
 - The Naavik piece and the arXiv paper are known only from search snippets.

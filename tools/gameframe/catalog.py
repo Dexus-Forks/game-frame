@@ -1,4 +1,4 @@
-"""The harness's tools and scripts, found on disk, each with the help it carries.
+"""GameFrame's tools and scripts, found on disk, each with the help it carries.
 
     from catalog import tools, find
     for t in tools(): print(t.name, t.kind, t.summary)

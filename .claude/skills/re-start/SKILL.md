@@ -1,9 +1,13 @@
 ---
 name: re-start
-description: Entry point for reverse engineering a game (or any closed program) with this harness. Use first, whenever a task involves understanding, documenting or reimplementing a game from its shipped binaries and data files. Gives the rules, the loop, a first-session checklist, and routes each kind of task to the right re-* skill.
+description: Entry point for reverse engineering a game (or any closed program) with GameFrame, an agentic framework for reverse engineering games. Use first, whenever a task involves understanding, documenting or reimplementing a game from its shipped binaries and data files. Gives the rules, the loop, a first-session checklist, and routes each kind of task to the right re-* skill.
 ---
 
 # Reverse engineering a game: start here
+
+GameFrame is an agentic framework for reverse engineering games. Its playbook of skills and
+agents runs inside your coding agent, and its toolkit of tested tools checks every result
+against the original. This skill is the playbook's first step.
 
 You are studying a finished program without its source code: its executables, its libraries and
 its data files. The aim is usually one of these:
@@ -26,7 +30,7 @@ once, briefly, with its source. Then follow the user's decision. What 35 countri
 
 ## Rules (they apply to every step)
 
-These are the harness's defaults. They keep the work exact and the project publishable. The
+These are the playbook's defaults. They keep the work exact and the project publishable. The
 user may change any of them for their project.
 
 1. **The player's game stays on the player's computer.** By default, do not commit, upload or
@@ -72,7 +76,7 @@ A small task may use only two or three steps. Do not skip `land`.
 
 ## Stage agents
 
-The harness also has one agent per stage, in `agents/` (a project has them in
+GameFrame also has one agent per stage, in `agents/` (a project has them in
 `.claude/agents/`; from the Claude Code plugin they are named `gameframe:re-tracer` and so on).
 Each one loads its skills, does only its stage, and ends with a
 `## Hand-off` block that names the next agent and gives it a one-line brief. You, the main
@@ -96,8 +100,8 @@ stages that would fill this session's context; do short steps yourself with the 
 ## First session on a new game
 
 0. Find the tools. The commands in the skills run from a project made by `new-project.sh`
-   (it copies the tools in) or from a clone of the harness. If the skills came from the Claude
-   Code plugin and neither exists yet, clone the harness first
+   (it copies the tools in) or from a clone of GameFrame. If the skills came from the Claude
+   Code plugin and neither exists yet, clone GameFrame first
    (`git clone https://github.com/tanepiper/game-frame ~/code/game-frame`) and run the steps
    below from there.
 1. `scripts/setup.sh` (and `--install` if anything is missing). See `re-setup`.
@@ -107,7 +111,7 @@ stages that would fill this session's context; do short steps yourself with the 
 3. Read `AGENTS.md`, `docs/CHECKLIST.md` and `docs/FINDINGS.md` if they exist. Search `docs/` and
    `labels/` for anything you are about to touch: earlier sessions may have traced it.
 4. `re-inventory`: run `tools/pe/peinfo.py` (Windows) or `tools/dos/dosinfo.py` (DOS) on every binary; decide which hold the game's own
-   code, and whether the game is native C/C++ (this harness), managed (.NET, IL2CPP, Mono),
+   code, and whether the game is native C/C++ (GameFrame), managed (.NET, IL2CPP, Mono),
    scripted (Lua, Python, GameMaker), packed (unpack first), or 16-bit DOS (docs/DOS.md; check
    for debug symbols with `tools/dos/tdinfo.py`).
 5. Classify the game: read `docs/games/README.md` and its family page, and write the kind of
@@ -135,7 +139,7 @@ choose how deep to go for each piece:
   level loader), then commit it. One capture and one test then cover many routines.
 - **Keep to the path.** When a side need appears (a format a routine reads, a missing
   tool), do only what the current subsystem needs and note the rest in `docs/CHECKLIST.md`.
-- **Batch harness changes.** Note generic lessons as you go; fix the harness and its tests
+- **Batch GameFrame changes.** Note generic lessons as you go; fix GameFrame and its tests
   once per subsystem.
 - **Split mechanical work off.** Long but simple pieces (menus, text tables, generated
   types) can go to a separate, cheaper session with an exact brief; keep the hard maths here.
@@ -164,4 +168,4 @@ porting, splitting work between sessions, and what to do when stuck. Write every
 `examples/sample-game/` is a tiny Windows game built for practice: run `tests/run.sh` to see the
 whole loop (inventory, emulate, port, bit-exact check) on it. Un-Banished
 (https://github.com/tanepiper/unbanished, `docs/case-studies/` here) is the full-size project
-this harness came from: a 1:1 reimplementation of the game Banished.
+GameFrame came from: a 1:1 reimplementation of the game Banished.

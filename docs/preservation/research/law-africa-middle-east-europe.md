@@ -78,7 +78,7 @@ Ten of the twelve jurisdictions have a software-specific exception. They are Rus
 - § 42: decompilation is allowed to get information needed for interoperability of an independently created program, under the EU conditions. The text implements the EU Software Directive through the EEA Agreement.
 
 ### Inferences
-- In every jurisdiction with an EU-style rule, "observe, study, test" is the widest permission. Decompilation is narrow and tied to interoperability between programs. Rebuilding a whole game in new code is not obviously "interoperability" in the statutory sense in any of these countries. The harness's strongest footing is probably observation of a lawfully owned copy plus writing new code that reads the user's own files, with nothing distributed.
+- In every jurisdiction with an EU-style rule, "observe, study, test" is the widest permission. Decompilation is narrow and tied to interoperability between programs. Rebuilding a whole game in new code is not obviously "interoperability" in the statutory sense in any of these countries. GameFrame's strongest footing is probably observation of a lawfully owned copy plus writing new code that reads the user's own files, with nothing distributed.
 - Nigeria's s.20(3) contract override and Switzerland's non-excludable backup copy are pro-user features. Russia, Ukraine and Norway also follow the EU rule that contract terms contrary to the decompilation exception are void (not confirmed for each).
 - Countries with only backup or use exceptions (Egypt, probably the UAE, and South Africa under its current Act) give no specific cover for decompiling. Israel's open fair use (s.19) and Nigeria's open-list fair dealing may give some room beyond the software-specific clauses.
 

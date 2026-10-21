@@ -164,7 +164,7 @@ The support below is for Ghidra release `Ghidra_12.1.4_build`, Unicorn 2.1.4 and
 | 68000 family | Amiga, ST, X68000, 68k Mac, Mega Drive, Sega CD, Jaguar, CD-i | Default language is a 68040 superset, plus 68020, 68030, ColdFire, CPU32 ([68000.ldefs](https://github.com/NationalSecurityAgency/ghidra/blob/master/Ghidra/Processors/68000/data/languages/68000.ldefs)) | | M68000 to M68060 and ColdFire ([m68k.h](https://github.com/unicorn-engine/unicorn/blob/master/include/unicorn/m68k.h)) | `M68K` | [Musashi](https://github.com/kstenerud/Musashi) (MIT-style), [Moira](https://github.com/dirkwhoffmann/Moira) (MIT) |
 | TMS9900 | TI-99/4A | None | [gnulnulf/Ghidra-TMS9900](https://github.com/gnulnulf/Ghidra-TMS9900) | None | None | MAME tms9900 |
 | CP1600 | Intellivision | Yes | | None | None | MAME cp1610 |
-| x86 | PC, PC-98, FM Towns, WonderSwan, Xbox, PS4 onward | Real mode, 16-bit protected, 32, 64, SMM ([x86.ldefs](https://github.com/NationalSecurityAgency/ghidra/blob/master/Ghidra/Processors/x86/data/languages/x86.ldefs)) | | x86 16, 32 and 64 | `X86` | The harness's `tools/emu` |
+| x86 | PC, PC-98, FM Towns, WonderSwan, Xbox, PS4 onward | Real mode, 16-bit protected, 32, 64, SMM ([x86.ldefs](https://github.com/NationalSecurityAgency/ghidra/blob/master/Ghidra/Processors/x86/data/languages/x86.ldefs)) | | x86 16, 32 and 64 | `X86` | GameFrame's `tools/emu` |
 | ARM | Archimedes, 3DO, GBA, DS, 3DS, Vita, Switch | ARM v4 to v8 with Thumb, little- and big-endian ([ARM.ldefs](https://github.com/NationalSecurityAgency/ghidra/blob/master/Ghidra/Processors/ARM/data/languages/ARM.ldefs)); AARCH64 v8.5-A, "missing some 8.5 vector" ([AARCH64.ldefs](https://github.com/NationalSecurityAgency/ghidra/blob/master/Ghidra/Processors/AARCH64/data/languages/AARCH64.ldefs)) | | ARM926, 946, 1176, 11MPCore, Cortex; no ARM7TDMI by name ([arm.h](https://github.com/unicorn-engine/unicorn/blob/master/include/unicorn/arm.h)) | `ARM`, `AARCH64` | Full emulators |
 | MIPS | PlayStation, N64, PS2, PSP | MIPS32/64, big- and little-endian; no R3000, R5900 or Allegrex language ([mips.ldefs](https://github.com/NationalSecurityAgency/ghidra/blob/master/Ghidra/Processors/MIPS/data/languages/mips.ldefs)) | [ghidra-emotionengine-reloaded](https://github.com/chaoticgd/ghidra-emotionengine-reloaded) (R5900), [ghidra-allegrex](https://github.com/kotcrab/ghidra-allegrex) (PSP) | MIPS32 and MIPS64 (R4000, VR5432); no R5900 ([mips.h](https://github.com/unicorn-engine/unicorn/blob/master/include/unicorn/mips.h)) | `MIPS`, `MIPS3` | [PCSX2](https://github.com/PCSX2/pcsx2), [PPSSPP](https://github.com/hrydgard/ppsspp) |
 | SuperH | Saturn, 32X, Dreamcast | SH-1, SH-2, SH-2A big-endian; SH-4 big- and little-endian ([superh.ldefs](https://github.com/NationalSecurityAgency/ghidra/blob/master/Ghidra/Processors/SuperH/data/languages/superh.ldefs); [SuperH4.ldefs](https://github.com/NationalSecurityAgency/ghidra/blob/master/Ghidra/Processors/SuperH4/data/languages/SuperH4.ldefs)) | [Ghidra-SegaSaturn-Processor](https://github.com/VGKintsugi/Ghidra-SegaSaturn-Processor) (archived) | None | `SH2`, `SH2A`, `SH3`, `SH4` | MAME sh, [Flycast](https://github.com/flyinghead/flycast) (GPL-2.0) |
@@ -212,7 +212,7 @@ It covers only the 32-bit and 64-bit families (68000, ARM, MIPS, PowerPC, x86). 
 - For the GBA, the ARM946 or TI925T models are the nearest to the ARM7TDMI.
 - Unicorn emulates CPUs only. Any function that touches custom chips needs stubs.
 
-The harness's Unicorn tools and how to use them are in the
+GameFrame's Unicorn tools and how to use them are in the
 [re-emulate](../../.claude/skills/re-emulate/SKILL.md) skill.
 
 ### Capstone and other disassemblers
@@ -235,7 +235,7 @@ For CPUs that Unicorn lacks, MAME's m6809, g65816, tms9900, cp1610, jaguar and m
 files carry `license:BSD-3-Clause` headers. MAME as a whole is GPL-2.0
 ([MAME COPYING](https://github.com/mamedev/mame/blob/master/COPYING);
 [mame/src/devices/cpu](https://github.com/mamedev/mame/tree/master/src/devices/cpu)). Those BSD
-and MIT cores fit beside the harness's Apache-2.0 code. GPL emulators remain usable as external
+and MIT cores fit beside GameFrame's Apache-2.0 code. GPL emulators remain usable as external
 tools. [TomHarte/CLK](https://github.com/TomHarte/CLK) (MIT) covers many systems.
 [ares](https://github.com/ares-emulator/ares) covers many consoles.
 

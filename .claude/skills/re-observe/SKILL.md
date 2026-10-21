@@ -1,6 +1,6 @@
 ---
 name: re-observe
-description: Run the original game where it can be watched, driven and captured - the harness's emulators, DOSBox-X, Wine, a Windows machine or a streamed PC, console emulators - and capture frames, state, inputs, calls, file reads and sound as measured evidence. Also list every input from outside, inventory every interface screen, and build a queryable object model of the game with doors for tests and agents. Use after inventory, before porting a system whose behaviour you need to see, and whenever a question can be settled by running the original.
+description: Run the original game where it can be watched, driven and captured - GameFrame's emulators, DOSBox-X, Wine, a Windows machine or a streamed PC, console emulators - and capture frames, state, inputs, calls, file reads and sound as measured evidence. Also list every input from outside, inventory every interface screen, and build a queryable object model of the game with doors for tests and agents. Use after inventory, before porting a system whose behaviour you need to see, and whenever a question can be settled by running the original.
 ---
 
 # Observe the running original

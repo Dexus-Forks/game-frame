@@ -1,15 +1,35 @@
 # GameFrame
 
-An agentic framework for reverse engineering games. AI agents and people use it to study a game
-from its shipped files. They document its formats and rules, and reimplement it so it behaves
-exactly like the original.
+GameFrame is an agentic framework for reverse engineering games. Its playbook of skills and
+agents runs inside your coding agent, and its toolkit of tested tools checks every result
+against the original. AI agents and people use it to study a game from its shipped files. They
+document its formats and rules, and reimplement it so it behaves exactly like the original.
 
-It packages a method, step-by-step agent skills, and tested tools around
-[Ghidra](https://ghidra-sre.org), the [Unicorn](https://www.unicorn-engine.org) emulator,
-[REA](https://github.com/morluto/rea) (Reverse Engineer Anything) and, for DOS games,
-[DOSBox-X](https://dosbox-x.com) and its debugger. It grew out of
-[Un-Banished](https://github.com/tanepiper/unbanished), a 1:1 reimplementation of the game
-Banished built this way; see [the case studies](docs/case-studies/README.md).
+The toolkit works with [Ghidra](https://ghidra-sre.org), the
+[Unicorn](https://www.unicorn-engine.org) emulator, [REA](https://github.com/morluto/rea)
+(Reverse Engineer Anything) and, for DOS games, [DOSBox-X](https://dosbox-x.com) and its
+debugger. GameFrame grew out of [Un-Banished](https://github.com/tanepiper/unbanished), a 1:1
+reimplementation of the game Banished built this way; see
+[the case studies](docs/case-studies/README.md).
+
+## Framework, playbook and toolkit
+
+GameFrame is the whole framework. It has two parts.
+
+The **playbook** is the method and the rules an agent follows:
+
+- the skills in `.claude/skills/re-*/`, one per step of the method;
+- the stage agents in `agents/`, packaged with the skills as a Claude Code plugin
+  (`.claude-plugin/`);
+- the rules in `AGENTS.md` and, for each game, in the project's own `AGENTS.md`
+  (`templates/project/`).
+
+The **toolkit** is the tested tools the playbook runs:
+
+- the tools in `tools/`, such as the Ghidra export and query, the Unicorn emulators, format
+  validation and the bit-exact comparison tools;
+- the scripts in `scripts/`, such as setup, new-project and the Ghidra runs;
+- the checks in `tests/run.sh`, which prove every tool on the samples in `examples/`.
 
 ## Quick start
 
@@ -36,7 +56,7 @@ The skills and the stage agents are also a Claude Code plugin. In Claude Code:
 ```
 
 The plugin brings the skills, the agents and the MCP servers in `.mcp.json`. The tools still
-run from a clone of the harness or from a project made with it: `re-start` says so first.
+run from a clone of GameFrame or from a project made with it: `re-start` says so first.
 
 ## Find your way with `gameframe`
 
@@ -50,7 +70,7 @@ project gets a copy.
 ./gameframe skill re-trace --sections  # a skill's headings; --section TITLE prints one part
 ./gameframe tools                      # every tool and script, with its first line of help
 ./gameframe tool decomp_query          # one tool's full help
-./gameframe run peinfo target/game.exe # run a tool with the harness's .venv
+./gameframe run peinfo target/game.exe # run a tool with GameFrame's .venv
 ./gameframe find vtable                # which skills and tools mention a word
 ./gameframe doctor                     # the toolchain check (scripts/setup.sh)
 ```

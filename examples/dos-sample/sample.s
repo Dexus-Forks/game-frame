@@ -1,5 +1,5 @@
 # The DOS sample: 16-bit code in the style of a Borland Pascal program (our own code, for
-# testing the harness). Every routine is FAR and uses the Pascal calling convention: arguments
+# testing GameFrame). Every routine is FAR and uses the Pascal calling convention: arguments
 # are pushed left to right, the callee removes them (`lretw $N`), results come back in AX
 # (16-bit) or DX:AX (32-bit). DS holds the data segment (the NE "auto data" segment), as in a
 # Pascal program. Data offsets are absolute in DS; make_exe.py builds the data segment to match.

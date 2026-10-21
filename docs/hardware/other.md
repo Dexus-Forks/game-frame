@@ -14,7 +14,7 @@ get more.
 | XMS (extended memory) | Memory above 1 MB, copied to and from conventional memory through `HIMEM.SYS` | `INT 2Fh` with `AX = 4310h` to find the driver, then far calls | Ordinary memory |
 | Overlays | Parts of the program loaded on demand into the same memory | Borland's `.OVR` files, or the game's own loader | One program; but know which overlay is loaded at which time while you read addresses |
 | DOS extenders | 32-bit protected mode with flat memory, with DOS calls passed to real mode | `DOS/4GW` (Watcom, LE executables), `PMODE/W`, `CWSDPMI` (DJGPP), Phar Lap | See [DOS games](../DOS.md) for loaders and emulators |
-| DPMI | The interface extenders use to ask for memory, selectors and interrupts | `INT 31h` | The harness's `dos_env` emulates the calls games use |
+| DPMI | The interface extenders use to ask for memory, selectors and interrupts | `INT 31h` | GameFrame's `dos_env` emulates the calls games use |
 
 Free memory mattered to players. Some games lowered detail or disabled sound when memory was
 short. Find the memory checks and fix their result in the port, so every run takes the same
@@ -22,7 +22,7 @@ path.
 
 ## Storage and CDs
 
-- **Hard disk files** are read with DOS calls (`INT 21h`) or the C runtime. The harness's
+- **Hard disk files** are read with DOS calls (`INT 21h`) or the C runtime. GameFrame's
   `fileio_trace.py` turns a DOSBox-X log into a map of the reads.
 - **CD audio**: many games played music as Red Book audio tracks on the CD, through `MSCDEX`
   (`INT 2Fh`, `AX = 15xxh`) in DOS or MCI (`mciSendCommand`) in Windows. The music is then not

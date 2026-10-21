@@ -72,7 +72,7 @@ The NEC V30MZ runs at 3.072 MHz and is compatible with 16-bit x86. The screen is
 
 Load the code with Ghidra's x86 real-mode language.
 [ghidra-wonderswan](https://github.com/JidouGhost-TL/ghidra-wonderswan) adds a loader. Unicorn
-runs x86 16-bit code, so the harness's emulator approach applies to the CPU. The extension has
+runs x86 16-bit code, so GameFrame's emulator approach applies to the CPU. The extension has
 few users, so test it on a known binary before trusting it.
 
 ## Virtual Boy

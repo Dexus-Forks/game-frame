@@ -2,14 +2,14 @@
 
 Static analysis tells you what the code could do. Running the original tells you what it does.
 Run the game wherever you can watch it, drive it, and capture what it shows, plays, reads and
-keeps in memory. Most of the evidence that settles a question (*measured*, in the harness's
+keeps in memory. Most of the evidence that settles a question (*measured*, in GameFrame's
 labels) comes from these runs.
 
 ## Where to run it
 
 | Environment | For | What you can capture |
 |---|---|---|
-| The harness's emulators (`pe_emu.py`, `dos_emu`, `dos_env`) | One function or the whole program, headless, scripted, in tests | Registers, memory, calls, random draws, frames from video memory, every byte ([re-emulate](../../.claude/skills/re-emulate/SKILL.md)) |
+| GameFrame's emulators (`pe_emu.py`, `dos_emu`, `dos_env`) | One function or the whole program, headless, scripted, in tests | Registers, memory, calls, random draws, frames from video memory, every byte ([re-emulate](../../.claude/skills/re-emulate/SKILL.md)) |
 | DOSBox-X | DOS games with a window, a debugger and file logging | Breakpoints, memory dumps, file access logs, screenshots, audio and video recording ([DOS games](../DOS.md)) |
 | DOSBox Staging | DOS games, accurate and simple to configure | Screenshots, audio and video, raw OPL output |
 | 86Box, PCem | DOS and Windows 9x games that need exact period hardware | The full machine, slowly |
@@ -29,7 +29,7 @@ windowed runs to see what happens and to find where to look.
 | **State** | Ground truth for the rules | Memory dumps at chosen points (the data segment, the heap, named variables); the game's own saves |
 | **Inputs** | To replay the same run in the port | The game's demo files; breakpoints on input reads ([Inputs](inputs.md)) |
 | **Calls** | The order of functions and random draws | `call_trace.py`; debugger traces; API logs (`WINEDEBUG=+relay`, API Monitor) |
-| **Files** | File formats measured from the original's own reads | DOSBox-X file logs and the harness's `fileio_trace.py`; Process Monitor on Windows |
+| **Files** | File formats measured from the original's own reads | DOSBox-X file logs and GameFrame's `fileio_trace.py`; Process Monitor on Windows |
 | **Sound** | Music and effects compared sample by sample | The emulated chip's register writes (OPL), WAV recordings from the emulator |
 | **Timing** | Tick rates, music tempo | Timer programming, frame counts, audio recordings measured over a long run |
 
@@ -40,7 +40,7 @@ game material ([Legal](../LEGAL.md)).
 
 A capture is only useful if you can make it again. Drive the original by script:
 
-- In the harness's emulators, script the inputs: `dos_env` answers the BIOS and DOS key
+- In GameFrame's emulators, script the inputs: `dos_env` answers the BIOS and DOS key
   reads from a queue (`env.keys`), and you can write a game's own key table in memory between
   frames.
 - In DOSBox-X, script the debugger over its control channel (Tyrian's `dbx_control.py`) or

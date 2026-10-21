@@ -68,7 +68,7 @@ Most of these jurisdictions have some exception. Australia, New Zealand, Singapo
 - Sections 80A–80D were inserted by the Copyright (New Technologies) Amendment Act 2008. — [NZLII s.80B history](https://www.nzlii.org/nz/legis/consol_act/ca1994133/s80b.html); [NZLII 2008 Act s.43](https://mail.nzlii.org/nz/legis/consol_act/ctaa2008372/s43.html)
 
 ### Inferences
-- For a harness user who studies a game they own and writes new code that reads their own files: the observe/study/test exceptions (Aus s.47B, NZ s.80C, Sing s.240, India s.52(1)(ac)) fit running and watching the game best. Decompilation exceptions are all tied to interoperability of an "independently created" program. Whether a clean-room reimplementation of the whole game counts as "interoperable" with the original data files is untested in these countries.
+- For a GameFrame user who studies a game they own and writes new code that reads their own files: the observe/study/test exceptions (Aus s.47B, NZ s.80C, Sing s.240, India s.52(1)(ac)) fit running and watching the game best. Decompilation exceptions are all tied to interoperability of an "independently created" program. Whether a clean-room reimplementation of the whole game counts as "interoperable" with the original data files is untested in these countries.
 - Singapore and NZ bar using decompiled information to make a "substantially similar program". A faithful game reimplementation may run into that limit, even if it ships no original code.
 - India's s.52(1)(ad) (copies or adaptations from a personally legally obtained copy, for non-commercial personal use) is unusually broad. It seems helpful for personal study, but it does not cover distributing the result.
 - Malaysia, Indonesia, Thailand and Vietnam give no clear decompilation right. Thailand's s.35(1) "research or study" (not for profit, three-step test) and Indonesia's Pasal 45(1)(a) "research and development" copy are the nearest hooks.
@@ -135,7 +135,7 @@ Every jurisdiction except Vietnam (where the details are unclear) now has TPM ru
 - The 2026 NZ policy package says TPM rules will be "strengthened", without detail. — [British Copyright Council, 9 June 2026](https://www.britishcopyright.org/new-zealand-copyright-update/)
 
 ### Inferences
-- In Australia, NZ, Singapore and Malaysia, the interoperability TPM exceptions are framed around "an independently created computer program". A harness that reads a person's own original files may arguably fit, but none of these has been tested for game reimplementations.
+- In Australia, NZ, Singapore and Malaysia, the interoperability TPM exceptions are framed around "an independently created computer program". A project that reads a person's own original files may arguably fit, but none of these has been tested for game reimplementations.
 - Singapore's 2025 regulations seem to remove the specific obsolete-game exception, but add one tied to s.232 preservation copying by public collections. A gallery, library, archive or museum may still circumvent to make preservation copies. Private individuals get no equivalent.
 - India's TPM rule needs an "intention of infringing". Circumvention for a lawful s.52 purpose (s.65A(2)(a)) is excused. This makes India one of the most permissive regimes here for study of a game a person owns.
 - Australia's Take-Two case shows game-integrity and online checks can be TPMs. Tools that patch a running game may be "circumvention devices" even when the user owns the game.

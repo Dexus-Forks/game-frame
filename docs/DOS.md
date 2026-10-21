@@ -1,6 +1,6 @@
 # DOS and 16-bit games
 
-Most of the harness was built on a 64-bit Windows game. DOS games (1985-2000) need different
+Most of GameFrame was built on a 64-bit Windows game. DOS games (1985-2000) need different
 tools at three steps: reading the executable, emulating code, and running the original. This
 page is the whole DOS route; the skills link here. The tools are tested against
 `examples/dos-sample/` (our own 16-bit code) by `tests/run.sh`.
@@ -16,7 +16,7 @@ python3 tools/dos/dosinfo.py target/GAME.EXE --pstrings 6 # Pascal strings, with
 |---|---|---|---|---|
 | `MZ` | Real-mode DOS (Turbo Pascal, Turbo C, Microsoft C, QuickBASIC) | "Old-style DOS Executable", loaded at segment `1000` | `dos_emu` (real mode) | DOSBox-X |
 | `NE` | 16-bit protected mode: Windows 3.x, OS/2 1.x, Borland Pascal 7 or Borland C++ with DPMI16 (`RTM.EXE`, `DPMI16BI.OVL`) | "New Executable", selectors `1000`, `1008`, ... | `dos_emu` (protected mode, same selectors) | DOSBox-X (or Windows 3.1 inside it) |
-| `LE` / `LX` | 32-bit flat code behind a DOS extender (Watcom + DOS/4GW, PMODE/W) | needs an LE/LX loader extension | not yet in this harness | DOSBox-X |
+| `LE` / `LX` | 32-bit flat code behind a DOS extender (Watcom + DOS/4GW, PMODE/W) | needs an LE/LX loader extension | not yet in the toolkit | DOSBox-X |
 | `PE` | A Windows program | use `tools/pe/peinfo.py` | `pe_emu.py` | Windows or Wine |
 
 Packed executables (LZEXE, PKLITE, EXEPACK, DIET: dosinfo's fingerprints) must be unpacked

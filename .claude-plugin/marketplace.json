@@ -1,6 +1,6 @@
 {
   "name": "game-frame",
-  "description": "The GameFrame harness for reverse engineering games, as a Claude Code plugin.",
+  "description": "GameFrame, an agentic framework for reverse engineering games, as a Claude Code plugin.",
   "owner": { "name": "Tane Piper", "url": "https://github.com/tanepiper" },
   "plugins": [
     {

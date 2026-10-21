@@ -203,6 +203,6 @@ that touches the game (determinism, pictures, builds without additions), and a l
 a release (replays, multiplayer, version against version). A baseline that changes is a change
 in behaviour: find the cause, and record a new baseline only when the change is intended.
 
-## 8. The harness itself
+## 8. The toolkit itself
 
-`tests/run.sh` proves the harness's tools against the sample game; run it after changing a tool.
+`tests/run.sh` proves GameFrame's tools against the sample game; run it after changing a tool.

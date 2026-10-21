@@ -205,7 +205,7 @@ Cores for the gaps (licence per GitHub detection or file header):
 ### Inferences
 - For 68000 (Mega Drive, Amiga, Neo Geo) and ARM (GBA, DS, 3DS) and MIPS (PS1, N64) functions, Unicorn can be the ground-truth runner. For the GBA, ARM926/946 or TI925T (ARMv4T/v5) models are the nearest; ARMv5 adds instructions the ARM7TDMI lacks, which only matters if code is malformed.
 - Unicorn's MIPS does not model the R3000A load delay slot (QEMU executes MIPS32 semantics); PS1 code that relies on reading the stale register would differ. This is untested.
-- For 6502, Z80, SM83, 6809, 65816, TMS9900, CP1600, SH-2/SH-4, Jaguar RISC, R5900, SPU, Gekko paired singles, the harness needs a separate core. The BSD-3-Clause MAME cores and the BSD/MIT Python/Rust cores are compatible with the harness's Apache-2.0 code; GPL emulators are usable as external tools but not as copied code.
+- For 6502, Z80, SM83, 6809, 65816, TMS9900, CP1600, SH-2/SH-4, Jaguar RISC, R5900, SPU, Gekko paired singles, GameFrame needs a separate core. The BSD-3-Clause MAME cores and the BSD/MIT Python/Rust cores are compatible with GameFrame's Apache-2.0 code; GPL emulators are usable as external tools but not as copied code.
 
 ### Gaps
 - Whether Unicorn's 750CL model decodes paired-single opcodes at all (likely an illegal-instruction exception) is untested.
@@ -225,7 +225,7 @@ Capstone (on `next`) covers 6502/65C02/65816 (MOS65XX), the 6800/6809/6309 famil
 - radare2 — [radareorg/radare2](https://github.com/radareorg/radare2); rizin (LGPL-3.0) — [rizinorg/rizin](https://github.com/rizinorg/rizin)
 
 ### Inferences
-- The harness already depends on Capstone; for 65816 targets the disassembly width must be chosen per function (LONG_M/LONG_X modes), mirroring the M/X flag state.
+- GameFrame already depends on Capstone; for 65816 targets the disassembly width must be chosen per function (LONG_M/LONG_X modes), mirroring the M/X flag state.
 - For Z80 and SM83, Capstone is not an option; Ghidra (Z80 built in, SM83 via GhidraBoy) or z80dasm/SkoolKit fill the gap.
 
 ### Gaps

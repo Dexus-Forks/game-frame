@@ -4,7 +4,7 @@ title: GameFrame
 hero:
   name: GameFrame
   text: An agentic framework for reverse engineering games
-  tagline: Understand a game from the copy you own, and rebuild it exactly. A method, step-by-step skills and tested tools for AI agents and people, around Ghidra, Unicorn and REA.
+  tagline: Understand a game from the copy you own, and rebuild it exactly. Its playbook of skills and agents runs inside your coding agent. Its toolkit of tested tools, around Ghidra, Unicorn and REA, checks every result against the original.
   actions:
     - theme: brand
       text: Start here
@@ -42,7 +42,7 @@ features:
     link: /case-studies/
   - icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>'
     title: Within the law
-    details: You need your own copy of the game. The harness ships no game files. Each project writes new code from documented behaviour.
+    details: You need your own copy of the game. GameFrame ships no game files. Each project writes new code from documented behaviour.
     link: /legal
 ---
 
@@ -55,11 +55,11 @@ trace.
 
 ## Set it up with your agent
 
-Copy this prompt into your coding agent (Claude Code, Codex, Cursor or another). It clones the
-harness, checks your tools, asks before it installs anything, and starts a project for your game.
+Copy this prompt into your coding agent (Claude Code, Codex, Cursor or another). It clones
+GameFrame, checks your tools, asks before it installs anything, and starts a project for your game.
 
 ```text
-Set up the GameFrame harness on this computer for me.
+Set up GameFrame on this computer for me.
 
 1. Clone https://github.com/tanepiper/game-frame into ~/code/game-frame
    (or update it with git pull if it is already there).

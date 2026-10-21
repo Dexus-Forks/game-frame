@@ -1,8 +1,8 @@
 # Tools for console work
 
-The harness's method works for consoles, but some tools change. Ghidra needs the right
+GameFrame's playbook works for consoles, but some tools change. Ghidra needs the right
 processor module and a loader for the console's file format. Ground truth comes mostly from
-emulators with debuggers. The harness's Unicorn emulator covers some console CPUs.
+emulators with debuggers. GameFrame's Unicorn emulator covers some console CPUs.
 
 ## Disassembly and decompilation
 
@@ -112,9 +112,9 @@ What to use them for:
 - **Input movies** (BizHawk, FCEUX, Mesen) as recorded per-frame input. They are the console
   equivalent of demos, and tool-assisted speedrun movies cover whole games.
 - **Scripting** (Lua in Mesen, BizHawk, FCEUX) to dump RAM every frame and to drive the game.
-  This is the console equivalent of the harness's headless runs.
+  This is the console equivalent of GameFrame's headless runs.
 
-## The harness's Unicorn emulator
+## GameFrame's Unicorn emulator
 
 Unicorn 2 emulates ARM, ARM64, M68K, MIPS (32 and 64-bit), PowerPC, RISC-V, s390x, SPARC,
 TriCore and x86. It has no 6502, 65816, Z80 or SuperH. It has no R5900, no paired singles and

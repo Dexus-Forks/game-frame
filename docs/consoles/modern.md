@@ -43,7 +43,7 @@ target. Switch 2 (5 June 2025) is not covered here.
 Recompilation projects such as Unleashed Recompiled and the GoldenEye 360 recompilation ship no
 game files and need the user's own copy
 ([tbreak](https://tbreak.com/goldeneye-007-xbox-360-pc-recompilation/)). That practice matches
-the harness's rule of no game material in the repository.
+GameFrame's rule of no game material in the repository.
 
 On 4 March 2024 Tropic Haze, yuzu's developer, settled with Nintendo for $2.4 million. A Rhode
 Island federal court entered a permanent injunction against offering yuzu or software that

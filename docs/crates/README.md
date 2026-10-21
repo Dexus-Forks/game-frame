@@ -31,7 +31,7 @@ version: a later compiler's maths functions, a different Pascal runtime, an OPL3
 OPL2. Before you rely on a crate for exact results:
 
 1. Find the matching code in your game: the runtime functions, the music driver, the decoder.
-2. Run the original on many inputs under the harness's emulator (`re-emulate`).
+2. Run the original on many inputs under GameFrame's emulator (`re-emulate`).
 3. Compare the results with the crate bit for bit.
 
 If they match, use the crate. If they differ, trace your game's version and port it.

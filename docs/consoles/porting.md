@@ -9,9 +9,9 @@ start and write it in the project's `AGENTS.md`.
 | Emulation | Run the original code on an emulated console | every emulator | Low for one game, once an emulator exists | The emulator; the player brings the game |
 | Static recompilation | Translate the original machine code into C or another language automatically, and link it with a reimplementation of the hardware | N64Recomp (Zelda 64: Recompiled) | Medium; the hardware layer is the work | The recompiler and the hardware layer; the player's ROM is translated on their machine |
 | Matching decompilation, then a port | Write C that compiles to the identical original binary, then build it for a new system | the SM64 and Ocarina of Time decompilations and their PC ports | Very high | Contested: the C is derived from the original program ([Legal](../LEGAL.md)) |
-| Reimplementation | Write new code from documented behaviour, checked against the original | most projects in this harness's case studies | High | The new code; the player brings the game's data |
+| Reimplementation | Write new code from documented behaviour, checked against the original | most projects in GameFrame's case studies | High | The new code; the player brings the game's data |
 
-The harness is built for reimplementation. The other routes share most of its steps (finding
+GameFrame is built for reimplementation. The other routes share most of its steps (finding
 functions, capturing ground truth, replacing hardware) and its tools help them too.
 
 ## Replacing the hardware

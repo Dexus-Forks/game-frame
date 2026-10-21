@@ -6,7 +6,7 @@ controllers from memory-mapped ports and times everything to the display's verti
 That makes console games different to reverse engineer from PC games, and different to port.
 
 This section covers how to study console games and how to bring them to other systems. It uses
-the harness's method unchanged; the tools and the hardware details differ.
+GameFrame's playbook unchanged; the tools and the hardware details differ.
 
 ## Pages
 

@@ -1,6 +1,6 @@
 # Case studies
 
-Three reimplementations built with this harness, of three different kinds of game, on three
+Three reimplementations built with GameFrame, of three different kinds of game, on three
 different platforms. Each took a different route. All three aim
 for the same results as the original for the same inputs.
 
@@ -12,10 +12,10 @@ for the same results as the original for the same inputs.
 
 ## The tooling they built to capture a game
 
-Each project needed the same things and built them its own way. The harness keeps the generic
+Each project needed the same things and built them its own way. GameFrame keeps the generic
 part of each.
 
-| Need | Un-Banished | Tyrian 2026 | Frontier | In the harness |
+| Need | Un-Banished | Tyrian 2026 | Frontier | In GameFrame |
 |---|---|---|---|---|
 | Decompile and search | Ghidra export, `decomp.py` | Ghidra export, labels from debug symbols | Ghidra export, functions seeded from overlay tables | `scripts/ghidra-export.sh`, `decomp_query.py`, `tdinfo.py` |
 | Run one original function | Unicorn (`pe_emu.py`) | `dos_emu` | the project's 386 runtime | `pe_emu.py`, `dos_emu` |

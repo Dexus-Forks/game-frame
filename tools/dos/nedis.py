@@ -11,7 +11,7 @@ targets, and data offsets in DS, are replaced by names from a labels file (label
 by default) where one matches: `lcall Reset_1040_0a12`, `mov al, byte ptr [PlayDemoNum]`.
 
 LENGTH is in bytes (default 0x100). Addresses are Ghidra's (1000:7f40). Needs capstone and
-unicorn (the harness's .venv). It does not follow jumps or find function ends.
+unicorn (GameFrame's .venv). It does not follow jumps or find function ends.
 """
 import os
 import re

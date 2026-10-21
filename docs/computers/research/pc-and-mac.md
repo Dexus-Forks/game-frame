@@ -52,7 +52,7 @@ Each PC era has its own executable format, so its own loader and tool chain: COM
 - Ghidra's built-in loaders include MZ, NE, PE and Mach-O. LE/LX needs a community extension (not confirmed; check the Ghidra loader list of the release in use) — [Ghidra file formats overview](https://www.mintlify.com/NationalSecurityAgency/ghidra/processors/file-formats)
 
 ### Inferences
-- The executable format tells you the era and the loader before anything else. Checking the magic (MZ, then the e_lfanew header: NE, LE, LX or PE) is the first triage step. The harness's `tools/triage` and `tools/dos` already cover MZ and NE.
+- The executable format tells you the era and the loader before anything else. Checking the magic (MZ, then the e_lfanew header: NE, LE, LX or PE) is the first triage step. GameFrame's `tools/triage` and `tools/dos` already cover MZ and NE.
 - A Tandy/PCjr code path is a separate rendering and sound path in the same binary. A port that aims for exact behaviour must choose which path is ground truth, and the emulator must report itself as Tandy (DOSBox `machine=tandy` or `pcjr`) to run it.
 - Win16 games (WinG era) cannot be run under any 64-bit Windows. Wine (with its own Win16 support) or a 32-bit Windows VM is the practical way to observe them.
 
@@ -173,7 +173,7 @@ Open emulators cover every Classic Mac era: Mini vMac and MAME for early 68000 M
 - "Classic Marathon 2" was re-released on Steam on Aleph One. The infobox gives 12 July 2024 but the lead says 2025 — [Marathon 2: Durandal](https://en.wikipedia.org/wiki/Marathon_2:_Durandal)
 
 ### Inferences
-- For ground truth on a 68k Mac game, the harness's Unicorn approach can run single CODE-segment functions if the A5 world and needed traps are stubbed, much as `tools/emu/dos_env` stubs DOS. This is a natural future extension.
+- For ground truth on a 68k Mac game, GameFrame's Unicorn approach can run single CODE-segment functions if the A5 world and needed traps are stubbed, much as `tools/emu/dos_env` stubs DOS. This is a natural future extension.
 - Aleph One is a reference for "official source plus fan engine" as a model, but its engine is not the original's binary. Exact-match work should still use the shipped binary.
 
 ### Gaps

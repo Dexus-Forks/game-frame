@@ -1,6 +1,6 @@
 # Built on others' work
 
-This harness learns from projects that kept games playable long before it existed. Each of them
+GameFrame learns from projects that kept games playable long before it existed. Each of them
 needs the player's own copy of the game. Each of them links to a store where the game is sold.
 
 ## Projects

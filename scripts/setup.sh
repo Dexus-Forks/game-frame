@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Check, and optionally install, everything the harness uses.
+# Check, and optionally install, everything GameFrame uses.
 #
 #   scripts/setup.sh            check only: a table of what is present and what is missing
 #   scripts/setup.sh --install  install what is missing (Homebrew on macOS, apt on Debian/Ubuntu)
@@ -47,7 +47,7 @@ check() { # label test-command brew apt hint
   row "$label" MISSING "$hint"; missing=$((missing + 1))
 }
 
-echo "Checking the reverse-engineering harness ($os):"
+echo "Checking the GameFrame toolkit ($os):"
 check python3 "python3 --version" python@3.12 python3-venv "Python 3.10 or newer"
 check java21 "find_java21" openjdk@21 openjdk-21-jdk "JDK 21 (Ghidra 11/12 needs it); set JAVA_HOME"
 if [[ -z "$(find_ghidra)" && $install == 1 && $os == Darwin ]] && have brew; then brew install ghidra >/dev/null; fi

@@ -29,7 +29,7 @@ counts the checks that passed and failed. With `--ghidra` the run has more check
 | Zig (optional) | Building the sample game for Windows from any host | https://ziglang.org |
 | REA (optional, recommended) | Evidence-backed inspection of binaries, packages, apps, runtimes | https://github.com/morluto/rea |
 
-Other tools that fit the method, for targets this harness does not cover itself: ILSpy or
+Other tools that fit the method, for targets the toolkit does not cover itself: ILSpy or
 dnSpyEx (.NET), Il2CppDumper or Cpp2IL (Unity IL2CPP), unluac (Lua bytecode), FModel and UE4SS
 (Unreal), RenderDoc and apitrace (graphics frames), x64dbg or Frida (debugging and run-time
 hooks, on your own copy only), binwalk (unknown archives), Wine or a Windows machine with Steam
