@@ -1,18 +1,12 @@
-# The research behind these pages
+# Sources and notes
 
-The [preservation chapters](../README.md) rest on research done on 21 October 2026. This page
-explains how it was done, what was checked afterwards and where its gaps are. The report and
-the four sets of notes follow it, unchanged except for the corrections listed below.
+The report and the four sets of notes below give the sources for the
+[preservation chapters](../README.md). Every finding links to its source. The notes keep cited
+findings apart from inferences, and each lists its gaps. A finding marked "(search snippet)"
+comes from a search result, because the page itself could not be fetched.
 
-## How it was done
-
-An AI agent searched the web on four questions at once, one agent per question. Each agent
-saved notes with a link for every finding. A fifth agent read the notes and wrote the report.
-The notes separate cited findings from inferences, and list their gaps. A finding marked
-"(search snippet)" comes from a search result, because the page itself could not be fetched.
-
-1. [Report: presenting the harness as game preservation](report.md): the synthesis, with draft
-   wording that the chapters started from.
+1. [Report: presenting the harness as game preservation](report.md): the summary of the notes, with
+   draft wording for the site.
 2. [Notes: why games disappear](why-games-vanish.md): the 2023 availability study, games that
    stop running, games still on sale but frozen, lost source code and media.
 3. [Notes: law and policy](law-and-policy.md): the US, the EU and the UK, "abandonware",
@@ -22,9 +16,7 @@ The notes separate cited findings from inferences, and list their gaps. A findin
 5. [Notes: how preservation projects describe their work](messaging.md): mission statements,
    words to use and avoid, critiques, the concern about AI.
 
-## Checked after the report
-
-These facts were checked against primary sources before the chapters were written.
+## Facts checked against primary sources
 
 | Claim | Result |
 |---|---|

@@ -136,7 +136,7 @@ The arguments that resonate are scale of loss (87% out of print), cultural herit
 ## Ethics of AI-assisted reverse engineering, and public concerns
 
 ### Takeaway
-In October 2026 this is a live and sensitive topic. A long-running human decompilation community (decomp.dev) shut down on 15 October 2026, saying AI had "broken" its community. Press links AI decompilation to quick, cheap game clones. A page promoting AI agents for reverse engineering must face this directly.
+A long-running human decompilation community (decomp.dev) shut down on 15 October 2026, saying AI had "broken" its community. Press links AI decompilation to quick, cheap game clones. A page promoting AI agents for reverse engineering must face this directly.
 
 ### Cited Findings
 - 404 Media, 15 October 2026: decomp.dev is shutting down because "the community aspect of decompilation has been broken" by AI — [404 Media](https://www.404media.co/video-game-reverse-engineering-community-shuts-down-because-ai-has-made-it-too-easy/)

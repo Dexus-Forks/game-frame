@@ -1,6 +1,6 @@
 # Notes: who preserves games, and where reimplementation fits
 
-Research note, 21 October 2026. Primary sources were used where reachable. Several key questions are only partly covered, and the Gaps sections say where.
+Several key questions are only partly covered. The Gaps sections say which.
 
 ## Institutions: who collects what, and who gives playable access
 

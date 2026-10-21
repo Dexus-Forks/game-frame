@@ -1,6 +1,6 @@
 # Notes: law and policy
 
-Not legal advice. Notes for a preservation-focused site. Research done 21 October 2026. Some primary pages (Federal Register, Justia, EUR-Lex, CURIA, the ECI register, the 2027 petitions page) blocked automated fetches; where that happened the finding cites the best reachable source and says so.
+Not legal advice. Some primary pages (Federal Register, Justia, EUR-Lex, CURIA, the ECI register, the 2027 petitions page) blocked automated fetches; where that happened the finding cites the best reachable source and says so.
 
 ## United States: DMCA Section 1201, the 1201(f) interoperability exemption, and reverse-engineering case law
 
