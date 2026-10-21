@@ -162,5 +162,5 @@ The screenshots in `docs/assets/case-studies/` show the games' own art. That art
 the games' rights holders, is shown to illustrate the case studies, and is under neither
 licence.
 
-Projects made with `scripts/new-project.sh` start with their own licence files (MIT and
-Apache 2.0 for their code); each project chooses its own.
+Projects made with `scripts/new-project.sh` start with the same two licences: Apache 2.0 for
+their code and CC BY 4.0 for their documentation.

@@ -5,7 +5,7 @@
 #
 # Creates DIR as a git repository with:
 #   AGENTS.md (+ CLAUDE.md)   the rules, with the game's name; edit the goal paragraph first
-#   README.md, LICENSE-MIT, LICENSE-APACHE   front page (build/run per part) and the dual licence
+#   README.md, LICENSE-APACHE, LICENSE-CC-BY-4.0   front page (build/run per part); code Apache 2.0, content CC BY 4.0
 #   .claude/skills/           the re-* skills (every step of the method)
 #   tools/, scripts/          the harness's tools, requirements.txt, .mcp.json (REA)
 #   docs/FINDINGS.md, docs/CHECKLIST.md, labels/names.tsv, labels/fields.tsv
@@ -23,10 +23,8 @@ mkdir -p "$dir"/{target,analysis,derived,docs,labels,.claude}
 cp -R "$ROOT/tools" "$ROOT/scripts" "$dir/"
 cp -R "$ROOT/.claude/skills" "$dir/.claude/"
 cp "$ROOT/requirements.txt" "$ROOT/.mcp.json" "$dir/"
-# Our code is dual-licensed MIT OR Apache-2.0.
-cp "$ROOT/templates/project/licences/LICENSE-APACHE" "$dir/"
-sed -e "s/YEAR/$(date +%Y)/" -e "s/AUTHOR/$(git config user.name 2>/dev/null || echo 'the authors')/" \
-  "$ROOT/templates/project/licences/LICENSE-MIT" > "$dir/LICENSE-MIT"
+# Code is Apache 2.0; documentation and other prose are CC BY 4.0 (as in the harness).
+cp "$ROOT/templates/project/licences/LICENSE-APACHE" "$ROOT/templates/project/licences/LICENSE-CC-BY-4.0" "$dir/"
 # The reference documents the skills point to (docs/DOS.md, docs/ABI.md, ...).
 for f in ABI GAME-PATTERNS DOS LEGAL OUTPUTS SETUP; do cp "$ROOT/docs/$f.md" "$dir/docs/"; done
 cp -R "$ROOT/docs/games" "$ROOT/docs/observe" "$ROOT/docs/case-studies" "$dir/docs/"

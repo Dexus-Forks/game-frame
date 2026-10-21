@@ -20,6 +20,8 @@ README with the full instructions.
 
 ## Licence
 
-The code is dual-licensed under the [MIT licence](LICENSE-MIT) or the
-[Apache License 2.0](LICENSE-APACHE), at your choice. GAME_NAME's files are © their owners:
-they are not part of this repository.
+The code is licensed under the [Apache License 2.0](LICENSE-APACHE). The documentation and
+other prose (`docs/`, the READMEs, `AGENTS.md`, the skills) are licensed under
+[Creative Commons Attribution 4.0](LICENSE-CC-BY-4.0): adapt and share them for any purpose,
+with credit. GAME_NAME's files are © their owners: they are not part of this repository, and
+screenshots of the game's art are under neither licence.
