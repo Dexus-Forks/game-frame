@@ -14,7 +14,7 @@ Commands:
   rust TYPE ...      Rust structs and readers for record types (and arrays of records), with a
                      comment on every field giving its Pascal type and offset
   rust-globals DIR   a module directory: one file per Pascal unit with its variables at their
-                     data-segment offsets, types.rs, and mod.rs's Globals with load/store to
+                     data-segment offsets, types/ (one file per record type), and mod.rs's Globals with load/store to
                      and from a 64 KB image of the segment (checks ported code against the
                      original's memory after an emulated run)
   rust-reader        the small PascalReader / PascalWriter module the generated code uses
@@ -375,7 +375,7 @@ def main(argv):
         if not args:
             sys.exit('rust-globals OUT_DIR: the module directory to write (for example src/globals)')
         units = td_rust.rust_globals(td, args[0])
-        print(f'wrote {args[0]}: mod.rs, types.rs and {len(units)} units')
+        print(f'wrote {args[0]}: mod.rs, types/ and {len(units)} units')
     elif cmd == 'json':
         out = dict(version=td.version, counts=td.counts, procedures=td.procedures(), globals=td.globals(),
                    types=td.named_types(), lines=td.line_map())

@@ -4,11 +4,12 @@ rust-reader); see its help.
 
   rust_for(td, type_names)   one Rust module: structs with read/write for record types
   rust_globals(td, out_dir)  a module directory: one file per Pascal unit with that unit's
-                             variables at their data-segment offsets, types.rs for the record
-                             types, mod.rs joining them into Globals with load/store
+                             variables at their data-segment offsets, types/ (one file per
+                             record type), mod.rs joining them into Globals with load/store
   reader()                   templates/pascal.rs: PascalReader, PascalWriter, PStr, Real48
 """
 import os
+import re
 import struct
 
 from tdinfo import element_record
@@ -147,10 +148,38 @@ def unit_module(unit):
     return m + '_' if m in RUST_KEYWORDS else m
 
 
+def snake(name):
+    """GREXDat -> grex_dat, SingleEnemy -> single_enemy (a run of capitals is one word)."""
+    s = re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1_\2', name)
+    return re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', s).lower()
+
+
+def write_types(out_dir, out_structs):
+    """types/: one file per record type, and mod.rs re-exporting them all."""
+    tdir = os.path.join(out_dir, 'types')
+    os.makedirs(tdir, exist_ok=True)
+    old = os.path.join(out_dir, 'types.rs')
+    if os.path.exists(old):
+        os.remove(old)
+    names = []
+    for sname, code in out_structs.items():
+        if not code:
+            continue
+        mod = snake(sname)
+        names.append((mod, sname))
+        with open(os.path.join(tdir, f'{mod}.rs'), 'w') as f:
+            f.write(f'//! Record type `{sname}`.\n' + GENERATED + '#![allow(clippy::all)]\n' + IMPORTS +
+                    '#[allow(unused_imports)]\nuse super::*;\n\n' + code)
+    with open(os.path.join(tdir, 'mod.rs'), 'w') as f:
+        f.write("//! Record types of the data segment's variables, one file each.\n" + GENERATED +
+                ''.join(f'mod {m};\n' for m, _ in sorted(names)) + '\n' +
+                ''.join(f'pub use {m}::{n};\n' for m, n in sorted(names)))
+
+
 def rust_globals(td, out_dir):
     """Write the data segment's variables as a module directory under out_dir: one file per
     Pascal unit (struct with load/store at the original offsets; Booleans kept as u8 so every
-    byte survives), types.rs (record types), mod.rs (Globals: one field per unit)."""
+    byte survives), types/ (one file per record type), mod.rs (Globals: one field per unit)."""
     auto = td.exe.autodata if td.exe.kind == 'NE' else None
     rows = []
     for i, (name, t, off, seg, bits) in enumerate(td.symbols, 1):
@@ -187,9 +216,7 @@ def rust_globals(td, out_dir):
                 '    pub fn store(&self, w: &mut PascalWriter) {\n' + '\n'.join(stores) + '\n    }\n}\n')
         with open(os.path.join(out_dir, f'{unit}.rs'), 'w') as f:
             f.write(body)
-    with open(os.path.join(out_dir, 'types.rs'), 'w') as f:
-        f.write('//! Record types of the data segment\'s variables.\n' + GENERATED + '#![allow(clippy::all)]\n' + IMPORTS + '\n'
-                + '\n'.join(v for v in out_structs.values() if v))
+    write_types(out_dir, out_structs)
     mods = sorted(units)
     with open(os.path.join(out_dir, 'mod.rs'), 'w') as f:
         f.write('//! Every variable of the original\'s data segment, by Pascal unit, at its original\n'
