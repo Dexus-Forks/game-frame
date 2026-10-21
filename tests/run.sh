@@ -249,8 +249,8 @@ if command -v dosbox-x >/dev/null; then
 import os, sys; sys.path.insert(0, 'tools/dos')
 from dbx_control import Debugger
 g = sys.argv[1]
-with Debugger(port=58993, timeout=30) as d:
-    d.launch([os.path.abspath('scripts/dosbox-run.sh'), '--out', g + '/dbx', '--time', '40', '--break', '--mcp', '58993', g, 'SAMPLEMZ.EXE'])
+with Debugger(port=0, timeout=30) as d:            # a free port: no stale DOSBox-X can connect
+    d.launch([os.path.abspath('scripts/dosbox-run.sh'), '--out', g + '/dbx', '--time', '40', '--break', '--mcp', str(d.port), g, 'SAMPLEMZ.EXE'])
     d.wait_connected(); d.wait_break()          # DEBUGBOX: stopped at the first instruction
     d.exec('BPINT 21 4C'); d.run()
     regs = d.wait_break()                       # stopped at INT 21h AH=4Ch (exit)

@@ -8,8 +8,8 @@ channel is the dosbox-x-mcp-server program (registered in .mcp.json as "dosbox")
 is the script-facing side, for repeatable ground-truth runs and tests.
 
     from dbx_control import Debugger
-    with Debugger(port=58993) as dbx:                  # listen first...
-        dbx.launch([os.path.abspath('scripts/dosbox-run.sh'), '--break', '--mcp', '58993', GAME, 'GAME.EXE'])
+    with Debugger(port=0) as dbx:                      # listen first, on a free port...
+        dbx.launch([os.path.abspath('scripts/dosbox-run.sh'), '--break', '--mcp', str(dbx.port), GAME, 'GAME.EXE'])
         dbx.wait_connected()                            # DOSBox-X connected
         dbx.wait_break()                                # DEBUGBOX stopped at the first instruction
         dbx.exec('BPINT 21 3D')                         # any debugger command; returns its output lines
@@ -25,10 +25,14 @@ runs each debugger COMMAND (for example BREAK "EXEC CPU" "EXEC D 0040:0000"), pr
 Addresses are what the running program uses: real-mode segments, or the DPMI host's selectors
 for a protected-mode program, which are NOT Ghidra's 1000/1008 numbering. Find a segment's
 selector with the debugger's LDT command, or match its bytes (see docs/DOS.md).
+Use port=0 (a free port) for scripts and tests: a DOSBox-X left from another run, or another
+session's, may still be trying to connect to a fixed port, and the listener would accept it.
+close() ends the whole process group that launch() started.
 Standard library only. It does not start DOSBox-X itself unless you call launch().
 """
 import os
 import re
+import signal
 import socket
 import subprocess
 import sys
@@ -45,6 +49,7 @@ class Debugger:
         self.listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.listener.bind(('127.0.0.1', port))
         self.listener.listen(1)
+        self.port = self.listener.getsockname()[1]        # port=0 picks a free port
         self.conn = None
         self.buf = b''
         self.next_id = 1
@@ -63,12 +68,34 @@ class Debugger:
                     s.close()
             except OSError:
                 pass
-        if self.process and self.process.poll() is None:
-            self.process.terminate()
+        self.stop()
+
+    def stop(self, grace=2.0):
+        """End DOSBox-X and every process launch() started (the script wrapper, script, dosbox-x).
+
+        Killing only the wrapper leaves dosbox-x running. Stopped in the debugger, it never
+        reaches -time-limit, and it reconnects to the next listener on the same port.
+        """
+        if not self.process or self.process.poll() is not None:
+            return
+        for sig in (signal.SIGTERM, signal.SIGKILL):
+            try:
+                os.killpg(self.process.pid, sig)
+            except (ProcessLookupError, PermissionError):
+                return
+            try:
+                self.process.wait(grace)
+                return
+            except subprocess.TimeoutExpired:
+                pass
 
     def launch(self, argv, **kw):
-        """Start DOSBox-X (usually scripts/dosbox-run.sh --mcp PORT ...) in the background."""
+        """Start DOSBox-X (usually scripts/dosbox-run.sh --mcp PORT ...) in the background.
+
+        It runs in its own process group, so close() can end all of it.
+        """
         kw.setdefault('cwd', self.workdir)
+        kw.setdefault('start_new_session', True)
         self.process = subprocess.Popen(argv, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, **kw)
         return self.process
 
