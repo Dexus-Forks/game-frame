@@ -14,8 +14,8 @@ Banished built this way; see [the case studies](docs/case-studies/README.md).
 ## Quick start
 
 ```bash
-git clone https://github.com/tanepiper/reverse-engineer-games.git
-cd reverse-engineer-games
+git clone https://github.com/tanepiper/game-frame.git
+cd game-frame
 scripts/setup.sh --install          # Ghidra, JDK 21, objdump, Node, Zig, and .venv (unicorn, pefile, capstone)
 tests/run.sh --ghidra               # proves every tool on the sample game (about 1½ minutes)
 

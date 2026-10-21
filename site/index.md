@@ -16,6 +16,9 @@ hero:
       text: The first skill
       link: /skills/re-start
 features:
+  - title: Game preservation
+    details: Many older games no longer run on current computers. Some are still on sale but have not been updated in years. This method works from the copy you bought, and records how the game works as it goes.
+    link: /preservation/
   - title: A taxonomy of games
     details: Who drives, the game or the player? Ten families of games, each with its rule set, reference games and projects to learn from, and the systems they share.
     link: /games/
@@ -32,7 +35,7 @@ features:
     details: Un-Banished, Tyrian 2000 and Frontier Elite II, and the tooling each built to capture its game.
     link: /case-studies/
   - title: Within the law
-    details: Your own copy, nothing redistributed, new code written from documented behaviour.
+    details: You need your own copy of the game. The harness ships no game files. Each project writes new code from documented behaviour.
     link: /legal
 ---
 
@@ -44,7 +47,7 @@ harness, checks your tools, asks before it installs anything, and starts a proje
 ```text
 Set up the reverse-engineer-games harness on this computer for me.
 
-1. Clone https://github.com/tanepiper/reverse-engineer-games into ~/code/reverse-engineer-games
+1. Clone https://github.com/tanepiper/game-frame into ~/code/game-frame
    (or update it with git pull if it is already there).
 2. Read AGENTS.md and .claude/skills/re-setup/SKILL.md.
 3. Run scripts/setup.sh and show me the table of what is present and what is missing.

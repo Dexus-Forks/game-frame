@@ -27,7 +27,7 @@ const SITE_SOURCES = ['README.md', 'docs', '.claude/skills', 'examples/*/README.
 export default defineConfig({
   title: 'Reverse engineering games',
   description: 'A method, skills and tools for AI agents and people who reverse engineer games and rebuild them exactly.',
-  // The workflow sets SITE_BASE to the Pages path (/reverse-engineer-games/); locally it is /.
+  // The workflow sets SITE_BASE to the Pages path (/game-frame/); locally it is /.
   base: process.env.SITE_BASE || '/',
   srcDir: '..',
   srcExclude: EXCLUDE,
@@ -55,6 +55,7 @@ export default defineConfig({
   themeConfig: {
     nav: [
       { text: 'Start', link: '/overview' },
+      { text: 'Preservation', link: '/preservation/' },
       { text: 'Games', link: '/games/' },
       {
         text: 'Guides',
@@ -77,7 +78,7 @@ export default defineConfig({
     editLink: {
       // Runs in the browser, so it cannot use GITHUB from repo.mts. Skill pages come from
       // the dynamic route; their source is the SKILL.md.
-      pattern: ({ filePath, params }) => 'https://github.com/tanepiper/reverse-engineer-games/edit/main/'
+      pattern: ({ filePath, params }) => 'https://github.com/tanepiper/game-frame/edit/main/'
         + (params?.skill ? `.claude/skills/${params.skill}/SKILL.md` : filePath),
       text: 'Edit this page on GitHub',
     },

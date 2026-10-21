@@ -7,6 +7,11 @@ of game you have, then how to observe it, then the reference pages as you need t
 The website is built from these files where they are (see [site/README.md](../site/README.md)):
 the order of this page and of each folder's `README.md` is the order of the site's menu.
 
+## Game preservation
+
+- [Game preservation](preservation/README.md): why older games disappear, what the harness
+  does to keep them playable, the law, AI, and the work it builds on.
+
 ## Kinds of games
 
 - [A taxonomy of games](games/README.md): who drives, the axes, the families, the

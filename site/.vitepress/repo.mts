@@ -16,7 +16,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
-export const GITHUB = 'https://github.com/tanepiper/reverse-engineer-games'
+export const GITHUB = 'https://github.com/tanepiper/game-frame'
 
 /** Repository paths (relative to ROOT) that are not pages, for VitePress's srcExclude. */
 export const EXCLUDE = [
