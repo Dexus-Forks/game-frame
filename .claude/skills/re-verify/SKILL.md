@@ -37,6 +37,25 @@ breakpoint (`tools/dos/dbx_control.py`). Fix the CPU speed (`--cycles N`) for an
 that depends on timing. Recorded demos (a file of inputs the game replays) are the best
 end-to-end check: the reimplementation must replay them to the same frames.
 
+### Reach the code a recording never reaches: fuzz from real states
+
+A demo or a recorded session only covers some branches (one game mode, one difficulty, a
+few event types). To cover the rest:
+
+1. Capture real states at the start of the fragment, as the whole program runs (for a DOS
+   game, memory images of the data and stack segments at a breakpoint).
+2. For each case, take one state and change only the inputs the fragment reads: plant a
+   random record (an event, a command), set random mode flags. Draw values the code tests
+   for (sentinels such as -99, 0, boundaries, the ends of ranges) as often as random ones.
+3. Load the changed state into the emulator and run the original fragment (`dos_emu`
+   `run_range`). Heap data it reads goes into a new segment, with the pointers in the
+   state set to it. Drop cases where the original never finishes, and say how many.
+4. Save before and after, and replay them through the same test as the recorded cases.
+   Report which inputs the passing cases covered (for example, the event types planted).
+
+This finds what reading misses: loops that start at 0 instead of 1, writes one past an
+array, branches only one mode takes.
+
 ## 2. Random draw order
 
 ```bash
