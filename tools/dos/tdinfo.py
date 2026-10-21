@@ -13,7 +13,10 @@ Commands:
   json OUT           everything above as one JSON file
   rust TYPE ...      Rust structs and readers for record types (and arrays of records), with a
                      comment on every field giving its Pascal type and offset
-  rust-reader        the small PascalReader module the generated readers use
+  rust-globals       one Globals struct: every variable of the data segment at its offset, with
+                     load/store to and from a 64 KB image of it (for checking ported code
+                     against the original's memory after an emulated run)
+  rust-reader        the small PascalReader / PascalWriter module the generated code uses
 
 Borland Pascal and Borland C++ write these symbols when a program is linked with debug
 information (TPC /V, BPC /V, TLINK /v), either appended to the program or in a .TDS file. Many
@@ -469,6 +472,68 @@ impl<'a> PascalReader<'a> {
         }
     }
 }
+
+/// Writes values back in the same layout (the inverse of `PascalReader`). Writing past the
+/// end of the buffer is ignored, so a 64 KB segment image can be written field by field.
+pub struct PascalWriter<'a> {
+    data: &'a mut [u8],
+    pos: usize,
+}
+
+impl<'a> PascalWriter<'a> {
+    pub fn new(data: &'a mut [u8]) -> Self {
+        PascalWriter { data, pos: 0 }
+    }
+    pub fn pos(&self) -> usize {
+        self.pos
+    }
+    pub fn seek(&mut self, pos: usize) {
+        self.pos = pos;
+    }
+    pub fn bytes(&mut self, b: &[u8]) {
+        for &x in b {
+            if let Some(d) = self.data.get_mut(self.pos) {
+                *d = x;
+            }
+            self.pos += 1;
+        }
+    }
+    pub fn u8(&mut self, v: u8) {
+        self.bytes(&[v]);
+    }
+    pub fn i8(&mut self, v: i8) {
+        self.bytes(&[v as u8]);
+    }
+    pub fn u16(&mut self, v: u16) {
+        self.bytes(&v.to_le_bytes());
+    }
+    pub fn i16(&mut self, v: i16) {
+        self.bytes(&v.to_le_bytes());
+    }
+    pub fn u32(&mut self, v: u32) {
+        self.bytes(&v.to_le_bytes());
+    }
+    pub fn i32(&mut self, v: i32) {
+        self.bytes(&v.to_le_bytes());
+    }
+    pub fn f32(&mut self, v: f32) {
+        self.bytes(&v.to_le_bytes());
+    }
+    pub fn f64(&mut self, v: f64) {
+        self.bytes(&v.to_le_bytes());
+    }
+    /// Pascal Boolean as one byte: 1 for true. (Globals keep Booleans as u8 to stay exact.)
+    pub fn boolean(&mut self, v: bool) {
+        self.u8(v as u8);
+    }
+    pub fn real48(&mut self, v: Real48) {
+        self.bytes(&v.0);
+    }
+    pub fn pstr<const N: usize>(&mut self, v: &PStr<N>) {
+        self.u8(v.len);
+        self.bytes(&v.bytes);
+    }
+}
 """
 
 
@@ -483,52 +548,58 @@ RUST_PRELUDE = {'Option', 'Result', 'Box', 'String', 'Vec', 'Some', 'None', 'Ok'
 
 def rust_struct_name(name):
     base = name[:-4] if name.lower().endswith('type') and len(name) > 4 else name
+    if '_' in base or base.isupper():   # SMALL_PACKET -> SmallPacket
+        base = ''.join(p[:1].upper() + p[1:].lower() for p in base.split('_') if p)
     base = base[:1].upper() + base[1:]
     return base + 'Rec' if base in RUST_PRELUDE else base   # Optiontype -> OptionRec
 
 
-def rust_type(td, t, out_structs, hint):
-    """(rust type, read expression) for type t; nested anonymous records become structs."""
+def rust_type(td, t, out_structs, hint, exact_bool=False):
+    """(rust type, read expression, write function) for type t. The write function takes the
+    expression of a value and returns a statement that writes it with `w`. Nested anonymous
+    records become structs. exact_bool keeps a Boolean as u8 (any byte value survives)."""
     ty = td.type(t)
     tid, name, size, b, w = ty
+    if tid == 0x28 and exact_bool:
+        return 'u8', 'r.u8()?', lambda v: f'w.u8({v});'
     if tid in RUST_SCALARS:
         rt, method = RUST_SCALARS[tid]
-        return rt, f'r.{method}()?'
+        return rt, f'r.{method}()?', lambda v, m=method: f'w.{m}({v});'
     if tid == 0x03:
-        return f'PStr<{size - 1}>', 'r.pstr()?'
+        return f'PStr<{size - 1}>', 'r.pstr()?', lambda v: f'w.pstr(&({v}));'
     if tid == 0x1C:
-        index, = struct.unpack_from('<H', td.type_slot(t + 1))
-        lo = hi = None
-        it = td.type(index)
-        if it and it[0] in (0x04, 0x05, 0x06, 0x08, 0x09, 0x0A, 0x0C):
-            lo, hi = struct.unpack('<ii', td.type_slot(index + 1))
         count = size // max(td.type_size(w), 1)
-        et, er = rust_type(td, w, out_structs, hint)
+        et, er, ew = rust_type(td, w, out_structs, hint, exact_bool)
         if et == 'u8':
-            return f'[u8; {count}]', 'r.array()?'
-        return f'[{et}; {count}]', f'r.arr(|r| Ok({er}))?'
+            return f'[u8; {count}]', 'r.array()?', lambda v: f'w.bytes(&({v}));'
+        return (f'[{et}; {count}]', f'r.arr(|r| Ok({er}))?',
+                lambda v, ew=ew: f'for x in ({v}).iter() {{ {ew("*x")} }}')
     if tid == 0x1E:
         sname = rust_struct_name(td.name(name)) if name else hint
         if sname not in out_structs:
             out_structs[sname] = None   # reserve, then fill (recursion)
-            out_structs[sname] = rust_record(td, t, sname, out_structs)
-        return sname, f'{sname}::read(r)?'
-    return f'[u8; {size}]', 'r.array()?'   # unknown kinds stay raw bytes
+            out_structs[sname] = rust_record(td, t, sname, out_structs, exact_bool)
+        return sname, f'{sname}::read(r)?', lambda v: f'({v}).write(w);'
+    if tid in (0x15, 0x16) and size == 4:
+        return 'u32', 'r.u32()?', lambda v: f'w.u32({v});'      # far pointer: offset, segment
+    return f'[u8; {size}]', 'r.array()?', lambda v: f'w.bytes(&({v}));'   # unknown kinds stay raw
 
 
-def rust_record(td, t, sname, out_structs):
-    fields, reads = [], []
+def rust_record(td, t, sname, out_structs, exact_bool=False):
+    fields, reads, writes = [], [], []
     for off, fname, ftype, fsize in td.record_fields(t):
-        rt, rexpr = rust_type(td, _member_type(td, t, fname), out_structs, sname + fname[:1].upper() + fname[1:])
+        rt, rexpr, wfn = rust_type(td, _member_type(td, t, fname), out_structs, sname + fname[:1].upper() + fname[1:], exact_bool)
         ident = rust_ident(fname)
         fields.append(f'    /// +{off:#06x} {fname}: {ftype}\n    pub {ident}: {rt},')
         reads.append(f'            {ident}: {rexpr},')
+        writes.append(f'        {wfn("self." + ident)}')
     size = td.type_size(t)
     return (f'#[derive(Debug, Clone, Copy, PartialEq)]\npub struct {sname} {{\n' + '\n'.join(fields) + '\n}\n\n'
             f'impl {sname} {{\n    /// Bytes in the original\'s memory and files.\n    pub const SIZE: usize = {size};\n\n'
             f'    pub fn read(r: &mut PascalReader) -> Result<Self, ShortRead> {{\n'
             f'        let start = r.pos();\n        let v = {sname} {{\n' + '\n'.join(reads) + '\n        };\n'
-            f'        debug_assert_eq!(r.pos() - start, Self::SIZE);\n        Ok(v)\n    }}\n}}\n')
+            f'        debug_assert_eq!(r.pos() - start, Self::SIZE);\n        Ok(v)\n    }}\n\n'
+            f'    pub fn write(&self, w: &mut PascalWriter) {{\n' + '\n'.join(writes) + '\n    }\n}\n')
 
 
 def _member_type(td, t, fname):
@@ -568,8 +639,51 @@ def rust_for(td, type_names):
             raise SystemExit(f'{tn}: not a record or an array of records')
     head = ('// Generated by tools/dos/tdinfo.py rust (reverse-engineer-games) from the original program\'s\n'
             '// debug symbols. Field order, types and offsets are the original\'s; do not edit by hand.\n'
-            '#![allow(clippy::all)]\n#[allow(unused_imports)]\nuse crate::pascal::{PascalReader, PStr, Real48, ShortRead};\n\n')
+            '#![allow(clippy::all)]\n#[allow(unused_imports)]\nuse crate::pascal::{PascalReader, PascalWriter, PStr, Real48, ShortRead};\n\n')
     return head + '\n'.join(tables) + '\n' + '\n'.join(v for v in out_structs.values() if v)
+
+
+def rust_globals(td):
+    """A Globals struct with every variable of the auto data segment at its offset, and
+    load/store to and from a 64 KB image of that segment (Booleans kept as u8)."""
+    auto = td.exe.autodata if td.exe.kind == 'NE' else None
+    rows = []
+    for i, (name, t, off, seg, bits) in enumerate(td.symbols, 1):
+        ty = td.type(t)
+        if bits & 7 != 0 or not ty or ty[0] in (0x23, 0x24) or (auto and seg != auto):
+            continue
+        rows.append((off, td.type_size(t), td.name(name), t, td.module_of_symbol(i)))
+    rows.sort()
+    counts = {}
+    for _, _, n, _, _ in rows:
+        counts[n.lower()] = counts.get(n.lower(), 0) + 1
+    out_structs, fields, loads, stores, seen = {}, [], [], [], set()
+    end = 0
+    for off, size, name, t, unit in rows:
+        ident = rust_ident(name if counts[name.lower()] == 1 else f'{name}_{unit}')
+        while ident in seen:
+            ident += f'_{off:04x}'
+        seen.add(ident)
+        rt, rexpr, wfn = rust_type(td, t, out_structs, rust_struct_name('G' + name), exact_bool=True)
+        alias = off < end
+        note = f' (overlaps the variable before it: loaded, not stored)' if alias else ''
+        fields.append(f'    /// {off:#06x} {name}: {td.type_name(t, 1)} ({unit or "?"}, {size} bytes){note}\n    pub {ident}: {rt},')
+        loads.append(f'            {ident}: {{ r.seek({off:#x}); {rexpr} }},')
+        if not alias:
+            stores.append(f'        w.seek({off:#x}); {wfn("self." + ident)}')
+        end = max(end, off + size)
+    head = ('// Generated by tools/dos/tdinfo.py rust-globals (reverse-engineer-games) from the original\n'
+            '// program\'s debug symbols: every variable of the data segment at its original offset.\n'
+            '// Booleans are u8 so that every byte survives a load and store. Do not edit by hand.\n'
+            '#![allow(clippy::all)]\n#[allow(unused_imports)]\nuse crate::pascal::{PascalReader, PascalWriter, PStr, Real48, ShortRead};\n\n')
+    body = ('#[derive(Debug, Clone, PartialEq)]\npub struct Globals {\n' + '\n'.join(fields) + '\n}\n\n'
+            'impl Globals {\n    /// Read every variable from an image of the data segment.\n'
+            '    pub fn load(ds: &[u8]) -> Result<Box<Globals>, ShortRead> {\n'
+            '        let r = &mut PascalReader::new(ds);\n        Ok(Box::new(Globals {\n' + '\n'.join(loads) + '\n        }))\n    }\n\n'
+            '    /// Write every variable back into an image of the data segment (bytes between\n'
+            '    /// variables are left as they are).\n'
+            '    pub fn store(&self, ds: &mut [u8]) {\n        let w = &mut PascalWriter::new(ds);\n' + '\n'.join(stores) + '\n    }\n}\n')
+    return head + body + '\n' + '\n'.join(v for v in out_structs.values() if v)
 
 
 def main(argv):
@@ -628,6 +742,8 @@ def main(argv):
                 print(f'{addr}\t{fname}:{line}')
     elif cmd == 'rust':
         print(rust_for(td, args), end='')
+    elif cmd == 'rust-globals':
+        print(rust_globals(td), end='')
     elif cmd == 'rust-reader':
         print(RUST_READER, end='')
     elif cmd == 'json':

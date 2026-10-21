@@ -59,7 +59,14 @@ The record types become reimplementation code directly: `tdinfo.py BINARY rust T
 Rust structs with readers in the original's field order, each field commented with its Pascal
 type and offset, and `tdinfo.py BINARY rust-reader` the `PascalReader` they use (little-endian
 integers, one-byte Boolean, 6-byte Real kept exact, `string[N]`). Generated names that clash
-with Rust's prelude get `Rec` (`Optiontype` -> `OptionRec`).
+with Rust's prelude get `Rec` (`Optiontype` -> `OptionRec`). Records also get `write`, the
+inverse of `read`.
+
+`tdinfo.py BINARY rust-globals` writes one `Globals` struct holding every variable of the data
+segment at its original offset, with `load` and `store` to and from a 64 KB image of the
+segment (Booleans stay `u8`, so every byte survives). Ported code then works on `Globals`, and a
+test can load the DS image from before an emulated run of the original, run the port, store,
+and compare with the DS image from after: every variable checked at once.
 
 The runtime library (`System`, `Crt`, `Dos`) has no symbols of its own. Borland Pascal 7's
 random generator, for example, is `RandSeed := RandSeed * $08088405 + 1` (a near `NextRand`
