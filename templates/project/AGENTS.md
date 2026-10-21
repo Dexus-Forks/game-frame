@@ -30,6 +30,8 @@ loader". Say what "done" means and how exact it must be.
 6. **Several sessions may work at once.** Stage only your own files (`git add path`), never
    `git add -A`, and never revert work you did not do.
 7. **Ask before downloading** anything; say the file, the source and the size.
+8. **Keep files small and modular.** One concern per module; split a file before it passes a
+   few hundred lines, generated code included (one file per original unit or table).
 
 ## Where things are
 

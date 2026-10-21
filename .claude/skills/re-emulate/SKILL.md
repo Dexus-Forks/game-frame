@@ -1,6 +1,6 @@
 ---
 name: re-emulate
-description: Run individual functions from a game's Windows x64 binaries (tools/emu/pe_emu.py) or 16-bit DOS/NE programs (tools/emu/dos_emu.py) under the Unicorn emulator to capture exact ground truth for chosen inputs, and record the calls they make (random draws) with call_trace.py. Use for anything a reimplementation must match bit for bit - random number generators, maths, procedural generation, simulation steps, pathfinding, parsers - instead of trusting the pseudocode.
+description: Run individual functions from a game's Windows x64 binaries (tools/emu/pe_emu.py) or 16-bit DOS/NE programs (tools/emu/dos_emu/) under the Unicorn emulator to capture exact ground truth for chosen inputs, and record the calls they make (random draws) with call_trace.py. Use for anything a reimplementation must match bit for bit - random number generators, maths, procedural generation, simulation steps, pathfinding, parsers - instead of trusting the pseudocode.
 ---
 
 # Emulate original code for ground truth
@@ -78,7 +78,7 @@ emu = Emu('target/Game.exe', ['target/Engine.dll'])  # loads, relocates, links i
 - **Floating point state**: the emulator starts with the default MXCSR (round to nearest). If the
   game changes the rounding mode or enables flush-to-zero, set it the same way.
 
-## 16-bit DOS and NE programs: dos_emu.py
+## 16-bit DOS and NE programs: dos_emu
 
 ```python
 import sys; sys.path.insert(0, 'tools/emu')
@@ -108,7 +108,7 @@ emu.trace({'1040:0a12': 'Random'}, args=1); emu.write_trace('derived/rng.trace')
   `emu.run_range('1000:cab1', '1000:ccac')` runs from one address until execution reaches the
   other. Pick a fragment that leaves the stack balanced and uses globals, not the enclosing
   procedure's locals (or set `bp` in `regs`). Near procedures end in `ret`: stop at its address.
-- **The whole program, headless**: `tools/emu/dos_env.py` adds DOS files, the BIOS, a DPMI
+- **The whole program, headless**: `tools/emu/dos_env/` adds DOS files, the BIOS, a DPMI
   host, timer interrupts and a key queue, so a DOS game starts and runs in dos_emu, frame by
   frame, with its memory open to you (docs/DOS.md section 5b). When it stops on something
   missing, add that to dos_env with a test, not a workaround in the game project.

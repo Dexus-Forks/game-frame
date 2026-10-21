@@ -89,8 +89,8 @@ to produce, and the pitfalls that cost time.
 | `tools/dos/tdinfo.py` | Borland Turbo Debugger symbols: original procedure, global and type names, parameters, record layouts, source lines, labels for Ghidra, Rust readers for records |
 | `tools/dos/nedis.py` | 16-bit disassembly with relocations applied: far calls and DS globals by name |
 | `tools/dos/readseg.py` | Typed values at `seg:off`, including Turbo Pascal `Real` and Pascal strings |
-| `tools/emu/dos_emu.py` | Call any function of a 16-bit NE (protected mode) or MZ (real mode) program, at Ghidra's addresses |
-| `tools/emu/dos_env.py` | A small DOS, BIOS, DPMI host and PC for dos_emu: run a whole DOS program headless, with files, timer interrupts, keys, and screenshots |
+| `tools/emu/dos_emu/` | Call any function of a 16-bit NE (protected mode) or MZ (real mode) program, at Ghidra's addresses |
+| `tools/emu/dos_env/` | A small DOS, BIOS, DPMI host and PC for dos_emu: run a whole DOS program headless, with files, timer interrupts, keys, and screenshots |
 | `tools/dos/fileio_trace.py` | From a DOSBox-X file log: every file's reads in order, with record patterns |
 | `tools/dos/dbx_control.py` | Drive DOSBox-X's debugger from a script: breakpoints, registers, memory |
 

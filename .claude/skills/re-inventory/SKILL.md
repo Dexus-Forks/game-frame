@@ -91,7 +91,7 @@ docs/DOS.md.
 | `UE4`/`UnrealEngine` strings, `.pak` files | Unreal Engine | Most logic is in the EXE plus Blueprint bytecode in `.uasset`; tools such as FModel and UE4SS read the assets |
 | `lua_pcall`, `.lua`/`.luac` files | Lua scripting on a native engine | Decompile the scripts (unluac, luadec) for game rules; the native side is the engine |
 | GameMaker / RPG Maker / Godot strings | A known engine with its own format | Use the engine's community tools for the data; the native binary is the stock runtime |
-| dosinfo: `MZ` or `NE`, Borland/Microsoft/Watcom runtime | 16-bit DOS or Windows 3.x code | This harness's DOS route: `dosinfo.py`, `tdinfo.py`, Ghidra, `dos_emu.py`, DOSBox-X (docs/DOS.md) |
+| dosinfo: `MZ` or `NE`, Borland/Microsoft/Watcom runtime | 16-bit DOS or Windows 3.x code | This harness's DOS route: `dosinfo.py`, `tdinfo.py`, Ghidra, `dos_emu`, DOSBox-X (docs/DOS.md) |
 | dosinfo: `LE`/`LX` (DOS/4GW, PMODE/W) | 32-bit DOS-extender program | Ghidra with an LE/LX loader extension; run it in DOSBox-X |
 | High-entropy executable section, `.vmp0`, `.themida`, UPX | Packed or protected | Stop. Unpack first (UPX: `upx -d`), or work from a memory dump with the user's agreement; Denuvo and VMProtect are out of scope for static analysis |
 

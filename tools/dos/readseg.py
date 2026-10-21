@@ -18,7 +18,7 @@ ADDRESS is as Ghidra prints it: 1008:0004, DAT_1008_0004 or FUN_1000_0028 (NE se
 0x1000 + 8 * (segment - 1); MZ images are loaded at segment 0x1000). `--count N` reads N
 consecutive values (a table). Values are as stored in the file, before the program runs:
 relocated words (selectors, far pointers to segments) still hold the file's placeholder.
-It does not read memory the program fills at run time (use dos_emu.py or DOSBox-X for that).
+It does not read memory the program fills at run time (use dos_emu or DOSBox-X for that).
 """
 import os
 import struct

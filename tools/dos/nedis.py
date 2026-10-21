@@ -5,7 +5,7 @@ Usage: nedis.py BINARY SEG:OFF|LABEL [LENGTH] [--labels FILE]
 
 Ghidra's listing aside, a plain disassembler shows a 16-bit program's calls to other segments
 and to imports as `lcall 0:ffff`: the file holds placeholders that the loader fills in. This
-tool loads the program the way tools/emu/dos_emu.py does (relocations applied, Ghidra's
+tool loads the program the way tools/emu/dos_emu/ does (relocations applied, Ghidra's
 selectors, imports as named stubs) and disassembles the result with capstone. Call and jump
 targets, and data offsets in DS, are replaced by names from a labels file (labels/names.tsv
 by default) where one matches: `lcall Reset_1040_0a12`, `mov al, byte ptr [PlayDemoNum]`.

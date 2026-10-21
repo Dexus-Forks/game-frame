@@ -114,7 +114,9 @@ expect "tdinfo maps code to source lines" "1000:0028	SAMPLE.S:11" "$PYTHON" tool
 expect "tdinfo writes a Rust reader for a record" "seed: r.i32()?," "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe rust SampleState
 expect "tdinfo writes the Rust Pascal reader and writer" "pub struct PascalWriter" "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe rust-reader
 expect "tdinfo writes record writers" "w.u16(self.total);" "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe rust SampleState
-expect "tdinfo writes Globals at their DS offsets" "w.seek(0x4); w.u16(self.total);" "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe rust-globals
+g="$(mktemp -d)/globals"; "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe rust-globals "$g" >/dev/null
+expect "tdinfo writes Globals per unit at their DS offsets" "w.seek(0x4); w.u16(self.total);" cat "$g/sample.rs"
+expect "tdinfo joins the units into Globals" "pub sample: sample::Sample," cat "$g/mod.rs"
 "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe labels > $D/labels.tsv
 expect "nedis applies relocations and names far calls" "lcall   KERNEL.3" "$PYTHON" tools/dos/nedis.py $D/sample.exe 1000:008c 6 --labels $D/labels.tsv
 expect "nedis names data in DS" "[RandSeed]" "$PYTHON" tools/dos/nedis.py $D/sample.exe 1000:0028 8 --labels $D/labels.tsv

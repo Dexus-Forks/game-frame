@@ -25,12 +25,15 @@ be mentioned and linked, but examples and advice must stay general.
    the README tables and `templates/project/AGENTS.md` consistent when anything changes.
 5. **Plain English.** Short sentences, common words, one idea each: the skills are read by
    agents and translated by people.
-6. **Dependencies stay small.** Python tools use the standard library plus `requirements.txt`
+6. **Files stay small.** Split a tool before it passes a few hundred lines: a package with one
+   module per concern (`tools/emu/dos_env/`: DOS, DPMI, BIOS, PC). Generated code is split too
+   (`tdinfo.py rust-globals` writes one file per Pascal unit). Keep import paths stable.
+7. **Dependencies stay small.** Python tools use the standard library plus `requirements.txt`
    (unicorn, pefile, capstone). Shell scripts use bash and the tools `scripts/setup.sh` installs.
-7. **Improve the harness from real games.** When a game project hits something generic (a
+8. **Improve the harness from real games.** When a game project hits something generic (a
    tool crash, a missing format, a pitfall), fix it here with a test against our own samples,
    and keep the game-specific part in the game's repository.
-8. **Stage only your own files** (`git add path`), never `git add -A`, and push after each
+9. **Stage only your own files** (`git add path`), never `git add -A`, and push after each
    verified change.
 
 ## Layout

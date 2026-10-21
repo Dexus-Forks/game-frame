@@ -14,8 +14,8 @@ python3 tools/dos/dosinfo.py target/GAME.EXE --pstrings 6 # Pascal strings, with
 
 | dosinfo says | What it is | Ghidra | Emulate one function | Run it all |
 |---|---|---|---|---|
-| `MZ` | Real-mode DOS (Turbo Pascal, Turbo C, Microsoft C, QuickBASIC) | "Old-style DOS Executable", loaded at segment `1000` | `dos_emu.py` (real mode) | DOSBox-X |
-| `NE` | 16-bit protected mode: Windows 3.x, OS/2 1.x, Borland Pascal 7 or Borland C++ with DPMI16 (`RTM.EXE`, `DPMI16BI.OVL`) | "New Executable", selectors `1000`, `1008`, ... | `dos_emu.py` (protected mode, same selectors) | DOSBox-X (or Windows 3.1 inside it) |
+| `MZ` | Real-mode DOS (Turbo Pascal, Turbo C, Microsoft C, QuickBASIC) | "Old-style DOS Executable", loaded at segment `1000` | `dos_emu` (real mode) | DOSBox-X |
+| `NE` | 16-bit protected mode: Windows 3.x, OS/2 1.x, Borland Pascal 7 or Borland C++ with DPMI16 (`RTM.EXE`, `DPMI16BI.OVL`) | "New Executable", selectors `1000`, `1008`, ... | `dos_emu` (protected mode, same selectors) | DOSBox-X (or Windows 3.1 inside it) |
 | `LE` / `LX` | 32-bit flat code behind a DOS extender (Watcom + DOS/4GW, PMODE/W) | needs an LE/LX loader extension | not yet in this harness | DOSBox-X |
 | `PE` | A Windows program | use `tools/pe/peinfo.py` | `pe_emu.py` | Windows or Wine |
 
@@ -34,7 +34,7 @@ Write every address as `seg:off` the way Ghidra prints it, in docs, labels and t
 - **MZ**: the load image starts at segment `1000`, so `1000:0000` is the first byte after
   the header; a second segment in the image is `1000 + paragraphs`.
 
-`dosinfo.py` prints Ghidra's selector for each segment. `readseg.py`, `dos_emu.py`,
+`dosinfo.py` prints Ghidra's selector for each segment. `readseg.py`, `dos_emu`,
 `tdinfo.py` and `decomp_query.py` all accept and print these addresses. The *running* program
 uses other numbers: real-mode segments where DOS loaded it, or the DPMI host's selectors.
 Only the DOSBox-X debugger shows those (section 7).
@@ -121,7 +121,7 @@ up to its size (a variant record), so check one offset in the code before relyin
   64-bit integer kept in the FPU, `string[N]` takes N+1 bytes, sets are bit arrays of up to 32
   bytes, `Boolean` is one byte. Records are not padded.
 
-## 5. Emulating one function: dos_emu.py
+## 5. Emulating one function: dos_emu
 
 ```python
 import sys; sys.path.insert(0, 'tools/emu')
@@ -145,7 +145,7 @@ emu.trace({'1040:0a12': 'Random'}, args=1)     # record calls (the random draws)
 
 ## 5b. Running the whole program headless: dos_env
 
-`tools/emu/dos_env.py` gives `dos_emu` a small DOS, BIOS, DPMI host and PC, so a whole Borland
+`tools/emu/dos_env/` gives `dos_emu` a small DOS, BIOS, DPMI host and PC, so a whole Borland
 Pascal 7 DPMI16 program can start and run, with no DOSBox and no window:
 
 ```python
