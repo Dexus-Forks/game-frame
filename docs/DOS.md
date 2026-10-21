@@ -124,6 +124,15 @@ up to its size (a variant record), so check one offset in the code before relyin
 - **Turbo Pascal types**: `Real` is 6 bytes and not IEEE (`readseg.py ... real48`), `Comp` is a
   64-bit integer kept in the FPU, `string[N]` takes N+1 bytes, sets are bit arrays of up to 32
   bytes, `Boolean` is one byte. Records are not padded.
+- **Real arithmetic is in the runtime library, with registers.** Without `{$N+}`, `Real` maths
+  calls the System unit's helpers: the first operand and the result in `DX:BX:AX`, the second
+  in `CX:SI:DI` (the low byte of `AX` or `CX` is the exponent). A typical block is
+  `call int-to-real; mov cx/si/di, constant; call multiply; call round`. Two helpers that
+  differ only by `mov ch, 0` (Trunc) or `mov ch, 1` (Round) before the same near call tell
+  Trunc from Round. Measured in one Borland Pascal 7 program: multiply rounds the 80-bit
+  product to 40 bits, halves up; Round rounds halves away from zero. Do not use floats for
+  this: emulate the helpers over every input the game can give (`emu.call(helper,
+  regs={'ax': ..., 'dx': ...})`) and port the exact algorithm.
 
 ## 5. Emulating one function: dos_emu
 
@@ -139,7 +148,8 @@ emu.trace({'1040:0a12': 'Random'}, args=1)     # record calls (the random draws)
 - Relocations are applied: selector, far-pointer and offset fixups to the program's own
   segments, chained or additive. Imports become stubs.
 - DS and SS are the auto data segment, as in a Pascal program. Pass `regs={'ds': ...}` for
-  code that expects something else.
+  code that expects something else, and other registers (`regs={'ax': ..., 'cx': ...}`) for
+  runtime helpers that take their arguments in registers.
 - An import or interrupt without a handler stops the run with its name and the caller's
   address. Add `stubs={'KERNEL.3': fn}` or `interrupts={0x21: fn}`; a handler reads and sets
   registers (`emu.reg('ax')`, `emu.set(ax=...)`), and an import handler returns the number
