@@ -1,4 +1,4 @@
-# AGENTS.md: working on the reverse-engineer-games harness
+# AGENTS.md: working on the GameFrame harness
 
 This file is for agents and people who change **the harness itself**. To reverse engineer a
 game *with* it, create a project (`scripts/new-project.sh`): the project gets its own `AGENTS.md`

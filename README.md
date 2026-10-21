@@ -1,7 +1,7 @@
-# reverse-engineer-games
+# GameFrame
 
-A harness for AI agents (and people) to reverse engineer games from their shipped files:
-understand how a game works, document its formats and rules, and reimplement it so it behaves
+An agentic framework for reverse engineering games. AI agents and people use it to study a game
+from its shipped files. They document its formats and rules, and reimplement it so it behaves
 exactly like the original.
 
 It packages a method, step-by-step agent skills, and tested tools around
@@ -162,7 +162,7 @@ Two licences, one for each kind of work:
 | **Content**: the documentation (`docs/`), the skills (`.claude/skills/`), the READMEs and `AGENTS.md`, and the website's text | [Creative Commons Attribution 4.0](LICENSE-CC-BY-4.0) (CC BY 4.0) |
 
 CC BY 4.0 lets anyone copy, adapt, translate and remix the content for any purpose, commercial
-included, as long as they credit it: for example "Based on *reverse-engineer-games* by Tane
+included, as long as they credit it: for example "Based on *GameFrame* by Tane
 Piper (CC BY 4.0)", with a link to the repository and a note of what changed.
 
 The screenshots in `docs/assets/case-studies/` show the games' own art. That art belongs to

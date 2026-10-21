@@ -1,7 +1,7 @@
 # AGENTS.md: reverse engineering GAME_NAME
 
 Rules for every agent (Claude Code, Codex, Cursor and others) and every person working here.
-The method and the tools come from the reverse-engineer-games harness; its skills are in
+The method and the tools come from the GameFrame harness; its skills are in
 `.claude/skills/` (agents without skill support: read each `SKILL.md`).
 
 ## The goal

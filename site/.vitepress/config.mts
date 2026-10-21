@@ -25,8 +25,8 @@ function gitTime(...paths: string[]): number | undefined {
 const SITE_SOURCES = ['README.md', 'docs', '.claude/skills', 'examples/*/README.md', 'site/index.md']
 
 export default defineConfig({
-  title: 'Reverse engineering games',
-  description: 'A method, skills and tools for AI agents and people who reverse engineer games and rebuild them exactly.',
+  title: 'GameFrame',
+  description: 'An agentic framework for reverse engineering games: a method, skills and tools for AI agents and people who rebuild games exactly.',
   // The workflow sets SITE_BASE to the Pages path (/game-frame/); locally it is /.
   base: process.env.SITE_BASE || '/',
   srcDir: '..',

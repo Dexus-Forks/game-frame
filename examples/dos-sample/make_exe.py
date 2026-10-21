@@ -32,7 +32,7 @@ EXPORTS = ['rng_seed', 'rng_next', 'sum_draws', 'checksum', 'get_data_seg', 'ask
            'read_file', 'wait_ticks', 'get_key', 'write_file']
 # Labels inside main_loop, written to symbols.tsv for the fragments.py test
 LABELS = ['main_loop', 'frame_top', 'draw', 'draw_even_end', 'draw_odd_end', 'event', 'event_end']
-DESCRIPTION = b'DOS sample for the reverse-engineer-games harness'
+DESCRIPTION = b'DOS sample for the GameFrame harness'
 MESSAGE = b'\x0cDOS SAMPLE 1'   # a Pascal string: length byte first
 
 

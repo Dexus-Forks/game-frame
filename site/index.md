@@ -1,10 +1,10 @@
 ---
 layout: home
-title: Reverse engineering games
+title: GameFrame
 hero:
-  name: Reverse engineering games
-  text: Understand a game from its shipped files, and rebuild it exactly
-  tagline: A method, step-by-step skills and tested tools for AI agents and people, around Ghidra, Unicorn and REA.
+  name: GameFrame
+  text: An agentic framework for reverse engineering games
+  tagline: Understand a game from the copy you own, and rebuild it exactly. A method, step-by-step skills and tested tools for AI agents and people, around Ghidra, Unicorn and REA.
   actions:
     - theme: brand
       text: Start here
@@ -45,7 +45,7 @@ Copy this prompt into your coding agent (Claude Code, Codex, Cursor or another).
 harness, checks your tools, asks before it installs anything, and starts a project for your game.
 
 ```text
-Set up the reverse-engineer-games harness on this computer for me.
+Set up the GameFrame harness on this computer for me.
 
 1. Clone https://github.com/tanepiper/game-frame into ~/code/game-frame
    (or update it with git pull if it is already there).
