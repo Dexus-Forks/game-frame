@@ -95,6 +95,12 @@ emu.trace({'1040:0a12': 'Random'}, args=1); emu.write_trace('derived/rng.trace')
   The emulator uses the same numbers, so pseudocode addresses work unchanged.
 - Arguments go in the **Pascal** order by default (left to right, callee pops). An int is a
   word, `Long(v)` two words, `FarPtr`/(seg, off) a far pointer. `conv='cdecl'` for C code.
+- A Pascal `var` parameter is a far pointer pushed segment first: pass the variable's
+  address, as in `emu.call('1008:2026', 1, 0x1048, 0xa2f4, 0x1048, 0xa2ee)` for
+  `P(n: Byte; var A, B)`. When the real callers always pass the same globals, port it
+  with a choice between them (player 1 or 2), not a pointer.
+- A procedure nested in another (it reads its parent's frame through `[bp + 4]`, the
+  static link) cannot be called alone: call the parent with states that reach it.
 - DS = SS = the auto data segment, as in a Pascal program; override with `regs={'ds': ...}`.
 - An import or interrupt with no handler stops with its name and caller: add
   `stubs={'KERNEL.3': fn}` (handler returns the bytes to pop) or `interrupts={0x21: fn}`.
