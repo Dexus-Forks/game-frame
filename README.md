@@ -94,6 +94,7 @@ to produce, and the pitfalls that cost time.
 | `tools/dos/readseg.py` | Typed values at `seg:off`, including Turbo Pascal `Real` and Pascal strings |
 | `tools/emu/dos_emu/` | Call any function of a 16-bit NE (protected mode) or MZ (real mode) program, at Ghidra's addresses |
 | `tools/emu/dos_env/` | A small DOS, BIOS, DPMI host and PC for dos_emu: run a whole DOS program headless, with files, timer interrupts, keys, and screenshots |
+| `tools/emu/fragments.py` | Capture fragments of a DOS program's main loop from one headless run: DS, stack, screens, open files and heap blocks before and after each fragment, for the port's tests |
 | `tools/dos/fileio_trace.py` | From a DOSBox-X file log: every file's reads in order, with record patterns |
 | `tools/dos/dbx_control.py` | Drive DOSBox-X's debugger from a script: breakpoints, registers, memory |
 

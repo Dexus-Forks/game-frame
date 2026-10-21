@@ -120,6 +120,8 @@ emu.trace({'1040:0a12': 'Random'}, args=1); emu.write_trace('derived/rng.trace')
   host, timer interrupts and a key queue, so a DOS game starts and runs in dos_emu, frame by
   frame, with its memory open to you (docs/DOS.md section 5b). When it stops on something
   missing, add that to dos_env with a test, not a workaround in the game project.
+  To save the state before and after chosen fragments of the main loop, frame after frame,
+  use `tools/emu/fragments.py` (re-verify, "Capturing fragments of a main loop").
 - For a function that needs DOS, timers, VGA or sound, run the whole program in DOSBox-X
   (`scripts/dosbox-run.sh`) and read memory with the debugger (`tools/dos/dbx_control.py`):
   docs/DOS.md sections 6 and 7.

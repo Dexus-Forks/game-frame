@@ -10,6 +10,8 @@ its exact result (ground truth for a reimplementation), without DOS, DOSBox or t
     buf = emu.bytes_in(b'abc')                     # a FarPtr into emulated memory
     emu.call('CHECKSUM', buf, 3)
     screen = emu.new_segment()                     # a whole 64 KB segment at offset 0
+    emu.run_range(emu.entry, '1000:ca59')          # a running program: entry to a chosen point,
+    emu.run_to_any(['1000:cb00', '1000:cb40'])     # then on to whichever comes first (its index)
 
 NE programs (Borland Pascal 7 DPMI16, Windows 3.x) run in 16-bit protected mode. Segment N gets
 selector 0x1000 + 8 * (N - 1), the same numbers Ghidra's NE loader uses, so an address from the

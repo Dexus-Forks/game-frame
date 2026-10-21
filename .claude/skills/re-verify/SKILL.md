@@ -73,7 +73,30 @@ array, branches only one mode takes.
 ### Capturing fragments of a main loop
 
 A capture saves the state when execution reaches a fragment's start and again at its end,
-frame after frame. What it must hold:
+frame after frame. For a DOS program, `tools/emu/fragments.py` does it in one headless run
+(dos_emu + dos_env):
+
+```bash
+.venv/bin/python tools/emu/fragments.py target/game/GAME.EXE derived/fragments 2000 \
+  'events=1000:2a14-1000:2a40,changed=0c20' 'draw=1000:2b00-1000:2b9e|1000:2bc4,every=5,max=200,heap=1' \
+  --frame-top 1000:2a10 --screen 0a40 --display 0a42 --heap 0a50,0a54
+```
+
+- `--frame-top` is the top of the main loop (it counts frames). `--screen` and `--display`
+  are the DS offsets of the words that hold the selectors of the screen being drawn and of
+  the VGA display; `--heap` lists the words that hold heap blocks' selectors. `--ds` sets the
+  data segment when it is not the program's start-up DS. `--start` starts at a routine
+  instead of the entry; `--clock` and `--date` fix the time DOS gives.
+- A SPEC is `NAME=START-END`. Join several ENDs with `|`. `changed=OFFSET` keeps only runs
+  that changed that DS word; `every=N` keeps one in N; `max=K` stops at K; `heap=1` saves
+  the heap blocks.
+- It writes `derived/fragments/NAME/NNNNN.before.*` and `.after.*`: `.ds`, `.ss`, `.bp`,
+  `.scr`, `.vga`, `.files` (handle, position, name) and `.heap` (selector + 64 KB each;
+  `after` holds only the blocks that changed). The port's test loads `before`, runs the
+  fragment and compares with `after`.
+- Two fragments cannot share a START. A fragment's END may be the next one's START.
+
+What a capture must hold:
 
 - **Every way out.** A loop body may end in more than one place (the normal jump back, a
   shortcut, a jump to the level's end). Stop at any of them. A capture that waits for one

@@ -188,3 +188,68 @@ write_file:
 	lretw
 1:	movw $0xffff, %ax
 	lretw
+
+# main_loop: a tiny game main loop for tools/emu/fragments.py (not called from entry). It gets
+# two 64 KB blocks (the screen and a second heap block) and the VGA display from DPMI, keeps
+# their selectors in DS, opens the file at FileName, then runs 8 frames and exits to DOS.
+# Each frame has two fragments:
+#   draw .. draw_even_end | draw_odd_end   writes the frame number into the screen and display
+#                      (and the heap block on even frames), reads one byte of the file
+#   event .. event_end  adds one to Event every 4th frame
+	.set ScreenSeg, 0x00A0   # word: selector of the screen being drawn (a heap block)
+	.set DisplaySeg, 0x00A2  # word: selector of the VGA display (A000h)
+	.set HeapSeg, 0x00A4     # word: selector of a second heap block
+	.set Frame, 0x00A6       # word: frame number, from 1
+	.set Event, 0x00A8       # word: changed every 4th frame
+	.set Handle, 0x00AA      # word: DOS handle of the open file
+main_loop:
+	movw $0x0100, %ax       # DPMI: DOS memory, BX paragraphs; DX = its selector
+	movw $0x1000, %bx
+	int $0x31
+	movw %dx, ScreenSeg
+	movw $0x0100, %ax
+	movw $0x1000, %bx
+	int $0x31
+	movw %dx, HeapSeg
+	movw $0x0002, %ax       # DPMI: real-mode segment A000h -> selector
+	movw $0xa000, %bx
+	int $0x31
+	movw %ax, DisplaySeg
+	movw $0x3d00, %ax
+	movw $FileName, %dx
+	int $0x21
+	movw %ax, Handle
+	movw $0, Frame
+	movw $0, Event
+frame_top:
+	incw Frame
+draw:
+	movw Frame, %di
+	movw %di, %ax
+	movw ScreenSeg, %es
+	movb %al, %es:(%di)
+	movw DisplaySeg, %es
+	movb %al, %es:(%di)
+	movb $0x3f, %ah         # read 1 byte of the file into FileBuf
+	movw Handle, %bx
+	movw $1, %cx
+	movw $FileBuf, %dx
+	int $0x21
+	testw $1, Frame
+	jnz draw_odd_end
+	movw HeapSeg, %es
+	movw Frame, %ax
+	movb %al, %es:(%di)
+draw_even_end:
+	jmp event
+draw_odd_end:
+	nop
+event:
+	testw $3, Frame
+	jnz event_end
+	incw Event
+event_end:
+	cmpw $8, Frame
+	jb frame_top
+	movw $0x4c00, %ax
+	int $0x21
