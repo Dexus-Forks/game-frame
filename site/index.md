@@ -35,3 +35,27 @@ features:
     details: Your own copy, nothing redistributed, new code written from documented behaviour.
     link: /legal
 ---
+
+## Set it up with your agent
+
+Copy this prompt into your coding agent (Claude Code, Codex, Cursor or another). It clones the
+harness, checks your tools, asks before it installs anything, and starts a project for your game.
+
+```text
+Set up the reverse-engineer-games harness on this computer for me.
+
+1. Clone https://github.com/tanepiper/reverse-engineer-games into ~/code/reverse-engineer-games
+   (or update it with git pull if it is already there).
+2. Read AGENTS.md and .claude/skills/re-setup/SKILL.md.
+3. Run scripts/setup.sh and show me the table of what is present and what is missing.
+4. Before you install anything, tell me what scripts/setup.sh --install will install and how
+   large each part is, and wait for my answer. Then run it.
+5. Run tests/run.sh --ghidra and report how many checks passed. If any failed, show the
+   failures and fix the setup before going on.
+6. Run scripts/setup.sh --rea and help me register REA with this agent.
+7. Ask me for the name of the game and the folder of my own copy of it. Then run
+   scripts/new-project.sh ~/re/<short-name> "<Game Name>" "<path to the game>".
+8. Open the new project, read its AGENTS.md, and start with the re-start skill.
+
+Never copy the game's files, extracted assets or decompiled code into a git repository.
+```
