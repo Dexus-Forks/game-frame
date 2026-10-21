@@ -36,7 +36,7 @@ ghidra="$(find_ghidra)"; java="$(find_java21)"
 [[ -n "$ghidra" && -n "$java" ]] || { echo "Ghidra or JDK 21 missing: run scripts/setup.sh" >&2; exit 1; }
 mkdir -p "$(dirname "$output")"
 output="$(cd "$(dirname "$output")" && pwd)/$(basename "$output")"
-JAVA_HOME="$java" "$ghidra/support/analyzeHeadless" "$project" re -process "$binary" -noanalysis \
+JAVA_HOME="$java" "$ghidra/support/analyzeHeadless" "$(ghidra_project_dir "$project")" re -process "$binary" -noanalysis \
   -scriptPath "$ROOT/tools/ghidra" -postScript "$java_script" "$output" "$@" 2>&1 \
   | grep -E "written to|ERROR|Exception" || true
 [[ -s "$output" ]] && echo "$output" || { echo "no output: is $binary in $project?" >&2; exit 1; }

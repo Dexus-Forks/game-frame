@@ -10,6 +10,7 @@
 #   tools/, scripts/          the harness's tools, requirements.txt, .mcp.json (REA)
 #   docs/FINDINGS.md, docs/CHECKLIST.md, labels/names.tsv, labels/fields.tsv
 #   docs/DOS.md, ABI.md, GAME-PATTERNS.md, LEGAL.md, OUTPUTS.md, SETUP.md   the reference documents
+#   docs/games/, docs/observe/, docs/case-studies/   the taxonomy, observing the original, case studies
 #   target/, analysis/, derived/   for the game, Ghidra output and ground truth: ignored by git
 # With PATH/TO/GAME it copies the game's executables and DLLs into target/ (data files are
 # left where they are: point the tools at them) and prints a first look at each binary.
@@ -28,6 +29,7 @@ sed -e "s/YEAR/$(date +%Y)/" -e "s/AUTHOR/$(git config user.name 2>/dev/null || 
   "$ROOT/templates/project/licences/LICENSE-MIT" > "$dir/LICENSE-MIT"
 # The reference documents the skills point to (docs/DOS.md, docs/ABI.md, ...).
 for f in ABI GAME-PATTERNS DOS LEGAL OUTPUTS SETUP; do cp "$ROOT/docs/$f.md" "$dir/docs/"; done
+cp -R "$ROOT/docs/games" "$ROOT/docs/observe" "$ROOT/docs/case-studies" "$dir/docs/"
 cp "$ROOT/templates/project/gitignore" "$dir/.gitignore"
 cp "$ROOT/templates/project/labels/"*.tsv "$dir/labels/"
 for f in AGENTS.md README.md docs/FINDINGS.md docs/CHECKLIST.md; do

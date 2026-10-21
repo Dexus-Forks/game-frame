@@ -44,6 +44,20 @@ Direct3D 9 and 11 shaders, and a data-driven interface. Every step of the loop w
   ledger, version comparison). Its "How it was made" page tells the story:
   https://github.com/tanepiper/unbanished/blob/main/docs/PROCESS.md
 
+## Seeing and driving the original and the port
+
+- **The original, streamed.** Banished ran on a Windows PC and streamed to the development
+  machine with Steam Remote Play. An agent with computer-use access watched and pressed
+  buttons; screenshots were filed with the settings that produced them and compared with the
+  port's headless captures by blurred image difference, because the stream is compressed.
+- **The probe.** A small command language that finds things on the screen (by the original's
+  dialog and control names, or by text) and in the town, and presses buttons and types as a
+  player would. The same commands work in the browser's console, in headless runs and in the
+  test scenarios, and answers are JSON. It is the port's object model and its doors
+  ([A model to query](../observe/object-model.md)).
+- **Baselines.** Test scenarios drive the game with the probe and record the answers; a
+  changed answer is a change in what the game does, and must be explained.
+
 ## Numbers (October 2026)
 
 About 130,000 lines of Rust; 2,050 of 9,846 original functions traced (68 % of the game's code

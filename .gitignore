@@ -7,3 +7,7 @@
 __pycache__/
 # The DOS sample build
 /examples/dos-sample/build/
+# The documentation site (site/README.md)
+/site/node_modules/
+/site/.vitepress/dist/
+/site/.vitepress/cache/

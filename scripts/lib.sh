@@ -18,3 +18,15 @@ find_java21() {
 }
 
 PYTHON="${PYTHON:-$ROOT/.venv/bin/python}"
+
+# A folder path for a Ghidra project that Ghidra accepts. Ghidra refuses project paths with a
+# folder that starts with "." (a worktree in .claude/worktrees/, a checkout under ~/.cache):
+# for those, a link without dots in $TMPDIR points at the real folder.
+ghidra_project_dir() {
+  local dir; dir="$(cd "$1" && pwd -P)" || return 1
+  case "$dir/" in
+    */.*) local link="${TMPDIR:-/tmp}"; link="${link%/}/re-ghidra-$(printf %s "$dir" | cksum | cut -d' ' -f1)"
+          ln -sfn "$dir" "$link" && echo "$link" ;;
+    *) echo "$dir" ;;
+  esac
+}

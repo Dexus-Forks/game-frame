@@ -30,11 +30,13 @@ ghidra="$(find_ghidra)"; java="$(find_java21)"
 [[ -n "$java" ]] || { echo "JDK 21 not found: run scripts/setup.sh, or set JAVA_HOME" >&2; exit 1; }
 bins=(); for b in "$@"; do bins+=("$(cd "$(dirname "$b")" && pwd)/$(basename "$b")"); done
 mkdir -p "$project" "$out" "$ROOT/analysis"
-echo "Analysing ${#bins[@]} binaries into $project (log: $(dirname "$project")/headless.log)"
+log="$(dirname "$project")/headless.log"
+project="$(ghidra_project_dir "$project")"
+echo "Analysing ${#bins[@]} binaries into $project (log: $log)"
 JAVA_HOME="$java" MAXMEM="${MAXMEM:-8G}" "$ghidra/support/analyzeHeadless" "$project" re \
   -overwrite -max-cpu "${GHIDRA_CPUS:-6}" -import "${bins[@]}" -loader-libraryLoadDepth 0 \
   -scriptPath "$ROOT/tools/ghidra" ${labels[@]+"${labels[@]}"} -postScript ExportAll.java "$out" \
-  2>&1 | tee "$(dirname "$project")/headless.log" \
+  2>&1 | tee "$log" \
   | grep -E --line-buffered "EXPORT DONE|LABELS DONE|Analysis succeeded|ERROR.*Exception" || true
 for b in "${bins[@]}"; do
   f="$out/$(basename "$b")/decomp.c"

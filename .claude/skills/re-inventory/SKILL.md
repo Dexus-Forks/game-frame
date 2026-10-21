@@ -119,3 +119,13 @@ Fill `docs/FINDINGS.md` (correct any first-look numbers the tools overturn, such
 segment with no bytes in the file, which is uninitialised data): the binaries table (file, role, architecture, compiler, notes), the
 engine and middleware with the evidence for each (the import or string that showed it), the
 data containers, and the open questions. Add the first lines to `docs/CHECKLIST.md`.
+
+## 6. Classify the game
+
+Look at the game itself, not only its files: play it or watch it played. Then place it in the
+taxonomy (`docs/games/README.md`): who drives (a stream with controls, software over a
+simulation, an environment, turns and choices), its time model, where its rules live, what
+must repeat exactly, and its family. Read the family page and copy its rule set into the
+project's `AGENTS.md`, adjusted to the game. Record in `docs/FINDINGS.md` how exact the
+interface must be, and why. A mixed game gets one line per mode, and the state that switches
+between them. Next: `re-observe`.

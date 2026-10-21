@@ -1,0 +1,32 @@
+# Documentation
+
+Everything the harness knows about reverse engineering games, apart from the step-by-step
+skills (in `.claude/skills/`, listed in the [README](../README.md#skills)). Start with the kind
+of game you have, then how to observe it, then the reference pages as you need them.
+
+The website is built from these files where they are (see [site/README.md](../site/README.md)):
+the order of this page and of each folder's `README.md` is the order of the site's menu.
+
+## Kinds of games
+
+- [A taxonomy of games](games/README.md): who drives, the axes, the families, the
+  connections between them.
+
+## Observing the original
+
+- [Observing the original](observe/README.md): running the original, inputs, the interface,
+  an object model of the game.
+
+## Reference
+
+- [Game patterns](GAME-PATTERNS.md): the parts most games are built from, as they appear in
+  machine code.
+- [DOS games](DOS.md): 16-bit programs, Borland debug symbols, the DOS emulators.
+- [Calling conventions and floating point](ABI.md): what decides exactness.
+- [What a project can ship](OUTPUTS.md): documents, a website, programs, releases.
+- [Setup](SETUP.md): the toolchain.
+- [Legal](LEGAL.md): working within the law and with respect for the original.
+
+## Case studies
+
+- [Case studies](case-studies/README.md): three reimplementations and the tooling they built.

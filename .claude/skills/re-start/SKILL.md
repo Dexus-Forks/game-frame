@@ -37,15 +37,16 @@ point to, and every number that matters is measured, not guessed.
 ## The loop
 
 ```
-inventory -> decompile -> trace -> format -> emulate -> reimplement -> verify -> land
-                            ^                                             |
-                            +---------------- when a check fails ---------+
+inventory -> observe -> decompile -> trace -> format -> emulate -> reimplement -> verify -> land
+                                       ^                                             |
+                                       +---------------- when a check fails ---------+
 ```
 
 | Step | Question it answers | Skill |
 |---|---|---|
 | Set up | Are Ghidra, Java, Python, Unicorn and REA ready? | `re-setup` |
-| Inventory | Which files hold the game's own code? Which engine, which protection, which data containers? | `re-inventory` |
+| Inventory | Which files hold the game's own code? Which engine, which protection, which data containers? What kind of game is it? | `re-inventory` |
+| Observe | What does the original actually do? Run it, drive it, capture frames, state, inputs; list every input and screen | `re-observe` |
 | Investigate with REA | Quick, evidence-backed answers about a binary, package, browser or Electron app | `re-rea` |
 | Decompile | Turn machine code into searchable pseudocode, and run one-off decompiles | `re-ghidra` |
 | Trace | How does the original do X? Which function, which fields, which constants? | `re-trace` |
@@ -67,8 +68,12 @@ A small task may use only two or three steps. Do not skip `land`.
    code, and whether the game is native C/C++ (this harness), managed (.NET, IL2CPP, Mono),
    scripted (Lua, Python, GameMaker), packed (unpack first), or 16-bit DOS (docs/DOS.md; check
    for debug symbols with `tools/dos/tdinfo.py`).
-5. `re-ghidra`: export the game's own binaries (`scripts/ghidra-export.sh`).
-6. Pick the foundations first: the random number generator, the maths helpers, the game clock
+5. Classify the game: read `docs/games/README.md` and its family page, and write the kind of
+   game, its time model and how exact the interface must be into `docs/FINDINGS.md`. Copy the
+   family's rule set into the project's `AGENTS.md`.
+6. `re-observe`: get the original running where you can watch, drive and capture it.
+7. `re-ghidra`: export the game's own binaries (`scripts/ghidra-export.sh`).
+8. Pick the foundations first: the random number generator, the maths helpers, the game clock
    and the data container. Everything else depends on them, and they are small enough to
    emulate and verify in one session.
 
@@ -93,9 +98,10 @@ choose how deep to go for each piece:
   once per subsystem, not after every finding.
 - **Split mechanical work off.** Long but simple pieces (menus, text tables, generated
   types) can go to a separate, cheaper session with an exact brief; keep the hard maths here.
-- **Think like the game.** A game drives itself on a frame clock and the player reacts; input
-  is state read once a frame. Find the frame loop and its order before anything else
-  (docs/GAME-PATTERNS.md, "The game drives, the player reacts").
+- **Think like the game.** Most games drive themselves on a frame clock and the player
+  reacts; others wait for the player and resolve each move. Know which (`docs/games/interaction.md`),
+  find the loop or the handlers and their order before anything else, and find every place
+  that reads input (`docs/observe/inputs.md`).
 - **Read the decompiler with care.** For 16-bit Pascal, Ghidra prints arguments in reverse
   order and loses Real (6-byte float) arithmetic: take those parts from the disassembly.
 
@@ -110,5 +116,5 @@ choose how deep to go for each piece:
 
 `examples/sample-game/` is a tiny Windows game built for practice: run `tests/run.sh` to see the
 whole loop (inventory, emulate, port, bit-exact check) on it. Un-Banished
-(https://github.com/tanepiper/unbanished, `docs/CASE-STUDY.md` here) is the full-size project
+(https://github.com/tanepiper/unbanished, `docs/case-studies/` here) is the full-size project
 this harness came from: a 1:1 reimplementation of the game Banished.

@@ -3,47 +3,10 @@
 Most games are built from the same handful of parts. Recognising the part tells you what to
 look for next and which details will matter for an exact reimplementation.
 
-## The game drives, the player reacts
-
-Most software waits for the user: a window, a menu, a button press, and the program reacts to
-it through event handlers. A game is the other way round. The game makes things happen on
-its own clock (enemies arrive, shots fly, the level scrolls), and the player reacts through
-the few controls the game gives. That shapes the code:
-
-- **A loop, not handlers.** Look for the loop that runs every frame, not for the code behind
-  a button. Almost everything happens inside it, in a fixed order; find that order first.
-- **Input is state, read once a frame.** Keys and buttons are bytes in memory (a key table
-  an interrupt handler fills, a button array) that the frame reads at one point. A recorded
-  demo is therefore just the input for each frame, and replaying it reproduces the game.
-- **The interface belongs to the game.** The HUD, status bar and messages are drawn by the
-  frame itself, often straight to the display, with the game's own font and shapes; menus
-  are usually loops of their own with their own input reading. Expect little that is
-  generic: trace each screen like game logic.
-- **Time and order are behaviour.** Because the game, not the player, starts events, the
-  frame count, the order of the steps in a frame and the random draws decide what happens.
-  Verify frame by frame against the original, and keep the port's order exactly.
-- **The player's input is the only thing the port does not own.** Model it as one input
-  record per frame. Then a demo, a recording or a test script can drive the port, and two
-  runs with the same input must give the same frames.
-
-- **One boundary, once a frame.** Put everything that crosses between the game and the
-  platform in one per-frame record: in, the input and any clock the game reads; out, the
-  finished picture, songs and sounds asked for. The core then runs headless, from a demo, a
-  test or a player, and the comparison with the original stays exact.
-
-### What kind of interaction?
-
-Look at the game before its code, and decide what kind of control system you are rebuilding.
-It decides where the hard parts are.
-
-| Kind | What it is like | Where to look, what to keep exact |
-|---|---|---|
-| A stream with controls (shooters, platformers, racing) | Things arrive at the player every frame; the player steers, fires, dodges | The frame loop and its order, per-frame input bytes, collision boxes, timing to the frame. A recorded demo replays everything. |
-| Traditional software over a simulation (city builders, strategy, management) | The world runs slowly on its own; events happen; the player may react through windows, menus and clicks | Two halves: an exact simulation step (fixed rate, random draws, saves) and a UI that behaves like ordinary event-driven software. Port the simulation exactly; the UI can be rebuilt by look and function. |
-| An environment the player moves through (RPGs, MMOs, open worlds) | The player moves freely; some things happen to them (walking into an area starts a fight), others they choose (interact with what they see) | Triggers and areas (what fires on entering, on being seen, on time), the interaction rules, the state they change, and for online games the split between what the client decides and what the server decides. |
-
-Many games mix them (a shooter's menus and shop are traditional software; a strategy game's
-battles may be a stream). Identify each mode and treat it by its kind.
+Start with the kind of game. Who drives (the game or the player), the families of games and
+their rule sets, and the systems they share are in [the taxonomy](games/README.md) and
+[Who drives](games/interaction.md). This page describes the parts themselves. To capture
+them from the running original, see [Observing the original](observe/README.md).
 
 ## The main loop
 
@@ -135,8 +98,9 @@ exercises every system's state.
 - Shaders ship compiled (DXBC for Direct3D 9-11, DXIL for 12, SPIR-V for Vulkan): disassemble
   them (fxc's `/dumpbin`, `dxc -dumpbin`, `spirv-dis`) to read the maths, and check constant
   buffer layouts against the CPU code that fills them.
-- UI is often data-driven (layouts in data files, a widget tree, events by id), with screens as
-  loop objects.
+- UI is often custom code in older games and data-driven in newer ones (layouts in data files,
+  a widget tree, events by id), with screens as loop objects. See
+  [Capturing the interface](observe/ui.md).
 - Frame capture tools (RenderDoc, PIX, apitrace) show the draw calls, their states and the
   constant values of a real frame: the fastest way to understand a rendering pass.
 

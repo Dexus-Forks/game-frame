@@ -9,7 +9,7 @@ It packages a method, step-by-step agent skills, and tested tools around
 [REA](https://github.com/morluto/rea) (Reverse Engineer Anything) and, for DOS games,
 [DOSBox-X](https://dosbox-x.com) and its debugger. It grew out of
 [Un-Banished](https://github.com/tanepiper/unbanished), a 1:1 reimplementation of the game
-Banished built this way; see [docs/CASE-STUDY.md](docs/CASE-STUDY.md).
+Banished built this way; see [the case studies](docs/case-studies/README.md).
 
 ## Quick start
 
@@ -29,9 +29,9 @@ and the `SKILL.md` files.
 ## The method
 
 ```
-inventory -> decompile -> trace -> format -> emulate -> reimplement -> verify -> land
-                            ^                                             |
-                            +---------------- when a check fails ---------+
+inventory -> observe -> decompile -> trace -> format -> emulate -> reimplement -> verify -> land
+                                       ^                                             |
+                                       +---------------- when a check fails ---------+
 ```
 
 Two rules hold it together. **Every claim rests on evidence** you can point to (an address, a
@@ -48,7 +48,8 @@ to produce, and the pitfalls that cost time.
 |---|---|
 | [re-start](.claude/skills/re-start/SKILL.md) | Rules, the loop, a first-session checklist, routing to the other skills |
 | [re-setup](.claude/skills/re-setup/SKILL.md) | Install and check the toolchain; register REA for your agent |
-| [re-inventory](.claude/skills/re-inventory/SKILL.md) | Which files hold the game's code; native, managed, scripted or packed; engine and middleware; data containers |
+| [re-inventory](.claude/skills/re-inventory/SKILL.md) | Which files hold the game's code; native, managed, scripted or packed; engine and middleware; data containers; what kind of game it is |
+| [re-observe](.claude/skills/re-observe/SKILL.md) | Run the original where you can watch, drive and capture it; every input; every screen; an object model with doors for tests and agents |
 | [re-rea](.claude/skills/re-rea/SKILL.md) | When to use REA's MCP tools, and how they fit with the text export |
 | [re-ghidra](.claude/skills/re-ghidra/SKILL.md) | Headless export, queries, one-off decompiles, vtables, constants, checking the disassembly |
 | [re-trace](.claude/skills/re-trace/SKILL.md) | From a string, import, export or class name to the function, its fields and constants |
@@ -110,11 +111,19 @@ symbols), and a real-mode MZ program, checked under the emulator and under DOSBo
 
 ## Documents
 
-- [docs/DOS.md](docs/DOS.md): the DOS route: MZ/NE/LE, Ghidra's segment numbering, debug
-  symbols, Pascal pitfalls, the 16-bit emulator, DOSBox-X and its debugger (also for agents,
-  through the `dosbox` MCP server).
+The documentation is in [docs/](docs/README.md), and is also built as a website
+(`npm --prefix site run dev`; see [site/README.md](site/README.md)).
+
+- **[A taxonomy of games](docs/games/README.md)**: who drives (the game or the player), the axes
+  every game sits on, ten families from arcade action to online games, each with a rule set,
+  reference games and projects to learn from, and the systems they share.
+- **[Observing the original](docs/observe/README.md)**: running the original, every kind of
+  input, capturing the interface, and an object model with doors for tests and agents.
+- **[Case studies](docs/case-studies/README.md)**: Un-Banished, Tyrian 2000 and Frontier:
+  Elite II, and the tooling each built to capture its game.
 - [docs/GAME-PATTERNS.md](docs/GAME-PATTERNS.md): main loops, random generators, entities,
-  resources, time, messages, saves, rendering, networking, as they appear in machine code.
+  resources, saves, rendering, as they appear in machine code.
+- [docs/DOS.md](docs/DOS.md): 16-bit DOS programs, Borland debug symbols, the DOS emulators.
 - [docs/ABI.md](docs/ABI.md): calling conventions, C++ layout, floating-point and integer details
   that decide exactness.
 - [docs/OUTPUTS.md](docs/OUTPUTS.md): what a project can ship: documents, a website, programs
@@ -122,7 +131,6 @@ symbols), and a real-mode MZ program, checked under the emulator and under DOSBo
 - [docs/LEGAL.md](docs/LEGAL.md): your own copy, nothing redistributed, new code from
   documented behaviour.
 - [docs/SETUP.md](docs/SETUP.md): the toolchain, and tools for targets beyond native code.
-- [docs/CASE-STUDY.md](docs/CASE-STUDY.md): how Un-Banished used all of this.
 
 ## Scope
 

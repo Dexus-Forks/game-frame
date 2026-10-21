@@ -121,6 +121,9 @@ games, which compute in 80-bit precision until stored; `imul`/`idiv` (signed) ag
   disassembly at the call site settle it.
 - **32-bit games** pass arguments on the stack (cdecl, stdcall) and `this` in ecx (thiscall);
   see `docs/ABI.md`.
+- **Paths with a dot folder.** Ghidra refuses a project path with a folder that starts with
+  "." (a git worktree in `.claude/worktrees/`). The scripts handle it with a link in `$TMPDIR`
+  (`ghidra_project_dir` in `scripts/lib.sh`); call `analyzeHeadless` yourself the same way.
 
 ## 16-bit programs (DOS MZ, NE)
 
