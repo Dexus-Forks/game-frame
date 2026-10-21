@@ -121,7 +121,7 @@ to produce, and the pitfalls that cost time.
 | [re-start](.claude/skills/re-start/SKILL.md) | Rules, the loop, a first-session checklist, routing to the other skills |
 | [re-setup](.claude/skills/re-setup/SKILL.md) | Install and check the toolchain; register REA for your agent |
 | [re-inventory](.claude/skills/re-inventory/SKILL.md) | Which files hold the game's code; native, managed, scripted or packed; engine and middleware; data containers; what kind of game it is |
-| [re-observe](.claude/skills/re-observe/SKILL.md) | Run the original where you can watch, drive and capture it; every input; every screen; an object model with doors for tests and agents |
+| [re-observe](.claude/skills/re-observe/SKILL.md) | Run the original where you can watch, drive and capture it; every input; every screen; an object model with entry points for tests and agents |
 | [re-rea](.claude/skills/re-rea/SKILL.md) | When to use REA's MCP tools, and how they fit with the text export |
 | [re-ghidra](.claude/skills/re-ghidra/SKILL.md) | Headless export, queries, one-off decompiles, vtables, constants, checking the disassembly |
 | [re-trace](.claude/skills/re-trace/SKILL.md) | From a string, import, export or class name to the function, its fields and constants |
@@ -223,7 +223,7 @@ The documentation is in [docs/](docs/README.md). It is also built as a website
 - **[Working on a project](docs/working/README.md)**: how agents work well on this, and how to
   write findings in plain English.
 - **[Observing the original](docs/observe/README.md)**: running the original, every kind of
-  input, capturing the interface, and an object model with doors for tests and agents.
+  input, capturing the interface, and an object model with entry points for tests and agents.
 - **[Case studies](docs/case-studies/README.md)**: Un-Banished, Tyrian 2000 and Frontier:
   Elite II, and the tooling each built to capture its game.
 - [docs/GAME-PATTERNS.md](docs/GAME-PATTERNS.md): main loops, random generators, entities,

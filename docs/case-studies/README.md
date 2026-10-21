@@ -36,7 +36,7 @@ part of each.
   later step faster and every finding easier to check.
 - **Capture from the original, then port.** Every port began with a way to run the original and
   record what it does.
-- **Build a door into the game.** A probe, a state image or a runtime hook: one narrow way in
+- **Build an entry point into the game.** A probe, a state image or a runtime hook: one narrow way in
   that tests, scripts and agents all use ([A model to query](../observe/object-model.md)).
 - **Check in small pieces, then as a whole.** Functions, then fragments or routines, then whole
   runs, demos and saves.

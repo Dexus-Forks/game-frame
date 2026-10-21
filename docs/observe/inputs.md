@@ -6,7 +6,7 @@ hardware the game detects and the order the operating system delivers events. Th
 the kinds of input, where you will find each in a game's code, and how to handle each in a
 port.
 
-**Every input enters the port through one door**, as a record per frame (real-time
+**Every input enters the port through one entry point**, as a record per frame (real-time
 games) or per command (games that wait). Then a recording, a demo or a test script can drive the port. Two runs with the same records give the same results. An input that reaches the
 game's rules any other way makes two runs differ. A recording cannot repeat it.
 

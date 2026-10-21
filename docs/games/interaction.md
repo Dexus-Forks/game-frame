@@ -27,7 +27,7 @@ player reacts through the few controls the game gives. This affects the code in 
   logic ([Capturing the interface](../observe/ui.md)).
 - **Time and order change the results.** Because the game starts most events, the frame
   count, the order of the steps in a frame and the random draws determine what happens. Verify frame by frame against the original. Keep the port's order exactly.
-- **Take everything from outside through one door.** The player's input comes from outside
+- **Take everything from outside through one entry point.** The player's input comes from outside
   the port. So do the clock, the random seed, files and
   saves, settings, the hardware the game detects and, on Windows, the order of window messages
   also come from outside. Pass all of them in as one record per frame or per tick. Then a demo, a recording or a test script can drive the port. Two runs with the same record must give the same frames. [Inputs](../observe/inputs.md) has the full list.

@@ -1,6 +1,6 @@
 ---
 name: re-observe
-description: Run the original game where it can be watched, driven and captured - GameFrame's emulators, DOSBox-X, Wine, a Windows machine or a streamed PC, console emulators - and capture frames, state, inputs, calls, file reads and sound as measured evidence. Also list every input from outside, inventory every interface screen, and build a queryable object model of the game with doors for tests and agents. Use after inventory, before porting a system whose behaviour you need to see, and whenever a question can be settled by running the original.
+description: Run the original game where it can be watched, driven and captured - GameFrame's emulators, DOSBox-X, Wine, a Windows machine or a streamed PC, console emulators - and capture frames, state, inputs, calls, file reads and sound as measured evidence. Also list every input from outside, inventory every interface screen, and build a queryable object model of the game with entry points for tests and agents. Use after inventory, before porting a system whose behaviour you need to see, and whenever a question can be settled by running the original.
 ---
 
 # Observe the running original
@@ -61,12 +61,12 @@ from the main menu, and by listing layout and string data. Capture each state wi
 that reached it. `docs/observe/ui.md` has the fields and how to rebuild data-driven and coded
 interfaces.
 
-## 6. Build the object model and its doors
+## 6. Build the object model and its entry points
 
 Give the original and the port the same model, named with the original's names: the interface
-tree, the world's entities and fields, and the session (loop, frame, pause, seed). Add doors as
+tree, the world's entities and fields, and the session (loop, frame, pause, seed). Add entry points as
 the work needs them: query, input (as the player), commands, time (step, run *n*), state in and
-out, trace, capture. Doors only read or act as a player would; tests, scripts and agents use
+out, trace, capture. Entry points only read or act as a player would; tests, scripts and agents use
 nothing else. `docs/observe/object-model.md` has the rules and examples from three ports.
 
 ## Evidence to produce

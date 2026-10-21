@@ -26,7 +26,7 @@ features:
     link: /games/
   - icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>'
     title: Observe the original
-    details: Run the game where you can watch, drive and capture it. Every kind of input, every screen, and an object model with doors for tests and agents.
+    details: Run the game where you can watch, drive and capture it. Every kind of input, every screen, and an object model with entry points for tests and agents.
     link: /observe/
   - icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l1.5 1.5L8 5"/><path d="M4 12l1.5 1.5L8 11"/><path d="M4 18l1.5 1.5L8 17"/><path d="M11 6h9M11 12h9M11 18h9"/></svg>'
     title: Skills for each step
