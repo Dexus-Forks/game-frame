@@ -26,7 +26,7 @@ features:
     details: Inventory, observe, decompile, trace, decode formats, emulate, reimplement, verify, land. Each skill is a complete guide an agent can follow alone.
     link: /skills/re-start
   - title: Measured against the original
-    details: Original functions run under emulation for ground truth, and the reimplementation must match bit for bit, draw for draw, frame for frame.
+    details: Original functions run under emulation for ground truth, and the reimplementation must match their results bit for bit.
     link: /skills/re-emulate
   - title: Case studies
     details: Un-Banished, Tyrian 2000 and Frontier Elite II, and the tooling each built to capture its game.
