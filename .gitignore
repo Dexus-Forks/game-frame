@@ -1,0 +1,7 @@
+# Ghidra projects and exports (scripts/ghidra-export.sh writes them here)
+/analysis/
+# The sample game's build, ground truth and port output
+/examples/sample-game/build/
+.venv/
+.env
+__pycache__/

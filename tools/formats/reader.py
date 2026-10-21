@@ -1,0 +1,88 @@
+"""A little-endian binary reader for prototyping decoders of a game's data files.
+
+    from reader import Reader
+    r = Reader(data)
+    magic = r.bytes(4); count = r.u32()
+    for _ in range(count):
+        rid, weight, name = r.u32(), r.f32(), r.pstr8()
+    r.done()   # raises if any byte is left: a field you have not found yet
+
+Every read is bounds-checked and says where it failed. `r.block(size)` returns a sub-reader for
+a length-prefixed section, so a decoder can check that each section is consumed exactly. Write
+the decoder here first, run it over every file of its type with validate.py, and only then
+port it to the reimplementation's language.
+"""
+import struct
+
+
+class FormatError(Exception):
+    pass
+
+
+class Reader:
+    def __init__(self, data, offset=0, end=None, name='data'):
+        self.data = data
+        self.pos = offset
+        self.end = len(data) if end is None else end
+        self.name = name
+
+    def _take(self, n):
+        if self.pos + n > self.end:
+            raise FormatError(f'{self.name}: read of {n} bytes at {self.pos:#x} passes the end ({self.end:#x})')
+        out = self.data[self.pos:self.pos + n]
+        self.pos += n
+        return out
+
+    def _unpack(self, fmt):
+        return struct.unpack(fmt, self._take(struct.calcsize(fmt)))[0]
+
+    def u8(self): return self._unpack('<B')
+    def i8(self): return self._unpack('<b')
+    def u16(self): return self._unpack('<H')
+    def i16(self): return self._unpack('<h')
+    def u32(self): return self._unpack('<I')
+    def i32(self): return self._unpack('<i')
+    def u64(self): return self._unpack('<Q')
+    def i64(self): return self._unpack('<q')
+    def f32(self): return self._unpack('<f')
+    def f64(self): return self._unpack('<d')
+    def bool(self): return self.u8() != 0
+    def bytes(self, n): return bytes(self._take(n))
+
+    def magic(self, expected):
+        got = self.bytes(len(expected))
+        if got != expected:
+            raise FormatError(f'{self.name}: magic {got!r} at {self.pos - len(expected):#x}, expected {expected!r}')
+
+    def cstr(self, encoding='latin-1'):
+        """A NUL-terminated string."""
+        end = self.data.index(b'\0', self.pos, self.end)
+        out = self.data[self.pos:end].decode(encoding)
+        self.pos = end + 1
+        return out
+
+    def pstr8(self, encoding='latin-1'):
+        """A string with a one-byte length in front."""
+        return self.bytes(self.u8()).decode(encoding)
+
+    def pstr32(self, encoding='latin-1'):
+        """A string with a four-byte length in front."""
+        return self.bytes(self.u32()).decode(encoding)
+
+    def wstr(self, units):
+        """`units` UTF-16 code units."""
+        return self.bytes(2 * units).decode('utf-16-le')
+
+    def block(self, size, name=None):
+        """A sub-reader over the next `size` bytes; this reader moves past them."""
+        start = self.pos
+        self._take(size)
+        return Reader(self.data, start, start + size, name or f'{self.name}[{start:#x}]')
+
+    def remaining(self):
+        return self.end - self.pos
+
+    def done(self):
+        if self.pos != self.end:
+            raise FormatError(f'{self.name}: {self.end - self.pos} bytes left unread at {self.pos:#x} '
+                              f'(next: {self.data[self.pos:self.pos + 16].hex(" ")})')

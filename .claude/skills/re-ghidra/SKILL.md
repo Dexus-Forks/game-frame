@@ -1,0 +1,114 @@
+---
+name: re-ghidra
+description: Decompile a game's binaries with Ghidra in headless mode and work with the result as text - the full export (decomp.c, functions, strings, imports, exports), queries with decomp_query.py, one-off decompiles of functions Ghidra missed, vtable and reference listings, constants read from the binary, and checks against the disassembly. Use whenever you need pseudocode for a native binary.
+---
+
+# Decompile with Ghidra
+
+Ghidra turns machine code into C-like *pseudocode*. It has no original names: a function is
+`FUN_1400be770` (the function at address 0x1400be770), a field is `*(int *)(param_1 + 0x44)`
+(the int 0x44 bytes into the first argument). Pseudocode is a reading aid, not truth: check
+anything exact against the disassembly or the emulator.
+
+## 1. Export once
+
+Import the game's own binaries **together**, so calls between the EXE and its DLLs resolve:
+
+```bash
+scripts/ghidra-export.sh target/Game.exe target/GameEngine.dll
+```
+
+It writes, per binary, into `analysis/export/<binary>/` (ignored by git):
+
+| File | Contents |
+|---|---|
+| `decomp.c` | Every function's pseudocode, each headed `// ==== <address> <name>` |
+| `functions.tsv` | address, size in bytes, name, `thunk` for thunks |
+| `strings.txt` | address and value of every defined string |
+| `imports.txt`, `exports.txt` | library!function; address and name of each export |
+
+Time: about a minute for a small program, 10 to 30 minutes for a large game. Run it in the
+background and keep working. It needs memory: `MAXMEM=16G` for games over 50 MB of code.
+
+## 2. Query the export
+
+```bash
+T=tools/triage/decomp_query.py; P=.venv/bin/python
+$P $T stats                      # functions, decompiled, labelled share
+$P $T fn 1400be770               # one function, with your labels applied
+$P $T callers FUN_1400be770      # who calls it (or refers to it through a table)
+$P $T callees 1400be770          # what it calls, labelled and largest first
+$P $T find 'Saves/'              # functions whose pseudocode contains a string or constant
+$P $T strings savegame           # strings containing a word, and the functions that use them
+$P $T writers 0x44               # functions that store to +0x44 (who sets this field?)
+$P $T biggest 40                 # the largest unlabelled functions (where the work is)
+```
+
+Plain `grep` and `awk` on `decomp.c` work too: `awk '/^\/\/ ==== 1400be770 /{p=1;print;next}
+/^\/\/ ==== /{p=0} p' analysis/export/Game.exe/decomp.c` prints one function.
+
+Every time you identify a function, add `address<TAB>label<TAB>evidence` to `labels/names.tsv`;
+`decomp_query.py` and `tools/pe/vtable.py` show labels everywhere from then on. Fields go in
+`labels/fields.tsv`. This shared vocabulary is what makes later sessions fast.
+
+## 3. One-off work in the analysed project
+
+Reuse the project the export made (no re-analysis, about a minute of start-up, so batch):
+
+```bash
+scripts/ghidra-run.sh Game.exe decompile analysis/notes/ai.txt 0x1400be770 0x1400be680
+scripts/ghidra-run.sh Game.exe named     analysis/notes/rand.txt Random Rand
+scripts/ghidra-run.sh Game.exe refs      analysis/notes/refs.txt 0x140178000
+scripts/ghidra-run.sh Game.exe vtable    analysis/notes/vt.txt Citizen 0x140165120 40
+```
+
+- `decompile` also **creates** functions Ghidra missed: callbacks reached only through tables
+  of pointers are often not functions in the bulk export.
+- `named` searches by name: best for a DLL that exports C++ names (`Random`, `Serialize`).
+- `refs` lists every reference to an address (a global, a table, a function) with the
+  referring function decompiled: the fastest way to find who uses a constant or a singleton.
+- `vtable` lists a table of function pointers. `tools/pe/vtable.py BINARY 0xTABLE --names
+  analysis/export/BINARY/functions.tsv` does the same without Ghidra.
+
+Ghidra locks a project: run one job per project at a time.
+
+## 4. Constants and data
+
+Pseudocode often shows a float constant as a global (`DAT_14016a2b0`). Read the real value:
+
+```bash
+.venv/bin/python tools/pe/readdata.py target/Game.exe f32 DAT_14016a2b0
+.venv/bin/python tools/pe/readdata.py target/Game.exe f32 0x14016a2c0 --count 12   # a table
+.venv/bin/python tools/pe/readdata.py target/Game.exe cstr 0x140180010
+```
+
+## 5. Check against the disassembly
+
+Before you reimplement arithmetic, loops or bit tricks, read the instructions; Ghidra drops loop
+bounds, mis-types floats, merges stack slots and loses register arguments:
+
+```bash
+objdump -d --no-show-raw-insn --start-address=0x1400be680 --stop-address=0x1400be770 \
+  target/Game.exe > analysis/notes/be680.s
+```
+
+What to look for: `cvttss2si` (float to int, truncating) against `cvtss2si` (rounding by the
+current mode); `minss`/`maxss` operand order (it decides which value wins with NaN); `movss`
+(32-bit float) against `movsd` (64-bit double); x87 instructions (`fld`, `fstp`) in 32-bit
+games, which compute in 80-bit precision until stored; `imul`/`idiv` (signed) against
+`mul`/`div` (unsigned); `sar` (keeps the sign) against `shr`.
+
+## Pitfalls
+
+- **Inlining.** A small function may exist only inside its callers. If `callers` finds none
+  but the code clearly runs, search for its body's distinctive constants instead.
+- **Magic numbers as integers.** A check for the bytes "SMPL" compiles to `== 0x4c504d53`
+  (little-endian). Search for the hex value as well as the text.
+- **Decimal offsets.** Ghidra prints some offsets in decimal: `param_1 + 100` is `+0x64`.
+  `writers` matches both.
+- **Thunks.** A `FUN_` that only jumps elsewhere is a thunk: follow it (functions.tsv marks them).
+- **Wrong signatures.** Ghidra guesses argument counts and types; a call through a register it
+  did not track shows fewer arguments than the callee uses. The callee's own pseudocode and the
+  disassembly at the call site settle it.
+- **32-bit games** pass arguments on the stack (cdecl, stdcall) and `this` in ecx (thiscall);
+  see `docs/ABI.md`.

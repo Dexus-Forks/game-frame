@@ -1,0 +1,86 @@
+---
+name: re-start
+description: Entry point for reverse engineering a game (or any closed program) with this harness. Use first, whenever a task involves understanding, documenting or reimplementing a game from its shipped binaries and data files. Gives the rules, the loop, a first-session checklist, and routes each kind of task to the right re-* skill.
+---
+
+# Reverse engineering a game: start here
+
+You are studying a finished program without its source code: its executables, its libraries and
+its data files. The aim is usually one of these:
+
+- **Understand** a system (how saves work, how the AI picks a job, what a value means).
+- **Document** formats and rules so people can mod or preserve the game.
+- **Reimplement** the game, or part of it, so it behaves the same (a new engine, a port, a
+  server, a tool that reads its files).
+
+All three use the same loop and the same discipline: every claim rests on evidence you can
+point to, and every number that matters is measured, not guessed.
+
+## Rules (they apply to every step)
+
+1. **The player's game stays on the player's computer.** Never commit, upload or paste the
+   game's binaries, data files, extracted assets, saves, decompiled code or disassembly. Keep
+   them in ignored folders (`target/`, `analysis/`, `derived/`). Publish findings as prose,
+   tables, addresses (`FUN_1400be770`), field offsets (`+0x44`) and constants.
+2. **Label every claim** with how you know it:
+   - *observed*: read in the code or the data (name the function or file);
+   - *measured*: produced by running original code (emulator or game), with the inputs;
+   - *inferred*: a reasoned guess; say what would confirm it;
+   - *unknown*: an open question, listed as such.
+   Never write that the game "does" something at run time from static reading alone.
+3. **Measure what must be exact.** Arithmetic, random numbers, procedural generation and
+   anything a simulation depends on: emulate the original and compare bit for bit.
+4. **Write it down as you go** (`re-land`). Findings, function labels and struct fields go into
+   the repository so the next session does not repeat your work.
+5. **Ask before downloading** tools or files the user has not approved (name, source, size).
+
+## The loop
+
+```
+inventory -> decompile -> trace -> format -> emulate -> reimplement -> verify -> land
+                            ^                                             |
+                            +---------------- when a check fails ---------+
+```
+
+| Step | Question it answers | Skill |
+|---|---|---|
+| Set up | Are Ghidra, Java, Python, Unicorn and REA ready? | `re-setup` |
+| Inventory | Which files hold the game's own code? Which engine, which protection, which data containers? | `re-inventory` |
+| Investigate with REA | Quick, evidence-backed answers about a binary, package, browser or Electron app | `re-rea` |
+| Decompile | Turn machine code into searchable pseudocode, and run one-off decompiles | `re-ghidra` |
+| Trace | How does the original do X? Which function, which fields, which constants? | `re-trace` |
+| Decode a format | What is in this data file, field by field? | `re-format` |
+| Emulate | What exactly does this original function return for these inputs? | `re-emulate` |
+| Reimplement | Write new code that behaves the same | `re-port` |
+| Verify | Is the new code bit-exact, deterministic, compatible with real saves? | `re-verify` |
+| Land | Document, label, commit | `re-land` |
+
+A small task may use only two or three steps. Do not skip `land`.
+
+## First session on a new game
+
+1. `scripts/setup.sh` (and `--install` if anything is missing). See `re-setup`.
+2. If the project has no repository yet: `scripts/new-project.sh DIR "Game Name" PATH/TO/GAME`.
+3. Read `AGENTS.md`, `docs/CHECKLIST.md` and `docs/FINDINGS.md` if they exist. Search `docs/` and
+   `labels/` for anything you are about to touch: earlier sessions may have traced it.
+4. `re-inventory`: run `tools/pe/peinfo.py` on every binary; decide which hold the game's own
+   code, and whether the game is native C/C++ (this harness), managed (.NET, IL2CPP, Mono),
+   scripted (Lua, Python, GameMaker) or packed (unpack first).
+5. `re-ghidra`: export the game's own binaries (`scripts/ghidra-export.sh`).
+6. Pick the foundations first: the random number generator, the maths helpers, the game clock
+   and the data container. Everything else depends on them, and they are small enough to
+   emulate and verify in one session.
+
+## Before you finish any session
+
+- Every new finding is in `docs/` with its evidence label.
+- Every function you identified has a row in `labels/names.tsv`.
+- `docs/CHECKLIST.md` reflects what is now traced, measured, reimplemented, verified.
+- Nothing from the game is staged (`git status`); only your own files are committed.
+
+## Worked example
+
+`examples/sample-game/` is a tiny Windows game built for practice: run `tests/run.sh` to see the
+whole loop (inventory, emulate, port, bit-exact check) on it. Un-Banished
+(https://github.com/tanepiper/unbanished, `docs/CASE-STUDY.md` here) is the full-size project
+this harness came from: a 1:1 reimplementation of the game Banished.
