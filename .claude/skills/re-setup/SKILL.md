@@ -13,6 +13,9 @@ scripts/setup.sh --install    # installs what is missing (Homebrew on macOS, apt
                               # and creates .venv with requirements.txt
 ```
 
+`./gameframe doctor` runs the same check, and passes options on (`./gameframe doctor
+--install`). `./gameframe run NAME ARGS` then runs any Python tool with the `.venv`.
+
 The script writes `.env` with `GHIDRA_INSTALL_DIR` and `JAVA_HOME` once both are found. Every
 script and `.mcp.json` read these, so set them there if your installs are elsewhere.
 

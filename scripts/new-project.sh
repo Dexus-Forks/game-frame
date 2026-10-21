@@ -8,6 +8,7 @@
 #   README.md, LICENSE-APACHE, LICENSE-CC-BY-4.0   front page (build/run per part); code Apache 2.0, content CC BY 4.0
 #   .claude/skills/           the re-* skills (every step of the method)
 #   tools/, scripts/          the harness's tools, requirements.txt, .mcp.json (REA)
+#   gameframe                 the help and discovery command (./gameframe help)
 #   docs/FINDINGS.md, docs/CHECKLIST.md, labels/names.tsv, labels/fields.tsv
 #   docs/DOS.md, ABI.md, GAME-PATTERNS.md, LEGAL.md, OUTPUTS.md, SETUP.md   the reference documents
 #   docs/games/, observe/, engines/, hardware/, consoles/, working/, case-studies/   the guides
@@ -22,7 +23,7 @@ dir="$1"; name="$2"; game="${3:-}"
 mkdir -p "$dir"/{target,analysis,derived,docs,labels,.claude}
 cp -R "$ROOT/tools" "$ROOT/scripts" "$dir/"
 cp -R "$ROOT/.claude/skills" "$dir/.claude/"
-cp "$ROOT/requirements.txt" "$ROOT/.mcp.json" "$dir/"
+cp "$ROOT/requirements.txt" "$ROOT/.mcp.json" "$ROOT/gameframe" "$dir/"
 # Code is Apache 2.0; documentation and other prose are CC BY 4.0 (as in the harness).
 cp "$ROOT/templates/project/licences/LICENSE-APACHE" "$ROOT/templates/project/licences/LICENSE-CC-BY-4.0" "$dir/"
 # The reference documents the skills point to (docs/DOS.md, docs/ABI.md, ...).

@@ -65,6 +65,7 @@ user may change any of them.
 | `docs/CHECKLIST.md` | What is traced, measured and reimplemented, and what is next |
 | `labels/names.tsv`, `labels/fields.tsv` | Names for original functions and struct fields, read by the tools |
 | `tools/`, `scripts/` | The harness's tools: https://github.com/tanepiper/game-frame |
+| `./gameframe` | Help on the method and the tools: `steps`, `skills`, `skill NAME`, `tools`, `tool NAME`, `run NAME ARGS`, `find WORD`, `doctor` |
 | `docs/DOS.md`, `docs/ABI.md`, `docs/GAME-PATTERNS.md`, `docs/OUTPUTS.md` | The harness's reference documents (DOS games: start with DOS.md; what to ship: OUTPUTS.md) |
 | `docs/games/`, `docs/observe/`, `docs/engines/`, `docs/hardware/`, `docs/consoles/`, `docs/working/` | The harness's taxonomy of games (with this game's family and its rule set) and how to observe the original: inputs, interface, object model |
 | `.mcp.json` | MCP servers for the agent: REA, and `dosbox` (DOSBox-X's debugger, for DOS games) |
@@ -73,7 +74,8 @@ user may change any of them.
 
 inventory → observe → decompile → trace → (format) → emulate → reimplement → verify → land. Start each
 session by reading `docs/CHECKLIST.md` and searching `docs/` and `labels/` for the addresses
-and names you are about to work on.
+and names you are about to work on. `./gameframe find WORD` shows which skills and
+tools cover a subject, and `./gameframe tool NAME` prints a tool's usage.
 
 Work a subsystem at a time and verify by risk (`re-start`, "Spend effort where it pays";
 `re-verify` section 0): fuzz only maths, random draws and branchy code; check the rest

@@ -26,6 +26,26 @@ Then open the new project with your agent and ask it to start with the **re-star
 Claude Code finds the skills in `.claude/skills/` automatically; other agents read `AGENTS.md`
 and the `SKILL.md` files.
 
+## Find your way with `gameframe`
+
+`./gameframe` is a small command for help and discovery. It reads the skills and the tools'
+own help from the files, so it never goes out of date. It needs only Python 3, and every new
+project gets a copy.
+
+```bash
+./gameframe steps                      # the method's loop, each step with its skill
+./gameframe skills                     # every skill in one line
+./gameframe skill re-trace --sections  # a skill's headings; --section TITLE prints one part
+./gameframe tools                      # every tool and script, with its first line of help
+./gameframe tool decomp_query          # one tool's full help
+./gameframe run peinfo target/game.exe # run a tool with the harness's .venv
+./gameframe find vtable                # which skills and tools mention a word
+./gameframe doctor                     # the toolchain check (scripts/setup.sh)
+```
+
+`steps`, `skills`, `tools`, `tool` and `find` also print JSON with `--json`, for agents and
+scripts.
+
 ## The method
 
 ```
@@ -68,7 +88,8 @@ to produce, and the pitfalls that cost time.
 | `scripts/ghidra-run.sh BINARY decompile\|named\|refs\|vtable\|labels OUT ARGS` | One-off jobs in the analysed project, without re-analysis |
 | `scripts/extract-installer.sh [--detect] INSTALLER OUT` | Unpacks an installer or package without running it: Inno Setup (GOG), NSIS, InstallShield, MSI, archives, `.dmg`, `.pkg`, GOG's `.sh` |
 | `scripts/dosbox-run.sh [--fileio] [--break] [--mcp PORT] DIR PROGRAM` | Runs a DOS program in DOSBox-X without a window: exit code, file I/O log, debugger control |
-| `tests/run.sh [--ghidra]` | 82 checks of every tool against the two sample games |
+| `./gameframe COMMAND` | Help and discovery: the steps, the skills, every tool's own help; runs a tool with the `.venv` |
+| `tests/run.sh [--ghidra]` | 103 checks of every tool against the two sample games |
 
 ## Tools
 

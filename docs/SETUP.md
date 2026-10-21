@@ -11,6 +11,9 @@ tests/run.sh --ghidra        # proves every tool against the sample game (~1½ m
 Linux and Windows, REA registration for each agent, common problems) are in the `re-setup`
 skill: [.claude/skills/re-setup/SKILL.md](../.claude/skills/re-setup/SKILL.md).
 
+`./gameframe doctor` runs the same check. `./gameframe tools` then lists every tool with its
+first line of help, and `./gameframe tool NAME` prints the rest.
+
 | Tool | Used for | Where it comes from |
 |---|---|---|
 | Ghidra 11 or 12 | Decompiling native code | https://ghidra-sre.org (Homebrew: `ghidra`) |

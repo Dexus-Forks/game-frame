@@ -74,6 +74,8 @@ A small task may use only two or three steps. Do not skip `land`.
 
 1. `scripts/setup.sh` (and `--install` if anything is missing). See `re-setup`.
 2. If the project has no repository yet: `scripts/new-project.sh DIR "Game Name" PATH/TO/GAME`.
+   `./gameframe steps`, `./gameframe tools` and `./gameframe find WORD` show the method, the
+   tools and where a subject is covered. `./gameframe tool NAME` prints a tool's usage.
 3. Read `AGENTS.md`, `docs/CHECKLIST.md` and `docs/FINDINGS.md` if they exist. Search `docs/` and
    `labels/` for anything you are about to touch: earlier sessions may have traced it.
 4. `re-inventory`: run `tools/pe/peinfo.py` (Windows) or `tools/dos/dosinfo.py` (DOS) on every binary; decide which hold the game's own

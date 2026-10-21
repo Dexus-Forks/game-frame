@@ -60,6 +60,7 @@ These rules are for changes to the harness itself, which is a public repository.
 | Path | What |
 |---|---|
 | `.claude/skills/re-*/SKILL.md` | One skill per step of the method |
+| `gameframe`, `tools/gameframe/` | The help and discovery command. It reads the skills and each tool's own help, so a new tool needs no entry there |
 | `scripts/` | setup, new-project, ghidra-export, ghidra-run, and `lib.sh` (paths and `.env`) |
 | `tools/pe`, `tools/dos`, `tools/triage`, `tools/emu`, `tools/formats`, `tools/verify`, `tools/ghidra` | The tools |
 | `templates/project/` | What `new-project.sh` writes into a game's repository |

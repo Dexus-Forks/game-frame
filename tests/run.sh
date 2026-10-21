@@ -300,6 +300,24 @@ scripts/new-project.sh "$tmp" "Test Game" $B >/dev/null 2>&1
 [[ -f "$tmp/AGENTS.md" && -f "$tmp/README.md" && -f "$tmp/LICENSE-APACHE" && -f "$tmp/LICENSE-CC-BY-4.0" && ! -e "$tmp/LICENSE-MIT" && -f "$tmp/docs/DOS.md" && -f "$tmp/docs/OUTPUTS.md" && -f "$tmp/docs/games/README.md" && -f "$tmp/docs/observe/inputs.md" && -f "$tmp/docs/working/agents.md" && -f "$tmp/docs/hardware/cpus.md" && -f "$tmp/.cargo/config.toml" && -f "$tmp/.claude/skills/re-start/SKILL.md" && -f "$tmp/target/game.exe" && -d "$tmp/.git" ]] \
   && grep -q "Test Game" "$tmp/AGENTS.md" && ! (cd "$tmp" && git ls-files | grep -q '^target/') \
   && ok "new-project creates a repository, keeps target/ out of git" || bad "new-project scaffold" "$(ls -la "$tmp" 2>&1)"
+expect "gameframe works in a new project" "tools/pe/peinfo.py  (program)" "$tmp/gameframe" tool peinfo
+
+echo "Help and discovery (gameframe)"
+G=./gameframe
+expect "gameframe prints its help with no command" "find WORD" $G
+expect "gameframe steps reads the loop from re-start" "re-emulate: What exactly does this original function return" $G steps
+expect "gameframe skills lists every skill" "$(ls -d .claude/skills/re-*/ | wc -l | tr -d ' ')" sh -c "$G skills --json | '$PYTHON' -c 'import json,sys; print(len(json.load(sys.stdin)))'"
+expect "gameframe skill prints one section" "## Pitfalls" $G skill emulate --section pitfalls
+expect "gameframe skill names a missing section" "has no section matching" $G skill re-trace --section nothing-here
+expect "gameframe tools shows each tool's own first line" "\"summary\": \"$(sed -n 2p tools/verify/seqdiff.py | sed 's/^"""//')\"" $G tools --json
+expect "every tool and script carries its own help" "missing: []" sh -c "$G tools --json | '$PYTHON' -c 'import json,sys; print(\"missing:\", [t[\"name\"] for t in json.load(sys.stdin) if not t[\"summary\"]])'"
+expect "gameframe tool prints the docstring unchanged" "Usage: decomp_query.py [--binary NAME]" $G tool decomp_query
+expect "gameframe tool finds a script by name" "scripts/ghidra-export.sh  (script)" $G tool ghidra-export
+expect "gameframe tool suggests a close name" "Did you mean: peinfo" $G tool peinf
+expect "gameframe run gives the same output as the tool" "$("$PYTHON" tools/pe/peinfo.py $B/game.exe | head -1)" $G run peinfo $B/game.exe
+expect "gameframe run passes the tool's exit code" "rc 1" sh -c "$G run bitcompare f32 $B/truth/seed-1.f32 $B/naive/seed-1.f32 >/dev/null; echo rc \$?"
+expect "gameframe run refuses a library and says why" "a library to import" $G run pe_emu
+expect "gameframe find names the skills and tools for a word" "tool vtable" $G find vtable
 
 echo "Documentation site"
 if [[ -d site/node_modules ]]; then
