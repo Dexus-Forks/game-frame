@@ -117,6 +117,8 @@ symbols), and a real-mode MZ program, checked under the emulator and under DOSBo
   resources, time, messages, saves, rendering, networking, as they appear in machine code.
 - [docs/ABI.md](docs/ABI.md): calling conventions, C++ layout, floating-point and integer details
   that decide exactness.
+- [docs/OUTPUTS.md](docs/OUTPUTS.md): what a project can ship: documents, a website, programs
+  for each system built by CI and attached to releases, a browser version, a server, tools.
 - [docs/LEGAL.md](docs/LEGAL.md): your own copy, nothing redistributed, new code from
   documented behaviour.
 - [docs/SETUP.md](docs/SETUP.md): the toolchain, and tools for targets beyond native code.

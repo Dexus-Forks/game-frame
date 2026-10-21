@@ -75,6 +75,11 @@ git pull --rebase && git push
 
 If the rebase conflicts in files you did not touch, stop and report.
 
-## 5. Report
+## 5. Ship
+
+When a version is ready for players, `docs/OUTPUTS.md` lists what to release and how: programs
+for each system built by CI from the tag, a browser version, a website.
+
+## 6. Report
 
 Two or three lines: the commit, what landed, what is verified, and the next open item.

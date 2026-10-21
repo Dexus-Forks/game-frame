@@ -36,6 +36,9 @@ Direct3D 9 and 11 shaders, and a data-driven interface. Every step of the loop w
   Each addition is a build option; a test builds the game without any of them and checks that
   it plays exactly as the full build; `--pure` turns them all off for one run. Doing this earlier
   would have been cheaper: see `re-port`, "Build it so it can be checked".
+- **Releases:** each version is tagged by one workflow, which also builds the game on Windows,
+  macOS and Linux runners and attaches a zip for each (`docs/OUTPUTS.md`), and rebuilds the
+  website with the browser version.
 - **The harness grew with the work:** each slow step or mistake became a tool or a rule
   (labels files, a readable-decompile tool, random-draw tracing and diffing, a deviations
   ledger, version comparison). Its "How it was made" page tells the story:
