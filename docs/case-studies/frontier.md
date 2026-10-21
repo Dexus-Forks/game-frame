@@ -5,6 +5,14 @@ platforms and the browser, on the player's own copy of the game. The repository 
 while the work is in progress. It is the harness's example of a different route: running the
 original inside the port and replacing it routine by routine.
 
+![The start-position menu over the title sequence's ships and stars](../assets/case-studies/frontier-start-menu.webp)
+
+![The cockpit view, landed at Merlin in the Ross 154 system, with the scanner and the status bar](../assets/case-studies/frontier-cockpit.webp)
+
+*The project's own runtime running the player's copy of the game, headless: the start-position
+menu, and the cockpit after choosing Ross 154. The maths library and the sound driver in
+these runs are the native ports.*
+
 ## Why it is a useful example
 
 Frontier is a [space simulation](../games/vehicle-sims.md): a galaxy generated from seeds, real

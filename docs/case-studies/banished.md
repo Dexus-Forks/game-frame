@@ -5,6 +5,13 @@ city-building game Banished (Shining Rock Software, 2014) in Rust, running on Wi
 Linux and in the browser on the player's own game files. This harness was extracted from it:
 the skills, the Ghidra scripts and the emulator began there and were made generic here.
 
+![A town in Un-Banished with the Town Hall window open on its Inventory tab](../assets/case-studies/banished-town-hall.webp)
+
+![A market of coloured stalls between wooden houses and fields, in a town of 116 people](../assets/case-studies/banished-market.webp)
+
+*Un-Banished drawing a large town with the original's interface, and a market in late summer.
+Both are the port's own frames, made from the player's game files.*
+
 ## Why it is a useful example
 
 Banished is a small but complete game: a C++ engine DLL that exports its class names, a game

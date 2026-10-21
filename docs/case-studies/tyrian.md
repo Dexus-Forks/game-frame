@@ -5,6 +5,14 @@ in Rust, for Windows, macOS, Linux and the browser. It reads the player's own co
 The repository is private while the work is in progress. It is the harness's main test of the
 16-bit DOS tools: most of `tools/dos/` and `tools/emu/dos_env/` came from it.
 
+![The asset viewer showing a sheet of level tiles from one of the game's tile files](../assets/case-studies/tyrian-viewer-tiles.webp)
+
+![The asset viewer showing a recorded demo as a list of steps: frames to wait, then the keys held](../assets/case-studies/tyrian-viewer-demo.webp)
+
+*The project's asset viewer, drawn by the port's own readers. Above, the tiles of one tile
+file. Below, a recorded demo: each step waits a number of frames and holds a set of keys,
+which is the input record the port replays ([Inputs](../observe/inputs.md)).*
+
 ## Why it is a useful example
 
 Tyrian is a vertical shoot 'em up ([Arcade action](../games/arcade-action.md)): a stream with
