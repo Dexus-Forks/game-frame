@@ -27,6 +27,10 @@ On Linux, Ghidra is not packaged: download the release zip from
 https://github.com/NationalSecurityAgency/ghidra/releases, unzip it, and put its folder in
 `GHIDRA_INSTALL_DIR`. On Windows, use WSL2 and follow the Linux steps.
 
+On Linux, in a container or in a cloud agent's workspace, read
+`docs/working/environments.md` as well. In each new shell, `source scripts/env.sh` loads `.env`
+and puts `gameframe` and the `.venv` Python on `PATH`.
+
 ## 2. Prove it works
 
 ```bash

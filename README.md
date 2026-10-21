@@ -152,6 +152,7 @@ library against the game), `re-editor` (documents to the writing rules) and `re-
 | Script | What it does |
 |---|---|
 | `scripts/setup.sh [--install] [--rea]` | Checks every tool; installs what is missing; shows REA's registration plan |
+| `source scripts/env.sh` | Sets `GAMEFRAME_ROOT`, loads `.env`, puts `gameframe` and the `.venv` Python on `PATH`, for each shell or agent session |
 | `scripts/new-project.sh DIR "Name" [GAME]` | Creates a project for one game: rules, skills, tools, ignored folders for the game and its derivatives |
 | `scripts/ghidra-export.sh [--labels FILE] BINARY...` | Headless Ghidra analysis and a text export: pseudocode, functions, strings, imports, exports; names applied from a labels file |
 | `scripts/ghidra-run.sh BINARY decompile\|named\|refs\|vtable\|labels OUT ARGS` | One-off jobs in the analysed project, without re-analysis |

@@ -61,6 +61,10 @@ done
 command -v dosbox-x >/dev/null || { echo "dosbox-x not found: scripts/setup.sh --install" >&2; exit 1; }
 game="$(cd "$1" && pwd)"; shift
 mkdir -p "$out"; out="$(cd "$out" && pwd)"
+if [[ $inplace == 0 && "$out/" == "$game/"* ]]; then
+  echo "--out ($out) is inside GAME_DIR ($game): the copy of GAME_DIR would include it. Put it elsewhere." >&2
+  exit 2
+fi
 drive="$game"
 if [[ $inplace == 0 ]]; then
   drive="$out/drive"; rm -rf "$drive"; cp -R "$game" "$drive"

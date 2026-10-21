@@ -242,9 +242,9 @@ expect "fileio_trace groups a table of records" "0x000004: [2, 1] x 3 (stride 3)
 expect "fileio_trace follows seeks" "0x000064: 16" "$PYTHON" tools/dos/fileio_trace.py "$log" --file data.dat
 rm -f "$log"
 if command -v dosbox-x >/dev/null; then
-  g="$(mktemp -d)"; cp $D/sample-mz.exe "$g/SAMPLEMZ.EXE"
+  g="$(mktemp -d)"; mkdir "$g/game"; cp $D/sample-mz.exe "$g/game/SAMPLEMZ.EXE"   # output stays outside the game folder it copies
   expect "dosbox-run runs a DOS program and reads its exit code (= dos_emu's first draw)" "exit code 23" \
-    scripts/dosbox-run.sh --out "$g/out" --time 20 "$g" SAMPLEMZ.EXE
+    scripts/dosbox-run.sh --out "$g/out" --time 20 "$g/game" SAMPLEMZ.EXE
   if ! dosbox_has_debug_channel; then
     echo "  skip  dbx_control (DOSBox-X $(dosbox_version) has no debugger control channel; needs 2026.10+)"
   else
@@ -253,7 +253,7 @@ import os, sys; sys.path.insert(0, 'tools/dos')
 from dbx_control import Debugger
 g = sys.argv[1]
 with Debugger(port=0, timeout=30) as d:            # a free port: no stale DOSBox-X can connect
-    d.launch([os.path.abspath('scripts/dosbox-run.sh'), '--out', g + '/dbx', '--time', '40', '--break', '--mcp', str(d.port), g, 'SAMPLEMZ.EXE'])
+    d.launch([os.path.abspath('scripts/dosbox-run.sh'), '--out', g + '/dbx', '--time', '40', '--break', '--mcp', str(d.port), g + '/game', 'SAMPLEMZ.EXE'])
     d.wait_connected(); d.wait_break()          # DEBUGBOX: stopped at the first instruction
     d.exec('BPINT 21 4C'); d.run()
     regs = d.wait_break()                       # stopped at INT 21h AH=4Ch (exit)
@@ -347,6 +347,8 @@ else
 fi
 
 echo "Help and discovery (gameframe)"
+expect "scripts/env.sh sets GAMEFRAME_ROOT and puts gameframe on PATH" "$(pwd)/gameframe" \
+  bash -c 'cd / && . "'"$(pwd)"'/scripts/env.sh" >/dev/null && command -v gameframe'
 G=./gameframe
 expect "gameframe prints its help with no command" "find WORD" $G
 expect "gameframe steps reads the loop from re-start" "re-emulate: What exactly does this original function return" $G steps

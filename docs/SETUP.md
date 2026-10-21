@@ -11,6 +11,10 @@ tests/run.sh --ghidra        # proves every tool against the sample game (~1½ m
 Linux and Windows, REA registration for each agent, common problems) are in the `re-setup`
 skill: [.claude/skills/re-setup/SKILL.md](../.claude/skills/re-setup/SKILL.md).
 
+For Linux machines, containers and cloud agent workspaces, see
+[Linux, cloud and container environments](working/environments.md). In each new shell or agent
+session, `source scripts/env.sh` sets up the paths.
+
 `./gameframe doctor` runs the same check. `./gameframe tools` then lists every tool with its
 first line of help, and `./gameframe tool NAME` prints the rest.
 
