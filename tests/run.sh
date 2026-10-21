@@ -111,6 +111,11 @@ expect "tdinfo lists procedures with sizes and parameters" "param     [bp+6] ran
 expect "tdinfo lays out a record" "+0x0004  total: Word  (2)" "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe types
 expect "tdinfo writes labels" "1008:0000	RandSeed" "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe labels
 expect "tdinfo maps code to source lines" "1000:0028	SAMPLE.S:11" "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe lines
+expect "tdinfo writes a Rust reader for a record" "seed: r.i32()?," "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe rust SampleState
+expect "tdinfo writes the Rust Pascal reader" "pub fn real48" "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe rust-reader
+"$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe labels > $D/labels.tsv
+expect "nedis applies relocations and names far calls" "lcall   KERNEL.3" "$PYTHON" tools/dos/nedis.py $D/sample.exe 1000:008c 6 --labels $D/labels.tsv
+expect "nedis names data in DS" "[RandSeed]" "$PYTHON" tools/dos/nedis.py $D/sample.exe 1000:0028 8 --labels $D/labels.tsv
 
 echo "16-bit emulator"
 expect "dos_emu runs the NE random generator (matches the reference)" "True [722, 842, 312, 2, 309]" "$PYTHON" - <<'PY'
@@ -195,7 +200,7 @@ fi
 echo "Project scaffold"
 tmp="$(mktemp -d)/re-test"
 scripts/new-project.sh "$tmp" "Test Game" $B >/dev/null 2>&1
-[[ -f "$tmp/AGENTS.md" && -f "$tmp/docs/DOS.md" && -f "$tmp/.claude/skills/re-start/SKILL.md" && -f "$tmp/target/game.exe" && -d "$tmp/.git" ]] \
+[[ -f "$tmp/AGENTS.md" && -f "$tmp/docs/DOS.md" && -f "$tmp/.cargo/config.toml" && -f "$tmp/.claude/skills/re-start/SKILL.md" && -f "$tmp/target/game.exe" && -d "$tmp/.git" ]] \
   && grep -q "Test Game" "$tmp/AGENTS.md" && ! (cd "$tmp" && git ls-files | grep -q '^target/') \
   && ok "new-project creates a repository, keeps target/ out of git" || bad "new-project scaffold" "$(ls -la "$tmp" 2>&1)"
 

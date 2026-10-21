@@ -29,6 +29,9 @@ for f in AGENTS.md docs/FINDINGS.md docs/CHECKLIST.md; do
   sed -e "s/GAME_NAME/$name/g" -e "s/DATE/$(date +%Y-%m-%d)/" "$ROOT/templates/project/$f" > "$dir/$f"
 done
 printf 'The instructions for this repository are in AGENTS.md:\n\n@AGENTS.md\n' > "$dir/CLAUDE.md"
+# target/ holds the game: Cargo must build elsewhere, or `cargo clean` deletes the game.
+mkdir -p "$dir/.cargo"
+printf '[build]\n# target/ holds your copy of the game: never let Cargo build (or clean) there.\ntarget-dir = "build"\n' > "$dir/.cargo/config.toml"
 [[ -f "$ROOT/.env" ]] && cp "$ROOT/.env" "$dir/.env"
 find "$dir/tools" -name '__pycache__' -prune -exec rm -r {} + 2>/dev/null || true
 if [[ -n "$game" ]]; then

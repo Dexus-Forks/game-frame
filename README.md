@@ -67,7 +67,7 @@ to produce, and the pitfalls that cost time.
 | `scripts/ghidra-export.sh [--labels FILE] BINARY...` | Headless Ghidra analysis and a text export: pseudocode, functions, strings, imports, exports; names applied from a labels file |
 | `scripts/ghidra-run.sh BINARY decompile\|named\|refs\|vtable\|labels OUT ARGS` | One-off jobs in the analysed project, without re-analysis |
 | `scripts/dosbox-run.sh [--fileio] [--break] [--mcp PORT] DIR PROGRAM` | Runs a DOS program in DOSBox-X without a window: exit code, file I/O log, debugger control |
-| `tests/run.sh [--ghidra]` | 52 checks of every tool against the two sample games |
+| `tests/run.sh [--ghidra]` | 56 checks of every tool against the two sample games |
 
 ## Tools
 
@@ -84,7 +84,8 @@ to produce, and the pitfalls that cost time.
 | `tools/verify/seqdiff.py` | The first random draw (or any event) where two traces differ |
 | `tools/ghidra/*.java` | The Ghidra scripts the shell scripts run (`ApplyLabels.java` names functions and creates missed ones) |
 | `tools/dos/dosinfo.py` | What is this DOS binary: MZ, NE or LE; segments with Ghidra's selectors; imports; compiler, extender, packer fingerprints; debug symbols; Pascal strings |
-| `tools/dos/tdinfo.py` | Borland Turbo Debugger symbols: original procedure, global and type names, parameters, record layouts, source lines, labels for Ghidra |
+| `tools/dos/tdinfo.py` | Borland Turbo Debugger symbols: original procedure, global and type names, parameters, record layouts, source lines, labels for Ghidra, Rust readers for records |
+| `tools/dos/nedis.py` | 16-bit disassembly with relocations applied: far calls and DS globals by name |
 | `tools/dos/readseg.py` | Typed values at `seg:off`, including Turbo Pascal `Real` and Pascal strings |
 | `tools/emu/dos_emu.py` | Call any function of a 16-bit NE (protected mode) or MZ (real mode) program, at Ghidra's addresses |
 | `tools/dos/fileio_trace.py` | From a DOSBox-X file log: every file's reads in order, with record patterns |

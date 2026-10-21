@@ -136,6 +136,11 @@ The same export works. Addresses are `seg:off`: NE segment N is `1000 + 8 * (N -
   the *last* source argument. Count from `[bp+6]` upwards, the first argument highest.
 - Pascal strings (length byte first) are missing from `strings.txt`: use
   `tools/dos/dosinfo.py BINARY --pstrings 6` and `tools/dos/readseg.py BINARY pstr ADDR`.
+- Disassembling the file directly shows far calls as `lcall 0:ffff` (unrelocated). Use
+  `tools/dos/nedis.py BINARY SEG:OFF LEN`: relocations applied, calls and globals named.
+- A Pascal string is referenced by its length byte (one before the text), and a procedure's
+  strings sit just before its code. A constant equal to a DS offset may print as `&global`.
+- `INT 34h`-`3Dh` in Borland code are floating-point instructions (the FPU emulator).
 - Constants: `tools/dos/readseg.py BINARY TYPE ADDR` reads typed values at `seg:off`
   (`u16`, `i32`, `ptr`, `real48` for Turbo Pascal's 6-byte Real, `pstr`, `hex`).
 

@@ -54,6 +54,18 @@ scripts/ghidra-export.sh --labels analysis/td-labels.tsv target/GAME.EXE
 ```
 
 With `--labels`, Ghidra names every function and global, and creates the functions it missed.
+
+The record types become reimplementation code directly: `tdinfo.py BINARY rust TYPE ...` writes
+Rust structs with readers in the original's field order, each field commented with its Pascal
+type and offset, and `tdinfo.py BINARY rust-reader` the `PascalReader` they use (little-endian
+integers, one-byte Boolean, 6-byte Real kept exact, `string[N]`). Generated names that clash
+with Rust's prelude get `Rec` (`Optiontype` -> `OptionRec`).
+
+The runtime library (`System`, `Crt`, `Dos`) has no symbols of its own. Borland Pascal 7's
+random generator, for example, is `RandSeed := RandSeed * $08088405 + 1` (a near `NextRand`
+built from 16-bit multiplies and shifts), `Random(n)` = (new seed * n) >> 32 using all 32
+bits, and `Randomize` seeds from INT 21h AH=2Ch (CX low word, DX high word). Find it by the
+constant `0x8405` and the global `RandSeed`, and measure it before trusting this.
 Record field offsets are summed from field sizes: tdinfo says when a record's fields do not add
 up to its size (a variant record), so check one offset in the code before relying on it.
 
@@ -76,6 +88,19 @@ up to its size (a variant record), so check one offset in the code before relyin
   search. Use `dosinfo.py --pstrings` and `readseg.py BINARY pstr ADDR`.
 - **Segment arithmetic.** `DAT_1048_12de` is offset `0x12de` in the data segment; a far
   pointer is offset then segment in memory (`readseg.py ... ptr`).
+- **String constants sit just before their procedure.** Borland Pascal emits a procedure's
+  string literals right before its first instruction, so the procedure that starts after a
+  string usually uses it. Code refers to a Pascal string by its *length byte*: search for the
+  address one before the text that `dosinfo.py --pstrings` prints.
+- **Constants that look like globals.** A 16-bit constant equal to an offset in DS shows up in
+  pseudocode as `&someGlobal` (a `BlockRead` count of 0x138a printed as `&tempdat3`). Check
+  the instruction (`tools/dos/nedis.py`) before believing a pointer.
+- **Floating point by interrupt.** Borland's FPU emulator replaces each x87 instruction with
+  `INT 34h`-`3Dh` followed by the instruction's bytes; disassemblers show `int 0x3c` and
+  nonsense after it. Read those runs as floating-point code (Real, Double), not as interrupts.
+- **Calls through placeholders.** Disassembling the file directly shows every far call as
+  `lcall 0:ffff`: the relocation fills it in. `tools/dos/nedis.py BINARY SEG:OFF LEN` applies
+  the relocations and prints label names for call targets and DS globals.
 - **Turbo Pascal types**: `Real` is 6 bytes and not IEEE (`readseg.py ... real48`), `Comp` is a
   64-bit integer kept in the FPU, `string[N]` takes N+1 bytes, sets are bit arrays of up to 32
   bytes, `Boolean` is one byte. Records are not padded.
@@ -121,6 +146,8 @@ python3 tools/dos/fileio_trace.py analysis/dosbox/dosbox.log --game target/game
   file: offsets and sizes in reading order, with repeated patterns collapsed
   (`[2, 1, 4] x 120 (stride 7)` is a table of 120 seven-byte records). The read sizes of a
   file read field by field are its record layout, *measured*.
+- A program that reads through a Pascal **text** file (Assign/Reset on a `Text` variable) is
+  read in 128-byte blocks: the log shows the buffer, not the fields. Read the code instead.
 - `--cycles N` fixes the CPU speed. Use the same value for every run you compare.
 - Exit codes come back through `IF ERRORLEVEL` (DOSBox-X's shell does not expand
   `%ERRORLEVEL%`, and a redirect inside a false `IF` still creates the file).

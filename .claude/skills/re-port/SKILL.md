@@ -26,6 +26,14 @@ between a reimplementation and a copy; keep it visible (see `docs/LEGAL.md`).
   form the tools can search, for example ``Original: `FUN_1400be680` ``. Mark guesses
   *inferred*.
 
+## Generated record types (Borland programs with debug symbols)
+
+`python3 tools/dos/tdinfo.py BINARY rust TYPE ...` writes Rust structs and readers for Pascal
+record types in the original's field order (with `rust-reader` for the `PascalReader` they
+use). Generate, do not hand-copy, and keep the generated file unedited: regenerate it when the
+harness improves. Rust projects made by new-project.sh build into `build/`: `target/` holds the
+game, and `cargo clean` would delete it.
+
 ## Exactness checklist
 
 These are the details that make a reimplementation drift, in order of how often they bite:

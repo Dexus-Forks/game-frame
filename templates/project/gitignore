@@ -1,6 +1,8 @@
 # Never commit the game, anything derived from it, or decompiled code.
 # The original game's binaries and data files (your own copy):
 /target/
+# Build output (Cargo builds here, see .cargo/config.toml; never in target/):
+/build/
 # Ghidra projects, exports, decompiled code, one-off dumps:
 /analysis/
 # Emulator ground truth, extracted assets, captures:
