@@ -17,6 +17,8 @@ Commands:
                      data-segment offsets, types/ (one file per record type), and mod.rs's Globals with load/store to
                      and from a 64 KB image of the segment (checks ported code against the
                      original's memory after an emulated run)
+  rust-locals PROC   a struct of a procedure's locals at their BP offsets, with load/store on an
+                     image of the stack segment (for code nested in a big procedure)
   rust-reader        the small PascalReader / PascalWriter module the generated code uses
 
 Borland Pascal and Borland C++ write these symbols when a program is linked with debug
@@ -371,6 +373,8 @@ def main(argv):
                 print(f'{addr}\t{fname}:{line}')
     elif cmd == 'rust':
         print(td_rust.rust_for(td, args), end='')
+    elif cmd == 'rust-locals':
+        print(td_rust.rust_locals(td, args[0]), end='')
     elif cmd == 'rust-globals':
         if not args:
             sys.exit('rust-globals OUT_DIR: the module directory to write (for example src/globals)')

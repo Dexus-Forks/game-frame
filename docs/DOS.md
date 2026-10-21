@@ -68,6 +68,10 @@ segment (Booleans stay `u8`, so every byte survives). Ported code then works on 
 test can load the DS image from before an emulated run of the original, run the port, store,
 and compare with the DS image from after: every variable checked at once.
 
+`tdinfo.py BINARY rust-locals PROC` does the same for one procedure's local variables and
+parameters, at their BP offsets in the stack segment: for code nested in a big procedure (a
+main loop's helpers that use its locals through the static link).
+
 The runtime library (`System`, `Crt`, `Dos`) has no symbols of its own. Borland Pascal 7's
 random generator, for example, is `RandSeed := RandSeed * $08088405 + 1` (a near `NextRand`
 built from 16-bit multiplies and shifts), `Random(n)` = (new seed * n) >> 32 using all 32

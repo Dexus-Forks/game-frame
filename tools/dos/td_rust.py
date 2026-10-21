@@ -6,6 +6,9 @@ rust-reader); see its help.
   rust_globals(td, out_dir)  a module directory: one file per Pascal unit with that unit's
                              variables at their data-segment offsets, types/ (one file per
                              record type), mod.rs joining them into Globals with load/store
+  rust_locals(td, proc_name) one Rust module: a struct of a procedure's local variables (and
+                             parameters) at their BP offsets, with load/store from an image of the
+                             stack segment and the procedure's BP
   reader()                   templates/pascal.rs: PascalReader, PascalWriter, PStr, Real48
 """
 import os
@@ -232,3 +235,48 @@ def rust_globals(td, out_dir):
                 '        }))\n    }\n\n    pub fn store(&self, ds: &mut [u8]) {\n        let w = &mut PascalWriter::new(ds);\n' +
                 ''.join(f'        self.{m}.store(w);\n' for m in mods) + '    }\n}\n')
     return sorted(units)
+
+
+def rust_locals(td, proc_name):
+    """A struct of a procedure's locals and parameters at their BP offsets (Booleans as u8),
+    with load(ss, bp) and store(ss, bp) on an image of the stack segment. Offsets wrap at 64 KB,
+    as BP-relative addresses do."""
+    procs = [p for p in td.procedures() if p['name'].lower() == proc_name.lower()]
+    if not procs:
+        raise SystemExit(f'{proc_name}: no such procedure')
+    proc = procs[0]
+    first = next(i for i, (n, t, o, seg, b) in enumerate(td.symbols, 1) if i == proc['index'])
+    scope = next(((f, c) for f, c, _, _, off, length in td.scopes if off == proc['offset'] and length), None)
+    if scope is None:
+        raise SystemExit(f'{proc_name}: no scope (no locals) in the symbols')
+    out_structs, fields, loads, stores, seen = {}, [], [], [], set()
+    sname = rust_struct_name(proc['name']) + 'Locals'
+    rows = []
+    for i in range(scope[0], scope[0] + scope[1]):
+        name, t, o, seg, bits = td.symbols[i - 1]
+        if bits & 7 not in (2, 3) or not td.type(t):
+            continue
+        rel = o - 0x10000 if o >= 0x8000 else o
+        rows.append((rel, td.name(name), t, bits & 7 == 3))
+    for rel, name, t, by_ref in sorted(rows):
+        ident = rust_ident(name)
+        while ident in seen:
+            ident += '_'
+        seen.add(ident)
+        if by_ref:                      # a var parameter: a far pointer on the stack
+            rt, rexpr, wfn = 'u32', 'r.u32()?', (lambda v: f'w.u32({v});')
+            what = f'var {td.type_name(t, 1)} (a far pointer)'
+        else:
+            rt, rexpr, wfn = rust_type(td, t, out_structs, rust_struct_name('L' + name), exact_bool=True)
+            what = td.type_name(t, 1)
+        fields.append(f'    /// [bp{rel:+d}] {name}: {what}\n    pub {ident}: {rt},')
+        loads.append(f'            {ident}: {{ r.seek(bp.wrapping_add({rel & 0xFFFF:#x}) as usize); {rexpr} }},')
+        stores.append(f'        w.seek(bp.wrapping_add({rel & 0xFFFF:#x}) as usize); {wfn("self." + ident)}')
+    head = (f'//! Local variables of `{proc["module"]}.{proc["name"]}` ({proc["address"]}), on its stack frame.\n'
+            + GENERATED.replace('rust-globals', f'rust-locals {proc["name"]}') + '#![allow(clippy::all)]\n' + IMPORTS + '\n')
+    body = (f'#[derive(Debug, Clone, PartialEq)]\npub struct {sname} {{\n' + '\n'.join(fields) + '\n}\n\n'
+            f'impl {sname} {{\n    /// Read them from an image of the stack segment, with the procedure\'s BP.\n'
+            f'    pub fn load(ss: &[u8], bp: u16) -> Result<Box<Self>, ShortRead> {{\n'
+            f'        let r = &mut PascalReader::new(ss);\n        Ok(Box::new({sname} {{\n' + '\n'.join(loads) + '\n        }))\n    }\n\n'
+            f'    pub fn store(&self, ss: &mut [u8], bp: u16) {{\n        let w = &mut PascalWriter::new(ss);\n' + '\n'.join(stores) + '\n    }\n}\n')
+    return head + body + '\n' + '\n'.join(v for v in out_structs.values() if v)

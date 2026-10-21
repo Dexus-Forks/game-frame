@@ -116,6 +116,7 @@ expect "tdinfo writes the Rust Pascal reader and writer" "pub struct PascalWrite
 expect "tdinfo writes record writers" "w.u16(self.total);" "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe rust SampleState
 g="$(mktemp -d)/globals"; "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe rust-globals "$g" >/dev/null
 expect "tdinfo writes Globals per unit at their DS offsets" "w.seek(0x4); w.u16(self.total);" cat "$g/sample.rs"
+expect "tdinfo writes a procedure's locals at their BP offsets" "[bp+6] range: Word" "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe rust-locals rng_next
 expect "tdinfo joins the units into Globals" "pub sample: sample::Sample," cat "$g/mod.rs"
 "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe labels > $D/labels.tsv
 expect "nedis applies relocations and names far calls" "lcall   KERNEL.3" "$PYTHON" tools/dos/nedis.py $D/sample.exe 1000:008c 6 --labels $D/labels.tsv
