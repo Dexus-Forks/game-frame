@@ -2,7 +2,7 @@
 
 Williams built 6809 boards for Defender and Robotron. Midway's Y, T and W-units ran their games
 on the TMS34010 graphics CPU at the slowest refresh of the late 2D boards. Much of the original
-assembly source for these games has surfaced. Midway Zeus, the later 3D board, runs its game on
+assembly source for these games is now public. Midway Zeus, the later 3D board, runs its game on
 a TI DSP with a custom 3D controller.
 
 | Board | Years | Main CPU and clock | Sound | Refresh | Protection | MAME status | Ghidra |
@@ -25,7 +25,7 @@ Williams' 6809 hardware ran Defender (1980) and Robotron 2084 (1982, Williams an
 - Early games use an M6802 sound CPU. Later ones use an M6808.
 - The memory map puts a blitter at CA00 to CA07. The driver notes that "Stargate and Defender
   do not have blitter".
-- A watchdog sits at CBFF.
+- A watchdog is at CBFF.
 - 1K by 4 bits of battery-backed CMOS RAM at CC00 to CFFF holds settings and high scores.
 
 ### Protection
@@ -35,8 +35,8 @@ None listed.
 ### Tools
 
 Ghidra's MC6800 module holds the 6809 spec
-([CPU families](../computers/cpu-families.md#the-6809)). Unicorn has no 6809 backend. Ground
-truth comes from MAME's debugger and Lua, or from a small 6809 core.
+([CPU families](../computers/cpu-families.md#the-6809)). Unicorn has no 6809 backend. Take
+ground truth from MAME's debugger and Lua, or from a small 6809 core.
 
 ### Projects to learn from
 
@@ -51,16 +51,17 @@ truth comes from MAME's debugger and Lua, or from a small 6809 core.
 
 The repository descriptions are short game blurbs. The repositories give no licence or
 provenance statement. No primary source shows an official release of the Defender or Robotron
-source by Williams or Eugene Jarvis. GameFrame's rule of no game material keeps this source out
-of a project's own repository. Treat it as third-party evidence ([Legal](../LEGAL.md)).
+source by Williams or Eugene Jarvis. GameFrame's rule against game material means a project does
+not copy this source into its own repository. Treat it as third-party evidence
+([Legal](../LEGAL.md)).
 
 ### For an exact reimplementation
 
 - Load the CMOS settings and high scores as an input to each test
   ([practices](practices.md#nvram-and-dip-settings-as-test-inputs)).
 - Model the blitter on games that have it. Defender and Stargate do not.
-- The source shows intent. The shipped ROM is the reference for exact behaviour, because the
-  source may not match the final revision.
+- The source shows what the programmers meant. It may not match the final revision, so use the
+  shipped ROM for exact behaviour.
 
 ## Midway Y-unit and Z-unit
 
@@ -75,7 +76,7 @@ The Y-unit ran Smash TV (1990) and Mortal Kombat. NARC (1988) ran on the related
 - Sound is Williams CVSD or ADPCM. The ADPCM sets have a Z80 at 4 MHz and an MSM6295.
 - Standard-resolution timing uses 506 by 289 totals, about 54.71 Hz (computed).
 
-MAME gives the TMS34010 its input clock. The chip's effective instruction rate is a fraction of
+MAME sets the TMS34010's input clock. The chip's effective instruction rate is a fraction of
 that clock (not confirmed).
 
 ### Protection
@@ -85,8 +86,8 @@ None listed.
 ### Tools
 
 - The [Ghidra_TMS34010](https://github.com/ZPaul2Fresh8/Ghidra_TMS34010) extension adds the
-  TMS34010. How complete it is is not confirmed.
-- Ghidra has no built-in TMS34010 module. Unicorn has none either. MAME is the runner for
+  TMS34010. Its completeness is not confirmed.
+- Ghidra has no built-in TMS34010 module. Unicorn has none either. Use MAME to produce
   ground truth.
 
 ### Projects to learn from
@@ -145,7 +146,7 @@ The W-unit ran Mortal Kombat 3 (1994) and WWF WrestleMania (1995). It adds an AD
 
 ### Protection
 
-A PIC16C57 security chip sits on the board. Ghidra has a built-in PIC module
+The board has a PIC16C57 security chip. Ghidra has a built-in PIC module
 ([protection](protection.md#protection-mcus)).
 
 ### Tools
@@ -159,7 +160,7 @@ None listed beyond the T-unit sources.
 ### For an exact reimplementation
 
 - Check whether MAME runs the PIC16C57's dumped program or a simulation.
-- The ADSP-2105 sound program is a separate instruction set to trace.
+- The ADSP-2105 sound program uses a different instruction set. Trace it separately.
 
 ## Midway Zeus
 
@@ -180,8 +181,8 @@ None listed.
 
 ### Tools
 
-- The 2018 talk calls MAME's support imperfect. The driver's current flags are an open
-  question.
+- The 2018 talk calls MAME's support imperfect. The driver's current flags are
+  unknown.
 - Ghidra has no built-in TMS320 module. Unicorn has none either.
 
 ### Projects to learn from

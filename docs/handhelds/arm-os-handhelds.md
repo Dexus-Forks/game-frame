@@ -1,8 +1,7 @@
 # ARM-OS handhelds
 
-The N-Gage, Gizmondo, GP32 and GP2X run ARM code on an operating system. **Their games are ARM
-code calling an operating system**, so the imports and OS calls matter as much as the CPU, much
-as in a Windows PE game. Ghidra's ARM module covers all four devices. Unicorn's ARM support can
+The N-Gage, Gizmondo, GP32 and GP2X run ARM code on an operating system. **Study a game's
+imports and OS calls as closely as its CPU code**, as for a Windows PE game. Ghidra's ARM module covers all four devices. Unicorn's ARM support can
 run their functions
 ([Ghidra Processors on GitHub](https://github.com/NationalSecurityAgency/ghidra/tree/master/Ghidra/Processors);
 [Unicorn Engine](https://www.unicorn-engine.org/)).
@@ -41,7 +40,7 @@ Whether it has a GDB stub is not confirmed.
 ### For an exact reimplementation
 
 EKA2L1 reimplements the OS at high level. Code that depends on exact OS behaviour may differ
-from a real N-Gage. Running a single function under Unicorn needs stubs for the Symbian calls it
+from a real N-Gage. To run a single function under Unicorn, write stubs for the Symbian calls it
 makes.
 
 ## Gizmondo
@@ -57,11 +56,11 @@ camera. Fourteen games were released. Only eight reached the US
 
 ### Tools
 
-No sourced emulator exists for it.
+No emulator is known for it.
 
 ### For an exact reimplementation
 
-Running a single function under Unicorn needs stubs for the Windows CE calls it makes. GPS, GPRS
+To run a single function under Unicorn, write stubs for the Windows CE calls it makes. GPS, GPRS
 and the camera are outside inputs ([Handheld practices](practices.md#sensors-and-other-inputs)).
 
 ## GP32
@@ -76,7 +75,7 @@ the need for the "Free Launcher" ([Wikipedia: GP32](https://en.wikipedia.org/wik
 
 ### Tools
 
-GP32 executable formats and emulators with debuggers are not confirmed here.
+The GP32's executable formats are not confirmed. Neither is any emulator with a debugger.
 
 ## GP2X
 
@@ -91,4 +90,4 @@ touchscreen and a d-pad ([Wikipedia: GP2X](https://en.wikipedia.org/wiki/GP2X)).
 
 ### Tools
 
-Emulators with debuggers are not confirmed here.
+No emulator with a debugger is confirmed.

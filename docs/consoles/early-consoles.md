@@ -1,9 +1,9 @@
 # Early consoles
 
 The first and second generation consoles have tiny ROMs, no operating system and well-known
-CPUs. Most of them use a 6502 family CPU, a Z80, a 6809 or the CP1600, and Ghidra builds in all
-four. On several of these machines the timing is part of the game logic, so cycle-exact traces
-from an emulator are the ground truth.
+CPUs. Most of them use a 6502 family CPU, a Z80, a 6809 or the CP1600. Ghidra builds in all four.
+On several of these machines the game logic depends on exact CPU timing. Take ground truth from
+cycle-exact emulator traces.
 
 ## The consoles
 
@@ -29,8 +29,8 @@ rewire jumpers ([Magnavox Odyssey](https://en.wikipedia.org/wiki/Magnavox_Odysse
 
 ### For an exact reimplementation
 
-The Odyssey cannot be reverse engineered as software. A port is a circuit simulation, closer
-to the discrete-logic arcade games.
+The Odyssey has no software to reverse engineer. A port has to simulate the circuit, as for
+the discrete-logic arcade games.
 
 ## Atari 2600
 
@@ -58,9 +58,9 @@ Commented 2600 disassemblies appear on AtariAge (not confirmed) ([AtariAge](http
 
 ### For an exact reimplementation
 
-Timing is the game. A faithful rebuild must model the cycles in each scanline. Cycle-exact
-emulator traces are the ground truth. Record the bank-switching scheme of the cartridge, as a
-function's address needs its bank.
+A port must model the CPU cycles in each scanline. Take ground truth from cycle-exact
+emulator traces. Record the cartridge's bank-switching scheme, because a function's address
+identifies it only together with its bank.
 
 ## Intellivision
 
@@ -69,10 +69,10 @@ function's address needs its bank.
 The CP1610 addresses only 16-bit words and uses 10 bits of each opcode. R7 is the program
 counter and R6 the stack pointer. SDBD builds a 16-bit operand from two 10-bit ROM reads
 ([Wikipedia: CP1600](https://en.wikipedia.org/wiki/General_Instrument_CP1600)). The STIC makes
-the video and an AY-3-8914 makes the sound. Game code calls into the Executive ROM
+the video. An AY-3-8914 makes the sound. Game code calls into the Executive ROM
 ([Intellivision](https://en.wikipedia.org/wiki/Intellivision)).
 
-The clock figure conflicts between sources. One gives about 894.886 kHz, the NTSC colour clock
+Sources give different clock speeds. One gives about 894.886 kHz, the NTSC colour clock
 divided by 4. The CPU article gives about 2 MHz for the CP1610.
 
 ### Tools
@@ -85,20 +85,20 @@ file carries a BSD-3-Clause header.
 
 ### For an exact reimplementation
 
-Many games call into the Executive ROM, so that ROM is part of the behaviour. Trace the calls
-into it as well as the cartridge code.
+Many games call into the Executive ROM, so a port must reproduce what that ROM does. Trace
+the calls into it as well as the cartridge code.
 
 ## ColecoVision
 
 ### Hardware
 
-The Z80A runs at 3.58 MHz. A TMS9928A with 16 KB of VRAM makes the video and an SN76489A makes
+The Z80A runs at 3.58 MHz. A TMS9928A with 16 KB of VRAM makes the video. An SN76489A makes
 the sound. The console has 1 KB of RAM and an 8 KB BIOS
 ([ColecoVision](https://en.wikipedia.org/wiki/ColecoVision)).
 
 ### Tools
 
-Ghidra builds in the Z80. Unicorn and Capstone have no Z80, so ground truth comes from a small
+Ghidra builds in the Z80. Unicorn and Capstone have no Z80, so take ground truth from a small
 core such as [iz80](https://github.com/ivanizag/iz80) (BSD-3, passes ZEXALL) or from MAME.
 
 ## Atari 5200
@@ -112,7 +112,7 @@ The SALLY 6502C runs at 1.79 MHz. ANTIC, GTIA and POKEY make the video and sound
 ### Hardware
 
 SALLY runs at 1.79 MHz and drops to 1.19 MHz when it accesses the TIA or the RIOT. MARIA makes
-the video and the TIA makes the sound. The console has 4 KB of RAM
+the video. The TIA makes the sound. The console has 4 KB of RAM
 ([Atari 7800](https://en.wikipedia.org/wiki/Atari_7800)).
 
 ### For an exact reimplementation
@@ -134,9 +134,10 @@ The 6809 joins A and B into a 16-bit D register. It has an 8x8 hardware multiply
 Ghidra builds in the 6809 under `MC6800`, and describes it as big-endian
 ([6800.ldefs](https://github.com/NationalSecurityAgency/ghidra/blob/master/Ghidra/Processors/MC6800/data/languages/6800.ldefs)).
 [ghidra-vectrex-loader](https://github.com/nevesnunes/ghidra-vectrex-loader) loads cartridges.
-Capstone has an `M680X_6809` mode. Unicorn has no 6809, and MAME's m6809 core file carries a
+Capstone has an `M680X_6809` mode. Unicorn has no 6809. MAME's m6809 core file carries a
 BSD-3-Clause header.
 
 ### For an exact reimplementation
 
-The CPU drives the beam, so the drawing is done by game code. Trace it like the game logic.
+The CPU drives the beam, so game code does the drawing. Trace the drawing code like the game
+logic.

@@ -1,8 +1,10 @@
 # Sinclair ZX81 and ZX Spectrum
 
 The Sinclair machines use the Z80 ([CPU families](cpu-families.md#the-8080-z80-and-sm83)). On
-the ZX81 the CPU also generates the display. On the Spectrum, contended memory ties every instruction's timing to the screen. The tables differ by model. Spectrum games came mostly
-on tape, often with turbo or protected loaders.
+the ZX81 the CPU also generates the display. On the Spectrum, the ULA delays the CPU when both
+use contended memory. An instruction's timing therefore depends on where the ULA is in the
+frame. The contention tables differ by model. Spectrum games came mostly on tape, often with
+turbo or protected loaders.
 
 ## Sinclair ZX81
 
@@ -67,7 +69,8 @@ port `0x7FFD` selects the RAM page at `0xC000`, the shadow screen, the ROM and a
 +2A and +3 add port `0x1FFD` for all-RAM modes (not confirmed)
 ([Sinclair Wiki: ZX Spectrum 128](https://sinclair.wiki.zxnet.co.uk/wiki/ZX_Spectrum_128)).
 
-**Contended memory** is the Spectrum's timing trap. It differs by model
+**Contended memory.** The ULA delays CPU accesses to contended memory while it reads the
+screen. The delays differ by model
 ([Sinclair Wiki: Contended memory](https://sinclair.wiki.zxnet.co.uk/wiki/Contended_memory)).
 
 | Model | Contended area | First contended T-state | Delay pattern per 8 T-states | T-states per line |
@@ -101,7 +104,7 @@ The +3 used 3-inch disks protected with non-standard sectors (not confirmed)
 | SZX | Snapshot with fuller machine state |
 | RZX | A recording of input for replay (not confirmed) |
 
-TZX exists to preserve the loaders. Revision 1.20 stores pilot, sync and bit timings in
+TZX was designed to keep turbo and protected loaders working. Revision 1.20 stores pilot, sync and bit timings in
 T-states at 3.5 MHz. It also stores pulse sequences, direct recordings and generalised symbol
 encodings. Block `0x10` is standard timing and `0x11` turbo. Block `0x13` is a pulse sequence
 used by some protections. Block `0x15` is a direct recording and `0x19` generalised data
@@ -130,8 +133,8 @@ The community references are Spectrum Computing
 SkoolKit's published disassemblies include Skool Daze, Back to Skool, Contact Sam Cruise,
 Manic Miner, Jet Set Willy, Hungry Horace and the 48K ROM
 ([SkoolKit disassemblies](https://skoolkit.ca/disassemblies/)). Each one reassembles byte for
-byte to the original. That gives an exact oracle for a port. Whether a disassembly includes
-game bytes, and under what licence, needs checking before you copy anything from it.
+byte to the original. A port can check its results against them. Before you copy anything from
+a disassembly, check whether it includes game bytes and what its licence is.
 
 ### For an exact reimplementation
 

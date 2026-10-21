@@ -1,13 +1,13 @@
 # Encryption and protection
 
 Arcade encryption was usually built into a custom CPU and keyed from battery-backed RAM. When
-the battery dies, the key is lost and the board "suicides". Preservation work broke the
-ciphers. It extracted keys from live boards and later wrote keys back to revive dead ones.
-MAME's source holds the algorithm descriptions. The MAME driver is the working decryption an
-agent can follow. Decrypt the program before any disassembly.
+the battery dies, the key is lost and the board "suicides". Preservation groups broke the
+ciphers. They extracted keys from working boards. Later they wrote keys back into dead boards
+so that the boards run again. MAME's source describes each algorithm. Each MAME driver
+contains decryption code that an agent can follow. Decrypt the program before any disassembly.
 
 The law on working around protection differs by country ([Legal](../LEGAL.md),
-[the law worldwide](../preservation/law/README.md)). The choice of route stays with you.
+[the law worldwide](../preservation/law/README.md)). You decide which route to take.
 
 | Scheme | Maker | CPU | Encrypts | Key store | On a dead battery |
 |---|---|---|---|---|---|
@@ -33,17 +33,17 @@ Intel 8751 protection MCU. System 1 uses many encrypted Z80 parts (315-5033, 315
 ### Protection
 
 **FD1094** is a custom 68000. It decrypts only words fetched from program space and leaves data
-alone. Its key sits in 8 KB of battery-backed RAM. Decryption is a chain of conditional XORs
+alone. It keeps its key in 8 KB of battery-backed RAM. Decryption is a chain of conditional XORs
 and bit swaps controlled by 32 variables. Eight of them vary by address and repeat every 0x2000
 words. The CPU has 256 internal "states" that the program can switch. A final step replaces
-about 300 or about 5000 values with FFFF. That step blocks PC-relative dumping tricks. When the
-battery dies the CPU still runs, with a wrong key
+about 300 or about 5000 values with FFFF. This step stops tricks that dump the program through
+PC-relative reads. When the battery dies the CPU still runs, with a wrong key
 ([MAME: sega/fd1094.cpp](https://github.com/mamedev/mame/blob/master/src/mame/sega/fd1094.cpp)).
 
 **FD1089A and FD1089B** encrypt opcodes and data with related mappings. Only 8 of each 16 bits
 change. Only 12 address bits select the key. MAME's notes call it clearly derived from the
-Z80-based MC8123 and much weaker. Fewer than 128 bytes of its 16 KB internal RAM decrypt a whole
-game. When the battery dies this CPU stops
+Z80-based MC8123 and much weaker. Fewer than 128 bytes of its 16 KB internal RAM are enough to
+decrypt a whole game. When the battery dies this CPU stops
 ([MAME: sega/fd1089.cpp](https://github.com/mamedev/mame/blob/master/src/mame/sega/fd1089.cpp)).
 
 Later Sega boards use the 315-5881 crypt device and per-game key chips. They are on the
@@ -52,7 +52,7 @@ pages.
 
 ### Tools
 
-MAME's FD1094 and FD1089 code is the decryption to follow. Who extracted the FD1094 keys, and
+Follow MAME's FD1094 and FD1089 code to decrypt these CPUs. Who extracted the FD1094 keys, and
 how, is not confirmed from a primary source.
 
 ### Projects to learn from
@@ -62,7 +62,7 @@ None listed yet.
 ### For an exact reimplementation
 
 - An FD1094 program can switch state at run time. A static decrypt needs the state of each
-  code region. Take ground truth from a running emulator for that reason.
+  code region. Take ground truth from a running emulator.
 - A dump from a dead-battery FD1094 board runs with a wrong key. Check that the set in use
   holds the right key.
 
@@ -80,9 +80,10 @@ With the battery removed, pulling pin 28 low makes it behave as a normal Z80. Th
 swaps of adjacent bit pairs, rotations and an XOR. It treats opcodes and data differently
 ([MAME: capcom/kabuki.cpp](https://github.com/mamedev/mame/blob/master/src/mame/capcom/kabuki.cpp)).
 
-**CPS-2** encrypts its main program. The key sits in SRAM inside a battery-powered custom IC. A
-board with a dead battery shows only a blue or green screen. The driver notes that no CPS-2
-game encrypted its sound program. Kabuki parts still appear as the sound Z80 on some boards
+**CPS-2** encrypts its main program. The key is stored in SRAM inside a battery-powered custom
+IC. A board with a dead battery shows only a blue or green screen. The driver notes that no
+CPS-2 game encrypted its sound program. Kabuki parts still appear as the sound Z80 on some
+boards
 ([MAME: capcom/cps2.cpp](https://github.com/mamedev/mame/blob/master/src/mame/capcom/cps2.cpp)).
 
 Andreas Naive broke the CPS-2 algorithm. Nicola Salmoria wrote the code. Charles MacDonald and
@@ -94,7 +95,7 @@ battery-backed RAM
 The full break came in January 2007 (secondary source)
 ([Capcom wiki (Wikipedia-derived)](https://capcom.fandom.com/wiki/CPS2)).
 
-**CPS-3** decrypts inside the SH-2 derivative on the security cartridge. The key sits in
+**CPS-3** decrypts inside the SH-2 derivative on the security cartridge. The key is stored in
 battery-powered SRAM on the CPU die. The CPU monitors voltage and cart removal. It erases the
 key on tampering. A dead cartridge is thought to fall back to keys identical to SFIII 2nd
 Impact. Reflashing verified this. The data on the CD and SIMMs is not encrypted beyond the boot
@@ -107,7 +108,7 @@ the boards
 
 ### Tools
 
-Collectors revive CPS-2 boards in several ways (secondary source)
+Collectors make dead CPS-2 boards work again in several ways (secondary source)
 ([Capcom wiki](https://capcom.fandom.com/wiki/CPS2);
 [shmups.system11.org forum](https://shmups.system11.org/viewtopic.php?p=1390355);
 [MiSTer forum: Phoenix ROMs](https://mail.misterfpga.org/viewtopic.php?p=36552)).
@@ -118,9 +119,9 @@ Collectors revive CPS-2 boards in several ways (secondary source)
 - Hardware key writers exist, for example InfiniKey.
 
 In September 2016 ArcadeHacker, with Eduardo Cruz and others, published a CPS-2 "desuicide"
-method. It reverse engineered the key-loading protocol. The code is on GitHub. It needs only an
-Arduino and test clips to write a key back. A follow-up on 3 April 2017 described at least 11
-types of Capcom custom security silicon
+method. To make it, they reverse engineered the key-loading protocol. The code is on GitHub. It
+needs only an Arduino and test clips to write a key back. A follow-up on 3 April 2017 described
+at least 11 types of Capcom custom security silicon
 ([Hackaday: desuicide tag](https://hackaday.com/tag/desuicide)).
 
 ### Projects to learn from
@@ -167,7 +168,7 @@ None listed yet.
 
 ### Hardware
 
-The late Neo Geo games carry protection chips that MAME lists
+Late Neo Geo games have protection chips. MAME lists them
 ([MAME: snk/neogeo.cpp](https://github.com/mamedev/mame/blob/master/src/mame/snk/neogeo.cpp)).
 Example sets are The King of Fighters '99, 2000 and 2003.
 
@@ -197,7 +198,7 @@ None listed yet.
 
 ### Hardware
 
-Protection MCUs appear across makers.
+Many makers used protection MCUs.
 
 | Maker | Board or game | MCU |
 |---|---|---|
@@ -219,8 +220,8 @@ never dumped, MAME may use a simulation.
 
 ### Tools
 
-Ghidra has built-in 8051 and PIC modules. Its MC6800 module holds the 6800 and 6805 specs. The
-Taito 68705 dumping history is not traced.
+Ghidra has built-in 8051 and PIC modules. Its MC6800 module holds the 6800 and 6805 specs. How the
+Taito 68705 ROMs were dumped is not covered here.
 
 ### Projects to learn from
 
@@ -229,5 +230,5 @@ None listed yet.
 ### For an exact reimplementation
 
 - Check whether MAME runs the MCU's dumped ROM or a simulation. A port built on a simulation
-  inherits any error in it.
+  has the same errors as the simulation.
 - Treat the MCU program as part of the game. Trace it like the main CPU.

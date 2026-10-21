@@ -1,7 +1,8 @@
 # A taxonomy of games
 
-Games are not all reverse engineered the same way. A shooter's difficulty sits in its frame
-loop, a city builder's in its simulation and saves, an adventure's in its script engine. This
+Games are not all reverse engineered the same way. The hard part differs by kind of game:
+the frame loop in a shooter, the simulation and saves in a city builder, the script engine in
+an adventure game. This
 section sorts games into families, gives each family a **rule set** (what must be exact, where
 the rules live, what to capture, how to check), names reference games, and lists public
 projects that rebuilt such games, so you can learn from them.
@@ -33,7 +34,7 @@ In my GameFrame project, classify the game.
 
 ## Axes
 
-Every game sits somewhere on each of these axes. Together they predict most of the work.
+Find your game's value on each of these axes. The values show where most of the work will be.
 
 | Axis | Values | Why it matters |
 |---|---|---|
@@ -62,8 +63,8 @@ Every game sits somewhere on each of these axes. Together they predict most of t
 
 ## Connections
 
-Families share systems. When a family page says "see also", it is because the same system,
-traced once, appears in another kind of game. The table shows the main shared systems and
+Many systems appear in several families. A family page says "see also" when a system it
+describes also appears in another kind of game. You trace such a system once. The table shows the main shared systems and
 where to read about each.
 
 | System | Families where it matters most | Read |
@@ -86,7 +87,7 @@ where to read about each.
 
 ## Approaches you will see in other projects
 
-The family pages list public projects that rebuilt games. They took different routes. The route decides what you can learn from each.
+The family pages list public projects that rebuilt games. What you can learn from each one depends on the route it took.
 
 | Approach | What it means | What you can learn from it |
 |---|---|---|

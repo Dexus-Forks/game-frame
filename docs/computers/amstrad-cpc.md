@@ -2,7 +2,7 @@
 
 The Amstrad CPC uses the Z80 ([CPU families](cpu-families.md#the-8080-z80-and-sm83)). Wait
 states stretch every instruction to a multiple of 4 T-states. The CRTC type changes the edges
-of the picture, which matters for split screens and overscan. CPC tapes use the TZX structure.
+of the picture. Games with split screens or overscan depend on those edges. CPC tapes use the TZX structure.
 
 ## CPC 464, 664, 6128 and the Plus range
 
@@ -29,7 +29,7 @@ Source: [Wikipedia: Amstrad CPC](https://en.wikipedia.org/wiki/Amstrad_CPC).
 **Timing.** Every instruction is stretched to a multiple of 4 T-states. The unit is the "NOP
 time" of 1 microsecond (not confirmed)
 ([CPCWiki: CPU timing](https://www.cpcwiki.eu/index.php/Z80)). CRTC types 0 to 4 differ at the
-edges. That matters for split screens and overscan (not confirmed)
+edges. Games with split screens and overscan depend on these differences (not confirmed)
 ([CPCWiki: CRTC](https://www.cpcwiki.eu/index.php/CRTC)). The gate array interrupts every 52
 lines, six times a frame (not confirmed)
 ([CPCWiki: Gate Array](https://www.cpcwiki.eu/index.php/Gate_Array)).
@@ -65,5 +65,6 @@ None listed yet.
 - Count time in NOP units of 4 T-states. A Z80 cycle table from another machine gives the wrong
   times.
 - Record the CRTC type of the reference machine if the game uses split screens or overscan.
-- Tie the game's frame to the gate array's six interrupts per frame where the game does.
+- If the game times its frame from the gate array's six interrupts per frame, the port must do
+  the same.
 - Keep the extended DSK or CDT image as the record of what shipped.

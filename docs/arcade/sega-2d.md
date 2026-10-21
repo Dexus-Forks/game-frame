@@ -27,14 +27,14 @@ Intel 8751 protection MCU. The [protection page](protection.md#sega) describes e
 
 - The FD1094 decrypts program-space words only. It has 256 internal states that the program can
   switch.
-- The FD1089 encrypts opcodes and data. Fewer than 128 bytes of its internal RAM decrypt a
-  whole game.
+- The FD1089 encrypts opcodes and data. Fewer than 128 bytes of its internal RAM are enough
+  to decrypt a whole game.
 
 ### Tools
 
-- Ghidra's 68000 module and Unicorn's M68K backend apply after decryption
+- Ghidra's 68000 module and Unicorn's M68K backend work on the program after decryption
   ([CPU families](../computers/cpu-families.md#the-68000)).
-- MAME's `fd1094.cpp` and `fd1089.cpp` are the decryption to follow.
+- Follow MAME's `fd1094.cpp` and `fd1089.cpp` to decrypt the program.
 - The Intel 8751 MCU has a built-in Ghidra 8051 module.
 
 ### Projects to learn from
@@ -70,7 +70,7 @@ None listed yet.
 
 ### For an exact reimplementation
 
-- Run the port at 57.23 Hz. That rate is a measurement on a real board.
+- Run the port at 57.23 Hz. MAME's value for this rate was measured on a real board.
 
 ## X Board
 
@@ -80,7 +80,7 @@ The X Board ran After Burner and other sprite-scaling games
 ([MAME: sega/segaxbd.cpp](https://github.com/mamedev/mame/blob/master/src/mame/sega/segaxbd.cpp)).
 
 - Two 68000s run at 12.5 MHz from a 50 MHz master clock.
-- A 315-5248 multiplier and a 315-5250 compare and timer chip assist them.
+- The board also has a 315-5248 multiplier and a 315-5250 compare and timer chip.
 - The screen shows 320 by 224 at about 59.64 Hz (computed).
 - Some games add Z80s at 8 MHz for link and motor control.
 
@@ -98,8 +98,8 @@ None listed yet.
 
 ### For an exact reimplementation
 
-- Model the 315-5248 multiplier and the 315-5250 chip as the CPUs see them. Their results feed
-  the game logic.
+- Model the 315-5248 multiplier and the 315-5250 chip as the CPUs see them. The game logic uses
+  their results.
 - Run both 68000s interleaved.
 - On a game with link or motor Z80s, record what those CPUs send and receive.
 
@@ -126,6 +126,6 @@ None listed yet.
 
 ### For an exact reimplementation
 
-- Treat the Y Board's refresh rate as open. Measure it from a board or a recording before
+- Treat the Y Board's refresh rate as unknown. Measure it from a board or a recording before
   relying on it.
 - Run the three 68000s interleaved.

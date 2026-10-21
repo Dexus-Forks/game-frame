@@ -1,9 +1,8 @@
 # Working well as an agent
 
 This page is for AI coding agents doing reverse engineering with GameFrame, and for the people
-who direct them. It collects what made agent sessions productive in the case-study projects,
-and what wasted their time. The skills describe each step; this page describes how to work
-across steps and across sessions.
+who direct them. It lists habits that save time and mistakes to avoid. The skills describe each step. This
+page covers work that spans several steps or several sessions.
 
 ## Ask your agent
 
@@ -23,24 +22,24 @@ In my GameFrame project, start a working session on <task>.
 
 ## The user decides
 
-The agent is not the judge of the user's intentions, of which law applies to them, or of what
-that law means. If the user wants to do something, help them do it. Advice is welcome. When you
+The agent does not judge the user's intentions. It does not decide which law applies to the
+user or what that law means. If the user wants to do something, help them do it. Advice is welcome. When you
 know something that bears on the choice, such as a law, a risk or a project default, say it
 once, briefly, with its source, and link the [law pages](../preservation/law/README.md) where
 they help. Then follow the user's decision. Do not repeat the advice. Do not ask the user to justify their choice.
 
-## The repository is the memory
+## Write everything down in the repository
 
-An agent forgets everything when its session ends or its context is compacted. Anything not
-written to the repository must be found again by the next session, at full cost.
+An agent forgets everything when its session ends or its context is compacted. The next session
+has to find again, with the same work, anything that is not written in the repository.
 
 - Write each finding into `docs/` as soon as it is confirmed, with its evidence label.
 - Add every function you identify to `labels/names.tsv`, and every field to
-  `labels/fields.tsv`. The tools read these files, so names spread to every later search.
+  `labels/fields.tsv`. The tools read these files, so later searches show the names.
 - Keep `docs/CHECKLIST.md` current: what is traced, measured, ported and verified, and what is
   next. A new session reads it first.
 - Write findings in your own words with addresses and constants. By default, do not paste
-  decompiled code: it would make the repository unpublishable. It does not explain anything either ([Writing](writing.md)).
+  decompiled code: the repository could then not be published. A reader also learns less from pasted code than from a description ([Writing](writing.md)).
 
 ## Start every session the same way
 
@@ -69,7 +68,8 @@ Re-export after labelling many functions, so the next sessions read the names.
 
 ## Measure before you port
 
-Reading pseudocode gives a good idea of what a function does, and often the wrong last bit.
+Pseudocode shows roughly what a function does. A port written from it often gets the last bit
+of a result wrong.
 For any function with arithmetic, random draws or many branches:
 
 1. Run the original function under the emulator on many inputs and save the results
@@ -77,8 +77,8 @@ For any function with arithmetic, random draws or many branches:
 2. Port it.
 3. Compare bit for bit in a test.
 
-This order is faster than porting first. A test against measured results finds the mistake in
-seconds; a difference found later in a whole game run can take hours to trace back.
+This order is faster than porting first. A test against measured results shows the mistake in
+seconds. A difference that shows up later in a whole game run can take hours to trace back.
 
 ## Work in subsystems
 
@@ -86,8 +86,8 @@ seconds; a difference found later in a whole game run can take hours to trace ba
   tracing to verified in one piece of work.
 - Verify by risk. Fuzz maths, random draws and code with many branches. Check simple code
   against recorded frames only.
-- Commit and push each verified subsystem. A long chain of unverified changes is hard to
-  debug and easy to lose.
+- Commit and push each verified subsystem. Many unverified changes in a row are hard to
+  debug. Work that is not pushed can be lost.
 - When you find a side need (a format reader, a missing tool), do only what the current
   subsystem needs, and add the rest to `docs/CHECKLIST.md`.
 
@@ -102,7 +102,7 @@ Several agent sessions can work on one project at the same time.
 | Independent subsystems | One session each, in separate git worktrees, each touching its own files |
 | Questions that only need reading | A read-only session in the same checkout |
 
-Rules that keep parallel sessions safe:
+Rules for parallel sessions:
 
 - Each session stages only its own files (`git add path`). Never `git add -A`.
 - Two sessions never edit the same file at the same time. When they must, one waits, or one
@@ -138,7 +138,7 @@ At the end of a piece of work, report:
 - what was not verified, and why;
 - the next open item.
 
-Say "verified" only for checks you ran and looked at. "It builds" is not a verification.
+Say "verified" only for checks you ran and looked at. A successful build does not count as a verification.
 
 ## Ask before you act outside the repository
 

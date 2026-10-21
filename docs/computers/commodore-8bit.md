@@ -112,8 +112,8 @@ The formats below are (not confirmed)
 ### Tools
 
 - **VICE** has a monitor with breakpoints and a remote monitor protocol
-  ([vice-emu.sourceforge.io](https://vice-emu.sourceforge.io/)). A script can drive the remote
-  monitor, which suits capture by an agent
+  ([vice-emu.sourceforge.io](https://vice-emu.sourceforge.io/)). An agent can drive captures
+  through the remote monitor with a script
   ([re-observe](../../.claude/skills/re-observe/SKILL.md)).
 - **CCS64** runs on Windows.
 - Ghidra has the 6502 built in. Its `ADC` p-code is not exact

@@ -1,16 +1,16 @@
 # Who drives: the game or the player
 
-Before you read a game's code, decide what kind of control system you are rebuilding. It tells
+Before you read a game's code, decide what kind of control system you are rebuilding. The answer tells
 you where the hard parts are, what must be exact, and how to check the result. This page
 describes the four kinds of interaction; the [family pages](README.md#families) apply them to
 each kind of game.
 
-## Most games drive themselves
+## Games that run on their own clock
 
 Most software waits for the user. It shows a window, the user presses a button, and the program
 reacts through an event handler. Most games work the other way round. The game makes things
 happen on its own clock (enemies arrive, shots fly, the level scrolls, the town grows), and the
-player reacts through the few controls the game gives. That shapes the code:
+player reacts through the few controls the game gives. This affects the code in these ways:
 
 - **Look for the loop.** Find the loop that runs every frame or every tick, before the code
   behind any button. Almost everything happens inside it, in a fixed order. Find that order first. Write it down as a table.
@@ -21,32 +21,32 @@ player reacts through the few controls the game gives. That shapes the code:
   (the menu loop and the game loop each read it), and some act on key events inside the
   window's message handler. Find every place that reads input; [Inputs](../observe/inputs.md)
   lists where to look.
-- **The interface belongs to the game.** The HUD, status bar and messages are drawn by the frame
+- **The game draws its own interface.** The HUD, status bar and messages are drawn by the frame
   itself, often straight to the screen, with the game's own font and shapes. Menus are usually
   loops of their own, with their own input reading. Trace each screen like game
   logic ([Capturing the interface](../observe/ui.md)).
-- **Time and order are behaviour.** Because the game starts most events, the frame
-  count, the order of the steps in a frame and the random draws decide what happens. Verify frame by frame against the original. Keep the port's order exactly.
-- **Take everything from outside through one door.** The player's input is the obvious thing
-  the port does not own, but it is not the only one. The clock, the random seed, files and
+- **Time and order change the results.** Because the game starts most events, the frame
+  count, the order of the steps in a frame and the random draws determine what happens. Verify frame by frame against the original. Keep the port's order exactly.
+- **Take everything from outside through one door.** The player's input comes from outside
+  the port. So do the clock, the random seed, files and
   saves, settings, the hardware the game detects and, on Windows, the order of window messages
   also come from outside. Pass all of them in as one record per frame or per tick. Then a demo, a recording or a test script can drive the port. Two runs with the same record must give the same frames. [Inputs](../observe/inputs.md) has the full list.
-- **One boundary, once a frame.** The same record works the other way: out go the finished
-  picture and the songs and sounds the frame asked for. With one boundary in both
-  directions, the core runs headless from a demo, a test or a player, and the comparison with
-  the original stays exact.
+- **Send the outputs through the same record.** The frame's outputs leave the same way: the
+  finished picture and the songs and sounds the frame asked for. The core can then run
+  headless from a demo, a test or a player. Its outputs can be compared exactly with the
+  original's.
 
-## Some games wait for the player
+## Games that wait for the player
 
 Turn-based games, adventure games, puzzle and board games, visual novels and most menus work
 like ordinary software: nothing happens until the player acts. The code is a set of handlers
 around a state, or a script interpreter that stops at each choice. Here:
 
-- The **rules** are what matter: what a move or a command does to the state. Port them from the handler or the script engine. Check them move by move.
+- The **rules** say what a move or a command does to the state. Port them from the handler or the script engine. Check them move by move.
 - There may still be a loop that animates while the game waits. Its timing usually changes
   nothing in the state. Find out which parts are only animation and which change the state.
 - **Order of resolution** inside one turn (who moves first, in which order effects apply,
-  which random draws happen) is behaviour, exactly as frame order is in a real-time game.
+  which random draws happen) changes the result, as frame order does in a real-time game.
 - A recording is the list of commands.
 
 Many real-time games also wait at times: a pause, a dialogue, an inventory screen. Find the
@@ -63,8 +63,9 @@ Look at the game before its code. Play it, or watch it played. Then decide which
 | **An environment the player moves through** | The player moves freely; some things happen to them (walking into an area starts a fight), others they choose (talk, open, take) | Triggers and areas (what fires on entering, on being seen, on time), the interaction rules, the state they change; for online games, what the client decides and what the server decides | Morrowind, Ultima VII, Daggerfall, Frontier: Elite II, World of Warcraft |
 | **Turns and choices** | Nothing happens until the player acts; then the game resolves the move | The rules of each move, the order of resolution inside a turn, the script engine, the save state | Civilization, X-COM's battles, Heroes of Might and Magic, Monkey Island, Zork, chess |
 
-**How exact must the interface be?** That depends on the project's goal. A 1:1 reimplementation (such as Un-Banished) treats the interface as behaviour: the
-player sees it, so its layout, text, timing and quirks are ported as exactly as the simulation.
+**How exact must the interface be?** Each project decides from its goal. A 1:1 reimplementation (such as Un-Banished)
+ports the interface's layout, text, timing and quirks as exactly as the simulation, because the
+player sees them.
 A project that only wants the game's rules on a new interface can rebuild the screens by look
 and function, but it should say so in its deviations ledger. Decide this at the start and
 write it in the project's `AGENTS.md`.

@@ -1,9 +1,8 @@
 # Running the original
 
-Static analysis tells you what the code could do. Running the original tells you what it does.
-Run the game wherever you can watch it, drive it, and capture what it shows, plays, reads and
-keeps in memory. Most of the evidence that settles a question (*measured*, in GameFrame's
-labels) comes from these runs.
+A run of the original shows what the code does with real inputs. Run the game wherever you can watch it, drive it, and capture what it shows, plays, reads and
+keeps in memory. Most *measured* evidence (a label in GameFrame) comes from these
+runs.
 
 ## Where to run it
 
@@ -38,7 +37,7 @@ game material ([Legal](../LEGAL.md)).
 
 ## Driving the original
 
-A capture is only useful if you can make it again. Drive the original by script:
+Drive the original by script, so you can make each capture again:
 
 - In GameFrame's emulators, script the inputs: `dos_env` answers the BIOS and DOS key
   reads from a queue (`env.keys`). You can also write a game's own key table in memory between frames.
@@ -63,7 +62,7 @@ settings, the seed, the commands or the demo, and the frame.
 
 ![bitcompare.py and seqdiff.py on the sample game. The port matches the original in 600 of 600 values. Its 746 random draws are identical. A naive port in double precision matches only 7 values. It is 12 ULP off at most.](../assets/captures/bitcompare.svg)
 
-On the sample game, the port matches the emulated original bit for bit. Its random draws come in the same order. A port that computes in double precision instead of float drifts by a few ULP. The check catches it.
+On the sample game, the port matches the emulated original bit for bit. Its random draws come in the same order. A port that computes in double precision instead of float is off by a few ULP. `bitcompare.py` reports each difference.
 
 ## Further reading
 

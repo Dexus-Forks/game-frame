@@ -1,7 +1,7 @@
 # Switch family
 
 The Switch, Switch Lite and Switch 2 run AArch64 code. Games ship as NSO files inside encrypted
-NCA containers. A decrypted dump and the right Ghidra loader come before any analysis. The
+NCA containers. Before any analysis, you need a decrypted dump and the right Ghidra loader. The
 Switch 2 adds Game-Key Cards and a display that runs up to 120 Hz with VRR.
 
 ## The devices
@@ -40,7 +40,7 @@ Island federal court entered a permanent injunction against offering yuzu or sof
 circumvents Nintendo's protections. The yuzu domain went to Nintendo
 ([Android Authority](https://androidauthority.com/nintendo-switch-yuzu-settlement-3422388);
 [Nintendo World Report](https://www.nintendoworldreport.com/news/66510/creators-of-yuzu-emulator-settle-lawsuit-with-nintendo)).
-Citra came down at the same time ([Wikipedia: Citra](https://en.wikipedia.org/wiki/Citra_(emulator))).
+Citra was taken down at the same time ([Wikipedia: Citra](https://en.wikipedia.org/wiki/Citra_(emulator))).
 The 2024 to 2026 cases ended in settlements. No court ruling on console emulators is known from
 that period. The user decides how to obtain and use their own keys and dumps.
 
@@ -48,9 +48,9 @@ that period. The user decides how to obtain and use their own keys and dumps.
 
 Repositories can disappear, so pin an exact emulator build and keep a local copy.
 
-On the Switch, yuzu ended in March 2024. Ryubing, a Ryujinx fork at ryujinx.app, moved to
+On the Switch, yuzu development stopped in March 2024. Ryubing, a Ryujinx fork at ryujinx.app, moved to
 maintenance in February 2026. Eden and Citron are described as the active forks. Suyu was an
-early fork. A February 2026 wave of takedown notices reportedly hit at least 13 Switch
+early fork. In February 2026, takedown notices reportedly targeted at least 13 Switch
 projects, including Citron, Eden and Ryubing. These Switch facts come from secondary 2026
 coverage ([tech-insider: Eden vs Ryubing](https://tech-insider.org/eden-vs-ryubing-best-switch-emulator-2026/);
 [tech-insider](https://tech-insider.org/?p=23388)).
@@ -86,10 +86,10 @@ as a mouse ([Wikipedia: Nintendo Switch 2](https://en.wikipedia.org/wiki/Nintend
 ### Tools
 
 The code is AArch64, which Ghidra's AARCH64 module and Unicorn's ARM64 support cover. Its
-security and homebrew status are not sourced here. No Switch 2 emulator is named.
+security and homebrew status are not confirmed. No Switch 2 emulator is known.
 
 ### For an exact reimplementation
 
 With VRR and up to 120 Hz, a Switch 2 game sets its own frame rate within what the display
-allows. A port records that rate per test. The Game-Key Card and the Joy-Con 2 mouse are
+allows. Record that rate in each test. The Game-Key Card and the Joy-Con 2 mouse are
 outside inputs ([Handheld practices](practices.md#sensors-and-other-inputs)).

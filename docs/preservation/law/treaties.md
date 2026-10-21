@@ -1,8 +1,9 @@
 # Treaties
 
-This page is not legal advice. The law that applies is the law where you live.
+This page is not legal advice. The law of the country where you live applies to you.
 
-International treaties set minimum rules that most countries share. They do not give anyone a right to study a program. They do not forbid it either. Each country decides that within limits.
+International treaties set minimum rules that most countries share. They neither give a right to study a program nor forbid it. Each country decides this within
+the limits the treaties set.
 
 ## What the treaties require
 
@@ -22,7 +23,7 @@ International treaties set minimum rules that most countries share. They do not 
   ([WCT agreed statements](https://www.wipo.int/wipolex/en/text/295456)).
 - **Locks get "adequate legal protection".** WCT Art. 11 asks for protection against breaking
   technical locks that restrict acts "not authorized ... or permitted by law". It says nothing
-  about tools. Those words leave room for a country to allow circumvention for a use an
+  about tools. Under this wording, a country can allow circumvention for a use an
   exception already permits.
 
 WIPO lists 119 parties to the WCT
@@ -33,7 +34,7 @@ cannot join WIPO treaties, but it is a WTO member.
 
 ## Trade agreements that go further
 
-US free trade agreements export a stricter model. The USMCA (CUSMA) between the US, Mexico and
+US free trade agreements contain stricter rules. The USMCA (CUSMA) between the US, Mexico and
 Canada is an example
 ([USMCA chapter 20](https://ustr.gov/sites/default/files/files/agreements/FTA/USMCA/Text/20-Intellectual-Property-Rights.pdf)).
 
@@ -46,8 +47,8 @@ Canada is an example
 - Art. 20.62 sets copyright at life plus 70 years, or 75 years from publication for company
   works. Canada moved to life plus 70 on 30 December 2022 for this reason.
 
-Similar rules sit in the US agreements with Australia, Singapore, Chile, Korea, Jordan, Morocco,
-Bahrain and Central America
+The US agreements with Australia, Singapore, Chile, Korea, Jordan, Morocco, Bahrain and
+Central America have similar rules
 ([EFF comparison](https://www.eff.org/pages/seven-lessons-comparison-technological-protection-measure-provisions)).
 When the US left the Trans-Pacific Partnership, the other eleven countries suspended its term
 and lock articles in the CPTPP
@@ -61,11 +62,11 @@ countries exclude computer programs from library copying
 ([SCCR/35/6](https://www.wipo.int/edocs/mdocs/copyright/en/sccr_35/sccr_35_6.docx)). WIPO's
 committee has not agreed a treaty. A draft from October 2026 defines preservation to include
 moving works "to stable technological formats"
-([SCCR/49/5](https://www.wipo.int/edocs/mdocs/copyright/en/sccr_49/sccr_49_5.pdf)). It binds no
-one and serves institutions only.
+([SCCR/49/5](https://www.wipo.int/edocs/mdocs/copyright/en/sccr_49/sccr_49_5.pdf)). The draft is not
+binding. It covers only institutions.
 
-No country gives a private owner a right to preserve a game. A private owner relies on the
-software exceptions on the regional pages.
+No country gives a private owner a right to preserve a game. A private owner can rely only on
+the software exceptions on the regional pages.
 
 ## How countries classify games
 
@@ -73,13 +74,13 @@ WIPO's 2013 study found that no country has settled how to classify games
 ([WIPO study](https://www.wipo.int/edocs/pubdocs/en/wipo_report_cr_vg.pdf)). Canada, China,
 Russia, Singapore and Spain treat games mainly as programs. The US, Germany, Japan, India and
 others protect each part by its own kind: code as a program, art as art, music as music. Kenya
-and South Korea treat games mainly as audiovisual works. The classification decides which term
-and which exceptions apply.
+and South Korea treat games mainly as audiovisual works. The copyright term and the
+exceptions that apply to a game depend on how the country classifies it.
 
 ## Heritage
 
 UNESCO's 2003 Charter on the Preservation of the Digital Heritage names software, and asks
 countries for legal frameworks that support preservation
 ([UNESCO Charter](https://webarchive.unesco.org/web/20170127184223/http://unesdoc.unesco.org/images/0013/001311/131178e.pdf)).
-UNESCO backs the Software Heritage archive of source code. These texts support calling games
-heritage. They give no one a legal permission.
+UNESCO backs the Software Heritage archive of source code. UNESCO's texts treat software as
+heritage. They do not give anyone a legal permission.

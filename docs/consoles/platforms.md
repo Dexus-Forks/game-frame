@@ -2,8 +2,8 @@
 
 Each console has its own CPU, video chip, sound hardware and conventions. This page lists the
 home consoles most often studied, with what each means for reverse engineering and porting. The
-details here are summaries; the community documents for each console are far more complete
-and are named in each section.
+details here are summaries. Each section names the community documents for that console,
+which are far more complete.
 
 Other consoles have their own pages:
 
@@ -36,10 +36,10 @@ The Game Boy, Game Boy Advance and the other handhelds are in the
   middle of other code.
 - **The frame.** Almost every game runs its logic once per vertical blank (60 Hz in NTSC
   regions, 50 Hz in PAL regions). A frame that takes too long causes a "lag frame", where the
-  logic skips a frame. Lag frames are behaviour that speedrunners know well.
+  logic skips a frame. Speedrunners study lag frames closely.
 - **Coprocessors in cartridges.** Some SNES cartridges carry extra chips: the Super FX (a RISC
-  CPU for 3D, as in Star Fox), DSP-1 (maths), SA-1 (a faster 65C816). Their code must be
-  traced as well.
+  CPU for 3D, as in Star Fox), DSP-1 (maths), SA-1 (a faster 65C816). Trace their code
+  as well.
 - **PC Engine.** HuC6280 code disassembles mostly correctly with Ghidra's 65C02 language. The
   block-transfer and MMU instructions need the
   [Ghidra_HuC6280](https://github.com/TiCoKH/Ghidra_HuC6280) extension. The CD unit is on the
@@ -62,15 +62,15 @@ The Game Boy, Game Boy Advance and the other handhelds are in the
   and its own overflow flags. A port of a PlayStation game's 3D must reproduce the GTE's
   results exactly where the game uses them for logic (collision, positions). The psx-spx
   document describes every GTE operation.
-- **No floating point on the PlayStation.** Everything is integer or fixed point. That makes
-  exact ports easier: integer maths has no rounding mode.
+- **No floating point on the PlayStation.** Everything is integer or fixed point. Integer maths
+  has no rounding mode, so exact ports are easier.
 - **N64 microcode.** The game sends display lists to the RSP, which runs microcode (Fast3D,
   F3DEX and others). The microcode transforms and lights vertices and passes triangles to the
-  RDP. A port interprets the display lists. Projects such as the SM64 PC port show how.
+  RDP. A port interprets the display lists. The SM64 PC port is one project that does this.
 - **N64 floating point.** The VR4300 has an FPU with single and double precision. Games are
   mostly single precision. MIPS has no 80-bit intermediates, so the C code's float maths maps
-  well to modern 32-bit floats; check fused multiply-add is not used by the port's compiler.
-- **Saturn.** Two CPUs share the work, with their own caches. Find which code runs on which CPU
+  well to modern 32-bit floats. Check that the port's compiler does not use fused multiply-add.
+- **Saturn.** The two SH-2s share the work. Each has its own cache. Find which code runs on which CPU
   and how they synchronise. Few games of this platform have been studied in depth.
 - **Community documents.** psx-spx (PlayStation), N64brew Wiki (Nintendo 64), SegaXtreme and
   the Saturn hardware manuals.
@@ -90,18 +90,19 @@ The Game Boy, Game Boy Advance and the other handhelds are in the
   infinities or NaNs, clamp large values, and round differently. A port that uses normal
   floats gets different results at the edges. PCSX2's code and documents describe the
   differences.
-- **Vector unit microprograms.** PS2 games run their own programs on VU1 for geometry. Those
-  programs are part of the game and must be traced like other code.
+- **Vector unit microprograms.** PS2 games run their own programs on VU1 for geometry. Trace
+  those programs like the rest of the game's code.
 - **GameCube paired singles.** The Gekko can do two single-precision operations in one
   instruction, with its own quantisation instructions for loading and storing compressed
   values. Ghidra needs an extension to read them. The Wii shares the paired singles and the DOL and REL formats. It is covered on the [Seventh generation onward](modern.md) page.
 - **Xbox.** The code is x86 and uses a version of DirectX 8. Much of the PC advice applies.
 - **Compilers.** Games for these consoles were mostly written in C and C++ with known
   compilers (GCC versions for PS2, Metrowerks CodeWarrior for GameCube, MSVC for Xbox).
-  Knowing the compiler helps recognise library code and makes matching decompilation possible
-  ([Matching decompilation](matching-decomp.md)).
+  If you know the compiler, you can recognise library code. Matching decompilation also needs
+  the compiler ([Matching decompilation](matching-decomp.md)).
 
 ## Arcade boards
 
 Arcade games ran on boards built for one game or one family of games. They have their own
-section, [Arcade](../arcade/README.md), with MAME as the record of each board.
+section, [Arcade](../arcade/README.md). MAME's driver for each board is the main record of
+that board.

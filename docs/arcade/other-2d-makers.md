@@ -2,7 +2,7 @@
 
 This page covers the 2D boards of Namco, Konami, Taito, Irem, Data East, Toaplan and Cave. Most
 run a 68000 with a Z80 for sound. Each maker has its own crystal, so the refresh rates run from
-about 55 Hz to about 60.6 Hz. Several boards carry a protection MCU.
+about 55 Hz to about 60.6 Hz. Several boards have a protection MCU.
 
 | Board | Years | Main CPU and clock | Sound | Refresh | Protection | MAME status | Ghidra |
 |---|---|---|---|---|---|---|---|
@@ -23,7 +23,7 @@ about 55 Hz to about 60.6 Hz. Several boards carry a protection MCU.
 
 Namco System 1 (from 1987) runs three MC6809E at 1.536 MHz for the main, sub and sound tasks.
 An HD63701 MCU runs at 6.144 MHz. Sound is a YM2151 plus Namco's CUS30 wavetable. The screen
-keeps Namco's 60.61 Hz (computed)
+runs at Namco's usual 60.61 Hz (computed)
 ([MAME: namco/namcos1.cpp](https://github.com/mamedev/mame/blob/master/src/mame/namco/namcos1.cpp)).
 
 Namco System 2 uses two 68000s at 12.288 MHz, a YM2151 and a C140 PCM chip. It shows 288 by 224
@@ -46,14 +46,14 @@ None listed yet.
 
 ### For an exact reimplementation
 
-- Run the three System 1 CPUs interleaved, with the HD63701 beside them.
+- Run the three System 1 CPUs and the HD63701 interleaved.
 - Run the port at about 60.61 Hz.
 
 ## Konami 68000 boards
 
 ### Hardware
 
-Konami's 68000 boards, such as TMNT (1989), pair a 68000 at 8 MHz with a Z80 at 3.58 MHz and a
+Konami's 68000 boards, such as TMNT (1989), use a 68000 at 8 MHz, a Z80 at 3.58 MHz and a
 YM2151. The screen runs at 24 MHz / 4 with 384 by 264 totals, about 59.19 Hz (computed). One
 configuration is marked "verified against real hardware"
 ([MAME: konami/tmnt.cpp](https://github.com/mamedev/mame/blob/master/src/mame/konami/tmnt.cpp)).
@@ -79,13 +79,13 @@ None listed yet.
 
 ### Hardware
 
-**Taito F2** uses a 68000 at 12 MHz, a Z80 at 4 MHz and a YM2610 at 8 MHz. MAME gives it a
+**Taito F2** uses a 68000 at 12 MHz, a Z80 at 4 MHz and a YM2610 at 8 MHz. MAME sets it to a
 nominal 60 Hz. Some variants use an OKI MSM6295 and different clocks "verified on pcb"
 ([MAME: taito/taito_f2.cpp](https://github.com/mamedev/mame/blob/master/src/mame/taito/taito_f2.cpp)).
 
 **Taito F3** ran Ring Rage, Arabian Magic and Riding Fight (all 1992). It uses a 68EC020 main
 CPU. MAME sets it to 16 MHz with a note that it "should be 30.47618_MHz_XTAL / 2". The Taito EN
-sound board carries a 68000 at 15.238 MHz, an Ensoniq ES5505, an ES5510 effects DSP at 10 MHz
+sound board has a 68000 at 15.238 MHz, an Ensoniq ES5505, an ES5510 effects DSP at 10 MHz
 and an MC68681 DUART. The screen runs at 26.686 MHz / 4 with 432 by 262 totals and 58.94 Hz.
 That rate comes from the crystal and from measurements in an arcade-projects thread. Another F3
 configuration uses 58.97 Hz
@@ -100,7 +100,8 @@ The Taito B System is not covered here. Bubble Bobble's board uses a 6 MHz pixel
 ### Protection
 
 Bubble Bobble uses an M68705P3 or an M6801U4 protection MCU
-([protection](protection.md#protection-mcus)). The Taito 68705 dumping history is not traced.
+([protection](protection.md#protection-mcus)). How the Taito 68705 ROMs were dumped is not
+covered here.
 
 ### Tools
 
@@ -113,11 +114,11 @@ None listed yet.
 
 ### For an exact reimplementation
 
-- The F3 CPU clock in MAME is admitted to be wrong. A cycle-exact port of an F3 game cannot
-  treat MAME's timing as settled.
-- Run an F3 port at 58.94 Hz. Check which configuration the game uses, because another uses
-  58.97 Hz.
-- Treat the F2's nominal 60 Hz as open.
+- A note in MAME says its F3 CPU clock is wrong. Do not use MAME's timing as ground truth for a
+  cycle-exact F3 port.
+- Run an F3 port at 58.94 Hz. Check which configuration the game uses. Another configuration
+  uses 58.97 Hz.
+- Treat the F2's nominal 60 Hz as unknown.
 
 ## Irem M72 and M92
 
@@ -125,7 +126,7 @@ None listed yet.
 
 **Irem M72** ran R-Type (1987). It uses an NEC V30 at 8 MHz from a 32 MHz master. The driver
 comment reads "16 MHz external freq (8MHz internal)". A Z80 drives a YM2151 and an 8-bit DAC.
-Some games carry an Intel 8751 MCU. The screen runs at about 55.02 Hz (computed)
+Some games have an Intel 8751 MCU. The screen runs at about 55.02 Hz (computed)
 ([MAME: irem/m72.cpp](https://github.com/mamedev/mame/blob/master/src/mame/irem/m72.cpp)).
 
 **Irem M92** ran Blade Master (1991). It uses an NEC V33 at 9 MHz and an NEC V35 sound CPU at
@@ -139,8 +140,8 @@ M72 uses an Intel 8751 or an 80C31 as a protection MCU.
 ### Tools
 
 The NEC V-series is 8086-compatible at the instruction level. Ghidra's and Unicorn's x86 16-bit
-modes should handle much of Irem's code. The V-series extra instructions and the V35's on-chip
-peripherals need care (not confirmed)
+modes can probably decode most of Irem's code. Check the V-series extra instructions and the
+V35's on-chip peripherals by hand (not confirmed)
 ([CPU families](../computers/cpu-families.md#x86)). Ghidra's 8051 module covers the 8751.
 
 ### Projects to learn from
@@ -157,10 +158,10 @@ None listed yet.
 
 ### Hardware
 
-DEC0 is the Bad Dudes era board. It uses a 68000 at 10 MHz, verified as "68000P12 running at
-10Mhz". A 65C02 at 1.5 MHz drives a YM2203, a YM3812 and an OKI MSM6295. Some games add a
-HuC6280, an Intel 8751 or an M68705R3. The screen runs at about 57.44 Hz (computed). An older
-comment gives 57.41 Hz
+DEC0 is the Data East board from the time of Bad Dudes. It uses a 68000 at 10 MHz, verified as
+"68000P12 running at 10Mhz". A 65C02 at 1.5 MHz drives a YM2203, a YM3812 and an OKI MSM6295.
+Some games add a HuC6280, an Intel 8751 or an M68705R3. The screen runs at about 57.44 Hz
+(computed). An older comment gives 57.41 Hz
 ([MAME: dataeast/dec0.cpp](https://github.com/mamedev/mame/blob/master/src/mame/dataeast/dec0.cpp)).
 
 ### Protection

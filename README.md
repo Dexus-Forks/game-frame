@@ -108,8 +108,8 @@ scripts.
 
 ![The method as a loop. Inventory, observe, decompile, trace, format, emulate, reimplement, verify and land, each with its skill. When a check fails, the work goes back to the trace.](docs/assets/method-loop.svg)
 
-Every claim names its evidence (an address, a value, a measurement) and carries a label:
-*observed*, *measured*, *inferred* or *unknown*. Every number that matters is measured. The original function runs under the emulator. The reimplementation must match it bit for bit.
+Write each claim with its evidence (an address, a value, a measurement) and one label:
+*observed*, *measured*, *inferred* or *unknown*. Measure each number the reimplementation must match by running the original function under the emulator. The reimplementation must give the same result bit for bit.
 
 ## Skills
 
@@ -230,11 +230,11 @@ The documentation is in [docs/](docs/README.md). It is also built as a website
   resources, saves, rendering, as they appear in machine code.
 - [docs/DOS.md](docs/DOS.md): 16-bit DOS programs, Borland debug symbols, the DOS emulators.
 - [docs/ABI.md](docs/ABI.md): calling conventions, C++ layout, floating-point and integer details
-  that decide exactness.
+  that a bit-exact port must copy.
 - [docs/OUTPUTS.md](docs/OUTPUTS.md): what a project can ship: documents, a website, programs
   for each system built by CI and attached to releases, a browser version, a server, tools.
-- [docs/LEGAL.md](docs/LEGAL.md): your own copy, nothing redistributed, new code from
-  documented behaviour.
+- [docs/LEGAL.md](docs/LEGAL.md): working from your own copy, sharing none of the game's files,
+  and writing new code from documented behaviour.
 - [docs/SETUP.md](docs/SETUP.md): the toolchain, and tools for targets beyond native code.
 
 ## Scope
@@ -251,7 +251,7 @@ repositories, and write new code from documented behaviour: see [docs/LEGAL.md](
 
 ## Licence
 
-Two licences, one for each kind of work:
+GameFrame uses two licences, one for each kind of work.
 
 | What | Licence |
 |---|---|

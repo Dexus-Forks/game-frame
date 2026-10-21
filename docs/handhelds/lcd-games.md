@@ -1,9 +1,9 @@
 # LCD games and Game & Watch
 
 On Game & Watch, Tiger LCD games and the Microvision, the program is mask ROM inside a 4-bit
-microcontroller. It cannot be read through a cartridge connector the usual way. It comes from a
-decap (a die photo) or a special electronic dump, and in practice from the MAME set. The output
-to compare is the set of lit LCD segments.
+microcontroller. It cannot be read through a cartridge connector the usual way. It is read from a
+decap (a die photo) or with a special electronic dump. In practice, projects take it from the
+MAME set. A test compares the set of lit LCD segments.
 
 ## The devices
 
@@ -66,9 +66,9 @@ How mask-ROM bits are read from a die photo is not described here.
 
 ### For an exact reimplementation
 
-**The output to compare is the set of lit segments per frame**, which is the MCU's LCD RAM. A
-pixel comparison against MAME's SVG adds nothing the segment state does not already hold.
-MAME's debugger with hap's SM5xx cores is the only sourced runner for ground truth.
+**Compare the lit segments in each frame.** The MCU's LCD RAM holds them. A pixel comparison
+against MAME's SVG gives no extra information. MAME's debugger with hap's SM5xx cores is the
+only known way to get ground truth.
 
 ## Tiger LCD games and Elektronika
 
@@ -80,7 +80,7 @@ chips ([MAME hh_sm510.cpp](https://raw.githubusercontent.com/mamedev/mame/master
 A MAME changelog notes Konami, Tiger and other hh_sm510 games being added to the Experimental
 category ([MAME forum](https://forum.mamedev.org/viewtopic.php?p=1346)).
 
-Mattel's LCD games of 1976 to 1977 are not covered here. Their CPUs need confirming.
+Mattel's LCD games of 1976 to 1977 are not covered here. Their CPUs are not confirmed.
 
 ## Microvision
 
@@ -92,7 +92,7 @@ processor is an Intel 8021 with 1K of ROM or a TI TMS1100 with 2K, clocked at 10
 display is a 16 by 16 pixel LCD. Input is a 12-button keypad and one paddle
 ([Wikipedia: Microvision](https://en.wikipedia.org/wiki/Microvision)).
 
-Surviving units suffer from LCD "screen rot". Early cartridges had no ESD protection, so a
+Many surviving units have LCD "screen rot". Early cartridges had no ESD protection, so a
 static discharge can destroy the CPU and its program. Keypad overlays tear
 ([Wikipedia: Microvision](https://en.wikipedia.org/wiki/Microvision)).
 
@@ -109,6 +109,6 @@ TMS1000 and the TMS1100 ([Sean Riddle: Chip Decap Info](https://www.seanriddle.c
 
 ### For an exact reimplementation
 
-The program comes from a decap or a MAME set. The cartridge connector does not give a normal
+Take the program from a decap or a MAME set. The cartridge connector does not give a normal
 ROM dump, because the program is inside the CPU chip
 ([Handheld practices](practices.md#lcd-behaviour)).

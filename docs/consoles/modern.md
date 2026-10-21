@@ -1,7 +1,7 @@
 # Seventh generation onward
 
-From the Xbox 360 on, every platform ships signed executables in a vendor format such as XEX, SELF or RPX. Most of them are encrypted. A decrypted dump and the right Ghidra loader
-come before any analysis. This page covers the home consoles. The DS, 3DS, PSP, Vita and Switch
+From the Xbox 360 on, every platform ships signed executables in a vendor format such as XEX, SELF or RPX. Most of them are encrypted. Before any analysis, you need a decrypted dump
+and the right Ghidra loader. This page covers the home consoles. The DS, 3DS, PSP, Vita and Switch
 are in the [Handhelds](../handhelds/README.md) section.
 
 ## The platforms
@@ -18,8 +18,8 @@ are in the [Handhelds](../handhelds/README.md) section.
 | Xbox Series X and S | 10 November 2020 | Zen 2, 8 cores to 3.8 GHz | | None known | None known |
 
 No emulator is known to run commercial Xbox One, PS5 or Series games. The PS4, Xbox One, PS5
-and Series are x86-64, and many of their games also have PC releases, which may be the easier
-target.
+and Series are x86-64. Many of their games also have PC releases, which may be easier to
+study.
 
 ## Keys and encrypted executables
 
@@ -33,8 +33,8 @@ target.
 
 Recompilation projects such as Unleashed Recompiled and the GoldenEye 360 recompilation ship no
 game files and need the user's own copy
-([tbreak](https://tbreak.com/goldeneye-007-xbox-360-pc-recompilation/)). That practice matches
-GameFrame's rule of no game material in the repository.
+([tbreak](https://tbreak.com/goldeneye-007-xbox-360-pc-recompilation/)). GameFrame follows the
+same rule and keeps all game material out of the repository.
 
 The Switch keys and the yuzu settlement are on the
 [Switch family](../handhelds/switch-family.md#keys-and-the-yuzu-settlement) page. The 3DS keys
@@ -50,7 +50,7 @@ build and keep a local copy.
 - RPCS3 has a PPU and SPU debugger (not confirmed) ([RPCS3](https://rpcs3.net/)).
 - Cemu has been open source since 2022. Its organisation maintains the RPX loader.
 - Xenia Canary is the active Xbox 360 branch. Secondary coverage reports near-daily commits into
-  July 2026, against a slower original repository
+  July 2026. The original repository gets fewer commits
   ([tech-insider](https://tech-insider.org/?p=20173); [Snapcraft: xenia-canary](https://snapcraft.io/xenia-canary)).
 - shadPS4 runs Bloodborne. Reported versions are v0.16.0 in June 2026 and v0.19.0 in October
   2026 ([Wikipedia: ShadPS4](https://en.wikipedia.org/wiki/ShadPS4);
@@ -100,16 +100,16 @@ confirmed. RPCS3 runs the games.
 ### Projects to learn from
 
 PS3Recomp is a PS3 static recompiler. One guide says its first playable games appeared in
-October 2026 without public downloads. The claim of "more than three thousand games" lacks a
-primary source ([Generation Amiga, June 2026](https://www.generationamiga.com/2026/06/15/ps3recomp-the-new-tool-bringing-native-playstation-3-ports-closer-to-pc/);
+October 2026 without public downloads. No primary source confirms the claim of "more than three
+thousand games" ([Generation Amiga, June 2026](https://www.generationamiga.com/2026/06/15/ps3recomp-the-new-tool-bringing-native-playstation-3-ports-closer-to-pc/);
 [Held Games](https://heldgames.com/tags/ps3recomp)).
 
 ### For an exact reimplementation
 
 Cell SPU single precision rounds toward zero, treats denormals as zero and has no INF or NaN
 (not confirmed) ([IBM Cell SDK 3.0](https://arcb.csc.ncsu.edu/~mueller/cluster/ps3/SDK3.0/docs/accessibility/sdkpt/cbet_3codemapeqv.html)).
-A port of SPU float code that uses host IEEE floats will drift, so it needs a software float
-model. Export the PPE and SPU code separately.
+Host IEEE floats give different results from SPU floats. A port of SPU float code needs a
+software float model. Export the PPE and SPU code separately.
 
 ## Wii and Wii U
 
@@ -130,15 +130,16 @@ for paired singles ([WiiBrew: Ghidra](https://wiibrew.org/wiki/Ghidra)). Dolphin
 ### Projects to learn from
 
 Super Mario Galaxy was reported 100% decompiled in late September 2026. It is the first Wii game
-to get there. A PC port called AstroCore is in progress, and decomp-toolkit is the tool
+to be fully decompiled. A PC port called AstroCore is in progress. The project uses
+decomp-toolkit
 ([Android Authority](https://androidauthority.com/super-mario-galaxy-decompiled-pc-port-3717193);
 [GitHub: Petari](https://github.com/Gota7/Petari); [decomp.dev](https://decomp.dev/)).
 
 ### For an exact reimplementation
 
 Gekko paired-single results depend on the quantised load and store (GQR) setup. Confirm it
-against Dolphin's code. The PowerPC consoles now share tooling, so big-endian PowerPC can be
-treated as one family.
+against Dolphin's code. The PowerPC consoles share tooling, so you can treat big-endian
+PowerPC as one family.
 
 ## PlayStation 4
 

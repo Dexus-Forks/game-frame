@@ -1,8 +1,8 @@
 # BBC Micro and Acorn Electron
 
 Acorn's 8-bit machines use the 6502 family ([CPU families](cpu-families.md#the-6502-line)).
-The BBC Micro pages sideways ROMs into its memory map. Its disk controller changed between models. The BBC also has the best documented 8-bit game code anywhere, in the Elite on the 6502
-project.
+The BBC Micro pages sideways ROMs into its memory map. Its disk controller changed between models. The Elite on the 6502 project documents
+the BBC version of Elite in detail.
 
 ## BBC Micro A, B, B+ and Master
 
@@ -29,8 +29,8 @@ Sources: [Wikipedia: BBC Micro](https://en.wikipedia.org/wiki/BBC_Micro),
   `&C000`–`&FFFF` and SHEILA I/O at `&FE00` (not confirmed)
   ([BeebWiki: Paged ROM](https://beebwiki.mdfs.net/Paged_ROM)).
 - **Disk controller.** The B+ moved from the Intel 8271 to the WD1770. That change broke some
-  software ([Wikipedia: BBC Micro](https://en.wikipedia.org/wiki/BBC_Micro)). It explains many
-  disk-protection failures across models.
+  software ([Wikipedia: BBC Micro](https://en.wikipedia.org/wiki/BBC_Micro)). Many protected
+  disks work on one model and fail on another because of it.
 
 ### How games were made and loaded
 
@@ -63,10 +63,10 @@ Stardot ([stardot.org.uk](https://stardot.org.uk/forums/)) and BeebWiki
 
 **Mark Moxon's "Elite on the 6502"** documents the BBC Micro, Electron, Master, C64, Apple II
 and NES versions of Elite, with about 130 deep dives ([bbcelite.com](https://www.bbcelite.com/)).
-Its source reassembles byte for byte to the original, which gives an exact oracle for any
-port. Ian Bell's site hosts the original BBC source discs (not confirmed)
-([iancgbell.clara.net/elite](http://www.iancgbell.clara.net/elite/)). Whether such a project
-includes game bytes, and under what licence, needs checking before you copy anything from it.
+Its source reassembles byte for byte to the original. A port can check its results against
+that source. Ian Bell's site hosts the original BBC source discs (not confirmed)
+([iancgbell.clara.net/elite](http://www.iancgbell.clara.net/elite/)). Before you copy anything
+from such a project, check whether it includes game bytes and what its licence is.
 
 ### For an exact reimplementation
 
@@ -95,7 +95,7 @@ Elite on the 6502 covers the Electron version of Elite. No other sources are lis
 
 ### Media and image formats
 
-As the BBC Micro: UEF for tape (not confirmed).
+UEF for tape, as on the BBC Micro (not confirmed).
 
 ### Tools
 

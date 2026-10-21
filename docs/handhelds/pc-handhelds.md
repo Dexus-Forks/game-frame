@@ -1,7 +1,7 @@
 # PC handhelds
 
 The Steam Deck and the other PC handhelds are x86-64 PCs with a built-in screen and controls.
-**These are PC game targets.** GameFrame's Windows PE path (Ghidra, Unicorn x86-64, Wine)
+GameFrame's Windows PE path (Ghidra, Unicorn x86-64, Wine)
 applies to them directly.
 
 ## The devices

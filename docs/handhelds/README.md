@@ -6,8 +6,8 @@ handhelds of today. Each page covers one family. The home consoles are in
 
 The handhelds fall into four groups. In the first, a 4-bit microcontroller with a segment LCD
 holds the program inside the CPU chip. The second uses 8-bit cartridge systems. The third runs
-ARM code on an operating system. The fourth uses modern ARM64 and x86-64 machines. Every group
-after the first ships the code on removable media.
+ARM code on an operating system. The fourth uses modern ARM64 and x86-64 machines. In every group
+after the first, games come on removable media.
 
 ## Across all handhelds
 
@@ -43,5 +43,5 @@ after the first ships the code on removable media.
 | The program | A ROM or a disc image | The same for cartridge handhelds; mask ROM inside the CPU on LCD games; files on an OS from the N-Gage onward |
 | The CPU | Mostly CPUs with a Ghidra module | Several with no built-in Ghidra module and no Unicorn backend, such as the SM5xx, TMS1100, SM83, TLCS-900/H, S1C88 and SM8521 |
 | The output | A frame on a TV | Lit LCD segments on LCD games; small passive or TFT screens; up to 120 Hz with VRR on the Switch 2 |
-| Saves | Battery RAM, memory cards | Battery RAM, often with a real-time clock whose state belongs in the save |
+| Saves | Battery RAM, memory cards | Battery RAM, often with a real-time clock whose state is stored in the save |
 | Outside inputs | Controllers | Controllers plus link cables, infrared, shock and touch sensors, GPS and cameras |

@@ -21,7 +21,7 @@ These patterns make text sound written by a machine. They also hide the facts. S
 
 | Pattern | Example | Rewrite |
 |---|---|---|
-| A summary that reveals its content after a colon | "Two rules hold it together: every claim rests on evidence, and every number is measured." | "Every claim names its evidence. Every number that matters is measured." |
+| A summary that reveals its content after a colon | "Two rules hold it together: every claim rests on evidence, and every number is measured." | "Give the evidence for every claim. Measure every number the port must match." |
 | A closing contrast "X, not Y" | "Numbers are measured, not guessed." | "Numbers are measured by running the original code." |
 | Matched pairs and triplets for rhythm | "the same loop and the same discipline"; "bit for bit, draw for draw, frame for frame" | Say the one thing that is true: "the same steps"; "bit for bit" |
 | Two clauses of the same shape joined by ", and" | "A takeover game must be traced at its register writes, and its port must rebuild what the chips did." | Two sentences: "Trace a takeover game at its register writes. The port must rebuild what the chips did." |
@@ -30,6 +30,7 @@ These patterns make text sound written by a machine. They also hide the facts. S
 | Metaphors and figures of speech | "the beating heart of the engine", "a door that opens" | The literal statement: "the main loop", "a function the mod can call" |
 | Dramatic openings | "Nobody knew why the save broke." | "The save broke because ..." |
 | Hedging filler | "It is worth noting that", "Essentially", "In order to" | Delete the words |
+| Abstract statements | "In each of these cases the game that players bought survives longest." | "When a studio loses its source code, the copies players bought are often all that is left." |
 
 A contrast is fine when it prevents a real mistake. "Keep the constant as `0.33333331f`, as
 read from the binary. Do not write `1.0 / 3.0`." That warning names the wrong thing the reader

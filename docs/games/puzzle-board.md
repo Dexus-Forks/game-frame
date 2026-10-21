@@ -3,8 +3,8 @@
 Falling-block and logic puzzles, board games, card games, and the small games that shipped
 with operating systems. Board and card games are [turns and
 choices](interaction.md#the-four-kinds); action puzzles (Tetris, Lemmings) are [streams with
-controls](interaction.md#the-four-kinds). They are often small, which makes them good first
-projects and good places to practise the method end to end.
+controls](interaction.md#the-four-kinds). They are often small, so they make good first
+projects for practising the whole method.
 
 ## Reference games
 
@@ -36,11 +36,11 @@ from observation, and many clones copy only the idea. Two kinds of work are usef
 deals and boards come from the random generator, often the C runtime's `rand` seeded with a
 number shown to the player (a deal number) or with the clock.
 
-**Inputs.** Keys or clicks, sometimes with repeat delays (auto-shift in Tetris) that are part of
-the behaviour. Record per frame for action puzzles, per move for board and card games.
+**Inputs.** Keys or clicks, sometimes with repeat delays (auto-shift in Tetris) that the port must
+copy. Record per frame for action puzzles, per move for board and card games.
 
-**Interface.** Simple, but exact: players know where everything is. Animations (a card flying,
-a line clearing) may block input for a number of frames; that is behaviour.
+**Interface.** Simple. Players know where everything is, so keep every position exact. Animations
+(a card flying, a line clearing) may block input for a number of frames. Port those frame counts.
 
 **Time and determinism.** Turn-based games wait. Action puzzles run at the console's or the
 screen's refresh rate; gravity is a table of frames per row.
@@ -57,5 +57,5 @@ seeds. Play recorded games move by move and compare the board.
 
 - [Arcade action](arcade-action.md): frame-exact input for action puzzles.
 - [Adventure](adventure.md): logic that waits for the player.
-- [Random number generators](../GAME-PATTERNS.md#random-number-generators): most of the
-  exactness here.
+- [Random number generators](../GAME-PATTERNS.md#random-number-generators): most of what
+  must be exact in these games.

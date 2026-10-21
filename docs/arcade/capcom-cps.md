@@ -1,8 +1,8 @@
 # Capcom CPS
 
-Capcom's CP System boards ran from 1988 to 2004. CPS-1 and CPS-2 are 68000 boards with an
-8 MHz pixel clock and a refresh near 59.64 Hz. CPS-2 encrypts its program with a Feistel cipher
-keyed from battery-backed RAM. CPS-3 moved to an encrypted SH-2 derivative with games on CD.
+Capcom's CP System boards ran from 1988 to 2004. CPS-1 and CPS-2 are 68000 boards with an 8 MHz
+pixel clock and a refresh near 59.64 Hz. CPS-2 encrypts its program with a Feistel cipher keyed
+from battery-backed RAM. CPS-3 uses an encrypted SH-2 derivative and loads its games from CD.
 
 | Board | Years | Main CPU and clock | Sound | Refresh | Protection | MAME status | Ghidra |
 |---|---|---|---|---|---|---|---|
@@ -53,11 +53,11 @@ None listed yet.
 
 ### Hardware
 
-CPS-2 ran from 1993 to 2004. Its first game was Super Street Fighter II. It carries about 50
-games in over 170 variants
+CPS-2 ran from 1993 to 2004. Its first game was Super Street Fighter II. About 50 games in over
+170 variants ran on it
 ([MAME: capcom/cps2.cpp](https://github.com/mamedev/mame/blob/master/src/mame/capcom/cps2.cpp)).
 
-- An A-board holds the 68000, RAM, graphics, sound and I/O. It carries a 93C46 serial EEPROM.
+- An A-board holds the 68000, RAM, graphics, sound and I/O. It also has a 93C46 serial EEPROM.
 - A B-board holds the game ROMs and custom chips.
 - The boards sit in plastic boxes colour-coded by region.
 - MAME runs the 68000 at 16 MHz and the Z80 at 8 MHz.
@@ -71,15 +71,15 @@ Its raw timing gives 59.637 Hz (computed).
 ### Protection
 
 CPS-2 encrypts its main program. Only opcodes are encrypted. The cipher is two 4-round Feistel
-networks with a 64-bit key. The key sits in SRAM inside a battery-powered custom IC. A board
-with a dead battery shows only a blue or green screen. No CPS-2 game encrypted its sound
+networks with a 64-bit key. The key is stored in SRAM inside a battery-powered custom IC. A
+board with a dead battery shows only a blue or green screen. No CPS-2 game encrypted its sound
 program. The [protection page](protection.md#capcom) has the cipher, the Phoenix sets and the
 desuicide work.
 
 ### Tools
 
-- MAME's `cps2crypt.cpp` is the decryption to follow.
-- After decryption, Ghidra's 68000 module and Unicorn's M68K backend apply.
+- Follow MAME's `cps2crypt.cpp` to decrypt the program.
+- After decryption, Ghidra's 68000 module and Unicorn's M68K backend work on the program.
 - Ghidra has no built-in module for the DSP-16A.
 
 ### Projects to learn from
@@ -100,8 +100,8 @@ desuicide work.
 
 ### Hardware
 
-CPS-3 ran from late 1996 to 1999 and carried six games. Among them are Red Earth (1996) and
-Street Fighter III (1997)
+CPS-3 ran from late 1996 to 1999 and six games were released on it. Among them are Red Earth
+(1996) and Street Fighter III (1997)
 ([MAME: capcom/cps3.cpp](https://github.com/mamedev/mame/blob/master/src/mame/capcom/cps3.cpp)).
 
 - The main board holds custom ASICs and 72-pin custom SIMMs of flash ROM. The program SIMMs are
@@ -114,17 +114,17 @@ Street Fighter III (1997)
 
 ### Protection
 
-The SH-2 derivative decrypts the code. The key sits in battery-powered SRAM on the CPU die. The
-CPU erases the key when it detects tampering. A dead cartridge is thought to fall back to keys
-identical to SFIII 2nd Impact. The data on the CD and SIMMs is not encrypted beyond the boot
-flash and the program areas.
+The SH-2 derivative decrypts the code. The key is stored in battery-powered SRAM on the CPU die.
+The CPU erases the key when it detects tampering. A dead cartridge is thought to fall back to
+keys identical to SFIII 2nd Impact. The data on the CD and SIMMs is not encrypted beyond the
+boot flash and the program areas.
 
 ### Tools
 
 - The CD is stored as a CHD. Extract its files with `chdman` first
   ([practices](practices.md#rom-sets-and-chd)).
-- Ghidra's SuperH module holds SH-1, SH-2 and SH-2A. Unicorn has no SH-2 backend. Ground truth
-  comes from MAME.
+- Ghidra's SuperH module holds SH-1, SH-2 and SH-2A. Unicorn has no SH-2 backend. Take ground
+  truth from MAME.
 
 ### Projects to learn from
 

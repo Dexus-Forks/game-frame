@@ -140,16 +140,16 @@ choose how deep to go for each piece:
   once per subsystem.
 - **Split mechanical work off.** Long but simple pieces (menus, text tables, generated
   types) can go to a separate, cheaper session with an exact brief; keep the hard maths here.
-- **Think like the game.** Most games drive themselves on a frame clock and the player
-  reacts; others wait for the player and resolve each move. Know which (`docs/games/interaction.md`),
+- **Find the game's clock.** Most games run on a frame clock while the player reacts. Others
+  wait for the player and resolve each move. Know which (`docs/games/interaction.md`),
   find the loop or the handlers and their order before anything else. Find every place that reads input (`docs/observe/inputs.md`).
 - **Read the decompiler with care.** For 16-bit Pascal, Ghidra prints arguments in reverse
   order and loses Real (6-byte float) arithmetic: take those parts from the disassembly.
 
 ## How to work
 
-Read `docs/working/agents.md` once per project: the repository as memory, measuring before
-porting, splitting work between sessions, and what to do when stuck. Write every document by
+Read `docs/working/agents.md` once per project. It covers writing everything down in the
+repository, measuring before porting, splitting work between sessions, and what to do when stuck. Write every document by
 `docs/working/writing.md`.
 
 ## Before you finish any session

@@ -1,6 +1,6 @@
 # PSP and PS Vita
 
-Sony's handhelds ship signed and encrypted executables. The PSP runs MIPS code with a vector
+Games for Sony's handhelds come as signed and encrypted executables. The PSP runs MIPS code with a vector
 unit. The Vita runs ARM code. Both need a Ghidra extension or loader.
 
 ## The devices

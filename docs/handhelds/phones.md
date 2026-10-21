@@ -2,7 +2,8 @@
 
 Before smartphones, phone games ran as J2ME or BREW apps. J2ME games are JVM bytecode, which
 Ghidra reads. Downloaded BREW apps are signed for one handset, so most were never dumped. One
-game often shipped in many builds for different handsets. Each build is its own target.
+game often shipped in many builds for different handsets. Treat each build as a separate
+target.
 
 ## The platforms
 
@@ -33,16 +34,16 @@ emulator under Apache 2.0. It runs most 2D and 3D games, including Mascot Capsul
 ### Projects to learn from
 
 Kahvibreak is a J2ME launcher and collection. It has been inactive since its maintainer
-(Nokia64) disappeared. Sources disagree on the year. One gives 2022. Its database has quality
-concerns ([GameTechWiki: Kahvibreak](https://emulation.gametechwiki.com/index.php/Kahvibreak);
+(Nokia64) disappeared. Sources disagree on the year. One gives 2022. Users report quality problems
+in its database ([GameTechWiki: Kahvibreak](https://emulation.gametechwiki.com/index.php/Kahvibreak);
 [techtactician roundup](https://techtactician.com/?p=58218)). Other efforts include a J2ME
 Preservation archive and the Cell Phone Game Preservation Wiki
 ([awesome-j2me list](https://www.context-awesome.com/list/hstsethi/awesome-j2me)).
 
 ### For an exact reimplementation
 
-One game often shipped in many builds for different handsets. Each build is its own target.
-Record which build a test runs.
+One game often shipped in many builds for different handsets. Treat each build as a separate
+target. Record which build a test runs.
 
 ## BREW and the Zeebo
 

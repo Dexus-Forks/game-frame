@@ -28,15 +28,16 @@ the exploration: levels full of triggers, doors, switches and scripted events.
 | Shockolate | System Shock | source port |
 | Xash3D FWGS | Half-Life | engine reimplementation that runs the original game code and data |
 
-Doom and Quake were released as source code, so their ports are not reverse engineering. They are still the best references for how such engines work. Chocolate Doom shows what "keep
-every quirk" costs and why demo compatibility forces it.
+Doom and Quake were released as source code, so their ports are not reverse engineering. They are still the best references for how such engines work. Chocolate Doom shows how much work it
+takes to keep every quirk. Old demos play in sync only when every quirk is kept.
 
 ## The rule set
 
 **What must be exact.** Movement: acceleration, friction, step-up height, sliding along walls,
 all in the game's units (often 16.16 fixed point). The tick rate and the order of thinkers
-(the per-object update functions). Hit scans and projectile collision. Random draws: Doom uses
-a fixed table of 256 numbers with indices, not a generator. Demos depend on its index.
+(the per-object update functions). Hit scans and projectile collision. Random draws: Doom reads
+a fixed table of 256 numbers through an index instead of running a generator. Demos stay in
+sync only if the index matches.
 
 **Where the rules live.** In code (thinkers, weapons, monsters as state tables of frames,
 durations and actions) and in level data: sectors or brushes, special lines and tags that link

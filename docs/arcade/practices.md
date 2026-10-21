@@ -1,13 +1,13 @@
 # Practices for arcade work
 
-This page covers the practices that apply to every arcade board. MAME's driver source is the
-record of the hardware. Its flags say how far to trust it as ground truth. The settings stored
-on the board are inputs to the game, so every test case records them.
+This page covers the practices that apply to every arcade board. MAME's driver source describes
+the hardware. MAME marks each game with flags that show how complete its emulation is. The game
+reads the settings stored on the board, so every test case records them.
 
-## MAME as the record
+## MAME driver source
 
 MAME's driver headers give the chip list, the clocks, the ROM names and the known bugs in one
-place. They also credit the research they rest on.
+place. They also name the people whose research they use.
 
 - The Neo Geo driver credits Charles MacDonald's MVS technical notes
   ([MAME: snk/neogeo.cpp](https://github.com/mamedev/mame/blob/master/src/mame/snk/neogeo.cpp)).
@@ -17,14 +17,14 @@ place. They also credit the research they rest on.
   ([MAME: capcom/cps3.cpp](https://github.com/mamedev/mame/blob/master/src/mame/capcom/cps3.cpp)).
 - The Taito F3 driver cites arcade-projects.com measurements of F3 sync
   ([MAME: taito/taito_f3.cpp](https://github.com/mamedev/mame/blob/master/src/mame/taito/taito_f3.cpp)).
-  Community measurements feed MAME's timing.
+  MAME takes some of its timing values from such community measurements.
 
 Drivers set clocks with `XTAL(...)` values and divisors. A comment such as "verified on pcb"
-marks a measured value. A value without such a comment is MAME's best model.
+marks a measured value. A value without such a comment is MAME's best estimate.
 
 ### Machine flags
 
-The flags say whether MAME can serve as ground truth for a game
+The flags show whether MAME emulates a game well enough to use as ground truth
 ([MAME gamedrv.h](https://github.com/mamedev/mame/blob/master/src/emu/gamedrv.h)).
 
 | Flag | Meaning |
@@ -39,23 +39,24 @@ The flags say whether MAME can serve as ground truth for a game
 | MACHINE_MECHANICAL | A mechanical game |
 | MACHINE_IS_BIOS_ROOT | A BIOS set |
 
-A ROM marked BAD_DUMP in a set is a second warning. The Sega Model 1 TGP ROMs for Virtua
-Fighter and three other games carry it ([Early 3D boards](early-3d.md#sega-model-1)).
+MAME also marks a ROM as BAD_DUMP when the dump is known to be faulty. The Sega Model 1 TGP ROMs
+for Virtua Fighter and three other games have this mark
+([Early 3D boards](early-3d.md#sega-model-1)).
 
 MAME also marks some of its own timing as wrong. The Taito F3 CPU clock is one case
 ([Other 2D makers](other-2d-makers.md#taito-f2-and-f3)). The Triforce, Chihiro, System 246 and
-Lindbergh families do not run in MAME. For those games ground truth comes from other emulators
+Lindbergh families do not run in MAME. For those games, take ground truth from other emulators
 or from owned hardware.
 
 ## ROM sets and CHD
 
-A ROM set names every dump a board holds. That includes BIOS sets such as Atari System 1's
+A ROM set lists every chip dump from a board. That includes BIOS sets such as Atari System 1's
 ([MAME: atari/atarisy1.cpp](https://github.com/mamedev/mame/blob/master/src/mame/atari/atarisy1.cpp)).
 It also includes the PAL images on CPS-1 B-boards
 ([MAME: capcom/cps1.cpp](https://github.com/mamedev/mame/blob/master/src/mame/capcom/cps1.cpp)).
 
-Disks and optical media are stored as **CHD** (Compressed Hunks of Data). The `chdman` tool
-handles them ([MAME chdman docs](https://github.com/mamedev/mame/blob/master/docs/source/tools/chdman.rst)).
+Disks and optical media are stored as **CHD** (Compressed Hunks of Data). MAME's `chdman`
+tool works with them ([MAME chdman docs](https://github.com/mamedev/mame/blob/master/docs/source/tools/chdman.rst)).
 
 - Create: `createhd`, `createcd`, `createdvd`, `createld` and `createraw`.
 - Extract: the matching `extract*` commands.
@@ -68,19 +69,19 @@ To read the files on a CPS-3 CD or a GD-ROM, extract them from the CHD first.
 
 ## NVRAM and DIP settings as test inputs
 
-NVRAM and DIP switches are inputs to the game.
+The game reads NVRAM and DIP switches. A test sets them like any other input.
 
 - Williams 6809 games keep settings and high scores in battery-backed CMOS RAM
   ([MAME: williams/williams.cpp](https://github.com/mamedev/mame/blob/master/src/mame/williams/williams.cpp)).
-- CPS-2 A-boards carry a 93C46 serial EEPROM. CPS-1 drivers include MAME's serial EEPROM
+- CPS-2 A-boards have a 93C46 serial EEPROM. CPS-1 drivers include MAME's serial EEPROM
   device. The Neo Geo includes NVRAM
   ([MAME: capcom/cps2.cpp](https://github.com/mamedev/mame/blob/master/src/mame/capcom/cps2.cpp);
   [capcom/cps1.cpp](https://github.com/mamedev/mame/blob/master/src/mame/capcom/cps1.cpp);
   [snk/neogeo.cpp](https://github.com/mamedev/mame/blob/master/src/mame/snk/neogeo.cpp)).
 - Neo Geo MVS motherboards differ by generation. Memory-card headers, coin lockouts, LED
   displays and soldered BIOS vary between MV-1, MV-1F, MV-1A, MV-1B and MV-1C.
-- Fatal Fury 3 in MAME crashes in the ending unless the language is Japanese. BIOS region and
-  language settings change the code path
+- Fatal Fury 3 in MAME crashes in the ending unless the language is Japanese. The BIOS region and
+  language settings change which code the game runs
   ([MAME: snk/neogeo.cpp](https://github.com/mamedev/mame/blob/master/src/mame/snk/neogeo.cpp)).
 - The NAOMI driver applies "usability defaults, i.e. 31kHz dip switch and non-canonical
   service mode settings in NVRAM". MAME's default NVRAM can differ from a factory board
@@ -94,9 +95,9 @@ started from. The list of outside inputs is in [inputs](../observe/inputs.md).
 
 ## Attract mode
 
-Attract-mode demos play from recorded inputs or from scripted AI. They depend on the random
-state and on NVRAM. To compare a port's attract mode with the original, start both from the
-same NVRAM image and the same power-on state.
+Attract-mode demos play from recorded inputs or from scripted AI. What a demo shows depends on
+the random state and on NVRAM. To compare a port's attract mode with the original, start both
+from the same NVRAM image and the same power-on state.
 
 Released source from the era shows that attract mode, audits, operator adjustments and
 diagnostics are separate modules. NBA Jam's source has ATTRACT.ASM, AUDIT.ASM, ADJUST.ASM and
@@ -105,14 +106,14 @@ DIAG.ASM. Smash TV's has DEMO.ASM and HSTD.ASM for the high-score table
 [historicalsource/smashtv](https://github.com/historicalsource/smashtv)). A full
 reimplementation rebuilds all of them.
 
-## Input recording and its limits
+## Input recording
 
 MAME's `-record` and `-playback` "do not work reliably for all systems". Playback can desync
 if the configuration (.cfg), NVRAM (.nv) and memory card files differ from the original run.
 MAME suggests recording and playing back with all of them deleted
 ([MAME docs: commandline-all.rst](https://github.com/mamedev/mame/blob/master/docs/source/commandline/commandline-all.rst)).
 
-Other options from the same page help capture ground truth.
+The same page lists other options for capturing ground truth.
 
 | Option | What it does |
 |---|---|
@@ -130,8 +131,9 @@ See [running the original](../observe/running-the-original.md) and the
 
 ## Refresh rates and frame drift
 
-Arcade refresh rates group by crystal. A rate marked "(computed)" is the pixel clock divided by
-the totals in the driver's `set_raw(...)` screen line.
+Boards with the same crystal and the same totals have the same refresh rate. A rate marked
+"(computed)" is the pixel clock divided by the totals in the driver's `set_raw(...)` screen
+line.
 
 | Group | Crystal and totals | Refresh | Boards |
 |---|---|---|---|
@@ -146,16 +148,16 @@ the totals in the driver's `set_raw(...)` screen line.
 | 18.432 MHz / 3 | 384 x 264 | about 60.61 Hz (computed) | Galaxian, Pac-Man, Galaga, Namco System 1 and 2, Donkey Kong |
 | Vector | 12.096 MHz / 4096 / 12 / 4 | about 61.5 Hz (computed) | Asteroids |
 
-The sources are the driver links on each family page. The Bubble Bobble entry rests on
+The sources are the driver links on each family page. The source for the Bubble Bobble entry is
 [MAME: taito/bublbobl.cpp](https://github.com/mamedev/mame/blob/master/src/mame/taito/bublbobl.cpp).
 
 A port that runs at a fixed 60 Hz drifts against a recording. At 60 Hz it shows about 317 more
 frames per minute than a 54.71 Hz Midway board. It shows about 22 more frames per minute than a
-59.64 Hz CPS board. Both figures follow from the rates above. On a Midway board the drift
-breaks a frame-by-frame comparison within seconds.
+59.64 Hz CPS board. Both figures are computed from the rates above. On a Midway board, a
+frame-by-frame comparison goes out of step within seconds.
 
 Some boards have a nominal rate in MAME. The Sega Y Board, the PlayChoice-10 and Taito F2 are
-set to 60 Hz with no raw timing behind it. Treat those rates as open.
+set to 60 Hz without raw screen timing. Treat those rates as unknown.
 
 ## Disassembly and emulation support per arcade CPU
 
@@ -184,14 +186,14 @@ Ghidra's bundled processors have no V60, i960, SHARC, TMS34010 or TMS320 entries
 The MC6800 module holds the 6800, 6805, 6809 and H6309 specs. The SuperH module holds SH-1, SH-2
 and SH-2A ([MC6800 languages](https://github.com/NationalSecurityAgency/ghidra/tree/master/Ghidra/Processors/MC6800/data/languages);
 [SuperH languages](https://github.com/NationalSecurityAgency/ghidra/tree/master/Ghidra/Processors/SuperH/data/languages)).
-The community TMS34010 module exists. How complete it is is not confirmed. No V60 module is
+A community TMS34010 module exists. Its completeness is not confirmed. No V60 module is
 known (not confirmed).
 
 Unicorn has ARM, ARM64, MIPS, x86, PowerPC, SPARC, M68K, RISC-V, S390X and TriCore. It has no
 Z80, 6502, 6809, 8080, SH-2 or TMS34010
 ([unicorn.h](https://github.com/unicorn-engine/unicorn/blob/master/include/unicorn/unicorn.h)).
-For Z80, 6502 and 6809 games, ground truth comes from MAME's debugger and Lua. A small
-purpose-built CPU core is the other route. The [CPU families](../computers/cpu-families.md)
+For Z80, 6502 and 6809 games, take ground truth from MAME's debugger and Lua, or from a small
+purpose-built CPU core. The [CPU families](../computers/cpu-families.md)
 page lists such cores. The [re-emulate](../../.claude/skills/re-emulate/SKILL.md) skill covers
 the Unicorn path for the CPUs it supports. FinalBurn Neo, Demul and JConfig are not covered
 here.
@@ -199,8 +201,8 @@ here.
 ## Source releases and the shipped ROM
 
 Released source from the era is assembly language for the board's CPU, even on the TMS34010
-games of the 1990s. Where original source exists it is strong evidence of intent. The shipped
-ROM remains the reference for exact behaviour, because the source may not match the final
-revision. The [Williams and Midway](williams-and-midway.md) page lists the source releases and
-their provenance. GameFrame's rule of no game material keeps such source out of a project's
-own repository ([Legal](../LEGAL.md)).
+games of the 1990s. Original source shows what the programmers meant. The source may not match
+the final revision, so use the shipped ROM for exact behaviour. The
+[Williams and Midway](williams-and-midway.md) page lists the source releases and their
+provenance. GameFrame's rule against game material means a project does not copy such source
+into its own repository ([Legal](../LEGAL.md)).

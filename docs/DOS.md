@@ -2,7 +2,7 @@
 
 Most of GameFrame was built on a 64-bit Windows game. DOS games (1985-2000) need different
 tools at three steps: reading the executable, emulating code, and running the original. This
-page is the whole DOS route; the skills link here. The tools are tested against
+page covers every DOS step. The skills link here. The tools are tested against
 `examples/dos-sample/` (our own 16-bit code) by `tests/run.sh`.
 
 ## 1. Which kind of DOS program is it?
@@ -55,7 +55,7 @@ scripts/ghidra-export.sh --labels analysis/td-labels.tsv target/GAME.EXE
 
 With `--labels`, Ghidra names every function and global, and creates the functions it missed.
 
-The record types become reimplementation code directly: `tdinfo.py BINARY rust TYPE ...` writes
+`tdinfo.py` turns the record types into reimplementation code. `tdinfo.py BINARY rust TYPE ...` writes
 Rust structs with readers in the original's field order, each field commented with its Pascal
 type and offset, and `tdinfo.py BINARY rust-reader` the `PascalReader` they use (little-endian
 integers, one-byte Boolean, 6-byte Real kept exact, `string[N]`). Generated names that clash
@@ -64,8 +64,8 @@ inverse of `read`.
 
 `tdinfo.py BINARY rust-globals` writes one `Globals` struct holding every variable of the data
 segment at its original offset, with `load` and `store` to and from a 64 KB image of the
-segment (Booleans stay `u8`, so every byte survives). Ported code then works on `Globals`. A test can load the DS image from before an emulated run of the original, run the port, store,
-and compare with the DS image from after: every variable checked at once.
+segment (Booleans stay `u8`, so `store` writes every byte back unchanged). Ported code then works on `Globals`. A test can load the DS image from before an emulated run of the original, run the port, store,
+and compare with the DS image from after. One test then checks every variable.
 
 `tdinfo.py BINARY rust-locals PROC` does the same for one procedure's local variables and
 parameters, at their BP offsets in the stack segment: for code nested in a big procedure (a
@@ -87,7 +87,7 @@ up to its size (a variant record), so check one offset in the code before relyin
   file sits next to it (`RTM.EXE`, a plain DOS program) made Ghidra's loader throw "Invalid
   index". The export script passes `-loader-libraryLoadDepth 0`, so Ghidra never searches.
 - **No-return calls.** Ghidra does not know that `INT 21h` with `AH=4Ch` (exit) or Pascal's
-  `Halt`/`RunError` never return: the next procedure's code is glued onto the end of the
+  `Halt`/`RunError` never return: the next procedure's code is joined to the end of the
   caller. Split it by creating the function at the right address (labels do this).
 - **Missed functions.** Procedures reached only through relocations or tables are not found.
   Debug-symbol labels fix this; otherwise use `scripts/ghidra-run.sh BINARY decompile`.
@@ -109,8 +109,8 @@ up to its size (a variant record), so check one offset in the code before relyin
   add sets the carry the jump tests; the sum wraps freely before it. Port the test on the
   same instruction, not on the whole sum.
 - **Stale globals are inputs.** A routine may test a temporary that another routine set
-  earlier in the frame (a `tempi2` left by the movement code). Keep the read: it is part of
-  the behaviour, and a test catches it only if the port leaves the global as the original
+  earlier in the frame (a `tempi2` left by the movement code). Keep the read, because the
+  original's result depends on it. A test catches it only if the port leaves the global as the original
   does.
 - **Strings.** Pascal strings (a length byte, then the text) are not found by Ghidra's string
   search. Use `dosinfo.py --pstrings` and `readseg.py BINARY pstr ADDR`.
@@ -193,7 +193,7 @@ emu.run_to('1000:ca59')                          # the next frame: carry on as i
 ```
 
 - **Carry on with `run_to`, never `run_range`.** `run_range(start, end)` starts afresh: it
-  puts SS:SP back at the start-up stack. Used to continue a running program, every call moves the stack above the live frames. Deep calls then overwrite the main procedure's
+  puts SS:SP back at the start-up stack. If you use it to continue a running program, every call moves the stack above the live frames. Deep calls then overwrite the main procedure's
   locals and return address (seen as stray file names in a local array, and the program
   "exiting" after some thousands of frames). `run_to(end)` keeps every register.
 
@@ -214,7 +214,7 @@ emu.run_to('1000:ca59')                          # the next frame: carry on as i
 ## 6. Running the original: DOSBox-X
 
 A store release usually ships its own DOSBox configuration (GOG: `__support/app/*.conf`). Start
-from it so runs match what the publisher tuned: `scripts/dosbox-run.sh --conf THAT.conf ...`
+from it so runs use the publisher's settings: `scripts/dosbox-run.sh --conf THAT.conf ...`
 (the script turns fullscreen off and keeps its own logging and autoexec).
 
 `scripts/setup.sh --install` installs DOSBox-X (on macOS `brew install --formula dosbox-x`; the
@@ -232,14 +232,14 @@ python3 tools/dos/fileio_trace.py analysis/dosbox/dosbox.log --game target/game
   it writes never change your copy. `--in-place` mounts the folder itself.
 - `--fileio` logs every open, read, seek and write. `fileio_trace.py` turns that into a map per
   file: offsets and sizes in reading order, with repeated patterns collapsed
-  (`[2, 1, 4] x 120 (stride 7)` is a table of 120 seven-byte records). The read sizes of a
-  file read field by field are its record layout, *measured*.
+  (`[2, 1, 4] x 120 (stride 7)` is a table of 120 seven-byte records). When a program reads a
+  file field by field, the read sizes give its record layout (*measured*).
 - A program that reads through a Pascal **text** file (Assign/Reset on a `Text` variable) is
   read in 128-byte blocks: the log shows the buffer, not the fields. Read the code instead.
 - `--cycles N` fixes the CPU speed. Use the same value for every run you compare.
 - Exit codes come back through `IF ERRORLEVEL` (DOSBox-X's shell does not expand
   `%ERRORLEVEL%`, and a redirect inside a false `IF` still creates the file).
-- Leave windowless runs to `-silent` with SDL's dummy drivers: no window, no sound.
+- Windowless runs use `-silent` with SDL's dummy drivers, so there is no window and no sound.
 
 ## 7. The debugger, from an agent or a script
 

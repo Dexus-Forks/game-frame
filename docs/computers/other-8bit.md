@@ -2,8 +2,8 @@
 
 This page covers three smaller families. The Dragon and the CoCo use the 6809E, the Oric uses
 the 6502, and the TI-99/4A uses the 16-bit TMS9900
-([CPU families](cpu-families.md)). On the Oric the BASIC ROM version is part of the ground
-truth. On the TI-99/4A the registers live in RAM.
+([CPU families](cpu-families.md)). On the Oric some games depend on the BASIC ROM version.
+On the TI-99/4A the general registers are held in RAM.
 
 ## Dragon 32/64 and TRS-80 Color Computer
 
@@ -15,7 +15,7 @@ truth. On the TI-99/4A the registers live in RAM.
 | CoCo 3 | 1986–1991 | 6809E, double speed | GIME, 64-colour palette |
 | Dragon 32 | August 1982 | 6809E at 0.89 MHz | MC6847 VDG |
 
-RAM across the range runs from 4 KB to 512 KB. Dragon Data collapsed in 1984. Sources:
+RAM across the range runs from 4 KB to 512 KB. Dragon Data went out of business in 1984. Sources:
 [Wikipedia: TRS-80 Color Computer](https://en.wikipedia.org/wiki/TRS-80_Color_Computer),
 [Wikipedia: Dragon 32/64](https://en.wikipedia.org/wiki/Dragon_32/64).
 
@@ -93,14 +93,14 @@ None listed yet.
 
 ### For an exact reimplementation
 
-- Record the BASIC ROM version. It is part of the ground truth.
+- Record the BASIC ROM version with the ground truth. Some games depend on v1.0.
 
 ## Texas Instruments TI-99/4A
 
 ### Hardware
 
 The TI-99/4A uses the TMS9900, a 16-bit big-endian CPU with only PC, WP and ST on the chip. Its
-sixteen general registers live in RAM at the workspace pointer. BLWP saves WP, PC and ST into
+sixteen general registers are held in RAM at the workspace pointer. BLWP saves WP, PC and ST into
 workspace registers 13 to 15
 ([Wikipedia: TMS9900](https://en.wikipedia.org/wiki/Texas_Instruments_TMS9900)).
 

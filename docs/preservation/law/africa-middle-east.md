@@ -1,9 +1,9 @@
 # Africa, the Middle East, Other Nations
 
-This page is not legal advice. The law that applies is the law where you live.
+This page is not legal advice. The law of the country where you live applies to you.
 
 Most of these countries have a software exception on the EU model. Many article numbers below
-are marked "(not confirmed)" because they have not been checked against the official text.
+are marked "(not confirmed)".
 
 ## South Africa
 
@@ -18,7 +18,7 @@ are marked "(not confirmed)" because they have not been checked against the offi
 
 ## Nigeria
 
-The Copyright Act 2022, signed on 17 March 2023, is one of the most user-friendly laws covered
+The Copyright Act 2022, signed on 17 March 2023, gives users more exceptions than most laws covered
 ([Gazette text](https://placng.org/i/wp-content/uploads/2023/04/Copyright-Act-2022.pdf)).
 
 - **Studying a program.** Section 20(1) is an open fair dealing clause. Section 20(2) allows
@@ -87,7 +87,7 @@ The Copyright Act 2022, signed on 17 March 2023, is one of the most user-friendl
 - **How long copyright lasts.** The author's life plus 70 years (not confirmed).
 - **Availability.** Since March 2022 many Western stores have stopped selling games in Russia
   ([PC Gamer](https://www.pcgamer.com/steam-ukraine-russia-payments/)). Where a game is no longer
-  sold, an owned copy is often the only way to keep it playable.
+  sold in Russia, players often have only the copies they already own.
 
 ## Ukraine
 
@@ -102,6 +102,7 @@ The Copyright Act 2022, signed on 17 March 2023, is one of the most user-friendl
 
 ## What this means for a project
 
-Study and decompiling for interoperability are covered in Nigeria, Kenya, Ukraine and, on the
-unconfirmed text, Russia and Turkey. In South Africa, Egypt and the UAE, decompiling has no express cover. Observing the running game has the firmest footing. Most of these countries
+Nigeria, Kenya and Ukraine permit study and decompiling for interoperability. The unconfirmed
+texts of Russia and Turkey permit them too. South Africa, Egypt and the UAE do not expressly
+permit decompiling. Observing the running game carries the least risk. Most of these countries
 ban breaking locks.

@@ -2,8 +2,8 @@
 
 A web page has a document object model: a tree you can query ("the button called Save"),
 read ("its text") and act on ("click it"), from scripts, tests and tools. A game has no such
-thing by default. Build one. It is the most useful tool a reimplementation can have, and if
-you build it for the original as well, you can ask both programs the same question and compare
+model. Build one for the port, so tests, scripts and agents can query and drive it. If you
+build it for the original as well, you can ask both programs the same question and compare
 the answers.
 
 ## What the model holds
@@ -15,13 +15,13 @@ the answers.
 | **The session** | the current screen or loop, pause, speed, the frame or step, the seed | variables in the main loop and the loop object | the same fields |
 
 Use the **original's names** for everything: the names from its debug symbols, exports,
-resources and string tables, or your labels where it has none. Then a question means the same
+resources and string tables, or your labels where it has none. Then one query finds the same
 thing in both programs.
 
 ## The doors
 
 A door is a narrow, documented way into the running game. Every tool, test and recording goes
-through a door; nothing reaches into the game's internals around them.
+through a door. No tool reads or writes the game's internals any other way.
 
 | Door | What it does | Examples from our ports |
 |---|---|---|
@@ -39,11 +39,11 @@ breakpoints for **trace**, video memory for **capture**.
 
 ## Rules for the doors
 
-- **Doors only read, or act as the player would.** A test that writes a field directly tests
-  a game that no player can reach. Inputs and commands go through the paths a player's input
+- **Doors only read, or act as the player would.** A test that writes a field directly can
+  put the game in a state that no player can reach. Inputs and commands go through the paths a player's input
   takes.
-- **One language for all users.** The same queries from a test, from a script in the browser's
-  console, from an agent, and from a headless run. Answers as structured data (JSON).
+- **One query language for every caller.** A test, a script in the browser's console, an agent
+  and a headless run all send the same queries. The answers come back as structured data (JSON).
 - **Stable names.** Find things by the original's names or by their text. Then tests
   keep working when the layout or the timing changes.
 - **Keep the doors outside the rules.** The model and its doors are an addition the original
@@ -60,7 +60,7 @@ breakpoints for **trace**, video memory for **capture**.
 4. **Add the doors one at a time**, as the work needs them: query first, then input, then
    time, then trace.
 5. **Compare by query.** Put both programs in the same state, apply the same inputs, run the
-   same queries and compare the answers. A difference then has a name, such as "citizen 12,
+   same queries and compare the answers. You can then name each difference, such as "citizen 12,
    field `hunger`".
 
 ## Examples

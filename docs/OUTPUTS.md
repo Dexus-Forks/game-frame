@@ -1,6 +1,6 @@
 # What a project can ship
 
-Reverse engineering a game produces more than notes. This page lists what a project can give to
+This page lists what a project can give to
 players and to other developers, and how to build and publish each one. Nothing here ever
 contains the game's own files: every output reads the player's own copy (see
 [LEGAL.md](LEGAL.md)).
@@ -59,7 +59,7 @@ binaries:
       env: { GH_TOKEN: "${{ github.token }}" }
 ```
 
-Points that matter:
+Details of the job:
 
 - **Build from the tag**, not from the branch: a release commit may be followed by a "start the
   next version" commit.
@@ -81,7 +81,7 @@ files: the page asks for them, keeps them in the browser's storage, and never up
 Host it on the project's website. Check that the browser and the desktop compute the same game
 (`re-verify`, "Every platform").
 
-### The original, and the original with more
+### Additions to the original
 
 A reimplementation that matches the original can still add things (multiplayer, mod support,
 a debug probe). Ship one program, with the additions on by default, and a switch (for example

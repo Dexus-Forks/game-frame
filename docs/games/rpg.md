@@ -3,20 +3,20 @@
 Games where the player builds characters and explores a world: computer RPGs, dungeon
 crawlers, roguelikes and Japanese RPGs. They are [environments](interaction.md#the-four-kinds)
 the player moves through, often with [turn-based](interaction.md#the-four-kinds) battles,
-dialogue that waits for choices, and a world that keeps state everywhere.
+dialogue that waits for choices, and a large world state.
 
 ## Reference games
 
 | Game | Year, platform | Why it is a good example |
 |---|---|---|
 | Dungeon Master | 1987, Atari ST | Real-time dungeon crawling on a grid; a world full of moving objects |
-| Ultima VII | 1992, DOS | A living world with schedules for every person; its own script byte code |
+| Ultima VII | 1992, DOS | A world where every person follows a schedule; its own script byte code |
 | Ultima Underworld | 1992, DOS | First-person 3D dungeon before Doom, with physics and conversations |
 | The Elder Scrolls II: Daggerfall | 1996, DOS | A huge generated world, quests from templates |
-| Diablo | 1996, Windows | Real-time action RPG; random dungeons, item generation, a debug build that helped |
+| Diablo | 1996, Windows | Real-time action RPG; random dungeons, item generation, a debug build whose symbols helped Devilution |
 | Fallout and Fallout 2 | 1997 and 1998, Windows | Turn-based combat, dialogue scripts in byte code, a large save state |
 | Baldur's Gate | 1998, Windows | Infinity Engine: real-time with pause, D&D rules as tables and scripts |
-| Morrowind | 2002, Windows | An open world, a script language for quests, plugins that change everything |
+| Morrowind | 2002, Windows | An open world, a script language for quests, plugins that can change any part of the game |
 | NetHack | 1987 onward, many | Roguelike with released source; the reference for turn-based dungeon rules |
 
 ## Projects to learn from
@@ -42,8 +42,8 @@ Dialogue and quest state: which flags a conversation reads and sets. Turn order 
 
 **Where the rules live.** Much is in data: tables of classes, items, spells, monsters; maps with
 objects and triggers; and **scripts**, often in a byte code the game interprets (Ultima VII's
-usecode, Fallout's scripts, Infinity Engine's BCS). Port the interpreter, then the data runs
-itself. The core formulas (to-hit, damage, experience) are in code.
+usecode, Fallout's scripts, Infinity Engine's BCS). Once the interpreter is ported, the port runs
+the game's own scripts. The core formulas (to-hit, damage, experience) are in code.
 
 **Inputs.** Movement (keys or clicks to move), commands (talk, take, use, cast), menu and
 dialogue choices. A turn-based battle takes one command per turn; real-time games read input

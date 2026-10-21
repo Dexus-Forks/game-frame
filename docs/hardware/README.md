@@ -1,9 +1,9 @@
 # Hardware of the era
 
-A PC game from 1985 to 2005 talks to its hardware far more directly than a modern program. DOS
+A PC game from 1985 to 2005 uses its hardware far more directly than a modern program. DOS
 games program the timer, the video card, the sound card and the joystick port themselves.
-Windows games of the late 1990s use DirectX or a card maker's own 3D API. Much of what a game
-does is shaped by the hardware it was written for: the CPU's floating-point unit, the video
+Windows games of the late 1990s use DirectX or a card maker's own 3D API. The hardware a game was
+written for affects much of its code: the CPU's floating-point unit, the video
 mode, the sound chip, the 3D card's features.
 
 When you rebuild such a game, you replace the hardware with modern equivalents. To do that
@@ -46,8 +46,8 @@ In my GameFrame project, find every place the game touches hardware.
 2. **Label the driver layer.** Most games wrap hardware access in a small set of functions
    (set a mode, set a palette, play a sample, read the joystick). Name them, and treat the rest
    of the game as their callers.
-3. **Decide what is behaviour.** The picture and the sound the player perceives are behaviour.
-   How the game produced them on the card usually is not. A frame drawn by Glide can be drawn
+3. **Decide what the port must copy.** It must copy the picture and the sound the player
+   perceives. It usually does not need to copy how the game produced them on the card. A frame drawn by Glide can be drawn
    by Vulkan, as long as it looks the same.
 4. **Keep what the game logic reads back.** Some games read values from the hardware and use
    them in their rules: a timer count, the retrace state, a joystick reading, a sound

@@ -1,6 +1,6 @@
 # 35 countries compared
 
-This page is not legal advice. The law that applies is the law where you live. Each country has
+This page is not legal advice. The law of the country where you live applies to you. Each country has
 its own section on the region pages of [this chapter](README.md).
 
 "OST" means observe, study and test. "Interop" means decompilation or reverse engineering for interoperability. "(nc)" means not confirmed. A dash means the point is not known.
@@ -43,4 +43,10 @@ its own section on the region pages of [this chapter](README.md).
 | Switzerland | Interop art. 21 (nc) | Banned; permitted uses exempt (nc) | art. 24(1bis) (nc) | Life + 50 for programs (nc) | art. 22b (nc) | — |
 | Norway | OST and interop, §§ 41–42 (nc) | EU model (nc) | Yes (nc) | Life + 70 (nc) | Likely, EEA | — |
 
-Three groups emerge. The EU-model group (the EU, the UK, Korea, Singapore, New Zealand, Russia, Ukraine, Turkey, Norway and partly India) gives clear cover for observation and narrow cover for decompilation. The trade-agreement group (Canada, Mexico, Colombia, Australia and others) adds strict lock bans with an interoperability exception. A third group (Brazil, Argentina, Egypt, Indonesia, Thailand, Vietnam, Malaysia, the UAE and South Africa for now) has only back-up and research rules. In that group, decompilation has no express cover.
+The countries fall into three groups. The EU-model group is the EU, the UK, Korea, Singapore,
+New Zealand, Russia, Ukraine, Turkey, Norway and partly India. Its laws clearly permit
+observation and permit decompilation only for narrow purposes. The trade-agreement group is
+Canada, Mexico, Colombia, Australia and others. Its laws add strict lock bans with an
+interoperability exception. The third group is Brazil, Argentina, Egypt, Indonesia, Thailand,
+Vietnam, Malaysia, the UAE and South Africa under its current Act. Its laws have only back-up
+and research rules. They do not expressly permit decompilation.

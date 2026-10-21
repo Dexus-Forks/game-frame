@@ -1,6 +1,6 @@
 # Recognising an engine
 
-An engine leaves marks in the files it ships with: archive formats, file extensions, DLL names,
+A game built on an engine usually shows it in its files: archive formats, file extensions, DLL names,
 version strings, copyright notices and debug paths. Check these during inventory, before you
 decompile anything. `tools/pe/peinfo.py` prints imports, exports, the PDB path and engine
 fingerprints for Windows binaries; `tools/dos/dosinfo.py` does the same for DOS programs.
@@ -69,7 +69,7 @@ The executable often contains code from libraries the game linked in. Ghidra can
 game's functions from a library's. Find and label the library code first, so you do not trace
 it by mistake.
 
-| Library code | How it shows itself | What to do |
+| Library code | How to spot it | What to do |
 |---|---|---|
 | The C runtime (MSVC, Watcom, Borland, DJGPP) | `malloc`, `printf`, `qsort`, `_ftol`, startup code before `main`; copyright strings | Apply function signatures for the compiler (Ghidra's Function ID, FLIRT-style signatures), or label by hand from the strings |
 | The C++ standard library | `std::` names in RTTI, `basic_string` | Label, do not trace |

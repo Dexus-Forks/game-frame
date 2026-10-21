@@ -2,7 +2,7 @@
 
 Atari moved from the 6502 to the 68000 family and to other CPUs. System 1 is a BIOS board with
 game cartridges. System 2 uses a DEC T-11, which no disassembler listed here supports. The GT
-board runs a 68EC020. Hard Drivin' splits each game across a 68010, TMS34010s and polygon DSPs.
+board runs a 68EC020. Each Hard Drivin' game runs on a 68010, TMS34010s and polygon DSPs.
 The 6502 vector games are on the
 [Z80 and 6502](z80-and-6502-era.md#atari-asteroids-and-the-vector-games) page.
 
@@ -57,8 +57,8 @@ None listed.
 
 ### Tools
 
-The DEC T-11 is a PDP-11 relative. Ghidra's bundled processors and Unicorn's architectures do
-not include it. MAME is the runner for ground truth.
+The DEC T-11 is related to the PDP-11. Ghidra's bundled processors and Unicorn's architectures
+do not include it. Use MAME to produce ground truth.
 
 ### Projects to learn from
 
@@ -89,7 +89,7 @@ None listed.
 
 ### Tools
 
-- The driver holds 55 entries, starting with "Hard Drivin' (cockpit, rev 7)". One carries
+- The driver holds 55 entries, starting with "Hard Drivin' (cockpit, rev 7)". One has
   MACHINE_NOT_WORKING.
 - Ghidra's 68000 module covers the 68010. The
   [Ghidra_TMS34010](https://github.com/ZPaul2Fresh8/Ghidra_TMS34010) extension covers the GSP
@@ -101,8 +101,8 @@ None listed yet.
 
 ### For an exact reimplementation
 
-- Expect three or more instruction sets per game. Game logic usually lives on the main CPU.
-  The DSP programs must be reproduced too ([early 3D boards](early-3d.md)).
+- Expect three or more instruction sets per game. The game logic usually runs on the main CPU.
+  A port must also reproduce the DSP programs ([early 3D boards](early-3d.md)).
 - Record which board variant and which DSP the set uses.
 
 ## Atari GT
@@ -128,7 +128,7 @@ None listed yet.
 
 ### For an exact reimplementation
 
-- Treat the CAGE sound board as its own program.
+- Trace the program on the CAGE sound board separately.
 
 ## Atari source releases
 
@@ -138,6 +138,6 @@ Gravitar, Liberator, Lunar Lander, Major Havoc (a disassembly), Millipede, Missi
 Pole Position, Quantum, Red Baron, Space Duel, Sprint, Star Wars and Tempest. It also has an
 "atari-coin-op-assembler" repository
 ([GitHub: historicalsource](https://github.com/historicalsource?tab=repositories)). The
-repositories give no licence or provenance statement. GameFrame's rule of no game material
-keeps this source out of a project's own repository. Treat it as third-party evidence. The
-shipped ROM remains the reference for exact behaviour ([Legal](../LEGAL.md)).
+repositories give no licence or provenance statement. GameFrame's rule against game material
+means a project does not copy this source into its own repository. Treat it as third-party
+evidence. Use the shipped ROM for exact behaviour ([Legal](../LEGAL.md)).

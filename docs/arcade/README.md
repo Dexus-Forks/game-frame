@@ -2,12 +2,12 @@
 
 This section covers arcade boards from discrete logic to the PC-based systems. Each page covers
 one era or one family of boards. Many boards were built for one game or a few games. The MAME
-driver source is the densest record of a board. It lists the chips, the crystals, the clock
-dividers and the screen timing.
+driver source for a board lists its chips, its crystals, its clock dividers and its screen
+timing. It usually gives more detail than any other public source.
 
 ## Across all boards
 
-- [Practices for arcade work](practices.md): MAME as the record, machine flags, ROM sets and
+- [Practices for arcade work](practices.md): MAME driver source, machine flags, ROM sets and
   CHD, NVRAM and DIP settings as test inputs, attract mode, input recording, refresh rates and
   frame drift.
 - [Encryption and protection](protection.md): suicide batteries, the Sega, Capcom, Konami and
@@ -39,24 +39,23 @@ dividers and the screen timing.
 ## How arcade work differs from console work
 
 A console has one hardware design for every game. An arcade board was often built for one game
-or for a short run of games. Each board family needs its own memory map, its own clocks and
-its own protection.
+or for a short run of games. Each board family has its own memory map, clocks and protection.
 
 Arcade refresh rates are rarely 60 Hz. They run from about 54.71 Hz on Midway's TMS34010
 boards to about 61.5 Hz on Atari's Asteroids. A port must run at the board's own rate to stay
 in step with a recording of the original. The [practices page](practices.md#refresh-rates-and-frame-drift)
 has the table.
 
-Three problems grow with each era.
+Later boards add three problems.
 
-1. From the 1980s, encryption sits in battery-backed custom CPUs. A disassembly of the raw ROM
-   means nothing until it is decrypted the way the CPU did it.
+1. From the 1980s, many boards use battery-backed custom CPUs that decrypt the program. A
+   disassembly of the raw ROM is unreadable until you decrypt it with the CPU's method.
 2. From 1988, 3D boards split the game across a main CPU and one or more DSPs. Each DSP runs
    its own program. Ghidra has no built-in module for most of those DSPs.
-3. From 2004, the boards are x86 PCs. Their code exists in decrypted form only on a running
-   machine with its keychip.
+3. From 2004, the boards are x86 PCs. The game code is decrypted only on a running machine
+   with its keychip.
 
-## A working order
+## Order of work
 
 1. Read the MAME driver for the board. Note the clocks, the screen totals and the machine
    flags.
@@ -65,10 +64,10 @@ Three problems grow with each era.
 3. On a 3D board, capture the DSP programs too. They hold part of the game.
 4. Record the DIP settings, the BIOS, the region and the NVRAM image with every test case
    ([practices](practices.md#nvram-and-dip-settings-as-test-inputs)).
-5. Check MAME's flags before using it as ground truth. Where MAME does not run a game, ground
-   truth comes from another emulator or from owned hardware.
+5. Check MAME's flags before using it as ground truth. If MAME does not run a game, take
+   ground truth from another emulator or from owned hardware.
 
-## The shape of each page
+## Page layout
 
 Each family page opens with one short paragraph and a table that compares its boards. Then it
 has one section per board. Each board section has the same headings in the same order.
@@ -80,14 +79,14 @@ has one section per board. Each board section has the same headings in the same 
 5. **For an exact reimplementation**: what to settle before porting.
 
 A refresh rate marked "(computed)" is the pixel clock divided by the horizontal and vertical
-totals in the MAME driver. It is derived from MAME's model and is not a separate measurement.
-A fact marked "(not confirmed)" has one source and lacks a second. A fact marked "(secondary
-source)" comes from a forum, a wiki copy or a press report. MAME's flags and entry counts
-change with each release.
+totals in the MAME driver. It comes from MAME's model of the board. It is not a separate
+measurement. A fact marked "(not confirmed)" has one source and lacks a second. A fact marked
+"(secondary source)" comes from a forum, a wiki copy or a press report. MAME's flags and entry
+counts change with each release.
 
 Encryption and protection are described factually. The law on working around them differs by
-country ([Legal](../LEGAL.md), [the law worldwide](../preservation/law/README.md)). The choice
-of route stays with you.
+country ([Legal](../LEGAL.md), [the law worldwide](../preservation/law/README.md)). You decide
+which route to take.
 
 ## Related pages
 

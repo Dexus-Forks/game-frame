@@ -1,8 +1,8 @@
 # Online games
 
 Massively multiplayer games and other games where a server owned by the publisher holds the
-world. The client is only half the game. The rules that matter (combat results, loot, the
-economy) run on a server you do not have. They are [environments](interaction.md#the-four-kinds)
+world. The main rules (combat results, loot, the economy) run on a server you do not
+have. They are [environments](interaction.md#the-four-kinds)
 shared by many players.
 
 Read [Legal](../LEGAL.md) before starting. Online games add limits that single-player games do
@@ -16,7 +16,7 @@ to court.
 |---|---|---|
 | Ultima Online | 1997 | Early MMO with a documented packet protocol and long-running server emulators |
 | EverQuest | 1999 | 3D MMO; zones as separate servers; a server emulator project for decades |
-| Phantasy Star Online | 2000, Dreamcast and PC | A console online game kept alive by community servers |
+| Phantasy Star Online | 2000, Dreamcast and PC | A console online game still played on community servers |
 | City of Heroes | 2004 | Shut down in 2012; a community server was later licensed by the publisher |
 | World of Warcraft | 2004 | The best known case of server emulation, and of legal action against private servers |
 
@@ -39,7 +39,7 @@ approximations rebuilt from what players observed.
 timing, so the original client accepts the server. Server rules can only be as exact as the
 evidence: captured traffic, client-side formulas, players' documentation. Mark them *inferred*.
 
-**Where the rules live.** Split. The client has the interface, rendering, prediction and some
+**Where the rules live.** The rules are split. The client has the interface, rendering, prediction and some
 formulas (to show numbers before the server answers). The server has the authority. Data files
 on the client often include tables the server also uses.
 
@@ -49,8 +49,8 @@ use.
 
 **Interface.** As large as an RPG's, plus chat, groups, trading, mail and auction houses.
 
-**Time and determinism.** Server ticks; the client interpolates and predicts. Exactness is
-defined by the protocol and the server's answers.
+**Time and determinism.** Server ticks; the client interpolates and predicts. A port is exact
+when it follows the protocol and gives the server's answers.
 
 **How to verify.** Against captured traffic from your own sessions (while the official service
 exists and allows it), and against the client: does it accept every message, and show the

@@ -1,7 +1,7 @@
 # Patterns you will meet in game code
 
-Most games are built from the same handful of parts. Recognising the part tells you what to
-look for next and which details will matter for an exact reimplementation.
+Most games are built from the same few parts. When you recognise a part, you know what to look
+for next and which details an exact reimplementation must copy.
 
 Start with the kind of game. Who drives (the game or the player), the families of games and
 their rule sets, and the systems they share are in [the taxonomy](games/README.md) and
@@ -17,19 +17,20 @@ pump sits inside it) and the present call (`IDirect3DDevice9::Present`, `IDXGISw
 
 - **Fixed step:** the update runs at a constant rate (often 30 or 60 per second) and an
   accumulator decides how many steps a frame runs. Game speed settings usually multiply the
-  number of steps, not the step size. Reimplement the accumulator exactly: the number of steps
-  per frame is behaviour.
+  number of steps, not the step size. Reimplement the accumulator exactly, because the number of
+  steps per frame changes the game's results.
 - **Variable step:** the update takes the frame time (`dt`). Exact replay is then impossible
   without recording `dt`; tests feed a fixed `dt`.
 - **Loop objects:** engines often have a stack or state machine of loops (menu, loading, game),
   each with load, start, update, draw, input and stop methods in a vtable.
 
-The order of systems inside one update is observable (who sees whose changes this step): record
-it early, in a table, from the update function's callees.
+The order of systems inside one update changes the results, because a later system sees the
+changes an earlier system made in the same step. Record the order early, in a table, from the
+update function's callees.
 
 ## Random number generators
 
-Usually small, self-contained and the first thing to emulate:
+Random number generators are usually small and self-contained. Emulate them first.
 
 | Kind | How to recognise it |
 |---|---|
@@ -40,8 +41,8 @@ Usually small, self-contained and the first thing to emulate:
 | WELL, PCG, SplitMix | constants such as 0x5851F42D4C957F2D (PCG), 0x9E3779B97F4A7C15 (SplitMix) |
 
 Games often have several generators (one for the simulation, one for effects or sound) and
-may seed them from the clock. Find every instance and who draws from each: a draw from the wrong
-stream is as bad as a draw out of order. Helpers built on the generator (a float in [0,1), a
+may seed them from the clock. Find every instance and who draws from each. A draw from the wrong
+generator changes the results as much as a draw out of order. Helpers built on the generator (a float in [0,1), a
 range, a "tolerance" around a value) each have their own rounding; emulate them too.
 
 ## Entities and components
@@ -51,7 +52,7 @@ range, a "tolerance" around a value) each have their own rounding; emulate them 
 - **Entity-component systems:** an entity is an id or a small object holding a list of
   components; each component type has a type id (often a hash of its name) and a vtable with
   lifecycle slots (create, attach, update, serialize, destroy). Systems iterate components of
-  one type in a fixed order: that order is behaviour.
+  one type in a fixed order. Keep that order in the reimplementation.
 - **Handles:** an index plus a generation counter, packed into 32 or 64 bits.
 
 ## Resources and data
@@ -70,8 +71,8 @@ range, a "tolerance" around a value) each have their own rounding; emulate them 
 ## Time
 
 Games keep time as integer ticks (milliseconds or microseconds) or as float seconds, and the
-calendar of a simulation (days, seasons, years) is derived from it. Float time accumulates
-error: if the original does that, the reimplementation must too.
+calendar of a simulation (days, seasons, years) is derived from it. Float time gathers
+rounding error. If the original keeps time as a float, the reimplementation must do the same.
 
 Use the game's own calendar and its own names. A game's year may have twelve "months" that are
 seasons (Early Spring to Late Winter), or eight, or none; its tenth month is not October. Read the names from the game's string tables. Use them in docs, tests and examples.
@@ -89,8 +90,8 @@ table.
 
 A save is the serialized world: often the same serializers as the data files, plus the random
 generator states, the clock, and object references written as indices or ids. Pointers between
-objects need a fix-up pass on load. Saves are the best test of a reimplementation: loading one
-exercises every system's state.
+objects need a fix-up pass on load. Loading a real save is the best test of a reimplementation,
+because a save holds the state of every system.
 
 ## Rendering and UI
 
@@ -100,7 +101,7 @@ exercises every system's state.
   a widget tree, events by id), with screens as loop objects. See
   [Capturing the interface](observe/ui.md).
 - Frame capture tools (RenderDoc, PIX, apitrace) show the draw calls, their states and the
-  constant values of a real frame: the fastest way to understand a rendering pass.
+  constant values of a real frame. A capture is the fastest way to understand a rendering pass.
 
 ## Networking (if any)
 
@@ -110,5 +111,5 @@ live service without its owner's permission.
 
 If you add lockstep multiplayer to a single-player game, look for state that belongs to one
 player but is read by the simulation: settings, unlocked achievements, difficulty options, the
-local clock, the window size. Two players with different values then compute different worlds.
+local clock, the window size. Two players with different values then compute different game states.
 Give every player the same values for a shared game (for example, count achievements from none in multiplayer). Check with digests that two players stay identical.

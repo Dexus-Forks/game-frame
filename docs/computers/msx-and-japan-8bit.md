@@ -36,7 +36,7 @@ Images are ROM dumps with a mapper type, DSK disks and CAS tapes (not confirmed)
 ### Tools
 
 - **openMSX** has a Tcl console and a separate debugger ([openmsx.org](https://openmsx.org/)).
-  A script can drive the Tcl console, which suits capture by an agent
+  An agent can drive captures through the Tcl console with a script
   ([re-observe](../../.claude/skills/re-observe/SKILL.md)).
 - Ghidra has the Z80 built in. Unicorn has no Z80. For ground truth use a small core such as
   iz80 ([CPU families](cpu-families.md#tools-per-family)).
@@ -51,7 +51,7 @@ None listed yet.
 
 - Record the mapper type of the cartridge. Name functions by bank and address.
 - Record the slot layout of the reference machine.
-- Record which VDP the reference machine has. European machines differ.
+- Record which VDP the reference machine has. European machines use the TMS9929A.
 
 ## NEC PC-8801
 

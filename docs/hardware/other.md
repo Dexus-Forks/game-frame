@@ -1,6 +1,6 @@
 # Memory, storage, input and networks
 
-This page covers memory beyond 640 KB, CDs, joysticks and networks. Each leaves its own marks
+This page covers memory beyond 640 KB, CDs, joysticks and networks, and how to recognise each
 in a game's code.
 
 ## Memory in DOS
@@ -16,7 +16,7 @@ get more.
 | DOS extenders | 32-bit protected mode with flat memory, with DOS calls passed to real mode | `DOS/4GW` (Watcom, LE executables), `PMODE/W`, `CWSDPMI` (DJGPP), Phar Lap | See [DOS games](../DOS.md) for loaders and emulators |
 | DPMI | The interface extenders use to ask for memory, selectors and interrupts | `INT 31h` | GameFrame's `dos_env` emulates the calls games use |
 
-Free memory mattered to players. Some games lowered detail or disabled sound when memory was
+Some games lowered detail or disabled sound when memory was
 short. Find the memory checks and fix their result in the port, so every run takes the same
 path.
 
@@ -31,8 +31,8 @@ path.
 - **CD checks**: a game checks for its disc by reading a file or a volume label. The port reads
   the player's files and does not need the check. Breaking copy protection is restricted in
   many countries ([Your own copy and the law](../preservation/law/README.md)).
-- **Streaming**: some games read from the CD while playing (video, music, level data). Read
-  timings then shaped the game; a port reads from disk and need not reproduce delays unless the
+- **Streaming**: some games read from the CD while playing (video, music, level data). The read
+  times then affected the game's timing. A port reads from disk and need not reproduce delays unless the
   game logic depended on them.
 
 ## Input devices
@@ -63,8 +63,8 @@ Multiplayer games of this time are usually lockstep: every computer runs the who
 only commands travel ([Strategy](../games/strategy.md), [Networking](../GAME-PATTERNS.md#networking-if-any)).
 The message format is the input record for multiplayer. Find it, together with the packet a game sends each turn.
 
-- A port can replace the transport (IPX, serial) with a modern one. The messages and the turn
-  timing are behaviour if two copies of the port must play together. They are also behaviour if
-  the port must play with the original, which is rarely worth it.
+- A port can replace the transport (IPX, serial) with a modern one. The port must keep the messages
+  and the turn timing if two copies of the port must play together. The same holds if the port
+  must play with the original, which is rarely worth it.
 - Tools from the time (Kali, Kahn) tunnelled IPX over the internet. DOSBox can do the same, so
   you can run two copies of the original and capture their messages.

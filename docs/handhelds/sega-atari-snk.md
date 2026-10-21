@@ -24,7 +24,7 @@ Many Game Gear games are Master System ports
 
 ### Tools
 
-Ghidra builds in the Z80. Unicorn and Capstone have no Z80, so ground truth comes from a small
+Ghidra builds in the Z80. Unicorn and Capstone have no Z80, so take ground truth from a small
 core such as [iz80](https://github.com/ivanizag/iz80) or from MAME. Emulicious also covers the
 Game Gear, with a profiler, tracer and source-level debugging
 ([Emulicious](https://emulicious.net/)).

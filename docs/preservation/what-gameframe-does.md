@@ -4,11 +4,11 @@ GameFrame helps one person study a game they own and rebuild it in new code. The
 runs on current computers. It reads the owner's original game files when it runs. It must give
 the same results as the original, measured on the original's own code.
 
-## A record of how the game worked
+## Documents of how the game works
 
 MAME, the arcade emulator, describes its own source code as documentation of the machines it
-emulates. Being able to play a game mainly proves that the documentation is right
-([MAME](https://github.com/mamedev/mame)). GameFrame takes the same view of one game.
+emulates. The MAME team says that playing a game mainly shows that the documentation is right
+([MAME](https://github.com/mamedev/mame)). GameFrame applies this idea to a single game.
 
 - The findings are written down as documents, with the address in the original that each claim
   comes from ([Writing findings](../working/writing.md)).
@@ -21,9 +21,9 @@ emulates. Being able to play a game mainly proves that the documentation is righ
 
 A later project can use the documents without the port's code.
 
-## Where it fits
+## Other preservation work
 
-Different people keep different parts of a game alive.
+Different groups preserve different parts of a game.
 
 | Who | What they keep |
 |---|---|
@@ -32,9 +32,9 @@ Different people keep different parts of a game alive.
 | Matching decompilations (Super Mario 64, Ocarina of Time) | Source code that compiles to the identical original program |
 | Reimplementations (ScummVM, OpenRCT2, DevilutionX) | New code that runs the original game's data on current systems |
 
-GameFrame belongs to the last group. It adds two things to it. It turns the method into
-skills an agent can follow step by step. It checks the new code against the original's own
-code, function by function.
+GameFrame belongs to the last group. Its playbook gives an agent the method as skills to
+follow step by step. Its toolkit checks the new code against the original's own code, one
+function at a time.
 
 ## What it cannot do
 
@@ -43,8 +43,8 @@ code, function by function.
   never released.
 - It does not make a game available to people who cannot buy it. Most of the 87% of games out
   of print stay out of print.
-- It is not a shortcut. A careful reimplementation of a small game takes weeks of work by a
-  person and an agent together.
+- A careful reimplementation of a small game takes weeks of work by a person and an agent
+  together.
 
 ## What a project ships
 

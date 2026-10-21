@@ -48,7 +48,7 @@ features:
 
 ## The method
 
-Each step has a skill. The steps run in order. A failed check sends the work back to the trace.
+Each step has a skill. The steps run in order. When a check fails, you go back to the trace step.
 
 ![The method as a loop. Inventory, observe, decompile, trace, format, emulate, reimplement, verify and land, each with its skill. When a check fails, the work goes back to the trace.](../docs/assets/method-loop.svg)
 

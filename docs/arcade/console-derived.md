@@ -36,7 +36,7 @@ a Capcom BIOS (COH1000C.353).
 ### Tools
 
 Of 116 entries, 3 do not work. Ghidra's MIPS module and Unicorn's MIPS backend cover the CPU
-([CPU families](../computers/cpu-families.md#mips)). PlayStation tools apply to the code
+([CPU families](../computers/cpu-families.md#mips)). PlayStation tools work on the code
 ([tools for console work](../consoles/tools.md)).
 
 ### Projects to learn from
@@ -59,7 +59,7 @@ System 12 (1996 onward) uses a CXD8661R or CXD8606BQ at 100 MHz and an H8/3002 s
 
 ### Protection
 
-Game boards carry key chips. Tekken 2 uses C406. Tekken itself sits on board COH-100 with no key
+Game boards have key chips. Tekken 2 uses C406. Tekken runs on board COH-100, which has no key
 chip. Ehrgeiz (1998, COH-700) uses KC021.
 
 ### Tools
@@ -90,7 +90,7 @@ Some cartridges use the 315-5881 chip found on NAOMI M2 carts. Tecmo World Cup '
 
 ### Tools
 
-Of 120 entries, 67 carry MACHINE_NOT_WORKING. Ghidra's SuperH module covers the SH-2. Unicorn
+Of 120 entries, 67 have MACHINE_NOT_WORKING. Ghidra's SuperH module covers the SH-2. Unicorn
 has no SH-2 backend ([CPU families](../computers/cpu-families.md#superh)).
 
 ### Projects to learn from
@@ -118,7 +118,7 @@ The filter board outputs VGA at 15 kHz or 31.5 kHz, chosen by a DIP switch.
 ### Protection
 
 Sega made six known cart PCB types: 171-7885A, 171-7919A, 171-7930B, 171-7978B, 171-8132B and
-171-8346C. A cart carries three security parts
+171-8346C. Each cart has three security parts
 ([MAME naomi.cpp](https://github.com/mamedev/mame/blob/master/src/mame/sega/naomi.cpp)).
 
 - A 315-5881, "usually different per game", with a 317-xxxx key number. Crazy Taxi, for
@@ -135,8 +135,8 @@ M1 carts are identified by an Actel ID. They take a key as a parameter
 ([MAME naomim1.cpp](https://github.com/mamedev/mame/blob/master/src/mame/sega/naomim1.cpp)).
 
 GD-ROM games load through the DIMM board. Its 315-6322 chip handles "DIMM SDRAM controller, DES
-decryption, host system communication" for NAOMI, Triforce and Chihiro. A PIC16 sits on the
-option board
+decryption, host system communication" for NAOMI, Triforce and Chihiro. The option board
+has a PIC16
 ([MAME naomigd.cpp](https://github.com/mamedev/mame/blob/master/src/mame/sega/naomigd.cpp)).
 
 Atomiswave (2003) ROM boards decrypt with an 8-bit key derived from the cartridge CPLD. MAME
@@ -174,20 +174,21 @@ uses a PPC603 placeholder at 64 MHz
 
 ### Protection
 
-Sega titles ship on GD-ROM through the DIMM board with key chips. Virtua Striker 2002 is
-GDT-0001 with 317-0337-JPN. F-Zero AX is GDT-0004 with 317-0362-COM. Some carry a PIC16C621A.
+Sega titles come on GD-ROM. They load through the DIMM board and use key chips. Virtua Striker
+2002 is GDT-0001 with 317-0337-JPN. F-Zero AX is GDT-0004 with 317-0362-COM. Some also have a
+PIC16C621A.
 Namco titles use ROM carts.
 
 ### Tools
 
-- All 73 Triforce entries in MAME carry MACHINE_NOT_WORKING.
+- All 73 Triforce entries in MAME have MACHINE_NOT_WORKING.
 - Mainline Dolphin removed Triforce support (the AM-Baseboard) in 2016 for lack of a maintainer
   ([Dolphin Progress Report, August 2016](https://dolphin-emu.org/blog/2016/09/01/dolphin-progress-report-august-2016/)).
 - Reports say it returned to mainline Dolphin in February 2026 (secondary source)
   ([Time Extension](https://www.timeextension.com/news/2026/02/gamecube-and-wii-emulator-dolphin-adds-support-for-triforce-arcade-platform-from-namco-nintendo-and-sega);
   [RetroHandhelds](https://retrohandhelds.gg/dolphin-emulator-finally-brings-triforce-arcade-support-to-main-branch/)).
-- Ghidra's PowerPC module and Unicorn's PPC backend cover the CPU. The paired-single
-  instructions need care ([CPU families](../computers/cpu-families.md#powerpc)).
+- Ghidra's PowerPC module and Unicorn's PPC backend cover the CPU. Check how each tool
+  handles the paired-single instructions ([CPU families](../computers/cpu-families.md#powerpc)).
 
 ### Projects to learn from
 
@@ -195,8 +196,8 @@ None listed yet.
 
 ### For an exact reimplementation
 
-- MAME is not ground truth for any Triforce game. Ground truth comes from Dolphin or from owned
-  hardware.
+- Do not use MAME as ground truth for any Triforce game. Take ground truth from Dolphin or from
+  owned hardware.
 
 ## Sega Chihiro
 
@@ -219,7 +220,7 @@ GD-ROM games load through the DIMM board, which does DES decryption.
 
 ### Tools
 
-All 64 MAME entries carry MACHINE_NOT_WORKING. Ghidra and Unicorn cover x86.
+All 64 MAME entries have MACHINE_NOT_WORKING. Ghidra and Unicorn cover x86.
 
 ### Projects to learn from
 
@@ -227,7 +228,7 @@ None listed yet.
 
 ### For an exact reimplementation
 
-- MAME is not ground truth for any Chihiro game.
+- Do not use MAME as ground truth for any Chihiro game.
 - The media board holds an .xbe loader. Ghidra and Unicorn cover the x86 code once the files
   are decrypted ([re-ghidra](../../.claude/skills/re-ghidra/SKILL.md)).
 
@@ -247,7 +248,7 @@ using same HDDs".
 
 ### Tools
 
-- All 60 MAME entries carry MACHINE_NOT_WORKING.
+- All 60 MAME entries have MACHINE_NOT_WORKING.
 - The Play! PS2 emulator has a "Namco System 2x6 Arcade Support" section. Arcade files go in an
   `arcaderoms` folder. They boot with `--arcade "arcade id"`
   ([Play! README](https://github.com/jpd002/Play-)).
@@ -265,15 +266,15 @@ None listed yet.
 
 ### Hardware
 
-Konami's Bemani line moved from consoles to PCs.
+Konami's Bemani games first ran on console-based boards. Later versions ran on PCs.
 
 - System 573 is based on the original PlayStation. It was used mainly for Bemani titles
   ([Wikipedia, System 573](https://en.wikipedia.org/wiki/System_573)).
 - Beatmania IIDX moved from the PlayStation-based Twinkle hardware to the Windows XP-based
-  "Bemani PC Type 1" with 9th Style. 9th Style also debuted e-Amusement
+  "Bemani PC Type 1" with 9th Style. e-Amusement also first appeared with 9th Style
   ([Wikipedia, Beatmania IIDX 9th Style](https://en.wikipedia.org/wiki/Beatmania_IIDX_9th_Style)).
-- Python 2 is PS2-based, with an Emotion Engine and 32 MB of Rambus memory. It hosted
-  GuitarFreaks and DrumMania V to V3
+- Python 2 is PS2-based, with an Emotion Engine and 32 MB of Rambus memory. GuitarFreaks
+  and DrumMania V to V3 ran on it
   ([Wikipedia, GuitarFreaks and DrumMania](https://en.wikipedia.org/wiki/GuitarFreaks_and_DrumMania);
   [gamerepair.info, Python 1](https://gamerepair.info/hardware/22_python_1)).
 - Dance Dance Revolution X ran on Bemani PC Type 4 under Windows XP Embedded
@@ -285,7 +286,7 @@ Konami's security plugs are not covered here.
 
 ### Tools
 
-The PlayStation-based boards take MIPS tools. The PC-based boards take the PE path
+For the PlayStation-based boards, use MIPS tools. For the PC-based boards, follow the PE path
 ([PC-based boards](pc-based.md)).
 
 ### Projects to learn from

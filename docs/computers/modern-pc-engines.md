@@ -1,10 +1,11 @@
 # Engine-era PC games
 
-In engine-era PC games much of the logic moves out of the native executable. It sits in managed
+In engine-era PC games much of the logic is outside the native executable. It is in managed
 assemblies, in C++ generated from them, or in packed asset files. This page has one section per
-engine or runtime, because the hardware no longer decides the method. Each section uses the
-headings of the machine pages that apply. Recognising an engine, and the engines themselves,
-are covered in [Software engines and middleware](../engines/README.md).
+engine or runtime. For these games the tools depend on the engine more than on the hardware.
+Each section uses the headings of the machine pages that apply.
+[Software engines and middleware](../engines/README.md) describes the engines and how to
+recognise each one.
 
 ## .NET and Unity with Mono
 
@@ -87,16 +88,16 @@ gdsdecomp recovers projects (not confirmed) ([gdsdecomp](https://github.com/bruv
 
 Kernel-level anti-cheat can block debuggers (not confirmed)
 ([Anti-cheat software](https://en.wikipedia.org/wiki/Anti-cheat_software)). Protected or
-virtualised regions resist decompilation. Unicorn emulation works best on the game's own logic
+virtualised code is hard to decompile. Unicorn emulation is most useful on the game's own logic
 ([re-emulate](../../.claude/skills/re-emulate/SKILL.md)).
 
 ## Linux builds as a second binary
 
-Linux ports came from Loki Software between 1998 and 2002. Linux play now runs mostly through
-Proton (2018) and the Steam Deck (2022). These facts are (not confirmed)
+Linux ports came from Loki Software between 1998 and 2002. Most Linux players now use Proton
+(2018) and the Steam Deck (2022). These facts are (not confirmed)
 ([Loki Entertainment Software](https://en.wikipedia.org/wiki/Loki_Entertainment_Software);
 [Proton](https://en.wikipedia.org/wiki/Proton_(software));
 [Steam Deck](https://en.wikipedia.org/wiki/Steam_Deck)).
 
-Linux builds sometimes keep more symbols than Windows builds. That makes a Linux build a useful
-second binary. Compare its functions with the Windows build to name them.
+Linux builds sometimes keep more symbols than Windows builds. Use a Linux build as a second
+binary. Compare its functions with the Windows build to name them.

@@ -1,8 +1,8 @@
 # Nintendo DS and 3DS
 
 The DS and 3DS run ARM code from cartridges. The DS splits a game between an ARM9 and an ARM7
-binary. The 3DS packs its code in AES-encrypted containers. A decrypted dump and the right
-Ghidra loader come before any analysis.
+binary. 3DS games store their code in AES-encrypted containers. Before any analysis, you need a
+decrypted dump and the right Ghidra loader.
 
 ## The devices
 
@@ -52,7 +52,7 @@ described as "pretty broken".
 [ghidra-3dsx-loader](https://github.com/danylokos/ghidra-3dsx-loader) loads 3DSX homebrew.
 Azahar runs the games.
 
-Citra came down in March 2024, at the same time as the yuzu settlement
+Citra was taken down in March 2024, at the same time as the yuzu settlement
 ([Wikipedia: Citra](https://en.wikipedia.org/wiki/Citra_(emulator));
 [Switch family](switch-family.md#keys-and-the-yuzu-settlement)). Lime3DS and PabloMK7's fork
 merged into Azahar in late 2024, with first releases in early 2025

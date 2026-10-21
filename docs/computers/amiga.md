@@ -1,8 +1,9 @@
 # Commodore Amiga
 
-The Amiga uses the big-endian 68000 line ([CPU families](cpu-families.md#the-68000)). Its
-custom chips shape how its games were written. Many games skip the OS and drive the chips
-directly. A game that uses the AmigaOS libraries can be traced at the OS call boundary. Trace a takeover game at its hardware register writes. The port must rebuild what the chips did.
+The Amiga uses the big-endian 68000 line ([CPU families](cpu-families.md#the-68000)). Many
+games skip the OS and drive the custom chips directly. A game that uses the AmigaOS libraries
+can be traced at the OS call boundary. Trace a takeover game at its hardware register writes.
+Its port must reproduce the effect of each chip operation.
 
 ## The chip sets
 
@@ -28,7 +29,7 @@ and HAM details. The exact PAL and NTSC CPU clocks also need that manual.
 - **Agnus** is the chip RAM DMA controller. It arbitrates between the CPU and the custom chips.
   It holds the Blitter and the Copper. The original Agnus addresses 512 KB of chip RAM. Later
   "Fat Agnus" revisions raised this to 1 MB and then 2 MB.
-- **Timing** runs in colour clocks of 280 ns.
+- **Timing.** The chips count time in colour clocks of 280 ns.
 - The **Blitter** combines up to three sources into a destination, over blocks up to
   1,024x1,024 pixels.
 - The **Copper** runs a program of three instructions (MOVE, WAIT, SKIP) synchronised to the
@@ -41,8 +42,8 @@ and HAM details. The exact PAL and NTSC CPU clocks also need that manual.
 
 ### How games were made and loaded
 
-Many games take over the machine and drive the chips directly. A takeover game ties its timing
-to the vertical blank, 50 Hz on PAL and 60 Hz on NTSC.
+Many games take over the machine and drive the chips directly. A takeover game times itself from
+the vertical blank, 50 Hz on PAL and 60 Hz on NTSC.
 
 Rob Northen's **Copylock** protected disks on the Amiga, the ST and the PC. Its trace vector
 decoder decrypts each instruction, runs it, then encrypts it again
@@ -53,7 +54,7 @@ reverse engineered the Amiga Copylock in June 2001 and counted over 500 titles u
 [Part 2](https://softpres.org/wip:2001-06-08)). Later keydisks carried a unique serial number
 in the disk format
 ([Codetapper interview with Rob Northen](https://codetapper.com/amiga/interviews/rob-northen)).
-A self-decrypting game is best read after decryption, from emulator memory.
+Read a self-decrypting game from emulator memory after it has decrypted itself.
 
 ### Media and image formats
 
@@ -64,8 +65,8 @@ A self-decrypting game is best read after decryption, from emulator memory.
 
 Sources: [Wikipedia: Amiga Disk File](https://en.wikipedia.org/wiki/Amiga_Disk_File),
 [IANA: IPF](https://www.iana.org/assignments/media-types/application/vnd.softpres-ipf-disk-image).
-IPF comes from the Software Preservation Society. SPS notes that the Amiga's free-form track
-format rules out automatic format scripting
+IPF comes from the Software Preservation Society. SPS notes that automatic format scripting
+cannot handle the Amiga's free-form track format
 ([SPS news 2005-08-05](https://softpres.org/news:2005-08-05)).
 
 ### Tools
@@ -106,7 +107,7 @@ format rules out automatic format scripting
   of chip RAM behaves differently from an ECS or AGA build.
 - Decide whether the game uses the OS or takes over the machine. Trace an OS game at the
   library calls. Trace a takeover game at its chip register writes.
-- Pick one TV standard. A takeover game's timing follows the vertical blank, 50 Hz or 60 Hz.
+- Pick one TV standard. A takeover game times itself from the vertical blank, at 50 Hz or 60 Hz.
 - Reproduce the Copper list, the Blitter operations and the audio DMA at that frame rate.
 - Take ground truth for a function that touches only RAM from Unicorn's 68000
   ([re-emulate](../../.claude/skills/re-emulate/SKILL.md)). Anything that reads chip registers

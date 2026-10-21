@@ -1,24 +1,25 @@
 # East Asia
 
-This page is not legal advice. The law that applies is the law where you live.
+This page is not legal advice. The law of the country where you live applies to you.
 
-South Korea and China have clear software exceptions. Japan has a flexible exception. Taiwan and
-Hong Kong rely on fair use or fair dealing. Enforcement in the region targets people who sell
-devices, services or edited game data.
+South Korea and China have written software exceptions. Japan has a general exception for uses
+that are not for enjoying the work. Taiwan and Hong Kong rely on fair use or fair dealing. In this
+region, rights holders and police have acted mostly against people who sell devices, services or
+edited game data.
 
 ## Japan
 
 - **Studying a program.** Japan has no decompilation article. Art. 30-4 of the Copyright Act,
   in force from 1 January 2019, permits uses that are not for enjoying the work, unless they
   unreasonably harm the owner
-  ([CRIC translation](https://www.cric.or.jp/english/clj/cloj7.html)). Analysing code is not
-  enjoyment. Playing the game is. Art. 47-3 lets the owner of a program copy adapt it for use on
+  ([CRIC translation](https://www.cric.or.jp/english/clj/cloj7.html)). Analysing code counts as a use
+  that is not for enjoyment. Playing the game counts as enjoyment. Art. 47-3 lets the owner of a program copy adapt it for use on
   a computer (not confirmed).
-- **Locks.** Japan has two regimes. The Copyright Act penalises dealing in tools (Art. 120-2, not
+- **Locks.** Two Japanese laws cover locks. The Copyright Act penalises dealing in tools (Art. 120-2, not
   confirmed). The Unfair Competition Prevention Act was amended in 2018 to cover licence checks
   and circumvention services
   ([METI](https://www.meti.go.jp/english/policy/economy/chizai/chiteki/pdf/english_2018rev.pdf)).
-  Penalties reach five years in prison and a fine of 5 million yen. **No interoperability or
+  The maximum penalty is five years in prison and a fine of 5 million yen. **No interoperability or
   preservation exception to Japan's lock rules is known.** Japan is the strictest country
   covered for breaking locks.
 - **Libraries and archives.** Libraries may copy under Art. 31. The National Diet Library
@@ -36,7 +37,7 @@ devices, services or edited game data.
   ([Nintendo](https://www.nintendo.co.jp/corporate/release/2013/130709.html)). Police arrested
   sellers of edited Pokémon in February 2021 and of modified Breath of the Wild saves in July
   2021 ([Nintendo Wire](https://nintendowire.com/news/2021/07/09/breath-of-the-wild-hacker-arrested-in-japan-for-selling-modified-save-games/)).
-  Every target was a commercial seller.
+  Everyone sued or arrested in these cases sold commercially.
 - **Games that shut down.** No rule is known.
 
 ## China
@@ -63,7 +64,7 @@ devices, services or edited game data.
 
 ## South Korea
 
-- **Studying a program.** Korea has the clearest statute in the region. Art. 101-4 of the
+- **Studying a program.** Art. 101-4 of the
   Copyright Act lets a lawful user decompile a program for interoperability, where the
   information is not easy to get. The information may not be used for other purposes, given to
   others, or used to build a substantially similar program
@@ -82,7 +83,7 @@ devices, services or edited game data.
 - **Games that shut down.** Korea is the only country in the region with consumer rules for
   closed games. Standard terms in force from 22 March 2024 give refunds and a route to
   compensation ([Korea Times](https://koreatimes.co.kr/www/nation/2024/11/419_387275.html)).
-  They protect money spent. They give no right to keep playing.
+  They cover money that players spent. They do not give a right to keep playing.
 
 ## Taiwan
 
@@ -110,5 +111,5 @@ devices, services or edited game data.
 
 ## What this means for a project
 
-Study and observation are covered in every country here. In Japan, breaking a lock has no known exception. Selling edited save data has led to arrests. In South Korea, running an online
+Every country on this page permits study and observation of a program. In Japan, breaking a lock has no known exception. Selling edited save data has led to arrests. In South Korea, running an online
 service for a game has led to fines.

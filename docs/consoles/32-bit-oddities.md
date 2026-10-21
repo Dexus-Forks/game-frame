@@ -1,7 +1,7 @@
 # Jaguar and 3DO
 
-The Atari Jaguar and the 3DO sit outside the main console lines. The Jaguar puts real game code
-on two RISC co-processors that Ghidra has no module for. The 3DO uses an ARMv3 CPU, older than
+The Atari Jaguar and the 3DO do not belong to the main console families. Jaguar games run
+much of their code on two RISC co-processors. Ghidra has no module for them. The 3DO uses an ARMv3 CPU, older than
 any ARM language Ghidra builds in. The handhelds are in the [Handhelds](../handhelds/README.md)
 section.
 
@@ -18,7 +18,7 @@ section.
 
 The 68000 runs at 13.295 MHz. Tom and Jerry are 32-bit RISC cores at 26.591 MHz, with 4 KB and
 8 KB of local RAM. The console has 2 MB of RAM. A memory controller flaw makes it awkward to run
-RISC code from main RAM, which pushed developers back to the 68000
+RISC code from main RAM, so developers ran more of their code on the 68000
 ([Wikipedia: Atari Jaguar](https://en.wikipedia.org/wiki/Atari_Jaguar)). The main loop runs on
 the 68000 and uploads RISC code ([Game Tech Wiki: Jaguar](https://emulation.gametechwiki.com/index.php/Jaguar)).
 Tom has two banks of thirty-two 32-bit registers (not confirmed)

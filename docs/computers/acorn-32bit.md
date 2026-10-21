@@ -49,7 +49,7 @@ None listed yet.
 - Treat every instruction that reads or writes R15 as touching the flags as well as the PC.
 - Load the code into Ghidra as ARM v4 with care. Mark each place where 26-bit behaviour changes
   the result.
-- Take ground truth from a 26-bit-aware emulator. Unicorn's ARM models are not a safe source
+- Take ground truth from a 26-bit-aware emulator. Unicorn's ARM models may give wrong results
   for this code.
 
 ## Acorn Risc PC

@@ -1,8 +1,8 @@
 # AI and reverse engineering
 
 GameFrame is written for AI agents working with people. Many people who reverse engineer
-games by hand are worried about AI. This chapter names that worry and says how GameFrame
-answers it.
+games by hand are worried about AI. This chapter describes that worry and what GameFrame
+does about it.
 
 ## The concern
 
@@ -13,12 +13,13 @@ broken "the community aspect of decompilation"
 People using AI now produce projects faster than people working by hand. It has become hard to
 tell which projects a person led.
 
-The same tools make cheap imitations of games easy. An imitation can copy how a game looks
+AI tools also make it easy to produce a cheap imitation of a game. An imitation can copy how a game looks
 without behaving like it. It can also be a way to copy a game that is still on sale.
 
-We share these concerns. An AI agent can read old code quickly. Speed alone preserves nothing.
+We share these concerns. An AI agent can read old code quickly. A port made quickly can still behave differently from
+the original.
 
-## How GameFrame answers it
+## What GameFrame does about it
 
 GameFrame asks an agent for evidence at every step.
 
@@ -38,9 +39,9 @@ GameFrame asks an agent for evidence at every step.
 This takes longer than making an imitation. Anyone with the same copy of the game can run the
 same tests and get the same answers.
 
-## Credit to the people who did this first
+## Earlier work
 
 The methods in GameFrame come from people who did this work by hand for decades: the
 ScummVM developers, the decompilation communities, the authors of OpenRCT2, OpenTTD,
-DevilutionX and many more ([Built on others' work](others-work.md)). Their documents are the
-references the playbook tells agents to read.
+DevilutionX and many more ([Built on others' work](others-work.md)). The playbook tells agents to
+read their documents.

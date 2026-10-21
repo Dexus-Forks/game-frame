@@ -2,8 +2,8 @@
 
 The Atari 8-bit computers use the 6502 family ([CPU families](cpu-families.md#the-6502-line)).
 ANTIC runs a display list and takes DMA cycles from the CPU on each line. Display list
-interrupts change the picture part way down the screen. Exact timing matters on these
-machines.
+interrupts change the picture part way down the screen. Game logic on these machines often
+depends on exact cycle timing.
 
 ## Atari 400, 800, XL and XE
 
@@ -54,7 +54,7 @@ The formats below are (not confirmed).
   ([arithmetic traps](cpu-families.md#ghidra-s-6502-adc-is-not-exact)). Unicorn has no 6502.
   Use py65, mos6502 or floooh/chips for ground truth.
 
-AtariAge is the community hub ([atariage.com](https://atariage.com/)).
+AtariAge is the main community forum ([atariage.com](https://atariage.com/)).
 
 ### Projects to learn from
 
@@ -62,8 +62,8 @@ None listed yet.
 
 ### For an exact reimplementation
 
-- Record the display list and every display list interrupt. They decide what the player sees
-  on each line.
+- Record the display list and every display list interrupt. Together they set the mode and
+  colours of each screen line.
 - Model the cycles ANTIC DMA takes on each line if game logic depends on CPU time.
 - Record the PORTB bank state for each code region on a 130XE.
 - Record whether the build is PAL or NTSC. PAL and NTSC versions are often separate builds.

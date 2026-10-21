@@ -1,6 +1,6 @@
 # United States, Europe and the United Kingdom
 
-This page is not legal advice. The law that applies is the law where you live.
+This page is not legal advice. The law of the country where you live applies to you.
 
 ## United States
 
@@ -27,7 +27,7 @@ This page is not legal advice. The law that applies is the law where you live.
 - **Cases.** Nintendo's case against the Yuzu emulator settled in 2024 for $2.4 million, on
   circumvention claims
   ([ChannelNews](https://www.channelnews.com.au/nintendo-settles-lawsuit-with-tropic-haze/)).
-- **Games that shut down.** No law.
+- **Games that shut down.** No US law covers them.
 
 ## European Union
 
@@ -88,6 +88,6 @@ Norway applies the EU Software Directive through the European Economic Area.
 
 ## What this means for a project
 
-Observing the running game and decompiling it for interoperability are both covered in these
-countries. Sharing the game and breaking locks are not covered. New code that copies no
-expression stays on the safe side of the EU and UK rules.
+The laws of these countries permit observing the running game. They permit decompiling it for
+interoperability. They do not permit sharing the game or breaking locks. Under the EU and UK
+rules, new code that copies none of the original's expression has the lowest risk.

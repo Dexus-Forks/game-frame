@@ -64,8 +64,8 @@ ScummVM, which reimplements most of them.
 ## How to approach a studio engine
 
 1. Find the archive format and list every file. These formats are usually documented already.
-2. Read the rule tables and text formats before any code. In these games, much of the
-   behaviour is data.
+2. Read the rule tables and text formats before any code. In these games, many of the
+   rules are in data.
 3. Find the script interpreter if there is one. List its opcodes.
 4. Trace the native code for what remains: the simulation step, combat formulas, pathfinding,
    AI. See the family pages for what must be exact ([Strategy](../games/strategy.md),

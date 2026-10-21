@@ -1,9 +1,10 @@
 # Game Boy family
 
-The Game Boy family has the most mature tool chain of any handheld. pret's hash-matched builds
-set a standard that few other platforms reach. The SM83 has no built-in Ghidra module and no
-Unicorn backend, so ground truth comes from SameBoy or another emulator. The Super Game Boy
-adds SNES code and region-dependent timing.
+The Game Boy family has the most mature tool chain of any handheld. pret's builds produce ROMs
+with the same hashes as the originals. Few other platforms have projects like them. The SM83
+has no built-in Ghidra module and no Unicorn backend, so take ground truth from SameBoy or
+another emulator. Super Game Boy games can also contain SNES code. Their timing depends on the
+region.
 
 ## The devices
 
@@ -42,7 +43,7 @@ The repository is archived. [minorum/ghidra-sm83](https://github.com/minorum/ghi
 fork ([Gekkio/GhidraBoy](https://github.com/Gekkio/GhidraBoy)).
 [yaxpeax-sm83](https://github.com/iximeow/yaxpeax-sm83) is a Rust SM83 disassembler.
 
-Unicorn has no SM83 backend, so ground truth comes from SameBoy or another emulator
+Unicorn has no SM83 backend, so take ground truth from SameBoy or another emulator
 ([Unicorn Engine](https://www.unicorn-engine.org/)).
 
 SameBoy emulates the DMG, MGB, CGB, the AGB in GBC mode, and the SGB and SGB2 at high level. It
@@ -67,7 +68,7 @@ The Game Boy Color came out in Japan on 21 October 1998. It reached North Americ
 1998 and Europe on 23 November 1998. Its Sharp SM83 runs at 4.194304 MHz. A double-speed mode
 runs it at 8.388608 MHz. It has 32 KiB of WRAM and 16 KiB of VRAM. The 160 by 144 reflective
 TFT has no backlight. It shows up to 56 of 32,768 colours at once. The infrared port runs up to
-9.5 kbit/s at under 2 m within 45°. Few games used it. The GBA dropped it. The GBC is
+9.5 kbit/s at under 2 m within 45°. Few games used it. The GBA has no infrared port. The GBC is
 slightly thicker and taller than the Pocket
 ([Wikipedia: Game Boy Color](https://en.wikipedia.org/wiki/Game_Boy_Color)). Pan Docs gives the
 speeds in M-cycles as about 1.05 MHz and 2.10 MHz
@@ -79,7 +80,7 @@ systems. Clear carts are CGB-only
 
 ### The CGB registers
 
-The CGB registers decide how a game behaves
+These registers control the CGB features a game uses
 ([Pan Docs: CGB Registers](https://gbdev.io/pandocs/CGB_Registers.html)).
 
 | Register | Address | What it does |
@@ -101,21 +102,22 @@ keep normal timing.
 pret/pokecrystal builds Pokémon Crystal (UE) v1.0 and v1.1 and the Australian release. Each
 matches a listed SHA-1. It also builds two later rebuild files and a patch. It pins its RGBDS
 version in `.rgbds-version`. Other pret projects are listed at pret.github.io
-([pret/pokecrystal](https://github.com/pret/pokecrystal)). A rebuild that hashes identically
-proves the disassembly is complete. That makes such a project a ground-truth model for a GBC
-reimplementation.
+([pret/pokecrystal](https://github.com/pret/pokecrystal)). A rebuild with the same hash
+proves that the disassembly is complete. A GBC reimplementation can use such a project as
+ground truth.
 
 ### For an exact reimplementation
 
-A port of a dual-mode game runs two code paths. The boot ROM's choice of mode is an input. A
-save with an MBC3 clock needs the clock state ([Handheld practices](practices.md)).
+A dual-mode game has a DMG code path and a CGB code path. A port needs both. Treat the mode
+the boot ROM picks as an input. For a cartridge with an MBC3 clock, the save must include the
+clock state ([Handheld practices](practices.md)).
 
 ## Super Game Boy
 
 ### Hardware
 
 The Super Game Boy is a SNES cartridge that holds a Game Boy chip, an ICD2 bridge and SNES-side
-system software. It frames the 160 by 144 screen in a 256 by 224 SNES picture. The border uses
+system software. It shows the 160 by 144 screen inside a 256 by 224 SNES picture. The border uses
 4 bpp tiles in 16 colours per tile. Palettes can be set per cell of a 20 by 18 grid. A game can
 add up to 24 SNES sprites, read four joypads separately and play SNES sound effects. Games can
 also upload code or data into SNES memory and run it on the SNES CPU
@@ -128,7 +130,7 @@ crystal and runs at the correct speed
 
 ### For an exact reimplementation
 
-An SGB-enhanced game carries 65C816 code as well as SM83 code. Its timing depends on which SGB
+An SGB-enhanced game contains 65C816 code as well as SM83 code. Its timing depends on which SGB
 and which region it ran on. Trace both CPUs' code.
 
 ## Game Boy Advance

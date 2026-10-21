@@ -14,7 +14,7 @@ interface must be depends on the project's goal ([Who drives](interaction.md#the
 | Transport Tycoon Deluxe | 1995, DOS | Hand-written x86 assembly; vehicles, signals, an economy |
 | RollerCoaster Tycoon 2 | 2002, Windows | Hand-written assembly; thousands of guests each with needs and thoughts |
 | Caesar III | 1998, Windows | Walkers that deliver services along roads; the city's needs drawn from them |
-| Theme Hospital | 1997, DOS | Patients, staff and rooms as queues; a sense of humour in every animation |
+| Theme Hospital | 1997, DOS | Patients, staff and rooms as queues |
 | The Settlers II | 1996, DOS | Carriers on a road network, an economy of goods in flags and buildings |
 | Dungeon Keeper | 1997, DOS | Management of creatures with needs, plus a real-time strategy layer |
 
@@ -49,7 +49,7 @@ come from queues with a fixed order. Read the data first. Many rules are numbers
 
 **Inputs.** Mostly clicks on the interface and on the map, which become **commands** (place a
 building, set a tax, assign a worker). Model the input as commands, each applied at a known
-step: then a recording is a list of commands with step numbers. Lockstep multiplayer becomes possible. Game speed is an input: it changes how many steps run per frame.
+step. A recording is then a list of commands with step numbers. The same commands can drive lockstep multiplayer. Game speed is an input: it changes how many steps run per frame.
 
 **Interface.** Large: many windows, lists, tooltips, graphs, a build menu, a map overlay. In
 older games every window is code; newer games read layouts from data. Either way the interface
@@ -69,7 +69,7 @@ pathfinding, name generators) on thousands of inputs.
 **Pitfalls.**
 - Lists of agents or buildings iterated in creation order, with holes from removals reused.
 - Sorting with an unstable sort (`qsort`): equal elements come out in an order you must copy.
-- Work spread over steps ("update a tenth of the map each step"): the slice order is behaviour.
+- Work spread over steps ("update a tenth of the map each step"): keep the slice order.
 - Numbers shown in the interface rounded differently from the numbers the simulation uses.
 - Per-player state (settings, achievements, difficulty) read by the simulation: it breaks
   lockstep multiplayer ([Networking](../GAME-PATTERNS.md#networking-if-any)).

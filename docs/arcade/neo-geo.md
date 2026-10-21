@@ -1,8 +1,8 @@
 # Neo Geo
 
 SNK's Neo Geo ran as an arcade board (MVS) and as a home system (AES). The two differ in timing
-as well as in BIOS. Late games carry protection chips. One of them holds a random number
-generator. Official re-releases run the MVS code under emulation.
+as well as in BIOS. Late games have protection chips. One of these chips contains a random
+number generator. Official re-releases run the MVS code under emulation.
 
 | Board | Years | Main CPU and clock | Sound | Refresh | Protection | MAME status | Ghidra |
 |---|---|---|---|---|---|---|---|
@@ -29,7 +29,7 @@ soldered BIOS vary between MV-1, MV-1F, MV-1A, MV-1B and MV-1C.
 
 ### Protection
 
-The late games carry protection chips that MAME lists. Example sets are The King of Fighters
+Late games have protection chips. MAME lists them. Example sets are The King of Fighters
 '99, 2000 and 2003.
 
 - NEO-CMC 90G06CF7042 decrypts the C-ROM graphics and bank-switches the S-ROM.
@@ -38,7 +38,7 @@ The late games carry protection chips that MAME lists. Example sets are The King
 - NEO-SMA decrypts and bank-switches the P-ROM program. It provides a random number generator.
   It stores 256 kb of game data.
 
-The [protection page](protection.md#snk-neo-geo) has more.
+The [protection page](protection.md#snk-neo-geo) has more on each chip.
 
 ### Tools
 
@@ -60,7 +60,8 @@ is in Hokkaido. ACA2 Neo Geo was announced in May 2024
 - Record the BIOS, the region and the language with every test. Fatal Fury 3 in MAME crashes in
   the ending unless the language is Japanese
   ([practices](practices.md#nvram-and-dip-settings-as-test-inputs)).
-- Record the motherboard generation where its features matter, such as the memory card.
+- Record the motherboard generation when the game uses a feature that differs between
+  generations, such as the memory card.
 - On a NEO-SMA game, reproduce the chip's random number generator from MAME's model.
 
 ## Neo Geo AES
@@ -86,4 +87,4 @@ None listed yet.
 ### For an exact reimplementation
 
 - Pick one system per test. The MVS and AES differ in timing as well as in BIOS.
-- Treat MAME's AES timing as unsettled.
+- Do not rely on MAME's AES timing.

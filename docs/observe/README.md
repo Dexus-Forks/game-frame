@@ -15,9 +15,9 @@ In my GameFrame project, get the original game running where we can watch and ca
 
 # Observing the original
 
-How to run the original game, watch it, drive it and capture what it does, so every claim in
-the port can rest on something measured. Read these after the [taxonomy](../games/README.md)
-has told you what kind of game you have.
+These pages describe how to run the original game, watch it, drive it and capture what it
+does, so each claim about the port can cite a measurement. Read them after you have used the
+[taxonomy](../games/README.md) to find what kind of game you have.
 
 - [Running the original](running-the-original.md): where to run it, what to capture, how to
   drive it by script, how to compare.

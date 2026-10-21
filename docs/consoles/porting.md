@@ -7,12 +7,13 @@ start and write it in the project's `AGENTS.md`.
 | Route | What it is | Examples | Effort | What can be published |
 |---|---|---|---|---|
 | Emulation | Run the original code on an emulated console | every emulator | Low for one game, once an emulator exists | The emulator; the player brings the game |
-| Static recompilation | Translate the original machine code into C or another language automatically, and link it with a reimplementation of the hardware | N64Recomp (Zelda 64: Recompiled) | Medium; the hardware layer is the work | The recompiler and the hardware layer; the player's ROM is translated on their machine |
+| Static recompilation | Translate the original machine code into C or another language automatically, and link it with a reimplementation of the hardware | N64Recomp (Zelda 64: Recompiled) | Medium; most of the work is in the hardware layer | The recompiler and the hardware layer; the player's ROM is translated on their machine |
 | Matching decompilation, then a port | Write C that compiles to the identical original binary, then build it for a new system | the SM64 and Ocarina of Time decompilations and their PC ports | Very high | Contested: the C is derived from the original program ([Legal](../LEGAL.md)) |
 | Reimplementation | Write new code from documented behaviour, checked against the original | most projects in GameFrame's case studies | High | The new code; the player brings the game's data |
 
-GameFrame is built for reimplementation. The other routes share most of its steps (finding
-functions, capturing ground truth, replacing hardware) and its tools help them too.
+GameFrame is designed for reimplementation. The other routes share most of its steps
+(finding functions, capturing ground truth, replacing hardware). GameFrame's toolkit helps
+with them too.
 
 ## Ask your agent
 
@@ -30,26 +31,25 @@ In my GameFrame project, help me choose how to port this console game.
 
 ## Replacing the hardware
 
-Whatever the route, the console's hardware must be replaced with code that runs on the new
-system. Split the work by device.
+Every route needs code on the new system that replaces the console's hardware. Split the work by device.
 
 ### The frame and the clock
 
-- The game's logic runs once per vertical blank. Keep that: one logic update per frame, at the
+- The game's logic runs once per vertical blank. Keep one logic update per frame, at the
   original's rate (60.0988 Hz for an NTSC NES, 59.94 Hz or 50 Hz for most others). Find the
   exact rate for your console and region.
 - If the port runs at a different display rate, run the logic at the original rate and show
   the latest frame, or interpolate only the picture. Never change how often the logic runs.
 - Lag frames happen when the original took more than one frame for its work. They change the
-  game. A reimplementation must decide whether to reproduce them. Matching speedrun behaviour
-  needs them; most ports do not. Record the decision.
+  game's timing. Decide whether the reimplementation reproduces them. A port that must match
+  speedrun behaviour needs them. Most ports do not. Record the decision.
 - PAL versions often run slower, or change speeds and timers to compensate. Pick one region as
   the reference.
 
 ### Input
 
 - The controller is read once a frame into RAM, often with a "pressed this frame" mask
-  computed from the previous frame. That RAM is the input record. Port the read, and feed it
+  computed from the previous frame. Log that RAM as the input record. Port the read, and feed it
   from the new system's controllers.
 - Some games read the controller more than once a frame, or in an interrupt. Find every read.
 - Input movies from emulators are per-frame input. Use them to drive both the original and
@@ -72,7 +72,7 @@ system. Split the work by device.
 ### Sound
 
 - Sound often runs on a separate CPU with its own program (the SNES's SPC700, the Mega Drive's
-  Z80, the PS2's IOP). That program is part of the game. Either emulate the sound CPU and its
+  Z80, the PS2's IOP). The game includes that program. Either emulate the sound CPU and its
   chip with the original program, or trace and port the sound program.
 - Emulating the sound CPU and chip is usually less work and gives exact sound. The program and
   samples still come from the player's copy.
@@ -91,8 +91,8 @@ system. Split the work by device.
 
 Games from the 32-bit generation on were linked with the console maker's libraries (Sony's
 libraries for the PlayStation, Nintendo's SDK for the N64 and GameCube). Identify them by
-signatures and label them. Port what the game asks of them, and leave the libraries
-themselves out.
+signatures and label them. Port the library functions the game calls. Do not copy
+the libraries into the port.
 
 ## Checking the port
 

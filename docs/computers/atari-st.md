@@ -2,8 +2,8 @@
 
 The Atari ST uses the big-endian 68000 line ([CPU families](cpu-families.md#the-68000)). Like
 the Amiga, many ST games skip the OS and drive the hardware directly. A game that uses TOS and
-GEM can be traced at its GEMDOS, BIOS, XBIOS, AES and VDI calls. The ST has the best documented
-debugger of these machines, in Hatari.
+GEM can be traced at its GEMDOS, BIOS, XBIOS, AES and VDI calls. Hatari, an ST emulator, has the best
+documented debugger of these machines.
 
 ## Atari 520ST and 1040ST
 
@@ -72,7 +72,7 @@ ST's chips.
   protection ([dungeon-master.com forum](https://www.dungeon-master.com/forum/viewtopic.php?p=163896)).
   DM/CSB version 3 was built with Think C on Apple hardware
   ([dungeon-master.com forum](https://www.dungeon-master.com/forum/viewtopic.php?p=162234)).
-  ReDMCSB's claims of matching the binaries remain unconfirmed.
+  ReDMCSB says its builds match the original binaries. No second source confirms this.
 
 ### For an exact reimplementation
 
@@ -109,7 +109,7 @@ As for the ST: ST, MSA and STX.
 
 ### Tools
 
-Hatari disassembles DSP code as well as CPU code, which covers the Falcon's 56001
+Hatari disassembles DSP code as well as CPU code. It can disassemble code for the Falcon's 56001
 ([Hatari debugger manual](https://hatari.tuxfamily.org/doc/debugger.html)).
 
 ### Projects to learn from

@@ -1,8 +1,9 @@
 # South and Southeast Asia and Oceania
 
-This page is not legal advice. The law that applies is the law where you live.
+This page is not legal advice. The law of the country where you live applies to you.
 
-Australia, New Zealand, Singapore and India have full software exceptions. Malaysia, Indonesia,
+Australia, New Zealand, Singapore and India have software exceptions for study and for
+decompiling. Malaysia, Indonesia,
 Thailand and Vietnam have back-up and research rules with no decompilation clause.
 
 ## India
@@ -62,7 +63,7 @@ Thailand and Vietnam have back-up and research rules with no decompilation claus
 - **Studying a program.** Since 2013, decompiling for interoperability counts as a form of fair
   use under s.185.1 of the Intellectual Property Code. Section 189.1 allows one back-up or
   adaptation ([RA 10372](https://lawphil.net/statutes/repacts/ra2013/ra_10372_2013.html)).
-- **Locks.** Circumvention doubles damages under s.216.1(b). No exception is written in.
+- **Locks.** Circumvention doubles damages under s.216.1(b). The section has no exceptions.
 - **Libraries and archives.** Non-profit libraries may make limited copies under s.188.1.
 - **How long copyright lasts.** The author's life plus 50 years.
 
@@ -97,7 +98,7 @@ Thailand and Vietnam have back-up and research rules with no decompilation claus
   ([Federal Register of Legislation](https://www.legislation.gov.au/C1968A00063/latest/text)).
   How far s.47D reaches is not confirmed.
 - **Locks.** Section 116AN gives a civil action against breaking access controls, with an
-  interoperability exception (search snippet). In *Take-Two v Anderson* (2024), the Federal Court
+  interoperability exception (not confirmed). In *Take-Two v Anderson* (2024), the Federal Court
   held that GTA V's online access checks were locks and that a cheat mod was a circumvention
   device ([Piper Alderman](https://piperalderman.com.au/insight/whats-in-a-game-technological-protection-measures-under-the-copyright-act/)).
   **A tool that patches a running game can be a circumvention device even when the user owns the
@@ -115,8 +116,8 @@ Thailand and Vietnam have back-up and research rules with no decompilation claus
 - **Games that shut down.** The consumer regulator, the ACCC, won A$3 million from Valve over
   Steam refunds
   ([ACCC](https://www.accc.gov.au/media-release/valve-to-pay-3-million-in-penalties-for-misrepresenting-gamers-consumer-guarantee-rights))
-  and A$3.5 million from Sony. Whether shutting down a paid game breaches consumer law has not
-  been decided.
+  and A$3.5 million from Sony. No court has decided whether shutting down a paid game breaches
+  consumer law.
 
 ## New Zealand
 
@@ -125,7 +126,7 @@ Thailand and Vietnam have back-up and research rules with no decompilation claus
   studying and testing. Section 80D voids contract terms that override these rights
   ([s.80C](https://www.nzlii.org/nz/legis/consol_act/ca1994133/s80c.html)).
 - **Locks.** Since 2018, access controls are protected, with a general exception for acts that do
-  not infringe (s.226E, search snippet). Section 226F allows getting past region locks.
+  not infringe (s.226E, not confirmed). Section 226F allows getting past region locks.
 - **Libraries and archives.** New preservation and orphan-works exceptions are planned, with a
   bill possible in 2027 ([British Copyright Council](https://www.britishcopyright.org/new-zealand-copyright-update/)).
 - **How long copyright lasts.** The author's life plus 50 years, rising to 70 under trade
@@ -133,6 +134,6 @@ Thailand and Vietnam have back-up and research rules with no decompilation claus
 
 ## What this means for a project
 
-Study and observation are covered in India, Singapore, Australia and New Zealand, and in
-narrower terms in the others. In Indonesia, Thailand and Vietnam, decompiling has no express
-cover. In Australia, a tool that patches the running game can be unlawful.
+India, Singapore, Australia and New Zealand permit study and observation of a program. The
+other countries on this page permit them in narrower terms. Indonesia, Thailand and Vietnam do
+not expressly permit decompiling. In Australia, a tool that patches the running game can be unlawful.

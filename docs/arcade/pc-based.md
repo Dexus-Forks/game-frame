@@ -1,9 +1,9 @@
 # PC-based boards
 
 From 2004 arcade boards are x86 PCs with custom I/O, a locked OS image and a hardware key.
-Ghidra handles the x86 code. The hard step is getting decrypted, unlocked files from hardware
-the person owns. Once the files are decrypted, the work follows GameFrame's Windows PE path or,
-for Linux boards, an ELF loader.
+Ghidra handles the x86 code. Most of the effort goes into getting decrypted, unlocked files from
+hardware that you own. Once the files are decrypted, use GameFrame's Windows PE path. For Linux
+boards, use an ELF loader.
 
 | Board | Years | Main CPU and clock | Sound | Refresh | Protection | MAME status | Ghidra |
 |---|---|---|---|---|---|---|---|
@@ -68,7 +68,7 @@ Lindbergh (2005/2006) runs Linux
 ### Protection
 
 "Both the CF and HDD are locked and unreadable on a regular PC." The PIC keychip has an AES-CBC
-engine. Everything but its key is dumpable.
+engine. Everything on the keychip except its key can be dumped.
 
 1. The CF derives a 176-byte secondary key. It decrypts 16 x 0x00 through 16 x 0x0b through the
    PIC.
@@ -78,9 +78,10 @@ engine. Everything but its key is dumpable.
 ### Tools
 
 - Eighteen of 19 MAME entries do not work.
-- lindbergh-loader runs Lindbergh games on modern Linux as replacement hardware, with JVS
-  pass-through ([lindbergh-loader README](https://github.com/lindbergh-loader/lindbergh-loader)).
-- A Lindbergh game is a Linux ELF program. The loader approach resembles GameFrame's Wine path
+- lindbergh-loader runs Lindbergh games on modern Linux in place of the original hardware, with
+  JVS pass-through
+  ([lindbergh-loader README](https://github.com/lindbergh-loader/lindbergh-loader)).
+- A Lindbergh game is a Linux ELF program. lindbergh-loader works like GameFrame's Wine path
   for Windows games ([running the original](../observe/running-the-original.md)).
 
 ### Projects to learn from
@@ -89,7 +90,7 @@ lindbergh-loader.
 
 ### For an exact reimplementation
 
-- MAME is not ground truth. Ground truth comes from lindbergh-loader or from owned hardware.
+- Do not use MAME as ground truth. Take ground truth from lindbergh-loader or from owned hardware.
 - Record the box colour. The red and yellow boxes differ in CPU and memory.
 
 ## Sega RingEdge, RingWide, Nu and ALLS
@@ -159,4 +160,4 @@ None listed yet.
 ### For an exact reimplementation
 
 - Work from decrypted files taken from owned hardware.
-- On ES3, record the graphics card. The cards carry custom BIOSes (secondary source).
+- On ES3, record the graphics card. The cards have custom BIOSes (secondary source).

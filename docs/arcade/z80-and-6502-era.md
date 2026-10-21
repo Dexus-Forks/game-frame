@@ -1,8 +1,9 @@
 # Z80 and 6502 boards
 
 The boards of 1979 to the mid-1980s run Z80 or 6502 programs, often with several CPUs on one
-board. Namco and Nintendo share an 18.432 MHz family of timings at about 60.61 Hz. Atari's
-vector games draw beam strokes. Nintendo's arcade systems reuse NES chips.
+board. Namco and Nintendo boards use timings based on 18.432 MHz and run at about 60.61 Hz.
+Atari's vector games draw lines with the beam of a vector display. Nintendo's arcade systems
+reuse NES chips.
 
 | Board | Years | Main CPU and clock | Sound | Refresh | Protection | MAME status | Ghidra |
 |---|---|---|---|---|---|---|---|
@@ -19,7 +20,7 @@ vector games draw beam strokes. Nintendo's arcade systems reuse NES chips.
 
 ### Hardware
 
-Namco's early boards share one crystal
+Namco's early boards use the same 18.432 MHz crystal
 ([MAME: galaxian/galaxian.h](https://github.com/mamedev/mame/blob/master/src/mame/galaxian/galaxian.h);
 [galaxian.cpp](https://github.com/mamedev/mame/blob/master/src/mame/galaxian/galaxian.cpp)).
 
@@ -30,8 +31,9 @@ Namco's early boards share one crystal
   That gives 288 by 224 visible pixels at about 60.61 Hz (computed)
   ([MAME: pacman/pacman.cpp](https://github.com/mamedev/mame/blob/master/src/mame/pacman/pacman.cpp)).
 - **Galaga (1981)** has three Z80s at 3.072 MHz each. Namco custom chips 51xx (I/O) and 54xx
-  (noise sound) run at 1.536 MHz. They talk through a 06xx bus interface. The timing matches
-  Pac-Man ([MAME: namco/galaga.cpp](https://github.com/mamedev/mame/blob/master/src/mame/namco/galaga.cpp)).
+  (noise sound) run at 1.536 MHz. They communicate through a 06xx bus interface. The timing
+  matches Pac-Man
+  ([MAME: namco/galaga.cpp](https://github.com/mamedev/mame/blob/master/src/mame/namco/galaga.cpp)).
 
 ### Protection
 
@@ -39,7 +41,7 @@ None listed.
 
 ### Tools
 
-Ghidra decodes the Z80 with its built-in module. Unicorn has no Z80 backend. Ground truth comes
+Ghidra decodes the Z80 with its built-in module. Unicorn has no Z80 backend. Take ground truth
 from MAME's debugger and Lua, or from a small Z80 core
 ([CPU families](../computers/cpu-families.md#the-8080-z80-and-sm83)).
 
@@ -53,8 +55,8 @@ Moon Patrol. Its menu has code or hardware pages for Pooyan and The Pit
 ### For an exact reimplementation
 
 - Run the port at about 60.61 Hz.
-- On Galaga, the three CPUs must run interleaved in the right order. Timing-dependent
-  behaviour depends on it.
+- On Galaga, run the three CPUs interleaved in the right order. Some of the game's behaviour
+  depends on this timing.
 - Model the 51xx and 54xx custom chips as the CPUs see them.
 
 ## Nintendo Donkey Kong
@@ -62,8 +64,8 @@ Moon Patrol. Its menu has code or hardware pages for Pooyan and The Pit
 ### Hardware
 
 Donkey Kong (1981) uses a 61.44 MHz crystal and a 6.144 MHz pixel clock, for about 60.61 Hz
-(computed). Its Z80 runs at 4 MHz, "verified in schematics". An Intel 8035 at 6 MHz drives the
-sound ([MAME: nintendo/dkong.h](https://github.com/mamedev/mame/blob/master/src/mame/nintendo/dkong.h);
+(computed). Its Z80 runs at 4 MHz, "verified in schematics". An Intel 8035 at 6 MHz runs the
+sound program ([MAME: nintendo/dkong.h](https://github.com/mamedev/mame/blob/master/src/mame/nintendo/dkong.h);
 [dkong.cpp](https://github.com/mamedev/mame/blob/master/src/mame/nintendo/dkong.cpp)).
 
 ### Protection
@@ -98,8 +100,8 @@ None listed.
 
 ### Tools
 
-Ghidra decodes the 6502 with its built-in module. Its p-code for `ADC` is not exact, so it
-cannot serve as ground truth
+Ghidra decodes the 6502 with its built-in module. Its p-code for `ADC` is not exact, so do not
+use Ghidra's emulation as ground truth
 ([CPU families](../computers/cpu-families.md#ghidras-6502-adc-is-not-exact)). Unicorn has no
 6502 backend.
 
@@ -117,8 +119,8 @@ cannot serve as ground truth
 
 ### For an exact reimplementation
 
-- A vector game's output is a list of beam strokes per frame. Compare that list directly before
-  comparing pixels.
+- A vector game draws a list of beam strokes each frame. Compare these lists before you compare
+  pixels.
 - Run the port at the vector refresh, about 61.5 Hz on Asteroids. Lunar Lander uses a
   different divisor.
 
@@ -147,7 +149,7 @@ None listed yet.
 
 ### For an exact reimplementation
 
-- Record the board revision. It sets the sound clock divisor.
+- Record the board revision. The sound clock divisor depends on it.
 - Use the decryption for the exact encrypted part on the board.
 
 ## Nintendo VS. System and PlayChoice-10
@@ -167,7 +169,8 @@ Not covered here.
 
 ### Tools
 
-A VS. game's code is NES code, so NES tools apply to it ([tools for console work](../consoles/tools.md)).
+A VS. game's code is NES code, so NES tools work on it
+([tools for console work](../consoles/tools.md)).
 
 ### Projects to learn from
 
@@ -176,4 +179,4 @@ None listed yet.
 ### For an exact reimplementation
 
 - On a dual-screen VS. game, run both CPUs and both screens.
-- The PlayChoice-10 rate is nominal in MAME. Treat it as open.
+- The PlayChoice-10 rate is nominal in MAME. Treat it as unknown.

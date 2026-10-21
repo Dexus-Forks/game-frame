@@ -30,7 +30,7 @@ picture the player saw depended on the card.
 - The game passes vertices already transformed to screen coordinates, with `1/w` for
   perspective correction. The game does all the 3D maths itself, so the maths is in the game's machine code. Port it exactly.
 - The Voodoo drew with 16-bit colour and dithering. It also filtered textures in its own way.
-  The original's look depends on that. Decide whether the port reproduces the 16-bit look or
+  The player saw those effects. Decide whether the port reproduces the 16-bit look or
   draws in full colour, and record the choice as a deviation if it differs.
 - Wrappers such as nGlide and dgVoodoo translate Glide calls to modern APIs. They show which
   parts of Glide a game needs. Use them to run the original on a modern machine for captures.
@@ -49,7 +49,7 @@ picture the player saw depended on the card.
 - Find the version from the imports (`ddraw.dll` with `IDirect3D3`, `d3d8.dll`, `d3d9.dll`)
   and the interface identifiers the game asks for.
 - Games before Direct3D 7 usually transform vertices themselves, as with Glide. From version
-  7 the card may do it; then the matrices and lights the game sets are the behaviour to port.
+  7 the card may do it. Then port the matrices and lights the game sets.
 - Shaders from Direct3D 8 and 9 ship compiled. Disassemble them to read the maths
   ([Rendering](../GAME-PATTERNS.md#rendering-and-ui)).
 - Direct3D can change the FPU precision when it creates a device ([CPUs](cpus.md)).
@@ -72,7 +72,7 @@ machine. They are the best reference for the port's renderer, and the easiest to
 1. List the renderers: separate DLLs (Unreal's `GlideDrv.dll`, `D3DDrv.dll`, `SoftDrv.dll`) or
    code paths chosen in the options.
 2. Find the interface between the game and its renderers. It is usually a table of functions
-   or a C++ class with virtual methods. Everything the game wants drawn passes through it.
+   or a C++ class with virtual methods. The game sends everything it draws through it.
 3. Choose one renderer as the reference. Write the choice in the project's `AGENTS.md`. The
    software renderer is easiest to compare exactly; the Glide renderer is often what players
    remember.

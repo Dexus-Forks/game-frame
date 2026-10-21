@@ -1,8 +1,8 @@
 # WonderSwan
 
 Bandai's WonderSwan family runs a CPU compatible with 16-bit x86. Ghidra's x86 real-mode
-language reads it. Unicorn runs x86 16-bit code, so GameFrame's emulator approach applies to the
-CPU.
+language reads it. Unicorn runs x86 16-bit code, so GameFrame's Unicorn emulator can run its
+functions.
 
 ## The devices
 

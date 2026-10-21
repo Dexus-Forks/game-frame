@@ -1,10 +1,9 @@
 # Japanese 16-bit and 32-bit computers
 
 The X68000 uses the big-endian 68000 line. The PC-9801 and the FM Towns use x86
-([CPU families](cpu-families.md)). Each machine's custom video and sound chips shape how its
-games were written. On the PC-98 they differ from the IBM PC's, even though the CPU and the OS
-match. A game that uses
-Human68k or MS-DOS can be traced at its OS calls. A game that drives the chips must be traced
+([CPU families](cpu-families.md)). Each machine has its own custom video and sound chips.
+The PC-98's chips differ from the IBM PC's, even though the CPU and the OS match. A game that
+uses Human68k or MS-DOS can be traced at its OS calls. A game that drives the chips must be traced
 at its hardware register writes.
 
 ## Sharp X68000
@@ -34,7 +33,7 @@ The XDF, DIM and HDM image formats still need sources.
 
 ### Tools
 
-- MAME is the fallback debugger.
+- Use MAME's debugger when no other debugger is available.
 - The XM6, PX68k and Unz debuggers still need sources.
 - Ghidra has the 68000 built in. Unicorn runs 68000 code but none of the X68000's chips.
 

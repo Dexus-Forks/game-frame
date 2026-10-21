@@ -45,5 +45,6 @@ public headers came with the editing tools and some patches. Unreal Tournament's
 3. Use the engine DLLs' exports to name the native functions in Ghidra.
 4. Trace the native code that the script calls for the rules you need: physics, movement,
    collision, damage.
-5. Reimplement the script interpreter and the native functions, or translate the scripts. The
-   first keeps mods working; the second is simpler for one game.
+5. Reimplement the script interpreter and the native functions, or translate the scripts. A
+   reimplemented interpreter keeps mods working. Translating the scripts is simpler if you only
+   need one game.

@@ -1,10 +1,10 @@
 # The Americas
 
-This page is not legal advice. The law that applies is the law where you live. The United States
+This page is not legal advice. The law of the country where you live applies to you. The United States
 is on [its own page](us-europe-uk.md).
 
-Canada has the strongest interoperability rules. Mexico has the harshest lock rules. Brazil and
-Argentina have no decompilation exception.
+Canada has interoperability exceptions both for studying a program and for locks. Mexico makes
+circumvention for profit a crime. Brazil and Argentina have no decompilation exception.
 
 ## Canada
 
@@ -21,21 +21,21 @@ Argentina have no decompilation exception.
 - **Libraries and archives.** Section 30.1 lets libraries, archives and museums copy works in an
   obsolete format, unless a copy is on sale
   ([Justice Laws](https://laws-lois.justice.gc.ca/eng/acts/c-42/page-8.html)).
-- **How long copyright lasts.** The author's life plus 70 years since 30 December 2022. Works
-  already free stayed free.
+- **How long copyright lasts.** The author's life plus 70 years since 30 December 2022. Works whose
+  copyright had already ended did not get it back.
 - **Owners who cannot be found.** The Copyright Board can license them
   ([Copyright Board](https://www.cb-cda.gc.ca/en/unlocatable-owners)). It granted 277 licences
   from 1990 to 2013, none for games.
 - **Cases.** In *Nintendo v. King* (2017), the Federal Court awarded $12.76 million against a
-  seller of game copiers and mod chips. The defence that buyers used them for homebrew failed for
-  lack of evidence
+  seller of game copiers and mod chips. The court rejected the defence that buyers used them for
+  homebrew, because the seller gave no evidence for it
   ([Smart & Biggar](https://smartbiggar.ca/insights/publication/nintendo-awarded-12-7-million-for-circumvention-of-technological-protection-measures-in-precedent-setting-case)).
 
 ## Mexico
 
 - **Studying a program.** Art. 105 of the Federal Copyright Law allows one use or back-up copy
   ([LFDA art. 105](https://mley.mx/LFDA/articulo/105/index.html.md)). The only reverse
-  engineering rule sits in the lock article.
+  engineering rule is in the lock article.
 - **Locks.** Art. 114 Quáter, from July 2020, excuses breaking a lock to make an independently
   created program interoperable
   ([LFDA art. 114 Quáter](https://mley.mx/LFDA/articulo/114-qu%C3%A1ter/index.html.md)).
@@ -47,8 +47,8 @@ Argentina have no decompilation exception.
   print and at risk of disappearing.
 - **How long copyright lasts.** The author's life plus 100 years, the longest term in the world
   ([LFDA art. 29](https://mley.mx/LFDA/articulo/29/index.html.md)).
-- **Cases.** Enforcement is by raids, such as the closure of Mexico City's Friki Plaza by the
-  industrial property office IMPI.
+- **Cases.** The authorities enforce the law by raids. The industrial property office IMPI closed
+  Mexico City's Friki Plaza in one of them.
 
 ## Brazil
 
@@ -60,8 +60,8 @@ Argentina have no decompilation exception.
   exceptions ([Lei 9.610](https://www.planalto.gov.br/ccivil_03/leis/l9610.htm)). Brazil is not
   a party to the WIPO Copyright Treaty.
 - **Libraries and archives.** No preservation exception.
-- **How long copyright lasts.** 50 years from publication for software. A game's art, music and
-  film parts last longer.
+- **How long copyright lasts.** 50 years from publication for software. Copyright in a game's art,
+  music and film parts lasts longer.
 - **Games that shut down.** Bill PL 3612/2026 would require two years of support and 180 days'
   notice. After a shutdown, a company would have to offer an offline version, community server
   tools or a partial refund ([Game Overdrive](https://gameoverdrive.com.br/pl-3612-2026-preservacao-jogos/)).
@@ -101,7 +101,7 @@ Argentina have no decompilation exception.
 
 ## What this means for a project
 
-Study is covered in Canada and Chile, and through lock exceptions in Mexico and Colombia. In
-Brazil and Argentina, decompiling has no express cover. Observing the running game and writing
-new code that copies no expression have the firmest footing there. In Mexico, breaking a lock
+Canada and Chile permit study of a program. Mexico and Colombia permit it through their lock
+exceptions. Brazil and Argentina do not expressly permit decompiling. There, observing the
+running game and writing new code that copies no expression carry the least risk. In Mexico, breaking a lock
 for profit is a crime.

@@ -67,11 +67,11 @@ version of it for Outlaws (1997). Like Build, it has sectors with floor and ceil
 ## How to approach a 2.5D game
 
 1. Decode the map format first. With the sectors, walls and objects in hand, you can draw the
-   map from above and see the level as the game sees it.
+   map from above and see the level's layout.
 2. Find the renderer's main loop. In these engines it is usually one large function that walks
    sectors or columns. It is the slowest code in the game, so it is often in assembly.
-3. Separate the renderer from the game logic. The renderer can be rebuilt by its output; the
-   game logic must be exact.
+3. Separate the renderer from the game logic. You can rebuild the renderer to match its output.
+   The game logic must be exact.
 4. Find the timer rate and the game update rate. They are often different.
 5. Compare frames from the same position and angle with the original
    ([Running the original](../observe/running-the-original.md)). A software renderer's output is

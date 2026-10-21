@@ -1,10 +1,10 @@
 # The Macintosh
 
-The Mac has had four CPU families, each with its own code format. 68k code lives in resource
+The Mac has had four CPU families, each with its own code format. 68k code is stored in resource
 forks, PowerPC code in PEF fragments, and Intel and Apple silicon code in Mach-O files. macOS
 since Catalina cannot run 32-bit apps, so most older Mac games now run only in an emulator or
-on old hardware. A fat or universal file carries two compiled versions of the same game, which
-gives a second view of each function.
+on old hardware. A fat or universal file holds two compiled versions of the same game. You can
+compare the two versions of each function.
 
 | Era | Years | CPU | Code format | Emulator |
 |---|---|---|---|---|
@@ -27,7 +27,7 @@ the last release for 68k Macs ([Basilisk II](https://en.wikipedia.org/wiki/Basil
 
 ### How games were made and loaded
 
-68k application code lives as CODE resources in the resource fork. The details below are
+68k application code is stored as CODE resources in the resource fork. The details below are
 (not confirmed)
 ([Inside Macintosh: Mac OS Runtime Architectures](https://developer.apple.com/library/archive/documentation/mac/runtimehtml/RTArch-110.html)).
 
@@ -68,11 +68,11 @@ AppleSingle/AppleDouble or DiskCopy images (not confirmed)
 ### Projects to learn from
 
 Bungie's Marathon (1994) (not confirmed) ([Marathon](https://en.wikipedia.org/wiki/Marathon_(video_game))).
-Bungie released the Marathon 2 source in January 2000, and Aleph One grew from it. The
+Bungie released the Marathon 2 source in January 2000, and Aleph One was developed from it. The
 trilogy's data became freeware in 2005. "Classic Marathon 2" was re-released on Steam on
 Aleph One ([Marathon 2: Durandal](https://en.wikipedia.org/wiki/Marathon_2:_Durandal);
 [Aleph One on GitHub](https://github.com/Aleph-One-Marathon/alephone)). Aleph One is a fan
-engine grown from that source. Exact-match work should still use the shipped binary.
+engine. For an exact match, study the shipped binary.
 
 ### For an exact reimplementation
 
@@ -82,7 +82,7 @@ A 68k Mac binary needs three steps before analysis. No mainstream loader does al
 2. Split the CODE resources.
 3. Rebuild the A5 jump table.
 
-Then name the A-line traps so the Toolbox calls read as calls.
+Then name the A-line traps, so that each Toolbox call shows as a named call.
 
 ## PowerPC Macintosh
 
@@ -124,8 +124,8 @@ The Marathon games and Aleph One, as above.
 
 ### For an exact reimplementation
 
-- In a fat app, compare the 68k and PPC versions of each function. They are two compiled views
-  of the same source.
+- In a fat app, compare the 68k and PPC versions of each function. Both were compiled from the
+  same source.
 
 ## Intel Macintosh
 
@@ -170,8 +170,8 @@ ARM64 Macs, from 2020 ([CPU families](cpu-families.md#arm)).
 ### How games were made and loaded
 
 Rosetta 2 shipped with Big Sur. Apple said at WWDC 2025 that most of it will go in macOS 28
-(2027), keeping support for older unmaintained games. The source disagrees with itself on 27
-or 28 ([Rosetta](https://en.wikipedia.org/wiki/Rosetta_(software))). Rosetta 2 does not translate
+(2027), keeping support for older unmaintained games. The article gives both 27 and 28 as the
+version ([Rosetta](https://en.wikipedia.org/wiki/Rosetta_(software))). Rosetta 2 does not translate
 kernel extensions or AVX instructions (not confirmed)
 ([About the Rosetta translation environment, Apple](https://developer.apple.com/documentation/apple-silicon/about-the-rosetta-translation-environment)).
 

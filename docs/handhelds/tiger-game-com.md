@@ -21,13 +21,13 @@ has two cartridge slots. The Pocket Pro has one.
 
 Internet use needed a separate cartridge and a 14.4 kbit/s modem for email and text web. The
 Pocket Pro dropped internet use except for high-score submission
-([Wikipedia: Game.com](https://en.wikipedia.org/wiki/Game.com)). The RAM size is not in these
-notes.
+([Wikipedia: Game.com](https://en.wikipedia.org/wiki/Game.com)). The RAM size is not
+confirmed.
 
 ### Tools
 
 No Ghidra module exists for the SM8521. A MAME Game.com driver is commonly cited but not
-confirmed here.
+confirmed.
 
 ### Projects to learn from
 
@@ -37,5 +37,5 @@ released in 2022 ([Wikipedia: Game.com](https://en.wikipedia.org/wiki/Game.com))
 ### For an exact reimplementation
 
 The touchscreen and the modem cartridge are outside inputs that a test records
-([Handheld practices](practices.md)). The SM8521 programs are small, so a SLEIGH module or a
-purpose-built core is a modest job.
+([Handheld practices](practices.md)). The SM8521 programs are small, so writing a SLEIGH module or
+a purpose-built core would take modest effort.

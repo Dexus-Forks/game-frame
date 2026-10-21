@@ -39,8 +39,8 @@ the buffer.
 
 - Sample rates are set as a "time constant": `256 - 1,000,000 / rate`. The real rate is the
   rate that constant gives, which is not exactly the rate the game asked for. Compute it.
-- Games mix several effects into one buffer in software. The mixer's volume scaling and
-  clipping are behaviour; port them exactly if the sound must match.
+- Games mix several effects into one buffer in software. If the sound must match, port
+  the mixer's volume scaling and clipping exactly.
 - If the game counts sound interrupts to time anything, that count is an input.
 
 ## MIDI

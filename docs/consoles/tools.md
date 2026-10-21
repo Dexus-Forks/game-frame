@@ -1,10 +1,10 @@
 # Tools for console work
 
-GameFrame's playbook works for consoles, but some tools change. The tables on this page serve
-home consoles and handhelds alike. The [Handhelds](../handhelds/README.md) pages add the
+GameFrame's playbook works for consoles, but some tools change. The tables on this page
+cover both home consoles and handhelds. The [Handhelds](../handhelds/README.md) pages add the
 handheld CPUs and tools. Ghidra needs the right
-processor module and a loader for the console's file format. Ground truth comes mostly from
-emulators with debuggers. GameFrame's Unicorn emulator covers some console CPUs.
+processor module and a loader for the console's file format. Take most ground truth from
+emulators with debuggers. GameFrame's Unicorn emulator runs some console CPUs.
 
 ## Disassembly and decompilation
 
@@ -40,7 +40,7 @@ Work from the disassembly and write your findings as tables and prose.
 **Ghidra's 6502 `ADC` p-code is not exact.** It has no decimal path. It leaves the incoming
 carry out of the carry-out test. It copies V from C instead of computing signed overflow
 ([6502.slaspec lines 127–138](https://github.com/NationalSecurityAgency/ghidra/blob/master/Ghidra/Processors/6502/data/languages/6502.slaspec#L127-L138)).
-P-code emulation cannot serve as ground truth for 6502 games. Take 6502 ground truth from a
+Do not use p-code emulation as ground truth for 6502 games. Take 6502 ground truth from a
 tested core: [py65](https://github.com/mnaberez/py65), [mre/mos6502](https://github.com/mre/mos6502),
 [floooh/chips](https://github.com/floooh/chips) or MAME.
 
@@ -65,8 +65,8 @@ For 65816 code, the Capstone width mode must follow the M and X flag state in ea
 | [Ghidra-Switch-Loader](https://github.com/Adubbz/Ghidra-Switch-Loader) | Nintendo Switch | NSO |
 
 Check each extension's recent activity before relying on it. Archived modules need a pinned
-version that matches the Ghidra release, or an active fork. Extensions with few users need a
-test on a known binary.
+version that matches the Ghidra release, or an active fork. Test an extension with few users on
+a known binary.
 
 ## Emulators with debuggers
 
@@ -114,7 +114,7 @@ What to use them for:
 - **Breakpoints** on reads and writes to find the code that changes a variable.
 - **Trace logs** of every instruction for a frame, to compare with your port's behaviour.
 - **Input movies** (BizHawk, FCEUX, Mesen) as recorded per-frame input. They are the console
-  equivalent of demos, and tool-assisted speedrun movies cover whole games.
+  equivalent of demos. Tool-assisted speedrun movies cover whole games.
 - **Scripting** (Lua in Mesen, BizHawk, FCEUX) to dump RAM every frame and to drive the game.
   This is the console equivalent of GameFrame's headless runs.
 

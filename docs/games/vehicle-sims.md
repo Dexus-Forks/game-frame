@@ -32,11 +32,11 @@ through (a galaxy, a theatre of war), and often with docked screens that wait fo
 **What must be exact.** The maths core: fixed-point or float formats, multiply and divide
 helpers, square roots, trigonometry tables, matrix and vector routines, and 64-bit positions
 where the world is large. Orbits and physics integration (the step and its order). Generation
-of the world from a seed: one wrong draw changes a whole galaxy. Players know their galaxy's names.
+of the world from a seed: one wrong draw changes the whole galaxy. Players remember the names of the systems, so a wrong name is noticed.
 
 **Where the rules live.** Mostly in code, often hand-written assembly for the maths. Ships,
-weapons and goods are tables. Mission scripts and campaign trees are data. Generated worlds are
-code plus seed: nothing is stored, so generation must be exact.
+weapons and goods are tables. Mission scripts and campaign trees are data. A generated world is
+stored only as a seed, so the generator code must be exact.
 
 **Inputs.** Joystick axes, mouse flight, keyboard. Throttle and view controls. Time
 acceleration is an input that changes how many steps a frame runs: record it.
@@ -47,10 +47,10 @@ same 3D engine. Docked screens (markets, ship fitting) are software that waits. 
 
 **Time and determinism.** A fixed step multiplied by time acceleration. Far objects may be
 updated less often than near ones. Orbits are often computed in closed form from time, not
-integrated: then the clock's format and precision decide the positions.
+integrated. The positions then depend on the clock's format and precision.
 
 **How to verify.** Emulate the maths routines on millions of random inputs and compare bit for
-bit: they are small and pure. Generate the galaxy or star systems from many seeds and compare
+bit. These routines are small and pure. Generate the galaxy or star systems from many seeds and compare
 every field. Compare frames of the 3D view from the same state.
 
 **Pitfalls.**

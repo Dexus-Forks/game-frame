@@ -1,6 +1,6 @@
 # Middleware
 
-Middleware is a library that a game licenses for one job. It is not the game. In most cases it does not need to be reverse engineered. Identify it, label its functions, and replace it in
+Middleware is a library that a game licenses for one job. In most cases it does not need to be reverse engineered. Identify it, label its functions, and replace it in
 the port with a library that does the same job. Check whether the game depends on any exact
 behaviour of the library, such as its random numbers, its rounding or its timing.
 
@@ -23,20 +23,20 @@ behaviour of the library, such as its random numbers, its rounding or its timing
 | Online | GameSpy SDK, DirectPlay, Kali | `gamespy` strings; `dplayx.dll` | Replace with your own networking; do not contact old services ([Online games](../games/online.md)) |
 | Protection | SafeDisc, SecuROM, StarForce, CD checks | `.icd` files, `secdrv.sys`, `~df394b.tmp`; checks for a disc label | Breaking it is restricted in many countries ([Legal](../LEGAL.md)); the port reads the player's files and does not need it |
 
-## When middleware matters
+## When the port must match the middleware
 
 Most middleware can be replaced freely. A few cases need care:
 
 - **Music timing.** If the game logic waits for the music (a level ends when a song ends, a
-  cut scene follows the music), the music library's timing is behaviour. Measure it.
+  cut scene follows the music), the port must match the music library's timing. Measure it.
 - **Random numbers.** A few libraries use the C runtime's `rand`. If the game also uses `rand`,
   the library's calls change the game's sequence. Trace every caller of the random function.
 - **Video frame counts.** Some games count video frames to time events. Use the same frame rate
   and frame count as the original file.
-- **Scripting.** The behaviour of the script language version is part of the game. Lua 4.0 and
+- **Scripting.** Use the same script language version as the game. Lua 4.0 and
   5.0 differ in their libraries and byte code, and Lua 5.3 added an integer type.
-- **Physics.** If physics decides a game result (a ball's bounce in a sports game), the physics
-  library's exact results are behaviour. This is hard to match without the same library. Decide
+- **Physics.** If physics sets a game result (a ball's bounce in a sports game), the port must
+  match the physics library's exact results. This is hard to match without the same library. Decide
   early whether your project can accept a deviation and record it.
 
 ## How to identify a library inside the executable

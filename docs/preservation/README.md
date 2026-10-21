@@ -7,18 +7,17 @@ helps the owner of such a game keep it playable. It works from the copy the owne
 GameFrame does not share games. It ships no game files, assets or decompiled code. It is
 tested only on sample programs written for it.
 
-These chapters explain why games need this care, what GameFrame does about it, and where
-its limits are.
+The chapters are:
 
-1. [Why games disappear](why-games-disappear.md): out of print, broken by new systems, frozen
-   by their makers, lost at the source.
-2. [What GameFrame does](what-gameframe-does.md): a record of how the game worked,
-   checked against the original, and what GameFrame cannot do.
+1. [Why games disappear](why-games-disappear.md): games that are out of print, games that no
+   longer run, games their makers stopped updating, and games whose source code is lost.
+2. [What GameFrame does](what-gameframe-does.md): the documents and code a project makes, how
+   they are checked against the original, and what GameFrame cannot do.
 3. [Your own copy and the law](law/README.md): the law in 35 countries, with one page per
-   region. It explains why "abandonware" has no legal standing. It also covers what past
-   takedowns of game projects have shown.
-4. [AI and reverse engineering](ai.md): the concern about AI copying games, and how
-   GameFrame answers it.
+   region. It explains why "abandonware" has no legal standing. It also lists past
+   takedowns of game projects.
+4. [AI and reverse engineering](ai.md): the concern about AI copying games, and what
+   GameFrame does about it.
 5. [Built on others' work](others-work.md): the projects and institutions GameFrame learns
    from, and where to read more.
 6. [For developers and publishers](rights-holders.md): what we promise the people who made

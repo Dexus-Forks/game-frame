@@ -1,7 +1,7 @@
 # The IBM PC and compatibles
 
-On the PC the CPU barely changes the method. The executable format does. Each PC era has its
-own executable format and tool chain. DOS used COM and MZ, Win16 used NE, DOS extenders used LE
+On the PC, identify the executable format first. The tools you need depend on the format more
+than on the CPU. Each PC era has its own executable format and tool chain. DOS used COM and MZ, Win16 used NE, DOS extenders used LE
 and LX, Win32 used PE32 and x64 uses PE32+. Check the magic first: MZ, then the header at
 `e_lfanew` for NE, LE, LX or PE. GameFrame's `tools/triage` and `tools/dos` already cover MZ
 and NE ([re-inventory](../../.claude/skills/re-inventory/SKILL.md)). The x86 CPUs and the PC's
@@ -143,8 +143,8 @@ None listed yet.
 ### How games were made and loaded
 
 Programs are NE executables (not confirmed). WinG shipped on 21 September 1994. It let
-Windows 3.x programs write bitmap memory directly. It helped port DOS games and was later
-replaced by DirectX and CreateDIBSection. Doom95, SimCity 2000, SimTower and Civilization II are
+Windows 3.x programs write bitmap memory directly. Developers used it to port DOS games. DirectX
+and CreateDIBSection later replaced it. Doom95, SimCity 2000, SimTower and Civilization II are
 among the games listed as using it ([WinG](https://en.wikipedia.org/wiki/WinG)).
 
 ### Media and image formats
@@ -231,12 +231,12 @@ None listed yet.
 ### For an exact reimplementation
 
 - A GOG release may wrap the original DOS program in DOSBox. Study the original program inside.
-- Later DRM-free releases are often the cleanest owned copy to study.
+- A later DRM-free release is often the easiest owned copy to study, because it has no DRM code.
 
 ## Compilers and their fingerprints
 
-The compiler identifies itself in the binary. Knowing it tells a port which library code to
-skip and which arithmetic rules to copy. These fingerprints are widely documented. Each one
+Each compiler leaves recognisable code and strings in the binary. Once you know the compiler,
+you know which library code a port can skip and which arithmetic rules it must copy. These fingerprints are widely documented. Each one
 below is (not confirmed).
 
 | Compiler | Fingerprint |
@@ -273,7 +273,7 @@ Protection checks moved over the years toward the disc, and later to online acti
   to the hardware and is integrated with the game's code. Publishers have removed it by patch
   ([Denuvo](https://en.wikipedia.org/wiki/Denuvo)).
 
-Protected or virtualised regions resist decompilation. Unicorn emulation works best on the
-game's own logic. Later DRM-free releases are often the cleanest owned copy to study. The law
+Protected or virtualised code is hard to decompile. Unicorn emulation is most useful on the
+game's own logic. A later DRM-free release is often the easiest owned copy to study. The law
 on working around protection varies by country ([Legal](../LEGAL.md),
-[the law worldwide](../preservation/law/README.md)). The choice of route stays with you.
+[the law worldwide](../preservation/law/README.md)). You decide which route to take.

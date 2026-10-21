@@ -1,10 +1,10 @@
 # Home computers and the PC
 
 This section covers the home computers, the PC and the Mac that games were written for. Each
-page covers one family of machines. An exact reimplementation of a game from any of them
-depends on three facts. The first is the CPU family and its arithmetic quirks. The second is
-the memory and banking state that was live when the code ran. The third is the timing the game
-was written against. On 8-bit machines that timing is part of the game logic.
+page covers one family of machines. An exact reimplementation of a game needs three facts
+about its machine: the CPU family and its arithmetic quirks, the memory and banking state when
+the code ran, and the timing the game was written against. On 8-bit machines the game logic
+depends on that timing.
 
 ## Ask your agent
 
@@ -87,20 +87,20 @@ The machines split into four groups with different first steps.
 |---|---|---|
 | 8-bit home computers | Get past the loader, then learn the frame timing | Sinclair to other 8-bit |
 | 16-bit and 32-bit home computers | Learn the custom chips, because many games bypass the OS | Amiga, Atari ST, Acorn 32-bit, Japanese 16/32-bit |
-| The PC and the Mac | Identify the executable format of the era; it decides the loader and the tools | IBM PC, Macintosh, engine-era games |
+| The PC and the Mac | Identify the executable format of the era. The loader and the tools depend on it | IBM PC, Macintosh, engine-era games |
 | Consoles | See [Console games](../consoles/README.md) | |
 
 ## Snapshot after the loader
 
 The first job on a tape or disk game is usually to get past the loader. Run the game under an
-emulator until the game code sits in memory. Then take a snapshot. Protection code is part of
-the original's behaviour only until the game starts. A reimplementation therefore normally
-begins from the decrypted image in memory. Keep the lossless media image (TZX, G64, WOZ,
-EDSK, ATX, IPF, STX) as the record of what shipped.
+emulator until the game code sits in memory. Then take a snapshot. A reimplementation does not
+need to copy the protection code that runs before the game starts. It therefore normally
+starts from the decrypted image in memory. Keep the lossless media image (TZX, G64, WOZ, EDSK,
+ATX, IPF, STX) as the record of what shipped.
 
 Copy protection is described factually on each page. The law on working around it differs by
-country ([Legal](../LEGAL.md), [the law worldwide](../preservation/law/README.md)). The choice
-of route stays with you.
+country ([Legal](../LEGAL.md), [the law worldwide](../preservation/law/README.md)). You decide
+which route to take.
 
 ## How games were written on 8-bit machines
 
@@ -108,8 +108,8 @@ Commercial games were mostly hand-written assembly. BASIC appears in loaders and
 type-in games. Tape was the main medium in the UK and Europe. Disk was the main medium in the
 US and Japan. Cartridges were common on the MSX, the VIC-20 and the Atari.
 
-Exact timing matters most on four machines. The Spectrum has contended memory. The C64 has
-VIC-II badlines and raster interrupts. The Atari has ANTIC DMA and display list interrupts.
+On four machines the game logic depends closely on exact timing. The Spectrum has contended
+memory. The C64 has VIC-II badlines and raster interrupts. The Atari has ANTIC DMA and display list interrupts.
 The CPC has wait states that round every access to 4 cycles.
 
 ## Related pages

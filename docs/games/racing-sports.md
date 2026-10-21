@@ -52,7 +52,7 @@ differences grow fast in physics: compare from the first tick. Stop at the first
   [ABI](../ABI.md#floating-point).
 - Collision against the track in a fixed order of segments.
 - "Rubber banding": AI speed that depends on the player's position.
-- Time trials and championships store the best times in files: part of the save state.
+- Time trials and championships store the best times in files. Treat those files as part of the save state.
 
 ## Connections
 

@@ -2,7 +2,7 @@
 
 GameFrame is an agentic framework for reverse engineering games. Its playbook of skills and agents runs inside your coding agent. Its toolkit of tested tools checks every result against the original.
 
-These pages hold everything GameFrame knows about reverse engineering games, apart from the
+These pages cover reverse engineering games, apart from the
 step-by-step skills (in `.claude/skills/`, listed in the [README](../README.md#skills)). Start with the kind
 of game you have, then how to observe it, then the reference pages as you need them.
 
@@ -27,7 +27,7 @@ the order of this page and of each folder's `README.md` is the order of the site
   to a port, and matching decompilation.
 - [Handhelds](handhelds/README.md): from the Game & Watch and the Game Boy family to the
   Switch, the Steam Deck and phone games, with saves, clocks, links and LCD behaviour.
-- [Arcade](arcade/README.md): the arcade boards, with MAME as the record of each board's
+- [Arcade](arcade/README.md): the arcade boards, with MAME's source as the reference for each board's
   clocks, encryption and refresh rate.
 
 ## Technology of the era
@@ -58,7 +58,7 @@ the order of this page and of each folder's `README.md` is the order of the site
 - [Game patterns](GAME-PATTERNS.md): the parts most games are built from, as they appear in
   machine code.
 - [DOS games](DOS.md): 16-bit programs, Borland debug symbols, the DOS emulators.
-- [Calling conventions and floating point](ABI.md): what decides exactness.
+- [Calling conventions and floating point](ABI.md): the details a bit-exact port must copy.
 - [What a project can ship](OUTPUTS.md): documents, a website, programs, releases.
 - [Setup](SETUP.md): the toolchain.
 - [Legal](LEGAL.md): working within the law and with respect for the original.

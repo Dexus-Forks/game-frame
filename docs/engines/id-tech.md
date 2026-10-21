@@ -1,6 +1,6 @@
 # The id Software engines
 
-id Software's engines shaped first-person games in the 1990s, and many other studios licensed
+Many first-person games of the 1990s ran on id Software's engines. Many other studios licensed
 them. id released the source code of each engine some years after its games, so these engines
 are the best documented of the era. Use them to learn how a game engine of the time worked. Use the released source as a reference when you study a game built on a licensed copy.
 
@@ -37,7 +37,7 @@ column once. All world positions are 16.16 fixed point.
   list order every tic.
 - **Random numbers.** Doom has no random generator in the usual sense. `P_Random` returns the
   next entry of a fixed table of 256 bytes, and an index wraps around it. Demos depend on that
-  index, so the order of calls is behaviour.
+  index, so the port must keep the order of calls.
 - **Demos.** A demo file stores the game settings and then one command per player per tic
   (forward move, side move, turn, buttons). Playing it back runs the same game, so any change
   in the order of thinkers or random calls breaks old demos. Chocolate Doom exists to keep
@@ -59,8 +59,8 @@ interprets. Even single-player Quake runs as a client and a server in one proces
   decompiler before you look at machine code. The engine's own code changes far less between
   games.
 - The software renderer was written for the Pentium. It overlaps the floating-point divide for
-  perspective correction with integer work, every 16 pixels. That trick explains code that
-  otherwise looks strange.
+  perspective correction with integer work, every 16 pixels. If an inner loop looks strange,
+  look for this overlap.
 - id released GLQuake, an OpenGL version, as a separate free download in 1997. It ran on 3dfx
   cards through a "MiniGL" driver ([3D accelerators](../hardware/graphics-3d.md)).
 
@@ -77,7 +77,7 @@ QVM in an interpreter, compile it to machine code when it loads, or load a nativ
 same code instead. Three modules exist: the server game (`qagame`), the client game (`cgame`)
 and the user interface (`ui`). Data is in `.pk3` files, which are ZIP archives.
 
-Licensees changed it heavily. Call of Duty's engine began as id Tech 3 and diverged with each
+Licensees changed it heavily. Call of Duty's engine began as id Tech 3 and changed further with each
 game.
 
 ## How to use the released source
@@ -86,7 +86,7 @@ game.
    released code is usually the last patch.
 2. Name the engine functions in your Ghidra project by matching them to the source. Strings,
    error messages and the order of functions in the binary help.
-3. Mark every function that differs from the source. Those are the licensee's changes. Most of your reverse engineering is there.
+3. Mark every function that differs from the source. Those are the licensee's changes. Spend most of your reverse engineering on them.
 4. Check that your project's rules allow reading the source. id's sources are under the GPL;
    reading them to understand behaviour is common. Copying them makes your project a derivative under the GPL ([Legal](../LEGAL.md)).
 

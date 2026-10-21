@@ -2,7 +2,7 @@
 
 The Virtual Boy and the Pokémon mini are Nintendo handhelds outside the Game Boy line. The
 Virtual Boy's V810 needs a Ghidra extension. The Pokémon mini's S1C88 has no Ghidra module and
-no Unicorn backend, so PokeMini's trace is the ground-truth source.
+no Unicorn backend, so take ground truth from PokeMini's trace.
 
 ## The devices
 
@@ -51,11 +51,11 @@ Unicorn backend exists for the S1C88.
 ### Projects to learn from
 
 An official emulator inside the GameCube game *Pokémon Channel* (2003) ran demo versions of
-some games. Homebrew followed reverse engineering. The demo *SHizZLE* was shown at Breakpoint
+some games. Homebrew games appeared after people reverse engineered the system. The demo *SHizZLE* was shown at Breakpoint
 2005 ([Wikipedia: Pokémon mini](https://en.wikipedia.org/wiki/Pok%C3%A9mon_Mini)).
 
 ### For an exact reimplementation
 
-PokeMini's trace is the ground-truth source. The shock sensor, IR, rumble and RTC are outside
+Take ground truth from PokeMini's trace. The shock sensor, IR, rumble and RTC are outside
 inputs and state that a test records ([Handheld practices](practices.md)). The S1C88 programs
-are small, so a SLEIGH module or a purpose-built core is a modest job.
+are small, so writing a SLEIGH module or a purpose-built core would take modest effort.

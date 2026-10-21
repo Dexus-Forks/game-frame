@@ -1,8 +1,8 @@
 # 2D graphics
 
-DOS games drew straight into video memory. The video card's mode decides how memory maps to
-pixels, how many colours there are and how the palette works. The port must reproduce the
-picture exactly, so it must understand the mode the game used.
+DOS games drew straight into video memory. The video mode sets how memory maps to pixels,
+how many colours there are and how the palette works. To reproduce the picture exactly, the
+port must handle the mode the game used.
 
 ## The video standards
 
@@ -38,7 +38,7 @@ page flipping.
 - Page flipping changes the start address register (CRTC, port `3D4h`, indexes `0Ch` and
   `0Dh`). The visible page is the one the start address points to at the retrace.
 - Games also used the VGA's latches to copy four pixels at once, and the write modes to fill
-  quickly. Port the result, the pixels, without copying the method.
+  quickly. Port the resulting pixels. You do not need to copy the method.
 
 ## Palettes
 
@@ -58,7 +58,7 @@ The VGA palette is written through ports `3C8h` (start index) and `3C9h` (red, g
 Port `3DAh` bit 3 is set while the screen is in its vertical retrace. Games wait for it to avoid
 tearing and to time their frames.
 
-- If a game waits for the retrace each frame, the display's refresh rate is its clock. VGA
+- If a game waits for the retrace each frame, the display's refresh rate sets the game's speed. VGA
   Mode 13h refreshes at 70 Hz; Mode X 320 × 240 at 60 Hz.
 - Some games count retraces to time animations or the whole game. Then a frame is 1/70 or 1/60
   of a second. Use that rate in the port.

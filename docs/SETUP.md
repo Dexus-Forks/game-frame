@@ -1,6 +1,6 @@
 # Setup
 
-The short version:
+To install and check everything:
 
 ```bash
 scripts/setup.sh --install   # Ghidra, JDK 21, objdump, Node, Zig; .venv with unicorn, pefile, capstone
@@ -16,7 +16,7 @@ first line of help, and `./gameframe tool NAME` prints the rest.
 
 ![tests/run.sh on the sample game. Each tool has a line marked ok, grouped by section, and the summary reads 94 passed, 0 failed.](assets/captures/run-tests.svg)
 
-A good setup ends like this. Each check runs a tool against the sample game. The summary line
+When the setup is complete, the run ends like this. Each check runs a tool against the sample game. The summary line
 counts the checks that passed and failed. With `--ghidra` the run has more checks.
 
 | Tool | Used for | Where it comes from |

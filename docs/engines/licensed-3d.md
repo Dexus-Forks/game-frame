@@ -48,7 +48,7 @@ Criterion Software's RenderWare was a cross-platform graphics library used on PC
 San Andreas (2004) and Burnout (2001).
 
 - Files are chunks with a type, a size and a library version: `.dff` (models), `.txd` (texture
-  dictionaries), `.rws` (streams). The chunk header makes the format easy to walk.
+  dictionaries), `.rws` (streams). A reader can walk a file chunk by chunk from the headers.
 - The same game on PC and PlayStation 2 uses the same chunk format with different platform
   data inside, so a PC reader helps with the console version.
 

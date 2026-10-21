@@ -1,8 +1,8 @@
 # Arcade action: shoot 'em ups, platformers, beat 'em ups, fighting
 
 Games where things come at the player every frame and the player steers, jumps, fires and
-dodges. They are [streams with controls](interaction.md#the-four-kinds): the game drives, the
-player reacts, and everything happens inside one frame loop at a fixed rate.
+dodges. They are [streams with controls](interaction.md#the-four-kinds): the game drives and the
+player reacts. The game runs its rules inside one frame loop at a fixed rate.
 
 ## Reference games
 
@@ -42,7 +42,7 @@ code that uses them.
 
 **Inputs.** Keys, joystick and mouse, read once a frame in most games. A demo is the input of
 each frame plus the starting seed. Fighting games buffer the last few frames of input to
-detect special moves: the buffer length and the matching rules are behaviour.
+detect special moves. Port the buffer length and the matching rules exactly.
 
 **Interface.** The HUD (score, lives, energy bars) is drawn by the frame, usually straight to
 video memory. Menus, shops and the title screen are separate loops. Fonts are the game's own
@@ -50,8 +50,8 @@ bitmaps. Port each screen from its code.
 
 **Time and determinism.** A fixed rate set by a timer interrupt or the display's refresh (70 Hz
 on VGA mode 13h; 60 Hz on NTSC consoles; 50 Hz on PAL). If the game waits for the vertical
-retrace, the refresh rate is its clock. Slowdown (fewer updates when the screen is busy) may be
-part of the behaviour on consoles and arcade boards.
+retrace, the refresh rate sets its speed. On consoles and arcade boards, a port may need to copy
+the slowdown (fewer updates when the screen is busy).
 
 **How to verify.** Play the game's own demos in the original and in the port, and compare every
 frame's state and screen. Fuzz the frame's fragments from real states (random enemies, shots,

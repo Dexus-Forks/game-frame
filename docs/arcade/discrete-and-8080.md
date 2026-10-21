@@ -1,7 +1,7 @@
 # Discrete logic and the 8080
 
-The first arcade games of 1972 to 1978 come in two kinds. Pong and Breakout have no CPU. A
-reimplementation of them is a circuit simulation. Space Invaders and the Midway 8080 boards run
+The first arcade games of 1972 to 1978 come in two kinds. Pong and Breakout have no CPU. To
+reimplement them, you simulate the circuit. Space Invaders and the Midway 8080 boards run
 an Intel 8080 program beside analog sound circuits.
 
 | Board | Years | Main CPU and clock | Sound | Refresh | Protection | MAME status | Ghidra |
@@ -23,7 +23,7 @@ None listed.
 
 ### Tools
 
-MAME's netlist driver is the model of the circuit. There is no program to decompile, so Ghidra
+MAME's netlist driver models the circuit. There is no program to decompile, so Ghidra
 and Unicorn do not apply.
 
 ### Projects to learn from
@@ -32,16 +32,17 @@ MAME's `pong.cpp` netlist.
 
 ### For an exact reimplementation
 
-- Simulate the circuit. The behaviour lives in the logic, the counters and their timing.
-- Take the netlist from MAME as the description to follow.
+- Simulate the circuit. The game's behaviour comes from the logic gates, the counters and their
+  timing.
+- Use MAME's netlist as the description of the circuit.
 
 ## Midway 8080 boards and Space Invaders
 
 ### Hardware
 
 Space Invaders (Taito, 1978; licensed to Midway in the US) uses an Intel 8080 CPU. Tomohiro
-Nishikado designed it. A Fujitsu MB14241 shifter helps it draw sprites. Sound comes from analog
-circuits plus a TI SN76477
+Nishikado designed it. The game draws sprites with the help of a Fujitsu MB14241 shifter. Sound
+comes from analog circuits plus a TI SN76477
 ([Wikipedia (mirror): Space Invaders](https://static.hlt.bme.hu/semantics/external/pages/SOAR/en.wikipedia.org/wiki/Space_Invaders.html)).
 Giant Bomb gives the Japanese release as 19 June 1978. Another source says November 1978
 ([Giant Bomb releases](https://giantbomb.com/wiki/Games/Space_Invaders/Releases)).
@@ -58,7 +59,7 @@ None listed.
 ### Tools
 
 - Ghidra decodes the 8080 with its built-in `8085` module.
-- Unicorn has no 8080 backend. Ground truth comes from MAME's debugger or a small 8080 core
+- Unicorn has no 8080 backend. Take ground truth from MAME's debugger or from a small 8080 core
   ([CPU families](../computers/cpu-families.md#the-8080-z80-and-sm83)).
 - The [practices page](practices.md#disassembly-and-emulation-support-per-arcade-cpu) has the
   full CPU table.

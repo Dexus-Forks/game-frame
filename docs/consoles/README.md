@@ -1,12 +1,12 @@
 # Console games
 
-A home console game runs on fixed hardware with no operating system to speak of. The game owns the
-whole machine: it writes to the video chip's registers, starts DMA transfers, reads the
-controllers from memory-mapped ports and times everything to the display's vertical blank.
-That makes console games different to reverse engineer from PC games, and different to port.
+A home console game runs on fixed hardware with little or no operating system. The game
+controls the hardware directly. It writes to the video chip's registers, starts DMA transfers,
+reads the controllers from memory-mapped ports and times everything to the display's vertical
+blank. So reverse engineering and porting a console game use different methods from PC work.
 
-This section covers how to study home console games and how to bring them to other systems. It
-uses GameFrame's playbook unchanged; the tools and the hardware details differ. The handhelds,
+This section covers how to study home console games and how to bring them to other systems. The
+work follows GameFrame's playbook. The tools and the hardware details differ from PC work. The handhelds,
 from the Game & Watch to the Switch, are in [Handhelds](../handhelds/README.md). The arcade
 boards are in [Arcade](../arcade/README.md).
 
@@ -58,7 +58,7 @@ In my GameFrame project, start work on a game for <console>.
 | Sound | A sound card or an API | A sound chip or a separate sound CPU with its own program |
 | Saves | Files | Battery-backed RAM in the cartridge, memory cards, passwords |
 | Ground truth | Run the EXE in an emulator or on a PC | Run the ROM in an accurate emulator with a debugger |
-| Source and symbols | Sometimes symbols, rarely source | Sometimes symbol maps on discs and in prototypes; leaked source exists for some games and must not be used ([Legal](../LEGAL.md)) |
+| Source and symbols | Sometimes symbols, rarely source | Sometimes symbol maps on discs and in prototypes; leaked source exists for some games; GameFrame's method does not use it ([Legal](../LEGAL.md)) |
 
 ## Where to start
 
@@ -67,11 +67,11 @@ In my GameFrame project, start work on a game for <console>.
 2. Get an accurate emulator with a debugger running the game ([Tools](tools.md)).
 3. Load the code into Ghidra with the right processor and memory map. For banked cartridges,
    load each bank at the address it runs at.
-4. Find the reset vector and the vertical blank interrupt handler. The main loop and the frame
-   timing follow from them.
+4. Find the reset vector and the vertical blank interrupt handler. From them you can find the
+   main loop and the frame timing.
 5. Find the controller read. It is usually one function called once a frame, storing the
-   buttons in RAM. That is the input record ([Inputs](../observe/inputs.md)).
+   buttons in RAM. Log those buttons each frame as the input record ([Inputs](../observe/inputs.md)).
 6. Map the RAM: which addresses hold the player, the enemies, the level, the random state.
-   Emulators' RAM watch and search features find these fast. Write them into `labels/`.
+   Use the emulator's RAM watch and RAM search to find these addresses. Write them into `labels/`.
 
 Then follow the usual loop: trace, emulate, port, verify.

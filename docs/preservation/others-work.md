@@ -1,7 +1,7 @@
 # Built on others' work
 
-GameFrame learns from projects that kept games playable long before it existed. Each of them
-needs the player's own copy of the game. Each of them links to a store where the game is sold.
+GameFrame learns from projects that kept games playable long before it existed. Each project
+below needs the player's own copy of the game and links to a store that sells it.
 
 ## Projects
 
@@ -9,11 +9,11 @@ needs the player's own copy of the game. Each of them links to a store where the
 |---|---|---|
 | [ScummVM](https://www.scummvm.org/) | over 325 adventure games | Rewrites the games' engines in new code. It began in 2001 and celebrated 25 years in 2026 |
 | [OpenRCT2](https://github.com/OpenRCT2/OpenRCT2) | RollerCoaster Tycoon 2 | Replaced the original program one function at a time while the game kept running |
-| [OpenTTD](https://www.openttd.org/) | Transport Tycoon Deluxe | Began from a disassembly and grew far beyond the original. Since March 2026, the Steam and GOG versions need a bought copy of the original game |
+| [OpenTTD](https://www.openttd.org/) | Transport Tycoon Deluxe | Began from a disassembly. It has since added many features the original lacked. Since March 2026, the Steam and GOG versions need a bought copy of the original game |
 | [DevilutionX](https://github.com/diasurgical/devilutionX) | Diablo | Runs the player's own Diablo data on current systems. GOG lists it as a free add-on for its copy of Diablo |
 | [The Force Engine](https://github.com/luciusDXL/TheForceEngine) | Dark Forces, Outlaws | Rebuilds LucasArts' Jedi engine from reverse engineering |
-| [dethrace](https://github.com/dethrace-labs/dethrace) | Carmageddon | Replaces the original's code function by function, and checks each one |
-| [MAME](https://github.com/mamedev/mame) | thousands of arcade machines | Documents each machine in code, and uses play to prove the documentation |
+| [dethrace](https://github.com/dethrace-labs/dethrace) | Carmageddon | Replaces the original's code one function at a time. Each new function is checked against the original |
+| [MAME](https://github.com/mamedev/mame) | thousands of arcade machines | Its code documents each machine. Playing the games tests that documentation |
 
 The [taxonomy of games](../games/README.md) lists many more for each kind of game.
 

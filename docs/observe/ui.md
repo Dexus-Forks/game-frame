@@ -1,6 +1,6 @@
 # Capturing the interface
 
-The interface is usually the least generic part of a game, and the part players notice first.
+A game's interface is usually written for that game alone. Players also notice it first.
 This page explains why it is hard, how to make an inventory of it, and how to capture enough of
 the running original to rebuild it.
 
@@ -29,13 +29,13 @@ The games people reverse engineer are mostly from before off-the-shelf engines w
 In the DOS and early Windows years, almost every game had its own engine: its own drawing
 code, fonts, menus, and input handling. Licensed engines (id Software's, Build, Unreal) came
 in the mid-1990s and mostly for first-person games; Unity and Unreal became the default for
-most studios only in the 2010s. So expect, for most games you will work on:
+most studios only in the 2010s. Expect these in most games you work on:
 
-- **Every screen is code.** Menus, HUDs, shops, inventories and dialogs are drawn by the
+- **Each screen is drawn by code.** Menus, HUDs, shops, inventories and dialogs are drawn by the
   game's own functions, often straight to video memory, with the game's own font.
 - **Little is shared between screens.** Two menus may be built by two different routines with
   different input handling and timing.
-- **The interface holds rules.** What can be bought, dropped or built, and in what order
+- **The interface code contains rules.** What can be bought, dropped or built, and in what order
   screens appear, are often decided inside the interface code.
 - **Later games use data.** Some games (Banished, Infinity Engine games, many 2000s games)
   read layouts, text and events from data files: a widget tree with names and handlers. Then
@@ -76,7 +76,7 @@ and for each screen and state in the inventory:
 
 Script the captures, so you can repeat them after a game update or for another language.
 
-What a capture must hold, learned from porting a game that draws its own interface:
+For a game that draws its own interface, a capture must hold:
 
 - **Every surface the screen is drawn on.** The HUD and messages are often drawn straight
   to the display, not into the off-screen frame the game builds the picture in. Save both.
@@ -92,8 +92,8 @@ What a capture must hold, learned from porting a game that draws its own interfa
 ## Rebuild it
 
 - **Data-driven interfaces:** write a reader for the layout format, and an engine that builds
-  the same tree with the same names. The names then become the way tests and tools find
-  controls ([A model to query](object-model.md)).
+  the same tree with the same names. Tests and tools then find controls by those
+  names ([A model to query](object-model.md)).
 - **Interfaces in code:** port each screen's drawing and input functions like any other game
   logic, with the font and shapes read from the game's data.
 - **Either way:** the interface reads the game's state and produces commands. Keep it out of the rules. Then a test can drive the rules without the interface. The interface can be checked against captures on its own.
@@ -106,5 +106,5 @@ What a capture must hold, learned from porting a game that draws its own interfa
 - Press the same inputs and compare the commands the screen produces.
 - Check text in every language the game ships: line breaks and widths change with the text.
 
-How exact the interface must be is the project's decision ([Who drives](../games/interaction.md#the-four-kinds)):
-a 1:1 project treats every pixel and frame of it as behaviour.
+Each project decides how exact the interface must be ([Who drives](../games/interaction.md#the-four-kinds)).
+A 1:1 project must match every pixel of every frame of it.

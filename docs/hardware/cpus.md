@@ -1,7 +1,7 @@
 # CPUs and floating point
 
-The CPU a game was written for decides how it does arithmetic. Arithmetic decides exactness. A
-port that rounds one result differently can change a whole simulation, so learn which number
+The CPU a game was written for sets the number formats and instructions it uses for arithmetic.
+A port that rounds one result differently can change a whole simulation. Learn which number
 formats and which instructions the game uses before you port any maths.
 
 ## The x86 generations

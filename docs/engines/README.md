@@ -14,10 +14,10 @@ Knowing the engine helps in several ways.
   and reverse engineer only the game code on top of it.
 - The game's rules may live in a script language the engine interprets (QuakeC, UnrealScript,
   Duke Nukem 3D's CON files, Infinity Engine scripts). Once the interpreter is ported, the
-  rules come with the data.
+  port runs the rules from the game's data.
 - An engine reimplementation may already run the game. Its documentation and tests tell you
   how the formats and the scripts behave. Read its documents and its behaviour. Follow your project's rules about reading its code ([Legal](../LEGAL.md)).
-- Middleware code is not the game. Identify it early and leave it out of your analysis.
+- Middleware is library code from another company. Identify it early and leave it out of your analysis.
   Replace it in the port with a library that does the same job.
 
 ## Finding the engine

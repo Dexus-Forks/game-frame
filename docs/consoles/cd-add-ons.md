@@ -1,6 +1,6 @@
 # CD add-ons
 
-The CD add-ons and their relatives put a second CPU or a BIOS beside the base console. Real game code runs on that second CPU. An emulator needs the add-on's BIOS. The Philips CD-i is
+These add-ons give the base console a second CPU or a BIOS. Game code runs on that second CPU. An emulator needs the add-on's BIOS. The Philips CD-i is
 a standalone player, but its programs are OS-9 modules on a 68000-family CPU.
 
 ## The platforms
@@ -24,7 +24,7 @@ separately. The second CPU's code is often taken from a RAM dump after the main 
 ### Hardware
 
 The add-on has a second 68000 at 12.5 MHz. It holds 512 KB of program RAM and 256 KB of word
-RAM shared with the Mega Drive. An RF5C164 makes PCM sound. The BIOS sits on the add-on. The
+RAM shared with the Mega Drive. An RF5C164 makes PCM sound. The BIOS is in the add-on. The
 size of the backup RAM is not confirmed.
 
 ### Tools
@@ -43,13 +43,13 @@ Trace both 68000s. Map which code runs on which CPU and how they share word RAM.
 
 ### Hardware
 
-The 32X adds two SH-2 CPUs at 23 MHz, 256 KB of SDRAM, a frame buffer and PWM sound. It sits on
-top of the Mega Drive's 68000 and Z80.
+The 32X adds two SH-2 CPUs at 23 MHz, 256 KB of SDRAM, a frame buffer and PWM sound. The
+Mega Drive's own 68000 and Z80 keep running beside them.
 
 ### Tools
 
-Ghidra builds in the SH-2 under SuperH. Unicorn has no SuperH, so ground truth comes from a
-full emulator such as PicoDrive or MAME (not confirmed). MAME's sh core is one option.
+Ghidra builds in the SH-2 under SuperH. Unicorn has no SuperH, so take ground truth from a
+full emulator such as PicoDrive or MAME (not confirmed). MAME's sh core is another source of ground truth.
 
 ### For an exact reimplementation
 
@@ -76,7 +76,7 @@ ground truth.
 
 ### For an exact reimplementation
 
-Record which System Card the game needs. The card decides the BIOS and the RAM the game sees.
+Record which System Card the game needs. The card sets which BIOS the game runs on and how much RAM it has.
 
 ## Philips CD-i
 

@@ -1,7 +1,7 @@
 # Early 3D boards
 
-Every early 3D board pairs a general CPU with one or more DSPs or custom geometry chips. Each
-DSP runs its own program. Game logic usually lives on the main CPU. A port must reproduce the
+Every early 3D board has a general CPU and one or more DSPs or custom geometry chips. Each
+DSP runs its own program. The game logic usually runs on the main CPU. A port must reproduce the
 DSP programs too, so expect two or more instruction sets per game. Ghidra has no built-in
 module for most of these DSPs. Atari's Hard Drivin' is on the
 [Atari](atari-coin-op.md#atari-hard-drivin) page. Midway Zeus is on the
@@ -41,7 +41,8 @@ None listed.
 
 ### Tools
 
-Ghidra and Unicorn cover the 68000. Neither has a TMS320 module. MAME is the runner for the DSPs.
+Ghidra and Unicorn cover the 68000. Neither has a TMS320 module. Use MAME to run the DSP
+programs.
 
 ### Projects to learn from
 
@@ -73,7 +74,7 @@ None listed.
 
 ### Tools
 
-The first entries are Ridge Racer variants from 1993. Of 42 entries, 2 carry
+The first entries are Ridge Racer variants from 1993. Of 42 entries, 2 have
 MACHINE_NOT_WORKING. Ghidra has no built-in module for the TMS320C25 or the M37702.
 
 ### Projects to learn from
@@ -86,7 +87,7 @@ Air Combat 22 followed on 3 July 2025. Rave Racer was announced for 26 February
 
 ### For an exact reimplementation
 
-- Uploaded DSP code lives in RAM. Capture it from a running emulator.
+- The uploaded DSP code exists only in RAM. Capture it from a running emulator.
 
 ## Sega Model 1
 
@@ -123,15 +124,15 @@ Whether that release emulates the Model 1 or reimplements it is not confirmed.
 
 ### For an exact reimplementation
 
-- For the games with BAD_DUMP TGP ROMs, MAME is not ground truth for the geometry stage.
+- For the games with BAD_DUMP TGP ROMs, do not use MAME as ground truth for the geometry stage.
 - Plan for a V60 disassembler.
-- The Model 1 TGP clock is an open question.
+- The Model 1 TGP clock is unknown.
 
 ## Sega Model 2
 
 ### Hardware
 
-Model 2 (1993/1994; Daytona USA 1994) is summed up in its header as "i960KB + (5x TGP) or (2x
+MAME's header describes Model 2 (1993/1994; Daytona USA 1994) as "i960KB + (5x TGP) or (2x
 SHARC) or (2x TGPx4)"
 ([MAME model2.cpp](https://github.com/mamedev/mame/blob/master/src/mame/sega/model2.cpp)).
 
@@ -167,9 +168,10 @@ None listed yet.
 
 ### For an exact reimplementation
 
-- Record the variant. It decides the geometry processor and its instruction set.
-- Treat MAME's video timing as unsettled.
-- "To The MAXX" uses simulated protection in MAME. A port built on it inherits any error.
+- Record the variant. The geometry processor and its instruction set depend on it.
+- Do not rely on MAME's video timing.
+- "To The MAXX" uses simulated protection in MAME. A port built on that simulation has the
+  same errors.
 
 ## Sega Model 3
 
@@ -183,7 +185,7 @@ Model 3 (1996; Virtua Fighter 3 and Scud Race) uses a PowerPC 603ev
   2.0".
 - A Guru readme in the same file says "The CPU on Scud Race runs at 66MHz". That conflicts with
   the Step 1.5 figure.
-- The host bridge is a Motorola MPC105 or MPC106 by step.
+- The host bridge is a Motorola MPC105 or MPC106, depending on the step.
 - The Real3D graphics have PCI IDs 0x16c311db (315-5827, Step 1.x) and 0x178611db (315-6022,
   Step 2). Both use Mitsubishi M5M410092FP 3D-RAM.
 - Sound is a 68000-12 with two 315-5687 SCSP chips. The optional Digital Sound Board v1 has a
@@ -212,7 +214,7 @@ Supermodel's source.
 
 ### For an exact reimplementation
 
-- Record the step of the board. It sets the CPU clock and the 3D engine.
+- Record the step of the board. The CPU clock and the 3D engine depend on it.
 - Run the port at 57.524 Hz, Supermodel's figure.
 - Check floating-point results against more than one emulator. MAME has a known FPU fault on
   one game.
@@ -231,7 +233,7 @@ Not covered here.
 
 ### Tools
 
-Of 19 entries, 2 carry MACHINE_NOT_WORKING. Most carry IMPERFECT_GRAPHICS and IMPERFECT_TIMING.
+Of 19 entries, 2 have MACHINE_NOT_WORKING. Most have IMPERFECT_GRAPHICS and IMPERFECT_TIMING.
 
 ### Projects to learn from
 
@@ -239,7 +241,7 @@ None listed yet.
 
 ### For an exact reimplementation
 
-- MAME's timing is flagged imperfect on most games. Treat it as unsettled.
+- MAME flags its timing as imperfect on most games. Do not rely on it.
 
 ## Konami GTI Club and Hornet
 
@@ -257,7 +259,7 @@ Some configurations use an X76 secure EEPROM.
 
 ### Tools
 
-- Of 72 Hornet entries, 58 carry MACHINE_NOT_WORKING. Operation Thunder Hurricane (1997) does
+- Of 72 Hornet entries, 58 have MACHINE_NOT_WORKING. Operation Thunder Hurricane (1997) does
   not work.
 - Ghidra's PowerPC module covers the main CPU. ghidra-sharc targets the ADSP-214xx.
 
@@ -267,7 +269,7 @@ None listed yet.
 
 ### For an exact reimplementation
 
-- Most Hornet games do not run in MAME. Ground truth comes from other emulators or from owned
+- Most Hornet games do not run in MAME. Take ground truth from other emulators or from owned
   hardware.
 
 ## Gaelco 3D
@@ -275,7 +277,7 @@ None listed yet.
 ### Hardware
 
 Gaelco 3D (1996) runs an M68000 at 15 MHz on Speed Up, with an ADSP-2115 sound DSP at 16 MHz.
-Settings sit in a 93C66 serial EEPROM
+Settings are stored in a 93C66 serial EEPROM
 ([MAME gaelco3d.cpp](https://github.com/mamedev/mame/blob/master/src/mame/gaelco/gaelco3d.cpp)).
 
 ### Protection

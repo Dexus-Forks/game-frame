@@ -3,16 +3,16 @@
 Eleven CPU families cover almost every game platform: the 8080/Z80/SM83 line, the 6502 line,
 the 6809, the 68000, the TMS9900, the CP1600, x86, ARM, MIPS, SuperH and PowerPC. A few
 one-off co-processors add to them, such as the Cell SPU and the Jaguar's RISC cores. The CPU
-family sets the byte order, the disassembler, the emulator core that can give ground truth,
-and the arithmetic a port must copy. This page covers every family except the x86 details,
+family tells you the byte order, the disassembler to use, the emulator cores that can give
+ground truth, and the arithmetic a port must copy. This page covers every family except the x86 details,
 which are in [CPUs and floating point](../hardware/cpus.md).
 
 ## Byte order
 
 Every 8-bit family here is little-endian except the 6809. Every 16-bit console CPU except x86
 is big-endian. A data-file decoder must follow the byte order of the machine that wrote the
-file ([re-format](../../.claude/skills/re-format/SKILL.md)). Files that moved between a 68000
-machine and an ARM or x86 machine can change byte order on the way.
+file ([re-format](../../.claude/skills/re-format/SKILL.md)). A file copied between a 68000
+machine and an ARM or x86 machine may have been converted to the other byte order.
 
 ## The 8080, Z80 and SM83
 
@@ -51,8 +51,9 @@ The **65C816** (1985) resets into a 65C02-like emulation mode. In native mode th
 flags set the widths of the accumulator and the index registers. Addresses become 24-bit, with
 DB and DP registers. The SNES 5A22 and the Apple IIgs use it
 ([Wikipedia: WDC 65C816](https://en.wikipedia.org/wiki/WDC_65C816)). The same opcode bytes
-decode differently by those flags. A disassembler must track the REP and SEP state. A wrong
-guess produces garbage after the first immediate operand.
+decode differently by those flags. A disassembler must track the REP and SEP state. If the
+disassembler guesses a width wrong, the instructions after the first immediate operand decode
+wrongly.
 
 The 6502 family runs the BBC Micro and Electron, VIC-20, C64, Atari 8-bit, Oric and Apple II.
 
@@ -78,7 +79,7 @@ the Amiga, the Atari ST, the X68000 and boards such as System 16 and CPS-2
 ## The TMS9900
 
 The **TMS9900** (June 1976) is a 16-bit big-endian CPU with only PC, WP and ST on the chip. Its
-sixteen general registers live in RAM at the workspace pointer. BLWP saves WP, PC and ST into
+sixteen general registers are held in RAM at the workspace pointer. BLWP saves WP, PC and ST into
 workspace registers 13 to 15
 ([Wikipedia: TMS9900](https://en.wikipedia.org/wiki/Texas_Instruments_TMS9900)). A register
 read in its disassembly is a memory read. To trace a function, trace the workspace RAM.
@@ -139,8 +140,8 @@ The PS3's **Cell** pairs one PPE with SPUs. Each SPU has its own 128-bit instruc
 ([Wikipedia: Cell](https://en.wikipedia.org/wiki/Cell_(processor))).
 
 The Jaguar's **Tom and Jerry** are 32-bit RISC cores at 26.591 MHz with 4 KB and 8 KB of local
-RAM. A flaw in the memory controller makes running their code from main RAM awkward. That
-pushed developers back to the 68000
+RAM. A flaw in the memory controller makes it hard to run their code from main RAM. Many
+developers ran their code on the 68000 instead
 ([Wikipedia: Atari Jaguar](https://en.wikipedia.org/wiki/Atari_Jaguar)). Tom has two banks of
 thirty-two 32-bit registers (not confirmed)
 ([Jagdox general](https://www.mulle-kybernetik.com/jagdox/general.html)).
@@ -187,7 +188,7 @@ Ghidra's processor list holds 39 folders
   is archived. [astrelsky/ghidra-emotionengine](https://github.com/astrelsky/ghidra-emotionengine/blob/master/README.md)
   shows how to build on the MIPS module.
 - An archived module such as GhidraBoy needs a pinned version that matches the Ghidra release.
-  The active fork is the other choice.
+  Or use the active fork.
 
 Loaders for platforms and console loaders are on [tools for console work](../consoles/tools.md).
 The commands for a headless export are in the
@@ -235,8 +236,8 @@ For CPUs that Unicorn lacks, MAME's m6809, g65816, tms9900, cp1610, jaguar and m
 files carry `license:BSD-3-Clause` headers. MAME as a whole is GPL-2.0
 ([MAME COPYING](https://github.com/mamedev/mame/blob/master/COPYING);
 [mame/src/devices/cpu](https://github.com/mamedev/mame/tree/master/src/devices/cpu)). Those BSD
-and MIT cores fit beside GameFrame's Apache-2.0 code. GPL emulators remain usable as external
-tools. [TomHarte/CLK](https://github.com/TomHarte/CLK) (MIT) covers many systems.
+and MIT cores can be combined with GameFrame's Apache-2.0 code. GPL emulators can still be used
+as separate external tools. [TomHarte/CLK](https://github.com/TomHarte/CLK) (MIT) covers many systems.
 [ares](https://github.com/ares-emulator/ares) covers many consoles.
 
 ## Arithmetic traps
@@ -252,11 +253,11 @@ That p-code has three faults.
 - It leaves the incoming carry out of the carry-out test.
 - It copies V from C. A real 6502 computes V as signed overflow.
 
-Decimal mode matters. `$99 + $01` gives `$00` with carry set in BCD, and `$9A` in binary
+The missing decimal mode changes results. `$99 + $01` gives `$00` with carry set in BCD, and `$9A` in binary
 ([Wikipedia: MOS Technology 6502](https://en.wikipedia.org/wiki/MOS_Technology_6502)). The NES
 2A03 has no decimal mode, so the same code gives different results on a stock 6502
-([NESdev Wiki: 2A03](https://www.nesdev.org/wiki/2A03)). P-code emulation cannot serve as
-ground truth for 6502 games. Take ground truth from a tested core such as py65, mos6502, MAME
+([NESdev Wiki: 2A03](https://www.nesdev.org/wiki/2A03)). Do not use Ghidra's p-code emulation
+as ground truth for 6502 games. Take ground truth from a tested core such as py65, mos6502, MAME
 or floooh/chips. The NMOS flag behaviour in decimal mode (N, V and Z) still needs a primary
 source.
 
@@ -292,10 +293,10 @@ source.
   ([IBM Cell SDK 3.0](https://arcb.csc.ncsu.edu/~mueller/cluster/ps3/SDK3.0/docs/accessibility/sdkpt/cbet_3codemapeqv.html)).
   Each original SPE gives about 1.8 GFLOPS in double precision
   ([Wikipedia: Cell](https://en.wikipedia.org/wiki/Cell_(processor))).
-- A port of PS2 or SPU float code that uses host IEEE floats will drift. It needs a software
-  float model.
-- Gekko paired-single results depend on the quantised load and store (GQR) setup. Dolphin's
-  code should confirm the details.
-- On x86, Turbo Pascal's 6-byte Real and each compiler's calling convention set the rules a PC
-  port must copy ([Turbo Pascal](https://en.wikipedia.org/wiki/Turbo_Pascal);
+- A port of PS2 or SPU float code that uses host IEEE floats will give slightly different
+  results. It needs a software float model.
+- Gekko paired-single results depend on the quantised load and store (GQR) setup. Check the
+  details in Dolphin's code.
+- On x86, a PC port must copy Turbo Pascal's 6-byte Real arithmetic and each compiler's
+  calling convention ([Turbo Pascal](https://en.wikipedia.org/wiki/Turbo_Pascal);
   [CPUs and floating point](../hardware/cpus.md); [Calling conventions](../ABI.md)).

@@ -48,11 +48,11 @@ trigger tables (when *x* happens, do *y*). Generated maps from a seed.
 
 **Inputs.** Commands: select, move, attack, build, each with targets. In lockstep games the
 commands are what travels over the network and what a replay stores, each tagged with the tick
-it takes effect. Find that command format early: it is the natural input record for the port.
+it takes effect. Find that command format early. The port can use it as its input record.
 Selections and the camera are not commands in most games; check yours.
 
-**Interface.** Sidebars, minimaps, unit panels, the selection box, and menus. Hotkeys and
-grouping (Ctrl + number) are behaviour players rely on. Turn-based games have dense screens
+**Interface.** Sidebars, minimaps, unit panels, the selection box, and menus. Players rely on
+hotkeys and grouping (Ctrl + number), so port them exactly. Turn-based games have dense screens
 of numbers and lists.
 
 **Time and determinism.** A fixed tick for real time, with a game speed that changes ticks per
@@ -60,7 +60,7 @@ second. Turns for turn-based games, with animations that do not change the state
 requires that nothing per-player (the local clock, settings, the camera) reaches the
 simulation.
 
-**How to verify.** Replays are the best evidence: if the original stores replays as commands,
+**How to verify.** Replays give the best evidence. If the original stores replays as commands,
 play them in the port and compare the state at every tick. Without replays, record commands
 from the original running under a debugger, or script both. Pathfinding: emulate the original
 finder on many start and end points and compare every path.

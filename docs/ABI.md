@@ -1,8 +1,8 @@
 # Calling conventions, data layout and floating point
 
-What you need to read a game's machine code correctly and to call its functions under the
-emulator. Tables only list what matters for games; the authoritative sources are linked at the
-end.
+This page lists what you need to read a game's machine code correctly and to call its functions
+under the emulator. The tables list only the details games use. The authoritative sources are
+linked at the end.
 
 ## Calling conventions
 
@@ -37,7 +37,7 @@ If pseudocode seems to use a value from nowhere, it may be one of these, kept ac
 
 ## Floating point
 
-Exactness in a reimplementation depends on these details:
+A reimplementation is exact only if it copies these details:
 
 - **SSE (all x64 games).** `float` operations are 32-bit (`addss`, `mulss`), `double` 64-bit
   (`addsd`). Each instruction rounds its result once. Copy the precision of every operation.
@@ -48,7 +48,7 @@ Exactness in a reimplementation depends on these details:
   round every result to float precision.
 - **Conversions.** `cvttss2si` truncates toward zero (a C cast); `cvtss2si` rounds with the
   current mode (`lrintf`). Ghidra writes both as a cast; the instruction tells you which.
-- **min and max.** `minss a, b` returns b when either is NaN: operand order decides NaN results.
+- **min and max.** `minss a, b` returns b when either is NaN, so keep the original's operand order.
 - **Fused multiply-add.** A compiler may turn `a * b + c` into one FMA instruction with one
   rounding instead of two. Look for `vfmadd` in the original; avoid accidental FMA in the
   reimplementation (compiler flags such as `-ffp-contract=off`).
@@ -63,8 +63,8 @@ Exactness in a reimplementation depends on these details:
 - `sar` is an arithmetic (signed) shift, `shr` a logical one; Ghidra shows both as `>>`.
 - Overflow wraps in machine code; languages that check or widen (Rust debug builds, Python)
   need explicit wrapping.
-- `imul`/`idiv` are signed, `mul`/`div` unsigned: the instruction decides the type, whatever
-  Ghidra declares.
+- `imul`/`idiv` are signed, `mul`/`div` unsigned. Take the type from the instruction, whatever
+  type Ghidra declares.
 
 ## Further reading
 
