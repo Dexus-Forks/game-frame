@@ -1,0 +1,56 @@
+# Builds the documentation site (site/, VitePress) from docs/, the skills and the examples,
+# and publishes it to GitHub Pages. Runs on every push to main that touches them, and by hand.
+name: Site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - '.claude/skills/**'
+      - 'examples/*/README.md'
+      - 'README.md'
+      - 'site/**'
+      - '.github/workflows/site.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # "last updated" dates come from git history
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - id: pages
+        uses: actions/configure-pages@v5
+      - run: npm --prefix site ci
+      - run: npm --prefix site run build
+        env:
+          SITE_BASE: ${{ steps.pages.outputs.base_path }}/
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/.vitepress/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

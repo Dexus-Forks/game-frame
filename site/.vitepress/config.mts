@@ -13,6 +13,8 @@ const vueDir = path.dirname(require.resolve('vue/package.json'))
 export default defineConfig({
   title: 'Reverse engineering games',
   description: 'A method, skills and tools for AI agents and people who reverse engineer games and rebuild them exactly.',
+  // The workflow sets SITE_BASE to the Pages path (/reverse-engineer-games/); locally it is /.
+  base: process.env.SITE_BASE || '/',
   srcDir: '..',
   srcExclude: EXCLUDE,
   rewrites: rewrite,

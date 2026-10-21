@@ -19,6 +19,10 @@ npm --prefix site run build    # site/.vitepress/dist
 | `/skills/<name>` | `.claude/skills/<name>/SKILL.md`, through the dynamic route `site/skills/[skill].md` |
 | `/examples/<name>` | `examples/<name>/README.md` |
 
+`.github/workflows/site.yml` builds it on every push to `main` that changes the docs, the
+skills, the examples or the site, and publishes it to GitHub Pages
+(https://tanepiper.github.io/reverse-engineer-games/), with `SITE_BASE` set to the Pages path.
+
 To add a page, write the Markdown file in `docs/` and link it from its folder's `README.md`
 (or from `docs/README.md`): it appears in the menu in that place. Links between files stay
 relative, as GitHub needs them; the site turns them into page URLs, and links to tools and
