@@ -9,6 +9,7 @@
 //   docs/<folder>/README.md           -> /<folder>/
 //   docs/<path>.md                    -> /<path, lower case>
 //   examples/<name>/README.md         -> /examples/<name>
+//   crates/<name>/README.md           -> /crates/<name>
 //   site/index.md                     -> /            (the home page, the one page written for the site)
 //   site/skills/[skill].md            -> /skills/<skill>, one per .claude/skills/<skill>/SKILL.md
 import fs from 'node:fs'
@@ -23,7 +24,7 @@ export const EXCLUDE = [
   '.git/**', '.venv/**', '**/node_modules/**', 'analysis/**', 'derived/**', 'target/**',
   'templates/**', 'tools/**', 'tests/**', 'scripts/**', 'labels/**',
   'AGENTS.md', 'CLAUDE.md', 'agents/**', 'site/README.md', 'site/.vitepress/**',
-  'examples/*/build/**',
+  'examples/*/build/**', 'crates/target/**', 'crates/*/THIRD_PARTY.md',
 ]
 
 /** The site path (with .md) for a repository Markdown file. */
@@ -32,7 +33,9 @@ export function rewrite(id: string): string {
   if (id === 'site/index.md') return 'index.md'
   if (id.startsWith('site/skills/')) return id.slice('site/'.length)
   if (id === 'docs/README.md') return 'guide.md'
-  let m = id.match(/^examples\/([^/]+)\/README\.md$/)
+  let m = id.match(/^crates\/([^/]+)\/README\.md$/)
+  if (m) return `crates/${m[1]}.md`
+  m = id.match(/^examples\/([^/]+)\/README\.md$/)
   if (m) return `examples/${m[1]}.md`
   m = id.match(/^docs\/(.*)$/)
   if (m) {
@@ -58,6 +61,7 @@ export function pageUrl(repoPath: string): string | null {
 function isPage(p: string): boolean {
   if (!fs.existsSync(path.join(ROOT, p))) return false
   return p === 'README.md' || /^docs\/.+\.md$/.test(p) || /^examples\/[^/]+\/README\.md$/.test(p)
+    || /^crates\/[^/]+\/README\.md$/.test(p)
 }
 
 /** A GitHub URL for a repository path that is not a page (a tool, a script, a folder). */

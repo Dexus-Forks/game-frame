@@ -26,6 +26,12 @@ the order of this page and of each folder's `README.md` is the order of the site
 - [Console games](consoles/README.md): the platforms, the tools, the routes to a port, and
   matching decompilation.
 
+## Crates
+
+- [Crates](crates/README.md): clean Rust implementations of chips and runtimes old games
+  need, such as the OPL2 FM chip, a WMA decoder, the MSVC maths functions and Turbo Pascal's
+  `Real`.
+
 ## Observing the original
 
 - [Observing the original](observe/README.md): running the original, inputs, the interface,

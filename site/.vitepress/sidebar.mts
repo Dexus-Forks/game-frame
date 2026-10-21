@@ -26,7 +26,8 @@ export function sidebar(): Item[] {
       const folderReadme = /\/README\.md$/.test(target) && target !== 'docs/README.md'
       if (!folderReadme) continue
       for (const child of links(target)) {
-        if (path.dirname(child.target) === path.dirname(target)) {
+        if (path.dirname(child.target) === path.dirname(target)
+          || /^crates\/[^/]+\/README\.md$/.test(child.target)) {
           items.push({ text: child.text, link: pageUrl(child.target)! })
         } else if (path.dirname(path.dirname(child.target)) === path.dirname(target)
           && /\/README\.md$/.test(child.target)) {

@@ -136,6 +136,19 @@ fails.
 | `tools/dos/fileio_trace.py` | From a DOSBox-X file log: every file's reads in order, with record patterns |
 | `tools/dos/dbx_control.py` | Drive DOSBox-X's debugger from a script: breakpoints, registers, memory |
 
+## Crates
+
+Clean Rust implementations of chips and runtimes that many old games need, each checked against
+an original program in one of the case studies. They live in `crates/`, a Cargo workspace,
+under Apache 2.0. See [docs/crates](docs/crates/README.md).
+
+| Crate | What it is |
+|---|---|
+| [gameframe-opl2](crates/opl2/README.md) | The YM3812 (OPL2) FM chip of the AdLib and Sound Blaster, with a resampler |
+| [gameframe-wma](crates/wma/README.md) | A WMA v2 decoder for xWMA and ASF streams, building for WebAssembly |
+| [gameframe-msvc-crt](crates/msvc-crt/README.md) | MSVC's `sinf`, `cosf`, `acosf`, `atan2f`, `qsort` order and `rand`, bit for bit |
+| [gameframe-turbo-pascal](crates/turbo-pascal/README.md) | Turbo Pascal's 6-byte `Real`, `Random` and Pascal data layouts |
+
 ## Worked example
 
 [examples/sample-game](examples/sample-game) is a tiny Windows x64 game (an EXE and an engine

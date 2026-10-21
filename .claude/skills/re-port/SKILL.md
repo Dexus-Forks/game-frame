@@ -16,6 +16,10 @@ decompiled code into the new code base: it is the original author's work, and it
 unreadable. This is the line between a reimplementation and a copy; keep it visible (see
 `docs/LEGAL.md`). If the user chooses otherwise, say this once and follow their decision.
 
+Before you write a sound chip, a codec or a language runtime yourself, check `docs/crates/`:
+the harness may already have a checked implementation (OPL2, WMA v2, the MSVC maths functions,
+Turbo Pascal's `Real`). Compare it with your game's version before you rely on it.
+
 ## Mirror the original's shape
 
 - One module or type per original class or system, named after it where the name is known

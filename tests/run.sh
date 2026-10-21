@@ -353,6 +353,15 @@ expect "gameframe run passes the tool's exit code" "rc 1" sh -c "$G run bitcompa
 expect "gameframe run refuses a library and says why" "a library to import" $G run pe_emu
 expect "gameframe find names the skills and tools for a word" "tool vtable" $G find vtable
 
+echo "Crates"
+if command -v cargo >/dev/null; then
+  out="$(cd crates && cargo test --release 2>&1)"
+  [[ $? == 0 ]] && ok "the crates' tests pass ($(echo "$out" | grep -o '[0-9]* passed' | awk '{s+=$1} END {print s}') tests)" \
+    || bad "crates" "$(echo "$out" | grep -E 'FAILED|panicked|error' | head -8)"
+else
+  echo "  skip  the crates (cargo is not installed)"
+fi
+
 echo "Documentation site"
 svg="$(mktemp)"
 printf '$ tests/run.sh\n  ok    a check <&>\n' | "$PYTHON" site/captures/term_svg.py "run" "$svg" \

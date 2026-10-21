@@ -80,6 +80,7 @@ export default defineConfig({
           { text: 'Working as an agent', link: '/working/agents' },
         ],
       },
+      { text: 'Crates', link: '/crates/' },
       { text: 'Skills', link: '/skills/re-start' },
       { text: 'Case studies', link: '/case-studies/' },
     ],

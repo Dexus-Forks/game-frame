@@ -1,0 +1,12 @@
+[package]
+name = "gameframe-msvc-crt"
+description = "Bit-exact pieces of the Microsoft C runtime that game logic depends on: sinf, cosf, acosf, atan2f, qsort's order and rand"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["msvc", "crt", "deterministic", "reverse-engineering", "games"]
+categories = ["mathematics", "algorithms"]
+
+[dependencies]

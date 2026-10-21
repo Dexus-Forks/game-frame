@@ -11,3 +11,5 @@ __pycache__/
 /site/node_modules/
 /site/.vitepress/dist/
 /site/.vitepress/cache/
+# The crates workspace build output
+/crates/target/

@@ -1,0 +1,12 @@
+[package]
+name = "gameframe-wma"
+description = "Pure-Rust Windows Media Audio v2 decoder for xWMA and ASF streams, with no dependencies and wasm support"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["wma", "xwma", "audio", "decoder", "wasm"]
+categories = ["multimedia::audio", "multimedia::encoding"]
+
+[dependencies]

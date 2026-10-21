@@ -1,0 +1,12 @@
+# Clean implementations of hardware and runtime pieces that many old games need, taken from
+# the case-study reimplementations and made generic. Each crate has its own README.
+[workspace]
+resolver = "2"
+members = ["opl2", "wma", "msvc-crt", "turbo-pascal"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+repository = "https://github.com/tanepiper/game-frame"
+rust-version = "1.80"

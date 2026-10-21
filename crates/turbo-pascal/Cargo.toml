@@ -1,0 +1,12 @@
+[package]
+name = "gameframe-turbo-pascal"
+description = "The Turbo Pascal runtime pieces DOS games depend on: the 6-byte Real with its exact arithmetic, Random, and Pascal data layouts"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["turbo-pascal", "borland", "real48", "dos", "reverse-engineering"]
+categories = ["emulators", "mathematics", "encoding"]
+
+[dependencies]

@@ -1,0 +1,12 @@
+[package]
+name = "gameframe-opl2"
+description = "Yamaha YM3812 (OPL2) FM synthesis, sample-accurate at the chip's own 49,716 Hz rate, with a band-limited resampler"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["opl2", "ym3812", "adlib", "fm-synthesis", "emulation"]
+categories = ["emulators", "multimedia::audio"]
+
+[dependencies]
