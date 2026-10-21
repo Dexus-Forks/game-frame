@@ -29,14 +29,14 @@ Institutions mostly preserve artefacts and documents: hardware, boxed media, mag
 ## Emulation as preservation
 
 ### Takeaway
-MAME frames emulation as *documentation of hardware*: its source code is the record, and playability only checks that record. Dump groups and flux imaging are not covered.
+MAME frames emulation as *documentation of hardware*: its source code is the record. Playability only checks that record. Dump groups and flux imaging are not covered.
 
 ### Cited Findings
 - MAME's standard self-description, repeated in its upstream README and in many mirrors and package listings, says it keeps software from disappearing by "documenting the hardware and how it functions." It says "the source code to MAME serves as this documentation," and that the fact that the software is usable "serves primarily to validate the accuracy of the documentation." After absorbing MESS it also covers computers, consoles and calculators — [mirror of the MAME README (wolfmame)](https://github.com/mahlemiut/wolfmame); [Haiku depot listing](https://depot.haiku-os.org/__multipage/pkg/mame). The text was not confirmed on mamedev.org itself.
 - The VGHF/SPN exemption request concerned breaking copy protection so that institutions can lend games. It shows that the legal limit on emulation-based access is anti-circumvention (section 1201), not emulation itself — [VGHF statement](https://gamehistory.org/dmca-2024-statement/)
 
 ### Inferences
-- MAME's framing ("the code is the documentation; running it validates it") is the same framing a reimplementation of one game can use: the new code documents the original game's behaviour, and parity tests show it is accurate.
+- MAME's framing ("the code is the documentation; running it validates it") is the same framing a reimplementation of one game can use: the new code documents the original game's behaviour. Parity tests show it is accurate.
 
 ### Gaps
 - higan/ares and cycle accuracy, Redump or No-Intro methods and counts, and Kryoflux, Greaseweazle and flux imaging are not covered.
@@ -62,7 +62,7 @@ Almost every project found requires the player's original data and ships no asse
 - **Nightdive Studios and community developers.** Doom Wiki lists Doom community members employed at Nightdive (Samuel "Kaiser" Villarreal, James "Quasar" Haley, Edward "Edward850" Richardson, Max "Altazimuth" Waine). It says Villarreal's Doom 64 EX and Powerslave EX work led to the KEX engine. Atari announced its acquisition of Nightdive on 22 March 2023 — [Doom Wiki](https://doomwiki.org/wiki/Nightdive_Studios); [Game World Observer](https://gameworldobserver.com/2023/03/23/atari-night-dive-studios-acquisition-system-shock)
 
 ### Inferences
-- "Bring your own data" is the near-universal rule. It is what separates reimplementation from piracy, and it is what lets stores (Steam, GOG) sell the original as the way in. OpenTTD's 2026 arrangement makes that link explicit: the original game is bought to play the reimplementation on a store.
+- "Bring your own data" is the near-universal rule. It separates reimplementation from piracy. It also lets stores (Steam, GOG) sell the original as the way in. OpenTTD's 2026 arrangement makes that link explicit: the original game is bought to play the reimplementation on a store.
 - The READMEs found avoid the word "preservation" and describe the projects as ports, re-implementations or engine rebuilds, with the aim of running on modern systems. Preservation framing comes mostly from journalists and institutions. A site should present preservation as the *effect* of these projects, not as their stated aim, unless it quotes a source that says so.
 - The re3 case shows the legal risk: a project that matches the original code closely and targets a still-sold, high-value franchise drew a lawsuit. The projects that thrive mostly target older titles, often with publisher tolerance or an agreement.
 
@@ -80,7 +80,7 @@ Matching decompilations (SM64 and others) produce source that rebuilds byte-iden
 - Matching decompilation means source that compiles to the target machine code with a specified toolchain. Functional reconstruction aims only to match behaviour — [TechRadar](https://www.techradar.com/features/decompilations-could-be-the-solution-to-ports-and-remakes-in-the-future)
 - The n64decomp/sm64 repository covers the JP, US, EU, Shindou and iQue releases. It does not include all assets needed to build the ROMs, so the original ROM is required — [GitHub n64decomp/sm64](https://github.com/n64decomp/sm64)
 - TechRadar notes that game preservation "has grown in importance" and presents decompilations as a way to keep retro games running on modern systems — [TechRadar](https://www.techradar.com/features/decompilations-could-be-the-solution-to-ports-and-remakes-in-the-future)
-- N64Recomp (Mr-Wiseguy) statically recompiles N64 machine code into C. Unlike a decompilation, the output is not readable, and only the original ROM is needed to run it. Zelda 64: Recompiled (Majora's Mask) uses the RT64 renderer and adds ultrawide, high frame rates and ray tracing. The port was reportedly built in about two days, helped by the existing decompilation. Wiseguy also made recompiled ports of Banjo-Kazooie, Rocket: Robot on Wheels and Superman 64 — [VGC](https://www.videogameschronicle.com/news/unofficial-pc-ports-of-n64-games-could-be-about-to-get-a-lot-easier); [Time Extension](https://www.timeextension.com/news/2024/05/new-tool-allows-n64-games-to-be-played-with-ray-tracing-uncapped-frame-rates-and-ultrawide-support); [Nintendo Life / Digital Foundry](https://www.nintendolife.com/news/2024/05/video-digital-foundry-takes-a-look-at-zelda-64-recompiled-majoras-mask)
+- N64Recomp (Mr-Wiseguy) statically recompiles N64 machine code into C. Unlike a decompilation, the output is not readable. Only the original ROM is needed to run it. Zelda 64: Recompiled (Majora's Mask) uses the RT64 renderer and adds ultrawide, high frame rates and ray tracing. The port was reportedly built in about two days, helped by the existing decompilation. Wiseguy also made recompiled ports of Banjo-Kazooie, Rocket: Robot on Wheels and Superman 64 — [VGC](https://www.videogameschronicle.com/news/unofficial-pc-ports-of-n64-games-could-be-about-to-get-a-lot-easier); [Time Extension](https://www.timeextension.com/news/2024/05/new-tool-allows-n64-games-to-be-played-with-ray-tracing-uncapped-frame-rates-and-ultrawide-support); [Nintendo Life / Digital Foundry](https://www.nintendolife.com/news/2024/05/video-digital-foundry-takes-a-look-at-zelda-64-recompiled-majoras-mask)
 
 ### Inferences
 - There are three approaches, in rising order of readability: static recompilation (mechanical, not readable), matching decompilation (readable, byte-exact), and clean reimplementation (readable, behaviour-exact, free in structure). Each ships no original assets and needs the player's own copy.
@@ -93,7 +93,7 @@ Matching decompilations (SM64 and others) produce source that rebuilds byte-iden
 ## Documentation of game behaviour beyond playability
 
 ### Takeaway
-Little was gathered. The sources found suggest that documentation is itself preservation: MAME treats code as documentation, and dethrace's stated aim is "to learn how [the game] works." Wikis such as ModdingWiki and The Cutting Room Floor were not reached in a usable form.
+Little was gathered. The sources found suggest that documentation is itself preservation: MAME treats code as documentation. dethrace's stated aim is "to learn how [the game] works." Wikis such as ModdingWiki and The Cutting Room Floor were not reached in a usable form.
 
 ### Cited Findings
 - MAME: "the source code to MAME serves as this documentation"; usability validates it — [MAME README mirror](https://github.com/mahlemiut/wolfmame)

@@ -20,16 +20,13 @@ public headers came with the editing tools and some patches. Unreal Tournament's
   header, a name table, an import table and an export table. Objects refer to each other by
   index into these tables. Readers for the format exist in many modding tools.
 - **Objects and classes.** Every object derives from `UObject`. Classes are defined in
-  UnrealScript; some classes also have **native** parts written in C++ in the engine DLLs. A
-  native class's C++ code is in a DLL such as `Engine.dll` or the game's own DLL, and its
-  script code is in a `.u` package.
+  UnrealScript; some classes also have **native** parts written in C++ in the engine DLLs. A native class's C++ code is in a DLL such as `Engine.dll` or the game's own DLL. Its script code is in a `.u` package.
 - **UnrealScript.** The game logic is mostly UnrealScript, compiled to byte code inside the
   `.u` packages. The engine interprets it. Tools decompile the byte code back to readable
   script. Start there for game rules, as for QuakeC.
 - **The DLLs.** `Core.dll` holds the object system, the name table and the script
   interpreter. `Engine.dll` holds the actor system, levels and the renderer interface. Each
-  renderer is a separate DLL (`GlideDrv.dll`, `D3DDrv.dll`, `OpenGLDrv.dll`, `SoftDrv.dll`),
-  and so is each audio device (`Galaxy.dll`).
+  renderer is a separate DLL (`GlideDrv.dll`, `D3DDrv.dll`, `OpenGLDrv.dll`, `SoftDrv.dll`). Each audio device is one too (`Galaxy.dll`).
 
 ## What to note
 
@@ -39,8 +36,7 @@ public headers came with the editing tools and some patches. Unreal Tournament's
   functions have fixed numbers, which the script calls. Map the numbers to names early.
 - The game's tick takes the frame time. It is a variable time step, so replays need the frame
   times recorded ([The main loop](../GAME-PATTERNS.md#the-main-loop)).
-- Licensees changed the engine and the package format version. Read the version field in
-  each package header, and check which fields your game's version has.
+- Licensees changed the engine and the package format version. Read the version field in each package header. Check which fields your game's version has.
 
 ## How to approach an Unreal Engine game
 

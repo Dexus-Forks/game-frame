@@ -26,8 +26,7 @@ The Copyright Act 2022, signed on 17 March 2023, is one of the most user-friendl
   restricts what the Act permits.**
 - **Locks.** Section 50 bans circumvention. Section 50(8) lets a lawful user circumvent to find
   what is needed for interoperability.
-- **Libraries and archives.** Section 25 lets archives, libraries, museums and galleries copy for
-  preservation, and copy works that are out of trade.
+- **Libraries and archives.** Section 25 lets archives, libraries, museums and galleries copy for preservation. They may also copy works that are out of trade.
 - **How long copyright lasts.** The author's life plus 70 years for literary works, and 50 years
   from release for audiovisual works.
 
@@ -104,8 +103,7 @@ The Copyright Act 2022, signed on 17 March 2023, is one of the most user-friendl
 ## What this means for a project
 
 Study and decompiling for interoperability are covered in Nigeria, Kenya, Ukraine and, on the
-unconfirmed text, Russia and Turkey. In South Africa, Egypt and the UAE, decompiling has no
-express cover, and observing the running game has the firmest footing. Most of these countries
+unconfirmed text, Russia and Turkey. In South Africa, Egypt and the UAE, decompiling has no express cover. Observing the running game has the firmest footing. Most of these countries
 ban breaking locks.
 
 Sources: [Notes: Africa, the Middle East, Other Nations](../research/law-africa-middle-east-europe.md).

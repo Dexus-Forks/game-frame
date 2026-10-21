@@ -1,8 +1,6 @@
 # GameFrame
 
-GameFrame is an agentic framework for reverse engineering games. Its playbook of skills and
-agents runs inside your coding agent, and its toolkit of tested tools checks every result
-against the original. AI agents and people use it to study a game from its shipped files. They
+GameFrame is an agentic framework for reverse engineering games. Its playbook of skills and agents runs inside your coding agent. Its toolkit of tested tools checks every result against the original. AI agents and people use it to study a game from its shipped files. They
 document its formats and rules, and reimplement it so it behaves exactly like the original.
 
 The toolkit works with [Ghidra](https://ghidra-sre.org), the
@@ -61,8 +59,7 @@ run from a clone of GameFrame or from a project made with it: `re-start` says so
 ## Find your way with `gameframe`
 
 `./gameframe` is a small command for help and discovery. It reads the skills and the tools'
-own help from the files, so it never goes out of date. It needs only Python 3, and every new
-project gets a copy.
+own help from the files, so it never goes out of date. It needs only Python 3. Every new project gets a copy.
 
 ```bash
 ./gameframe steps                      # the method's loop, each step with its skill
@@ -83,8 +80,7 @@ scripts.
 ![The method as a loop. Inventory, observe, decompile, trace, format, emulate, reimplement, verify and land, each with its skill. When a check fails, the work goes back to the trace.](docs/assets/method-loop.svg)
 
 Every claim names its evidence (an address, a value, a measurement) and carries a label:
-*observed*, *measured*, *inferred* or *unknown*. Every number that matters is measured. The
-original function runs under the emulator, and the reimplementation must match it bit for bit.
+*observed*, *measured*, *inferred* or *unknown*. Every number that matters is measured. The original function runs under the emulator. The reimplementation must match it bit for bit.
 
 ## Skills
 
@@ -183,7 +179,7 @@ symbols), and a real-mode MZ program, checked under the emulator and under DOSBo
 
 ## Documents
 
-The documentation is in [docs/](docs/README.md), and is also built as a website
+The documentation is in [docs/](docs/README.md). It is also built as a website
 (`npm --prefix site run dev`; see [site/README.md](site/README.md)).
 
 - **[A taxonomy of games](docs/games/README.md)**: who drives (the game or the player), the axes

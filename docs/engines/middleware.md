@@ -1,7 +1,6 @@
 # Middleware
 
-Middleware is a library that a game licenses for one job. It is not the game, and in most cases
-it does not need to be reverse engineered. Identify it, label its functions, and replace it in
+Middleware is a library that a game licenses for one job. It is not the game. In most cases it does not need to be reverse engineered. Identify it, label its functions, and replace it in
 the port with a library that does the same job. Check whether the game depends on any exact
 behaviour of the library, such as its random numbers, its rounding or its timing.
 

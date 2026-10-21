@@ -12,8 +12,7 @@ a study of the US reissue market. It sampled 1,500 games released in the US befo
 ([VGHF study explainer](https://gamehistory.org/study-explainer/)). No five-year period in the
 sample reaches 20%.
 
-Some platforms are far lower. The study found 4.5% of Commodore 64 games in print, and almost
-all of those come from one service, Antstream. It found 5.87% of the Game Boy library in print.
+Some platforms are far lower. The study found 4.5% of Commodore 64 games in print. Almost all of those come from one service, Antstream. It found 5.87% of the Game Boy library in print.
 Fewer than 3% of games from before 1985 are in print. About 1,000 games left sale when Nintendo
 closed the 3DS and Wii U eShops in March 2023.
 
@@ -60,7 +59,7 @@ Nobody has counted how many games are in this position. Many games from small st
 Studios lose their own code. Konami no longer had the final code of Silent Hill 2 and 3. Its HD
 Collection was built from incomplete code
 ([Push Square](https://www.pushsquare.com/news/2012/05/silent_hill_hd_collection_ported_from_incomplete_code)).
-Square Enix said data from the first Kingdom Hearts was lost, and its HD version recreated it
+Square Enix said data from the first Kingdom Hearts was lost. Its HD version recreated it
 ([Game Revolution](https://www.gamerevolution.com/news/5796-square-lost-kingdom-hearts-assets-forced-to-recreate-hd-version-from-scratch)).
 
 Discs decay. The Canadian Conservation Institute gives recordable discs lifetimes between a few

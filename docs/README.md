@@ -1,8 +1,6 @@
 # Documentation
 
-GameFrame is an agentic framework for reverse engineering games. Its playbook of skills and
-agents runs inside your coding agent, and its toolkit of tested tools checks every result
-against the original.
+GameFrame is an agentic framework for reverse engineering games. Its playbook of skills and agents runs inside your coding agent. Its toolkit of tested tools checks every result against the original.
 
 These pages hold everything GameFrame knows about reverse engineering games, apart from the
 step-by-step skills (in `.claude/skills/`, listed in the [README](../README.md#skills)). Start with the kind

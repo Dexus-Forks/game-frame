@@ -12,8 +12,7 @@ so a port gives the same numbers as the original program.
 `powf`, `floorf` and `sqrtf` are correctly rounded in the runtime and in Rust, so Rust's own
 functions already match them.
 
-It comes from [Un-Banished](https://github.com/tanepiper/unbanished). There the float functions
-match Banished's copies of the runtime on 200,000 calls each, and the sort matches the original's
+It comes from [Un-Banished](https://github.com/tanepiper/unbanished). There the float functions match Banished's copies of the runtime on 200,000 calls each. The sort matches the original's
 order of equal elements on recorded sorts (*measured* with GameFrame's emulator).
 
 ## Use it
@@ -42,8 +41,7 @@ crate, compare it with your game's own copy:
 1. Find the game's `sinf` (or the others) in the decompile: the import from `msvcrt.dll` or
    `ucrtbase.dll`, or a statically linked copy.
 2. Run it under GameFrame's emulator on many inputs (`re-emulate`).
-3. Compare the results with this crate bit for bit. If they differ, the game uses another
-   version, and its algorithm must be traced.
+3. Compare the results with this crate bit for bit. If they differ, the game uses another version. Trace its algorithm.
 
 The 32-bit runtime's x87 versions of these functions are different code with different results.
 

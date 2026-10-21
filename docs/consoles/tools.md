@@ -98,9 +98,8 @@ test on a known binary.
 | Arcade | MAME |
 | Several systems, scripted | BizHawk (Lua scripting, input movies, RAM watch, many cores) |
 
-Debugger support in the newer emulators varies, and some entries above are not confirmed. The
-[Seventh generation onward](modern.md#emulator-status) page gives the dated status of each, and
-the family pages give the rest ([Early consoles](early-consoles.md), [Handhelds](handhelds.md),
+Debugger support in the newer emulators varies. Some entries above are not confirmed. The
+[Seventh generation onward](modern.md#emulator-status) page gives the dated status of each. The family pages give the rest ([Early consoles](early-consoles.md), [Handhelds](handhelds.md),
 [CD add-ons](cd-add-ons.md)).
 
 What to use them for:

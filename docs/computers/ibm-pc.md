@@ -97,8 +97,7 @@ None listed yet.
 
 ### For an exact reimplementation
 
-- A Tandy path is a separate rendering and sound path in the same binary. Choose which path is
-  ground truth, and write the choice in the project's `AGENTS.md`.
+- A Tandy path is a separate rendering and sound path in the same binary. Choose which path is ground truth. Write the choice in the project's `AGENTS.md`.
 - Find the hardware test that picks the path. Run the reference capture with the machine type
   that matches your choice.
 

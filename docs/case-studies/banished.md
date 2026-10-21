@@ -59,11 +59,9 @@ Direct3D 9 and 11 shaders, and a data-driven interface. Every step of the loop w
   port's headless captures by blurred image difference, because the stream is compressed.
 - **The probe.** A small command language that finds things on the screen (by the original's
   dialog and control names, or by text) and in the town, and presses buttons and types as a
-  player would. The same commands work in the browser's console, in headless runs and in the
-  test scenarios, and answers are JSON. It is the port's object model and its doors
+  player would. The same commands work in the browser's console, in headless runs and in the test scenarios. Answers are JSON. It is the port's object model and its doors
   ([A model to query](../observe/object-model.md)).
-- **Baselines.** Test scenarios drive the game with the probe and record the answers; a
-  changed answer is a change in what the game does, and must be explained.
+- **Baselines.** Test scenarios drive the game with the probe and record the answers; a changed answer is a change in what the game does. Each one must be explained.
 
 ## Numbers (October 2026)
 

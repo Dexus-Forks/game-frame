@@ -74,8 +74,7 @@ calendar of a simulation (days, seasons, years) is derived from it. Float time a
 error: if the original does that, the reimplementation must too.
 
 Use the game's own calendar and its own names. A game's year may have twelve "months" that are
-seasons (Early Spring to Late Winter), or eight, or none; its tenth month is not October. Read
-the names from the game's string tables, and write docs, tests and examples in them.
+seasons (Early Spring to Late Winter), or eight, or none; its tenth month is not October. Read the names from the game's string tables. Use them in docs, tests and examples.
 
 ## Messages and text
 
@@ -96,8 +95,7 @@ exercises every system's state.
 ## Rendering and UI
 
 - Shaders ship compiled (DXBC for Direct3D 9-11, DXIL for 12, SPIR-V for Vulkan): disassemble
-  them (fxc's `/dumpbin`, `dxc -dumpbin`, `spirv-dis`) to read the maths, and check constant
-  buffer layouts against the CPU code that fills them.
+  them (fxc's `/dumpbin`, `dxc -dumpbin`, `spirv-dis`) to read the maths. Check constant buffer layouts against the CPU code that fills them.
 - UI is often custom code in older games and data-driven in newer ones (layouts in data files,
   a widget tree, events by id), with screens as loop objects. See
   [Capturing the interface](observe/ui.md).
@@ -113,5 +111,4 @@ live service without its owner's permission.
 If you add lockstep multiplayer to a single-player game, look for state that belongs to one
 player but is read by the simulation: settings, unlocked achievements, difficulty options, the
 local clock, the window size. Two players with different values then compute different worlds.
-Give every player the same values for a shared game (for example, count achievements from none
-in multiplayer), and check with digests that two players stay identical.
+Give every player the same values for a shared game (for example, count achievements from none in multiplayer). Check with digests that two players stay identical.

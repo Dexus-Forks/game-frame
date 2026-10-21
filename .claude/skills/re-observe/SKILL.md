@@ -78,10 +78,8 @@ nothing else. `docs/observe/object-model.md` has the rules and examples from thr
 ## Pitfalls
 
 - A capture without its inputs cannot be repeated or trusted. Record the inputs first.
-- A compressed video stream is not pixel-exact: compare layout, and use blurred image
-  differences with a threshold.
+- A compressed video stream is not pixel-exact: compare layout. Use blurred image differences with a threshold.
 - The clock and the random seed are inputs too. A second run that differs usually read one.
-- A live online service belongs to someone else, and its terms usually forbid testing against
-  it. Breaking copy protection is restricted in many countries. If the user's plan touches
+- A live online service belongs to someone else. Its terms usually forbid testing against it. Breaking copy protection is restricted in many countries. If the user's plan touches
   either, say so once with the source (`docs/LEGAL.md`, `docs/preservation/law/`), then follow
   the user's decision.

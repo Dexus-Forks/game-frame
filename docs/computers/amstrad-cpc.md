@@ -51,7 +51,7 @@ Games came on tape and on 3-inch disk. Disk protection is described on
 - **WinAPE** ([winape.net](http://www.winape.net/)) and **Caprice32**
   ([github.com/ColinPitrat/caprice32](https://github.com/ColinPitrat/caprice32)) have
   debuggers.
-- Ghidra has the Z80 built in. Unicorn has no Z80, and Capstone has no Z80. For ground truth
+- Ghidra has the Z80 built in. Neither Unicorn nor Capstone supports the Z80. For ground truth
   use a small core such as iz80 ([CPU families](cpu-families.md#tools-per-family)).
 
 CPCWiki ([cpcwiki.eu](https://www.cpcwiki.eu/)) is the community reference.

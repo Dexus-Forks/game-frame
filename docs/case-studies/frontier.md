@@ -26,10 +26,7 @@ registers.
 - **A runtime of its own.** The project wrote an in-process 386 real-mode CPU with the DOS,
   BIOS, EMS and VGA services the game uses. The original runs on it from boot to the cockpit,
   natively and in the browser, reading the player's files.
-- **Oracle and scaffold at once.** Any original routine can be called with chosen inputs in
-  `cargo test`, and its registers and memory compared with the native port. The playable game
-  runs the original code, and native ports are hooked in at the original routines' addresses
-  as they are written. When nothing original runs any more, the runtime remains only as the
+- **Oracle and scaffold at once.** Any original routine can be called with chosen inputs in `cargo test`. Its registers and memory are compared with the native port. The playable game runs the original code. Native ports are hooked in at the original routines' addresses as they are written. When nothing original runs any more, the runtime remains only as the
   oracle.
 - **The maths library first.** All 47 routines of the maths overlay (float arithmetic, square
   roots, matrices, projection, the vertex transformer, face shading, 64-bit positions) were

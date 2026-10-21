@@ -1,8 +1,7 @@
 # BBC Micro and Acorn Electron
 
 Acorn's 8-bit machines use the 6502 family ([CPU families](cpu-families.md#the-6502-line)).
-The BBC Micro pages sideways ROMs into its memory map, and its disk controller changed between
-models. The BBC also has the best documented 8-bit game code anywhere, in the Elite on the 6502
+The BBC Micro pages sideways ROMs into its memory map. Its disk controller changed between models. The BBC also has the best documented 8-bit game code anywhere, in the Elite on the 6502
 project.
 
 ## BBC Micro A, B, B+ and Master

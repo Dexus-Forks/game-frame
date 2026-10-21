@@ -1,7 +1,6 @@
 # 3D accelerators
 
-From 1996, PC games could draw 3D with a separate graphics card. For a few years every card maker
-had its own API, and games shipped a separate renderer for each card. By 2000 Direct3D and
+From 1996, PC games could draw 3D with a separate graphics card. For a few years every card maker had its own API. Games shipped a separate renderer for each card. By 2000 Direct3D and
 OpenGL had replaced most of them. A game of this period may contain several renderers, and the
 picture the player saw depended on the card.
 
@@ -24,15 +23,13 @@ picture the player saw depended on the card.
 
 ## Glide
 
-3dfx's Glide was a thin API close to the Voodoo hardware. It was the most used of the card
-makers' APIs, and many games had a Glide renderer as their best-looking option.
+3dfx's Glide was a thin API close to the Voodoo hardware. It was the most used of the card makers' APIs. Many games had a Glide renderer as their best-looking option.
 
 - Games load `glide.dll`, `glide2x.dll` or `glide3x.dll` and call functions such as
   `grDrawTriangle`, `grTexSource`, `grAlphaBlendFunction`, `grBufferSwap`.
 - The game passes vertices already transformed to screen coordinates, with `1/w` for
-  perspective correction. The game does all the 3D maths itself, so it is in the game's
-  machine code, and it must be ported exactly.
-- The Voodoo drew with 16-bit colour and dithering, and it filtered textures in its own way.
+  perspective correction. The game does all the 3D maths itself, so the maths is in the game's machine code. Port it exactly.
+- The Voodoo drew with 16-bit colour and dithering. It also filtered textures in its own way.
   The original's look depends on that. Decide whether the port reproduces the 16-bit look or
   draws in full colour, and record the choice as a deviation if it differs.
 - Wrappers such as nGlide and dgVoodoo translate Glide calls to modern APIs. They show which
@@ -76,10 +73,10 @@ machine. They are the best reference for the port's renderer, and the easiest to
    code paths chosen in the options.
 2. Find the interface between the game and its renderers. It is usually a table of functions
    or a C++ class with virtual methods. Everything the game wants drawn passes through it.
-3. Choose one renderer as the reference, and write it in the project's `AGENTS.md`. The
+3. Choose one renderer as the reference. Write the choice in the project's `AGENTS.md`. The
    software renderer is easiest to compare exactly; the Glide renderer is often what players
    remember.
-4. Port the interface, and write one modern renderer behind it.
+4. Port the interface. Write one modern renderer behind it.
 5. Capture frames from the original with the reference renderer and compare. For hardware
    renderers, compare with a tolerance and look at the difference image.
 

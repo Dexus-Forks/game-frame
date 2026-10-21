@@ -1,6 +1,6 @@
 # Notes: the PC and the Macintosh
 
-Covers IBM PC compatibles and the Apple Macintosh as game platforms, from 1981 to today: eras and executable formats, compilers, protection, Mac formats and emulators, Linux and modern engines. A finding marked "(not confirmed)" is widely documented, and the link is the place to confirm it. Treat its wording and dates as needing one more confirmation.
+Covers IBM PC compatibles and the Apple Macintosh as game platforms, from 1981 to today: eras and executable formats, compilers, protection, Mac formats and emulators, Linux and modern engines. A finding marked "(not confirmed)" is widely documented. The link is the place to confirm it. Treat its wording and dates as needing one more confirmation.
 
 ## PC eras as game platforms, and the executable formats of each era
 
@@ -39,7 +39,7 @@ Each PC era has its own executable format, so its own loader and tool chain: COM
 **Windows XP to Windows 11 and 64-bit (2001–)**
 - Windows XP 25 October 2001. AMD64 first shipped with the Opteron (April 2003) and Athlon 64 (September 2003). Windows XP Professional x64 Edition April 2005 (not confirmed) — [Windows XP](https://en.wikipedia.org/wiki/Windows_XP); [x86-64](https://en.wikipedia.org/wiki/X86-64); [Windows XP Professional x64 Edition](https://en.wikipedia.org/wiki/Windows_XP_Professional_x64_Edition)
 - 64-bit programs use PE32+ (optional header magic 0x20B, against 0x10B for PE32) (not confirmed) — [PE Format, Microsoft Learn](https://learn.microsoft.com/en-us/windows/win32/debug/pe-format)
-- WOW64 runs 32-bit x86 programs on x64 Windows, and 32-bit x86 and ARM programs on ARM64 Windows. A 32-bit process cannot load a 64-bit DLL for execution, and the reverse also fails. DLLs loaded as data or resource files are exempt — [Running 32-bit Applications, Microsoft Learn](https://learn.microsoft.com/en-us/windows/win32/winprog64/running-32-bit-applications)
+- WOW64 runs 32-bit x86 programs on x64 Windows, and 32-bit x86 and ARM programs on ARM64 Windows. A 32-bit process cannot load a 64-bit DLL for execution. The reverse also fails. DLLs loaded as data or resource files are exempt — [Running 32-bit Applications, Microsoft Learn](https://learn.microsoft.com/en-us/windows/win32/winprog64/running-32-bit-applications)
 - "64-bit Windows does not support running 16-bit Windows-based applications", because handles have 32 significant bits. Attempts fail with ERROR_BAD_EXE_FORMAT — [Running 32-bit Applications, Microsoft Learn](https://learn.microsoft.com/en-us/windows/win32/winprog64/running-32-bit-applications)
 - 32-bit Windows up to Windows 10 kept NTVDM for DOS and Win16 programs. Windows 11 (5 October 2021) has no 32-bit edition, so no 16-bit support remains in any current Windows (not confirmed) — [Virtual DOS machine](https://en.wikipedia.org/wiki/Virtual_DOS_machine); [Windows 11](https://en.wikipedia.org/wiki/Windows_11)
 
@@ -53,7 +53,7 @@ Each PC era has its own executable format, so its own loader and tool chain: COM
 
 ### Inferences
 - The executable format tells you the era and the loader before anything else. Checking the magic (MZ, then the e_lfanew header: NE, LE, LX or PE) is the first triage step. GameFrame's `tools/triage` and `tools/dos` already cover MZ and NE.
-- A Tandy/PCjr code path is a separate rendering and sound path in the same binary. A port that aims for exact behaviour must choose which path is ground truth, and the emulator must report itself as Tandy (DOSBox `machine=tandy` or `pcjr`) to run it.
+- A Tandy/PCjr code path is a separate rendering and sound path in the same binary. A port that aims for exact behaviour must choose which path is ground truth. The emulator must report itself as Tandy (DOSBox `machine=tandy` or `pcjr`) to run it.
 - Win16 games (WinG era) cannot be run under any 64-bit Windows. Wine (with its own Win16 support) or a 32-bit Windows VM is the practical way to observe them.
 
 ### Gaps
@@ -78,7 +78,7 @@ The compiler leaves runtime-library code, copyright strings, startup code and ca
 
 ### Inferences
 - Pascal, Borland C and Watcom each have their own calling conventions and real-number formats (Turbo Pascal's 6-byte Real, for example). A port that must match bit for bit has to reproduce the language's arithmetic rules, not the C rules.
-- A Unity Mono game is decompiled to near-source C#. An IL2CPP game is native code whose names can be recovered. The two need different workflows, and the folder layout shows which one you have.
+- A Unity Mono game is decompiled to near-source C#. An IL2CPP game is native code whose names can be recovered. The two need different workflows. The folder layout shows which one you have.
 
 ### Gaps
 - The first linker version to write the Rich header is not confirmed.
@@ -119,7 +119,7 @@ The Mac has had four CPU families: 68k (1984–1996), PowerPC (1994–2006), Int
 **68k Macs and Classic Mac OS**
 - Macintosh 128K 24 January 1984, Motorola 68000 at about 8 MHz. Mac II March 1987 (68020, colour). Quadra 700/900 October 1991 (68040) (not confirmed) — [Macintosh 128K](https://en.wikipedia.org/wiki/Macintosh_128K); [Macintosh II](https://en.wikipedia.org/wiki/Macintosh_II); [Macintosh Quadra](https://en.wikipedia.org/wiki/Macintosh_Quadra)
 - Mac OS 8.1 (January 1998) was the last 680x0-compatible release. Mac OS 8.5 was PowerPC-only — [Basilisk II](https://en.wikipedia.org/wiki/Basilisk_II)
-- 68k application code is stored as CODE resources in the resource fork. CODE 0 holds the jump table. Globals and the jump table sit around register A5 (the "A5 world"), and the Segment Loader loads segments on demand. Toolbox calls are A-line traps (opcodes $Axxx) (not confirmed) — [Inside Macintosh: Mac OS Runtime Architectures (archive)](https://developer.apple.com/library/archive/documentation/mac/runtimehtml/RTArch-110.html)
+- 68k application code is stored as CODE resources in the resource fork. CODE 0 holds the jump table. Globals and the jump table sit around register A5 (the "A5 world"). The Segment Loader loads segments on demand. Toolbox calls are A-line traps (opcodes $Axxx) (not confirmed) — [Inside Macintosh: Mac OS Runtime Architectures (archive)](https://developer.apple.com/library/archive/documentation/mac/runtimehtml/RTArch-110.html)
 - Ghidra does not understand resource forks. On macOS you can open a fork by adding `..namedfork/rsrc` to the path. Users import extracted CODE resources as raw binaries, set the header up by hand, and have added A-trap names to the 68000 spec without parameter knowledge. RetroGhidra has a basic Classic Mac loader (community forum source) — [A-Traps in Ghidra, 68kMLA](https://68kmla.org/bb/goto/post?id=466137); [68kmla.org thread](https://68kmla.org/bb/goto/post?id=510430) (search snippet)
 - Forks are lost when files are copied to non-Mac file systems, so archives use MacBinary, BinHex, AppleSingle/AppleDouble or HFS disk images (DiskCopy 4.2) (not confirmed) — [Resource fork](https://en.wikipedia.org/wiki/Resource_fork)
 

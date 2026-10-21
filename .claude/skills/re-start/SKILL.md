@@ -5,9 +5,7 @@ description: Entry point for reverse engineering a game (or any closed program) 
 
 # Reverse engineering a game: start here
 
-GameFrame is an agentic framework for reverse engineering games. Its playbook of skills and
-agents runs inside your coding agent, and its toolkit of tested tools checks every result
-against the original. This skill is the playbook's first step.
+GameFrame is an agentic framework for reverse engineering games. Its playbook of skills and agents runs inside your coding agent. Its toolkit of tested tools checks every result against the original. This skill is the playbook's first step.
 
 You are studying a finished program without its source code: its executables, its libraries and
 its data files. The aim is usually one of these:
@@ -120,8 +118,7 @@ stages that would fill this session's context; do short steps yourself with the 
 6. `re-observe`: get the original running where you can watch, drive and capture it.
 7. `re-ghidra`: export the game's own binaries (`scripts/ghidra-export.sh`).
 8. Pick the foundations first: the random number generator, the maths helpers, the game clock
-   and the data container. Everything else depends on them, and they are small enough to
-   emulate and verify in one session.
+   and the data container. Everything else depends on them. They are small enough to emulate and verify in one session.
 
 ## Spend effort where it pays
 
@@ -145,8 +142,7 @@ choose how deep to go for each piece:
   types) can go to a separate, cheaper session with an exact brief; keep the hard maths here.
 - **Think like the game.** Most games drive themselves on a frame clock and the player
   reacts; others wait for the player and resolve each move. Know which (`docs/games/interaction.md`),
-  find the loop or the handlers and their order before anything else, and find every place
-  that reads input (`docs/observe/inputs.md`).
+  find the loop or the handlers and their order before anything else. Find every place that reads input (`docs/observe/inputs.md`).
 - **Read the decompiler with care.** For 16-bit Pascal, Ghidra prints arguments in reverse
   order and loses Real (6-byte float) arithmetic: take those parts from the disassembly.
 

@@ -2,8 +2,7 @@
 
 This page is not legal advice. The law that applies is the law where you live.
 
-International treaties set minimum rules that most countries share. They do not give anyone a
-right to study a program, and they do not forbid it. Each country decides that within limits.
+International treaties set minimum rules that most countries share. They do not give anyone a right to study a program. They do not forbid it either. Each country decides that within limits.
 
 ## What the treaties require
 

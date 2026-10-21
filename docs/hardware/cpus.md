@@ -20,8 +20,7 @@ formats and which instructions the game uses before you port any maths.
 
 A game's minimum CPU (on the box, or in the setup program) tells you which instructions to
 expect. Some games had separate code paths for different CPUs: a 3DNow! path, an MMX path and a
-plain path. The game chose one at start-up by testing the CPU with `CPUID`. Find that test, and
-decide which path your project reproduces.
+plain path. The game chose one at start-up by testing the CPU with `CPUID`. Find that test. Then decide which path your project reproduces.
 
 ## Number formats
 
@@ -32,8 +31,7 @@ integer whose low bits are the fraction. Common formats are 16.16 (16 integer bi
 bits, as in Doom), 8.8 and 24.8.
 
 - Multiplying two 16.16 numbers gives a 32.32 result. The game keeps the middle 32 bits. On a
-  386 this is one `IMUL` into `EDX:EAX` followed by `SHRD`. Check whether the game rounds or
-  truncates, and what it does on overflow.
+  386 this is one `IMUL` into `EDX:EAX` followed by `SHRD`. Check whether the game rounds or truncates. Check what it does on overflow.
 - Division often uses a reciprocal table or a shift. Copy the table and the exact method.
 - `SAR` (arithmetic shift) rounds toward minus infinity, and `IDIV` rounds toward zero. The
   two give different results for negative numbers. Keep the one the game uses

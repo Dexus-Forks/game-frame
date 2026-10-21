@@ -47,8 +47,7 @@ breakpoints for **trace**, video memory for **capture**.
 - **Stable names.** Find things by the original's names or by their text. Then tests
   keep working when the layout or the timing changes.
 - **Keep the doors outside the rules.** The model and its doors are an addition the original
-  does not have: put them behind a build option, and check that the game plays identically
-  without them (see the `re-port` skill, "Additions the original does not have").
+  does not have: put them behind a build option. Check that the game plays identically without them (see the `re-port` skill, "Additions the original does not have").
 
 ## How to build it
 

@@ -69,8 +69,7 @@ system. Split the work by device.
 
 - Battery-backed RAM (SRAM) in cartridges: map it to a file. Keep the same layout, so saves
   move between the original (through an emulator) and the port.
-- Memory cards (PlayStation, PS2, GameCube): the game uses a card API in its libraries. Port the
-  API calls to files, and keep the save data's format.
+- Memory cards (PlayStation, PS2, GameCube): the game uses a card API in its libraries. Port the API calls to files. Keep the save data's format.
 - Passwords: the password encodes the game's state. Port the encoding exactly; players still
   have old passwords.
 
@@ -87,5 +86,5 @@ Use the same checks as for PC games ([Running the original](../observe/running-t
 
 1. Play an input movie in the original's emulator, and dump RAM every frame.
 2. Play the same movie in the port, and dump the same variables.
-3. Compare frame by frame, and stop at the first difference.
+3. Compare frame by frame. Stop at the first difference.
 4. Compare pictures of the same frames. Tile-based video can be compared pixel by pixel.

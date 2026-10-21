@@ -36,8 +36,7 @@ music driver, Turbo Pascal's 6-byte `Real` arithmetic, and its own drawing to VG
   frame draws from and into, and the open DOS files (the demo being read).
 - **Then the whole frame.** Once every part matched, they were wired into one frame function
   and checked against whole-frame captures. That caught state the parts' own tests never saw
-  (temporaries the caller keeps in globals). The timer interrupt's counters are left out of
-  the comparison, and the BIOS clock is an input.
+  (temporaries the caller keeps in globals). The timer interrupt's counters are left out of the comparison. The BIOS clock is an input.
 - **Fuzzing from real states.** Demo frames do not reach every branch. Fuzzers start from
   captured states, change them at random (new enemies, shots, events) and compare the
   original and the port on thousands of frames.

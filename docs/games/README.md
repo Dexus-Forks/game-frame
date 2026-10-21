@@ -69,8 +69,7 @@ where to read about each.
 
 ## Approaches you will see in other projects
 
-The family pages list public projects that rebuilt games. They took different routes, and the
-route decides what you can learn from each:
+The family pages list public projects that rebuilt games. They took different routes. The route decides what you can learn from each.
 
 | Approach | What it means | What you can learn from it |
 |---|---|---|
@@ -82,5 +81,4 @@ route decides what you can learn from each:
 A clean-room project (see [Legal](../LEGAL.md)) reads other projects' documents and method,
 not their code. Write in your project's rules which of them may be read.
 
-Projects change, move and sometimes are taken down. Check each link before relying on it, and
-check the descriptions here before you cite them.
+Projects change, move and sometimes are taken down. Check each link before relying on it. Check the descriptions here before you cite them.

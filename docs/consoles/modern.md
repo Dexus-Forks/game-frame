@@ -1,7 +1,6 @@
 # Seventh generation onward
 
-From the Xbox 360 on, every platform ships signed executables in a vendor format such as XEX,
-SELF, RPX or NSO, and most of them are encrypted. A decrypted dump and the right Ghidra loader
+From the Xbox 360 on, every platform ships signed executables in a vendor format such as XEX, SELF, RPX or NSO. Most of them are encrypted. A decrypted dump and the right Ghidra loader
 come before any analysis. This page also covers the handhelds of the same years: the Nintendo
 DS, 3DS, PSP and PS Vita.
 
@@ -75,8 +74,7 @@ build and keep a local copy.
   2026 ([Wikipedia: ShadPS4](https://en.wikipedia.org/wiki/ShadPS4);
   [itechguides](https://www.itechguides.com/what-the-bloodborne-pc-port-is-and-how-it-works/)).
 - On the Switch, yuzu ended in March 2024. Ryubing, a Ryujinx fork at ryujinx.app, moved to
-  maintenance in February 2026. Eden and Citron are described as the active forks, and suyu was
-  an early fork. A February 2026 wave of takedown notices reportedly hit at least 13 Switch
+  maintenance in February 2026. Eden and Citron are described as the active forks. Suyu was an early fork. A February 2026 wave of takedown notices reportedly hit at least 13 Switch
   projects, including Citron, Eden and Ryubing. These Switch facts come from secondary 2026
   coverage ([tech-insider: Eden vs Ryubing](https://tech-insider.org/eden-vs-ryubing-best-switch-emulator-2026/);
   [tech-insider](https://tech-insider.org/?p=23388)).
@@ -129,8 +127,7 @@ that wrap a PE. They are signed and usually encrypted
 
 ### Tools
 
-[XEXLoaderWV](https://github.com/zeroKilo/XEXLoaderWV) loads XEX2 files. Ghidra's PowerPC
-module has no VMX128, and Unicorn has no VMX128.
+[XEXLoaderWV](https://github.com/zeroKilo/XEXLoaderWV) loads XEX2 files. Neither Ghidra's PowerPC module nor Unicorn supports VMX128.
 
 ### Projects to learn from
 
@@ -176,8 +173,7 @@ model. Export the PPE and SPU code separately.
 
 ### Hardware
 
-The Wii's Broadway is a PowerPC at 729 MHz. A Starlet ARM9 runs IOS. Executables are DOL and REL
-files, and discs are AES-encrypted ([Wii](https://en.wikipedia.org/wiki/Wii)). The Wii U's
+The Wii's Broadway is a PowerPC at 729 MHz. A Starlet ARM9 runs IOS. Executables are DOL and REL files. Discs are AES-encrypted ([Wii](https://en.wikipedia.org/wiki/Wii)). The Wii U's
 Espresso has three PowerPC cores at 1.24 GHz. Its executables are RPX and RPL ELF variants
 ([Wii U](https://en.wikipedia.org/wiki/Wii_U)). Broadway and Espresso descend from the
 GameCube's Gekko ([Wikipedia: Gekko](https://en.wikipedia.org/wiki/Gekko_(processor))).
@@ -187,8 +183,7 @@ GameCube's Gekko ([Wikipedia: Gekko](https://en.wikipedia.org/wiki/Gekko_(proces
 The Wii uses the GameCube's tools: [Ghidra-GameCube-Loader](https://github.com/Cuyler36/Ghidra-GameCube-Loader)
 for DOL and REL, and [ghidra-gekko-broadway-lang](https://github.com/aldelaro5/ghidra-gekko-broadway-lang)
 for paired singles ([WiiBrew: Ghidra](https://wiibrew.org/wiki/Ghidra)). Dolphin runs the games.
-[GhidraRPXLoader](https://github.com/cemu-project/GhidraRPXLoader) loads Wii U files, and Cemu
-runs them.
+[GhidraRPXLoader](https://github.com/cemu-project/GhidraRPXLoader) loads Wii U files. Cemu runs them.
 
 ### Projects to learn from
 

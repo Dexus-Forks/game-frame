@@ -38,8 +38,7 @@ to the discrete-logic arcade games.
 
 The 6507 is a 6502 with 8 KB of address space and no interrupts
 ([Wikipedia: MOS Technology 6502](https://en.wikipedia.org/wiki/MOS_Technology_6502)). The TIA
-makes the video and the sound. The RIOT holds 128 bytes of RAM. A cartridge has 4 KB of address
-space, and larger games use bank-switching schemes such as F8, F6, E0 and 3F
+makes the video and the sound. The RIOT holds 128 bytes of RAM. A cartridge has 4 KB of address space. Larger games use bank-switching schemes such as F8, F6, E0 and 3F
 ([Atari 2600](https://en.wikipedia.org/wiki/Atari_2600);
 [Atari 2600 hardware](https://en.wikipedia.org/wiki/Atari_2600_hardware)).
 
@@ -106,8 +105,7 @@ core such as [iz80](https://github.com/ivanizag/iz80) (BSD-3, passes ZEXALL) or 
 
 ### Hardware
 
-The SALLY 6502C runs at 1.79 MHz. ANTIC, GTIA and POKEY make the video and sound, and the
-console has 16 KB of RAM ([Atari 5200](https://en.wikipedia.org/wiki/Atari_5200)).
+The SALLY 6502C runs at 1.79 MHz. ANTIC, GTIA and POKEY make the video and sound. The console has 16 KB of RAM ([Atari 5200](https://en.wikipedia.org/wiki/Atari_5200)).
 
 ## Atari 7800
 
@@ -119,16 +117,16 @@ the video and the TIA makes the sound. The console has 4 KB of RAM
 
 ### For an exact reimplementation
 
-NTSC cartridges are signed, and the console checks the signature. PAL 7800s skip the signature
+NTSC cartridges are signed. The console checks the signature. PAL 7800s skip the signature
 check.
 
 ## Vectrex
 
 ### Hardware
 
-The 68A09 runs at 1.5 MHz. An AY-3-8912 makes the sound, and the console has 1 KB of RAM. The
+The 68A09 runs at 1.5 MHz. An AY-3-8912 makes the sound. The console has 1 KB of RAM. The
 CPU drives the vector beam through a DAC ([Vectrex](https://en.wikipedia.org/wiki/Vectrex)).
-The 6809 joins A and B into a 16-bit D register, and has an 8x8 hardware multiply
+The 6809 joins A and B into a 16-bit D register. It has an 8x8 hardware multiply
 ([Wikipedia: Motorola 6809](https://en.wikipedia.org/wiki/Motorola_6809)).
 
 ### Tools

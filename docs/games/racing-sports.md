@@ -34,8 +34,7 @@ racing lines for the AI, team and player databases in sports games. Grip curves 
 ratios are usually tables: read them, do not refit them.
 
 **Inputs.** Analogue steering and throttle (joystick, wheel, mouse) or digital keys with a
-ramp the game applies. Record the value the game reads each tick, after its own filtering,
-and also find the filtering (dead zones, ramps, calibration).
+ramp the game applies. Record the value the game reads each tick, after its own filtering. Also find the filtering (dead zones, ramps, calibration).
 
 **Interface.** Speedometers, position and lap counters, mini-maps are drawn by the game. Sports
 games have large management interfaces (teams, transfers, tactics) that behave like
@@ -46,8 +45,7 @@ most of these games are recorded inputs plus the seed, so the physics must repea
 
 **How to verify.** Record a lap in the original (input per tick, or the game's own replay
 file) and play it in the port; compare the car's position, speed and rotation each tick. Small
-differences grow fast in physics: compare from the first tick, and stop at the first
-difference.
+differences grow fast in physics: compare from the first tick. Stop at the first difference.
 
 **Pitfalls.**
 - Floating-point physics on x87 (32-bit games) rounds differently from SSE: see

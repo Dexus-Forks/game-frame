@@ -39,7 +39,7 @@ Work outward from something you can see. In rough order of usefulness:
    their name (CRC32, FNV-1a, murmur). If a table pairs constants with factories, hash candidate
    names and look the constants up.
 6. **Data.** A value you can see in the game (a price, a duration) may appear as a constant
-   (`readdata.py`) or in a data file (`re-format`), and its readers lead to the rules.
+   (`readdata.py`) or in a data file (`re-format`). Its readers lead to the rules.
 7. **The main loop.** From `WinMain`/`main` (or the entry point) find the per-frame update; the
    systems hang off it in a fixed order, which you will need anyway (see `docs/GAME-PATTERNS.md`).
 

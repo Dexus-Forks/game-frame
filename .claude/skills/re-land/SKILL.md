@@ -21,7 +21,7 @@ work.
     confirm it), or under **Open questions**;
   - no copied pseudocode, disassembly or data dumps: describe them.
   - plain English with no rhetorical patterns (colon reveals, "X, not Y" endings, matched
-    pairs, "and the ..." chains): see `docs/working/writing.md`.
+    pairs, two clauses of the same shape joined by ", and", "and the ..." chains): see `docs/working/writing.md`.
 - **Labels:** a row in `labels/names.tsv` for every function you identified
   (`1400be770<TAB>Citizen::ChooseJob<TAB>called from the AI tick, reads the job table`), a row in
   `labels/fields.tsv` for every field.
@@ -57,13 +57,12 @@ Other sessions may edit the repository at the same time:
 
 - **A scripted edit that silently does nothing.** A search-and-replace whose text does not
   match the file changes nothing and reports nothing. In scripts, check that each replacement
-  matched (count it, or assert it), and look at `git diff` before you commit.
-- **`git add` with a moved file.** After a file is moved, naming its old or new path may stage
-  only part of the move, and a commit that does not build goes in. After staging, check that
+  matched (count it, or assert it). Look at `git diff` before you commit.
+- **`git add` with a moved file.** After a file is moved, naming its old or new path may stage only part of the move. Then a commit that does not build goes in. After staging, check that
   nothing you meant to commit is still unstaged (`git status --short`, look for lines that do
   not start with a letter in the first column) and read `git diff --cached --stat`.
 - **Processes left running.** Games, servers and emulators started for a test keep running
-  after it fails. Stop them before you finish, and give long runs a time limit.
+  after it fails. Stop them before you finish. Give long runs a time limit.
 
 ## 4. Commit and push
 

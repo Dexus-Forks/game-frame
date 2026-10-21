@@ -1,8 +1,7 @@
 # gameframe-opl2
 
 An emulator of the Yamaha YM3812 (OPL2), the FM synthesis chip on the AdLib card and the Sound
-Blaster family. DOS games play their music by writing to the chip's registers. Give this crate
-the same writes at the same times, and it makes the samples the chip would make.
+Blaster family. DOS games play their music by writing to the chip's registers. Give this crate the same writes at the same times. It makes the samples the chip would make.
 
 - It runs at the chip's own rate: one sample every 72 master clocks, 3,579,545 / 72 = 49,716
   samples a second.
@@ -12,8 +11,7 @@ the same writes at the same times, and it makes the samples the chip would make.
   and the two timers with the status register.
 - Everything is integer and deterministic. The same writes give the same samples on every
   platform, including WebAssembly.
-- A band-limited resampler converts the output to 44.1 or 48 kHz without aliasing, and can
-  adjust its ratio a little to keep a host's audio buffer steady.
+- A band-limited resampler converts the output to 44.1 or 48 kHz without aliasing. It can adjust its ratio a little to keep a host's audio buffer steady.
 - No dependencies and no `unsafe` code.
 
 It comes from the Frontier: Elite II reimplementation, where it plays the music and effects of
@@ -60,8 +58,7 @@ times:
    emulator ([Sound](https://tanepiper.github.io/game-frame/hardware/sound)).
 2. Port the game's music driver so it makes the same writes. Compare the two lists write by
    write.
-3. Drive this crate from the port's writes, and generate samples between writes to match the
-   timing.
+3. Drive this crate from the port's writes. Generate samples between writes to match the timing.
 
 The driver's tempo usually comes from a timer interrupt the game programmed. Measure its rate
 from the timer programming; a small error changes a song's length.

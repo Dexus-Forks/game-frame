@@ -7,7 +7,7 @@ Scope: South Africa, Nigeria, Kenya, Egypt, Israel, Turkey, UAE, Saudi Arabia, R
 ## 1. Statutory exceptions for reverse engineering, decompiling and observing/studying/testing software
 
 ### Takeaway
-Ten of the twelve jurisdictions have a software-specific exception. They are Russia, Ukraine, Switzerland, Norway, Turkey, Israel, Nigeria, Kenya, Saudi Arabia (new 2026 law) and, more narrowly, Egypt and the UAE (backup and use copies). Most copy the EU Software Directive model: a lawful user may observe, study and test the program, and may decompile only to get interface information for interoperability, under strict conditions. South Africa's current Act has only narrow computer-program exceptions. Its broader fair use and interoperability clauses sit in the Copyright Amendment Bill, which is still not law in October 2026. Nigeria is unusual: its decompilation-for-interoperability permission appears in the anti-circumvention section, not the general exceptions.
+Ten of the twelve jurisdictions have a software-specific exception. They are Russia, Ukraine, Switzerland, Norway, Turkey, Israel, Nigeria, Kenya, Saudi Arabia (new 2026 law) and, more narrowly, Egypt and the UAE (backup and use copies). Most copy the EU Software Directive model: a lawful user may observe, study and test the program. The user may decompile only to get interface information for interoperability, under strict conditions. South Africa's current Act has only narrow computer-program exceptions. Its broader fair use and interoperability clauses sit in the Copyright Amendment Bill, which is still not law in October 2026. Nigeria is unusual: its decompilation-for-interoperability permission appears in the anti-circumvention section, not the general exceptions.
 
 ### Cited Findings
 
@@ -38,7 +38,7 @@ Ten of the twelve jurisdictions have a software-specific exception. They are Rus
 - The Executive Regulations to Book III were issued by Prime Ministerial Decree 497 of 2005 (not confirmed).
 
 **Israel (Copyright Act 2007, in force 25 May 2008)** (all not confirmed) — [WIPO Lex](https://www.wipo.int/wipolex/en/)
-- s.19 is an open US-style fair use clause with four factors, and it applies to software.
+- s.19 is an open US-style fair use clause with four factors. It applies to software.
 - s.24 is a software exception. A lawful possessor may copy a program for backup, for maintenance, for security of the computer system, to correct errors and, where the information is not otherwise readily available, to obtain information needed to make an independently created program interoperable. The copy must be destroyed when possession ends. Exact sub-paragraph numbering is not confirmed.
 
 **Turkey (Law No. 5846 on Intellectual and Artistic Works, 5 December 1951, FSEK)** (all not confirmed) — [mevzuat.gov.tr](https://www.mevzuat.gov.tr/mevzuatmetin/1.3.5846.pdf)
@@ -64,12 +64,12 @@ Ten of the twelve jurisdictions have a software-specific exception. They are Rus
 
 **Ukraine (Law No. 2811-IX "On Copyright and Related Rights", adopted 1 December 2022)**
 - Adopted on 1 December 2022 and published in Vidomosti VRU 2023, No. 57, art. 166 — [zakon.rada.gov.ua](https://zakon.rada.gov.ua/laws/show/2811-20). Entry into force on 1 January 2023 is not confirmed.
-- Art. 25 (free use of computer programs). Part 1 lets a lawful user make a backup copy, decompile for interoperability, and observe and study the program. Decompilation is allowed only if the interoperability information was not previously available from other sources, and the information may not be passed on except as needed for interoperability. Part 2 permits reproduction, translation, adaptation and other changes needed for proper use, including error correction, unless the contract says otherwise — [zakon.rada.gov.ua](https://zakon.rada.gov.ua/laws/show/2811-20)
+- Art. 25 (free use of computer programs). Part 1 lets a lawful user make a backup copy, decompile for interoperability, and observe and study the program. Decompilation is allowed only if the interoperability information was not previously available from other sources. The information may not be passed on except as needed for interoperability. Part 2 permits reproduction, translation, adaptation and other changes needed for proper use, including error correction, unless the contract says otherwise — [zakon.rada.gov.ua](https://zakon.rada.gov.ua/laws/show/2811-20)
 - The previous law (No. 3792-XII of 23 December 1993) had art. 24 on free copying, modification and decompilation of programs — [kodeksy.com.ua](https://kodeksy.com.ua/pro_avtors_ke_pravo_i_sumizhni_prava/statja-24.htm)
 
 **Switzerland (Federal Act on Copyright and Related Rights, URG/LDA, 9 October 1992, SR 231.1)** (all not confirmed) — [fedlex](https://www.fedlex.admin.ch/eli/cc/1993/1798_1798_1798/en)
-- Art. 21(1): a lawful user may obtain information on interfaces with independently developed programs by decompiling, or have a third party do it. Art. 21(2): the information may be used only to develop, maintain and use interoperable programs, and only if this does not unreasonably impair normal exploitation of the program or the rightholder's legitimate interests.
-- Art. 24(2): a lawful user may make one backup copy, and this cannot be excluded by contract.
+- Art. 21(1): a lawful user may obtain information on interfaces with independently developed programs by decompiling, or have a third party do it. Art. 21(2): the information may be used only to develop, maintain and use interoperable programs. This applies only if the use does not unreasonably impair normal exploitation of the program or the rightholder's legitimate interests.
+- Art. 24(2): a lawful user may make one backup copy. A contract cannot exclude this.
 - Art. 19(4): the private-use exception does not apply to computer programs. Art. 12(2): a sold copy of software may be used and resold.
 - There is no separate "observe, study, test" article like the EU's art. 5(3). How Swiss law covers this is not confirmed.
 
@@ -202,7 +202,7 @@ Little reported case law exists in this region on emulators or reverse engineeri
 ## 7. Practical realities (sanctions, region locks, availability)
 
 ### Takeaway
-Since March 2022 many Western publishers and stores have stopped sales in Russia and Belarus, and payments were disrupted in Russia and Ukraine. Russia is now drafting its own game law with licensing-like controls. Game availability in Gulf states is shaped by content classification.
+Since March 2022 many Western publishers and stores have stopped sales in Russia and Belarus. Payments were disrupted in Russia and Ukraine. Russia is now drafting its own game law with licensing-like controls. Game availability in Gulf states is shaped by content classification.
 
 ### Cited Findings
 - In March 2022, GOG and Microsoft halted sales in Russia. Ubisoft, EA, Epic Games and Activision Blizzard suspended sales and microtransactions. CD Projekt suspended supply in Russia and Belarus. Steam users in Russia lost the main payment methods because of US sanctions — [Massively OP, 31 March 2022](https://massivelyop.com/2022/03/31/international-sanctions-cause-steam-payment-snarl-ups-for-indie-game-devs-in-russia-and-ukraine/); [TechRaptor](https://techraptor.Net/gaming/news/valve-suspends-payments-to-developers-in-ukraine-and-russia)

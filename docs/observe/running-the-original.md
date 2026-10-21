@@ -41,8 +41,7 @@ game material ([Legal](../LEGAL.md)).
 A capture is only useful if you can make it again. Drive the original by script:
 
 - In GameFrame's emulators, script the inputs: `dos_env` answers the BIOS and DOS key
-  reads from a queue (`env.keys`), and you can write a game's own key table in memory between
-  frames.
+  reads from a queue (`env.keys`). You can also write a game's own key table in memory between frames.
 - In DOSBox-X, script the debugger over its control channel (Tyrian's `dbx_control.py`) or
   type into the window with an automation tool.
 - On a Windows machine streamed to your desk, an agent with computer-use access can watch and
@@ -62,11 +61,9 @@ settings, the seed, the commands or the demo, and the frame.
 | Frames | pixel for pixel when both are exact; image difference with blur and a threshold when one is a compressed stream | an image-difference tool (Un-Banished's `imgdiff`) |
 | Sound | sample for sample when both come from the same chip model; by ear and spectrum otherwise | the OPL register log; a WAV difference |
 
-![bitcompare.py and seqdiff.py on the sample game. The port matches the original in 600 of 600 values, and its 746 random draws are identical. A naive port in double precision matches only 7 values, and is 12 ULP off at most.](../assets/captures/bitcompare.svg)
+![bitcompare.py and seqdiff.py on the sample game. The port matches the original in 600 of 600 values. Its 746 random draws are identical. A naive port in double precision matches only 7 values. It is 12 ULP off at most.](../assets/captures/bitcompare.svg)
 
-On the sample game, the port matches the emulated original bit for bit, and its random draws
-come in the same order. A port that computes in double precision instead of float drifts by a few
-ULP, and the check catches it.
+On the sample game, the port matches the emulated original bit for bit. Its random draws come in the same order. A port that computes in double precision instead of float drifts by a few ULP. The check catches it.
 
 ## Further reading
 

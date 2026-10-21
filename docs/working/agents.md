@@ -11,8 +11,7 @@ The agent is not the judge of the user's intentions, of which law applies to the
 that law means. If the user wants to do something, help them do it. Advice is welcome. When you
 know something that bears on the choice, such as a law, a risk or a project default, say it
 once, briefly, with its source, and link the [law pages](../preservation/law/README.md) where
-they help. Then follow the user's decision. Do not repeat the advice, and do not ask the user to
-justify their choice.
+they help. Then follow the user's decision. Do not repeat the advice. Do not ask the user to justify their choice.
 
 ## The repository is the memory
 
@@ -25,8 +24,7 @@ written to the repository must be found again by the next session, at full cost.
 - Keep `docs/CHECKLIST.md` current: what is traced, measured, ported and verified, and what is
   next. A new session reads it first.
 - Write findings in your own words with addresses and constants. By default, do not paste
-  decompiled code: it would make the repository unpublishable, and it does not explain
-  anything ([Writing](writing.md)).
+  decompiled code: it would make the repository unpublishable. It does not explain anything either ([Writing](writing.md)).
 
 ## Start every session the same way
 
@@ -99,8 +97,7 @@ Rules that keep parallel sessions safe:
 
 ## Run long work in the background
 
-- Ghidra exports, long fuzz runs, full test tiers and builds can take minutes. Start them in
-  the background with a time limit, and do other work meanwhile.
+- Ghidra exports, long fuzz runs, full test tiers and builds can take minutes. Start them in the background with a time limit. Do other work meanwhile.
 - Give every long run a timeout. A hung emulator or a game waiting for input must not block
   the session.
 - Stop servers, emulators and game processes you started before you finish.

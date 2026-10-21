@@ -57,11 +57,9 @@ exists and allows it), and against the client: does it accept every message, and
 same thing?
 
 **Pitfalls.**
-- Testing against a live service without permission breaks its terms, and can lead to bans or
-  legal action.
-- Anti-cheat and protection in the client: bypassing it may be illegal, and it is not needed to
-  study a game you run offline.
-- Traffic that contains other players' data: keep it private, and do not publish it.
+- Testing against a live service without permission breaks its terms. It can lead to bans or legal action.
+- Anti-cheat and protection in the client: bypassing it may be illegal. It is not needed to study a game you run offline.
+- Traffic that contains other players' data: keep it private. Do not publish it.
 
 ## Connections
 

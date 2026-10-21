@@ -7,13 +7,12 @@ the kinds of input, where you will find each in a game's code, and how to handle
 port.
 
 **Every input enters the port through one door**, as a record per frame (real-time
-games) or per command (games that wait). Then a recording, a demo or a test script can drive
-the port, and two runs with the same records give the same results. Anything that reaches the
+games) or per command (games that wait). Then a recording, a demo or a test script can drive the port. Two runs with the same records give the same results. Anything that reaches the
 game's rules without going through that door is a bug waiting to happen.
 
 ## How games read input
 
-There are two patterns, and many games use both:
+There are two patterns. Many games use both.
 
 | Pattern | What it looks like | What to record |
 |---|---|---|
@@ -117,8 +116,7 @@ When the original has demos, start there: they define the input record for you.
 1. List every input above that the game reads, with the address of each read.
 2. Put the ones that change the rules into one record type per frame or per command. Keep
    inputs that only change the presentation (window size, volume) outside it.
-3. Make the platform layer (keyboard, mouse, window) produce that record, and the rules read
-   only the record.
+3. Make the platform layer (keyboard, mouse, window) produce that record. The rules read only the record.
 4. Write recordings as the start state (seed, configuration, files' versions) plus the list of
    records. Two runs from the same recording must give identical state, every frame.
 5. Make the record the door for tests and tools too: a test script, a fuzzer or an agent

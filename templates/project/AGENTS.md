@@ -2,8 +2,7 @@
 
 Rules for every agent (Claude Code, Codex, Cursor and others) and every person working here.
 The method and the tools come from GameFrame. GameFrame is an agentic framework for reverse
-engineering games. Its playbook of skills and agents runs inside your coding agent, and its
-toolkit of tested tools checks every result against the original. Its skills are in
+engineering games. Its playbook of skills and agents runs inside your coding agent. Its toolkit of tested tools checks every result against the original. Its skills are in
 `.claude/skills/` (agents without skill support: read each `SKILL.md`). Its stage agents are
 in `.claude/agents/`: each does one step and hands off to the next (`re-start`, "Stage agents").
 
@@ -18,7 +17,7 @@ loader". Say what "done" means and how exact it must be.
 The agent is not the judge of the user's intentions, of which law applies to them, or of what
 that law means. If the user wants to do something, the agent helps them do it. The agent may
 advise. When it knows something that bears on the choice, such as a law, a risk or one of the
-defaults below, it says so once, briefly, with its source, and then follows the user's decision.
+defaults below, it says so once, briefly, with its source. Then it follows the user's decision.
 What 35 countries allow is in GameFrame's `docs/preservation/law/README.md`.
 
 ## Working rules
@@ -47,8 +46,7 @@ user may change any of them.
 6. **Write it down.** Findings go into `docs/`, function names into `labels/names.tsv`, struct
    fields into `labels/fields.tsv`, progress into `docs/CHECKLIST.md`. An undocumented finding
    is re-derived by the next session.
-7. **Several sessions may work at once.** Stage only your own files (`git add path`), never
-   `git add -A`, and never revert work you did not do.
+7. **Several sessions may work at once.** Stage only your own files (`git add path`), never `git add -A`. Never revert work you did not do.
 8. **Ask before downloading** anything; say the file, the source and the size.
 9. **Licence and instructions.** Our code is Apache 2.0 (LICENSE-APACHE; `license =
    "Apache-2.0"` in manifests); documentation and other prose are CC0 1.0,

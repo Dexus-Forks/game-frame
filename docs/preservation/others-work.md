@@ -21,8 +21,7 @@ The [taxonomy of games](../games/README.md) lists many more for each kind of gam
 
 - Electronic Arts released the source code of Command & Conquer and Red Alert in 2020, and of
   more Command & Conquer games in February 2025. Players still buy the game data.
-- GOG started its Preservation Program in late 2024. It keeps about 100 classic games working
-  on current systems, and has added more since
+- GOG started its Preservation Program in late 2024. It keeps about 100 classic games working on current systems. It has added more since
   ([GOG](https://www.gog.com/en/gog-preservation-program)).
 - Atari re-released Transport Tycoon Deluxe in March 2026 and contributes to OpenTTD's server
   costs ([OpenTTD](https://www.openttd.org/news/2026/03/19/steam-changes-update)).

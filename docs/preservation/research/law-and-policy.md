@@ -108,7 +108,7 @@ UK law mirrors the EU directive (CDPA 1988 s.50A-50C, with s.296A voiding contra
 Copyright does not lapse when a game leaves sale or its publisher closes. Sharing game files without permission is infringement in the US, EU and UK, whatever the motive.
 
 ### Cited Findings
-- "Abandonware" is not a legal category. Out-of-print games stay under copyright, and sharing them is infringement unless the rights holder allows it. Some sites distribute with permission (e.g. World of Spectrum). — [Wikipedia, Abandonware](https://en.wikipedia.org/wiki/Abandonware); [How-To Geek](https://www.howtogeek.com/829307/what-is-abandonware-and-is-it-legal/)
+- "Abandonware" is not a legal category. Out-of-print games stay under copyright. Sharing them is infringement unless the rights holder allows it. Some sites distribute with permission (e.g. World of Spectrum). — [Wikipedia, Abandonware](https://en.wikipedia.org/wiki/Abandonware); [How-To Geek](https://www.howtogeek.com/829307/what-is-abandonware-and-is-it-legal/)
 - The US 1201 exemptions limit even accredited institutions to on-premises access; remote access was denied because of the risk of recreational use. — [eCFR 201.40](https://www.ecfr.gov/current/title-37/chapter-II/subchapter-A/part-201/section-201.40); [VGHF](https://gamehistory.org/dmca-2024-statement/)
 - About 87% of US games released before 2010 are out of print. — [VGHF statement](https://gamehistory.org/dmca-2024-statement/)
 

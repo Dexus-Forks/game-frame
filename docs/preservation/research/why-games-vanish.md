@@ -6,7 +6,7 @@
 The July 2023 study by the Video Game History Foundation (VGHF) and Software Preservation Network (SPN) found that 87% of classic US-released games (pre-2010) are out of print, with only 13% commercially available. No later update to the study itself was found by October 2026. The figure is still the standard one used in policy fights, for example after the 2024 DMCA ruling.
 
 ### Cited Findings
-- Published by VGHF and SPN. The explainer post is dated July 10, 2023, and was written by Phil Salvador. The full report is on Zenodo (doi 10.5281/zenodo.8161056). — [VGHF explainer](https://gamehistory.org/study-explainer)
+- Published by VGHF and SPN. The explainer post is dated July 10, 2023. Phil Salvador wrote it. The full report is on Zenodo (doi 10.5281/zenodo.8161056). — [VGHF explainer](https://gamehistory.org/study-explainer)
 - Headline: 87% of classic games released in the US are out of print, so 13% are in print (margin of error ±2.5%). No five-year period examined rose above 20% availability. — [VGHF explainer](https://gamehistory.org/study-explainer)
 - A more precise figure is 13.27% available through commercial means. The authors call the rest "critically endangered". — [Exputer summary](https://exputer.com/news/games/87-classic-games-disappeared/); [GeekWire](https://www.geekwire.com/2023/researchers-find-87-of-u-s-classic-video-games-are-out-of-print-and-critically-endangered/)
 - Scope: US-released games from before 2010, which the authors chose as roughly when digital distribution took off. The general sample was 1,500 random games from MobyGames. More than 4,000 games were studied in total once the platform samples are counted. Data is accurate as of April 15, 2023. — [VGHF explainer](https://gamehistory.org/study-explainer)
@@ -17,7 +17,7 @@ The July 2023 study by the Video Game History Foundation (VGHF) and Software Pre
   - Games from before 1985: under 3%.
   — [VGHF explainer](https://gamehistory.org/study-explainer)
 - Definition of "available": a yes or no answer. A re-release counted only if it was not "substantially different" from the original. Expensive collectibles, raw source code only, and sales only for defunct vintage hardware did not count. An average user had to be able to play the game. — [VGHF explainer](https://gamehistory.org/study-explainer)
-- Method: volunteers from VGHF and the University of Washington Information School worked for about four months, and the results were double-checked. Penn State University Libraries' Data Learning Center and SPN's Law & Policy Working Group gave input. — [VGHF explainer](https://gamehistory.org/study-explainer)
+- Method: volunteers from VGHF and the University of Washington Information School worked for about four months. The results were double-checked. Penn State University Libraries' Data Learning Center and SPN's Law & Policy Working Group gave input. — [VGHF explainer](https://gamehistory.org/study-explainer)
 - About 1,000 unique games fell out of release when the 3DS and Wii U eShops closed. — [VGHF explainer](https://gamehistory.org/study-explainer)
 - Policy follow-up: in October 2024 the US Copyright Office denied SPN's DMCA exemption request (backed by VGHF), which would have let libraries give remote access to out-of-print games for research. The ruling is on p. 191 of the Register's Recommendation. VGHF's response cited the 87% figure. — [VGHF statement](https://gamehistory.org/dmca-2024-statement/); [VGC](https://videogameschronicle.com/news/us-copyright-office-refuses-to-allow-remote-access-to-out-of-print-games)
 - Reasons the Office gave: the single-user and on-premises limits were unclear, proponents had not shown the use was non-infringing, and it agreed with the ESA that remote access could harm the market for re-releases. TechSpot reports that this was the fourth rejection of such a request since 2015. — [TechSpot](https://www.techspot.com/community/topics/us-copyright-office-denies-dmca-exemption-deals-blow-to-video-game-preservation-efforts.288839/)
@@ -36,7 +36,7 @@ The July 2023 study by the Video Game History Foundation (VGHF) and Software Pre
 ## 2. How legally owned games become unplayable
 
 ### Takeaway
-Games break when the platform moves on (16-bit code on 64-bit Windows, 32-bit apps on macOS, DRM drivers, old graphics APIs). They also break or vanish when services shut down: online servers, licence revocation, store delistings and console store closures. Several of these changes landed between 2014 and 2026, and more are scheduled (Rosetta 2).
+Games break when the platform moves on (16-bit code on 64-bit Windows, 32-bit apps on macOS, DRM drivers, old graphics APIs). They also break or vanish when services shut down: online servers, licence revocation, store delistings and console store closures. Several of these changes landed between 2014 and 2026. More are scheduled (Rosetta 2).
 
 ### Cited Findings
 **Operating systems and hardware**
@@ -50,13 +50,13 @@ Games break when the platform moves on (16-bit code on 64-bit Windows, 32-bit ap
 
 **Online services and licence revocation**
 - The Crew (Ubisoft): delisted December 2023, servers closed March 31, 2024, and player licences revoked from April 2024, with no offline mode. — [Stop Killing Games wiki](https://stopkillinggames.wiki.gg/wiki/The_Crew)
-- Lawsuits followed. A proposed US class action was filed on November 4, 2024 (E.D. California), and its status is unknown. On March 31, 2026 the French consumer group UFC-Que Choisir announced its own suit against Ubisoft. — [Gigazine](https://gigazine.net/gsc_news/en/20241112-ubisoft-lawsuit-the-crew-shutdown); [GamingOnLinux, Mar 2026](https://www.gamingonlinux.com/2026/03/french-consumer-group-ufc-que-choisir-sues-ubisoft-over-the-crew-shutdown/page=1)
+- Lawsuits followed. A proposed US class action was filed on November 4, 2024 (E.D. California). Its status is unknown. On March 31, 2026 the French consumer group UFC-Que Choisir announced its own suit against Ubisoft. — [Gigazine](https://gigazine.net/gsc_news/en/20241112-ubisoft-lawsuit-the-crew-shutdown); [GamingOnLinux, Mar 2026](https://www.gamingonlinux.com/2026/03/french-consumer-group-ufc-que-choisir-sues-ubisoft-over-the-crew-shutdown/page=1)
 - California's law requiring sellers to disclose that buyers get a licence, not ownership, was signed in September 2024 and took effect in 2025. — [Stop Killing Games wiki](https://stopkillinggames.wiki.gg/wiki/The_Crew)
 - "Stop Destroying Videogames", the EU citizens' initiative started by Ross Scott, gathered 1,294,188 validated signatures and met the thresholds in 24 member states. The European Parliament held a hearing on April 16, 2026 (IMCO, JURI, PETI). The Commission adopted its reply on June 16, 2026. — [heise](https://heise.de/-11154579); [European Citizens' Initiative](https://citizens-initiative.europa.eu/news/european-commission-replies-stop-destroying-videogames-initiative-2026-06-16_cs); [LevelUp](https://www.levelup.com/noticias/stop-killing-games-la-union-europea-responde-a-la-iniciativa-tras-superar-el-millon-de-firmas-que-sigue-en-esta-lucha-contra-las-politicas-de-los-editores-de-videojuegos/)
 - Wii online play ended in 2014 when the GameSpy agreement ended. — [Wii Shop Channel, Wikipedia](https://Www.Wikipedia.org/wiki/Wii_Point)
 
 **Storefront delistings (licence expiry)**
-- Rock Band 4 was delisted from PlayStation and Xbox in October 2025 because its core soundtrack licences expired, and its DLC was removed too. Owners can still download it. — [Game Informer](https://gameinformer.com/2025/10/01/rock-band-4-will-be-delisted-this-weekend)
+- Rock Band 4 was delisted from PlayStation and Xbox in October 2025 because its core soundtrack licences expired. Its DLC was removed too. Owners can still download it. — [Game Informer](https://gameinformer.com/2025/10/01/rock-band-4-will-be-delisted-this-weekend)
 - Spec Ops: The Line was delisted from Steam and other stores because "partnership licenses" expired. Project Gotham Racing 4 is reportedly gone because its car licences expired. — [KeenGamer](https://www.keengamer.com/articles/features/others/why-games-get-delisted-and-why-its-hurting-gaming/)
 - Sony said: "we delist assets with licensed music when the licenses expire". — [VGC](https://www.videogameschronicle.com/news/sony-claims-it-delisted-the-kotor-remake-trailer-due-to-music-license-expiring)
 

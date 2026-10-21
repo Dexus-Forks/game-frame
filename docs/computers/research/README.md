@@ -1,6 +1,6 @@
 # Sources and notes
 
-These files give the sources for the Computers section and the newer console pages. Every finding links to its source. The notes keep cited findings apart from inferences, and each section lists its gaps. "(search snippet)" marks a finding taken from a search result.
+These files give the sources for the Computers section and the newer console pages. Every finding links to its source. The notes keep cited findings apart from inferences. Each section lists its gaps. "(search snippet)" marks a finding taken from a search result.
 
 1. [Report: game platforms and CPUs](report.md): the full report on CPU families, home computers, the PC and Mac, and more consoles.
 2. [Notes: CPU families and tools](cpu-families.md): each CPU family, its arithmetic traps, and its support in Ghidra, Unicorn and Capstone.

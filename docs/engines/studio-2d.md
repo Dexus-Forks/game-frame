@@ -27,7 +27,7 @@ and the MPQ archive format.
   encryption with keys derived from the file names. StormLib reads them.
 - `storm.dll` also holds shared code: memory, files, networking and drawing helpers. Its
   functions are exported by ordinal; community lists name many of them.
-- StarCraft's replays store commands per game tick, and the simulation is fully deterministic.
+- StarCraft's replays store commands per game tick. The simulation is fully deterministic.
   OpenBW reimplemented it exactly enough to play replays.
 - Diablo's Devilution project reconstructed the source with help from debug information left
   in the Japanese PlayStation port. Look for such builds of your game: demos, other
@@ -66,7 +66,7 @@ ScummVM, which reimplements most of them.
 1. Find the archive format and list every file. These formats are usually documented already.
 2. Read the rule tables and text formats before any code. In these games, much of the
    behaviour is data.
-3. Find the script interpreter if there is one, and list its opcodes.
+3. Find the script interpreter if there is one. List its opcodes.
 4. Trace the native code for what remains: the simulation step, combat formulas, pathfinding,
    AI. See the family pages for what must be exact ([Strategy](../games/strategy.md),
    [RPGs](../games/rpg.md)).

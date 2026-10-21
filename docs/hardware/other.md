@@ -61,8 +61,7 @@ the game's own range, as an input ([Inputs](../observe/inputs.md)).
 
 Multiplayer games of this time are usually lockstep: every computer runs the whole game and
 only commands travel ([Strategy](../games/strategy.md), [Networking](../GAME-PATTERNS.md#networking-if-any)).
-The message format is the input record for multiplayer. Find it, and the packet a game sends
-each turn.
+The message format is the input record for multiplayer. Find it, together with the packet a game sends each turn.
 
 - A port can replace the transport (IPX, serial) with a modern one. The messages and the turn
   timing are behaviour if two copies of the port must play together. They are also behaviour if

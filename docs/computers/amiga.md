@@ -2,9 +2,7 @@
 
 The Amiga uses the big-endian 68000 line ([CPU families](cpu-families.md#the-68000)). Its
 custom chips shape how its games were written. Many games skip the OS and drive the chips
-directly. A game that uses the AmigaOS libraries can be traced at the OS call boundary. A
-takeover game must be traced at its hardware register writes, and its port must rebuild what
-the chips did.
+directly. A game that uses the AmigaOS libraries can be traced at the OS call boundary. Trace a takeover game at its hardware register writes. The port must rebuild what the chips did.
 
 ## The chip sets
 
@@ -161,8 +159,7 @@ No differences from OCS are listed yet.
 
 ### Tools
 
-No differences from OCS are listed yet. Ghidra's default 68000 language is a 68040 superset,
-and Ghidra also has 68020 and 68030 languages.
+No differences from OCS are listed yet. Ghidra's default 68000 language is a 68040 superset. Ghidra also has 68020 and 68030 languages.
 
 ### Projects to learn from
 

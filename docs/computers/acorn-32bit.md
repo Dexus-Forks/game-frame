@@ -1,7 +1,6 @@
 # Acorn Archimedes and Risc PC
 
-Acorn's 32-bit machines use ARM ([CPU families](cpu-families.md#arm)). The ARM2 and ARM3 run a
-26-bit address mode with the flags in R15, and old Archimedes games depend on it. Ghidra's ARM
+Acorn's 32-bit machines use ARM ([CPU families](cpu-families.md#arm)). The ARM2 and ARM3 run a 26-bit address mode with the flags in R15. Old Archimedes games depend on it. Ghidra's ARM
 languages start at v4, so this code has no exact built-in match. A game that uses RISC OS can
 be traced at its SWI calls.
 

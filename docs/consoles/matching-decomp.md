@@ -37,8 +37,7 @@ explains how these projects work and when the route is worth its cost.
 - Matching is slow. Compilers of the time are sensitive to the order of statements, the types
   of temporary variables and the use of registers. Some functions take days to match.
 - It needs the original compiler, which often runs only in an emulator or an old system.
-- The resulting source is derived from the original program, and projects have different views
-  of what may be published. Check the legal position where you live before publishing such
+- The resulting source is derived from the original program. Projects have different views of what may be published. Check the legal position where you live before publishing such
   code ([Legal](../LEGAL.md)).
 
 ## When to choose it

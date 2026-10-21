@@ -11,8 +11,7 @@ of the game and ships none of its files.
 
 ## Build and run each part
 
-Every part this repository has (core library, player, viewer, tools) gets a row, and its own
-README with the full instructions.
+Every part this repository has (core library, player, viewer, tools) gets a row. Each also gets its own README with the full instructions.
 
 | Part | Build | Run or test |
 |---|---|---|

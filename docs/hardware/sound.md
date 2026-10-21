@@ -1,7 +1,6 @@
 # Sound
 
-Sound hardware in DOS games is programmed directly. A game's music may exist only as commands
-to a synthesiser chip, and its timing may come from the sound card's interrupts. To reproduce
+Sound hardware in DOS games is programmed directly. A game's music may exist only as commands to a synthesiser chip. Its timing may come from the sound card's interrupts. To reproduce
 the sound exactly, you need to know which device the game wrote for and how it drove it.
 
 ## The devices

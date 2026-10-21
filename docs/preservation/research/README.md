@@ -1,8 +1,7 @@
 # Sources and notes
 
 The reports and notes below give the sources for the
-[preservation chapters](../README.md). Every finding links to its source. The notes keep cited
-findings apart from inferences, and each lists its gaps. A finding marked "(search snippet)"
+[preservation chapters](../README.md). Every finding links to its source. The notes keep cited findings apart from inferences. Each lists its gaps. A finding marked "(search snippet)"
 comes from a search result, because the page itself could not be fetched.
 
 1. [Report: presenting GameFrame as game preservation](report.md): the summary of the notes, with

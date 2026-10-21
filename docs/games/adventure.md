@@ -1,8 +1,7 @@
 # Adventure and story games
 
 Point-and-click adventures, text adventures, interactive fiction and visual novels. They are
-[turns and choices](interaction.md#the-four-kinds): nothing happens until the player acts, and
-the story is a script that waits at every choice. Most were built on a **script engine**: the
+[turns and choices](interaction.md#the-four-kinds): nothing happens until the player acts. The story is a script that waits at every choice. Most were built on a **script engine**: the
 game is byte code in data files, run by an interpreter in the executable.
 
 ## Reference games

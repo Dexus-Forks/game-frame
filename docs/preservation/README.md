@@ -2,9 +2,7 @@
 
 Many older games can no longer be bought. Many games people own no longer run on current
 computers. Some games are still on sale, but nobody has updated them in years. GameFrame
-helps the owner of such a game keep it playable. It works from the copy the owner bought. It
-rebuilds the game in new code that behaves exactly like the original, and it writes down how
-the game works along the way.
+helps the owner of such a game keep it playable. It works from the copy the owner bought. It rebuilds the game in new code that behaves exactly like the original. Along the way, it writes down how the game works.
 
 GameFrame does not share games. It ships no game files, assets or decompiled code. It is
 tested only on sample programs written for it.

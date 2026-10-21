@@ -3,7 +3,7 @@
 Commodore's 8-bit machines use the 6502 family ([CPU families](cpu-families.md#the-6502-line)).
 On the C64, the visible ROMs and I/O depend on the 6510's port at `$01` and on the cartridge
 lines. The VIC-II steals cycles on badlines. PAL and NTSC versions of a game are often separate
-builds. The 1541 disk drive has its own 6502, and fast loaders run code on it.
+builds. The 1541 disk drive has its own 6502. Fast loaders run code on it.
 
 ## Commodore VIC-20
 

@@ -94,8 +94,7 @@ Other consoles have their own pages:
   programs are part of the game and must be traced like other code.
 - **GameCube paired singles.** The Gekko can do two single-precision operations in one
   instruction, with its own quantisation instructions for loading and storing compressed
-  values. Ghidra needs an extension to read them. The Wii shares the paired singles and the
-  DOL and REL formats, and is on the [Seventh generation onward](modern.md) page.
+  values. Ghidra needs an extension to read them. The Wii shares the paired singles and the DOL and REL formats. It is covered on the [Seventh generation onward](modern.md) page.
 - **Xbox.** The code is x86 and uses a version of DirectX 8. Much of the PC advice applies.
 - **Compilers.** Games for these consoles were mostly written in C and C++ with known
   compilers (GCC versions for PS2, Metrowerks CodeWarrior for GameCube, MSVC for Xbox).
@@ -106,5 +105,4 @@ Other consoles have their own pages:
 
 Arcade games ran on boards built for one game or one family of games. Common ones are Capcom's
 CPS-1 and CPS-2 (68000 and Z80; CPS-2 encrypts its code), SNK's Neo Geo (68000 and Z80) and
-Sega's System 16 and later boards. MAME emulates thousands of boards, and its source code is the
-most complete description of most of them. Its debugger is the main tool for arcade games.
+Sega's System 16 and later boards. MAME emulates thousands of boards. Its source code is the most complete description of most of them. Its debugger is the main tool for arcade games.

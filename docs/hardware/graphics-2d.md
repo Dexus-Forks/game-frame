@@ -78,7 +78,7 @@ Windows games used GDI (slow), WinG (1994), and from 1995 DirectDraw. DirectDraw
 a pointer to a surface in video memory, so the drawing code is often the same as in a DOS game.
 
 - `IDirectDrawSurface::Lock` returns the pointer and the pitch. The pitch can be larger than the
-  width; the game must use it, and a port must not assume pitch equals width.
+  width; the game must use it. A port must not assume that the pitch equals the width.
 - 8-bit modes use a DirectDraw palette (`IDirectDrawPalette::SetEntries`) with 8-bit values.
 - 16-bit modes come as 5-6-5 or 5-5-5 bit layouts. The game checks which with the pixel
   format and may have two code paths.

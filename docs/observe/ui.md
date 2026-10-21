@@ -81,9 +81,7 @@ What a capture must hold, learned from porting a game that draws its own interfa
   controls ([A model to query](object-model.md)).
 - **Interfaces in code:** port each screen's drawing and input functions like any other game
   logic, with the font and shapes read from the game's data.
-- **Either way:** the interface reads the game's state and produces commands. Keep it out of
-  the rules, so a test can drive the rules without the interface, and the interface can be
-  checked against captures on its own.
+- **Either way:** the interface reads the game's state and produces commands. Keep it out of the rules. Then a test can drive the rules without the interface. The interface can be checked against captures on its own.
 
 ## Check it
 

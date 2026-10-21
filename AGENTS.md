@@ -6,9 +6,7 @@ from `templates/project/`, and the skills in `.claude/skills/` (start with `re-s
 
 ## What this repository is
 
-GameFrame is an agentic framework for reverse engineering games. Its playbook of skills and
-agents runs inside your coding agent, and its toolkit of tested tools checks every result
-against the original. The playbook is the method, the skills in `.claude/skills/re-*`, the
+GameFrame is an agentic framework for reverse engineering games. Its playbook of skills and agents runs inside your coding agent. Its toolkit of tested tools checks every result against the original. The playbook is the method, the skills in `.claude/skills/re-*`, the
 agents in `agents/` and these rules. The toolkit is `tools/` and `scripts/`. Nothing here is
 specific to one game. Un-Banished (https://github.com/tanepiper/unbanished) is the worked case study and may
 be mentioned and linked, but examples and advice must stay general.
@@ -51,13 +49,11 @@ These rules are for changes to GameFrame itself, which is a public repository.
 7. **Dependencies stay small.** Python tools use the standard library plus `requirements.txt`
    (unicorn, pefile, capstone). Shell scripts use bash and the tools `scripts/setup.sh` installs.
 8. **Improve GameFrame from real games.** When a game project hits something generic (a
-   tool crash, a missing format, a pitfall), fix it here with a test against our own samples,
-   and keep the game-specific part in the game's repository.
+   tool crash, a missing format, a pitfall), fix it here with a test against our own samples. Keep the game-specific part in the game's repository.
 9. **Two licences.** Code is Apache 2.0 (`LICENSE-APACHE`); documentation, skills and other
    prose are CC0 1.0, dedicated to the public domain (`LICENSE-CC0-1.0`). A new file takes the licence of its kind; the
    README's Licence section lists which folders are which.
-10. **Stage only your own files** (`git add path`), never `git add -A`, and push after each
-   verified change.
+10. **Stage only your own files** (`git add path`), never `git add -A`. Push after each verified change.
 
 ## Layout
 

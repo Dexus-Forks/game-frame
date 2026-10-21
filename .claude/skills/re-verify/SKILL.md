@@ -158,8 +158,7 @@ compare. Differences usually come from the platform's maths library, from fused 
 on one target only, or from a different iteration order of a hash map.
 
 **Recordings.** Record a game's commands with the digest at each checkpoint, then replay the
-recording and check every digest. A recording made today is a regression test for every later
-change, and it is how a lockstep multiplayer game is checked: two players are two replays of
+recording and check every digest. A recording made today is a regression test for every later change. It is also how a lockstep multiplayer game is checked: two players are two replays of
 the same commands.
 
 ## 4. Real saves

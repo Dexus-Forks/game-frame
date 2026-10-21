@@ -2,8 +2,7 @@
 
 id Software's engines shaped first-person games in the 1990s, and many other studios licensed
 them. id released the source code of each engine some years after its games, so these engines
-are the best documented of the era. Use them to learn how a game engine of the time worked, and
-use the released source as a reference when you study a game built on a licensed copy.
+are the best documented of the era. Use them to learn how a game engine of the time worked. Use the released source as a reference when you study a game built on a licensed copy.
 
 | Engine | First game, year | Source released | Platform of the original |
 |---|---|---|---|
@@ -21,7 +20,7 @@ a per-column depth buffer. Game time runs at 70 ticks per second, from the repro
 
 What to note when you study a game built on it:
 
-- Most of the game logic is in C, and most of the drawing is in 16-bit assembly.
+- Most of the game logic is in C. Most of the drawing is in 16-bit assembly.
 - Actors use state tables: each state has a sprite, a duration in tics, a "think" function and
   the next state.
 - Maps are compressed with RLEW and Carmack compression; graphics use Huffman compression.
@@ -67,8 +66,7 @@ interprets. Even single-player Quake runs as a client and a server in one proces
 
 ## Quake II
 
-The game logic moved from byte code to a native DLL, `gamex86.dll`, written in C. The engine
-calls it through a table of functions, and it calls the engine through another table. Licensees
+The game logic moved from byte code to a native DLL, `gamex86.dll`, written in C. The engine calls it through a table of functions. It calls the engine through another table. Licensees
 replaced the DLL to make their own games. When you study a Quake II-engine game, start at the
 DLL's single export, `GetGameAPI`, which returns the table of game functions.
 
@@ -88,11 +86,9 @@ game.
    released code is usually the last patch.
 2. Name the engine functions in your Ghidra project by matching them to the source. Strings,
    error messages and the order of functions in the binary help.
-3. Mark every function that differs from the source. Those are the licensee's changes, and
-   that is where most of your reverse engineering is.
+3. Mark every function that differs from the source. Those are the licensee's changes. Most of your reverse engineering is there.
 4. Check that your project's rules allow reading the source. id's sources are under the GPL;
-   reading them to understand behaviour is common, and copying them makes your project a
-   derivative under the GPL ([Legal](../LEGAL.md)).
+   reading them to understand behaviour is common. Copying them makes your project a derivative under the GPL ([Legal](../LEGAL.md)).
 
 ## Projects to learn from
 

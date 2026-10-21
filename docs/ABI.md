@@ -52,8 +52,7 @@ Exactness in a reimplementation depends on these details:
 - **Fused multiply-add.** A compiler may turn `a * b + c` into one FMA instruction with one
   rounding instead of two. Look for `vfmadd` in the original; avoid accidental FMA in the
   reimplementation (compiler flags such as `-ffp-contract=off`).
-- **Maths functions.** `sinf`, `cosf`, `atan2f`, `powf`, `expf` come from the C runtime the game
-  shipped with, and differ in the last bit between runtimes. Emulate them and reimplement the
+- **Maths functions.** `sinf`, `cosf`, `atan2f`, `powf`, `expf` come from the C runtime the game shipped with. They differ in the last bit between runtimes. Emulate them and reimplement the
   original's versions when the simulation depends on them.
 - **Denormals and rounding mode** live in MXCSR (SSE) or the x87 control word. Games sometimes
   enable flush-to-zero for speed; check the start-up code for `ldmxcsr` or `_controlfp`.

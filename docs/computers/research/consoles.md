@@ -146,7 +146,7 @@ Ghidra's built-in processors cover most CPUs here (6502, CP1600, Z80, 68000, Sup
 ## Legal and practical notes
 
 ### Takeaway
-From the Xbox 360 onward an emulator, loader or recompiler needs decrypted executables or console keys that the user must extract from their own hardware; emulator projects for current Nintendo hardware have faced legal action, and the guide should state those facts and leave choices to the user.
+From the Xbox 360 onward an emulator, loader or recompiler needs decrypted executables or console keys that the user must extract from their own hardware; emulator projects for current Nintendo hardware have faced legal action. The guide should state those facts and leave choices to the user.
 
 ### Cited Findings
 - On 4 March 2024 Tropic Haze (yuzu's developer) settled with Nintendo for $2.4 million; a Rhode Island federal court entered a permanent injunction barring it from offering yuzu or its code and from making software that circumvents Nintendo's protections; the yuzu-emu.org domain went to Nintendo. — [Android Authority](https://androidauthority.com/nintendo-switch-yuzu-settlement-3422388); [Nintendo World Report](https://www.nintendoworldreport.com/news/66510/creators-of-yuzu-emulator-settle-lawsuit-with-nintendo)

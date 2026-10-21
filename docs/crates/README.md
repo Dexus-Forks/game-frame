@@ -2,7 +2,7 @@
 
 Clean Rust implementations of hardware and runtime pieces that many old games need. Each one
 comes from a case-study reimplementation, where it was checked against the original program.
-Here they are generic, tested without any game's files, and free to use under Apache 2.0.
+Here they are generic and tested without any game's files. They are free to use under Apache 2.0.
 
 | Crate | What it is | Comes from |
 |---|---|---|
@@ -38,8 +38,7 @@ If they match, use the crate. If they differ, trace your game's version and port
 
 ## Rules for adding a crate
 
-- It comes from a reimplementation where it was checked against the original program, and its
-  README says how it was checked.
+- It comes from a reimplementation where it was checked against the original program. Its README says how it was checked.
 - It is generic: no game's names, formats or rules in its code.
 - Its tests run without any game's files. Tests that need a tool (such as FFmpeg) skip when the
   tool is missing.

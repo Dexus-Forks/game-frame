@@ -5,15 +5,14 @@ description: Reimplement traced game behaviour in new code that behaves exactly 
 
 # Reimplement, exactly
 
-Precondition: the behaviour is traced and documented, and anything numeric has ground truth. If
+Precondition: the behaviour is traced and documented. Anything numeric has ground truth. If
 you find yourself inventing a rule while writing code, stop and trace it.
 
 ## Write new code
 
 Read the pseudocode to understand the behaviour, then write the new code from your notes, with
 clear names and the target language's own types and structure. By default, do not paste
-decompiled code into the new code base: it is the original author's work, and it is also
-unreadable. This is the line between a reimplementation and a copy; keep it visible (see
+decompiled code into the new code base: it is the original author's work. It is also unreadable. This is the line between a reimplementation and a copy; keep it visible (see
 `docs/LEGAL.md`). If the user chooses otherwise, say this once and follow their decision.
 
 Before you write a sound chip, a codec or a language runtime yourself, check `docs/crates/`:
@@ -83,9 +82,8 @@ metering and floats switched off does all of this.
 
 `python3 tools/dos/tdinfo.py BINARY rust TYPE ...` writes Rust structs and readers for Pascal
 record types in the original's field order (with `rust-reader` for the `PascalReader` they
-use). Generate, do not hand-copy, and keep the generated file unedited: regenerate it when the
-toolkit improves. Rust projects made by new-project.sh build into `build/`: `target/` holds the
-game, and `cargo clean` would delete it.
+use). Generate the code instead of copying it by hand. Keep the generated file unedited: regenerate it when the
+toolkit improves. Rust projects made by new-project.sh build into `build/`: `target/` holds the game. `cargo clean` would delete it.
 
 ## Exactness checklist
 

@@ -49,8 +49,7 @@ come from queues with a fixed order. Read the data first. Many rules are numbers
 
 **Inputs.** Mostly clicks on the interface and on the map, which become **commands** (place a
 building, set a tax, assign a worker). Model the input as commands, each applied at a known
-step: then a recording is a list of commands with step numbers, and lockstep multiplayer is
-possible. Game speed is an input: it changes how many steps run per frame.
+step: then a recording is a list of commands with step numbers. Lockstep multiplayer becomes possible. Game speed is an input: it changes how many steps run per frame.
 
 **Interface.** Large: many windows, lists, tooltips, graphs, a build menu, a map overlay. In
 older games every window is code; newer games read layouts from data. Either way the interface

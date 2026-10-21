@@ -17,14 +17,14 @@ in every project made with GameFrame.
 
 ## Patterns to avoid
 
-These patterns make text sound written by a machine. They also hide the facts. Search for each
-one before you finish, and rewrite what you find.
+These patterns make text sound written by a machine. They also hide the facts. Search for each one before you finish. Rewrite what you find.
 
 | Pattern | Example | Rewrite |
 |---|---|---|
 | A summary that reveals its content after a colon | "Two rules hold it together: every claim rests on evidence, and every number is measured." | "Every claim names its evidence. Every number that matters is measured." |
 | A closing contrast "X, not Y" | "Numbers are measured, not guessed." | "Numbers are measured by running the original code." |
 | Matched pairs and triplets for rhythm | "the same loop and the same discipline"; "bit for bit, draw for draw, frame for frame" | Say the one thing that is true: "the same steps"; "bit for bit" |
+| Two clauses of the same shape joined by ", and" | "A takeover game must be traced at its register writes, and its port must rebuild what the chips did." | Two sentences: "Trace a takeover game at its register writes. The port must rebuild what the chips did." |
 | Clauses chained with "and the ..." | "It reads the file and the header and the table." | Separate sentences, or a list |
 | Signposts | "Here is how it works." "Three things stand out." | Start with the first fact |
 | Metaphors and figures of speech | "the beating heart of the engine", "a door that opens" | The literal statement: "the main loop", "a function the mod can call" |

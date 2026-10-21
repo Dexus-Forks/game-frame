@@ -1,7 +1,6 @@
 # CD add-ons
 
-The CD add-ons and their relatives put a second CPU or a BIOS beside the base console. Real
-game code runs on that second CPU, and an emulator needs the add-on's BIOS. The Philips CD-i is
+The CD add-ons and their relatives put a second CPU or a BIOS beside the base console. Real game code runs on that second CPU. An emulator needs the add-on's BIOS. The Philips CD-i is
 a standalone player, but its programs are OS-9 modules on a 68000-family CPU.
 
 ## The platforms
@@ -71,7 +70,7 @@ unit needs a System Card BIOS. The Super System Card adds RAM, and the Arcade Ca
 HuC6280 code disassembles mostly correctly with Ghidra's 65C02 language. The block-transfer and
 MMU instructions come out wrong without the
 [Ghidra_HuC6280](https://github.com/TiCoKH/Ghidra_HuC6280) extension. Capstone has only the 6502
-modes. Mednafen and Mesen 2 run the games, and Mednafen has a debugger in its SDL front end
+modes. Mednafen and Mesen 2 run the games. Mednafen has a debugger in its SDL front end
 ([Mednafen docs](https://mednafen.github.io/documentation/)). MAME's h6280 core is a source of
 ground truth.
 

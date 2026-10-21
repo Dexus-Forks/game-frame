@@ -16,8 +16,7 @@ the games' makers.
 ## If you have a concern
 
 Please [open an issue](https://github.com/tanepiper/game-frame/issues) on the
-GameFrame repository. Tell us what concerns you. We will reply, and we will remove anything you
-reasonably object to.
+GameFrame repository. Tell us what concerns you. We will reply. We will remove anything you reasonably object to.
 
 If your concern is about a project built with GameFrame, contact that project too. Each
 project lives in its own repository under its own maintainers.

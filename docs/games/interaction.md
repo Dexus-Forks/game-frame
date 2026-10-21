@@ -13,8 +13,7 @@ happen on its own clock (enemies arrive, shots fly, the level scrolls, the town 
 player reacts through the few controls the game gives. That shapes the code:
 
 - **Look for the loop.** Find the loop that runs every frame or every tick, before the code
-  behind any button. Almost everything happens inside it, in a fixed order. Find that order
-  first, and write it down as a table.
+  behind any button. Almost everything happens inside it, in a fixed order. Find that order first. Write it down as a table.
 - **Input is usually state, read at fixed points.** Keys and buttons are often bytes in memory
   (a key table that an interrupt handler fills, a button array) that the frame reads at one
   point. A recorded demo is then just the input for each frame, and replaying it reproduces
@@ -27,14 +26,11 @@ player reacts through the few controls the game gives. That shapes the code:
   loops of their own, with their own input reading. Trace each screen like game
   logic ([Capturing the interface](../observe/ui.md)).
 - **Time and order are behaviour.** Because the game starts most events, the frame
-  count, the order of the steps in a frame and the random draws decide what happens. Verify
-  frame by frame against the original, and keep the port's order exactly.
+  count, the order of the steps in a frame and the random draws decide what happens. Verify frame by frame against the original. Keep the port's order exactly.
 - **Take everything from outside through one door.** The player's input is the obvious thing
   the port does not own, but it is not the only one. The clock, the random seed, files and
   saves, settings, the hardware the game detects and, on Windows, the order of window messages
-  also come from outside. Pass all of them in as one record per frame or per tick. Then a
-  demo, a recording or a test script can drive the port, and two runs with the same record
-  must give the same frames. [Inputs](../observe/inputs.md) has the full list.
+  also come from outside. Pass all of them in as one record per frame or per tick. Then a demo, a recording or a test script can drive the port. Two runs with the same record must give the same frames. [Inputs](../observe/inputs.md) has the full list.
 - **One boundary, once a frame.** The same record works the other way: out go the finished
   picture and the songs and sounds the frame asked for. With one boundary in both
   directions, the core runs headless from a demo, a test or a player, and the comparison with
@@ -46,8 +42,7 @@ Turn-based games, adventure games, puzzle and board games, visual novels and mos
 like ordinary software: nothing happens until the player acts. The code is a set of handlers
 around a state, or a script interpreter that stops at each choice. Here:
 
-- The **rules** are what matter: what a move or a command does to the state. Port them from
-  the handler or the script engine, and check them move by move.
+- The **rules** are what matter: what a move or a command does to the state. Port them from the handler or the script engine. Check them move by move.
 - There may still be a loop that animates while the game waits. Its timing usually changes
   nothing in the state. Find out which parts are only animation and which change the state.
 - **Order of resolution** inside one turn (who moves first, in which order effects apply,
@@ -59,8 +54,7 @@ state that switches between "the game runs" and "the game waits".
 
 ## The four kinds
 
-Look at the game before its code. Play it, or watch it played, and decide which kind (or which
-mix) you have.
+Look at the game before its code. Play it, or watch it played. Then decide which kind (or which mix) you have.
 
 | Kind | What it is like | Where to look, what to keep exact | Examples |
 |---|---|---|---|

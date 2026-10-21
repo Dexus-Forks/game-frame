@@ -16,8 +16,7 @@ Knowing the engine helps in several ways.
   Duke Nukem 3D's CON files, Infinity Engine scripts). Once the interpreter is ported, the
   rules come with the data.
 - An engine reimplementation may already run the game. Its documentation and tests tell you
-  how the formats and the scripts behave. Read its documents and its behaviour, and follow
-  your project's rules about reading its code ([Legal](../LEGAL.md)).
+  how the formats and the scripts behave. Read its documents and its behaviour. Follow your project's rules about reading its code ([Legal](../LEGAL.md)).
 - Middleware code is not the game. Identify it early and leave it out of your analysis.
   Replace it in the port with a library that does the same job.
 
@@ -56,7 +55,6 @@ Knowing the engine helps in several ways.
 
 ## A warning about versions
 
-Licensees changed the engines they bought. Duke Nukem 3D, Shadow Warrior and Blood all use the
-Build engine, and all three differ in its code. Deus Ex runs Unreal Engine 1 with Ion Storm's
+Licensees changed the engines they bought. Duke Nukem 3D, Shadow Warrior and Blood all use the Build engine. Each of them changed its code. Deus Ex runs Unreal Engine 1 with Ion Storm's
 changes. A released engine source shows one version. Confirm every detail against the binary
 you are studying before you rely on it, and record which version the source was.

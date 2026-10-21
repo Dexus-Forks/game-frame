@@ -64,8 +64,7 @@ inverse of `read`.
 
 `tdinfo.py BINARY rust-globals` writes one `Globals` struct holding every variable of the data
 segment at its original offset, with `load` and `store` to and from a 64 KB image of the
-segment (Booleans stay `u8`, so every byte survives). Ported code then works on `Globals`, and a
-test can load the DS image from before an emulated run of the original, run the port, store,
+segment (Booleans stay `u8`, so every byte survives). Ported code then works on `Globals`. A test can load the DS image from before an emulated run of the original, run the port, store,
 and compare with the DS image from after: every variable checked at once.
 
 `tdinfo.py BINARY rust-locals PROC` does the same for one procedure's local variables and
@@ -105,8 +104,7 @@ up to its size (a variant record), so check one offset in the code before relyin
   and `var` parameters through the static link (`mov di, [bp+4]`, then `[di+...]`); map those
   offsets to the parent's names before reading the helper.
 - **Scans with string instructions.** `repe scasb` over an array finds the next element that
-  differs from AL; the loop then resumes the scan with the saved CX and DI. Port it as a loop
-  over the array, and check how it stops (often `or cl, cl` on the low byte only).
+  differs from AL; the loop then resumes the scan with the saved CX and DI. Port it as a loop over the array. Check how it stops (often `or cl, cl` on the low byte only).
 - **Which carry counts.** In `add dx, bx; add dx, 1180h; add dx, ax; jae ok`, only the last
   add sets the carry the jump tests; the sum wraps freely before it. Port the test on the
   same instruction, not on the whole sum.
@@ -175,9 +173,7 @@ emu.trace({'1040:0a12': 'Random'}, args=1)     # record calls (the random draws)
   code that expects something else, and other registers (`regs={'ax': ..., 'cx': ...}`) for
   runtime helpers that take their arguments in registers.
 - An import or interrupt without a handler stops the run with its name and the caller's
-  address. Add `stubs={'KERNEL.3': fn}` or `interrupts={0x21: fn}`; a handler reads and sets
-  registers (`emu.reg('ax')`, `emu.set(ax=...)`), and an import handler returns the number
-  of argument bytes to remove.
+  address. Add `stubs={'KERNEL.3': fn}` or `interrupts={0x21: fn}`; a handler reads and sets registers (`emu.reg('ax')`, `emu.set(ax=...)`). An import handler returns the number of argument bytes to remove.
 - Not emulated: DOS itself, DPMI services, timers, VGA, sound, the x87 (Borland's FPU
   emulator fixups are left alone). Code that needs them runs in DOSBox-X instead.
 
@@ -197,8 +193,7 @@ emu.run_to('1000:ca59')                          # the next frame: carry on as i
 ```
 
 - **Carry on with `run_to`, never `run_range`.** `run_range(start, end)` starts afresh: it
-  puts SS:SP back at the start-up stack. Used to continue a running program, every call
-  moves the stack above the live frames, and deep calls then overwrite the main procedure's
+  puts SS:SP back at the start-up stack. Used to continue a running program, every call moves the stack above the live frames. Deep calls then overwrite the main procedure's
   locals and return address (seen as stray file names in a local array, and the program
   "exiting" after some thousands of frames). `run_to(end)` keeps every register.
 

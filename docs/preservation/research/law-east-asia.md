@@ -23,7 +23,7 @@ Korea has the clearest statute: a decompilation exception limited to interoperab
 - Korea also has a general fair-use clause, Art. 35-5 (added 2011). (not confirmed)
 
 **Taiwan**
-- Copyright Act (last amended 15 June 2022), Art. 59: the owner of a lawful copy of a computer program may modify it where necessary for use on a machine, and may make backup copies, for personal use only. If the owner loses ownership other than by destruction, the modified and backup copies must be destroyed unless the rights holder agrees otherwise. — [Laws & Regulations Database of the ROC, Copyright Act](https://law.moj.gov.tw/ENG/LawClass/LawAll.aspx?pcode=J0070017)
+- Copyright Act (last amended 15 June 2022), Art. 59: the owner of a lawful copy of a computer program may modify it where necessary for use on a machine. The owner may also make backup copies, for personal use only. If the owner loses ownership other than by destruction, the modified and backup copies must be destroyed unless the rights holder agrees otherwise. — [Laws & Regulations Database of the ROC, Copyright Act](https://law.moj.gov.tw/ENG/LawClass/LawAll.aspx?pcode=J0070017)
 - Art. 65: fair use is not infringement; four factors, including purpose and commercial nature and the effect on the work's current and potential market value. — [same](https://law.moj.gov.tw/ENG/LawClass/LawAll.aspx?pcode=J0070017)
 - Taiwan's IP Office analysed decompilation of programs as a fair-use question under Art. 65 (article 89-19, 2000, Chinese). — [TIPO PDF](https://www.tipo.gov.tw/public/AttachmentORG/電腦程式還原工程合理使用之界線(89-19).pdf)
 - Taiwan's anti-circumvention article lists "reverse engineering" as an exception (see section 2), which signals the legislature treats it as legitimate. — [Copyright Act Art. 80-2(3)(8)](https://law.moj.gov.tw/ENG/LawClass/LawAll.aspx?pcode=J0070017)
@@ -52,7 +52,7 @@ Korea has the clearest statute: a decompilation exception limited to interoperab
 ## 2. Anti-circumvention of technological protection measures (TPMs), and exceptions
 
 ### Takeaway
-All five jurisdictions ban dealing in circumvention tools, and most ban the act of circumventing access controls. Every one except Japan has a written exception for reverse engineering or interoperability (China, Taiwan, Korea, Hong Kong). Japan has two overlapping regimes (Copyright Act and the Unfair Competition Prevention Act, UCPA), and its 2018 UCPA amendment made selling save-data editing services a crime, which led to arrests from 2021.
+All five jurisdictions ban dealing in circumvention tools, and most ban the act of circumventing access controls. Every one except Japan has a written exception for reverse engineering or interoperability (China, Taiwan, Korea, Hong Kong). Japan has two overlapping regimes (Copyright Act and the Unfair Competition Prevention Act, UCPA). Its 2018 UCPA amendment made selling save-data editing services a crime, which led to arrests from 2021.
 
 ### Cited Findings
 

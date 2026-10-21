@@ -86,7 +86,7 @@ The families split into 8-bit little-endian accumulators (8080/Z80/SM83, 6502 li
 - The GPU has two banks of thirty-two 32-bit registers — [Jagdox general](https://www.mulle-kybernetik.com/jagdox/general.html) (secondary hardware notes; not confirmed against Atari documentation)
 
 ### Inferences
-- Every 8-bit family here is little-endian except the 6809, and every 16-bit console CPU except x86 is big-endian; data-file decoders must follow the CPU's byte order.
+- Every 8-bit family here is little-endian except the 6809. Every 16-bit console CPU except x86 is big-endian; data-file decoders must follow the CPU's byte order.
 - On the TMS9900, register reads in disassembly are memory reads; tracing a function's "registers" means tracing the workspace RAM that WP points at.
 - On the 65C816, the same opcode bytes decode differently by the M and X flags, so a disassembler must track REP/SEP state; a wrong guess produces garbage after the first immediate operand.
 

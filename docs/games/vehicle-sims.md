@@ -32,8 +32,7 @@ through (a galaxy, a theatre of war), and often with docked screens that wait fo
 **What must be exact.** The maths core: fixed-point or float formats, multiply and divide
 helpers, square roots, trigonometry tables, matrix and vector routines, and 64-bit positions
 where the world is large. Orbits and physics integration (the step and its order). Generation
-of the world from a seed: one wrong draw changes a whole galaxy, and players know their
-galaxy's names.
+of the world from a seed: one wrong draw changes a whole galaxy. Players know their galaxy's names.
 
 **Where the rules live.** Mostly in code, often hand-written assembly for the maths. Ships,
 weapons and goods are tables. Mission scripts and campaign trees are data. Generated worlds are

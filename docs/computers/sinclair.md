@@ -1,8 +1,7 @@
 # Sinclair ZX81 and ZX Spectrum
 
 The Sinclair machines use the Z80 ([CPU families](cpu-families.md#the-8080-z80-and-sm83)). On
-the ZX81 the CPU also generates the display. On the Spectrum, contended memory ties every
-instruction's timing to the screen, and the tables differ by model. Spectrum games came mostly
+the ZX81 the CPU also generates the display. On the Spectrum, contended memory ties every instruction's timing to the screen. The tables differ by model. Spectrum games came mostly
 on tape, often with turbo or protected loaders.
 
 ## Sinclair ZX81
@@ -112,8 +111,7 @@ page (not confirmed).
 
 ### Tools
 
-- **SkoolKit** reads TAP, TZX and PZX tapes and Z80 and SZX snapshots, and plays RZX
-  recordings. Its `tap2sna.py` simulates tape loading. Its `trace.py` traces execution and can
+- **SkoolKit** reads TAP, TZX and PZX tapes and Z80 and SZX snapshots. It also plays RZX recordings. Its `tap2sna.py` simulates tape loading. Its `trace.py` traces execution and can
   write AY output as WAV ([SkoolKit](https://skoolkit.ca/)). SkoolKit is GPL-3.0.
 - **Fuse** ([fuse-emulator.sourceforge.net](https://fuse-emulator.sourceforge.net/)),
   **ZEsarUX** ([github.com/chernandezba/zesarux](https://github.com/chernandezba/zesarux)) and

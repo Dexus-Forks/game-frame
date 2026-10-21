@@ -1,7 +1,6 @@
 # MSX, PC-8801 and Sharp X1
 
-These machines use the Z80 ([CPU families](cpu-families.md#the-8080-z80-and-sm83)). The MSX
-maps memory through slots and subslots, and its MegaROM cartridges switch banks with a mapper.
+These machines use the Z80 ([CPU families](cpu-families.md#the-8080-z80-and-sm83)). The MSX maps memory through slots and subslots. Its MegaROM cartridges switch banks with a mapper.
 The PC-8801 and the X1 were two of Japan's four major home computers, with the FM-7 and the
 MSX.
 

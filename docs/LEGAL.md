@@ -4,12 +4,11 @@ This is practical guidance, not legal advice. Laws differ between countries; if 
 matters, ask a lawyer who knows software law where you live.
 
 These are GameFrame's defaults and the reasons for them. The user decides what their own
-project does. An agent gives this advice when it bears on a choice, and then follows the user's
-decision ([The user decides](working/agents.md#the-user-decides)).
+project does. An agent gives this advice when it bears on a choice. Then it follows the user's decision ([The user decides](working/agents.md#the-user-decides)).
 
 ## What GameFrame assumes
 
-- **You own a legitimate copy of the game**, and you analyse it on your own computer.
+- **You own a legitimate copy of the game.** You analyse it on your own computer.
 - **Nothing from the game is redistributed.** Binaries, data files, extracted art, sound, text,
   saves, decompiled code and disassembly stay on the local machine, in folders git ignores.
 - **The result is new work.** A reimplementation is written from your understanding of the
@@ -35,8 +34,7 @@ EU Software Directive, and US case law such as Sega v. Accolade and Sony v. Conn
 limits. A game's end-user licence may say otherwise; whether such a clause holds depends on the
 country.
 
-The rules differ a great deal between countries. Some allow decompiling only for
-interoperability, and some give it no express cover. [Your own copy and the law](preservation/law/README.md)
+The rules differ a great deal between countries. Some allow decompiling only for interoperability. Others give it no express cover. [Your own copy and the law](preservation/law/README.md)
 summarises 35 countries, with one page per region.
 
 ## Clean room, or not
@@ -44,8 +42,7 @@ summarises 35 countries, with one page per region.
 A *clean-room* reimplementation separates the people who study the original from the people
 who write the new code: one group writes a specification, the other implements it without
 seeing the original. It is the strongest protection, and the hardest to organise. When the
-same agent studies and writes (as in Un-Banished), say so plainly, and keep the discipline
-above: no copied code, findings in your own words, every claim traceable to evidence.
+same agent studies and writes (as in Un-Banished), say so plainly. Keep the discipline above: no copied code, findings in your own words, every claim traceable to evidence.
 
 ## Respect
 
