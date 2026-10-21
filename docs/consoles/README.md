@@ -12,6 +12,13 @@ the harness's method unchanged; the tools and the hardware details differ.
 
 - [Console platforms](platforms.md): the consoles from the NES to the sixth generation, with
   their CPUs, video and sound chips, and what each means for the work.
+- [Early consoles](early-consoles.md): the Odyssey, Atari 2600, Intellivision, ColecoVision,
+  Atari 5200 and 7800, and Vectrex.
+- [Handhelds and 32-bit oddities](handhelds.md): the Game Gear, Lynx, Neo Geo Pocket,
+  WonderSwan, Virtual Boy, Jaguar and 3DO.
+- [CD add-ons](cd-add-ons.md): the Sega CD, 32X, PC Engine CD and Philips CD-i.
+- [Seventh generation onward](modern.md): from the DS, PSP and Xbox 360 to the PS5, with their
+  signed executables, loaders and emulator status.
 - [Tools for console work](tools.md): Ghidra processors and loaders, emulators with debuggers,
   Unicorn's architectures, and splitting tools.
 - [Routes to a port](porting.md): reimplementation, matching decompilation, static

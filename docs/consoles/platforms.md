@@ -5,6 +5,15 @@ platforms most often studied, with what each means for reverse engineering and p
 details here are summaries; the community documents for each console are far more complete
 and are named in each section.
 
+Other consoles have their own pages:
+
+- [Early consoles](early-consoles.md): the Odyssey to the Vectrex.
+- [Handhelds and 32-bit oddities](handhelds.md): the Game Gear, Lynx, Neo Geo Pocket,
+  WonderSwan, Virtual Boy, Jaguar and 3DO.
+- [CD add-ons](cd-add-ons.md): the Sega CD, 32X, PC Engine CD and CD-i.
+- [Seventh generation onward](modern.md): the DS, 3DS, PSP, Vita, Xbox 360, PS3, Wii, Wii U,
+  PS4, Xbox One, Switch, PS5 and Series consoles.
+
 ## 8-bit and 16-bit consoles
 
 | Console | Year | CPU | Video | Sound |
@@ -31,6 +40,10 @@ and are named in each section.
 - **Coprocessors in cartridges.** Some SNES cartridges carry extra chips: the Super FX (a RISC
   CPU for 3D, as in Star Fox), DSP-1 (maths), SA-1 (a faster 65C816). Their code must be
   traced as well.
+- **PC Engine.** HuC6280 code disassembles mostly correctly with Ghidra's 65C02 language. The
+  block-transfer and MMU instructions need the
+  [Ghidra_HuC6280](https://github.com/TiCoKH/Ghidra_HuC6280) extension. The CD unit is on the
+  [CD add-ons](cd-add-ons.md) page.
 - **Community documents.** NESdev Wiki (NES), SNESdev Wiki and fullsnes (SNES), Pan Docs (Game
   Boy), GBATEK (GBA and DS), Plutiedev and Sega Retro (Mega Drive).
 
@@ -81,7 +94,8 @@ and are named in each section.
   programs are part of the game and must be traced like other code.
 - **GameCube paired singles.** The Gekko can do two single-precision operations in one
   instruction, with its own quantisation instructions for loading and storing compressed
-  values. Ghidra needs an extension to read them.
+  values. Ghidra needs an extension to read them. The Wii shares the paired singles and the
+  DOL and REL formats, and is on the [Seventh generation onward](modern.md) page.
 - **Xbox.** The code is x86 and uses a version of DirectX 8. Much of the PC advice applies.
 - **Compilers.** Games for these consoles were mostly written in C and C++ with known
   compilers (GCC versions for PS2, Metrowerks CodeWarrior for GameCube, MSVC for Xbox).
