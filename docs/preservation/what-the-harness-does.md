@@ -51,3 +51,5 @@ code, function by function.
 A project made with the harness may publish its own new code and its documents. It never
 publishes the game's files, extracted assets or decompiled code. Players bring their own copy
 of the game ([What a project can ship](../OUTPUTS.md)).
+
+Sources: [Notes: who preserves games](research/ecosystem.md).

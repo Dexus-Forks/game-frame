@@ -24,6 +24,8 @@ its limits are.
    from, and where to read more.
 6. [For developers and publishers](rights-holders.md): what we promise the people who made
    these games, and how to reach us.
+7. [The research behind these pages](research/README.md): the report and notes that back every
+   claim here, what was checked, and the gaps.
 
 This section is not legal advice. For the working rules of a project, read
 [Legal](../LEGAL.md).

@@ -72,3 +72,5 @@ anniversary in 2025, because nobody can say for certain who owns it.
 
 In each of these cases the game that players bought survives longest. The shipped program is
 often the most complete record of how the game worked. That record is what this harness reads.
+
+Sources: [Notes: why games disappear](research/why-games-vanish.md).

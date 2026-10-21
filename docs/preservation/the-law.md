@@ -77,3 +77,5 @@ Sharing an out-of-print game is still unlawful.
 Requiring the player's own files is necessary. It is not enough on its own. The code a project
 publishes must be new, written from documented behaviour. The process must be written down so
 that anyone can check it. This harness is built around both.
+
+Sources: [Notes: law and policy](research/law-and-policy.md).

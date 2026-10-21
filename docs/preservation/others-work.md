@@ -35,3 +35,5 @@ The [taxonomy of games](../games/README.md) lists many more for each kind of gam
   documents and source code.
 - [Software Heritage](https://www.softwareheritage.org/), an archive of source code.
 - [Digital Preservation Coalition](https://www.dpconline.org/).
+
+Sources: [Notes: who preserves games](research/ecosystem.md).

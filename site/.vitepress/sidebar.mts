@@ -1,7 +1,8 @@
 // The site's menu, read from the documentation's own structure.
 //
 // docs/README.md has one "## Section" per menu group, each with a list of links. A link to a
-// folder's README.md opens into that folder's pages, in the order of the links in that README.
+// folder's README.md opens into that folder's pages, in the order of the links in that README,
+// and a subfolder's README linked from it opens into its pages too.
 // The skills follow, in the order of the README's skills table, then the examples.
 import fs from 'node:fs'
 import path from 'node:path'
@@ -27,6 +28,13 @@ export function sidebar(): Item[] {
       for (const child of links(target)) {
         if (path.dirname(child.target) === path.dirname(target)) {
           items.push({ text: child.text, link: pageUrl(child.target)! })
+        } else if (path.dirname(path.dirname(child.target)) === path.dirname(target)
+          && /\/README\.md$/.test(child.target)) {
+          // A subfolder's README opens into its own pages, one level deep.
+          const sub = links(child.target)
+            .filter(c => path.dirname(c.target) === path.dirname(child.target))
+            .map(c => ({ text: c.text, link: pageUrl(c.target)! }))
+          items.push({ text: child.text, link: pageUrl(child.target)!, collapsed: true, items: sub })
         }
       }
     }

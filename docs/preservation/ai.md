@@ -44,3 +44,5 @@ The methods in this harness come from people who did this work by hand for decad
 ScummVM developers, the decompilation communities, the authors of OpenRCT2, OpenTTD,
 DevilutionX and many more ([Built on others' work](others-work.md)). Their documents are the
 references the harness tells agents to read.
+
+Sources: [Notes: how preservation projects describe their work](research/messaging.md).

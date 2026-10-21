@@ -24,7 +24,9 @@ skills, the examples or the site, and publishes it to GitHub Pages
 (https://tanepiper.github.io/game-frame/), with `SITE_BASE` set to the Pages path.
 
 To add a page, write the Markdown file in `docs/` and link it from its folder's `README.md`
-(or from `docs/README.md`): it appears in the menu in that place. Links between files stay
+(or from `docs/README.md`): it appears in the menu in that place. A subfolder's `README.md`
+linked from a folder's `README.md` becomes a group of its own, one level deep
+(`docs/preservation/research/`). Links between files stay
 relative, as GitHub needs them; the site turns them into page URLs, and links to tools and
 scripts into links to GitHub (`.vitepress/links.mts`). The build fails on a link to a page
 that does not exist.
