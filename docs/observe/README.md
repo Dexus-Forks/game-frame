@@ -1,3 +1,18 @@
+## Ask your agent
+
+Run and capture the original. Copy this prompt into your coding agent:
+
+```text
+In my GameFrame project, get the original game running where we can watch and capture it.
+
+1. Read docs/observe/running-the-original.md and the re-observe skill.
+2. Pick the environment for this game (GameFrame's emulators, DOSBox-X, Wine, a console
+   emulator). Tell me what it needs before you install anything.
+3. Write a script that starts the game, plays a fixed input and saves frames and state.
+4. Record next to each capture the game version, the settings, the seed and the inputs.
+5. Keep every capture in the ignored derived/ folder.
+```
+
 # Observing the original
 
 How to run the original game, watch it, drive it and capture what it does, so every claim in

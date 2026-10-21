@@ -4,6 +4,21 @@ The interface is usually the least generic part of a game, and the part players 
 This page explains why it is hard, how to make an inventory of it, and how to capture enough of
 the running original to rebuild it.
 
+## Ask your agent
+
+Inventory the interface. Copy this prompt into your coding agent:
+
+```text
+In my GameFrame project, make an inventory of every screen.
+
+1. Read docs/observe/ui.md.
+2. Find screens three ways: from the main menu's code, from the layout and string data, and by
+   playing the game (ask me to play, or drive it by script).
+3. For each screen, record how to reach it, the code or layout that draws it, its states, its
+   inputs, what it changes, its text and its font.
+4. Capture each state with the inputs that reached it, into derived/.
+```
+
 ## Why game interfaces are custom
 
 Most software builds its interface from a toolkit: the operating system's buttons, lists and

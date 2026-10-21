@@ -7,6 +7,21 @@ fingerprints for Windows binaries; `tools/dos/dosinfo.py` does the same for DOS 
 
 ![peinfo.py on the sample game's game.exe. It prints the architecture, the image base, the link date, the PDB name, the sections with their entropy, and the imported DLLs with engine.dll first.](../assets/captures/peinfo.svg)
 
+## Ask your agent
+
+Identify the engine. Copy this prompt into your coding agent:
+
+```text
+In my GameFrame project, identify the engine and the libraries the game uses.
+
+1. Read docs/engines/recognising.md and docs/engines/middleware.md.
+2. Check the file extensions and magic numbers, the DLLs, the strings, the PDB path and the
+   RTTI names (tools/pe/peinfo.py or tools/dos/dosinfo.py).
+3. Write the engine and each library into docs/FINDINGS.md with the evidence for each.
+4. Label the library code in Ghidra with a prefix, so later tracing skips it.
+5. If the engine's source was released, tell me its version and licence before reading it.
+```
+
 ## Where to look
 
 | Place | What to look for | How |

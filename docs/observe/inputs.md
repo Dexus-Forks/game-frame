@@ -10,6 +10,22 @@ port.
 games) or per command (games that wait). Then a recording, a demo or a test script can drive the port. Two runs with the same records give the same results. Anything that reaches the
 game's rules without going through that door is a bug waiting to happen.
 
+## Ask your agent
+
+List every input. Copy this prompt into your coding agent:
+
+```text
+In my GameFrame project, list every input the game reads from outside.
+
+1. Read docs/observe/inputs.md.
+2. Search the decompile for the signatures it lists: interrupts, ports, API imports, clock
+   reads, file opens and network calls.
+3. For each input, write the address that reads it, what it reads and how often, in a table in
+   docs/FINDINGS.md.
+4. Propose the port's input record: one record per frame or per command. Mark which inputs
+   change the rules and which only change the presentation.
+```
+
 ## How games read input
 
 There are two patterns. Many games use both.

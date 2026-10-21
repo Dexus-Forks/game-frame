@@ -10,6 +10,21 @@ When you rebuild such a game, you replace the hardware with modern equivalents. 
 exactly, you need to know what each piece of hardware did, how the game used it, and which of
 its details the player can see or hear.
 
+## Ask your agent
+
+Find the hardware layer. Copy this prompt into your coding agent:
+
+```text
+In my GameFrame project, find every place the game touches hardware.
+
+1. Read docs/hardware/README.md and the pages for this game's devices.
+2. In the disassembly, find IN, OUT and INT instructions and writes to A000, B800 and 0040.
+   For a Windows game, list the imports from DirectX, Glide, OpenGL and WinMM.
+3. Name the driver functions (set a mode, set a palette, play a sound, read the joystick).
+4. List the values the game reads back from the hardware. They are inputs.
+5. Propose one reference configuration (video, sound, input) and ask me to confirm it.
+```
+
 ## Pages
 
 - [CPUs and floating point](cpus.md): the x86 generations, the x87 FPU, MMX, 3DNow! and SSE,

@@ -5,6 +5,22 @@ who direct them. It collects what made agent sessions productive in the case-stu
 and what wasted their time. The skills describe each step; this page describes how to work
 across steps and across sessions.
 
+## Ask your agent
+
+Start a working session. Copy this prompt into your coding agent:
+
+```text
+In my GameFrame project, start a working session on <task>.
+
+1. Read AGENTS.md and docs/CHECKLIST.md.
+2. Search docs/ and labels/ for the addresses, names and resources this task touches.
+3. Tell me in one sentence what done means and how it will be verified.
+4. Load the skill for the step this task needs, and follow it.
+5. Write each finding into docs/ with its evidence label as soon as it is confirmed.
+6. At the end, report the commit, what was verified with numbers, what was not verified,
+   and the next open item.
+```
+
 ## The user decides
 
 The agent is not the judge of the user's intentions, of which law applies to them, or of what

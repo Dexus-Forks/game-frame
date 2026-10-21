@@ -10,6 +10,35 @@ debugger. GameFrame grew out of [Un-Banished](https://github.com/tanepiper/unban
 reimplementation of the game Banished built this way; see
 [the case studies](docs/case-studies/README.md).
 
+## Set it up with your agent
+
+Copy this prompt into your coding agent (Claude Code, Codex, Cursor or another). It clones
+GameFrame and checks your tools. It asks before it installs anything, then starts a project for
+your game.
+
+<!-- #region setup-prompt -->
+```text
+Set up GameFrame on this computer for me.
+
+1. Clone https://github.com/tanepiper/game-frame into ~/code/game-frame
+   (or update it with git pull if it is already there).
+2. Read AGENTS.md and .claude/skills/re-setup/SKILL.md.
+3. Run scripts/setup.sh and show me the table of what is present and what is missing.
+4. Before you install anything, tell me what scripts/setup.sh --install will install and how
+   large each part is. Wait for my answer, then run it.
+5. Run tests/run.sh --ghidra and report how many checks passed. If any failed, show the
+   failures and fix the setup before going on.
+6. Run scripts/setup.sh --rea and help me register REA with this agent.
+7. Ask me for the name of the game and the folder of my own copy of it. Then run
+   scripts/new-project.sh ~/re/<short-name> "<Game Name>" "<path to the game>".
+8. Open the new project, read its AGENTS.md, and start with the re-start skill.
+
+Never copy the game's files, extracted assets or decompiled code into a git repository.
+```
+<!-- #endregion setup-prompt -->
+
+To set it up by hand instead, follow the [quick start](#quick-start).
+
 ## Framework, playbook and toolkit
 
 GameFrame is the whole framework. It has two parts.

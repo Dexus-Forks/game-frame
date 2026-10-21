@@ -8,6 +8,21 @@ That makes console games different to reverse engineer from PC games, and differ
 This section covers how to study console games and how to bring them to other systems. It uses
 GameFrame's playbook unchanged; the tools and the hardware details differ.
 
+## Ask your agent
+
+Start on a console game. Copy this prompt into your coding agent:
+
+```text
+In my GameFrame project, start work on a game for <console>.
+
+1. Read docs/consoles/README.md, docs/consoles/tools.md and the platform page for <console>.
+2. Record the region, the revision and the checksum of the ROM or disc image.
+3. Load the code into Ghidra with the right processor and memory map, and label the hardware
+   registers.
+4. Find the reset vector, the vertical blank handler and the controller read.
+5. Map the main variables in RAM with the emulator's RAM search. Write them into labels/.
+```
+
 ## Platforms by generation
 
 - [Early consoles](early-consoles.md): the Odyssey, Atari 2600, Intellivision, ColecoVision,

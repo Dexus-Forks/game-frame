@@ -14,6 +14,23 @@ Use it at the start of a project, together with the `re-inventory` skill:
    `AGENTS.md`.
 4. Follow the connections to the systems your game shares with other families.
 
+## Ask your agent
+
+Classify my game. Copy this prompt into your coding agent:
+
+```text
+In my GameFrame project, classify the game.
+
+1. Read docs/games/README.md and docs/games/interaction.md.
+2. Look at the game's files and its manual. Ask me how it plays if you cannot tell.
+3. Decide who drives (a stream, a simulation, an environment, or turns), the time model,
+   where the rules live and what must repeat exactly. Name the family.
+4. Read that family's page. Write the kind of game, its axes and its family into
+   docs/FINDINGS.md, with the evidence for each.
+5. Copy the family's rule set into the project's AGENTS.md and adjust it to this game.
+6. Ask me how exact the interface must be, and record my answer.
+```
+
 ## Axes
 
 Every game sits somewhere on each of these axes. Together they predict most of the work.

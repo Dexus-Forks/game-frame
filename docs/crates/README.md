@@ -11,6 +11,21 @@ Here they are generic and tested without any game's files. They are free to use 
 | [gameframe-msvc-crt](../../crates/msvc-crt/README.md) | The Microsoft C runtime's `sinf`, `cosf`, `acosf`, `atan2f`, `qsort` order and `rand`, bit for bit | Un-Banished, matching the game's runtime on 200,000 calls per function |
 | [gameframe-turbo-pascal](../../crates/turbo-pascal/README.md) | Turbo Pascal's 6-byte `Real` with its exact arithmetic, `Random`, and Pascal data layouts | Tyrian 2026, matching the original runtime on 40,000 operands per routine |
 
+## Ask your agent
+
+Check a crate against my game. Copy this prompt into your coding agent:
+
+```text
+In my GameFrame project, check whether <crate> matches this game.
+
+1. Read the crate's README in GameFrame's crates/ folder.
+2. Find the game's own version of the code: the runtime functions, the music driver or the
+   decoder.
+3. Run the original under GameFrame's emulator on many inputs (the re-emulate skill).
+4. Compare the results with the crate bit for bit and report the first difference.
+5. If they match, add the crate as a dependency. If not, trace the game's version.
+```
+
 ## Use them
 
 The crates live in the repository's `crates/` folder, a Cargo workspace. Add one as a git

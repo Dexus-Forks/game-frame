@@ -14,6 +14,20 @@ start and write it in the project's `AGENTS.md`.
 GameFrame is built for reimplementation. The other routes share most of its steps (finding
 functions, capturing ground truth, replacing hardware) and its tools help them too.
 
+## Ask your agent
+
+Choose a route to a port. Copy this prompt into your coding agent:
+
+```text
+In my GameFrame project, help me choose how to port this console game.
+
+1. Read docs/consoles/porting.md and docs/consoles/matching-decomp.md.
+2. Tell me what each route would take for this game: reimplementation, matching
+   decompilation, static recompilation or emulation.
+3. List for each route what we could publish and what the player must provide.
+4. Wait for my choice. Then write it into the project's AGENTS.md.
+```
+
 ## Replacing the hardware
 
 Whatever the route, the console's hardware must be replaced with code that runs on the new

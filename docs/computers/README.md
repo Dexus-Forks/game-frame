@@ -6,6 +6,21 @@ depends on three facts. The first is the CPU family and its arithmetic quirks. T
 the memory and banking state that was live when the code ran. The third is the timing the game
 was written against. On 8-bit machines that timing is part of the game logic.
 
+## Ask your agent
+
+Start on a home computer game. Copy this prompt into your coding agent:
+
+```text
+In my GameFrame project, start work on a game for <machine>.
+
+1. Read docs/computers/README.md, docs/computers/cpu-families.md and the page for <machine>.
+2. Identify the media image format and the exact release. Record its checksum.
+3. Set up the emulator with a debugger that the page names. Tell me what it needs before you
+   install anything.
+4. Run the game past its loader and save a memory snapshot once the game code is in memory.
+5. Record the CPU, the memory banking and the frame timing in docs/FINDINGS.md.
+```
+
 ## Across all machines
 
 - [CPU families](cpu-families.md): the eleven CPU families, their byte order, Ghidra, Unicorn
