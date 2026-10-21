@@ -56,6 +56,20 @@ few event types). To cover the rest:
 This finds what reading misses: loops that start at 0 instead of 1, writes one past an
 array, branches only one mode takes.
 
+### Heap addresses and bytes that are not the game's
+
+- **Addresses from the allocator.** Where the original stores heap pointers in variables
+  (a loaded bank's selector, copied into each enemy), the port cannot rebuild the
+  allocator's history from a snapshot. Give the port a heap whose allocator a test can
+  script: before the run, queue the addresses the original returned (read them from the
+  `after` state); with nothing queued it picks its own. Every other byte stays comparable.
+- **Compare the named variables, list the rest.** The data segment also holds the runtime
+  library's own state (its heap and file bookkeeping), padding, and blocks without symbols
+  (a driver's data that an interrupt changes mid-frame). Build a mask of the bytes the
+  port's variable model covers (store a model twice, over two different fills: the bytes
+  that differ are not covered), compare only those, and write down what is left out and
+  why. Never mask a byte you have not explained.
+
 ## 2. Random draw order
 
 ```bash
