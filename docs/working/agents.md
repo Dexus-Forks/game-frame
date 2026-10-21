@@ -45,6 +45,9 @@ search text well, so use it before opening Ghidra.
 - `decomp_query.py callers` and `callees` walk the call graph.
 - `decomp_query.py find TEXT` and `strings` find where a string or constant is used.
 - `decomp_query.py writers OFFSET` finds every function that writes a field.
+
+![decomp_query.py showing the sample game's simulate function from the Ghidra export. The pseudocode seeds the random number generator, allocates an object with a vtable, and calls through the vtable in a loop.](../assets/captures/decomp-query.svg)
+
 - Run one-off decompiles or vtable exports with `scripts/ghidra-run.sh` when the export is not
   enough.
 

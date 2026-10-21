@@ -5,6 +5,8 @@ version strings, copyright notices and debug paths. Check these during inventory
 decompile anything. `tools/pe/peinfo.py` prints imports, exports, the PDB path and engine
 fingerprints for Windows binaries; `tools/dos/dosinfo.py` does the same for DOS programs.
 
+![peinfo.py on the sample game's game.exe. It prints the architecture, the image base, the link date, the PDB name, the sections with their entropy, and the imported DLLs with engine.dll first.](../assets/captures/peinfo.svg)
+
 ## Where to look
 
 | Place | What to look for | How |

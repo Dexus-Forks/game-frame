@@ -14,6 +14,11 @@ skill: [.claude/skills/re-setup/SKILL.md](../.claude/skills/re-setup/SKILL.md).
 `./gameframe doctor` runs the same check. `./gameframe tools` then lists every tool with its
 first line of help, and `./gameframe tool NAME` prints the rest.
 
+![tests/run.sh on the sample game. Each tool has a line marked ok, grouped by section, and the summary reads 94 passed, 0 failed.](assets/captures/run-tests.svg)
+
+A good setup ends like this. Each check runs a tool against the sample game. The summary line
+counts the checks that passed and failed. With `--ghidra` the run has more checks.
+
 | Tool | Used for | Where it comes from |
 |---|---|---|
 | Ghidra 11 or 12 | Decompiling native code | https://ghidra-sre.org (Homebrew: `ghidra`) |

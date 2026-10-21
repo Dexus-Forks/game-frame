@@ -62,6 +62,12 @@ settings, the seed, the commands or the demo, and the frame.
 | Frames | pixel for pixel when both are exact; image difference with blur and a threshold when one is a compressed stream | an image-difference tool (Un-Banished's `imgdiff`) |
 | Sound | sample for sample when both come from the same chip model; by ear and spectrum otherwise | the OPL register log; a WAV difference |
 
+![bitcompare.py and seqdiff.py on the sample game. The port matches the original in 600 of 600 values, and its 746 random draws are identical. A naive port in double precision matches only 7 values, and is 12 ULP off at most.](../assets/captures/bitcompare.svg)
+
+On the sample game, the port matches the emulated original bit for bit, and its random draws
+come in the same order. A port that computes in double precision instead of float drifts by a few
+ULP, and the check catches it.
+
 ## Further reading
 
 - [Capturing the interface](ui.md): an inventory of every screen.

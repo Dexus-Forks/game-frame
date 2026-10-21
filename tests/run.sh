@@ -320,6 +320,11 @@ expect "gameframe run refuses a library and says why" "a library to import" $G r
 expect "gameframe find names the skills and tools for a word" "tool vtable" $G find vtable
 
 echo "Documentation site"
+svg="$(mktemp)"
+printf '$ tests/run.sh\n  ok    a check <&>\n' | "$PYTHON" site/captures/term_svg.py "run" "$svg" \
+  && grep -q '&lt;&amp;&gt;' "$svg" && grep -q '>ok</tspan>' "$svg" \
+  && ok "term_svg draws terminal text as SVG, escaped and coloured" || bad "term_svg"
+rm -f "$svg"
 if [[ -d site/node_modules ]]; then
   out="$(npm --prefix site run build 2>&1)"
   [[ $? == 0 && -f site/.vitepress/dist/games/interaction.html && -f site/.vitepress/dist/skills/re-observe.html ]] \

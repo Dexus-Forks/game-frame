@@ -49,6 +49,22 @@ Each page shows the date of the last commit to its source file, so the workflow 
 whole history. A skill page takes the date of its `SKILL.md`. The home page shows the date of
 the newest commit to any page.
 
+## Pictures
+
+Pictures live in `docs/assets/`, and pages link them with relative paths, so they show on
+GitHub too. Keep them small: SVG for diagrams and terminal output, compressed WebP for
+screenshots. Never use a picture or data from a commercial game. The case-study screenshots of
+our own ports are the one exception (see `AGENTS.md`).
+
+| Picture | What |
+|---|---|
+| `docs/assets/method-loop.svg` | The method as a loop, drawn by hand; edit the SVG text directly |
+| `docs/assets/captures/*.svg` | Terminal output of the tools on the sample game. After `tests/run.sh --ghidra`, run `site/captures/make.sh` to remake them |
+| `docs/assets/case-studies/*.webp` | Frames of the case-study ports |
+
+The home page's feature icons are inline SVG in `site/index.md`, drawn with `currentColor`, so
+they take the brand colour in both modes.
+
 | File | What |
 |---|---|
 | `.vitepress/config.mts` | The site's settings |
@@ -56,5 +72,6 @@ the newest commit to any page.
 | `.vitepress/sidebar.mts` | The menu, read from `docs/README.md` and the folder READMEs |
 | `.vitepress/links.mts` | Relative links resolved for the site |
 | `.vitepress/llms.mts` | The Markdown copies, `llms.txt` and `llms-full.txt` |
-| `.vitepress/theme/` | The default theme, plus the home page's "Last updated" line and each page's Markdown link |
+| `.vitepress/theme/` | The default theme, plus the home page's "Last updated" line, its hero picture, each page's Markdown link, and `custom.css`: brand colours, heading rules, image frames, the feature icons' tiles |
+| `captures/make.sh`, `captures/term_svg.py` | Remake the terminal pictures in `docs/assets/captures/` from the tools, run on the sample game |
 | `skills/[skill].md`, `skills/[skill].paths.mts` | One page per skill |

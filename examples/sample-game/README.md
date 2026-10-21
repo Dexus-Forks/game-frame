@@ -13,6 +13,8 @@ vtable), and a data file loader.
 ../../.venv/bin/python port.py --naive build/naive   # doubles instead of floats: watch the checks fail
 ```
 
+![bitcompare.py and seqdiff.py on this sample. The port matches the original in 600 of 600 values, and its 746 random draws are identical. The naive port matches only 7 values.](../../docs/assets/captures/bitcompare.svg)
+
 Try the whole method on it as an exercise: run `scripts/ghidra-export.sh` on the two binaries,
 find `simulate` without looking at `game.c`, label what you find, read the growth table with
 `tools/pe/readdata.py`, and write your own port. The compiler inlined `tree_new` and the vtable
