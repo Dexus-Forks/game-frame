@@ -77,7 +77,9 @@ def main(argv):
             def sub(mm):
                 v = int(mm.group(1), 0)
                 return f'[{labels[(ds, v)]}]' if (ds, v) in labels else mm.group(0)
-            text = re.sub(r'\[(?:[a-z]{2} \+ )?(0x[0-9a-f]+|\d+)\]', sub, text)
+            # Only absolute operands ([0x12de]) name a DS global: in [si + 0x10] the constant
+            # is a field or element offset from a register, not an address.
+            text = re.sub(r'\[(0x[0-9a-f]+|\d+)\]', sub, text)
         print(f'{seg:04x}:{ins.address:04x}  {ins.mnemonic:<7} {text}')
 
 

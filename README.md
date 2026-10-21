@@ -68,7 +68,7 @@ to produce, and the pitfalls that cost time.
 | `scripts/ghidra-run.sh BINARY decompile\|named\|refs\|vtable\|labels OUT ARGS` | One-off jobs in the analysed project, without re-analysis |
 | `scripts/extract-installer.sh [--detect] INSTALLER OUT` | Unpacks an installer or package without running it: Inno Setup (GOG), NSIS, InstallShield, MSI, archives, `.dmg`, `.pkg`, GOG's `.sh` |
 | `scripts/dosbox-run.sh [--fileio] [--break] [--mcp PORT] DIR PROGRAM` | Runs a DOS program in DOSBox-X without a window: exit code, file I/O log, debugger control |
-| `tests/run.sh [--ghidra]` | 62 checks of every tool against the two sample games |
+| `tests/run.sh [--ghidra]` | 63 checks of every tool against the two sample games |
 
 ## Tools
 

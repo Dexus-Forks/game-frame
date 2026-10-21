@@ -116,6 +116,8 @@ expect "tdinfo writes the Rust Pascal reader" "pub fn real48" "$PYTHON" tools/do
 "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe labels > $D/labels.tsv
 expect "nedis applies relocations and names far calls" "lcall   KERNEL.3" "$PYTHON" tools/dos/nedis.py $D/sample.exe 1000:008c 6 --labels $D/labels.tsv
 expect "nedis names data in DS" "[RandSeed]" "$PYTHON" tools/dos/nedis.py $D/sample.exe 1000:0028 8 --labels $D/labels.tsv
+fr=$(awk '$1=="field_read"{print $3}' $D/symbols.tsv)
+expect "nedis leaves register-relative operands alone ([si + 4] is not Total)" "[si + 4]" "$PYTHON" tools/dos/nedis.py $D/sample.exe "1000:${fr#0x}" 4 --labels $D/labels.tsv
 
 echo "16-bit emulator"
 expect "dos_emu runs the NE random generator (matches the reference)" "True [722, 842, 312, 2, 309]" "$PYTHON" - <<'PY'

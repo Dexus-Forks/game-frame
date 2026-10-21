@@ -27,7 +27,7 @@ import sys
 import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-EXPORTS = ['rng_seed', 'rng_next', 'sum_draws', 'checksum', 'get_data_seg', 'ask_host', 'dos_version']
+EXPORTS = ['rng_seed', 'rng_next', 'sum_draws', 'checksum', 'get_data_seg', 'ask_host', 'dos_version', 'field_read']
 DESCRIPTION = b'DOS sample for the reverse-engineer-games harness'
 MESSAGE = b'\x0cDOS SAMPLE 1'   # a Pascal string: length byte first
 
@@ -183,7 +183,7 @@ def tdinfo(syms, code_len):
     members = [struct.pack('<BHH', 0, name('seed'), 4), struct.pack('<BHH', 0, name('total'), 6),
                struct.pack('<BHH', 0x80, name('calls'), 6)]
     procs = [('rng_seed', 2), ('rng_next', 3), ('sum_draws', 3), ('checksum', 3),
-             ('get_data_seg', 3), ('ask_host', 3), ('dos_version', 3)]
+             ('get_data_seg', 3), ('ask_host', 3), ('dos_version', 3), ('field_read', 3)]
     symbols, scopes = [], []
     for proc, t in procs:
         symbols.append(struct.pack('<HHHHB', name(proc), t, syms[proc], 1, 0x18))

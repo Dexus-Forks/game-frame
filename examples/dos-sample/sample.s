@@ -105,3 +105,9 @@ dos_version:
 	movb $0x30, %ah
 	int $0x21
 	lretw
+
+# function field_read: word    reads a field at [si+4]: offset 4 is also Total's address in
+# DS, so a disassembler must not call it Total (nedis test)
+field_read:
+	movw 4(%si), %ax
+	lretw
