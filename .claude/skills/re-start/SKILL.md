@@ -93,6 +93,9 @@ choose how deep to go for each piece:
   once per subsystem, not after every finding.
 - **Split mechanical work off.** Long but simple pieces (menus, text tables, generated
   types) can go to a separate, cheaper session with an exact brief; keep the hard maths here.
+- **Think like the game.** A game drives itself on a frame clock and the player reacts; input
+  is state read once a frame. Find the frame loop and its order before anything else
+  (docs/GAME-PATTERNS.md, "The game drives, the player reacts").
 - **Read the decompiler with care.** For 16-bit Pascal, Ghidra prints arguments in reverse
   order and loses Real (6-byte float) arithmetic: take those parts from the disassembly.
 

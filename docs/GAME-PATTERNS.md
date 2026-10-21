@@ -3,6 +3,29 @@
 Most games are built from the same handful of parts. Recognising the part tells you what to
 look for next and which details will matter for an exact reimplementation.
 
+## The game drives, the player reacts
+
+Most software waits for the user: a window, a menu, a button press, and the program reacts to
+it through event handlers. A game is the other way round. The game makes things happen on
+its own clock (enemies arrive, shots fly, the level scrolls), and the player reacts through
+the few controls the game gives. That shapes the code:
+
+- **A loop, not handlers.** Look for the loop that runs every frame, not for the code behind
+  a button. Almost everything happens inside it, in a fixed order; find that order first.
+- **Input is state, read once a frame.** Keys and buttons are bytes in memory (a key table
+  an interrupt handler fills, a button array) that the frame reads at one point. A recorded
+  demo is therefore just the input for each frame, and replaying it reproduces the game.
+- **The interface belongs to the game.** The HUD, status bar and messages are drawn by the
+  frame itself, often straight to the display, with the game's own font and shapes; menus
+  are usually loops of their own with their own input reading. Expect little that is
+  generic: trace each screen like game logic.
+- **Time and order are behaviour.** Because the game, not the player, starts events, the
+  frame count, the order of the steps in a frame and the random draws decide what happens.
+  Verify frame by frame against the original, and keep the port's order exactly.
+- **The player's input is the only thing the port does not own.** Model it as one input
+  record per frame. Then a demo, a recording or a test script can drive the port, and two
+  runs with the same input must give the same frames.
+
 ## The main loop
 
 `WinMain` → engine set-up → a loop that, each frame, reads input, updates the game, draws, and
