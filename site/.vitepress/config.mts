@@ -1,7 +1,8 @@
+import { execFileSync } from 'node:child_process'
 import { createRequire } from 'node:module'
 import path from 'node:path'
 import { defineConfig } from 'vitepress'
-import { EXCLUDE, GITHUB, rewrite } from './repo.mts'
+import { EXCLUDE, GITHUB, ROOT, rewrite } from './repo.mts'
 import { repoLinks } from './links.mts'
 import { sidebar } from './sidebar.mts'
 
@@ -9,6 +10,19 @@ import { sidebar } from './sidebar.mts'
 // They live outside site/, where the server build cannot find vue/server-renderer by itself.
 const require = createRequire(import.meta.url)
 const vueDir = path.dirname(require.resolve('vue/package.json'))
+
+/** The time (ms) of the newest commit touching any of these repository paths, or undefined. */
+function gitTime(...paths: string[]): number | undefined {
+  try {
+    const out = execFileSync('git', ['log', '-1', '--format=%at', '--', ...paths], { cwd: ROOT, encoding: 'utf8' }).trim()
+    return out ? Number(out) * 1000 : undefined
+  } catch {
+    return undefined
+  }
+}
+
+// Every path the site builds pages from, for the home page's date.
+const SITE_SOURCES = ['README.md', 'docs', '.claude/skills', 'examples/*/README.md', 'site/index.md']
 
 export default defineConfig({
   title: 'Reverse engineering games',
@@ -20,6 +34,13 @@ export default defineConfig({
   rewrites: rewrite,
   cleanUrls: true,
   lastUpdated: true,
+  // Skill pages come from one template, so take the date of their SKILL.md. The home page
+  // takes the date of the newest change to any page.
+  transformPageData(pageData) {
+    const skill = pageData.params?.skill
+    if (skill) pageData.lastUpdated = gitTime(`.claude/skills/${skill}/SKILL.md`) ?? pageData.lastUpdated
+    else if (pageData.frontmatter.layout === 'home') pageData.lastUpdated = gitTime(...SITE_SOURCES)
+  },
   vite: {
     resolve: {
       alias: [
@@ -50,6 +71,7 @@ export default defineConfig({
     ],
     sidebar: sidebar(),
     outline: { level: [2, 3] },
+    lastUpdated: { formatOptions: { dateStyle: 'long' } },
     search: { provider: 'local' },
     socialLinks: [{ icon: 'github', link: GITHUB }],
     editLink: {

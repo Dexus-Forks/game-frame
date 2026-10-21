@@ -29,10 +29,15 @@ relative, as GitHub needs them; the site turns them into page URLs, and links to
 scripts into links to GitHub (`.vitepress/links.mts`). The build fails on a link to a page
 that does not exist.
 
+Each page shows the date of the last commit to its source file, so the workflow checks out the
+whole history. A skill page takes the date of its `SKILL.md`. The home page shows the date of
+the newest commit to any page.
+
 | File | What |
 |---|---|
 | `.vitepress/config.mts` | The site's settings |
 | `.vitepress/repo.mts` | Which files are pages, and the URL of each |
 | `.vitepress/sidebar.mts` | The menu, read from `docs/README.md` and the folder READMEs |
 | `.vitepress/links.mts` | Relative links resolved for the site |
+| `.vitepress/theme/` | The default theme, plus the home page's "Last updated" line |
 | `skills/[skill].md`, `skills/[skill].paths.mts` | One page per skill |
