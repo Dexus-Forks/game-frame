@@ -70,6 +70,23 @@ few event types). To cover the rest:
 This finds what reading misses: loops that start at 0 instead of 1, writes one past an
 array, branches only one mode takes.
 
+### Capturing fragments of a main loop
+
+A capture saves the state when execution reaches a fragment's start and again at its end,
+frame after frame. What it must hold:
+
+- **Every way out.** A loop body may end in more than one place (the normal jump back, a
+  shortcut, a jump to the level's end). Stop at any of them. A capture that waits for one
+  end that a frame never reaches runs on into later frames and misses every other fragment.
+- **The memory it reads.** Besides the data and stack segments and the screens, save the
+  heap blocks the fragment reads or draws into (tile maps, off-screen buffers), as selector
+  plus contents; for `after`, only the blocks that changed.
+- **Open files.** Save each open DOS handle's name and position. Code that reads input from
+  a file (a recorded demo) then replays from the same place in the port.
+- **What it covered.** Before trusting a pass, count what the captured cases changed (the
+  score, the armour, the enemies removed, the screen). A recording may never take a path;
+  say which paths passed and which were never reached.
+
 ### Heap addresses and bytes that are not the game's
 
 - **Addresses from the allocator.** Where the original stores heap pointers in variables

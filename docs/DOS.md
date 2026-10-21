@@ -95,6 +95,22 @@ up to its size (a variant record), so check one offset in the code before relyin
 - **Pascal calling convention.** Arguments are pushed left to right and the callee removes
   them (`retf N`). Ghidra shows these as `__stdcall16far` with `param_1` being the *last*
   Pascal argument. Read parameters from `[bp+6]` upwards: the first at the highest offset.
+- **Parameter numbers drift.** Ghidra may split one far-pointer parameter into two
+  `param_N` halves, so every later number is off by one; `in_stack_X` and `local_X` names
+  are offsets from a frame base two bytes away from BP. Take each parameter's BP offset from
+  the disassembly, and name it from the caller's push list (`mov di, 0x649e; push ds; push
+  di` is the global at 0x649e), not from how the pseudocode uses it: a "change" counter may
+  really be a speed.
+- **A big procedure's helpers see its frame.** A nested procedure reads its parent's locals
+  and `var` parameters through the static link (`mov di, [bp+4]`, then `[di+...]`); map those
+  offsets to the parent's names before reading the helper.
+- **Scans with string instructions.** `repe scasb` over an array finds the next element that
+  differs from AL; the loop then resumes the scan with the saved CX and DI. Port it as a loop
+  over the array, and check how it stops (often `or cl, cl` on the low byte only).
+- **Stale globals are inputs.** A routine may test a temporary that another routine set
+  earlier in the frame (a `tempi2` left by the movement code). Keep the read: it is part of
+  the behaviour, and a test catches it only if the port leaves the global as the original
+  does.
 - **Strings.** Pascal strings (a length byte, then the text) are not found by Ghidra's string
   search. Use `dosinfo.py --pstrings` and `readseg.py BINARY pstr ADDR`.
 - **Segment arithmetic.** `DAT_1048_12de` is offset `0x12de` in the data segment; a far
@@ -112,6 +128,11 @@ up to its size (a variant record), so check one offset in the code before relyin
 - **Calls through placeholders.** Disassembling the file directly shows every far call as
   `lcall 0:ffff`: the relocation fills it in. `tools/dos/nedis.py BINARY SEG:OFF LEN` applies
   the relocations and prints label names for call targets and DS globals.
+- **Text files are buffered in the record.** `ReadChar` takes the next byte of the 128-byte
+  buffer inside the `TextRec` (`BufPos`, `BufEnd`), and refills it with one DOS read of
+  `BufSize` bytes when it is empty. That buffer sits in the data segment, so a port that
+  reads the file another way leaves different bytes there: port the runtime's routines over
+  the record, with a table of open DOS handles and their positions.
 - **Text files end at ^Z.** On a Turbo Pascal `Text` file, `Eof` is true when the next byte is
   0x1A, not only at the real end, and `Read` at the end returns 0x1A. A game that stores
   binary data in a Text file (demo recordings, scripts) stops early at a 0x1A byte in the
