@@ -38,7 +38,8 @@ These rules are for changes to the harness itself, which is a public repository.
    outputs and what it does not do; `--help` or no arguments prints it.
 4. **Skills are self-contained.** An agent that loads one skill must be able to do that step
    from it alone: exact commands, decisions, evidence to produce, pitfalls. Keep the skills,
-   the README tables and `templates/project/AGENTS.md` consistent when anything changes.
+   the agents, the README tables, `templates/project/AGENTS.md` and the plugin's version in
+   `.claude-plugin/plugin.json` consistent when anything changes.
 5. **Plain English.** Short sentences, common words, one idea each: the skills are read by
    agents and translated by people.
 6. **Files stay small.** Split a tool before it passes a few hundred lines: a package with one
@@ -60,6 +61,8 @@ These rules are for changes to the harness itself, which is a public repository.
 | Path | What |
 |---|---|
 | `.claude/skills/re-*/SKILL.md` | One skill per step of the method |
+| `agents/re-*.md` | One agent per stage, which hand off to each other (`.claude/agents` links here) |
+| `.claude-plugin/` | The Claude Code plugin and its marketplace: the skills and the agents |
 | `gameframe`, `tools/gameframe/` | The help and discovery command. It reads the skills and each tool's own help, so a new tool needs no entry there |
 | `scripts/` | setup, new-project, ghidra-export, ghidra-run, and `lib.sh` (paths and `.env`) |
 | `tools/pe`, `tools/dos`, `tools/triage`, `tools/emu`, `tools/formats`, `tools/verify`, `tools/ghidra` | The tools |

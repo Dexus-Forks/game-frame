@@ -70,8 +70,36 @@ inventory -> observe -> decompile -> trace -> format -> emulate -> reimplement -
 
 A small task may use only two or three steps. Do not skip `land`.
 
+## Stage agents
+
+The harness also has one agent per stage, in `agents/` (a project has them in
+`.claude/agents/`; from the Claude Code plugin they are named `gameframe:re-tracer` and so on).
+Each one loads its skills, does only its stage, and ends with a
+`## Hand-off` block that names the next agent and gives it a one-line brief. You, the main
+session, send the agents: read each hand-off, check its evidence, and send the next one.
+
+| Agent | Stage | Usually hands off to |
+|---|---|---|
+| `re-surveyor` | Setup check, inventory, kind of game | `re-decompiler`, `re-observer` |
+| `re-observer` | Run, drive and capture the original | `re-tracer`, `re-verifier` |
+| `re-decompiler` | Ghidra export, REA | `re-tracer` |
+| `re-tracer` | How the game does one thing | `re-decoder`, `re-measurer`, `re-porter` |
+| `re-decoder` | One data format, proven on every file | `re-porter`, `re-tracer` |
+| `re-measurer` | Ground truth under the emulator | `re-porter`, `re-verifier` |
+| `re-porter` | The reimplementation | `re-verifier` |
+| `re-verifier` | Parity, determinism, saves, pictures | `re-lander`, or back to `re-porter` |
+| `re-lander` | Document, label, commit, push | the next checklist item |
+
+Send one agent at a time for one subject. Only the lander commits. Use the agents for long
+stages that would fill this session's context; do short steps yourself with the skill.
+
 ## First session on a new game
 
+0. Find the tools. The commands in the skills run from a project made by `new-project.sh`
+   (it copies the tools in) or from a clone of the harness. If the skills came from the Claude
+   Code plugin and neither exists yet, clone the harness first
+   (`git clone https://github.com/tanepiper/game-frame ~/code/game-frame`) and run the steps
+   below from there.
 1. `scripts/setup.sh` (and `--install` if anything is missing). See `re-setup`.
 2. If the project has no repository yet: `scripts/new-project.sh DIR "Game Name" PATH/TO/GAME`.
    `./gameframe steps`, `./gameframe tools` and `./gameframe find WORD` show the method, the

@@ -26,6 +26,18 @@ Then open the new project with your agent and ask it to start with the **re-star
 Claude Code finds the skills in `.claude/skills/` automatically; other agents read `AGENTS.md`
 and the `SKILL.md` files.
 
+### As a Claude Code plugin
+
+The skills and the stage agents are also a Claude Code plugin. In Claude Code:
+
+```text
+/plugin marketplace add tanepiper/game-frame
+/plugin install gameframe@game-frame
+```
+
+The plugin brings the skills, the agents and the MCP servers in `.mcp.json`. The tools still
+run from a clone of the harness or from a project made with it: `re-start` says so first.
+
 ## Find your way with `gameframe`
 
 `./gameframe` is a small command for help and discovery. It reads the skills and the tools'
@@ -73,6 +85,16 @@ to produce, and the pitfalls that cost time.
 | [re-port](.claude/skills/re-port/SKILL.md) | Reimplement exactly: precision, order of operations, draw order, iteration order; an exact core with commands, digests and a headless runner; additions (multiplayer, mods) kept apart |
 | [re-verify](.claude/skills/re-verify/SKILL.md) | Bit-exact parity, draw order, determinism with digests and on every platform, recordings, saves, pictures, version against version, test tiers |
 | [re-land](.claude/skills/re-land/SKILL.md) | Document in evidence style, label, commit safely |
+
+## Stage agents
+
+One agent per stage of the method, in [agents/](agents/). Each loads its skills, does only its
+stage and ends with a hand-off that names the next agent. The main session sends them one at a
+time; only the lander commits. `re-start` ("Stage agents") has the table of hand-offs.
+
+`re-surveyor` → `re-observer`, `re-decompiler` → `re-tracer` → `re-decoder`, `re-measurer` →
+`re-porter` → `re-verifier` → `re-lander`, and back to the tracer or the porter when a check
+fails.
 
 ## Scripts
 
@@ -175,8 +197,8 @@ Two licences, one for each kind of work:
 
 | What | Licence |
 |---|---|
-| **Code**: `tools/`, `scripts/`, `tests/`, `examples/`, `templates/`, `site/` (its configuration and code), the Ghidra scripts | [Apache License 2.0](LICENSE-APACHE) |
-| **Content**: the documentation (`docs/`), the skills (`.claude/skills/`), the READMEs and `AGENTS.md`, and the website's text | [Creative Commons Attribution 4.0](LICENSE-CC-BY-4.0) (CC BY 4.0) |
+| **Code**: `tools/`, `scripts/`, `tests/`, `examples/`, `templates/`, `site/` (its configuration and code), `.claude-plugin/`, the Ghidra scripts | [Apache License 2.0](LICENSE-APACHE) |
+| **Content**: the documentation (`docs/`), the skills (`.claude/skills/`), the agents (`agents/`), the READMEs and `AGENTS.md`, and the website's text | [Creative Commons Attribution 4.0](LICENSE-CC-BY-4.0) (CC BY 4.0) |
 
 CC BY 4.0 lets anyone copy, adapt, translate and remix the content for any purpose, commercial
 included, as long as they credit it: for example "Based on *GameFrame* by Tane

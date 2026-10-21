@@ -22,7 +22,7 @@ export const GITHUB = 'https://github.com/tanepiper/game-frame'
 export const EXCLUDE = [
   '.git/**', '.venv/**', '**/node_modules/**', 'analysis/**', 'derived/**', 'target/**',
   'templates/**', 'tools/**', 'tests/**', 'scripts/**', 'labels/**',
-  'AGENTS.md', 'CLAUDE.md', 'site/README.md', 'site/.vitepress/**',
+  'AGENTS.md', 'CLAUDE.md', 'agents/**', 'site/README.md', 'site/.vitepress/**',
   'examples/*/build/**',
 ]
 

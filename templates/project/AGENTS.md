@@ -2,7 +2,8 @@
 
 Rules for every agent (Claude Code, Codex, Cursor and others) and every person working here.
 The method and the tools come from the GameFrame harness; its skills are in
-`.claude/skills/` (agents without skill support: read each `SKILL.md`).
+`.claude/skills/` (agents without skill support: read each `SKILL.md`). Its stage agents are
+in `.claude/agents/`: each does one step and hands off to the next (`re-start`, "Stage agents").
 
 ## The goal
 

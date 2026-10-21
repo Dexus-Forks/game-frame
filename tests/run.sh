@@ -297,10 +297,44 @@ rm -rf "$L"
 echo "Project scaffold"
 tmp="$(mktemp -d)/re-test"
 scripts/new-project.sh "$tmp" "Test Game" $B >/dev/null 2>&1
-[[ -f "$tmp/AGENTS.md" && -f "$tmp/README.md" && -f "$tmp/LICENSE-APACHE" && -f "$tmp/LICENSE-CC-BY-4.0" && ! -e "$tmp/LICENSE-MIT" && -f "$tmp/docs/DOS.md" && -f "$tmp/docs/OUTPUTS.md" && -f "$tmp/docs/games/README.md" && -f "$tmp/docs/observe/inputs.md" && -f "$tmp/docs/working/agents.md" && -f "$tmp/docs/hardware/cpus.md" && -f "$tmp/.cargo/config.toml" && -f "$tmp/.claude/skills/re-start/SKILL.md" && -f "$tmp/target/game.exe" && -d "$tmp/.git" ]] \
+[[ -f "$tmp/AGENTS.md" && -f "$tmp/README.md" && -f "$tmp/LICENSE-APACHE" && -f "$tmp/LICENSE-CC-BY-4.0" && ! -e "$tmp/LICENSE-MIT" && -f "$tmp/docs/DOS.md" && -f "$tmp/docs/OUTPUTS.md" && -f "$tmp/docs/games/README.md" && -f "$tmp/docs/observe/inputs.md" && -f "$tmp/docs/working/agents.md" && -f "$tmp/docs/hardware/cpus.md" && -f "$tmp/.cargo/config.toml" && -f "$tmp/.claude/skills/re-start/SKILL.md" && -f "$tmp/.claude/agents/re-tracer.md" && -f "$tmp/target/game.exe" && -d "$tmp/.git" ]] \
   && grep -q "Test Game" "$tmp/AGENTS.md" && ! (cd "$tmp" && git ls-files | grep -q '^target/') \
   && ok "new-project creates a repository, keeps target/ out of git" || bad "new-project scaffold" "$(ls -la "$tmp" 2>&1)"
 expect "gameframe works in a new project" "tools/pe/peinfo.py  (program)" "$tmp/gameframe" tool peinfo
+
+echo "Claude Code plugin"
+out="$("$PYTHON" - <<'PY' 2>&1
+import json, re, pathlib
+plugin = json.loads(pathlib.Path('.claude-plugin/plugin.json').read_text())
+market = json.loads(pathlib.Path('.claude-plugin/marketplace.json').read_text())
+assert [p['name'] for p in market['plugins']] == [plugin['name']], 'the marketplace lists the plugin'
+assert pathlib.Path(plugin['skills'], 're-start', 'SKILL.md').is_file(), 'the plugin finds the skills'
+assert pathlib.Path('.claude/agents').resolve() == pathlib.Path('agents').resolve(), '.claude/agents links to agents/'
+skills = {p.parent.name for p in pathlib.Path('.claude/skills').glob('*/SKILL.md')}
+start = pathlib.Path('.claude/skills/re-start/SKILL.md').read_text()
+agents = sorted(pathlib.Path('agents').glob('*.md'))
+assert agents, 'no agents'
+for a in agents:
+    text = a.read_text()
+    front = re.match(r'---\n(.*?)\n---\n', text, re.S).group(1)
+    assert re.search(rf'^name: {a.stem}$', front, re.M), f'{a}: name matches the file'
+    assert re.search(r'^description: .{40,}', front, re.M), f'{a}: has a description'
+    for s in re.findall(r'`(re-[a-z]+)`', text.split('## Where it ends')[0].split('Load these skills first:')[1].split('\n')[0]):
+        assert s in skills, f'{a}: no skill {s}'
+    for n in re.findall(r'`(re-[a-z]+er)`', text):
+        assert pathlib.Path('agents', n + '.md').is_file(), f'{a}: hands off to a missing agent {n}'
+    assert f'Stage: {a.stem}' in text and '## Hand-off' in text, f'{a}: ends with a hand-off'
+    assert f'| `{a.stem}` |' in start, f're-start does not list {a.stem}'
+print(len(agents), 'agents')
+PY
+)"
+[[ $? == 0 ]] && ok "the plugin lists the skills and agents; every agent loads real skills and hands off to a real agent ($out)" || bad "plugin and agents" "$out"
+if command -v claude >/dev/null; then
+  out="$(claude plugin validate --strict . 2>&1)"
+  [[ $? == 0 ]] && ok "claude plugin validate --strict passes" || bad "claude plugin validate" "$out"
+else
+  echo "  skip  claude plugin validate (no claude command)"
+fi
 
 echo "Help and discovery (gameframe)"
 G=./gameframe
