@@ -26,6 +26,20 @@ the few controls the game gives. That shapes the code:
   record per frame. Then a demo, a recording or a test script can drive the port, and two
   runs with the same input must give the same frames.
 
+### What kind of interaction?
+
+Look at the game before its code, and decide what kind of control system you are rebuilding.
+It decides where the hard parts are.
+
+| Kind | What it is like | Where to look, what to keep exact |
+|---|---|---|
+| A stream with controls (shooters, platformers, racing) | Things arrive at the player every frame; the player steers, fires, dodges | The frame loop and its order, per-frame input bytes, collision boxes, timing to the frame. A recorded demo replays everything. |
+| Traditional software over a simulation (city builders, strategy, management) | The world runs slowly on its own; events happen; the player may react through windows, menus and clicks | Two halves: an exact simulation step (fixed rate, random draws, saves) and a UI that behaves like ordinary event-driven software. Port the simulation exactly; the UI can be rebuilt by look and function. |
+| An environment the player moves through (RPGs, MMOs, open worlds) | The player moves freely; some things happen to them (walking into an area starts a fight), others they choose (interact with what they see) | Triggers and areas (what fires on entering, on being seen, on time), the interaction rules, the state they change, and for online games the split between what the client decides and what the server decides. |
+
+Many games mix them (a shooter's menus and shop are traditional software; a strategy game's
+battles may be a stream). Identify each mode and treat it by its kind.
+
 ## The main loop
 
 `WinMain` → engine set-up → a loop that, each frame, reads input, updates the game, draws, and
