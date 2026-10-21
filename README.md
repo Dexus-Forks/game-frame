@@ -134,4 +134,5 @@ repositories, and write new code from documented behaviour: see [docs/LEGAL.md](
 
 ## Licence
 
-MIT. See [LICENSE](LICENSE).
+Dual-licensed under the [MIT licence](LICENSE-MIT) or the [Apache License 2.0](LICENSE-APACHE),
+at your choice. Projects made with `scripts/new-project.sh` start with the same two licences.
