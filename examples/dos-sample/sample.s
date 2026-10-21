@@ -168,3 +168,23 @@ get_key:
 	movb $0, %ah
 	int $0x16
 	lretw
+
+# function write_file: word    opens the file named at DS:0x0080 read/write (mode 2, as Pascal's
+# Reset does), writes 3 bytes from DS:0x0090, closes it; returns 0, or 0xFFFF (dos_env test:
+# the game folder must not change).
+write_file:
+	movw $0x3d02, %ax
+	movw $FileName, %dx
+	int $0x21
+	jc 1f
+	movw %ax, %bx
+	movb $0x40, %ah
+	movw $3, %cx
+	movw $FileBuf, %dx
+	int $0x21
+	movb $0x3e, %ah
+	int $0x21
+	xorw %ax, %ax
+	lretw
+1:	movw $0xffff, %ax
+	lretw

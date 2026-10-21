@@ -28,7 +28,7 @@ import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 EXPORTS = ['rng_seed', 'rng_next', 'sum_draws', 'checksum', 'get_data_seg', 'ask_host', 'dos_version', 'field_read',
-           'read_file', 'wait_ticks', 'get_key']
+           'read_file', 'wait_ticks', 'get_key', 'write_file']
 DESCRIPTION = b'DOS sample for the reverse-engineer-games harness'
 MESSAGE = b'\x0cDOS SAMPLE 1'   # a Pascal string: length byte first
 

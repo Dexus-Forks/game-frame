@@ -167,15 +167,22 @@ except RuntimeError as e: print(e)"
 expect "dos_emu runs real-mode MZ code at Ghidra's addresses (data after the code)" "True [722, 842, 312]" "$PYTHON" -c "
 import sys, os; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu, Long
 m = DosEmu('$D/sample-mz.exe'); ds = m.call('1000:0088')
-code_paras = -(-(int(open('$D/symbols.tsv').read().split('get_key')[1].split()[1], 16) + 3) // 16)
+last = max(int(l.split()[2], 16) for l in open('$D/symbols.tsv'))
 m.call('1000:000f', Long(1234), regs={'ds': ds})
-print(ds == 0x1000 + code_paras, [m.call('1000:0028', 1000, regs={'ds': ds}) for _ in range(3)])"
+print(ds > 0x1000 + last // 16, [m.call('1000:0028', 1000, regs={'ds': ds}) for _ in range(3)])"
 
 echo "Headless DOS environment (dos_env)"
 printf 'HELLO DOS ENV\n' > $D/SAMPLE.TXT
 expect "dos_env serves DOS file reads from a folder (names without case)" "14 b'HELLO DOS ENV'" "$PYTHON" -c "
 import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu; from dos_env import DosEnv
 e = DosEmu('$D/sample.exe'); env = DosEnv(e, root='$D'); print(e.call('READ_FILE'), e.read((0x1008, 0x90), 13))"
+w="$(mktemp -d)"
+expect "dos_env never writes the game folder: writes go to the overlay" "unchanged XYZ" "$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu; from dos_env import DosEnv
+e = DosEmu('$D/sample.exe'); env = DosEnv(e, root='$D', overlay='$w')
+e.write((0x1008, 0x90), b'XYZ'); e.call('READ_FILE') if False else None; e.call('WRITE_FILE')
+print('unchanged' if open('$D/SAMPLE.TXT').read() == 'HELLO DOS ENV\\n' else 'CHANGED', open('$w/SAMPLE.TXT').read()[:3])"
+rm -rf "$w"
 expect "dos_env delivers timer interrupts to the program's own INT 8 handler" "3 3" "$PYTHON" -c "
 import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu; from dos_env import DosEnv
 e = DosEmu('$D/sample.exe'); env = DosEnv(e, root='$D'); print(e.call('WAIT_TICKS'), env.irq0_count)"

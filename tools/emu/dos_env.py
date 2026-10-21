@@ -11,8 +11,10 @@
     print(env.log[-20:])                           # what the program asked of DOS, in order
 
 What it provides:
-  - DOS (INT 21h): files under `root` (names matched without case; writes and new files go to
-    `overlay`, so the game folder is never changed), handles, seek, find first/next with the
+  - DOS (INT 21h): files under `root` (names matched without case). A file the program writes
+    is saved to `overlay` when closed (and kept in `env.written`); root is never written, and
+    a file only opened read/write (Pascal's default) is not saved at all. Later opens read the
+    overlay's copy first. handles, seek, find first/next with the
     DTA, current drive and directory, date and time (fixed: `env.clock`, so runs repeat
     exactly), version 5.0, interrupt vectors (kept in a table; nothing is ever called through
     them), device information, and exit (ends the run with ProgramStopped(exit code)).
@@ -71,6 +73,7 @@ class DosEnv:
         self.pm_vectors, self.rm_vectors, self.exc_vectors = {}, {}, {}
         self.callbacks = []
         self.keys = []                        # BIOS keyboard queue: scan << 8 | ascii
+        self.written = {}                     # files the program wrote: NAME -> bytes
         emu.stubs.update({'KERNEL.15': self.global_alloc, 'KERNEL.17': self.global_free,
                           'KERNEL.18': self.global_lock, 'KERNEL.169': self.get_free_space,
                           'KERNEL.91': self.init_task,
@@ -187,24 +190,26 @@ class DosEnv:
             pass                                                # chdir: one folder only
         elif ah in (0x3C, 0x3D, 0x5B):
             name = self.asciiz(ds, dx)
-            write = ah != 0x3D or (al & 3) != 0
-            path = self.host_path(name, for_write=write)
-            if ah == 0x3D and (path is None or not os.path.isfile(path)):
-                self.log.append(f'open {name}: not found')
-                return self.fail(2)
-            data = bytearray(open(path, 'rb').read()) if (path and os.path.isfile(path) and ah == 0x3D) else bytearray()
-            if write and path and not (self.overlay and path.startswith(self.overlay)):
-                path = self.host_path(os.path.basename(path), for_write=True)  # copy-on-write
+            if ah == 0x3D:
+                path = self.host_path(name)
+                if path is None or not os.path.isfile(path):
+                    self.log.append(f'open {name}: not found')
+                    return self.fail(2)
+                data = bytearray(open(path, 'rb').read())
+            else:
+                data = bytearray()                      # create: an empty file
+            # Writes never reach root: a file is saved (to overlay, or nowhere) only when the
+            # program writes to it. Pascal's Reset opens files read/write (FileMode 2), so the
+            # open mode alone says nothing.
             h = self.next_handle
             self.next_handle += 1
-            self.files[h] = [path, data, 0, write]
+            self.files[h] = [name, data, 0, ah != 0x3D]   # name, bytes, position, dirty
             self.log.append(f'{"create" if ah != 0x3D else "open"} {name} -> {h}')
             emu.set(ax=h)
         elif ah == 0x3E:
             f = self.files.pop(bx, None)
-            if f and f[3] and self.overlay:
-                with open(f[0], 'wb') as out:
-                    out.write(f[1])
+            if f and f[3]:
+                self.save(f[0], f[1])
         elif ah == 0x3F:
             if bx == 0:
                 return emu.set(ax=0)
@@ -225,6 +230,7 @@ class DosEnv:
                     return self.fail(6)
                 f[1][f[2]:f[2] + cx] = data
                 f[2] += cx
+                f[3] = True                                 # dirty: saved on close
             emu.set(ax=cx)
         elif ah == 0x41:
             pass
@@ -257,6 +263,16 @@ class DosEnv:
         else:
             emu.error = f'INT 21h AH={ah:02X}h (AL={al:02X}h) is not provided by dos_env'
             emu.uc.emu_stop()
+
+    def save(self, name, data):
+        """A written file goes to overlay (never to root); without an overlay it is kept only
+        in memory (env.written)."""
+        self.written[os.path.basename(name.replace('\\', '/')).upper()] = bytes(data)
+        if self.overlay:
+            os.makedirs(self.overlay, exist_ok=True)
+            with open(os.path.join(self.overlay, os.path.basename(name.replace('\\', '/')).upper()), 'wb') as out:
+                out.write(data)
+        self.log.append(f'save {name} ({len(data)} bytes)')
 
     def find_first(self, pattern, attrs):
         import fnmatch
