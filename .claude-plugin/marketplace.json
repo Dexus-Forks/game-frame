@@ -5,7 +5,7 @@
   "plugins": [
     {
       "name": "gameframe",
-      "description": "Reverse engineer games and rebuild them exactly: the GameFrame skills and stage agents.",
+      "description": "Reverse engineer games and rebuild them exactly: the GameFrame skills, stage agents and task agents.",
       "source": "./",
       "category": "development",
       "homepage": "https://tanepiper.github.io/game-frame/"

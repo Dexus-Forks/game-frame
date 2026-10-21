@@ -141,6 +141,12 @@ time; only the lander commits. `re-start` ("Stage agents") has the table of hand
 `re-porter` → `re-verifier` → `re-lander`, and back to the tracer or the porter when a check
 fails.
 
+Eight task agents do one job each, in any stage: `re-identifier` (engine and libraries),
+`re-randomiser` (random generators and draw order), `re-listener` (every input),
+`re-cataloguer` (every screen), `re-mapper` (hardware and memory), `re-matcher` (a crate or
+library against the game), `re-editor` (documents to the writing rules) and `re-checker`
+(claims and sources). `re-start` ("Task agents") has their table.
+
 ## Scripts
 
 | Script | What it does |

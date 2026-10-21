@@ -95,6 +95,23 @@ session, send the agents: read each hand-off, check its evidence, and send the n
 Send one agent at a time for one subject. Only the lander commits. Use the agents for long
 stages that would fill this session's context; do short steps yourself with the skill.
 
+## Task agents
+
+Task agents do one job that can come up in any stage. They have the same format and end with
+the same hand-off. Send them when a job is large enough to fill this session's context.
+
+| Agent | Task | Usually hands off to |
+|---|---|---|
+| `re-identifier` | The engine, middleware, compiler and libraries, with library code labelled | `re-decompiler`, `re-tracer` |
+| `re-randomiser` | Every random generator, its seeding, its callers and the draw order | `re-porter`, `re-verifier` |
+| `re-listener` | Every input from outside, and the port's input record | `re-porter`, `re-observer` |
+| `re-cataloguer` | Every screen of the interface, with captures | `re-tracer`, `re-porter` |
+| `re-mapper` | Hardware registers, memory banks and RAM variables, named | `re-tracer`, `re-listener` |
+| `re-matcher` | A crate, library or released source compared with the game's version | `re-porter`, `re-tracer` |
+| `re-editor` | Documents edited to the writing rules, wording only | `re-checker`, `re-lander` |
+| `re-checker` | Every claim's evidence and sources checked, doubtful ones marked | `re-editor`, `re-lander` |
+
+
 ## First session on a new game
 
 0. Find the tools. The commands in the skills run from a project made by `new-project.sh`
