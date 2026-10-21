@@ -245,6 +245,9 @@ if command -v dosbox-x >/dev/null; then
   g="$(mktemp -d)"; cp $D/sample-mz.exe "$g/SAMPLEMZ.EXE"
   expect "dosbox-run runs a DOS program and reads its exit code (= dos_emu's first draw)" "exit code 23" \
     scripts/dosbox-run.sh --out "$g/out" --time 20 "$g" SAMPLEMZ.EXE
+  if ! dosbox_has_debug_channel; then
+    echo "  skip  dbx_control (DOSBox-X $(dosbox_version) has no debugger control channel; needs 2026.10+)"
+  else
   expect "dbx_control drives the debugger: break at exit, read AL and the new seed" "AL=23 seed=3b032b05" "$PYTHON" - "$g" <<'PY'
 import os, sys; sys.path.insert(0, 'tools/dos')
 from dbx_control import Debugger
@@ -258,6 +261,7 @@ with Debugger(port=0, timeout=30) as d:            # a free port: no stale DOSBo
     d.run()
 print(f'AL={regs["STEP_AX"] & 0xFF} seed={seed:08x}')
 PY
+  fi
   rm -rf "$g"
 else
   echo "  skip  dosbox-run (dosbox-x is not installed: scripts/setup.sh --install)"

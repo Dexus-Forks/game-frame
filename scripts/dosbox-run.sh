@@ -43,7 +43,12 @@ while [[ "${1:-}" == --* ]]; do
     --int21) flags+=(-log-int21); shift ;;
     --debug) flags+=(-break-start); window=1; tty=1; shift ;;
     --break) prefix="DEBUGBOX "; tty=1; shift ;;
-    --mcp) sets+=(-set "dosbox mcp_server=$2"); tty=1; shift 2 ;;
+    --mcp)
+      if ! dosbox_has_debug_channel; then
+        echo "--mcp needs DOSBox-X 2026.10 or later with the debugger (this one: $(dosbox_version)); see the re-setup skill" >&2
+        exit 2
+      fi
+      sets+=(-set "dosbox mcp_server=$2"); tty=1; shift 2 ;;
     --cycles) sets+=(-set "cpu cycles=fixed $2"); shift 2 ;;
     --set) sets+=(-set "$2"); shift 2 ;;
     --conf) confs+=(-conf "$(cd "$(dirname "$2")" && pwd)/$(basename "$2")"); shift 2 ;;
@@ -74,12 +79,17 @@ env=()
 [[ $window == 0 ]] && env=(SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy)
 mode=(-silent)
 [[ $window == 1 ]] && mode=(-exit)
-# The macOS build enables its debugger only in a terminal: give it a pseudo-terminal (script).
-pty=()
-[[ $tty == 1 && $(uname -s) == Darwin ]] && pty=(script -q /dev/null)
-[[ $tty == 1 && $(uname -s) == Linux ]] && pty=(script -qec)
-env TERM="${TERM:-xterm}" ${env[@]+"${env[@]}"} ${pty[@]+"${pty[@]}"} dosbox-x ${confs[@]+"${confs[@]}"} -conf "$conf" -set "sdl fullscreen=false" "${mode[@]}" -fastlaunch -nomenu -time-limit "$time" \
-  ${flags[@]+"${flags[@]}"} ${sets[@]+"${sets[@]}"} > "$out/console.txt" 2>&1 || true
+cmd=(dosbox-x ${confs[@]+"${confs[@]}"} -conf "$conf" -set "sdl fullscreen=false" "${mode[@]}" -fastlaunch -nomenu
+  -time-limit "$time" ${flags[@]+"${flags[@]}"} ${sets[@]+"${sets[@]}"})
+# DOSBox-X enables its debugger only in a terminal: give it a pseudo-terminal with script(1).
+# macOS script takes the command as separate arguments; util-linux script (Linux) takes it as
+# one string after -c, so the arguments are quoted into that string.
+if [[ $tty == 1 && $(uname -s) == Darwin ]]; then
+  cmd=(script -q /dev/null "${cmd[@]}")
+elif [[ $tty == 1 && $(uname -s) == Linux ]]; then
+  cmd=(script -qec "$(printf '%q ' "${cmd[@]}")" /dev/null)
+fi
+env TERM="${TERM:-xterm}" ${env[@]+"${env[@]}"} "${cmd[@]}" > "$out/console.txt" 2>&1 || true
 code=0
 [[ -f "$drive/EXITCODE.TXT" ]] && code="$(tr -d '\r E' < "$drive/EXITCODE.TXT" | sed '/^$/d' | tail -1)"
 rm -f "$drive/RUN_RE.BAT" "$drive/EXITCODE.TXT"

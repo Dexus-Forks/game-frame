@@ -58,7 +58,10 @@ check node "node --version" node nodejs "Node.js 18+ (REA runs with npx)"
 check zig "zig version" zig "" "optional: builds examples/sample-game (https://ziglang.org/download)"
 check innoextract "innoextract --version | head -1" innoextract innoextract "optional: extracts Inno Setup installers (GOG): scripts/extract-installer.sh"
 check 7z "command -v 7z || command -v 7zz" sevenzip p7zip-full "optional: extracts NSIS, MSI, cab, 7z and rar: scripts/extract-installer.sh"
-check dosbox-x "command -v dosbox-x >/dev/null && { dosbox-x -version 2>/dev/null || true; } | sed -n 's/^\\(DOSBox-X version [^ ,]*\\).*/\\1/p'" dosbox-x dosbox-x "optional, for DOS games: brew install --formula dosbox-x, or https://dosbox-x.com"
+check dosbox-x "command -v dosbox-x >/dev/null && { dosbox-x -version 2>&1 || true; } | sed -n 's/^\\(DOSBox-X version [^ ,]*\\).*/\\1/p'" dosbox-x dosbox-x "optional, for DOS games: brew install --formula dosbox-x, or https://dosbox-x.com"
+if command -v dosbox-x >/dev/null && ! dosbox_has_debug_channel; then
+  row "dosbox-x debugger" OLD "$(dosbox_version) has no debugger control channel (needs 2026.10+): build a current one, see the re-setup skill"
+fi
 
 if [[ ! -x "$ROOT/.venv/bin/python" && $install == 1 ]]; then
   python3 -m venv "$ROOT/.venv" && "$ROOT/.venv/bin/pip" install -q -r "$ROOT/requirements.txt"

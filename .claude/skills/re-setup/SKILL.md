@@ -56,6 +56,14 @@ See `re-rea` for when to use it.
 - REA's own skill (`reverse-engineer-anything`) explains every tool. Install it with REA's setup,
   or from its repository.
 
+REA lists the hosts it supports. On others (for example Debian 13) its doctor warns, but the MCP
+connection, Ghidra-backed tools and the sample checks have worked. Try REA on the sample game
+before relying on it.
+
+Ghidra analysis of a large binary can take minutes, longer than many clients wait for one
+tool call. Raise the client's tool timeout for REA (in Codex, `tool_timeout_sec` in the
+server's entry).
+
 If REA tools do not appear: restart the agent (MCP servers start with the session), then check
 `npx -y rea-agents@6.4.0 doctor --client claude_code --json`. A tool that reports
 `provider_unavailable` usually means Ghidra or Java is not where `.env` says.
@@ -66,6 +74,24 @@ If REA tools do not appear: restart the agent (MCP servers start with the sessio
   dosbox-x`; the cask is disabled for failing Gatekeeper). Homebrew's build has the heavy
   debugger; `brew install --HEAD --formula dosbox-x` adds the newest commands (`STEPIN`). Check:
   `scripts/dosbox-run.sh` on the DOS sample prints `exit code 23` (tests/run.sh does this).
+- **The debugger control channel needs DOSBox-X 2026.10 or later**, built with the debugger.
+  `dosbox-run.sh --mcp`, `tools/dos/dbx_control.py` and the `dosbox` MCP server all use it.
+  Distribution packages are often older (Debian 13 ships a 2025 build). `scripts/setup.sh`
+  then shows a `dosbox-x debugger OLD` row, `--mcp` stops with a message, and the debugger test
+  is skipped. Build a current one on Linux (ask the user first: it is a download and a long
+  build):
+  ```bash
+  sudo apt install libtool autogen autoconf automake libncurses-dev gcc g++ make nasm \
+    libsdl2-dev libsdl2-net-dev libpcap-dev libslirp-dev fluidsynth libfluidsynth-dev \
+    libavformat-dev libavcodec-dev libavcodec-extra libswscale-dev libfreetype-dev \
+    libxkbfile-dev libxrandr-dev
+  git clone --depth 1 https://github.com/joncampbell123/dosbox-x.git
+  cd dosbox-x && ./build-debug-sdl2      # SDL2 with the heavy debugger
+  ```
+  The package list follows DOSBox-X's `BUILD.md`; the debugger needs `libncurses-dev`. Use
+  the repository's build script. It passes the compiler flags the code needs; a plain
+  `./configure && make` with a newer compiler can stop on a warning treated as an error.
+  Put the result on `PATH` (or `sudo make install`) and run `scripts/setup.sh` again.
 - The debugger MCP server for agents (ask the user first: it is a download and a build):
   `cargo install --git https://github.com/caiiiycuk/dosbox-x-mcp-server --tag v0.1.2 --locked`.
   `.mcp.json` registers it as `dosbox` (set `DOSBOX_X_MCP_SERVER` to its path if it is not on
@@ -75,6 +101,9 @@ If REA tools do not appear: restart the agent (MCP servers start with the sessio
 ## Common problems
 
 - `dosbox-x not found` after `brew install --HEAD`: run `brew link dosbox-x`.
+- `dbx_control` or the dosbox MCP server times out waiting for DOSBox-X: check that
+  `scripts/setup.sh` shows no `OLD` row. An older DOSBox-X ignores `mcp_server` and never
+  connects.
 
 | Symptom | Cause and fix |
 |---|---|

@@ -30,3 +30,19 @@ ghidra_project_dir() {
     *) echo "$dir" ;;
   esac
 }
+
+# DOSBox-X's version as YYYY.MM.DD, or nothing when it is not installed.
+dosbox_version() {
+  command -v dosbox-x >/dev/null || return 0
+  { dosbox-x -version 2>&1 || true; } | sed -n 's/^DOSBox-X version \([0-9][0-9.]*\).*/\1/p' | head -1
+}
+
+# True when DOSBox-X has the debugger control channel (the mcp_server setting), which
+# dosbox-run.sh --mcp, dbx_control.py and the dosbox MCP server need: 2026.10 or later.
+# Distribution packages are often older; build a current one (the re-setup skill).
+dosbox_has_debug_channel() {
+  local v; v="$(dosbox_version)"
+  [[ -n "$v" ]] || return 1
+  local y="${v%%.*}" rest="${v#*.}"; local m="${rest%%.*}"
+  (( 10#$y > 2026 || (10#$y == 2026 && 10#$m >= 10) ))
+}
