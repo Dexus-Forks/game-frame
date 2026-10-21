@@ -62,3 +62,8 @@ Set up the GameFrame harness on this computer for me.
 
 Never copy the game's files, extracted assets or decompiled code into a git repository.
 ```
+
+Agents can also read this site as plain text. [llms.txt](/llms.txt) lists every
+page with a short description, and [llms-full.txt](/llms-full.txt) holds all
+of them in one file. Each page has a Markdown copy at the same address with `.md` at the end,
+such as [/games/interaction.md](/games/interaction.md).

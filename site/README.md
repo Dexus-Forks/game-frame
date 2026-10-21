@@ -31,6 +31,20 @@ relative, as GitHub needs them; the site turns them into page URLs, and links to
 scripts into links to GitHub (`.vitepress/links.mts`). The build fails on a link to a page
 that does not exist.
 
+After the build, `.vitepress/llms.mts` writes text for AI agents into the output, with no extra
+dependency:
+
+- a plain Markdown copy of every page beside its HTML (`/games/interaction.md`,
+  `/games/index.md`, `/skills/re-start.md`): front matter removed, relative links pointing at
+  the other `.md` copies, skill pages from their `SKILL.md`;
+- `/llms.txt`, an index in the [llms.txt](https://llmstxt.org) format: every page with its first
+  sentence, in the order of the menu;
+- `/llms-full.txt`, every page in one file.
+
+Each page names its copy in a `<link rel="alternate" type="text/markdown">` and in a small link
+under the page. The workflow sets `SITE_URL` so the links in `llms.txt` are full URLs; locally
+they are paths.
+
 Each page shows the date of the last commit to its source file, so the workflow checks out the
 whole history. A skill page takes the date of its `SKILL.md`. The home page shows the date of
 the newest commit to any page.
@@ -41,5 +55,6 @@ the newest commit to any page.
 | `.vitepress/repo.mts` | Which files are pages, and the URL of each |
 | `.vitepress/sidebar.mts` | The menu, read from `docs/README.md` and the folder READMEs |
 | `.vitepress/links.mts` | Relative links resolved for the site |
-| `.vitepress/theme/` | The default theme, plus the home page's "Last updated" line |
+| `.vitepress/llms.mts` | The Markdown copies, `llms.txt` and `llms-full.txt` |
+| `.vitepress/theme/` | The default theme, plus the home page's "Last updated" line and each page's Markdown link |
 | `skills/[skill].md`, `skills/[skill].paths.mts` | One page per skill |

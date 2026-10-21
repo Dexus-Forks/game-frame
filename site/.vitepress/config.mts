@@ -4,6 +4,7 @@ import path from 'node:path'
 import { defineConfig } from 'vitepress'
 import { EXCLUDE, GITHUB, ROOT, rewrite } from './repo.mts'
 import { repoLinks } from './links.mts'
+import { home, textLinks, writeLlmsFiles } from './llms.mts'
 import { sidebar } from './sidebar.mts'
 
 // The pages are the repository's own Markdown files, read where they are: see repo.mts.
@@ -24,11 +25,13 @@ function gitTime(...paths: string[]): number | undefined {
 // Every path the site builds pages from, for the home page's date.
 const SITE_SOURCES = ['README.md', 'docs', '.claude/skills', 'examples/*/README.md', 'site/index.md']
 
+// The workflow sets SITE_BASE to the Pages path (/game-frame/); locally it is /.
+const base = process.env.SITE_BASE || '/'
+
 export default defineConfig({
   title: 'GameFrame',
   description: 'An agentic framework for reverse engineering games: a method, skills and tools for AI agents and people who rebuild games exactly.',
-  // The workflow sets SITE_BASE to the Pages path (/game-frame/); locally it is /.
-  base: process.env.SITE_BASE || '/',
+  base,
   srcDir: '..',
   srcExclude: EXCLUDE,
   rewrites: rewrite,
@@ -39,8 +42,18 @@ export default defineConfig({
   transformPageData(pageData) {
     const skill = pageData.params?.skill
     if (skill) pageData.lastUpdated = gitTime(`.claude/skills/${skill}/SKILL.md`) ?? pageData.lastUpdated
-    else if (pageData.frontmatter.layout === 'home') pageData.lastUpdated = gitTime(...SITE_SOURCES)
+    else if (pageData.frontmatter.layout === 'home') {
+      pageData.lastUpdated = gitTime(...SITE_SOURCES)
+      home.frontmatter = pageData.frontmatter
+    }
   },
+  // Each page names its plain Markdown copy, which llms.mts writes after the build.
+  transformHead({ pageData, siteConfig }) {
+    if (pageData.isNotFound) return
+    const href = siteConfig.site.base + pageData.relativePath
+    return [['link', { rel: 'alternate', type: 'text/markdown', href }]]
+  },
+  buildEnd: writeLlmsFiles,
   vite: {
     resolve: {
       alias: [
@@ -50,7 +63,7 @@ export default defineConfig({
     },
   },
   markdown: {
-    config: md => md.use(repoLinks),
+    config: md => md.use(repoLinks).use(textLinks(base)),
   },
   themeConfig: {
     nav: [

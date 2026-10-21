@@ -306,6 +306,12 @@ if [[ -d site/node_modules ]]; then
   out="$(npm --prefix site run build 2>&1)"
   [[ $? == 0 && -f site/.vitepress/dist/games/interaction.html && -f site/.vitepress/dist/skills/re-observe.html ]] \
     && ok "the site builds from docs/ and the skills, with no dead links" || bad "site build" "$(echo "$out" | grep -iv '^\s*at ' | tail -8)"
+  dist=site/.vitepress/dist
+  grep -q '^- \[.*\](/games/interaction.md): ' $dist/llms.txt 2>/dev/null \
+    && grep -q '^# ' $dist/games/interaction.md && ! head -1 $dist/games/interaction.md | grep -q '^---' \
+    && grep -q '](/observe/inputs.md)' $dist/games/interaction.md \
+    && grep -q 'Skill `re-observe`' $dist/skills/re-observe.md && grep -q 'Source: /skills/re-observe' $dist/llms-full.txt \
+    && ok "the site writes llms.txt, llms-full.txt and a Markdown copy of each page" || bad "llms.txt and .md copies" "$(head -12 $dist/llms.txt 2>&1)"
 else
   echo "  skip  the site (run: npm --prefix site install)"
 fi
