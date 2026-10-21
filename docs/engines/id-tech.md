@@ -62,8 +62,8 @@ interprets. Even single-player Quake runs as a client and a server in one proces
 - The software renderer was written for the Pentium. It overlaps the floating-point divide for
   perspective correction with integer work, every 16 pixels. That trick explains code that
   otherwise looks strange.
-- Quake shipped GLQuake, an OpenGL version, which ran on 3dfx cards through a "MiniGL" driver
-  ([3D accelerators](../hardware/graphics-3d.md)).
+- id released GLQuake, an OpenGL version, as a separate free download in 1997. It ran on 3dfx
+  cards through a "MiniGL" driver ([3D accelerators](../hardware/graphics-3d.md)).
 
 ## Quake II
 

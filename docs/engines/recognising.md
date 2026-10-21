@@ -28,13 +28,13 @@ fingerprints for Windows binaries; `tools/dos/dosinfo.py` does the same for DOS 
 | Quake III engine (id Tech 3) | Quake III Arena, Return to Castle Wolfenstein, Star Trek: Elite Force, Call of Duty | `.pk3` (ZIP) files; `.qvm` modules; `.BSP` `IBSP` version 46 or 47 |
 | GoldSrc | Half-Life, Counter-Strike, Team Fortress Classic | `hl.exe`, `hw.dll`, `sw.dll`, `client.dll`, `hl.dll`; `.wad` starting `WAD3`; `.BSP` version 30 |
 | Build engine | Duke Nukem 3D, Shadow Warrior, Blood, Redneck Rampage | `.GRP` starting `KenSilverman`; `.ART` tiles; `.MAP` with version 7 |
-| Jedi engine | Star Wars: Dark Forces, Outlaws | `.GOB` starting `GOB\x0a`; `.LEV`, `.INF`, `.O` files |
+| Jedi engine | Star Wars: Dark Forces, Outlaws | `.GOB` starting `GOB\x0a` (Dark Forces), `.LAB` archives (Outlaws); `.LEV`, `.INF`, `.O` files |
 | Unreal Engine 1 and 2 | Unreal, Unreal Tournament, Deus Ex, Rune, Splinter Cell | `Core.dll`, `Engine.dll`; packages `.u`, `.utx`, `.unr` starting with `C1 83 2A 9E` |
 | LithTech | Shogo, Blood II, No One Lives Forever, AvP 2 | `.REZ` archives; `lithtech.exe`; `.dat` worlds, `.abc` models |
 | NetImmerse and Gamebryo | Morrowind, Oblivion, Civilization IV, Dark Age of Camelot | `.nif` files starting `NetImmerse File Format` or `Gamebryo File Format` |
 | RenderWare | Grand Theft Auto III, Vice City, San Andreas, Burnout | `.dff` models, `.txd` texture dictionaries, `.rws` streams; `RenderWare` strings |
 | Infinity Engine | Baldur's Gate, Planescape: Torment, Icewind Dale | `chitin.key`, `.bif` archives; `.bcs` compiled scripts; `.are`, `.cre`, `.itm` |
-| Westwood engines | Command & Conquer, Red Alert, Dune 2000, Lands of Lore | `.MIX` archives; `.SHP`, `.VQA`, `.AUD` |
+| Westwood engines | Dune II, Lands of Lore, Command & Conquer, Red Alert, Dune 2000 | `.PAK` archives (Dune II, Lands of Lore); `.MIX` archives (from Command & Conquer); `.SHP`, `.VQA`, `.AUD` |
 | Blizzard engines | Diablo, StarCraft, Diablo II, Warcraft III | `.MPQ` archives starting `MPQ\x1a`; `storm.dll` |
 | SCUMM | Monkey Island, Day of the Tentacle, Sam & Max | `.LFL`, `.000`, `.LA0`, `.SOU` files; resource blocks `ROOM`, `SCRP`, `LECF` |
 | Sierra SCI | King's Quest IV to VII, Space Quest III to 6, Gabriel Knight | `RESOURCE.MAP`, `RESOURCE.000`; `SCIV.EXE` or `SIERRA.EXE` |

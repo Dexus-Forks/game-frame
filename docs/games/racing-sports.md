@@ -19,9 +19,9 @@ with a large share of simulation (opponents, a championship, transfers in a foot
 | Project | Game | Approach |
 |---|---|---|
 | Restunts | Stunts | reverse engineering of the DOS program toward a reimplementation |
-| dethrace | Carmageddon | reimplementation from reverse engineering, helped by debug symbols in a demo build |
+| dethrace | Carmageddon | reimplementation from reverse engineering, helped by Watcom debug symbols for an earlier internal build, found on the Splat Pack CD |
 | SWOS 96/97 port (by zlatkok) | Sensible World of Soccer 96/97 | reimplementation from disassembly |
-| OpenNFS | Need for Speed 1 to 5 | engine that reads the original track and car data |
+| OpenNFS | Need for Speed 1 to 5 | new engine that reads the original track and car data; NFS 2 and 3 load most completely |
 
 ## The rule set
 

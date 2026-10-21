@@ -9,7 +9,7 @@ picture exactly, so it must understand the mode the game used.
 | Standard | Year | Modes games used | Notes |
 |---|---|---|---|
 | CGA | 1981 | 320 × 200 in 4 colours from fixed palettes; 640 × 200 in 2 colours; text modes | Memory at `B800:0000`, even and odd lines in two banks |
-| EGA | 1984 | 320 × 200 and 640 × 350 in 16 colours from 64 | Planar memory at `A000:0000`: four bit planes, one per colour bit |
+| EGA | 1984 | 320 × 200 in 16 fixed colours; 640 × 350 in 16 colours from 64 | Planar memory at `A000:0000`: four bit planes, one per colour bit |
 | VGA | 1987 | 320 × 200 in 256 colours (Mode 13h); 640 × 480 in 16 colours | Palette of 256 entries, each 6 bits per channel |
 | Mode X (VGA, unchained) | used from about 1991 | 320 × 240 in 256 colours, with several pages | Planar memory; documented by Michael Abrash |
 | VESA VBE (SVGA) | VBE 1.2 in 1991, 2.0 in 1994 | 640 × 480 and higher in 256 colours or more | Banked memory in VBE 1.x; a linear frame buffer from VBE 2.0 |
@@ -62,8 +62,8 @@ tearing and to time their frames.
   Mode 13h refreshes at 70 Hz; Mode X 320 × 240 at 60 Hz.
 - Some games count retraces to time animations or the whole game. Then a frame is 1/70 or 1/60
   of a second. Use that rate in the port.
-- Port `3DAh` bit 0 is the display-enable flag, used for horizontal timing. Raster effects use
-  it.
+- Port `3DAh` bit 0 is set while the display is blanked, in either retrace. Games use it for
+  horizontal timing in raster effects.
 
 ## Text modes
 

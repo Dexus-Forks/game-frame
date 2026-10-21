@@ -47,7 +47,7 @@ makers' APIs, and many games had a Glide renderer as their best-looking option.
 | Direct3D 6 | 1998 | Multitexturing, texture compression |
 | Direct3D 7 | 1999 | Hardware transform and lighting |
 | Direct3D 8 | 2000 | Vertex and pixel shaders (1.x), DirectDraw merged into Direct3D |
-| Direct3D 9 | 2002 | Shader model 2 and 3; used by games until well after 2010 |
+| Direct3D 9 | 2002 | Shader model 2, and shader model 3 from DirectX 9.0c (2004); used by games until well after 2010 |
 
 - Find the version from the imports (`ddraw.dll` with `IDirect3D3`, `d3d8.dll`, `d3d9.dll`)
   and the interface identifiers the game asks for.

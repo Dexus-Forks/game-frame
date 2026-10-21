@@ -43,14 +43,16 @@ bits, as in Doom), 8.8 and 24.8.
 
 ### The x87 FPU
 
-From the 486DX until SSE2 became common (around 2004), floating point meant the x87 FPU.
+From the 486DX until SSE2 became common (around 2004), floating point meant the x87 FPU. Before
+the 486DX, the FPU was a separate chip (8087, 287, 387) that few players owned.
 
 - Registers hold 80-bit extended precision values. A result is rounded to 32 or 64 bits only
   when it is stored to memory (`FST`, `FSTP`). Intermediate results inside one expression keep
   more precision. A port computing in 32-bit floats throughout gets different last bits.
 - The **precision control** field of the FPU control word can make every result round to 24
   bits (float) or 53 bits (double). Direct3D sets 24-bit precision by default when it creates a
-  device, unless the game asks it not to (`D3DCREATE_FPU_PRESERVE`). So a Direct3D game's
+  device, unless the game asks it not to (`D3DCREATE_FPU_PRESERVE` in Direct3D 8 and 9,
+  `DDSCL_FPUPRESERVE` in DirectX 7). So a Direct3D game's
   arithmetic may change after the device is created. Read the control word the game runs with:
   `FLDCW` instructions and calls to `_controlfp`.
 - Conversion from float to integer: the C cast truncates, and MSVC called `_ftol` to do it,
@@ -68,8 +70,8 @@ From the 486DX until SSE2 became common (around 2004), floating point meant the 
 - **3DNow!** gives pairs of 32-bit floats, with fast reciprocal and square-root estimates
   (`PFRCP`, `PFRSQRT`). The estimates have AMD's own accuracy. If game logic uses them, the port
   must reproduce the estimate exactly, usually with a table or by emulating it.
-- **SSE** adds `RCPSS` and `RSQRTSS` estimates with Intel's accuracy, which differs between CPU
-  models. If a game's rules depend on them, record the CPU the original ran on.
+- **SSE** adds `RCPSS` and `RSQRTSS` estimates. Intel specifies only a maximum error, so the
+  exact bits differ between Intel and AMD CPUs and between models. If a game's rules depend on them, record the CPU the original ran on.
 - Games with several paths gave different results on different CPUs. Pick one path and
   document it as the reference.
 

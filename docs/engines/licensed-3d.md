@@ -30,8 +30,8 @@ games include No One Lives Forever (2000) and Aliens versus Predator 2 (2001).
 
 ## NetImmerse and Gamebryo
 
-NetImmerse (Numerical Design Limited, later Gamebryo from Emergent) is a scene-graph library more
-than a full engine. Studios wrote the game around it.
+NetImmerse, from Numerical Design Limited (NDL), was renamed Gamebryo in 2003. NDL became part
+of Emergent Game Technologies in 2005. It is a scene-graph library more than a full engine. Studios wrote the game around it.
 
 - Games include Morrowind (2002), Dark Age of Camelot (2001), Oblivion (2006) and
   Civilization IV (2005).

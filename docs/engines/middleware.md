@@ -13,7 +13,7 @@ behaviour of the library, such as its random numbers, its rounding or its timing
 | Video | Bink (RAD, 1999) | `.BIK` files starting `BIK`; `binkw32.dll` | FFmpeg decodes most Bink 1 files |
 | Video | Westwood VQA, Sierra VMD, Cinepak in AVI | `.VQA`, `.VMD`, `.AVI` | FFmpeg, or a small decoder from the documented format |
 | Sound | Miles Sound System (RAD), earlier the Audio Interface Library | `mss32.dll`, `MSS` strings; in DOS, `AIL` driver files (`.DIG`, `.MDI`) | A modern audio library; MIDI through a software synthesiser |
-| Sound | DIGPAK and MIDPAK, HMI Sound Operating System | driver files `.ADV`, `HMI*.386`; `SOS` strings | The same |
+| Sound | DIGPAK and MIDPAK, HMI Sound Operating System | DIGPAK drivers as `.COM` files and MIDPAK music drivers as `.ADV` files, called through `INT 66h`; `HMI*.386`; `SOS` strings | The same |
 | Sound | FMOD | `fmod.dll`, `fmodex.dll`; `FMOD` strings | A modern library; FMOD's tracker-module playback has its own quirks to match |
 | Sound | DirectSound, DirectMusic, A3D, EAX | imports from `dsound.dll`, `dmusic`; `a3d.dll`; `EAX` strings | See [Sound hardware](../hardware/sound.md) |
 | 3D graphics | Direct3D, OpenGL, Glide | imports from `ddraw.dll`, `d3d8.dll`, `opengl32.dll`, `glide2x.dll` | See [3D accelerators](../hardware/graphics-3d.md) |
@@ -34,8 +34,8 @@ Most middleware can be replaced freely. A few cases need care:
   the library's calls change the game's sequence. Trace every caller of the random function.
 - **Video frame counts.** Some games count video frames to time events. Use the same frame rate
   and frame count as the original file.
-- **Scripting.** The behaviour of the script language version is part of the game: Lua 4.0 and
-  5.0 differ in their number formats and libraries.
+- **Scripting.** The behaviour of the script language version is part of the game. Lua 4.0 and
+  5.0 differ in their libraries and byte code, and Lua 5.3 added an integer type.
 - **Physics.** If physics decides a game result (a ball's bounce in a sports game), the physics
   library's exact results are behaviour. This is hard to match without the same library. Decide
   early whether your project can accept a deviation and record it.

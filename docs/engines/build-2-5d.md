@@ -43,13 +43,14 @@ on the map. Sprites can be flat on the floor or on a wall, or face the camera.
 
 ## The Jedi engine
 
-LucasArts wrote the Jedi engine for Star Wars: Dark Forces (1995) and reused it for Outlaws
-(1997). Like Build, it has sectors with floor and ceiling heights, plus rooms above rooms and
+LucasArts wrote the Jedi engine for Star Wars: Dark Forces (1995) and reused a much changed
+version of it for Outlaws (1997). Like Build, it has sectors with floor and ceiling heights, plus rooms above rooms and
 3D object models.
 
 - Level logic is in `.INF` files: a text language that defines elevators, doors, switches and
   triggers as small state machines.
-- Data is in `.GOB` archives. Levels are `.LEV` (geometry) and `.O` (objects).
+- Dark Forces keeps its data in `.GOB` archives; Outlaws uses `.LAB` archives instead. Levels
+  are `.LEV` (geometry) and `.O` (objects).
 - The source was never released. The Force Engine is a reimplementation built from reverse
   engineering. Its documents explain the formats and the INF language.
 
@@ -58,7 +59,7 @@ LucasArts wrote the Jedi engine for Star Wars: Dark Forces (1995) and reused it 
 | Engine | Games | Notes |
 |---|---|---|
 | Doom engine variants | Heretic, Hexen, Strife | See [The id Software engines](id-tech.md) |
-| ROTT engine | Rise of the Triad (1994) | Built from the Wolfenstein 3D engine, with heights added |
+| ROTT engine | Rise of the Triad (1994) | Built from the Wolfenstein 3D engine. Each map keeps one floor and one ceiling height; raised areas are built from floating platform objects |
 | Voxel Space (NovaLogic) | Comanche (1992), Delta Force (1998) | Terrain drawn from a height map and a colour map, one column at a time |
 | XnGine (Bethesda) | The Elder Scrolls: Daggerfall (1996) | True 3D for its time; Daggerfall Unity documents its formats |
 | Ultima Underworld engine (Looking Glass) | Ultima Underworld (1992), System Shock (1994) | Texture-mapped 3D with sloped floors, before Doom |

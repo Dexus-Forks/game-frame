@@ -6,11 +6,13 @@ share formats and code, so work on one game helps with the others.
 
 ## Westwood Studios
 
-Dune II (1992), Command & Conquer (1995), Red Alert (1996), Lands of Lore (1993) and Dune 2000
-(1998) share formats.
+Dune II (1992), Lands of Lore (1993), Command & Conquer (1995), Red Alert (1996) and Dune 2000
+(1998) share many formats. The formats changed between games, so check each header.
 
-- `.MIX` archives with entries named by a hash of the file name.
-- `.SHP` sprites, `.VQA` video, `.AUD` audio with Westwood's ADPCM.
+- Dune II and Lands of Lore keep their files in `.PAK` archives. From Command & Conquer, the
+  games use `.MIX` archives with entries named by a hash of the file name.
+- `.SHP` sprites (the layout differs between generations), `.VQA` video, `.AUD` audio with
+  Westwood's ADPCM.
 - Rules for units and buildings are in INI files (`RULES.INI` in Red Alert), so many rules are
   data. Read them first.
 - Electronic Arts released the source of Command & Conquer and Red Alert in 2020. For these
@@ -28,7 +30,7 @@ and the MPQ archive format.
 - StarCraft's replays store commands per game tick, and the simulation is fully deterministic.
   OpenBW reimplemented it exactly enough to play replays.
 - Diablo's Devilution project reconstructed the source with help from debug information left
-  in a release for another platform. Look for such builds of your game: demos, other
+  in the Japanese PlayStation port. Look for such builds of your game: demos, other
   platforms and beta versions sometimes kept symbols.
 
 ## The Infinity Engine (BioWare)

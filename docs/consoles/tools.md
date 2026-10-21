@@ -8,12 +8,12 @@ emulators with debuggers. The harness's Unicorn emulator covers some console CPU
 
 | CPU | Consoles | In Ghidra |
 |---|---|---|
-| 6502 and 65C02 | NES, PC Engine (HuC6280 is close) | Built in (6502). Extensions add NES ROM loaders and mappers |
+| 6502 and 65C02 | NES, PC Engine (HuC6280 is close) | Built in (6502, 65C02). Extensions add NES ROM loaders and mappers |
 | 65C816 | SNES | Through community extensions; IDA and dedicated disassemblers are alternatives |
 | Z80 and SM83 | Master System, Game Boy, sound CPUs | Z80 built in; the Game Boy's SM83 through extensions |
 | 68000 | Mega Drive, Neo Geo, arcade boards | Built in (68000). Extensions add Mega Drive ROM loaders |
 | MIPS (R3000, R4300, R5900) | PlayStation, Nintendo 64, PlayStation 2 | MIPS built in; extensions add PS-X EXE and N64 ROM loaders, and the R5900's extra instructions |
-| SuperH (SH-2, SH-4) | Saturn, Dreamcast | Built in (SuperH, SuperH4) |
+| SuperH (SH-2, SH-4) | Saturn, Dreamcast | Built in (SuperH with SH-1, SH-2 and SH-2A; SuperH4) |
 | PowerPC (Gekko, Broadway) | GameCube, Wii | PowerPC built in; extensions add paired-single instructions and DOL and REL loaders |
 | ARM7 (ARM and Thumb) | Game Boy Advance, Nintendo DS | Built in |
 | x86 | Xbox | Built in; an extension adds the XBE loader |
@@ -55,8 +55,8 @@ What to use them for:
 
 ## The harness's Unicorn emulator
 
-Unicorn emulates ARM, ARM64, MIPS (32 and 64-bit), PowerPC, SPARC, M68K, RISC-V and x86. It has
-no 6502, 65816, Z80 or SuperH. For the CPUs it supports, you can run one original function
+Unicorn 2 emulates ARM, ARM64, M68K, MIPS (32 and 64-bit), PowerPC, RISC-V, s390x, SPARC,
+TriCore and x86. It has no 6502, 65816, Z80 or SuperH. For the CPUs it supports, you can run one original function
 headless, as `pe_emu.py` does for Windows code:
 
 1. Load the ROM or the executable's code segments at their addresses.
