@@ -264,6 +264,21 @@ expect "compare_trees finds the changed file, ignoring case" "DIFFERENT  DATA/LE
 expect "compare_trees counts identical files" "1 identical, 1 different" "$PYTHON" tools/triage/compare_trees.py "$I/a" "$I/b"
 rm -rf "$I"
 
+echo "Ledger and coverage"
+L="$(mktemp -d)"; mkdir -p "$L/src/build" "$L/export/game.exe"
+printf '/// Original: `FUN_140001090`\nfn grow() {}\n// Deviation: the time comes in as an argument,\n// so tests can fix it.\nfn tick() {}\n// Not ported: the debug overlay.\n' > "$L/src/world.rs"
+printf '# A helper. Original: `rng_next`\n' > "$L/src/tool.py"
+echo "// Deviation: generated" > "$L/src/build/gen.rs"; echo "# Deviation notes" > "$L/src/NOTES.md"
+printf '140001000\t40\trng_next\t\n140001090\t300\tsimulate\t\n140001200\t20\tFUN_140001200\t\n140001300\t5\tthunk_x\tthunk\n' > "$L/export/game.exe/functions.tsv"
+expect "deviations joins a comment block and skips build/ and prose" "Deviation: 1, Not ported: 1." "$PYTHON" tools/triage/deviations.py "$L/src"
+expect "deviations keeps the whole block" "argument, so tests can fix it." "$PYTHON" tools/triage/deviations.py "$L/src"
+"$PYTHON" tools/triage/deviations.py --out "$L/DEV.md" "$L/src" >/dev/null
+echo "// Deviation: new" >> "$L/src/tool.py"
+expect "deviations --check finds a stale ledger" "out of date" "$PYTHON" tools/triage/deviations.py --out "$L/DEV.md" --check "$L/src"
+expect "coverage counts addresses and names, not thunks" "2 of 3 functions cited (66.7 %), 340 of 360 bytes (94.4 % by size)" "$PYTHON" tools/triage/coverage.py --export "$L/export" "$L/src"
+expect "coverage lists the largest uncited function" "140001200" "$PYTHON" tools/triage/coverage.py --export "$L/export" "$L/src"
+rm -rf "$L"
+
 echo "Project scaffold"
 tmp="$(mktemp -d)/re-test"
 scripts/new-project.sh "$tmp" "Test Game" $B >/dev/null 2>&1
@@ -276,6 +291,9 @@ if [[ "${1:-}" == --ghidra ]]; then
   scripts/ghidra-export.sh $B/game.exe $B/engine.dll >/dev/null 2>&1 && ok "ghidra-export exports both binaries" || bad "ghidra-export"
   expect "decomp_query shows a function" "rng_next" "$PYTHON" tools/triage/decomp_query.py --binary game.exe fn simulate
   expect "decomp_query finds string users" "main" "$PYTHON" tools/triage/decomp_query.py --binary game.exe strings "after 10"
+  C="$(mktemp -d)"; printf '// Original: `simulate`\n' > "$C/sim.rs"
+  expect "coverage reads a real export" "1 of" "$PYTHON" tools/triage/coverage.py --binary game.exe "$C"
+  rm -rf "$C"
   scripts/ghidra-run.sh game.exe decompile analysis/notes/test.txt 0x140001090 >/dev/null 2>&1
   expect "ghidra-run decompiles by address" "FUNCTION 140001090 simulate" cat analysis/notes/test.txt
   "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe labels > analysis/notes/dos-labels.tsv

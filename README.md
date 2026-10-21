@@ -54,8 +54,8 @@ to produce, and the pitfalls that cost time.
 | [re-trace](.claude/skills/re-trace/SKILL.md) | From a string, import, export or class name to the function, its fields and constants |
 | [re-format](.claude/skills/re-format/SKILL.md) | Decode archives, resources and saves; prove decoders on every file |
 | [re-emulate](.claude/skills/re-emulate/SKILL.md) | Run original functions under Unicorn for ground truth; trace random draws |
-| [re-port](.claude/skills/re-port/SKILL.md) | Reimplement exactly: precision, order of operations, draw order, iteration order |
-| [re-verify](.claude/skills/re-verify/SKILL.md) | Bit-exact parity, draw order, determinism, saves, pictures, version against version |
+| [re-port](.claude/skills/re-port/SKILL.md) | Reimplement exactly: precision, order of operations, draw order, iteration order; an exact core with commands, digests and a headless runner; additions (multiplayer, mods) kept apart |
+| [re-verify](.claude/skills/re-verify/SKILL.md) | Bit-exact parity, draw order, determinism with digests and on every platform, recordings, saves, pictures, version against version, test tiers |
 | [re-land](.claude/skills/re-land/SKILL.md) | Document in evidence style, label, commit safely |
 
 ## Scripts
@@ -68,7 +68,7 @@ to produce, and the pitfalls that cost time.
 | `scripts/ghidra-run.sh BINARY decompile\|named\|refs\|vtable\|labels OUT ARGS` | One-off jobs in the analysed project, without re-analysis |
 | `scripts/extract-installer.sh [--detect] INSTALLER OUT` | Unpacks an installer or package without running it: Inno Setup (GOG), NSIS, InstallShield, MSI, archives, `.dmg`, `.pkg`, GOG's `.sh` |
 | `scripts/dosbox-run.sh [--fileio] [--break] [--mcp PORT] DIR PROGRAM` | Runs a DOS program in DOSBox-X without a window: exit code, file I/O log, debugger control |
-| `tests/run.sh [--ghidra]` | 71 checks of every tool against the two sample games |
+| `tests/run.sh [--ghidra]` | 82 checks of every tool against the two sample games |
 
 ## Tools
 
@@ -79,6 +79,8 @@ to produce, and the pitfalls that cost time.
 | `tools/pe/readdata.py` | The real value of a `DAT_` constant or table |
 | `tools/pe/vtable.py` | The functions in a table of function pointers |
 | `tools/triage/decomp_query.py` | A function with your labels; callers; callees; who uses a string; who writes a field; where the work is |
+| `tools/triage/deviations.py` | Every `Deviation:` and `not ported` comment in the reimplementation, as one ledger; `--check` for tests |
+| `tools/triage/coverage.py` | How much of the original (by count and by size) the reimplementation cites, and the largest functions nobody cites yet |
 | `tools/emu/pe_emu.py` | Call any function of a Windows x64 EXE or DLL with chosen inputs and read the result |
 | `tools/emu/call_trace.py` | The calls an emulated function makes (random draws), in order, with call sites |
 | `tools/formats/reader.py`, `validate.py` | Prototype a format decoder; prove it consumes every byte of every file |
@@ -112,7 +114,7 @@ symbols), and a real-mode MZ program, checked under the emulator and under DOSBo
   symbols, Pascal pitfalls, the 16-bit emulator, DOSBox-X and its debugger (also for agents,
   through the `dosbox` MCP server).
 - [docs/GAME-PATTERNS.md](docs/GAME-PATTERNS.md): main loops, random generators, entities,
-  resources, saves, rendering, as they appear in machine code.
+  resources, time, messages, saves, rendering, networking, as they appear in machine code.
 - [docs/ABI.md](docs/ABI.md): calling conventions, C++ layout, floating-point and integer details
   that decide exactness.
 - [docs/LEGAL.md](docs/LEGAL.md): your own copy, nothing redistributed, new code from
