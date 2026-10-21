@@ -24,11 +24,18 @@ music driver, Turbo Pascal's 6-byte `Real` arithmetic, and its own drawing to VG
   twenty parts in the original's order. For each part, a headless run of the original saves
   the data segment, the stack and the screen before and after that part, frame by frame. The
   port runs the same part from the "before" image and must produce the "after" image exactly.
+  Captures also save the VGA display (the HUD is drawn straight onto it), the heap blocks the
+  frame draws from and into, and the open DOS files (the demo being read).
+- **Then the whole frame.** Once every part matched, they were wired into one frame function
+  and checked against whole-frame captures. That caught state the parts' own tests never saw
+  (temporaries the caller keeps in globals). The timer interrupt's counters are left out of
+  the comparison, and the BIOS clock is an input.
 - **Fuzzing from real states.** Demo frames do not reach every branch. Fuzzers start from
   captured states, change them at random (new enemies, shots, events) and compare the
   original and the port on thousands of frames.
-- **Arithmetic the original did in software.** Every `Real` routine the game uses was run on
-  40,000 random operands each and ported to match.
+- **Arithmetic the original did in software.** Every `Real` routine the game uses was called
+  on random and edge-case operands (hundreds of thousands of calls per routine, division
+  852,000) and ported to match.
 - **Sound and timing.** The music driver's register writes to the OPL2 chip were compared for
   41 songs; the music tempo was measured against DOSBox recordings.
 
@@ -48,4 +55,6 @@ music driver, Turbo Pascal's 6-byte `Real` arithmetic, and its own drawing to VG
 - When debug symbols exist, generate code from them before writing any by hand.
 - Port a long main loop in fragments, each checked from captured states, in the original's
   order. A fragment that matches stays matched while the rest is written.
-- Demos give the common paths; fuzzing from real states gives the rest.
+- Demos give the common paths; fuzzing from real states gives the rest. Fuzz by risk: maths,
+  random draws and branchy code, not every routine.
+- Check the whole loop body once the parts match: the wiring is where the last bugs hide.
