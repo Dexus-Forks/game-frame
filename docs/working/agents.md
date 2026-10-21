@@ -1,0 +1,121 @@
+# Working well as an agent
+
+This page is for AI coding agents doing reverse engineering with the harness, and for the people
+who direct them. It collects what made agent sessions productive in the case-study projects,
+and what wasted their time. The skills describe each step; this page describes how to work
+across steps and across sessions.
+
+## The repository is the memory
+
+An agent forgets everything when its session ends or its context is compacted. Anything not
+written to the repository must be found again by the next session, at full cost.
+
+- Write each finding into `docs/` as soon as it is confirmed, with its evidence label.
+- Add every function you identify to `labels/names.tsv`, and every field to
+  `labels/fields.tsv`. The tools read these files, so names spread to every later search.
+- Keep `docs/CHECKLIST.md` current: what is traced, measured, ported and verified, and what is
+  next. A new session reads it first.
+- Write findings in your own words with addresses and constants. Never paste decompiled code;
+  it is not allowed in the repository and it does not explain anything ([Writing](writing.md)).
+
+## Start every session the same way
+
+1. Read the project's `AGENTS.md` and `docs/CHECKLIST.md`.
+2. Search `docs/` and `labels/` for the addresses, names and resources you are about to work
+   on. An earlier session may have traced them.
+3. State the task in one sentence, with what "done" means and how it will be verified.
+4. Load the skill for the step you are on (`re-trace`, `re-emulate`, `re-port` and so on).
+
+## Read the export as text
+
+The Ghidra export (`decomp.c`, `functions.tsv`, `strings.txt`) is a set of text files. Agents
+search text well, so use it before opening Ghidra.
+
+- `decomp_query.py fn ADDRESS` shows a function with your labels applied.
+- `decomp_query.py callers` and `callees` walk the call graph.
+- `decomp_query.py find TEXT` and `strings` find where a string or constant is used.
+- `decomp_query.py writers OFFSET` finds every function that writes a field.
+- Run one-off decompiles or vtable exports with `scripts/ghidra-run.sh` when the export is not
+  enough.
+
+Re-export after labelling many functions, so the next sessions read the names.
+
+## Measure before you port
+
+Reading pseudocode gives a good idea of what a function does, and often the wrong last bit.
+For any function with arithmetic, random draws or many branches:
+
+1. Run the original function under the emulator on many inputs and save the results
+   (`re-emulate`).
+2. Port it.
+3. Compare bit for bit in a test.
+
+This order is faster than porting first. A test against measured results finds the mistake in
+seconds; a difference found later in a whole game run can take hours to trace back.
+
+## Work in subsystems
+
+- Choose a subsystem (the player's movement, a menu, the level loader) and take it from
+  tracing to verified in one piece of work.
+- Verify by risk. Fuzz maths, random draws and code with many branches. Check simple code
+  against recorded frames only.
+- Commit and push each verified subsystem. A long chain of unverified changes is hard to
+  debug and easy to lose.
+- When you find a side need (a format reader, a missing tool), do only what the current
+  subsystem needs, and add the rest to `docs/CHECKLIST.md`.
+
+## Split work between sessions
+
+Several agent sessions can work on one project at the same time.
+
+| Kind of work | Where it goes |
+|---|---|
+| Hard reasoning: maths, timing, the main loop, exactness bugs | The main session, with the most capable model |
+| Long mechanical work: generated types, text tables, menus, moving code without changing it | A separate session with an exact brief, possibly a faster and cheaper model |
+| Independent subsystems | One session each, in separate git worktrees, each touching its own files |
+| Questions that only need reading | A read-only session in the same checkout |
+
+Rules that keep parallel sessions safe:
+
+- Each session stages only its own files (`git add path`). Never `git add -A`.
+- Two sessions never edit the same file at the same time. When they must, one waits, or one
+  works in a worktree and rebases.
+- A session that changes shared documents tells the others which sections it changed.
+- A brief for another session names the files, the addresses, what is already known and what
+  "done" means. The other session does not share your context.
+
+## Run long work in the background
+
+- Ghidra exports, long fuzz runs, full test tiers and builds can take minutes. Start them in
+  the background with a time limit, and do other work meanwhile.
+- Give every long run a timeout. A hung emulator or a game waiting for input must not block
+  the session.
+- Stop servers, emulators and game processes you started before you finish.
+
+## When you are stuck
+
+| Symptom | What to try |
+|---|---|
+| The port differs from the original after many frames | Compare state every frame and stop at the first difference; compare random draws with `seqdiff.py` |
+| A value is right in some runs and wrong in others | Something outside the input record changes it: a clock, an uninitialised variable, iteration over a hash map |
+| The decompiler's output makes no sense | Read the disassembly; check the calling convention, the segment or bank, and whether the code is data |
+| A function seems to do nothing | Check for self-modifying code, a jump table, or a function reached through a vtable or a callback |
+| You cannot find where something happens | Watch the memory in an emulator and break on the write; then follow the writer |
+| You have tried the same idea three times | Stop, write down what you know and what you tried in the checklist, and ask the person directing the work |
+
+## Report what you did
+
+At the end of a piece of work, report:
+
+- what changed, with the commit;
+- what was verified, with the test names and the numbers that passed;
+- what was not verified, and why;
+- the next open item.
+
+Say "verified" only for checks you ran and looked at. "It builds" is not a verification.
+
+## Ask before you act outside the repository
+
+Ask the person directing the work before you download files, install large tools, publish
+anything, contact an online service, or change anything outside the project. Never upload the
+game's files or anything derived from them.

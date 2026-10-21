@@ -12,10 +12,24 @@ the order of this page and of each folder's `README.md` is the order of the site
 - [A taxonomy of games](games/README.md): who drives, the axes, the families, the
   connections between them.
 
+## Engines, hardware and consoles
+
+- [Software engines and middleware](engines/README.md): recognising an engine, the id and
+  Build engines, Unreal, other licensed engines, studio engines, middleware.
+- [Hardware of the era](hardware/README.md): CPUs and floating point, 2D graphics, 3D
+  accelerators, sound, memory, storage, input and networks.
+- [Console games](consoles/README.md): the platforms, the tools, the routes to a port, and
+  matching decompilation.
+
 ## Observing the original
 
 - [Observing the original](observe/README.md): running the original, inputs, the interface,
   an object model of the game.
+
+## Working on a project
+
+- [Working on a project](working/README.md): how agents work well on this, and how to write
+  findings.
 
 ## Reference
 

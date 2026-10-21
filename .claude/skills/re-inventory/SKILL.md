@@ -93,6 +93,8 @@ docs/DOS.md.
 | GameMaker / RPG Maker / Godot strings | A known engine with its own format | Use the engine's community tools for the data; the native binary is the stock runtime |
 | dosinfo: `MZ` or `NE`, Borland/Microsoft/Watcom runtime | 16-bit DOS or Windows 3.x code | This harness's DOS route: `dosinfo.py`, `tdinfo.py`, Ghidra, `dos_emu`, DOSBox-X (docs/DOS.md) |
 | dosinfo: `LE`/`LX` (DOS/4GW, PMODE/W) | 32-bit DOS-extender program | Ghidra with an LE/LX loader extension; run it in DOSBox-X |
+| A ROM or disc image for a console (`.nes`, `.sfc`, `.md`, `.z64`, `.bin`/`.cue`, `.iso`) | Console code at fixed addresses, often banked, no OS | The console route: `docs/consoles/` (platforms, tools, routes to a port) |
+| An engine's archives or DLLs (`.WAD`, `.PAK`, `.GRP`, `.u`, `.MPQ`, `glide2x.dll`, `Engine.dll`) | A known engine or library | Read `docs/engines/recognising.md`; use the engine's documented formats and released source where it exists |
 | High-entropy executable section, `.vmp0`, `.themida`, UPX | Packed or protected | Stop. Unpack first (UPX: `upx -d`), or work from a memory dump with the user's agreement; Denuvo and VMProtect are out of scope for static analysis |
 
 For an Android or iOS game, an Electron or browser game, or an archive you cannot identify, use
@@ -119,6 +121,10 @@ Fill `docs/FINDINGS.md` (correct any first-look numbers the tools overturn, such
 segment with no bytes in the file, which is uninitialised data): the binaries table (file, role, architecture, compiler, notes), the
 engine and middleware with the evidence for each (the import or string that showed it), the
 data containers, and the open questions. Add the first lines to `docs/CHECKLIST.md`.
+
+Also record the hardware the game was written for: the minimum CPU, the video modes, the 3D
+APIs, the sound devices and the input devices it supports (`docs/hardware/`). Its setup program
+and its readme list them.
 
 ## 6. Classify the game
 

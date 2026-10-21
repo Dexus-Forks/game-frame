@@ -20,6 +20,8 @@ work.
   - every claim *observed*, *measured* (with the script and inputs), *inferred* (with what would
     confirm it), or under **Open questions**;
   - no copied pseudocode, disassembly or data dumps: describe them.
+  - plain English with no rhetorical patterns (colon reveals, "X, not Y" endings, matched
+    pairs, "and the ..." chains): see `docs/working/writing.md`.
 - **Labels:** a row in `labels/names.tsv` for every function you identified
   (`1400be770<TAB>Citizen::ChooseJob<TAB>called from the AI tick, reads the job table`), a row in
   `labels/fields.tsv` for every field.

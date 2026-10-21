@@ -297,7 +297,7 @@ rm -rf "$L"
 echo "Project scaffold"
 tmp="$(mktemp -d)/re-test"
 scripts/new-project.sh "$tmp" "Test Game" $B >/dev/null 2>&1
-[[ -f "$tmp/AGENTS.md" && -f "$tmp/README.md" && -f "$tmp/LICENSE-APACHE" && -f "$tmp/LICENSE-CC-BY-4.0" && ! -e "$tmp/LICENSE-MIT" && -f "$tmp/docs/DOS.md" && -f "$tmp/docs/OUTPUTS.md" && -f "$tmp/docs/games/README.md" && -f "$tmp/docs/observe/inputs.md" && -f "$tmp/.cargo/config.toml" && -f "$tmp/.claude/skills/re-start/SKILL.md" && -f "$tmp/target/game.exe" && -d "$tmp/.git" ]] \
+[[ -f "$tmp/AGENTS.md" && -f "$tmp/README.md" && -f "$tmp/LICENSE-APACHE" && -f "$tmp/LICENSE-CC-BY-4.0" && ! -e "$tmp/LICENSE-MIT" && -f "$tmp/docs/DOS.md" && -f "$tmp/docs/OUTPUTS.md" && -f "$tmp/docs/games/README.md" && -f "$tmp/docs/observe/inputs.md" && -f "$tmp/docs/working/agents.md" && -f "$tmp/docs/hardware/cpus.md" && -f "$tmp/.cargo/config.toml" && -f "$tmp/.claude/skills/re-start/SKILL.md" && -f "$tmp/target/game.exe" && -d "$tmp/.git" ]] \
   && grep -q "Test Game" "$tmp/AGENTS.md" && ! (cd "$tmp" && git ls-files | grep -q '^target/') \
   && ok "new-project creates a repository, keeps target/ out of git" || bad "new-project scaffold" "$(ls -la "$tmp" 2>&1)"
 

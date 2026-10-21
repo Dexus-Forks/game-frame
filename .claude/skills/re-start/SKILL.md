@@ -104,6 +104,12 @@ choose how deep to go for each piece:
 - **Read the decompiler with care.** For 16-bit Pascal, Ghidra prints arguments in reverse
   order and loses Real (6-byte float) arithmetic: take those parts from the disassembly.
 
+## How to work
+
+Read `docs/working/agents.md` once per project: the repository as memory, measuring before
+porting, splitting work between sessions, and what to do when stuck. Write every document by
+`docs/working/writing.md`.
+
 ## Before you finish any session
 
 - Every new finding is in `docs/` with its evidence label.

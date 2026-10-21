@@ -30,7 +30,7 @@ export function sidebar(): Item[] {
         }
       }
     }
-    groups.push({ text: section.name, collapsed: false, items })
+    groups.push({ text: section.name, collapsed: true, items })
   }
   groups.push({
     text: 'Skills',

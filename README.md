@@ -117,6 +117,14 @@ The documentation is in [docs/](docs/README.md), and is also built as a website
 - **[A taxonomy of games](docs/games/README.md)**: who drives (the game or the player), the axes
   every game sits on, ten families from arcade action to online games, each with a rule set,
   reference games and projects to learn from, and the systems they share.
+- **[Software engines and middleware](docs/engines/README.md)**: how to recognise an engine,
+  the id, Build and Unreal engines, other licensed and studio engines, and middleware.
+- **[Hardware of the era](docs/hardware/README.md)**: CPUs from the 8086 to SSE2, fixed point
+  and the x87 FPU, VGA and Mode X, 3dfx and the other 3D cards, sound cards and FM synthesis.
+- **[Console games](docs/consoles/README.md)**: the platforms from the NES to the sixth
+  generation, the tools, the routes to a port, and matching decompilation.
+- **[Working on a project](docs/working/README.md)**: how agents work well on this, and how to
+  write findings in plain English.
 - **[Observing the original](docs/observe/README.md)**: running the original, every kind of
   input, capturing the interface, and an object model with doors for tests and agents.
 - **[Case studies](docs/case-studies/README.md)**: Un-Banished, Tyrian 2000 and Frontier:

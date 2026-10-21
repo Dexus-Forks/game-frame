@@ -35,7 +35,16 @@ export default defineConfig({
     nav: [
       { text: 'Start', link: '/overview' },
       { text: 'Games', link: '/games/' },
-      { text: 'Observe', link: '/observe/' },
+      {
+        text: 'Guides',
+        items: [
+          { text: 'Engines and middleware', link: '/engines/' },
+          { text: 'Hardware of the era', link: '/hardware/' },
+          { text: 'Console games', link: '/consoles/' },
+          { text: 'Observing the original', link: '/observe/' },
+          { text: 'Working as an agent', link: '/working/agents' },
+        ],
+      },
       { text: 'Skills', link: '/skills/re-start' },
       { text: 'Case studies', link: '/case-studies/' },
     ],

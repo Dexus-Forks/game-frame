@@ -52,6 +52,6 @@ be mentioned and linked, but examples and advice must stay general.
 | `examples/sample-game/` | The test target: C sources, build script, ground truth, a port, a decoder |
 | `examples/dos-sample/` | The 16-bit test target: assembly, our own NE/MZ linker, Borland-style debug symbols |
 | `tests/run.sh` | The checks |
-| `docs/` | The taxonomy of games (`games/`), observing the original (`observe/`), case studies, ABI, DOS, game patterns, legal notes, setup |
+| `docs/` | The taxonomy of games (`games/`), engines, hardware, consoles, observing the original (`observe/`), working as an agent (`working/`), case studies, ABI, DOS, game patterns, legal notes, setup |
 | `site/` | The documentation website (VitePress). It builds from `docs/`, the skills and the examples where they are; it holds no copies of their content |
 | `.mcp.json` | REA for Claude Code, reading `GHIDRA_INSTALL_DIR` and `JAVA_HOME` |
