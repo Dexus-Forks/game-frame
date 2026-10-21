@@ -1,18 +1,20 @@
 # Console platforms
 
 Each console has its own CPU, video chip, sound hardware and conventions. This page lists the
-platforms most often studied, with what each means for reverse engineering and porting. The
+home consoles most often studied, with what each means for reverse engineering and porting. The
 details here are summaries; the community documents for each console are far more complete
 and are named in each section.
 
 Other consoles have their own pages:
 
 - [Early consoles](early-consoles.md): the Odyssey to the Vectrex.
-- [Handhelds and 32-bit oddities](handhelds.md): the Game Gear, Lynx, Neo Geo Pocket,
-  WonderSwan, Virtual Boy, Jaguar and 3DO.
+- [Jaguar and 3DO](32-bit-oddities.md): the Atari Jaguar and the 3DO.
 - [CD add-ons](cd-add-ons.md): the Sega CD, 32X, PC Engine CD and CD-i.
-- [Seventh generation onward](modern.md): the DS, 3DS, PSP, Vita, Xbox 360, PS3, Wii, Wii U,
-  PS4, Xbox One, Switch, PS5 and Series consoles.
+- [Seventh generation onward](modern.md): the Xbox 360, PS3, Wii, Wii U, PS4, Xbox One, PS5
+  and Series consoles.
+
+The Game Boy, Game Boy Advance and the other handhelds are in the
+[Handhelds](../handhelds/README.md) section.
 
 ## 8-bit and 16-bit consoles
 
@@ -22,9 +24,7 @@ Other consoles have their own pages:
 | Sega Master System | 1985 | Zilog Z80 | VDP: tiles and sprites | SN76489 |
 | PC Engine / TurboGrafx-16 | 1987 | HuC6280 (65C02 variant) | HuC6270 VDC | Six wave channels |
 | Sega Mega Drive / Genesis | 1988 | Motorola 68000, plus a Z80 for sound | VDP: two scrolling layers, sprites | YM2612 FM and SN76489 |
-| Game Boy | 1989 | Sharp SM83 (similar to Z80 and 8080) | Tiles, sprites, one background, a window | Four channels |
 | Super Nintendo / Super Famicom | 1990 | Ricoh 5A22 (65C816), plus the SPC700 sound CPU | PPU: up to four layers, Mode 7 rotation and scaling | S-DSP with eight sample channels |
-| Game Boy Advance | 2001 | ARM7TDMI | Tile modes and bitmap modes | Four Game Boy channels and two sample channels |
 
 **What to know.**
 
@@ -44,8 +44,8 @@ Other consoles have their own pages:
   block-transfer and MMU instructions need the
   [Ghidra_HuC6280](https://github.com/TiCoKH/Ghidra_HuC6280) extension. The CD unit is on the
   [CD add-ons](cd-add-ons.md) page.
-- **Community documents.** NESdev Wiki (NES), SNESdev Wiki and fullsnes (SNES), Pan Docs (Game
-  Boy), GBATEK (GBA and DS), Plutiedev and Sega Retro (Mega Drive).
+- **Community documents.** NESdev Wiki (NES), SNESdev Wiki and fullsnes (SNES), Plutiedev and
+  Sega Retro (Mega Drive). Pan Docs and GBATEK cover the [Game Boy family](../handhelds/game-boy.md).
 
 ## 32-bit and 64-bit consoles
 
@@ -103,6 +103,5 @@ Other consoles have their own pages:
 
 ## Arcade boards
 
-Arcade games ran on boards built for one game or one family of games. Common ones are Capcom's
-CPS-1 and CPS-2 (68000 and Z80; CPS-2 encrypts its code), SNK's Neo Geo (68000 and Z80) and
-Sega's System 16 and later boards. MAME emulates thousands of boards. Its source code is the most complete description of most of them. Its debugger is the main tool for arcade games.
+Arcade games ran on boards built for one game or one family of games. They have their own
+section, [Arcade](../arcade/README.md), with MAME as the record of each board.

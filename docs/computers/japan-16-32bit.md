@@ -138,5 +138,3 @@ None listed yet.
 - Identify the extender and its executable format before loading the program into Ghidra
   ([IBM PC](ibm-pc.md#dos-extenders)).
 - Write separate notes for the FM Towns sprite and sound hardware.
-
-Sources: [Report: game platforms and CPUs](research/report.md).

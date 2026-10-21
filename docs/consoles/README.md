@@ -1,12 +1,14 @@
 # Console games
 
-A console game runs on fixed hardware with no operating system to speak of. The game owns the
+A home console game runs on fixed hardware with no operating system to speak of. The game owns the
 whole machine: it writes to the video chip's registers, starts DMA transfers, reads the
 controllers from memory-mapped ports and times everything to the display's vertical blank.
 That makes console games different to reverse engineer from PC games, and different to port.
 
-This section covers how to study console games and how to bring them to other systems. It uses
-GameFrame's playbook unchanged; the tools and the hardware details differ.
+This section covers how to study home console games and how to bring them to other systems. It
+uses GameFrame's playbook unchanged; the tools and the hardware details differ. The handhelds,
+from the Game & Watch to the Switch, are in [Handhelds](../handhelds/README.md). The arcade
+boards are in [Arcade](../arcade/README.md).
 
 ## Ask your agent
 
@@ -27,13 +29,13 @@ In my GameFrame project, start work on a game for <console>.
 
 - [Early consoles](early-consoles.md): the Odyssey, Atari 2600, Intellivision, ColecoVision,
   Atari 5200 and 7800, and Vectrex.
-- [Console platforms](platforms.md): the consoles from the NES to the sixth generation, with
-  their CPUs, video and sound chips, and what each means for the work.
+- [Console platforms](platforms.md): the home consoles from the NES to the sixth generation,
+  with their CPUs, video and sound chips, and what each means for the work.
 - [CD add-ons](cd-add-ons.md): the Sega CD, 32X, PC Engine CD and Philips CD-i.
-- [Handhelds and 32-bit oddities](handhelds.md): the Game Gear, Lynx, Neo Geo Pocket,
-  WonderSwan, Virtual Boy, Jaguar and 3DO.
-- [Seventh generation onward](modern.md): from the DS, PSP and Xbox 360 to the PS5, with their
-  signed executables, loaders and emulator status.
+- [Jaguar and 3DO](32-bit-oddities.md): the Atari Jaguar and the 3DO, with their RISC
+  co-processors and the ARMv3 CPU.
+- [Seventh generation onward](modern.md): from the Xbox 360 to the PS5, with their signed
+  executables, loaders and emulator status.
 
 ## Doing the work
 

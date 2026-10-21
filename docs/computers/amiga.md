@@ -169,5 +169,3 @@ OpenFodder covers the CD32 version of Cannon Fodder.
 
 - Record the model and the Kickstart version. An AGA build can differ from the OCS build of the
   same game.
-
-Sources: [Report: game platforms and CPUs](research/report.md).

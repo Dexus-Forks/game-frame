@@ -83,5 +83,3 @@ countries for legal frameworks that support preservation
 ([UNESCO Charter](https://webarchive.unesco.org/web/20170127184223/http://unesdoc.unesco.org/images/0013/001311/131178e.pdf)).
 UNESCO backs the Software Heritage archive of source code. These texts support calling games
 heritage. They give no one a legal permission.
-
-Sources: [Notes: international frameworks](../research/law-international.md).

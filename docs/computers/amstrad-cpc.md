@@ -67,5 +67,3 @@ None listed yet.
 - Record the CRTC type of the reference machine if the game uses split screens or overscan.
 - Tie the game's frame to the gate array's six interrupts per frame where the game does.
 - Keep the extended DSK or CDT image as the record of what shipped.
-
-Sources: [Report: game platforms and CPUs](research/report.md).

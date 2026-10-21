@@ -138,5 +138,3 @@ references.
 - Code that runs on the 1541 is part of the loader. Get past it, then snapshot the game in
   memory ([snapshot after the loader](README.md#snapshot-after-the-loader)).
 - Keep the G64 image as the record of what shipped. G64 keeps the protection.
-
-Sources: [Report: game platforms and CPUs](research/report.md).

@@ -1,6 +1,8 @@
 # Tools for console work
 
-GameFrame's playbook works for consoles, but some tools change. Ghidra needs the right
+GameFrame's playbook works for consoles, but some tools change. The tables on this page serve
+home consoles and handhelds alike. The [Handhelds](../handhelds/README.md) pages add the
+handheld CPUs and tools. Ghidra needs the right
 processor module and a loader for the console's file format. Ground truth comes mostly from
 emulators with debuggers. GameFrame's Unicorn emulator covers some console CPUs.
 
@@ -99,7 +101,10 @@ test on a known binary.
 | Several systems, scripted | BizHawk (Lua scripting, input movies, RAM watch, many cores) |
 
 Debugger support in the newer emulators varies. Some entries above are not confirmed. The
-[Seventh generation onward](modern.md#emulator-status) page gives the dated status of each. The family pages give the rest ([Early consoles](early-consoles.md), [Handhelds](handhelds.md),
+[Seventh generation onward](modern.md#emulator-status) page gives the dated status of the home
+console emulators. The [Handhelds](../handhelds/README.md) pages give the handheld emulators,
+from SameBoy and PokeMini to the Switch forks. The family pages give the rest
+([Early consoles](early-consoles.md), [Jaguar and 3DO](32-bit-oddities.md),
 [CD add-ons](cd-add-ons.md)).
 
 What to use them for:

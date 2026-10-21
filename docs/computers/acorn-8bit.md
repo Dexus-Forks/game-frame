@@ -108,5 +108,3 @@ Elkulator covers the Electron. Ghidra and Unicorn support is as for the BBC Micr
 ### For an exact reimplementation
 
 - Model the slower RAM access. The BBC Micro's timing does not fit the Electron.
-
-Sources: [Report: game platforms and CPUs](research/report.md).

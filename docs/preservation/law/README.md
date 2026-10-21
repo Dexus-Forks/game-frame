@@ -92,6 +92,3 @@ that anyone can check it.
 Each country uses the same headings: studying a program, locks, libraries and archives, how long
 copyright lasts, owners who cannot be found, cases, and games that shut down. "(not confirmed)"
 marks a point that has not been checked against the official text.
-
-Sources: [Report: game preservation law worldwide](../research/law-worldwide.md) and the notes
-it draws on.

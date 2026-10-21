@@ -128,5 +128,3 @@ None listed yet.
 - A register read in the disassembly is a memory read. Trace the workspace RAM along with the
   function.
 - Record the workspace pointer at the entry of each function you emulate.
-
-Sources: [Report: game platforms and CPUs](research/report.md).

@@ -89,5 +89,3 @@ Microware OS-9. Programs are OS-9 modules.
 
 Load the modules with Ghidra's 68000 language. MAME's cdimono1 driver and CeDImu run the
 programs.
-
-Sources: [Report: game platforms and CPUs](../computers/research/report.md).

@@ -44,5 +44,3 @@ its own section on the region pages of [this chapter](README.md).
 | Norway | OST and interop, §§ 41–42 (nc) | EU model (nc) | Yes (nc) | Life + 70 (nc) | Likely, EEA | — |
 
 Three groups emerge. The EU-model group (the EU, the UK, Korea, Singapore, New Zealand, Russia, Ukraine, Turkey, Norway and partly India) gives clear cover for observation and narrow cover for decompilation. The trade-agreement group (Canada, Mexico, Colombia, Australia and others) adds strict lock bans with an interoperability exception. A third group (Brazil, Argentina, Egypt, Indonesia, Thailand, Vietnam, Malaysia, the UAE and South Africa for now) has only back-up and research rules. In that group, decompilation has no express cover.
-
-Sources: [Report: game preservation law worldwide](../research/law-worldwide.md).

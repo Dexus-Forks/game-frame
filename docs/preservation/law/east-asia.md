@@ -112,5 +112,3 @@ devices, services or edited game data.
 
 Study and observation are covered in every country here. In Japan, breaking a lock has no known exception. Selling edited save data has led to arrests. In South Korea, running an online
 service for a game has led to fines.
-
-Sources: [Notes: East Asia](../research/law-east-asia.md).

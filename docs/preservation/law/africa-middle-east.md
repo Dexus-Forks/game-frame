@@ -105,5 +105,3 @@ The Copyright Act 2022, signed on 17 March 2023, is one of the most user-friendl
 Study and decompiling for interoperability are covered in Nigeria, Kenya, Ukraine and, on the
 unconfirmed text, Russia and Turkey. In South Africa, Egypt and the UAE, decompiling has no express cover. Observing the running game has the firmest footing. Most of these countries
 ban breaking locks.
-
-Sources: [Notes: Africa, the Middle East, Other Nations](../research/law-africa-middle-east-europe.md).

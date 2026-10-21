@@ -88,5 +88,3 @@ None listed yet.
 ### For an exact reimplementation
 
 - Record whether the code runs in 26-bit or 32-bit mode. Older games run in 26-bit mode.
-
-Sources: [Report: game platforms and CPUs](research/report.md).

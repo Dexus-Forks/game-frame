@@ -120,5 +120,3 @@ None listed yet.
 
 - Record the model. An STE game can use the Blitter and DMA sound that the ST lacks.
 - On the Falcon, export the DSP code apart from the 68030 code.
-
-Sources: [Report: game platforms and CPUs](research/report.md).

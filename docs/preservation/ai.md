@@ -35,8 +35,8 @@ GameFrame asks an agent for evidence at every step.
 - **Nothing from the game is shared.** Decompiled code stays on the owner's computer. The
   published code is new ([Legal](../LEGAL.md)).
 
-These rules make the work slower than an imitation. They also make it checkable. Anyone with the
-same copy of the game can run the same tests and get the same answers.
+This takes longer than making an imitation. Anyone with the same copy of the game can run the
+same tests and get the same answers.
 
 ## Credit to the people who did this first
 
@@ -44,5 +44,3 @@ The methods in GameFrame come from people who did this work by hand for decades:
 ScummVM developers, the decompilation communities, the authors of OpenRCT2, OpenTTD,
 DevilutionX and many more ([Built on others' work](others-work.md)). Their documents are the
 references the playbook tells agents to read.
-
-Sources: [Notes: how preservation projects describe their work](research/messaging.md).

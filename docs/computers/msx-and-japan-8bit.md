@@ -122,5 +122,3 @@ None listed yet.
 ### For an exact reimplementation
 
 - Confirm the CPU clock and the chips from a second source before you model timing.
-
-Sources: [Report: game platforms and CPUs](research/report.md).

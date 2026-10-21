@@ -190,5 +190,3 @@ None listed yet.
 ### For an exact reimplementation
 
 - Record whether the reference run used native ARM64 code or x86-64 code under Rosetta 2.
-
-Sources: [Report: game platforms and CPUs](research/report.md).

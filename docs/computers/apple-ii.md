@@ -66,5 +66,3 @@ Source: [WOZ reference](https://applesaucefdc.com/woz/reference2/).
 - Record the soft switch and language card state for each code region.
 - Keep the WOZ image as the record of a protected disk. A DSK image loses the protection.
 - On the IIgs, record the m and x flag state at the entry of each function.
-
-Sources: [Report: game platforms and CPUs](research/report.md).

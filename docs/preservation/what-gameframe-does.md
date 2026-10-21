@@ -19,7 +19,7 @@ emulates. Being able to play a game mainly proves that the documentation is righ
 - File formats are decoded and proved against every file of their type
   ([re-format](../../.claude/skills/re-format/SKILL.md)).
 
-The documents outlive any one port. A later project can read them without the code.
+A later project can use the documents without the port's code.
 
 ## Where it fits
 
@@ -51,5 +51,3 @@ code, function by function.
 A project made with GameFrame may publish its own new code and its documents. It never
 publishes the game's files, extracted assets or decompiled code. Players bring their own copy
 of the game ([What a project can ship](../OUTPUTS.md)).
-
-Sources: [Notes: who preserves games](research/ecosystem.md).

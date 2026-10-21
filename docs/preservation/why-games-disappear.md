@@ -69,7 +69,5 @@ years and a century, depending on the dye and the metal layer
 Rights get tangled. No One Lives Forever (2000) could still not be bought legally at its 25th
 anniversary in 2025, because nobody can say for certain who owns it.
 
-In each of these cases the game that players bought survives longest. The shipped program is
-often the most complete record of how the game worked. That record is what GameFrame reads.
-
-Sources: [Notes: why games disappear](research/why-games-vanish.md).
+When a studio loses its source code, the copies players bought are often all that is left.
+GameFrame works from those copies.

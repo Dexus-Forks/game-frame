@@ -75,7 +75,10 @@ export default defineConfig({
         items: [
           { text: 'Engines and middleware', link: '/engines/' },
           { text: 'Hardware of the era', link: '/hardware/' },
+          { text: 'Home computers', link: '/computers/' },
           { text: 'Console games', link: '/consoles/' },
+          { text: 'Handhelds', link: '/handhelds/' },
+          { text: 'Arcade', link: '/arcade/' },
           { text: 'Observing the original', link: '/observe/' },
           { text: 'Working as an agent', link: '/working/agents' },
         ],

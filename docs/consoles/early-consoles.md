@@ -140,5 +140,3 @@ BSD-3-Clause header.
 ### For an exact reimplementation
 
 The CPU drives the beam, so the drawing is done by game code. Trace it like the game logic.
-
-Sources: [Report: game platforms and CPUs](../computers/research/report.md).

@@ -136,5 +136,3 @@ Thailand and Vietnam have back-up and research rules with no decompilation claus
 Study and observation are covered in India, Singapore, Australia and New Zealand, and in
 narrower terms in the others. In Indonesia, Thailand and Vietnam, decompiling has no express
 cover. In Australia, a tool that patches the running game can be unlawful.
-
-Sources: [Notes: South and Southeast Asia and Oceania](../research/law-asia-pacific.md).

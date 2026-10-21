@@ -277,5 +277,3 @@ Protected or virtualised regions resist decompilation. Unicorn emulation works b
 game's own logic. Later DRM-free releases are often the cleanest owned copy to study. The law
 on working around protection varies by country ([Legal](../LEGAL.md),
 [the law worldwide](../preservation/law/README.md)). The choice of route stays with you.
-
-Sources: [Report: game platforms and CPUs](research/report.md).

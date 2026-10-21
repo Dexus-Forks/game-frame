@@ -100,5 +100,3 @@ Proton (2018) and the Steam Deck (2022). These facts are (not confirmed)
 
 Linux builds sometimes keep more symbols than Windows builds. That makes a Linux build a useful
 second binary. Compare its functions with the Windows build to name them.
-
-Sources: [Report: game platforms and CPUs](research/report.md).

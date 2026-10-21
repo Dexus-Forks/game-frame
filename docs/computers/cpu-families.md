@@ -299,5 +299,3 @@ source.
 - On x86, Turbo Pascal's 6-byte Real and each compiler's calling convention set the rules a PC
   port must copy ([Turbo Pascal](https://en.wikipedia.org/wiki/Turbo_Pascal);
   [CPUs and floating point](../hardware/cpus.md); [Calling conventions](../ABI.md)).
-
-Sources: [Report: game platforms and CPUs](research/report.md).

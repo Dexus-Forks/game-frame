@@ -23,8 +23,12 @@ the order of this page and of each folder's `README.md` is the order of the site
 
 - [Home computers and the PC](computers/README.md): the CPU families, the 8-bit and 16-bit
   home computers, the PC eras and the Mac, with the tools and timing for each.
-- [Console games](consoles/README.md): the consoles and handhelds by generation, the tools,
-  the routes to a port, and matching decompilation.
+- [Console games](consoles/README.md): the home consoles by generation, the tools, the routes
+  to a port, and matching decompilation.
+- [Handhelds](handhelds/README.md): from the Game & Watch and the Game Boy family to the
+  Switch, the Steam Deck and phone games, with saves, clocks, links and LCD behaviour.
+- [Arcade](arcade/README.md): the arcade boards, with MAME as the record of each board's
+  clocks, encryption and refresh rate.
 
 ## Technology of the era
 

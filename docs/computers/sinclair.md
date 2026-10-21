@@ -142,5 +142,3 @@ game bytes, and under what licence, needs checking before you copy anything from
   ([snapshot after the loader](README.md#snapshot-after-the-loader)).
 - Keep the TZX image as the record of what shipped.
 - If the game must match frame timing, model the contention table for the model you chose.
-
-Sources: [Report: game platforms and CPUs](research/report.md).

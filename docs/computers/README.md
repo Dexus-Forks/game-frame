@@ -131,9 +131,3 @@ The CPC has wait states that round every access to 4 cycles.
 
 The Sinclair QL (68008) and the SAM Coupé (Z80B) belong with these machines. Their pages
 still need sources.
-
-Sources: [Report: game platforms and CPUs](research/report.md).
-
-## Sources
-
-- [Sources and notes](research/README.md): the report and the notes behind these pages.

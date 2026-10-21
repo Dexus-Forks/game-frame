@@ -68,5 +68,3 @@ None listed yet.
 - Record the PORTB bank state for each code region on a 130XE.
 - Record whether the build is PAL or NTSC. PAL and NTSC versions are often separate builds.
 - Keep the ATX image as the record of a protected disk.
-
-Sources: [Report: game platforms and CPUs](research/report.md).
