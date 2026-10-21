@@ -1,7 +1,7 @@
 # Online games
 
 Massively multiplayer games and other games where a server owned by the publisher holds the
-world. The client is only half the game: the rules that matter (combat results, loot, the
+world. The client is only half the game. The rules that matter (combat results, loot, the
 economy) run on a server you do not have. They are [environments](interaction.md#the-four-kinds)
 shared by many players.
 
@@ -49,7 +49,7 @@ use.
 **Interface.** As large as an RPG's, plus chat, groups, trading, mail and auction houses.
 
 **Time and determinism.** Server ticks; the client interpolates and predicts. Exactness is
-defined by the protocol and the server's answers, not by the client's frames.
+defined by the protocol and the server's answers.
 
 **How to verify.** Against captured traffic from your own sessions (while the official service
 exists and allows it), and against the client: does it accept every message, and show the

@@ -1,12 +1,12 @@
 # Inputs: everything that comes from outside
 
 A reimplementation is exact when the same inputs give the same results. That only works if you
-know **every** input: not just the keys the player presses, but the clock, the files, the
+know every input. Besides the keys the player presses, that includes the clock, the files, the
 hardware the game detects and the order the operating system delivers events. This page lists
 the kinds of input, where you will find each in a game's code, and how to handle each in a
 port.
 
-The rule: **every input enters the port through one door**, as a record per frame (real-time
+**Every input enters the port through one door**, as a record per frame (real-time
 games) or per command (games that wait). Then a recording, a demo or a test script can drive
 the port, and two runs with the same records give the same results. Anything that reaches the
 game's rules without going through that door is a bug waiting to happen.

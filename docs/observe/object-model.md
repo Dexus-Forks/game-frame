@@ -44,8 +44,8 @@ breakpoints for **trace**, video memory for **capture**.
   takes.
 - **One language for all users.** The same queries from a test, from a script in the browser's
   console, from an agent, and from a headless run. Answers as structured data (JSON).
-- **Stable names.** Find things by the original's names or by their text, not by pixel
-  positions or fixed waits. Tests survive layout and timing changes.
+- **Stable names.** Find things by the original's names or by their text. Then tests
+  keep working when the layout or the timing changes.
 - **Keep the doors outside the rules.** The model and its doors are an addition the original
   does not have: put them behind a build option, and check that the game plays identically
   without them (see the `re-port` skill, "Additions the original does not have").
@@ -60,9 +60,9 @@ breakpoints for **trace**, video memory for **capture**.
 3. **Give the port the same model.** The port's state, exposed with the same names.
 4. **Add the doors one at a time**, as the work needs them: query first, then input, then
    time, then trace.
-5. **Compare by query.** A check becomes: put both programs in the same state, apply the same
-   inputs, run the same queries, compare the answers. Differences come out named ("citizen 12,
-   field `hunger`"), not as a byte offset.
+5. **Compare by query.** Put both programs in the same state, apply the same inputs, run the
+   same queries and compare the answers. A difference then has a name, such as "citizen 12,
+   field `hunger`".
 
 ## Examples
 

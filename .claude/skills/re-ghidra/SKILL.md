@@ -7,8 +7,8 @@ description: Decompile a game's binaries with Ghidra in headless mode and work w
 
 Ghidra turns machine code into C-like *pseudocode*. It has no original names: a function is
 `FUN_1400be770` (the function at address 0x1400be770), a field is `*(int *)(param_1 + 0x44)`
-(the int 0x44 bytes into the first argument). Pseudocode is a reading aid, not truth: check
-anything exact against the disassembly or the emulator.
+(the int 0x44 bytes into the first argument). Pseudocode helps you read the code, but it can
+be wrong. Check anything exact against the disassembly or the emulator.
 
 ## 1. Export once
 

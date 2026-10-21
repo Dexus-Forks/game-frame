@@ -8,7 +8,7 @@ description: Reimplement traced game behaviour in new code that behaves exactly 
 Precondition: the behaviour is traced and documented, and anything numeric has ground truth. If
 you find yourself inventing a rule while writing code, stop and trace it.
 
-## Write new code, not a translation
+## Write new code
 
 Read the pseudocode to understand the behaviour, then write the new code from your notes, with
 clear names and the target language's own types and structure. Never paste decompiled code into

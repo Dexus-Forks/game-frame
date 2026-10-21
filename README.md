@@ -34,10 +34,9 @@ inventory -> observe -> decompile -> trace -> format -> emulate -> reimplement -
                                        +---------------- when a check fails ---------+
 ```
 
-Two rules hold it together. **Every claim rests on evidence** you can point to (an address, a
-value, a measurement) and is labelled *observed*, *measured*, *inferred* or *unknown*. **Every
-number that matters is measured**: the original function runs under the emulator, and the
-reimplementation must match it bit for bit.
+Every claim names its evidence (an address, a value, a measurement) and carries a label:
+*observed*, *measured*, *inferred* or *unknown*. Every number that matters is measured. The
+original function runs under the emulator, and the reimplementation must match it bit for bit.
 
 ## Skills
 

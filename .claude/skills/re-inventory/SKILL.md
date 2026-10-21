@@ -5,8 +5,8 @@ description: First look at a game's files (Windows PE, or DOS MZ/NE/LE executabl
 
 # Inventory a game
 
-The goal is a short, evidenced map of the game before any decompiling: what to analyse, with
-which tool, and what to leave alone. A wrong choice here (decompiling a packed binary, or
+Before any decompiling, make a short map of the game with evidence. It says what to analyse,
+with which tool, and what to leave alone. A wrong choice here (decompiling a packed binary, or
 analysing the C++ runtime of a Unity game instead of its C# code) wastes days.
 
 ## 0. Get the files out of their installer

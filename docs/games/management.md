@@ -45,7 +45,7 @@ loads the original's saves.
 
 **Where the rules live.** In code for the agents and the step, in data for buildings, goods,
 needs and prices. Agents are usually state machines with timers; the jobs or tasks they take
-come from queues with a fixed order. Read the data first: many "rules" are numbers in tables.
+come from queues with a fixed order. Read the data first. Many rules are numbers in tables.
 
 **Inputs.** Mostly clicks on the interface and on the map, which become **commands** (place a
 building, set a tax, assign a worker). Model the input as commands, each applied at a known

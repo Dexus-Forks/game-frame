@@ -39,7 +39,7 @@ interpreter, the graphics and sound drivers, and a few hard-coded puzzles. Find 
 interpreter's dispatch table first: it is a loop over opcodes calling one function each.
 
 **Inputs.** Clicks on verbs and objects, typed commands (text parsers), dialogue choices, and
-keyboard shortcuts. Store recordings as commands, not as mouse paths.
+keyboard shortcuts. Store recordings as commands.
 
 **Interface.** The verb bar, inventory, dialogue choices, text windows, the cursor and its
 changes over hotspots. Fonts and text rendering, including line breaking, are part of the look.

@@ -46,7 +46,7 @@ DLL with an entity interface. Read the level format and the state tables before 
 
 **Inputs.** Keyboard and mouse. Mouse movement adds up between ticks; the game reads the total
 once per tick and scales it. Record the per-tick command (forward move, side move, turn,
-buttons), not raw events: that is what the demo format stores in most of these games.
+buttons). Most of these games store that command in their demo files.
 
 **Interface.** The status bar, automap and menus are drawn by the game. The weapon sprite and
 crosshair are part of the 3D view. Text uses the game's own fonts.

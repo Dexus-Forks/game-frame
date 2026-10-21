@@ -1,8 +1,8 @@
 # Case studies
 
 Three reimplementations built with this harness, of three different kinds of game, on three
-different platforms. Each took a different route to the same goal: the same results as the
-original for the same inputs.
+different platforms. Each took a different route. All three aim
+for the same results as the original for the same inputs.
 
 | Project | Game | Family | Platform | Route |
 |---|---|---|---|---|

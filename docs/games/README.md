@@ -83,4 +83,4 @@ A clean-room project (see [Legal](../LEGAL.md)) reads other projects' documents 
 not their code. Write in your project's rules which of them may be read.
 
 Projects change, move and sometimes are taken down. Check each link before relying on it, and
-treat the descriptions here as a starting point, not as evidence.
+check the descriptions here before you cite them.

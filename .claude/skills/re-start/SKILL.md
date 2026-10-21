@@ -13,8 +13,8 @@ its data files. The aim is usually one of these:
 - **Reimplement** the game, or part of it, so it behaves the same (a new engine, a port, a
   server, a tool that reads its files).
 
-All three use the same loop and the same discipline: every claim rests on evidence you can
-point to, and every number that matters is measured, not guessed.
+All three follow the same loop. Every claim names the evidence behind it. Every number that
+matters is measured by running the original code.
 
 ## Rules (they apply to every step)
 
@@ -86,16 +86,15 @@ A small task may use only two or three steps. Do not skip `land`.
 A full reimplementation is long. Most of the cost is verification and reading assembly, so
 choose how deep to go for each piece:
 
-- **Verify by risk, not by habit.** Fuzz only code with arithmetic, random draws, or many
+- **Verify by risk.** Fuzz only code with arithmetic, random draws, or many
   branches a recording never takes. Check simple code (menus, drawing, plain state changes)
   against recorded frames only. `re-verify` has the table.
 - **Port in subsystems.** Read, port and verify a whole subsystem (the player, a menu, the
-  level loader) before committing, not one small routine at a time. One capture and one
-  test then cover many routines.
+  level loader), then commit it. One capture and one test then cover many routines.
 - **Keep to the path.** When a side need appears (a format a routine reads, a missing
   tool), do only what the current subsystem needs and note the rest in `docs/CHECKLIST.md`.
 - **Batch harness changes.** Note generic lessons as you go; fix the harness and its tests
-  once per subsystem, not after every finding.
+  once per subsystem.
 - **Split mechanical work off.** Long but simple pieces (menus, text tables, generated
   types) can go to a separate, cheaper session with an exact brief; keep the hard maths here.
 - **Think like the game.** Most games drive themselves on a frame clock and the player

@@ -6,7 +6,7 @@ description: Finish a slice of reverse-engineering work - write findings into do
 # Document, label, commit
 
 Undocumented findings are re-derived by the next session, at full cost. Landing is part of the
-work, not an extra.
+work.
 
 ## 1. Document
 

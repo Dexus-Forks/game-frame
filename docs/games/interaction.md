@@ -12,21 +12,21 @@ reacts through an event handler. Most games work the other way round. The game m
 happen on its own clock (enemies arrive, shots fly, the level scrolls, the town grows), and the
 player reacts through the few controls the game gives. That shapes the code:
 
-- **A loop, not handlers.** Look for the loop that runs every frame or every tick, not for the
-  code behind a button. Almost everything happens inside it, in a fixed order. Find that order
+- **Look for the loop.** Find the loop that runs every frame or every tick, before the code
+  behind any button. Almost everything happens inside it, in a fixed order. Find that order
   first, and write it down as a table.
 - **Input is usually state, read at fixed points.** Keys and buttons are often bytes in memory
   (a key table that an interrupt handler fills, a button array) that the frame reads at one
   point. A recorded demo is then just the input for each frame, and replaying it reproduces
-  the game. This is common, not a rule. Some games read input in several places in a frame
+  the game. Many games work this way, but not all. Some games read input in several places in a frame
   (the menu loop and the game loop each read it), and some act on key events inside the
   window's message handler. Find every place that reads input; [Inputs](../observe/inputs.md)
   lists where to look.
 - **The interface belongs to the game.** The HUD, status bar and messages are drawn by the frame
   itself, often straight to the screen, with the game's own font and shapes. Menus are usually
-  loops of their own, with their own input reading. Expect little that is generic: trace each
-  screen like game logic ([Capturing the interface](../observe/ui.md)).
-- **Time and order are behaviour.** Because the game, not the player, starts events, the frame
+  loops of their own, with their own input reading. Trace each screen like game
+  logic ([Capturing the interface](../observe/ui.md)).
+- **Time and order are behaviour.** Because the game starts most events, the frame
   count, the order of the steps in a frame and the random draws decide what happens. Verify
   frame by frame against the original, and keep the port's order exactly.
 - **Take everything from outside through one door.** The player's input is the obvious thing
@@ -52,7 +52,7 @@ around a state, or a script interpreter that stops at each choice. Here:
   nothing in the state. Find out which parts are only animation and which change the state.
 - **Order of resolution** inside one turn (who moves first, in which order effects apply,
   which random draws happen) is behaviour, exactly as frame order is in a real-time game.
-- A recording is the list of commands, not a list of frames.
+- A recording is the list of commands.
 
 Many real-time games also wait at times: a pause, a dialogue, an inventory screen. Find the
 state that switches between "the game runs" and "the game waits".
@@ -69,8 +69,7 @@ mix) you have.
 | **An environment the player moves through** | The player moves freely; some things happen to them (walking into an area starts a fight), others they choose (talk, open, take) | Triggers and areas (what fires on entering, on being seen, on time), the interaction rules, the state they change; for online games, what the client decides and what the server decides | Morrowind, Ultima VII, Daggerfall, Frontier: Elite II, World of Warcraft |
 | **Turns and choices** | Nothing happens until the player acts; then the game resolves the move | The rules of each move, the order of resolution inside a turn, the script engine, the save state | Civilization, X-COM's battles, Heroes of Might and Magic, Monkey Island, Zork, chess |
 
-**How exact must the interface be?** That depends on the project's goal, not on the kind of
-game. A 1:1 reimplementation (such as Un-Banished) treats the interface as behaviour: the
+**How exact must the interface be?** That depends on the project's goal. A 1:1 reimplementation (such as Un-Banished) treats the interface as behaviour: the
 player sees it, so its layout, text, timing and quirks are ported as exactly as the simulation.
 A project that only wants the game's rules on a new interface can rebuild the screens by look
 and function, but it should say so in its deviations ledger. Decide this at the start and

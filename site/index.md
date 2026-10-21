@@ -25,7 +25,7 @@ features:
   - title: Skills for each step
     details: Inventory, observe, decompile, trace, decode formats, emulate, reimplement, verify, land. Each skill is a complete guide an agent can follow alone.
     link: /skills/re-start
-  - title: Measured, not guessed
+  - title: Measured against the original
     details: Original functions run under emulation for ground truth, and the reimplementation must match bit for bit, draw for draw, frame for frame.
     link: /skills/re-emulate
   - title: Case studies

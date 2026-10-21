@@ -2,8 +2,8 @@
 
 A 1:1 reimplementation of **Frontier: Elite II** (DOS, 1993) in Rust and wgpu, for native
 platforms and the browser, on the player's own copy of the game. The repository is private
-while the work is in progress. It is the harness's example of a different route: running the
-original inside the port and replacing it routine by routine.
+while the work is in progress. It shows a different route. The port runs the
+original inside itself and replaces it routine by routine.
 
 ![The start-position menu over the title sequence's ships and stars](../assets/case-studies/frontier-start-menu.webp)
 

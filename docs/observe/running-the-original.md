@@ -29,7 +29,7 @@ windowed runs to see what happens and to find where to look.
 | **State** | Ground truth for the rules | Memory dumps at chosen points (the data segment, the heap, named variables); the game's own saves |
 | **Inputs** | To replay the same run in the port | The game's demo files; breakpoints on input reads ([Inputs](inputs.md)) |
 | **Calls** | The order of functions and random draws | `call_trace.py`; debugger traces; API logs (`WINEDEBUG=+relay`, API Monitor) |
-| **Files** | Formats measured, not guessed | DOSBox-X file logs and the harness's `fileio_trace.py`; Process Monitor on Windows |
+| **Files** | File formats measured from the original's own reads | DOSBox-X file logs and the harness's `fileio_trace.py`; Process Monitor on Windows |
 | **Sound** | Music and effects compared sample by sample | The emulated chip's register writes (OPL), WAV recordings from the emulator |
 | **Timing** | Tick rates, music tempo | Timer programming, frame counts, audio recordings measured over a long run |
 

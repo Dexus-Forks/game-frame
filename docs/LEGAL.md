@@ -20,7 +20,7 @@ matters, ask a lawyer who knows software law where you live.
 |---|---|
 | Never commit game files or extracted assets | They are the copyright holder's work; distributing them is infringement, whatever the purpose |
 | Never commit decompiled code or disassembly | Decompiled code is a derivative of the original program; publishing it can infringe, and it is unreadable anyway |
-| Document behaviour, not code | Facts about how a program behaves (a formula, a file layout, a constant) are generally not protected the way expression is; describing them in your own words keeps the line clear |
+| Describe behaviour in your own words | Facts about how a program behaves (a formula, a file layout, a constant) are generally not protected the way expression is; describing them in your own words keeps the line clear |
 | Cite the original function for every finding | It makes the work checkable, and it shows the reimplementation came from analysis rather than a leak |
 | Do not bypass protection or online services | Circumventing copy protection is restricted in many places (for example the DMCA in the US and the EU Copyright Directive), even when the purpose is lawful; online services also have terms you agreed to |
 
