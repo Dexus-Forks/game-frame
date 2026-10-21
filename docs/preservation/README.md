@@ -14,8 +14,9 @@ its limits are.
    by their makers, lost at the source.
 2. [What GameFrame does](what-gameframe-does.md): a record of how the game worked,
    checked against the original, and what GameFrame cannot do.
-3. [Your own copy and the law](law/README.md): what 35 countries allow and forbid, with one
-   page per region, the myth of "abandonware", and what takedowns have shown.
+3. [Your own copy and the law](law/README.md): the law in 35 countries, with one page per
+   region. It explains why "abandonware" has no legal standing. It also covers what past
+   takedowns of game projects have shown.
 4. [AI and reverse engineering](ai.md): the concern about AI copying games, and how
    GameFrame answers it.
 5. [Built on others' work](others-work.md): the projects and institutions GameFrame learns
