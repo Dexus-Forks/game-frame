@@ -79,6 +79,28 @@ the port must model.
 |---|---|---|
 | Network messages | IPX (`INT 7Ah`), serial ports (`INT 14h`, ports `0x3F8`), Winsock (`recv`, `WSARecv`), DirectPlay | In lockstep games, the other players' commands are inputs per tick. In client-server games, the server's messages are the inputs ([Online games](../games/online.md)) |
 
+## Things that are easy to miss
+
+Lessons from porting a DOS game's main loop, true of many games:
+
+- **Two keyboard paths.** Besides the key table the frame reads, a game may ask the BIOS
+  "is a key waiting?" to skip a screen or end a demo. That is a second input, read at a
+  different point.
+- **Devices that are not there.** With no joystick or mouse installed, the polling code may
+  write nothing, or only clear a flag. Find out what an absent device leaves in memory, and
+  model that state too.
+- **Demo files are state.** A demo read through the runtime's file routines (Pascal `Text`,
+  C `FILE`) keeps its buffer, the open DOS handle and the file position in the program's
+  memory. A capture taken mid-demo must save them, or the port cannot carry on from it.
+- **Counters owned by interrupts.** Timer interrupts keep counting while the frame waits, so
+  their counters differ from run to run. Take the clock value the frame read as an input
+  (from the original's state after the read), and leave the interrupt's own counters out of
+  comparisons, with the reason written next to the check.
+- **Outputs belong in the record too.** What the frame sends out (the finished picture
+  copied to the display, a song request, sounds queued per channel) goes in the same
+  per-frame record as the input. Then the core runs headless and every output can be
+  compared.
+
 ## Recording inputs from the original
 
 | Method | Gives | Tools |

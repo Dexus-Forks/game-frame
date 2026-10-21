@@ -61,6 +61,19 @@ and for each screen and state in the inventory:
 
 Script the captures, so you can repeat them after a game update or for another language.
 
+What a capture must hold, learned from porting a game that draws its own interface:
+
+- **Every surface the screen is drawn on.** The HUD and messages are often drawn straight
+  to the display, not into the off-screen frame the game builds the picture in. Save both.
+- **Text as pixels.** The game's own font tables, often with shadow or darkened variants:
+  check text pixel by pixel, like sprites.
+- **What was on screen before.** Status bars often redraw an item only when its value
+  changes, comparing with a "last value" variable. A test that starts in the middle of a
+  run needs the display contents from before, and those variables.
+- **Off-screen buffers.** Tile maps and effect buffers the frame draws from or into live in
+  memory blocks the program allocated. Save each block with the pointer or selector that
+  names it; for the state after the frame, keep only the blocks that changed.
+
 ## Rebuild it
 
 - **Data-driven interfaces:** write a reader for the layout format, and an engine that builds
