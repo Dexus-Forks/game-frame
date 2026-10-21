@@ -163,6 +163,10 @@ expect "import stubs and interrupt handlers run" "0xa03 5" "$PYTHON" -c "
 import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu
 e = DosEmu('$D/sample.exe', stubs={'KERNEL.3': lambda m: m.set(ax=0x0a03)}, interrupts={0x21: lambda m: m.set(ax=5)})
 print(hex(e.call('ASK_HOST')), e.call('DOS_VERSION'))"
+expect "call() sets general registers for routines that take them in registers" "0x4242" "$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu
+e = DosEmu('$D/sample.exe', stubs={'KERNEL.3': lambda m: m.set(ax=m.reg('cx'))})
+print(hex(e.call('ASK_HOST', regs={'cx': 0x4242})))"
 expect "an unhandled interrupt names itself" "unhandled interrupt 21h (AH=30h) at 1000:0094" "$PYTHON" -c "
 import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu
 try: DosEmu('$D/sample.exe').call('DOS_VERSION')

@@ -8,8 +8,9 @@ from .types import FarPtr, Long, ProgramStopped, TRAP
 
 class Runner:
     def call(self, target, *args, conv='pascal', near=False, regs=None):
-        """Run the routine at `target` with `args` and return AX. `regs` sets registers first
-        (for example ds=... for code that expects another data segment)."""
+        """Run the routine at `target` with `args` and return AX. `regs` sets registers first:
+        segment registers (ds=... for code that expects another data segment) and the others
+        (ax=..., cx=... for runtime helpers that take their arguments in registers)."""
         ptr = self.addr(target)
         state = dict(self.regs)
         state.update(regs or {})
@@ -27,6 +28,7 @@ class Runner:
                                       'write a far wrapper (push cs; call near; retf) into free memory')
         self.push(self.stub_seg)
         self.push(TRAP)
+        self.set(**{k: v for k, v in (regs or {}).items() if k not in ('ss', 'sp', 'ds', 'es')})
         self._run(ptr)
         return self.reg('ax')
 
