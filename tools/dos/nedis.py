@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Disassemble 16-bit code with its relocations applied and its names shown.
 
-Usage: nedis.py BINARY SEG:OFF [LENGTH] [--labels FILE]
+Usage: nedis.py BINARY SEG:OFF|LABEL [LENGTH] [--labels FILE]
 
 Ghidra's listing aside, a plain disassembler shows a 16-bit program's calls to other segments
 and to imports as `lcall 0:ffff`: the file holds placeholders that the loader fills in. This
@@ -49,7 +49,11 @@ def main(argv):
     length = int(argv[2], 0) if len(argv) > 2 else 0x100
     emu = DosEmu(path)
     labels = load_labels(labels_path)
-    seg, off = (int(x, 16) for x in where.replace('_', ':').split(':')[-2:])
+    by_name = {v.lower(): k for k, v in labels.items()}
+    if where.lower() in by_name:
+        seg, off = by_name[where.lower()]
+    else:
+        seg, off = (int(x, 16) for x in where.replace('_', ':').split(':')[-2:])
     code = emu.read((seg, off), length)
     ds = emu.regs['ds']
     imports = {o: k for o, k in emu.imports.items()}

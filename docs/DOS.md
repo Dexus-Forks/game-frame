@@ -101,6 +101,15 @@ up to its size (a variant record), so check one offset in the code before relyin
 - **Calls through placeholders.** Disassembling the file directly shows every far call as
   `lcall 0:ffff`: the relocation fills it in. `tools/dos/nedis.py BINARY SEG:OFF LEN` applies
   the relocations and prints label names for call targets and DS globals.
+- **Text files end at ^Z.** On a Turbo Pascal `Text` file, `Eof` is true when the next byte is
+  0x1A, not only at the real end, and `Read` at the end returns 0x1A. A game that stores
+  binary data in a Text file (demo recordings, scripts) stops early at a 0x1A byte in the
+  right place: model it, and check which positions `Eof` can see.
+- **Finding the game clock.** Look for writes to ports 43h/40h (the PIT: `mov al, 36h; out
+  43h, al`, then the divisor's two bytes to 40h) and for `SetIntVec(8, ...)`: the new IRQ 0
+  handler and the divisor give the tick rate (1,193,182 / divisor Hz), and the loop that
+  waits for a counter the handler decrements gives ticks per frame. A handler that also
+  calls the old vector when a running sum carries keeps the BIOS clock at 18.2 Hz.
 - **Turbo Pascal types**: `Real` is 6 bytes and not IEEE (`readseg.py ... real48`), `Comp` is a
   64-bit integer kept in the FPU, `string[N]` takes N+1 bytes, sets are bit arrays of up to 32
   bytes, `Boolean` is one byte. Records are not padded.
