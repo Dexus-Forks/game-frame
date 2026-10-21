@@ -107,6 +107,9 @@ up to its size (a variant record), so check one offset in the code before relyin
 - **Scans with string instructions.** `repe scasb` over an array finds the next element that
   differs from AL; the loop then resumes the scan with the saved CX and DI. Port it as a loop
   over the array, and check how it stops (often `or cl, cl` on the low byte only).
+- **Which carry counts.** In `add dx, bx; add dx, 1180h; add dx, ax; jae ok`, only the last
+  add sets the carry the jump tests; the sum wraps freely before it. Port the test on the
+  same instruction, not on the whole sum.
 - **Stale globals are inputs.** A routine may test a temporary that another routine set
   earlier in the frame (a `tempi2` left by the movement code). Keep the read: it is part of
   the behaviour, and a test catches it only if the port leaves the global as the original

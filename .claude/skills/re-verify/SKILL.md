@@ -83,6 +83,13 @@ frame after frame. What it must hold:
   plus contents; for `after`, only the blocks that changed.
 - **Open files.** Save each open DOS handle's name and position. Code that reads input from
   a file (a recorded demo) then replays from the same place in the port.
+- **Pieces and the whole.** Capture each new piece of a loop body and the whole body too.
+  The pieces say where a port goes wrong; the whole proves the wiring between them (state a
+  piece's own test never saw, such as temporaries the caller keeps in globals).
+- **State an interrupt owns.** A timer or music interrupt runs while the frame waits for its
+  time: its counters after a frame depend on the host, not on the frame. Leave them out of
+  the comparison with the reason written down. A clock the frame reads (the BIOS tick count)
+  is an input: give the port the value the original read.
 - **What it covered.** Before trusting a pass, count what the captured cases changed (the
   score, the armour, the enemies removed, the screen). A recording may never take a path;
   say which paths passed and which were never reached.

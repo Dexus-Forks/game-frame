@@ -26,6 +26,11 @@ the few controls the game gives. That shapes the code:
   record per frame. Then a demo, a recording or a test script can drive the port, and two
   runs with the same input must give the same frames.
 
+- **One boundary, once a frame.** Put everything that crosses between the game and the
+  platform in one per-frame record: in, the input and any clock the game reads; out, the
+  finished picture, songs and sounds asked for. The core then runs headless, from a demo, a
+  test or a player, and the comparison with the original stays exact.
+
 ### What kind of interaction?
 
 Look at the game before its code, and decide what kind of control system you are rebuilding.
