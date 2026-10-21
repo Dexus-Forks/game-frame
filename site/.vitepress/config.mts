@@ -51,7 +51,7 @@ export default defineConfig({
       text: 'Edit this page on GitHub',
     },
     footer: {
-      message: 'MIT OR Apache-2.0. No game material: bring your own copy.',
+      message: 'Code: Apache 2.0. Content: CC BY 4.0. No game material: bring your own copy.',
     },
   },
 })

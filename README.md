@@ -147,5 +147,20 @@ repositories, and write new code from documented behaviour: see [docs/LEGAL.md](
 
 ## Licence
 
-Dual-licensed under the [MIT licence](LICENSE-MIT) or the [Apache License 2.0](LICENSE-APACHE),
-at your choice. Projects made with `scripts/new-project.sh` start with the same two licences.
+Two licences, one for each kind of work:
+
+| What | Licence |
+|---|---|
+| **Code**: `tools/`, `scripts/`, `tests/`, `examples/`, `templates/`, `site/` (its configuration and code), the Ghidra scripts | [Apache License 2.0](LICENSE-APACHE) |
+| **Content**: the documentation (`docs/`), the skills (`.claude/skills/`), the READMEs and `AGENTS.md`, and the website's text | [Creative Commons Attribution 4.0](LICENSE-CC-BY-4.0) (CC BY 4.0) |
+
+CC BY 4.0 lets anyone copy, adapt, translate and remix the content for any purpose, commercial
+included, as long as they credit it: for example "Based on *reverse-engineer-games* by Tane
+Piper (CC BY 4.0)", with a link to the repository and a note of what changed.
+
+The screenshots in `docs/assets/case-studies/` show the games' own art. That art belongs to
+the games' rights holders, is shown to illustrate the case studies, and is under neither
+licence.
+
+Projects made with `scripts/new-project.sh` start with their own licence files (MIT and
+Apache 2.0 for their code); each project chooses its own.

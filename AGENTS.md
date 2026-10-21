@@ -35,7 +35,10 @@ be mentioned and linked, but examples and advice must stay general.
 8. **Improve the harness from real games.** When a game project hits something generic (a
    tool crash, a missing format, a pitfall), fix it here with a test against our own samples,
    and keep the game-specific part in the game's repository.
-9. **Stage only your own files** (`git add path`), never `git add -A`, and push after each
+9. **Two licences.** Code is Apache 2.0 (`LICENSE-APACHE`); documentation, skills and other
+   prose are CC BY 4.0 (`LICENSE-CC-BY-4.0`). A new file takes the licence of its kind; the
+   README's Licence section lists which folders are which.
+10. **Stage only your own files** (`git add path`), never `git add -A`, and push after each
    verified change.
 
 ## Layout
