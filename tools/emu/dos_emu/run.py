@@ -1,5 +1,5 @@
-"""Running code: calls with the Pascal or C convention, fragments between two addresses, run
-slices with interrupt delivery, import stubs, interrupt handlers, stopping.
+"""Running code: calls with the Pascal or C convention, fragments between two addresses (or to
+the first of several ends), run slices with interrupt delivery, import stubs, interrupt handlers, stopping.
 Part of DosEmu (see __init__.py); the methods use its state."""
 from unicorn import UC_HOOK_CODE, UcError
 
@@ -50,17 +50,33 @@ class Runner:
         reaches `end`. For a running program: run_range(entry, a), then run_to(b), run_to(a)..."""
         self._run_until((self.reg('cs'), self.reg('ip')), end)
 
-    def _run_until(self, ptr, end):
-        stop = self.addr(end)
-        at = self.linear(*stop)
-        def on_end(uc, address, size, _):
-            self.pending = 'return'
-            uc.emu_stop()
-        h = self.uc.hook_add(UC_HOOK_CODE, on_end, begin=at, end=at)
+    def run_to_any(self, ends):
+        """Like run_to, for several possible ends (a fragment that can finish in more than one
+        place, or "the next fragment or the next frame, whichever comes first"): carry on until
+        execution reaches one of `ends` and return its index in `ends`. An end at the current
+        CS:IP is reached at once: step past it first (step) to search for the next one."""
+        return self._run_until((self.reg('cs'), self.reg('ip')), *ends)
+
+    def step(self):
+        """Run one instruction from the current CS:IP (no interrupt delivery, no stubs)."""
+        self.uc.emu_start(self.reg('ip'), 0, count=1)   # unicorn runs with IP as the address
+        self.set(cs=self.reg('cs'))
+
+    def _run_until(self, ptr, *ends):
+        hit, hooks = [], []
+        for i, end in enumerate(ends):
+            at = self.linear(*self.addr(end))
+            def on_end(uc, address, size, _, i=i):
+                hit.append(i)
+                self.pending = 'return'
+                uc.emu_stop()
+            hooks.append(self.uc.hook_add(UC_HOOK_CODE, on_end, begin=at, end=at))
         try:
             self._run(ptr)
         finally:
-            self.uc.hook_del(h)
+            for h in hooks:
+                self.uc.hook_del(h)
+        return hit[0] if hit else None
 
     def call_long(self, target, *args, **kw):
         """Like call, for a routine that returns a 32-bit value in DX:AX."""

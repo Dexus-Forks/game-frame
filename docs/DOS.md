@@ -213,6 +213,8 @@ emu.run_to('1000:ca59')                          # the next frame: carry on as i
   tick that advances, a PIT counter that counts, Borland RTM's memory calls (RTM.5/6/21).
 - Then capture state frame by frame: `emu.read((0x1048, 0), 0x10000)` is the data segment
   for `Globals::load`; any segment a pointer names can be dumped the same way.
+  `tools/emu/fragments.py` does this for chosen fragments of the main loop: the state before
+  and after each one, every frame, ready for the port's tests (re-verify).
 
 ## 6. Running the original: DOSBox-X
 

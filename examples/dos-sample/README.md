@@ -6,7 +6,8 @@ involved.
 - `sample.s`: routines in the style of a Borland Pascal program (FAR, Pascal calling
   convention, DS = data segment): a Turbo-Pascal-style random generator, a loop that draws
   numbers, a checksum over a far pointer, a selector fixup, an imported call (`KERNEL.3`) and
-  a DOS call (`INT 21h`).
+  a DOS call (`INT 21h`), and `main_loop`: eight frames of a tiny main loop for
+  `tools/emu/fragments.py` (DPMI blocks, the VGA display, a file read each frame).
 - `make_exe.py OUT`: assembles it with `zig cc` (LLVM, `.code16`) and links it with Python into
   `sample.exe` (NE, 16-bit protected mode), `sample-td.exe` (the same with Turbo Debugger
   symbols appended) and `sample-mz.exe` (real-mode MZ).

@@ -209,6 +209,21 @@ import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu; from do
 e = DosEmu('$D/sample.exe'); env = DosEnv(e, root='$D'); s = e.new_selector(base=0xB8123)
 print(hex(e.linear(e.new_selector(base=0xA0000)))[2:], hex(e.linear(s))[2:])"
 
+echo "Fragments of a main loop (fragments.py)"
+a() { printf '1000:%s' "$(awk -v n="$1" '$1 == n { sub(/^0x/, "", $3); print $3 }' $D/symbols.tsv)"; }
+w="$(mktemp -d)"
+expect "fragments captures fragments of a running main loop" "draw: 8 of 8 runs saved" "$PYTHON" tools/emu/fragments.py $D/sample.exe "$w" 8 \
+  "draw=$(a draw)-$(a draw_even_end)|$(a draw_odd_end),heap=1" "event=$(a event)-$(a event_end),changed=a8" \
+  "tail=$(a event_end)-$(a frame_top),every=2,max=3" --frame-top "$(a frame_top)" --start "$(a main_loop)" \
+  --screen a0 --display a2 --heap a0,a4
+expect "fragments keeps only runs that change a word, and one in N up to K" "event 2 tail 3" sh -c "
+  echo event \$(ls '$w/event' | grep -c before.ds) tail \$(ls '$w/tail' | grep -c before.ds)"
+expect "fragments saves state before and after: DS, screen, display, files, heap" "ds scr vga files heap 2 1" "$PYTHON" -c "
+w = '$w/draw/00000'; r = lambda e: open(w + e, 'rb').read()
+print(' '.join(k for k in ('ds', 'scr', 'vga', 'files') if r('.before.' + k) != r('.after.' + k)), 'heap', len(r('.before.heap')) // 65538, len(r('.after.heap')) // 65538)"
+expect "fragments saves the open files with their positions" "5	1	sample.txt" cat "$w/draw/00000.after.files"
+rm -rf "$w"
+
 echo "DOSBox-X runtime"
 log="$(mktemp)"
 cat > "$log" <<'LOG'

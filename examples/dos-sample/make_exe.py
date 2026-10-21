@@ -11,7 +11,8 @@ so the harness needs no 16-bit compiler or linker:
                        exports, a selector relocation and an import from KERNEL (ordinal 3)
   OUT_DIR/sample-mz.exe  plain real-mode MZ: the same code and data in one load image, with an
                        MZ relocation for the data segment's paragraph
-  OUT_DIR/symbols.tsv  name, segment, offset of every routine (the "map file")
+  OUT_DIR/symbols.tsv  name, segment, offset of every routine and of main_loop's labels (the
+                       "map file")
   OUT_DIR/sample-td.exe  sample.exe with Turbo Debugger symbols (TDINFO 3.0) appended inside a
                        CodeView-style NB02 wrapper, laid out as Borland Pascal 7 writes them:
                        procedures, globals, a parameter, a record type, line numbers
@@ -29,6 +30,8 @@ import tempfile
 HERE = os.path.dirname(os.path.abspath(__file__))
 EXPORTS = ['rng_seed', 'rng_next', 'sum_draws', 'checksum', 'get_data_seg', 'ask_host', 'dos_version', 'field_read',
            'read_file', 'wait_ticks', 'get_key', 'write_file']
+# Labels inside main_loop, written to symbols.tsv for the fragments.py test
+LABELS = ['main_loop', 'frame_top', 'draw', 'draw_even_end', 'draw_odd_end', 'event', 'event_end']
 DESCRIPTION = b'DOS sample for the reverse-engineer-games harness'
 MESSAGE = b'\x0cDOS SAMPLE 1'   # a Pascal string: length byte first
 
@@ -71,7 +74,7 @@ def data_segment():
     d += MESSAGE + b'\0' + DESCRIPTION + b'\0'
     d += bytes(0x80 - len(d))
     d += b'sample.txt\0'                     # FileName at 0x80 (read_file)
-    d += bytes(0xA0 - len(d))                # FileBuf at 0x90
+    d += bytes(0xB0 - len(d))                # FileBuf at 0x90; main_loop's words at 0xA0
     return bytes(d)
 
 
@@ -234,7 +237,7 @@ def main(out_dir):
     open(os.path.join(out_dir, 'sample-td.exe'), 'wb').write(with_tdinfo(ne, tdinfo(syms, len(code))))
     open(os.path.join(out_dir, 'sample-mz.exe'), 'wb').write(build_mz(code, syms, data))
     with open(os.path.join(out_dir, 'symbols.tsv'), 'w') as f:
-        for name in ['entry'] + EXPORTS:
+        for name in ['entry'] + EXPORTS + LABELS:
             f.write(f'{name}\t1\t{syms[name]:#06x}\n')
     print(f'built {out_dir}/sample.exe (NE), sample-td.exe (NE + TD symbols), sample-mz.exe (MZ), symbols.tsv')
 
