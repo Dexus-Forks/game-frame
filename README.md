@@ -66,13 +66,15 @@ to produce, and the pitfalls that cost time.
 | `scripts/new-project.sh DIR "Name" [GAME]` | Creates a project for one game: rules, skills, tools, ignored folders for the game and its derivatives |
 | `scripts/ghidra-export.sh [--labels FILE] BINARY...` | Headless Ghidra analysis and a text export: pseudocode, functions, strings, imports, exports; names applied from a labels file |
 | `scripts/ghidra-run.sh BINARY decompile\|named\|refs\|vtable\|labels OUT ARGS` | One-off jobs in the analysed project, without re-analysis |
+| `scripts/extract-installer.sh [--detect] INSTALLER OUT` | Unpacks an installer or package without running it: Inno Setup (GOG), NSIS, InstallShield, MSI, archives, `.dmg`, `.pkg`, GOG's `.sh` |
 | `scripts/dosbox-run.sh [--fileio] [--break] [--mcp PORT] DIR PROGRAM` | Runs a DOS program in DOSBox-X without a window: exit code, file I/O log, debugger control |
-| `tests/run.sh [--ghidra]` | 56 checks of every tool against the two sample games |
+| `tests/run.sh [--ghidra]` | 62 checks of every tool against the two sample games |
 
 ## Tools
 
 | Tool | What it answers |
 |---|---|
+| `tools/triage/compare_trees.py` | Two copies or releases compared file by file (SHA-256, case-insensitive paths); hashes to publish |
 | `tools/pe/peinfo.py` | What is this binary: architecture, compiler, PDB path, imports, exports, RTTI, engine and packer fingerprints |
 | `tools/pe/readdata.py` | The real value of a `DAT_` constant or table |
 | `tools/pe/vtable.py` | The functions in a table of function pointers |

@@ -9,6 +9,26 @@ The goal is a short, evidenced map of the game before any decompiling: what to a
 which tool, and what to leave alone. A wrong choice here (decompiling a packed binary, or
 analysing the C++ runtime of a Unity game instead of its C# code) wastes days.
 
+## 0. Get the files out of their installer
+
+A purchased game often arrives as an installer (GOG's Inno Setup `.exe`, a Steam depot, an
+NSIS or InstallShield setup, an `.msi`, a `.dmg` or `.pkg`, GOG's Linux `.sh`). Never run it:
+extract it.
+
+```bash
+scripts/extract-installer.sh --detect "~/Downloads/setup_game.exe"     # what it is, which tool
+scripts/extract-installer.sh "~/Downloads/setup_game.exe" target/gog
+python3 tools/triage/compare_trees.py target/game target/gog         # same version?
+python3 tools/triage/compare_trees.py target/game /dev/null --hashes > docs/HASHES.txt
+```
+
+- A small macOS `.app` named after the game is often only GOG Galaxy's web installer: no game.
+- Store releases bundle extras worth reading: DOSBox or ScummVM configs (the CPU speed and
+  sound hardware the publisher tuned the game for), manuals and cheat sheets as PDF, saves.
+- When you have two releases, compare them before choosing one. Identical executables mean
+  every address and finding carries over; record the hashes (they are not game material) so
+  every later finding names the exact version it was made on.
+
 ## 1. List the files
 
 ```bash

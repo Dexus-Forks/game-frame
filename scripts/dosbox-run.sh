@@ -17,6 +17,9 @@
 #                  dosbox-x-mcp-server (agents, port 58991) or tools/dos/dbx_control.py
 #                  (scripts) listens; start that listener first
 #   --cycles N     a fixed CPU speed (DOSBox-X "cycles=fixed N"); use one value for every run
+#   --conf FILE    a DOSBox configuration to start from (repeatable), such as the one a GOG or
+#                  Steam release ships; this script's own settings come after it and win
+#                  (window, autoexec, logging). Fullscreen is turned off.
 #   --set "SECTION KEY=VALUE"   any other DOSBox-X setting (repeatable)
 #   --in-place     mount GAME_DIR itself (default: a fresh copy in OUT/drive, so saves and
 #                  settings the program writes never change your copy of the game)
@@ -29,7 +32,7 @@
 # screenshots or feed keys: see docs/DOS.md for those.
 set -euo pipefail
 . "$(dirname "$0")/lib.sh"
-out="$ROOT/analysis/dosbox"; time=60; window=0; inplace=0; flags=(); sets=(); after=(); prefix=""; tty=0
+out="$ROOT/analysis/dosbox"; time=60; window=0; inplace=0; flags=(); sets=(); after=(); prefix=""; tty=0; confs=()
 
 while [[ "${1:-}" == --* ]]; do
   case "$1" in
@@ -43,12 +46,13 @@ while [[ "${1:-}" == --* ]]; do
     --mcp) sets+=(-set "dosbox mcp_server=$2"); tty=1; shift 2 ;;
     --cycles) sets+=(-set "cpu cycles=fixed $2"); shift 2 ;;
     --set) sets+=(-set "$2"); shift 2 ;;
+    --conf) confs+=(-conf "$(cd "$(dirname "$2")" && pwd)/$(basename "$2")"); shift 2 ;;
     --in-place) inplace=1; shift ;;
     --then) after+=("$2"); shift 2 ;;
     *) echo "unknown option $1" >&2; exit 2 ;;
   esac
 done
-[[ $# -ge 2 ]] || { sed -n '2,24p' "$0"; exit 2; }
+[[ $# -ge 2 ]] || { sed -n '2,31p' "$0"; exit 2; }
 command -v dosbox-x >/dev/null || { echo "dosbox-x not found: scripts/setup.sh --install" >&2; exit 1; }
 game="$(cd "$1" && pwd)"; shift
 mkdir -p "$out"; out="$(cd "$out" && pwd)"
@@ -74,7 +78,7 @@ mode=(-silent)
 pty=()
 [[ $tty == 1 && $(uname -s) == Darwin ]] && pty=(script -q /dev/null)
 [[ $tty == 1 && $(uname -s) == Linux ]] && pty=(script -qec)
-env TERM="${TERM:-xterm}" ${env[@]+"${env[@]}"} ${pty[@]+"${pty[@]}"} dosbox-x -conf "$conf" "${mode[@]}" -fastlaunch -nomenu -time-limit "$time" \
+env TERM="${TERM:-xterm}" ${env[@]+"${env[@]}"} ${pty[@]+"${pty[@]}"} dosbox-x ${confs[@]+"${confs[@]}"} -conf "$conf" -set "sdl fullscreen=false" "${mode[@]}" -fastlaunch -nomenu -time-limit "$time" \
   ${flags[@]+"${flags[@]}"} ${sets[@]+"${sets[@]}"} > "$out/console.txt" 2>&1 || true
 code=0
 [[ -f "$drive/EXITCODE.TXT" ]] && code="$(tr -d '\r E' < "$drive/EXITCODE.TXT" | sed '/^$/d' | tail -1)"

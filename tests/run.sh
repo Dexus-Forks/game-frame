@@ -197,6 +197,22 @@ else
   echo "  skip  dosbox-run (dosbox-x is not installed: scripts/setup.sh --install)"
 fi
 
+echo "Installers and releases"
+I="$(mktemp -d)"
+cp $B/game.exe "$I/setup.exe" && printf 'Inno Setup Setup Data (5.6.2)' >> "$I/setup.exe"
+expect "extract-installer recognises an Inno Setup installer" "Inno Setup -> innoextract" scripts/extract-installer.sh --detect "$I/setup.exe"
+mkdir -p "$I/web.app/Contents/MacOS" && : > "$I/web.app/Contents/MacOS/GalaxyWebInstaller"
+expect "extract-installer flags a web-installer app" "probably no game files inside" scripts/extract-installer.sh --detect "$I/web.app"
+mkdir -p "$I/src/data" && echo level > "$I/src/data/LEVEL1.DAT" && cp $S/../dos-sample/build/sample-mz.exe "$I/src/GAME.EXE"
+(cd "$I/src" && zip -qr ../game.zip .)
+printf '#!/bin/sh\n# MojoSetup installer\nexit 0\n' > "$I/game.sh" && cat "$I/game.zip" >> "$I/game.sh"
+expect "extract-installer unpacks a zip" "extracted into" scripts/extract-installer.sh "$I/game.zip" "$I/a"
+expect "extract-installer unpacks a GOG-style .sh (zip after a script)" "GOG Linux installer" scripts/extract-installer.sh "$I/game.sh" "$I/b"
+echo changed > "$I/b/data/LEVEL1.DAT"
+expect "compare_trees finds the changed file, ignoring case" "DIFFERENT  DATA/LEVEL1.DAT" "$PYTHON" tools/triage/compare_trees.py "$I/a" "$I/b"
+expect "compare_trees counts identical files" "1 identical, 1 different" "$PYTHON" tools/triage/compare_trees.py "$I/a" "$I/b"
+rm -rf "$I"
+
 echo "Project scaffold"
 tmp="$(mktemp -d)/re-test"
 scripts/new-project.sh "$tmp" "Test Game" $B >/dev/null 2>&1

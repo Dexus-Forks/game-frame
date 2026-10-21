@@ -129,6 +129,10 @@ emu.trace({'1040:0a12': 'Random'}, args=1)     # record calls (the random draws)
 
 ## 6. Running the original: DOSBox-X
 
+A store release usually ships its own DOSBox configuration (GOG: `__support/app/*.conf`). Start
+from it so runs match what the publisher tuned: `scripts/dosbox-run.sh --conf THAT.conf ...`
+(the script turns fullscreen off and keeps its own logging and autoexec).
+
 `scripts/setup.sh --install` installs DOSBox-X (on macOS `brew install --formula dosbox-x`; the
 cask fails Gatekeeper). Homebrew's build has the heavy debugger (CPU logs, memory breakpoints);
 `brew install --HEAD --formula dosbox-x` adds the newest debugger commands (`STEPIN`,

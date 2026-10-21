@@ -13,6 +13,7 @@
 #   Node.js (for npx)                                    REA, the reverse-engineering MCP server
 #   Zig (~200 MB, optional)                              builds the sample games from any host
 #   DOSBox-X (~50 MB, optional)                          runs DOS games for ground truth (DOS only)
+#   innoextract, 7-Zip (~5 MB, optional)                 extract installers (scripts/extract-installer.sh)
 # Nothing is installed without --install. On Linux, Ghidra is not in apt: the script prints the
 # download page instead of fetching a large archive itself.
 set -uo pipefail
@@ -55,6 +56,8 @@ else row ghidra MISSING "https://github.com/NationalSecurityAgency/ghidra/releas
 check objdump "objdump --version" binutils binutils "binutils or LLVM objdump"
 check node "node --version" node nodejs "Node.js 18+ (REA runs with npx)"
 check zig "zig version" zig "" "optional: builds examples/sample-game (https://ziglang.org/download)"
+check innoextract "innoextract --version | head -1" innoextract innoextract "optional: extracts Inno Setup installers (GOG): scripts/extract-installer.sh"
+check 7z "command -v 7z || command -v 7zz" sevenzip p7zip-full "optional: extracts NSIS, MSI, cab, 7z and rar: scripts/extract-installer.sh"
 check dosbox-x "command -v dosbox-x >/dev/null && { dosbox-x -version 2>/dev/null || true; } | sed -n 's/^\\(DOSBox-X version [^ ,]*\\).*/\\1/p'" dosbox-x dosbox-x "optional, for DOS games: brew install --formula dosbox-x, or https://dosbox-x.com"
 
 if [[ ! -x "$ROOT/.venv/bin/python" && $install == 1 ]]; then
