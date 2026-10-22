@@ -20,6 +20,7 @@ scripts/extract-installer.sh --detect "~/Downloads/setup_game.exe"     # what it
 scripts/extract-installer.sh "~/Downloads/setup_game.exe" target/gog
 python3 tools/triage/compare_trees.py target/game target/gog         # same version?
 python3 tools/triage/compare_trees.py target/game /dev/null --hashes > docs/HASHES.txt
+python3 tools/triage/fixity.py bag target/game derived/bags/game-as-bought --info "External-Description=GOG 1.2"   # fixity
 python3 tools/disc/discinfo.py target/cd/GAME.CUE --files          # a CD: tracks, file systems, dates
 python3 tools/triage/similar.py target/game target/gog             # what changed between two releases
 ```

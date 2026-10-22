@@ -29,6 +29,7 @@ python3 tools/triage/constants.py target/GAME.EXE        # the decompressor or c
 python3 tools/triage/binview.py target/data/units.dat derived/units.png --width 24   # records show as stripes
 python3 tools/formats/rawimage.py target/data/TITLE.SCR derived/title.png --mode linear8   # a raw picture?
 python3 tools/formats/markers.py plant saves/slot1.sav derived/marked.sav --from 0x40   # follow fields into memory
+python3 tools/formats/fields.py target/data/units.dat --stride 24 --png derived/units.png   # what each offset holds
 ```
 
 Text that turns readable under one XOR byte or a short key is a common way games hid their

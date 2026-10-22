@@ -49,7 +49,7 @@ export function sidebar(): Item[] {
     text: 'In your browser',
     collapsed: true,
     items: [{ text: 'Overview', link: '/lab/' }, { text: 'File explorer', link: '/lab/files' },
-      { text: 'Pixel explorer', link: '/lab/pixels' }],
+      { text: 'Pixel explorer', link: '/lab/pixels' }, { text: 'Records explorer', link: '/lab/records' }],
   })
   groups.push({
     text: 'Agents',

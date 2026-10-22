@@ -12,6 +12,10 @@ work that spans several steps and several sessions.
   files on someone else's machine.
 - [Getting more from Ghidra](ghidra.md): every call with its arguments, code that is not an
   executable, carrying labels to a new build, Function ID, types, processors.
+- [Practising on games with source](practice.md): practice targets, a ladder of exercises,
+  and testing agents on games whose answers can be checked.
+- [Keeping a game for the long term](preservation.md): archive packages, fixity with BagIt,
+  format identification, and recording what was done.
 - [Handling the game as evidence](evidence.md): identifying the copy, keeping it unchanged,
   tying each finding to it, and making each result repeatable.
 - [Permissions and gates](gates.md): the commands an agent may run without asking, the ones

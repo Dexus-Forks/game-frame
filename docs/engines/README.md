@@ -37,6 +37,12 @@ Knowing the engine helps in several ways.
 - [Studio engines for 2D and isometric games](studio-2d.md): Westwood, Blizzard, the Infinity
   Engine, the Fallout engine, the adventure engines.
 
+## Inside an engine
+
+- [Engine structures in machine code](engine-structures.md): type records, reference
+  counting, factories, streaming, scene graphs, controllers and level of detail, as they
+  appear in the binary.
+
 ## Web players
 
 - [Flash and Shockwave games](flash-and-shockwave.md): SWF files and projectors, ActionScript,

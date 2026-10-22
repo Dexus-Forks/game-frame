@@ -54,6 +54,25 @@ Unicorn in [re-emulate](../../.claude/skills/re-emulate/SKILL.md). Set the regis
 run one function, and read the result. It is slower than Unicorn and needs the same care with
 the hardware the function reads.
 
+## Code coverage: what runs when
+
+A game runs most of its code every frame. The code for one action, such as buying a unit,
+saving or opening a door, runs only when that action happens. Coverage shows it. Record which
+basic blocks run while you play without the action. Then record again, doing the same and the
+action once. The blocks in the second run and not the first are the action's code.
+
+- **Recording.** DynamoRIO's drcov tool (`drrun -t drcov -- game.exe`) writes a coverage log
+  on Windows and Linux. Frida scripts write the same format. On a console or DOS emulator, a
+  debugger that logs executed addresses gives a list to use instead.
+- **Comparing.** `tools/triage/coverdiff.py BASELINE.log ACTION.log --module game.exe --base
+  0x400000 --functions analysis/export/game.exe/functions.tsv` lists the functions that ran
+  only with the action, by name.
+- **Viewing.** Coverage plug-ins for Ghidra (such as Cartographer) and IDA (Lighthouse) colour
+  the blocks that ran in the listing.
+
+Keep the two runs alike: the same save, the same menus, the same length. Every extra
+difference adds functions to the list.
+
 ## Patching a copy
 
 Some questions are quicker to answer by changing the game. Examples are skipping a long intro

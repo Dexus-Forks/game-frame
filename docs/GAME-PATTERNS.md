@@ -82,6 +82,29 @@ rounding error. If the original keeps time as a float, the reimplementation must
 Use the game's own calendar and its own names. A game's year may have twelve "months" that are
 seasons (Early Spring to Late Winter), or eight, or none; its tenth month is not October. Read the names from the game's string tables. Use them in docs, tests and examples.
 
+## Physics
+
+Movement, collisions and forces run in a fixed order of small steps. The port must take the
+same steps in the same order with the same numbers, or objects drift apart within seconds.
+
+| Integrator | How to recognise it | What changes the result |
+|---|---|---|
+| Explicit Euler | Position updated from the old velocity, then velocity from the acceleration | Swapping the two lines gives semi-implicit Euler, a different result |
+| Semi-implicit (symplectic) Euler | Velocity updated first, then position from the new velocity | The order of the two updates |
+| Verlet | The new position from the current and the previous position, with no velocity stored | Where the previous position is kept, and how a changing time step is handled |
+| Runge-Kutta (fourth order) | Four evaluations of the forces per step, combined with weights 1/6, 1/3, 1/3 and 1/6 (the constants 0.5 and 0.1666) | Each evaluation's time and state |
+
+- **The time step.** A fixed step (often 1/30 or 1/60 of a second) repeats the same results
+  every run. A variable step follows the frame time, and the results depend on the machine.
+  Look for the step in the main loop ([The main loop](#the-main-loop)). A port that must
+  replay recordings needs the original's steps exactly.
+- **Sub-steps.** Many games split each frame into several physics steps. Count them.
+- **Collision order.** Pairs of objects are tested and resolved in an order: by list, by grid
+  cell, or after sorting along an axis (sweep and prune). Resolving A against B before C
+  against B gives different positions from the reverse. Record the order and the sort.
+- **Iterations.** Solvers for stacked or jointed objects repeat a fixed number of times. The
+  count is part of the rule.
+
 ## Passwords, level codes and cheat codes
 
 Before memory cards and save files, many games gave the player a password to continue from a

@@ -11,6 +11,7 @@ import HomeSetupPrompt from './HomeSetupPrompt.vue'
 import MarkdownLink from './MarkdownLink.vue'
 import FileExplorer from './lab/FileExplorer.vue'
 import PixelExplorer from './lab/PixelExplorer.vue'
+import RecordsExplorer from './lab/RecordsExplorer.vue'
 import './custom.css'
 
 export default {
@@ -19,6 +20,7 @@ export default {
     // The browser tools of /lab/, used in its pages.
     app.component('FileExplorer', FileExplorer)
     app.component('PixelExplorer', PixelExplorer)
+    app.component('RecordsExplorer', RecordsExplorer)
   },
   Layout: () => h(DefaultTheme.Layout, null, {
     'home-hero-image': () => h(HomeHeroImage),

@@ -44,6 +44,9 @@ material.
 | Calls and random draws | `tools/emu/call_trace.py`; debugger traces |
 | File reads | `tools/dos/fileio_trace.py` on DOSBox-X logs; Process Monitor; Wine's `WINEDEBUG=+file` (`docs/observe/system-calls.md`) |
 | Calls to the system | Wine's relay log, strace, a proxy library (`docs/observe/system-calls.md`) |
+| What it draws | apitrace or RenderDoc captures of the draw calls; dgVoodoo 2 for older APIs (`docs/observe/drawing.md`) |
+| Network messages | Wireshark captures, then `tools/formats/pcap.py` and `tools/formats/fields.py` (`docs/observe/network.md`) |
+| The code for one action | coverage of two runs, with and without the action, compared by `tools/triage/coverdiff.py` (`docs/observe/debuggers.md`) |
 | Values at a moment | a debugger or an emulator's GDB stub, with memory breakpoints (`docs/observe/debuggers.md`) |
 | Sound | the chip's register writes; WAV recordings |
 

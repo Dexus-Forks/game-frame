@@ -415,6 +415,39 @@ import sys; sys.path.insert(0, 'tools/formats'); from reader import Reader
 a = Reader(bytes([0b10110100])); b = Reader(bytes([0b10110100])); print(a.bits(3), a.bits(5), b.bits(3, True), b.bits(5, True))"
 rm -rf "$W"
 
+echo "Network captures, fields, coverage, fixity"
+W="$(mktemp -d)"
+"$PYTHON" tests/make_pcap.py "$W/c.pcap"
+expect "pcap lists the flows of a capture" "UDP  10.0.0.1:27960 <-> 10.0.0.2:50123  80 messages" "$PYTHON" tools/formats/pcap.py "$W/c.pcap"
+"$PYTHON" tools/formats/pcap.py "$W/c.pcap" --flow 1 --stream "$W/s.bin" >/dev/null
+[[ "$(cat "$W/s.bin")" == "HELLO LOBBY" ]] && ok "pcap joins a TCP direction into a stream" || bad "pcap --stream"
+"$PYTHON" tools/formats/pcap.py "$W/c.pcap" --flow 0 --dir b --dump "$W/msgs" >/dev/null
+expect "fields finds the type byte" "+0x002  3 values: 0x01, 0x02, 0x03 (each with its own length: a type?)" "$PYTHON" tools/formats/fields.py "$W/msgs"
+expect "fields finds the sequence counter" "+0x003  counter u16 LE (+1 each)" "$PYTHON" tools/formats/fields.py "$W/msgs"
+expect "fields finds the length field" "length u16 LE (the whole message)" "$PYTHON" tools/formats/fields.py "$W/msgs"
+expect "fields groups by type and sees the counter's step" "+0x003  counter u16 LE (+3 each)" "$PYTHON" tools/formats/fields.py "$W/msgs" --by-type 2
+"$PYTHON" - "$W" <<'PY'
+import struct, sys
+d = sys.argv[1]
+def drcov(path, blocks):
+    head = ('DRCOV VERSION: 2\nDRCOV FLAVOR: drcov\nModule Table: version 2, count 2\n'
+            'Columns: id, base, end, entry, checksum, timestamp, path\n'
+            ' 0, 0x400000, 0x450000, 0x401000, 0x0, 0x0, C:\\game\\GAME.EXE\n'
+            ' 1, 0x77000000, 0x77100000, 0x0, 0x0, 0x0, C:\\Windows\\ntdll.dll\n'
+            f'BB Table: {len(blocks)} bbs\n').encode()
+    open(path, 'wb').write(head + b''.join(struct.pack('<IHH', s, 8, m) for s, m in blocks))
+base = [(0x1000, 0), (0x1010, 0), (0x2000, 0), (0x500, 1)]
+drcov(f'{d}/a.cov', base); drcov(f'{d}/b.cov', base + [(0x3000, 0), (0x3020, 0), (0x600, 1)])
+open(f'{d}/functions.tsv', 'w').write('401000\t32\tmain_loop\t\n402000\t16\tdraw\t\n403000\t64\tbuy_unit\t\n')
+PY
+expect "coverdiff names the function that ran only with the action" "403000  buy_unit  (2 blocks)" "$PYTHON" tools/triage/coverdiff.py "$W/a.cov" "$W/b.cov" --module game.exe --base 0x400000 --functions "$W/functions.tsv"
+mkdir -p "$W/game/DATA" && echo a > "$W/game/GAME.EXE" && echo b > "$W/game/DATA/L1.DAT"
+"$PYTHON" tools/triage/fixity.py bag "$W/game" "$W/bag" --info "External-Description=test" >/dev/null
+expect "fixity makes a BagIt bag that verifies" "2 files checked: all unchanged" "$PYTHON" tools/triage/fixity.py verify "$W/bag"
+echo x >> "$W/bag/data/DATA/L1.DAT"
+expect "fixity finds a changed file" "changed  data/DATA/L1.DAT" "$PYTHON" tools/triage/fixity.py verify "$W/bag"
+rm -rf "$W"
+
 echo "Ledger and coverage"
 L="$(mktemp -d)"; mkdir -p "$L/src/build" "$L/export/game.exe"
 printf '/// Original: `FUN_140001090`\nfn grow() {}\n// Deviation: the time comes in as an argument,\n// so tests can fix it.\nfn tick() {}\n// Not ported: the debug overlay.\n' > "$L/src/world.rs"
