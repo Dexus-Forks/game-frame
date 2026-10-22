@@ -2,7 +2,7 @@
 """Make function labels from a reimplementation's citations: every item whose comment says
 "Original: FUN_xxxx" names that original function.
 
-Usage: cite_labels.py SOURCE_DIR [--existing names.tsv] [--out FILE] [--check FILE]
+Usage: cite_labels.py SOURCE_DIR [--existing names.tsv] [--no-lines] [--out FILE] [--check FILE]
 
 GameFrame's rule is that every ported item names the original function it came from, in a
 comment such as `/// Original: FUN_1400be770` (or `// Original: 1400be770`). The port then knows
@@ -18,6 +18,8 @@ struct, an enum or a class, in Rust, C, C++, Python, JavaScript or TypeScript.
 - --existing names.tsv: addresses already labelled there by hand are left out, so a person's label
   always wins.
 - --out FILE writes the labels (address, label, evidence as file:line); without it they are printed.
+- --no-lines gives the evidence as the file alone. A committed labels file then changes only when
+  a citation or an item's name changes, not with every edit above it.
 - --check FILE exits 1 if FILE differs from what the tool would write, for a test that keeps the
   generated labels current.
 
@@ -69,7 +71,7 @@ def items(lines):
     return out
 
 
-def scan(root):
+def scan(root, lines_too=True):
     labels, skipped = [], 0
     for base, dirs, files in os.walk(root):
         dirs[:] = sorted(d for d in dirs if d not in ('target', 'build', 'node_modules', '.git'))
@@ -106,7 +108,7 @@ def scan(root):
                     continue
                 rel = os.path.relpath(path, root)
                 for k, addr in enumerate(addrs):
-                    labels.append((addr, name if k == 0 else f'{name}_{k + 1}', f'{rel}:{i + 1}'))
+                    labels.append((addr, name if k == 0 else f'{name}_{k + 1}', f'{rel}:{i + 1}' if lines_too else rel))
     return labels, skipped
 
 
@@ -136,7 +138,7 @@ def main(argv):
         print(__doc__)
         return 0
     opt = lambda name: argv[argv.index(name) + 1] if name in argv else None
-    labels, skipped = scan(argv[0])
+    labels, skipped = scan(argv[0], '--no-lines' not in argv)
     text, n = render(labels, load(opt('--existing')))
     if opt('--check'):
         old = open(opt('--check'), encoding='utf-8').read() if os.path.exists(opt('--check')) else ''
