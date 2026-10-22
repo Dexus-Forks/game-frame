@@ -8,6 +8,8 @@ the BBC version of Elite in detail.
 
 ### Hardware
 
+![The BBC Micro memory map and its sixteen sideways ROM banks](../assets/diagrams/bbc-memory-map.svg)
+
 | Model | Launch | CPU |
 |---|---|---|
 | Model A, Model B | 1 December 1981 | 6502A at 2 MHz |
@@ -77,6 +79,8 @@ from such a project, check whether it includes game bytes and what its licence i
 ## Acorn Electron
 
 ### Hardware
+
+![The Electron reads each RAM byte in two 4-bit halves](../assets/diagrams/electron-ram.svg)
 
 | Fact | Value |
 |---|---|

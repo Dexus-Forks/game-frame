@@ -13,6 +13,8 @@ an Intel 8080 program beside analog sound circuits.
 
 ### Hardware
 
+![Pong as counters and gates](../assets/diagrams/arcade-pong-netlist.svg)
+
 Pong (Atari, 1972) has no CPU. MAME emulates it as a netlist of discrete logic. Breakout uses
 the same approach
 ([MAME: atari/pong.cpp](https://github.com/mamedev/mame/blob/master/src/mame/atari/pong.cpp)).
@@ -40,6 +42,8 @@ MAME's `pong.cpp` netlist.
 
 ### Hardware
 
+![The Midway 8080 board clocks and refresh rate](../assets/diagrams/arcade-invaders-board.svg)
+
 Space Invaders (Taito, 1978; licensed to Midway in the US) uses an Intel 8080 CPU. Tomohiro
 Nishikado designed it. The game draws sprites with the help of a Fujitsu MB14241 shifter. Sound
 comes from analog circuits plus a TI SN76477
@@ -53,6 +57,8 @@ screen runs at about 59.54 Hz (computed)
 ([MAME: midw8080/mw8080bw.h](https://github.com/mamedev/mame/blob/master/src/mame/midw8080/mw8080bw.h)).
 
 ### Protection
+
+![The MB14241 shifter reading 8 bits at an offset](../assets/diagrams/arcade-mb14241.svg)
 
 None listed.
 

@@ -81,6 +81,8 @@ check it before you rely on it.
 
 ## Four groups of machines
 
+![The four groups of machines and the first step for each](../assets/diagrams/computer-groups.svg)
+
 The machines split into four groups with different first steps.
 
 | Group | First step | Pages |
@@ -91,6 +93,8 @@ The machines split into four groups with different first steps.
 | Consoles | See [Console games](../consoles/README.md) | |
 
 ## Snapshot after the loader
+
+![A loader runs in an emulator until the game code is in memory, then a snapshot is taken](../assets/diagrams/computer-loader-snapshot.svg)
 
 The first job on a tape or disk game is usually to get past the loader. Run the game under an
 emulator until the game code sits in memory. Then take a snapshot. A reimplementation does not
@@ -103,6 +107,8 @@ country ([Legal](../LEGAL.md), [the law worldwide](../preservation/law/README.md
 which route to take.
 
 ## How games were written on 8-bit machines
+
+![Four 8-bit machines where the video hardware takes CPU time](../assets/diagrams/computer-8bit-timing.svg)
 
 Commercial games were mostly hand-written assembly. BASIC appears in loaders and in budget and
 type-in games. Tape was the main medium in the UK and Europe. Disk was the main medium in the

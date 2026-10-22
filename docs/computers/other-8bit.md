@@ -9,6 +9,8 @@ On the TI-99/4A the general registers are held in RAM.
 
 ### Hardware
 
+![The 6809E, SAM and VDG chips of the Dragon and CoCo](../assets/diagrams/coco-dragon.svg)
+
 | Machine | Years | CPU | Video |
 |---|---|---|---|
 | TRS-80 CoCo | Announced July 1980 at US$399 | 6809E | MC6847 VDG |
@@ -57,6 +59,8 @@ None listed yet.
 
 ### Hardware
 
+![Oric serial attributes in a line of text](../assets/diagrams/oric-attributes.svg)
+
 | Fact | Value |
 |---|---|
 | Years | Oric-1 on 1 September 1982; Atmos on 1 February 1984 |
@@ -98,6 +102,8 @@ None listed yet.
 ## Texas Instruments TI-99/4A
 
 ### Hardware
+
+![TMS9900 registers held in RAM and the BLWP instruction](../assets/diagrams/ti99-workspace.svg)
 
 The TI-99/4A uses the TMS9900, a 16-bit big-endian CPU with only PC, WP and ST on the chip. Its
 sixteen general registers are held in RAM at the workspace pointer. BLWP saves WP, PC and ST into

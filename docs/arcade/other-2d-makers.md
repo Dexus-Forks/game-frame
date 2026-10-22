@@ -17,6 +17,8 @@ about 55 Hz to about 60.6 Hz. Several boards have a protection MCU.
 | Toaplan 1 | 1988 | 68000 at 10 MHz | Z80 at 3.5 MHz, YM3812 | Not covered here | Not covered here | In MAME | 68000 built in |
 | Cave 68000 | 1994 on | 68000 at 16 MHz | YMZ280B, or MSM6295, or Z80 and YM2151 | about 57.55 Hz | Not covered here | In MAME | 68000 built in |
 
+![The 2D boards of seven makers at a glance](../assets/diagrams/arcade-other-2d.svg)
+
 ## Namco System 1 and 2
 
 ### Hardware
@@ -78,6 +80,8 @@ None listed yet.
 ## Taito F2 and F3
 
 ### Hardware
+
+![The Taito F3 CPU and its sound board](../assets/diagrams/arcade-taito-f3.svg)
 
 **Taito F2** uses a 68000 at 12 MHz, a Z80 at 4 MHz and a YM2610 at 8 MHz. MAME sets it to a
 nominal 60 Hz. Some variants use an OKI MSM6295 and different clocks "verified on pcb"

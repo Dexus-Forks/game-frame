@@ -13,6 +13,8 @@ number generator. Official re-releases run the MVS code under emulation.
 
 ### Hardware
 
+![The Neo Geo MVS clock tree](../assets/diagrams/arcade-neogeo-clocks.svg)
+
 The MVS launched in 1990 and was discontinued in 2004. Alpha Denshi (ADK) designed it. It came
 as 1, 2, 4 and 6-slot motherboards
 ([MAME: snk/neogeo.h](https://github.com/mamedev/mame/blob/master/src/mame/snk/neogeo.h);
@@ -28,6 +30,8 @@ MVS motherboards differ by generation. Memory-card headers, coin lockouts, LED d
 soldered BIOS vary between MV-1, MV-1F, MV-1A, MV-1B and MV-1C.
 
 ### Protection
+
+![Which Neo Geo ROMs each protection chip handles](../assets/diagrams/arcade-neogeo-roms.svg)
 
 Late games have protection chips. MAME lists them. Example sets are The King of Fighters
 '99, 2000 and 2003.

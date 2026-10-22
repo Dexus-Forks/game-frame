@@ -18,11 +18,15 @@ MSX.
 
 Sources: [Wikipedia: MSX](https://en.wikipedia.org/wiki/MSX), [MSX Wiki](https://www.msx.org/wiki/).
 
+![MSX pages and slots selected by port A8h](../assets/diagrams/msx-slots.svg)
+
 **Slots.** Slots and subslots are selected through the PPI at port `A8h` and the register at
 `FFFFh`. VRAM is reached only through VDP ports `98h` and `99h` (not confirmed)
 ([MSX Wiki: Slots](https://www.msx.org/wiki/Slots)).
 
 ### How games were made and loaded
+
+![The bank windows of four MegaROM mappers](../assets/diagrams/msx-megarom.svg)
 
 Cartridges were common on the MSX. MegaROM cartridges use bank-switching mappers: Konami,
 Konami SCC, ASCII 8K and ASCII 16K. An emulator needs the right mapper type to run a dump
@@ -56,6 +60,8 @@ None listed yet.
 ## NEC PC-8801
 
 ### Hardware
+
+![The PC-8801 and the Sharp X1 compared](../assets/diagrams/japan-8bit.svg)
 
 | Fact | Value |
 |---|---|

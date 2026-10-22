@@ -7,7 +7,11 @@ family tells you the byte order, the disassembler to use, the emulator cores tha
 ground truth, and the arithmetic a port must copy. This page covers every family except the x86 details,
 which are in [CPUs and floating point](../hardware/cpus.md).
 
+![The eleven CPU families and the machines they ran](../assets/diagrams/cpu-families-map.svg)
+
 ## Byte order
+
+![A 32-bit value stored little-endian and big-endian](../assets/diagrams/cpu-byte-order.svg)
 
 Every 8-bit family here is little-endian except the 6809. Every 16-bit console CPU except x86
 is big-endian. A data-file decoder must follow the byte order of the machine that wrote the
@@ -46,6 +50,8 @@ PAL RP2A07 uses a different clock divider ([NESdev Wiki: 2A03](https://www.nesde
 The PC Engine's **HuC6280** is a 65C02-style core with extra instructions, an MMU that maps
 64 KB onto 2 MB, a timer and a PSG
 ([Wikipedia: Hudson Soft HuC6280](https://en.wikipedia.org/wiki/Hudson_Soft_HuC6280)).
+
+![The same 65C816 bytes decoded with an 8-bit and a 16-bit accumulator](../assets/diagrams/cpu-65816-widths.svg)
 
 The **65C816** (1985) resets into a 65C02-like emulation mode. In native mode the m and x
 flags set the widths of the accumulator and the index registers. Addresses become 24-bit, with
@@ -148,6 +154,8 @@ thirty-two 32-bit registers (not confirmed)
 
 ## Tools per family
 
+![Ghidra, Unicorn and Capstone support for each CPU family](../assets/diagrams/cpu-tool-support.svg)
+
 The support below is for Ghidra release `Ghidra_12.1.4_build`, Unicorn 2.1.4 and Capstone's
 `next` branch at 6.0.0-Alpha11
 ([Ghidra processors](https://github.com/NationalSecurityAgency/ghidra/tree/master/Ghidra/Processors);
@@ -243,6 +251,8 @@ as separate external tools. [TomHarte/CLK](https://github.com/TomHarte/CLK) (MIT
 ## Arithmetic traps
 
 ### Ghidra's 6502 ADC is not exact
+
+![Three cases where Ghidra's 6502 ADC differs from a real 6502](../assets/diagrams/cpu-6502-adc.svg)
 
 Ghidra's 6502 spec computes `ADC` as `C = carry(A, op1); A = A + op1 + tmpC; resultFlags(A);
 V = C;`

@@ -8,6 +8,8 @@ and NE ([re-inventory](../../.claude/skills/re-inventory/SKILL.md)). The x86 CPU
 hardware are on [CPUs and floating point](../hardware/cpus.md) and
 [Hardware of the era](../hardware/README.md).
 
+![How to tell COM, MZ, NE, LE, LX and PE files apart](../assets/diagrams/ibmpc-exe-formats.svg)
+
 | Era | Years | Hardware | Executable | Running it today |
 |---|---|---|---|---|
 | IBM PC, XT, AT | 1981–1984 | 8088 at 4.77 MHz; 80286 in the AT; MDA or CGA; PC speaker on the 8253 PIT (not confirmed) | COM, MZ | DOSBox, DOSBox-X |
@@ -33,6 +35,8 @@ Sources: [IBM Personal Computer](https://en.wikipedia.org/wiki/IBM_Personal_Comp
 [x86-64](https://en.wikipedia.org/wiki/X86-64),
 [Windows XP Professional x64 Edition](https://en.wikipedia.org/wiki/Windows_XP_Professional_x64_Edition),
 [PE Format, Microsoft Learn](https://learn.microsoft.com/en-us/windows/win32/debug/pe-format).
+
+![The PC eras and their executable formats](../assets/diagrams/ibmpc-eras.svg)
 
 Ghidra has built-in loaders for MZ, NE and PE. LE and LX need a community extension
 (not confirmed) ([Ghidra file formats overview](https://www.mintlify.com/NationalSecurityAgency/ghidra/processors/file-formats)).
@@ -72,6 +76,8 @@ None listed yet.
 ## PCjr and Tandy 1000
 
 ### Hardware
+
+![The Tandy colour modes and sound chip](../assets/diagrams/ibmpc-tandy.svg)
 
 1984 on. CGA modes plus 160x200 in 16 colours and 320x200 in 16 colours. SN76496 sound at port
 C0h (not confirmed).
@@ -235,6 +241,8 @@ None listed yet.
 
 ## Compilers and their fingerprints
 
+![The fingerprints of six PC compilers](../assets/diagrams/ibmpc-compilers.svg)
+
 Each compiler leaves recognisable code and strings in the binary. Once you know the compiler,
 you know which library code a port can skip and which arithmetic rules it must copy. These fingerprints are widely documented. Each one
 below is (not confirmed).
@@ -252,6 +260,8 @@ The Borland debug symbols are on [DOS games](../DOS.md). .NET and Unity are on
 [Engine-era PC games](modern-pc-engines.md).
 
 ## Copy protection over the years
+
+![PC copy protection from manual checks to Denuvo](../assets/diagrams/ibmpc-protection.svg)
 
 Protection checks moved over the years toward the disc, and later to online activation.
 

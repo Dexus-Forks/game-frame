@@ -10,6 +10,8 @@ turbo or protected loaders.
 
 ### Hardware
 
+![The ZX81 screen in SLOW mode and in FAST mode](../assets/diagrams/zx81-display.svg)
+
 | Fact | Value |
 |---|---|
 | Years | 1981–1984; launched in the UK on 5 March 1981 at £69.95 assembled |
@@ -62,12 +64,16 @@ Sources: [Wikipedia: ZX Spectrum](https://en.wikipedia.org/wiki/ZX_Spectrum),
 The ULA gives 256x192 pixels with 8x8 attribute cells. The 128K models add an AY-3-8912 sound
 chip.
 
+![The Spectrum memory map and the 128K paging port](../assets/diagrams/spectrum-memory-map.svg)
+
 **Memory map and paging.** The 48K map puts ROM at `0x0000`–`0x3FFF`, the screen bitmap at
 `0x4000`–`0x57FF` and the attributes at `0x5800`–`0x5AFF` (not confirmed)
 ([Sinclair Wiki](https://sinclair.wiki.zxnet.co.uk/wiki/ZX_Spectrum_48K)). On 128K models,
 port `0x7FFD` selects the RAM page at `0xC000`, the shadow screen, the ROM and a lock bit. The
 +2A and +3 add port `0x1FFD` for all-RAM modes (not confirmed)
 ([Sinclair Wiki: ZX Spectrum 128](https://sinclair.wiki.zxnet.co.uk/wiki/ZX_Spectrum_128)).
+
+![The Spectrum screen layout and attribute clash](../assets/diagrams/spectrum-screen.svg)
 
 **Contended memory.** The ULA delays CPU accesses to contended memory while it reads the
 screen. The delays differ by model
@@ -80,6 +86,8 @@ screen. The delays differ by model
 | +2A, +3 | Pages 4 to 7, only when MREQ is active | 14363 | 7,6,5,4,3,2,1,0,0 | |
 
 "Late timing" ULAs run one T-state later than the 48K figure.
+
+![A Spectrum frame and the contention delay pattern](../assets/diagrams/spectrum-contention.svg)
 
 **Frames.** A frame lasts 69888 T-states on the 48K and 70908 on the 128K, with one maskable
 interrupt per frame. Most games use IM 2 (not confirmed)
@@ -94,6 +102,8 @@ The +3 used 3-inch disks protected with non-standard sectors (not confirmed)
 ([CPCWiki: Copy protection](https://www.cpcwiki.eu/index.php/Copy_protection)).
 
 ### Media and image formats
+
+![TZX blocks and the pulses of a standard-speed block](../assets/diagrams/spectrum-tzx.svg)
 
 | Format | What it holds |
 |---|---|

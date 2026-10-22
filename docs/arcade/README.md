@@ -38,6 +38,8 @@ timing. It usually gives more detail than any other public source.
 
 ## How arcade work differs from console work
 
+![Encrypted CPUs, DSPs and PC boards over the years](../assets/diagrams/arcade-three-problems.svg)
+
 A console has one hardware design for every game. An arcade board was often built for one game
 or for a short run of games. Each board family has its own memory map, clocks and protection.
 
@@ -56,6 +58,8 @@ Later boards add three problems.
    with its keychip.
 
 ## Order of work
+
+![The five steps before porting an arcade game](../assets/diagrams/arcade-order-of-work.svg)
 
 1. Read the MAME driver for the board. Note the clocks, the screen totals and the machine
    flags.

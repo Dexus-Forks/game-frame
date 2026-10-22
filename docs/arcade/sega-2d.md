@@ -12,6 +12,8 @@ the [Z80 and 6502](z80-and-6502-era.md#sega-system-1) page.
 | X Board | Not covered here (After Burner) | Two 68000s at 12.5 MHz | Not covered here | about 59.64 Hz (computed) | Not covered here | In MAME | 68000 built in |
 | Y Board | 1988 | Three 68000s at 12.5 MHz | Not covered here | nominal 60 Hz | Not covered here | In MAME | 68000 built in |
 
+![Sega System 16B, 18, X and Y Boards compared](../assets/diagrams/arcade-sega-2d.svg)
+
 ## System 16B
 
 ### Hardware

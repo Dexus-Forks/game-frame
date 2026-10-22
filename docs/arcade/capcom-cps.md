@@ -14,6 +14,8 @@ from battery-backed RAM. CPS-3 uses an encrypted SH-2 derivative and loads its g
 
 ### Hardware
 
+![The CPS-1 chips and refresh rate](../assets/diagrams/arcade-cps1.svg)
+
 CPS-1 arrived in 1988 with Forgotten Worlds. Final Fight (1989) and Street Fighter II (1991)
 followed ([MAME: capcom/cps1.h](https://github.com/mamedev/mame/blob/master/src/mame/capcom/cps1.h);
 [cps1.cpp](https://github.com/mamedev/mame/blob/master/src/mame/capcom/cps1.cpp)).
@@ -52,6 +54,8 @@ None listed yet.
 ## CPS-2
 
 ### Hardware
+
+![The CPS-2 A-board and B-board](../assets/diagrams/arcade-cps2.svg)
 
 CPS-2 ran from 1993 to 2004. Its first game was Super Street Fighter II. About 50 games in over
 170 variants ran on it
@@ -99,6 +103,8 @@ desuicide work.
 ## CPS-3
 
 ### Hardware
+
+![The CPS-3 CD-ROM, flash SIMMs and security cartridge](../assets/diagrams/arcade-cps3.svg)
 
 CPS-3 ran from late 1996 to 1999 and six games were released on it. Among them are Red Earth
 (1996) and Street Fighter III (1997)

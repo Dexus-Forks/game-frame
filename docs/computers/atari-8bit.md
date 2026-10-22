@@ -24,6 +24,10 @@ depends on exact cycle timing.
 
 Source: [Wikipedia: Atari 8-bit](https://en.wikipedia.org/wiki/Atari_8-bit_computers).
 
+![An Atari display list and a display list interrupt](../assets/diagrams/atari8-display-list.svg)
+
+![PORTB banking on the 130XE and ANTIC DMA on a scan line](../assets/diagrams/atari8-memory.svg)
+
 The details below are (not confirmed)
 ([Altirra Hardware Reference Manual](https://www.virtualdub.org/altirra.html)).
 

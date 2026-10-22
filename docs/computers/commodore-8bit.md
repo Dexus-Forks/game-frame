@@ -9,6 +9,8 @@ builds. The 1541 disk drive has its own 6502. Fast loaders run code on it.
 
 ### Hardware
 
+![PAL and NTSC clocks and frame sizes of the VIC-20 and C64](../assets/diagrams/commodore-pal-ntsc.svg)
+
 | Fact | Value |
 |---|---|
 | Years | 1980 in Japan, 1981 worldwide, to 1985; US$299.95 |
@@ -55,6 +57,8 @@ None listed yet.
 
 Source: [Wikipedia: Commodore 64](https://en.wikipedia.org/wiki/Commodore_64).
 
+![How the $01 port switches ROM and I/O on the C64](../assets/diagrams/c64-banking.svg)
+
 **Banking.** The 6510's on-chip port at `$01` switches the BASIC, KERNAL and character ROMs and
 the `$D000` I/O area in and out
 ([Wikipedia: Commodore 64](https://en.wikipedia.org/wiki/Commodore_64)). The map below is
@@ -83,10 +87,14 @@ record the bank state for each code region.
 
 Badlines steal 40 cycles every eighth line (not confirmed). Games also use raster interrupts.
 
+![C64 badlines in a PAL frame](../assets/diagrams/c64-badlines.svg)
+
 **Sound.** The two SID revisions differ audibly, mainly in the filter (not confirmed)
 ([Wikipedia: SID](https://en.wikipedia.org/wiki/MOS_Technology_6581)).
 
 ### How games were made and loaded
+
+![The 1541 drive running loader code, with the D64 track zones](../assets/diagrams/c64-1541.svg)
 
 Cartridges auto-start on the "CBM80" signature at `$8000`
 ([Wikipedia: Commodore 64](https://en.wikipedia.org/wiki/Commodore_64)).

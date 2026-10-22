@@ -20,6 +20,8 @@ The law on working around protection differs by country ([Legal](../LEGAL.md),
 | Konami-1 | Konami | Custom 6809 | Opcodes only | Fixed by address | No battery |
 | NEO-CMC, NEO-PCM2, NEO-SMA | SNK and Playmore | Separate chips | Graphics, sound, samples, program | In the chip | Not covered here |
 
+![What each scheme does when its battery dies](../assets/diagrams/arcade-suicide.svg)
+
 ## Sega
 
 ### Hardware
@@ -31,6 +33,8 @@ Intel 8751 protection MCU. System 1 uses many encrypted Z80 parts (315-5033, 315
 [sega/system1.cpp](https://github.com/mamedev/mame/blob/master/src/mame/sega/system1.cpp)).
 
 ### Protection
+
+![How the FD1094 decrypts an opcode](../assets/diagrams/arcade-fd1094.svg)
 
 **FD1094** is a custom 68000. It decrypts only words fetched from program space and leaves data
 alone. It keeps its key in 8 KB of battery-backed RAM. Decryption is a chain of conditional XORs
@@ -74,6 +78,8 @@ CPS-1 QSound games use Kabuki for the sound Z80. CPS-2 and CPS-3 encrypt the mai
 [Capcom CPS](capcom-cps.md) for the boards.
 
 ### Protection
+
+![The CPS-2 opcode cipher](../assets/diagrams/arcade-cps2-cipher.svg)
 
 **Kabuki** is a custom Z80 module that runs encrypted code with its key in battery-backed RAM.
 With the battery removed, pulling pin 28 low makes it behave as a normal Z80. The cipher uses
@@ -145,6 +151,8 @@ Konami-1 is a 6809 with scrambled opcodes
 
 ### Protection
 
+![Konami-1 opcode XOR values by address bits](../assets/diagrams/arcade-konami1.svg)
+
 Opcode bytes are XORed with 0x22, 0x82, 0x28 or 0x88. The value depends on address bits 1 and 3
 (`pc & 0xa`). Data bytes are left alone.
 
@@ -173,6 +181,8 @@ Late Neo Geo games have protection chips. MAME lists them
 Example sets are The King of Fighters '99, 2000 and 2003.
 
 ### Protection
+
+![Which Neo Geo ROMs each protection chip handles](../assets/diagrams/arcade-neogeo-roms.svg)
 
 - **NEO-CMC 90G06CF7042** decrypts the C-ROM graphics and bank-switches the S-ROM.
 - **NEO-CMC 90G06CF7050** adds decryption of the M-ROM sound program.
@@ -214,6 +224,8 @@ Sources: [MAME: taito/bublbobl.cpp](https://github.com/mamedev/mame/blob/master/
 [williams/midwunit.cpp](https://github.com/mamedev/mame/blob/master/src/mame/williams/midwunit.cpp).
 
 ### Protection
+
+![Protection MCUs by maker](../assets/diagrams/arcade-protection-mcus.svg)
 
 A protection MCU often holds game logic such as enemy behaviour or lookup tables. If its ROM was
 never dumped, MAME may use a simulation.

@@ -9,6 +9,8 @@ documented debugger of these machines.
 
 ### Hardware
 
+![The Atari ST chips and its three screen modes](../assets/diagrams/atari-st-hardware.svg)
+
 | Fact | Value |
 |---|---|
 | Years | 520ST shipped in June 1985; 1040ST from 1986 |
@@ -29,6 +31,8 @@ SPS supports Copylock ST and Speedlock timing tracks
 ([SPS 2002-10-28](https://softpres.org/wip:2002-10-28); [SPS Speedlock](https://softpres.org/wip:2003-06-01)).
 
 ### Media and image formats
+
+![What ST, MSA and STX disk images keep](../assets/diagrams/atari-st-disks.svg)
 
 | Format | What it holds |
 |---|---|
@@ -87,6 +91,8 @@ ST's chips.
 ## Atari STE, Mega STE, TT030 and Falcon030
 
 ### Hardware
+
+![The STE, Mega STE, TT030 and Falcon030](../assets/diagrams/atari-ste-line.svg)
 
 | Fact | Value |
 |---|---|

@@ -10,6 +10,8 @@ at its hardware register writes.
 
 ### Hardware
 
+![X68000 VRAM, sprites and floppy format](../assets/diagrams/x68000.svg)
+
 | Fact | Value |
 |---|---|
 | Years | Released in March 1987, in Japan only; to 1993 |
@@ -49,6 +51,8 @@ None listed yet.
 ## NEC PC-9801
 
 ### Hardware
+
+![The PC-9801 video controllers, blitters and FM cards](../assets/diagrams/pc98.svg)
 
 | Fact | Value |
 |---|---|
@@ -99,6 +103,8 @@ None listed yet.
 ## Fujitsu FM Towns
 
 ### Hardware
+
+![The FM Towns software layers and chips](../assets/diagrams/fm-towns.svg)
 
 | Fact | Value |
 |---|---|

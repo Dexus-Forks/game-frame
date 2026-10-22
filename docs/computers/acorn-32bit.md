@@ -8,6 +8,8 @@ be traced at its SWI calls.
 
 ### Hardware
 
+![The ARM, MEMC, VIDC and IOC chips of the Archimedes](../assets/diagrams/archimedes-chips.svg)
+
 | Model | Year | CPU | OS |
 |---|---|---|---|
 | A305, A310, A440 | July 1987 | ARM2 at 8 MHz | Arthur |
@@ -45,6 +47,8 @@ Archimedes disk image formats still need sources.
 None listed yet.
 
 ### For an exact reimplementation
+
+![The 26-bit ARM R15 with flags, mode and program counter](../assets/diagrams/arm26-r15.svg)
 
 - Treat every instruction that reads or writes R15 as touching the flags as well as the PC.
 - Load the code into Ghidra as ARM v4 with care. Mark each place where 26-bit behaviour changes

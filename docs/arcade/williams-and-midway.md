@@ -17,6 +17,8 @@ a TI DSP with a custom 3D controller.
 
 ### Hardware
 
+![The Williams 6809 board I/O area](../assets/diagrams/arcade-williams-map.svg)
+
 Williams' 6809 hardware ran Defender (1980) and Robotron 2084 (1982, Williams and Vid Kidz)
 ([MAME: williams/williams.cpp](https://github.com/mamedev/mame/blob/master/src/mame/williams/williams.cpp)).
 
@@ -66,6 +68,8 @@ not copy this source into its own repository. Treat it as third-party evidence
 ## Midway Y-unit and Z-unit
 
 ### Hardware
+
+![The Midway Y, T and W-units compared](../assets/diagrams/arcade-midway-units.svg)
 
 The Y-unit ran Smash TV (1990) and Mortal Kombat. NARC (1988) ran on the related Z-unit
 ([MAME: williams/midyunit.cpp](https://github.com/mamedev/mame/blob/master/src/mame/williams/midyunit.cpp)).
@@ -165,6 +169,8 @@ None listed beyond the T-unit sources.
 ## Midway Zeus
 
 ### Hardware
+
+![The DSP, the Zeus chip and the Wave RAM of Midway Zeus](../assets/diagrams/arcade-midway-zeus.svg)
 
 Midway Zeus (1997) ran Mortal Kombat 4 and Invasion. Its main CPU is a TI TMS32C032 DSP at
 60 MHz. The Zeus chip is a Midway custom 3D controller. It has 512 registers in the CPU's

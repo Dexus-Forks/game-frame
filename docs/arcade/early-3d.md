@@ -22,6 +22,8 @@ module for most of these DSPs. Atari's Hard Drivin' is on the
 
 ### Hardware
 
+![Namco System 21 master and slave DSPs](../assets/diagrams/arcade-namco-s21.svg)
+
 Namco System 21 "Polygonizer" (1988 onward) runs two M68000s at 12.288 MHz and an MC6809E for
 sound ([MAME namcos21.cpp](https://github.com/mamedev/mame/blob/master/src/mame/namco/namcos21.cpp)).
 The DSP setup varies by game.
@@ -56,6 +58,8 @@ None listed yet.
 ## Namco System 22 and Super System 22
 
 ### Hardware
+
+![Namco System 22 code uploads to its DSPs](../assets/diagrams/arcade-namco-s22.svg)
 
 System 22 (1993 onward) uses an M68020 at 49.152 MHz / 2
 ([MAME namcos22.cpp](https://github.com/mamedev/mame/blob/master/src/mame/namco/namcos22.cpp)).
@@ -92,6 +96,8 @@ Air Combat 22 followed on 3 July 2025. Rave Racer was announced for 26 February
 ## Sega Model 1
 
 ### Hardware
+
+![Sega Model 1, 2 and 3 compared](../assets/diagrams/arcade-sega-models.svg)
 
 Model 1 (1992) runs an "NEC uPD70615GD-16-S V60 CPU, running at 16.000MHz" with a Fujitsu
 MB86233 "TGP" coprocessor. The header gives no TGP clock. Sound is a TMP68000N-10 at 10 MHz with
@@ -131,6 +137,8 @@ Whether that release emulates the Model 1 or reimplements it is not confirmed.
 ## Sega Model 2
 
 ### Hardware
+
+![The geometry hardware of each Model 2 variant](../assets/diagrams/arcade-model2-variants.svg)
 
 MAME's header describes Model 2 (1993/1994; Daytona USA 1994) as "i960KB + (5x TGP) or (2x
 SHARC) or (2x TGPx4)"
@@ -222,6 +230,8 @@ Supermodel's source.
 ## Taito JC System
 
 ### Hardware
+
+![Taito JC, Konami Hornet and Gaelco 3D CPUs](../assets/diagrams/arcade-3d-others.svg)
 
 Taito JC (1995) runs an M68040 at 20 MHz and a TMS320C51 DSP at 40 MHz. Games include Dangerous
 Curves and Landing Gear (both 1995)

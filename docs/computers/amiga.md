@@ -7,6 +7,8 @@ Its port must reproduce the effect of each chip operation.
 
 ## The chip sets
 
+![The OCS, ECS and AGA chip sets and their models](../assets/diagrams/amiga-chipsets.svg)
+
 | Models | Years | CPU | Chip RAM | Chip set | Kickstart |
 |---|---|---|---|---|---|
 | A1000, A500, A2000 | 1985–1992 | 68000 | 256 KB to 1 MB | OCS | 1.0–1.3 |
@@ -20,6 +22,8 @@ Floppies hold 880 KB. Sources:
 ## Amiga with OCS
 
 ### Hardware
+
+![The Amiga custom chips and chip RAM](../assets/diagrams/amiga-chips.svg)
 
 The facts below come from
 [Wikipedia: Original Chip Set](https://en.wikipedia.org/wiki/Original_Chip_Set). That article
@@ -40,6 +44,10 @@ and HAM details. The exact PAL and NTSC CPU clocks also need that manual.
   Audio DMA peaks at about 28,867 samples/s per channel on NTSC and 28,837 on PAL.
 - Displays are 200 lines on NTSC and 256 on PAL.
 
+![A Copper list changing the background colour down the screen](../assets/diagrams/amiga-copper.svg)
+
+![The Blitter combining three sources into one](../assets/diagrams/amiga-blitter.svg)
+
 ### How games were made and loaded
 
 Many games take over the machine and drive the chips directly. A takeover game times itself from
@@ -54,9 +62,13 @@ reverse engineered the Amiga Copylock in June 2001 and counted over 500 titles u
 [Part 2](https://softpres.org/wip:2001-06-08)). Later keydisks carried a unique serial number
 in the disk format
 ([Codetapper interview with Rob Northen](https://codetapper.com/amiga/interviews/rob-northen)).
+![A trace vector decoder decrypting one instruction at a time](../assets/diagrams/amiga-copylock.svg)
+
 Read a self-decrypting game from emulator memory after it has decrypted itself.
 
 ### Media and image formats
+
+![What ADF and IPF disk images keep](../assets/diagrams/amiga-disks.svg)
 
 | Format | What it holds |
 |---|---|

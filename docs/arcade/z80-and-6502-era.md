@@ -20,6 +20,8 @@ reuse NES chips.
 
 ### Hardware
 
+![The Namco clock tree and the three Galaga CPUs](../assets/diagrams/arcade-namco-clocks.svg)
+
 Namco's early boards use the same 18.432 MHz crystal
 ([MAME: galaxian/galaxian.h](https://github.com/mamedev/mame/blob/master/src/mame/galaxian/galaxian.h);
 [galaxian.cpp](https://github.com/mamedev/mame/blob/master/src/mame/galaxian/galaxian.cpp)).
@@ -63,6 +65,8 @@ Moon Patrol. Its menu has code or hardware pages for Pooyan and The Pit
 
 ### Hardware
 
+![The CPUs of Donkey Kong, Sega System 1, the VS. System and the PlayChoice-10](../assets/diagrams/arcade-early-boards.svg)
+
 Donkey Kong (1981) uses a 61.44 MHz crystal and a 6.144 MHz pixel clock, for about 60.61 Hz
 (computed). Its Z80 runs at 4 MHz, "verified in schematics". An Intel 8035 at 6 MHz runs the
 sound program ([MAME: nintendo/dkong.h](https://github.com/mamedev/mame/blob/master/src/mame/nintendo/dkong.h);
@@ -88,6 +92,8 @@ Computer Archeology's menu has a Donkey Kong page
 ## Atari Asteroids and the vector games
 
 ### Hardware
+
+![Asteroids drawing strokes on a vector display](../assets/diagrams/arcade-asteroids-vector.svg)
 
 Asteroids (1979) draws on a vector display. Its master clock is 12.096 MHz, with a 6502 at
 1.512 MHz. MAME sets the vector refresh to (12.096 MHz / 4096) / 12 / 4, which is about 61.5 Hz

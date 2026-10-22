@@ -7,6 +7,8 @@ Each section uses the headings of the machine pages that apply.
 [Software engines and middleware](../engines/README.md) describes the engines and how to
 recognise each one.
 
+![Where the game logic lives in Mono, IL2CPP, Unreal and Godot games](../assets/diagrams/engine-code.svg)
+
 ## .NET and Unity with Mono
 
 ### How games were made and loaded
@@ -92,6 +94,8 @@ virtualised code is hard to decompile. Unicorn emulation is most useful on the g
 ([re-emulate](../../.claude/skills/re-emulate/SKILL.md)).
 
 ## Linux builds as a second binary
+
+![Naming Windows functions from a Linux build with symbols](../assets/diagrams/engine-second-binary.svg)
 
 Linux ports came from Loki Software between 1998 and 2002. Most Linux players now use Proton
 (2018) and the Steam Deck (2022). These facts are (not confirmed)

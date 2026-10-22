@@ -24,6 +24,8 @@ marks a measured value. A value without such a comment is MAME's best estimate.
 
 ### Machine flags
 
+![MAME machine flags and what they mean](../assets/diagrams/arcade-machine-flags.svg)
+
 The flags show whether MAME emulates a game well enough to use as ground truth
 ([MAME gamedrv.h](https://github.com/mamedev/mame/blob/master/src/emu/gamedrv.h)).
 
@@ -50,6 +52,8 @@ or from owned hardware.
 
 ## ROM sets and CHD
 
+![A CHD file and the chdman commands](../assets/diagrams/arcade-chd.svg)
+
 A ROM set lists every chip dump from a board. That includes BIOS sets such as Atari System 1's
 ([MAME: atari/atarisy1.cpp](https://github.com/mamedev/mame/blob/master/src/mame/atari/atarisy1.cpp)).
 It also includes the PAL images on CPS-1 B-boards
@@ -68,6 +72,8 @@ tool works with them ([MAME chdman docs](https://github.com/mamedev/mame/blob/ma
 To read the files on a CPS-3 CD or a GD-ROM, extract them from the CHD first.
 
 ## NVRAM and DIP settings as test inputs
+
+![An arcade test case and its inputs](../assets/diagrams/arcade-test-inputs.svg)
 
 The game reads NVRAM and DIP switches. A test sets them like any other input.
 
@@ -95,6 +101,8 @@ started from. The list of outside inputs is in [inputs](../observe/inputs.md).
 
 ## Attract mode
 
+![Attract mode, audits, adjustments and diagnostics](../assets/diagrams/arcade-attract-mode.svg)
+
 Attract-mode demos play from recorded inputs or from scripted AI. What a demo shows depends on
 the random state and on NVRAM. To compare a port's attract mode with the original, start both
 from the same NVRAM image and the same power-on state.
@@ -107,6 +115,8 @@ DIAG.ASM. Smash TV's has DEMO.ASM and HSTD.ASM for the high-score table
 reimplementation rebuilds all of them.
 
 ## Input recording
+
+![Recording and playing back inputs in MAME](../assets/diagrams/arcade-input-recording.svg)
 
 MAME's `-record` and `-playback` "do not work reliably for all systems". Playback can desync
 if the configuration (.cfg), NVRAM (.nv) and memory card files differ from the original run.
@@ -131,6 +141,8 @@ See [running the original](../observe/running-the-original.md) and the
 
 ## Refresh rates and frame drift
 
+![Arcade refresh rates by board group](../assets/diagrams/arcade-refresh-rates.svg)
+
 Boards with the same crystal and the same totals have the same refresh rate. A rate marked
 "(computed)" is the pixel clock divided by the totals in the driver's `set_raw(...)` screen
 line.
@@ -151,6 +163,8 @@ line.
 The sources are the driver links on each family page. The source for the Bubble Bobble entry is
 [MAME: taito/bublbobl.cpp](https://github.com/mamedev/mame/blob/master/src/mame/taito/bublbobl.cpp).
 
+![Frames drifting at a fixed 60 Hz](../assets/diagrams/arcade-frame-drift.svg)
+
 A port that runs at a fixed 60 Hz drifts against a recording. At 60 Hz it shows about 317 more
 frames per minute than a 54.71 Hz Midway board. It shows about 22 more frames per minute than a
 59.64 Hz CPS board. Both figures are computed from the rates above. On a Midway board, a
@@ -160,6 +174,8 @@ Some boards have a nominal rate in MAME. The Sega Y Board, the PlayChoice-10 and
 set to 60 Hz without raw screen timing. Treat those rates as unknown.
 
 ## Disassembly and emulation support per arcade CPU
+
+![Ghidra and Unicorn support per arcade CPU](../assets/diagrams/arcade-cpu-support.svg)
 
 | CPU | Boards | Ghidra | Unicorn | Other tools |
 |---|---|---|---|---|
@@ -199,6 +215,8 @@ the Unicorn path for the CPUs it supports. FinalBurn Neo, Demul and JConfig are 
 here.
 
 ## Source releases and the shipped ROM
+
+![Released source, later fixes and the shipped ROM](../assets/diagrams/arcade-source-vs-rom.svg)
 
 Released source from the era is assembly language for the board's CPU, even on the TMS34010
 games of the 1990s. Original source shows what the programmers meant. The source may not match

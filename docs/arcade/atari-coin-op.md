@@ -17,6 +17,8 @@ The 6502 vector games are on the
 
 ### Hardware
 
+![The CPUs of Atari System 1, System 2 and GT](../assets/diagrams/arcade-atari-boards.svg)
+
 System 1 (1984) is a BIOS board plus game cartridges. Its first game was Peter Pack Rat. It
 uses an MC68010 at 7.16 MHz. A 6502 sound CPU runs at 1.79 MHz with a YM2151, a POKEY and a
 TMS5220C speech chip. Its screen is 336 by 240 visible at about 59.92 Hz (computed)
@@ -71,6 +73,8 @@ None listed yet.
 ## Atari Hard Drivin'
 
 ### Hardware
+
+![The CPUs and DSPs of Hard Drivin'](../assets/diagrams/arcade-hard-drivin.svg)
 
 Hard Drivin' (1988) runs an M68010 at 8 MHz from a 32 MHz crystal. Graphics run on a TMS34010
 "GSP" from a 48 MHz crystal. Some boards add a second TMS34010 "MSP" at 50 MHz. The polygon

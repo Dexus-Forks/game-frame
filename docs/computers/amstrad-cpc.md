@@ -26,6 +26,10 @@ of the picture. Games with split screens or overscan depend on those edges. CPC 
 
 Source: [Wikipedia: Amstrad CPC](https://en.wikipedia.org/wiki/Amstrad_CPC).
 
+![CPC instructions stretched to whole NOPs](../assets/diagrams/cpc-nop-timing.svg)
+
+![The CPC gate array interrupts six times a frame](../assets/diagrams/cpc-interrupts.svg)
+
 **Timing.** Every instruction is stretched to a multiple of 4 T-states. The unit is the "NOP
 time" of 1 microsecond (not confirmed)
 ([CPCWiki: CPU timing](https://www.cpcwiki.eu/index.php/Z80)). CRTC types 0 to 4 differ at the

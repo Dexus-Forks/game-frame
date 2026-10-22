@@ -13,6 +13,8 @@ boards, use an ELF loader.
 | Sega Nu, Nu 2, ALLS | 2013 on | Core i3-3220; Core i5-6500 | Not covered here | Not covered here | Keychips (not covered here) | Not covered here | x86 built in |
 | Namco ES1, ES3 | Not covered here | Core i5-3550S on ES3 | Not covered here | Not covered here | HASP HL Max dongle and BitLocker on ES3 | Not covered here | x86 built in |
 
+![PC-based arcade boards and their keys](../assets/diagrams/arcade-pc-boards.svg)
+
 ## Taito Type X family
 
 ### Hardware
@@ -67,6 +69,8 @@ Lindbergh (2005/2006) runs Linux
 
 ### Protection
 
+![The Lindbergh chain from keychip to game](../assets/diagrams/arcade-lindbergh.svg)
+
 "Both the CF and HDD are locked and unreadable on a regular PC." The PIC keychip has an AES-CBC
 engine. Everything on the keychip except its key can be dumped.
 
@@ -109,6 +113,8 @@ The Ring, Nu and ALLS boards run embedded editions of Windows
 The RingEdge, RingWide and ALLS CPU clocks are not confirmed.
 
 ### Protection
+
+![The Ring keychip encrypting each direction of the bus](../assets/diagrams/arcade-ring-keychip.svg)
 
 The Ring keychip contains "a PIC microcontroller, a dedicated cryptography chip, a hardware SHA
 engine for authentication, and flash storage". "All bus communication is encrypted using AES 128

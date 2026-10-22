@@ -17,6 +17,8 @@ earlier families. It runs none of the Triforce, Chihiro or System 246 entries.
 | Sega Chihiro | 2002 | Xbox x86 | Not covered here | Not covered here | DIMM board DES on GD-ROM | All 64 not working | x86 built in |
 | Namco System 246, 256, Super 256 | 2001 to 2010 | R5900 at 294 MHz | SPU2 | Not covered here | Security cart per game | All 60 not working | MIPS built in; R5900 by extension |
 
+![Arcade boards built from consoles with their MAME status](../assets/diagrams/arcade-console-derived.svg)
+
 ## Sony ZN-1 and ZN-2
 
 ### Hardware
@@ -116,6 +118,8 @@ GD-ROM drive
 The filter board outputs VGA at 15 kHz or 31.5 kHz, chosen by a DIP switch.
 
 ### Protection
+
+![NAOMI cart, M4, M1 and GD-ROM security](../assets/diagrams/arcade-naomi-security.svg)
 
 Sega made six known cart PCB types: 171-7885A, 171-7919A, 171-7930B, 171-7978B, 171-8132B and
 171-8346C. Each cart has three security parts

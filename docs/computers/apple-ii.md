@@ -9,6 +9,8 @@ disk formats as copy protection.
 
 ### Hardware
 
+![The Apple II memory map and soft switches](../assets/diagrams/apple2-memory-map.svg)
+
 | Model | Launch | CPU |
 |---|---|---|
 | Apple II | 10 June 1977 | 6502 at 1.023 MHz |
@@ -29,6 +31,8 @@ About six million Apple IIs were sold.
   `$D000`–`$FFFF` ([AppleWin](https://github.com/AppleWin/AppleWin)).
 
 ### How games were made and loaded
+
+![The Disk II and what DSK and WOZ images keep](../assets/diagrams/apple2-disk.svg)
 
 Disk II and Apple DOS arrived in late 1978, with 140 KB per side
 ([Wikipedia: Apple II (original)](https://en.wikipedia.org/wiki/Apple_II_(original))). Disk II

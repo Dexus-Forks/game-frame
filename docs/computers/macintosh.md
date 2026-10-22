@@ -6,6 +6,8 @@ since Catalina cannot run 32-bit apps, so most older Mac games now run only in a
 on old hardware. A fat or universal file holds two compiled versions of the same game. You can
 compare the two versions of each function.
 
+![The four Mac CPU families, their code formats and the bridges between them](../assets/diagrams/mac-eras.svg)
+
 | Era | Years | CPU | Code format | Emulator |
 |---|---|---|---|---|
 | 68k Classic Mac OS | 1984–1998 (Mac OS 8.1 is the last 68k release) | 68000, 68020, 68030, 68040 | CODE resources in the resource fork, A5 world, A-line traps | Mini vMac, MAME, Basilisk II |
@@ -26,6 +28,8 @@ The Macintosh 128K arrived on 24 January 1984, the Mac II in March 1987 and the 
 the last release for 68k Macs ([Basilisk II](https://en.wikipedia.org/wiki/Basilisk_II)).
 
 ### How games were made and loaded
+
+![The A5 world of a 68k Mac application](../assets/diagrams/mac-a5-world.svg)
 
 68k application code is stored as CODE resources in the resource fork. The details below are
 (not confirmed)
@@ -93,6 +97,8 @@ The first Power Macs launched on 14 March 1994 with a 68k emulator in ROM (not c
 the G5 ([CPU families](cpu-families.md#powerpc)).
 
 ### How games were made and loaded
+
+![A fat Classic app and a universal Mach-O file](../assets/diagrams/mac-binaries.svg)
 
 PEF is Apple's RISC executable format for Classic Mac OS. The Code Fragment Manager loads it.
 PowerPC Mac OS X kept it for Carbon apps
