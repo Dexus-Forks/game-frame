@@ -45,6 +45,8 @@ Even a game built on an engine usually has a custom interface on top of it.
 
 ## Make an inventory
 
+![The interface as a map of screens and the inputs between them](../assets/diagrams/ui-inventory.svg)
+
 Before porting any screen, list them all. For each screen, write down:
 
 | Field | Example |

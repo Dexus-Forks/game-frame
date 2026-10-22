@@ -8,6 +8,8 @@ project does. An agent gives this advice when it bears on a choice. Then it foll
 
 ## What GameFrame assumes
 
+![What goes in the public repository and what stays on your machine](assets/diagrams/shared-kept.svg)
+
 - **You own a legitimate copy of the game.** You analyse it on your own computer.
 - **Nothing from the game is redistributed.** Binaries, data files, extracted art, sound, text,
   saves, decompiled code and disassembly stay on the local machine, in folders git ignores.

@@ -8,6 +8,8 @@ and it points to the code worth reading. This page lists the ways to record it o
 
 ## What to look for
 
+![A logging layer between the game and the system, and a sample log](../assets/diagrams/syscall-trace.svg)
+
 | Question | Calls to log |
 |---|---|
 | Which files load, in what order, and which bytes of each | Opening, reading, seeking and closing files |

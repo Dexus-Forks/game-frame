@@ -27,6 +27,8 @@ files, the emulator settings that run them, and the port.
 
 ## Fixity: knowing nothing changed
 
+![Checksums recorded once and checked again later](../assets/diagrams/fixity-check.svg)
+
 ```bash
 python3 tools/triage/fixity.py bag ~/Downloads/game-setup derived/bags/game-1.2 \
     --info "External-Description=GOG release 1.2, installer setup_game_1.2.exe" \

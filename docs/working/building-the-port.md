@@ -11,6 +11,8 @@ can ship](../OUTPUTS.md) the releases.
 
 ## The split
 
+![One exact core inside desktop, browser, test and server platforms](../assets/diagrams/core-platforms.svg)
+
 - **The core has no platform code.** It does no drawing, plays no sound, opens no window and
   reads no clock. It takes inputs and time from its caller and returns state, draw lists and
   sound events. This is what lets it run in tests, headless, in a browser, on a server and in
@@ -50,6 +52,8 @@ A reimplementation ships no game data. It reads the player's own copy:
 
 ## Browser builds
 
+![The player's files go to the browser's storage and never to a server](../assets/diagrams/browser-files.svg)
+
 A core written in Rust, C or C++ compiles to WebAssembly and runs in the browser on the
 player's files. Points to plan for:
 
@@ -71,6 +75,8 @@ player's files. Points to plan for:
   natively and in the browser and compare the state.
 
 ## Writing the original's formats
+
+![Read, write and compare every file to prove a writer](../assets/diagrams/round-trip.svg)
 
 Editors, mod tools and save converters write files in the original's formats. Prove each
 writer with a round trip: read every file of that kind, write it back, and compare the bytes.

@@ -54,6 +54,8 @@ starting point, and the port's state compared with memory dumps of the original
 
 ## High-level and low-level emulation
 
+![What low-level emulation, high-level emulation and a reimplementation each replace](../assets/diagrams/emulation-levels.svg)
+
 An emulator copies the hardware at some level. The choice matters for a port too, because the
 port must replace the same hardware:
 

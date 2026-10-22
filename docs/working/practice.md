@@ -22,6 +22,8 @@ licence for its data, as for any game.
 
 ## A ladder of exercises
 
+![Five exercises from naming a function to porting a system](../assets/diagrams/practice-ladder.svg)
+
 1. **Identify.** The compiler, the libraries and the engine (`re-inventory`). Check against the
    build files in the source.
 2. **The main loop.** Find it from the entry point and list the systems it calls in order.

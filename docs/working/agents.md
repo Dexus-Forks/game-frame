@@ -43,6 +43,8 @@ has to find again, with the same work, anything that is not written in the repos
 
 ## Start every session the same way
 
+![A working session: read, trace, measure, port, verify, land](../assets/diagrams/session-loop.svg)
+
 1. Read the project's `AGENTS.md` and `docs/CHECKLIST.md`.
 2. Search `docs/` and `labels/` for the addresses, names and resources you are about to work
    on. An earlier session may have traced them.

@@ -41,6 +41,8 @@ each of them.
 
 ## The kinds of input
 
+![Every input from outside, through one entry point into the core](../assets/diagrams/input-sources.svg)
+
 ### The player's controls
 
 | Input | Where you see it in DOS games | Where you see it in Windows games | How to handle it |
@@ -128,6 +130,8 @@ These apply to many games:
 When the original has demos, start there. Their format is the game's own input record.
 
 ## Designing the port's input record
+
+![An input record: the commands the core received at each step](../assets/diagrams/input-record.svg)
 
 1. List every input above that the game reads, with the address of each read.
 2. Put the ones that change the rules into one record type per frame or per command. Keep

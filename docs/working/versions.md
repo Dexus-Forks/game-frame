@@ -8,6 +8,8 @@ and keeping a port faithful to one version while it reads the data of several.
 
 ## Choosing the version
 
+![The versions of one game, and the one the port follows](../assets/diagrams/version-tree.svg)
+
 Decide this at the start and record the decision in the project's evidence log:
 
 - **The version players have.** Usually the last official patch, or the version sold today in

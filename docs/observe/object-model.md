@@ -20,6 +20,8 @@ thing in both programs.
 
 ## The entry points
 
+![Tests, agents, the probe and replays query and drive the running game](../assets/diagrams/object-model.svg)
+
 An entry point is a narrow, documented way into the running game. Every tool, test and recording goes
 through an entry point. No tool reads or writes the game's internals any other way.
 

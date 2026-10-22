@@ -41,6 +41,8 @@ magic, the version and the entry count."
 
 ## Evidence labels
 
+![Evidence labels from measured to assumed](../assets/diagrams/evidence-labels.svg)
+
 Every claim carries one of these labels, in the text or in a table column.
 
 | Label | Meaning | Example |

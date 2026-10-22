@@ -27,6 +27,8 @@ that possible. They cost little at the start of a project. They are hard to add 
 
 ## Tie each finding to the copy
 
+![A chain from the copy's hashes to a finding, a document and a test](../assets/diagrams/evidence-chain.svg)
+
 A function address, an offset or a constant is true for one build. In another build it may
 be different.
 

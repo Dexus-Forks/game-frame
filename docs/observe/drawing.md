@@ -19,6 +19,8 @@ APIs themselves.
 
 ## What to take from a capture
 
+![A frame built up from its draw calls in order](../assets/diagrams/frame-capture.svg)
+
 - **Draw order and state.** The sequence of draws, with blending, depth testing and texture
   stages. The port must draw in the same order where it shows, as with transparent objects.
 - **Textures.** Each texture as uploaded, with its format and size. Compare with the port's

@@ -55,6 +55,8 @@ load map.
 
 ## Carrying labels to a new build
 
+![Labels moved from build 1.0 to build 1.1 by matching functions](../assets/diagrams/label-carry.svg)
+
 When a patch or another release arrives, the addresses move. Most functions stay the same.
 `tools/triage/match_functions.py` compares two exports and matches the functions. It uses the
 same pseudocode once addresses are removed, shared pieces of pseudocode, and the order of

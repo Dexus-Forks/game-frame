@@ -22,6 +22,8 @@ windowed runs to see what happens and to find where to look.
 
 ## What to capture
 
+![Captures from a run of the original, kept out of git and compared with the port](../assets/diagrams/capture-pipeline.svg)
+
 | Capture | Why | How |
 |---|---|---|
 | **Frames** | Ground truth for drawing and for the interface | Video memory from the emulator; screenshots; `screencapture` of a stream window; frame capture tools for 3D APIs |

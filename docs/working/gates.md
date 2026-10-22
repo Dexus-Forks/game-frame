@@ -26,6 +26,8 @@ session's mode. The lists do not try to name every tool an agent may need.
 
 ## Gates
 
+![Permissions, then gates for game material, decompiled code and other agents' files](../assets/diagrams/gate-flow.svg)
+
 `scripts/hooks/gate.py` runs before some tool calls. A gate that blocks exits with status 2
 and writes the reason on stderr. Claude Code shows the reason to the agent, which can then fix
 the problem. In every other case the gate exits 0 and changes nothing.

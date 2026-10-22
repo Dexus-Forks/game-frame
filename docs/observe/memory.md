@@ -7,6 +7,8 @@ repeat. The tool is `tools/triage/memscan.py`.
 
 ## Scan, change, scan again
 
+![Each scan keeps fewer addresses until one is left](../assets/diagrams/memory-scan.svg)
+
 1. Start the game in an emulator or under a debugger that can save memory. Note the value on
    screen, for example 500 gold.
 2. Save a dump of the memory that could hold it. For a DOS game this is the data segment, or
@@ -39,6 +41,8 @@ to check it against. A value found nowhere, though the rules are right, may be s
 way. Scan with `changed` and `same` instead of `=N`.
 
 ## From the address to the code
+
+![A write watchpoint stops at the instruction that changes the value](../assets/diagrams/watchpoint.svg)
 
 An address is a lead. Confirm it, then find the code.
 

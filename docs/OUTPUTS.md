@@ -17,6 +17,8 @@ contains the game's own files: every output reads the player's own copy (see
 
 ## A reimplementation
 
+![What a project ships: documents, a website, programs, a browser version and a server](assets/diagrams/outputs-map.svg)
+
 ### Ready-made programs for each system
 
 Most players will not build from source. A CI workflow can build the program on each system
