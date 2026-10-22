@@ -10,6 +10,8 @@ work that spans several steps and several sessions.
 - [Linux, cloud and container environments](environments.md): what an agent installs on Linux
   or in a cloud workspace, `scripts/env.sh` for each session, headless runs, REA, and game
   files on someone else's machine.
+- [Handling the game as evidence](evidence.md): identifying the copy, keeping it unchanged,
+  tying each finding to it, and making each result repeatable.
 - [Permissions and gates](gates.md): the commands an agent may run without asking, the ones
   that ask first, and the hooks that stop game material, decompiled code and stray commits.
 - [Writing findings and documents](writing.md): plain English, the patterns to avoid, evidence

@@ -13,13 +13,16 @@
 #   GOG Linux .sh (MojoSetup: a zip appended to a script)  unzip
 #   macOS .dmg                              hdiutil (mounted read-only, copied, detached)
 #   macOS .pkg                              pkgutil --expand-full
+#   CD images: .cue with .bin, .iso, raw .bin  tools/disc/discinfo.py --extract (and --audio
+#                                           for CD audio tracks; it also lists the tracks)
 #   macOS .app                              copied as it is; a tiny app is often only a web
 #                                           installer (GOG Galaxy's), with no game inside
 # It never runs the installer. Extract into an ignored folder (target/), never into git.
 set -euo pipefail
+PY="$(command -v python3)"
 detect_only=0
 [[ "${1:-}" == --detect ]] && { detect_only=1; shift; }
-[[ $# -ge 1 ]] || { sed -n '2,20p' "$0"; exit 2; }
+[[ $# -ge 1 ]] || { sed -n '2,22p' "$0"; exit 2; }
 src="$1"; out="${2:-}"
 [[ -e "$src" ]] || { echo "$src: no such file" >&2; exit 1; }
 [[ $detect_only == 1 || -n "$out" ]] || { echo "give an output folder" >&2; exit 2; }
@@ -50,6 +53,10 @@ else
     *"xar archive"*) kind="macOS package"; tool=pkgutil ;;
     *"Composite Document File"*|*"CDFV2"*) kind="Windows Installer (MSI)"; tool=7z ;;
   esac
+  if [[ "$lower" == *.cue ]] || { [[ $kind == unknown ]] && [[ "$lower" == *.iso || "$lower" == *.bin ]] &&
+       "$PY" "$(dirname "$0")/../tools/disc/discinfo.py" "$src" --json 2>/dev/null | grep -q '"kind": "\(ISO 9660\|Joliet\|HFS\)'; }; then
+    kind="CD image"; tool=discinfo
+  fi
   if [[ $kind == unknown && "$lower" == *.dmg ]]; then kind="macOS disk image"; tool=hdiutil; fi
   if [[ $kind == unknown && "$desc" == *"PE32"* ]]; then
     if has "$src" "Inno Setup Setup Data"; then kind="Inno Setup"; tool=innoextract
@@ -76,6 +83,7 @@ case "$tool" in
            cp -R "$mnt"/. "$out"/; hdiutil detach "$mnt" >/dev/null ;;
   pkgutil) rmdir "$out" 2>/dev/null || true; pkgutil --expand-full "$src" "$out" ;;
   copy) cp -R "$src" "$out"/ ;;
+  discinfo) "$PY" "$(dirname "$0")/../tools/disc/discinfo.py" "$src" --extract "$out" --audio "$out/cd-audio" ;;
 esac
 echo "extracted into $out: $(find "$out" -type f | wc -l | tr -d ' ') files, $(du -sh "$out" | cut -f1)"
 echo "next: compare with any other copy (tools/triage/compare_trees.py), then re-inventory"

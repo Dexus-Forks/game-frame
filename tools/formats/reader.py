@@ -1,4 +1,4 @@
-"""A little-endian binary reader for prototyping decoders of a game's data files.
+"""A binary reader (little-endian, with big-endian and variable-length reads) for prototyping decoders of a game's data files.
 
     from reader import Reader
     r = Reader(data)
@@ -46,8 +46,35 @@ class Reader:
     def i64(self): return self._unpack('<q')
     def f32(self): return self._unpack('<f')
     def f64(self): return self._unpack('<d')
+    # Big-endian numbers: Amiga, Atari ST and Macintosh games, most consoles, network data.
+    def u16be(self): return self._unpack('>H')
+    def i16be(self): return self._unpack('>h')
+    def u32be(self): return self._unpack('>I')
+    def i32be(self): return self._unpack('>i')
+    def f32be(self): return self._unpack('>f')
     def bool(self): return self.u8() != 0
     def bytes(self, n): return bytes(self._take(n))
+
+    def uleb(self):
+        """An unsigned variable-length number, 7 bits per byte, low bits first (LEB128, as in
+        protobuf, DWARF, .NET and many save formats). The top bit says another byte follows."""
+        n = shift = 0
+        while True:
+            b = self.u8()
+            n |= (b & 0x7F) << shift
+            shift += 7
+            if not b & 0x80:
+                return n
+
+    def sleb(self):
+        """A signed LEB128 number: the last byte's bit 6 is the sign."""
+        n = shift = 0
+        while True:
+            b = self.u8()
+            n |= (b & 0x7F) << shift
+            shift += 7
+            if not b & 0x80:
+                return n - (1 << shift) if b & 0x40 else n
 
     def magic(self, expected):
         got = self.bytes(len(expected))

@@ -39,11 +39,19 @@ Work outward from something you can see. In rough order of usefulness:
    their name (CRC32, FNV-1a, murmur). If a table pairs constants with factories, hash candidate
    names and look the constants up.
 6. **Data.** A value you can see in the game (a price, a duration) may appear as a constant
-   (`readdata.py`) or in a data file (`re-format`). Its readers lead to the rules.
+   (`readdata.py`) or in a data file (`re-format`). Its readers lead to the rules. A value
+   that changes during play (gold, health) can be found in memory dumps with
+   `tools/triage/memscan.py`. The code that writes that address is the rule
+   (`docs/observe/memory.md`).
 7. **The main loop.** From `WinMain`/`main` (or the entry point) find the per-frame update; the
    systems hang off it in a fixed order, which you will need anyway (see `docs/GAME-PATTERNS.md`).
 
 ## 2. Read the function
+
+Optimised code hides its source behind compiler forms: division by a constant becomes a
+multiply and a shift, a `switch` becomes a jump table, small functions are copied into their
+callers. `docs/COMPILED-CODE.md` lists these forms and how to find the game's own code past the
+C runtime's start-up.
 
 - Note its inputs: what `param_1` is (often `this`), the globals it reads (`DAT_...` pointers to
   singletons), and the callees that touch the OS, threads, files or the GPU.

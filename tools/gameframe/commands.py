@@ -14,7 +14,7 @@ import skills
 from paths import NAME, SCRIPTS, python, rel
 from search import search
 
-GROUPS = {'pe': 'Windows PE', 'dos': '16-bit DOS', 'emu': 'Emulators', 'triage': 'Triage',
+GROUPS = {'disc': 'Discs and disk images', 'pe': 'Windows PE', 'dos': '16-bit DOS', 'emu': 'Emulators', 'triage': 'Triage',
           'formats': 'Formats', 'verify': 'Verify', 'ghidra': 'Ghidra scripts',
           'scripts': 'Scripts'}
 

@@ -12,15 +12,22 @@ analysing the C++ runtime of a Unity game instead of its C# code) wastes days.
 ## 0. Get the files out of their installer
 
 A purchased game often arrives as an installer (GOG's Inno Setup `.exe`, a Steam depot, an
-NSIS or InstallShield setup, an `.msi`, a `.dmg` or `.pkg`, GOG's Linux `.sh`). Never run it:
-extract it.
+NSIS or InstallShield setup, an `.msi`, a `.dmg` or `.pkg`, GOG's Linux `.sh`) or on a CD (an
+image as `.cue` and `.bin`, or `.iso`). Never run an installer: extract it.
 
 ```bash
 scripts/extract-installer.sh --detect "~/Downloads/setup_game.exe"     # what it is, which tool
 scripts/extract-installer.sh "~/Downloads/setup_game.exe" target/gog
 python3 tools/triage/compare_trees.py target/game target/gog         # same version?
 python3 tools/triage/compare_trees.py target/game /dev/null --hashes > docs/HASHES.txt
+python3 tools/disc/discinfo.py target/cd/GAME.CUE --files          # a CD: tracks, file systems, dates
+python3 tools/triage/similar.py target/game target/gog             # what changed between two releases
 ```
+
+- A CD can hold more than its files. Audio tracks are often the game's music, which the port
+  must play. A Mode 2 data track can hold video and sound in Form 2 sectors, which a cooked
+  `.iso` loses. A hybrid disc can hold a Mac volume (HFS) beside the PC one. Read
+  `docs/media/discs.md` before you choose which image to work from.
 
 - A small macOS `.app` named after the game is often only GOG Galaxy's web installer: no game.
 - Store releases bundle extras worth reading: DOSBox or ScummVM configs (the CPU speed and
@@ -34,6 +41,11 @@ python3 tools/triage/compare_trees.py target/game /dev/null --hashes > docs/HASH
 ```bash
 find target -maxdepth 3 -type f | sed 's/.*\.//' | sort | uniq -c | sort -rn | head -30   # by extension
 find target -maxdepth 3 -type f -size +5M -exec ls -lh {} \; | sort -k5 -h               # the big ones
+```
+
+```bash
+python3 tools/triage/filetypes.py target --summary      # kinds of file, by their bytes
+python3 tools/triage/filetypes.py target                # each file: kind, entropy, a note
 ```
 
 Group them: executables and libraries (`.exe .dll .so .dylib`), data containers (large files
@@ -105,8 +117,8 @@ REA's routing (`re-rea`): it has dedicated tools for each.
 For each large file type:
 
 ```bash
-xxd target/data.pak | head -8                         # magic number, header fields, offsets
-.venv/bin/python -c "import math,collections,sys;d=open(sys.argv[1],'rb').read(1<<20);c=collections.Counter(d);print(-sum(n/len(d)*math.log2(n/len(d)) for n in c.values()))" target/data.pak
+xxd target/data.pak | head -8                          # magic number, header fields, offsets
+python3 tools/triage/filetypes.py target/data.pak --blocks 65536   # entropy, block by block
 ```
 
 Entropy near 8.0 means compressed or encrypted; 4 to 6 means plain structured data. Look for

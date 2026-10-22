@@ -37,6 +37,11 @@ the order of this page and of each folder's `README.md` is the order of the site
 - [Software engines and middleware](engines/README.md): recognising an engine, the id and
   Build engines, Unreal, other licensed engines, studio engines, middleware.
 
+## Media and files
+
+- [Media, files and protection](media/README.md): CDs and floppies, identifying unknown files,
+  packed and protected code.
+
 ## Crates
 
 - [Crates](crates/README.md): clean Rust implementations of chips and runtimes old games
@@ -64,6 +69,8 @@ the order of this page and of each folder's `README.md` is the order of the site
   machine code.
 - [DOS games](DOS.md): 16-bit programs, Borland debug symbols, the DOS emulators.
 - [Calling conventions and floating point](ABI.md): the details a bit-exact port must copy.
+- [Reading compiled code](COMPILED-CODE.md): what compilers make of common source, and how to
+  find the game's own code past the runtime.
 - [What a project can ship](OUTPUTS.md): documents, a website, programs, releases.
 - [Setup](SETUP.md): the toolchain.
 - [Legal](LEGAL.md): working within the law and with respect for the original.

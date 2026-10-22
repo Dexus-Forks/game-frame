@@ -84,6 +84,7 @@ export default withMermaid(defineConfig({
           { text: 'Console games', link: '/consoles/' },
           { text: 'Handhelds', link: '/handhelds/' },
           { text: 'Arcade', link: '/arcade/' },
+          { text: 'Media and files', link: '/media/' },
           { text: 'Observing the original', link: '/observe/' },
           { text: 'Agent teams', link: '/teams/' },
           { text: 'Working as an agent', link: '/working/agents' },

@@ -20,6 +20,18 @@ length-prefixed strings (a small integer followed by that many printable bytes);
 records of a fixed stride; float values (`0000803f` is 1.0, `0000003f` is 0.5). Measure entropy
 (`re-inventory` section 4): near 8.0 means compressed or encrypted.
 
+```bash
+python3 tools/triage/filetypes.py target/data/units.dat --blocks 4096   # where the dense parts are
+python3 tools/formats/xorscan.py target/data/script.dat                 # a simple XOR or add key?
+python3 tools/formats/timestamps.py --scan saves/slot1.sav --from 1996 --to 1998   # a saved date?
+python3 tools/triage/similar.py saves/before.sav saves/after.sav                  # how much changed
+```
+
+Text that turns readable under one XOR byte or a short key is a common way games hid their
+scripts and tables. xorscan.py tries those weak schemes and shows a preview of each. Confirm
+the scheme in the reader's code before you port it. Two saves made a minute apart, with one
+setting changed, show which bytes hold that setting and where the save time is.
+
 ## 2. Find the reader in the code
 
 Guessing a format from bytes alone is slow and fragile. Find the code that reads it:
@@ -74,7 +86,8 @@ def decode(r):                       # r is a tools/formats/reader.py Reader
 ```
 
 `reader.py` gives bounds-checked reads (`u8 u16 u32 i32 u64 f32 f64 bool bytes cstr pstr8
-pstr32 wstr`), `magic()`, and `block(size)` for a length-prefixed section that must be consumed
+pstr32 wstr`), big-endian reads (`u16be i16be u32be i32be f32be`) for Amiga, Mac and console
+data, variable-length numbers (`uleb sleb`), `magic()`, and `block(size)` for a length-prefixed section that must be consumed
 exactly. Then run it over every file:
 
 ```bash

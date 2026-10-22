@@ -16,7 +16,7 @@ from headers import comment_doc, has_main, python_doc, summary
 from paths import SCRIPTS, TOOLS, rel
 
 SKIP = {'gameframe', 'templates', '__pycache__'}
-ORDER = ['pe', 'dos', 'triage', 'emu', 'formats', 'verify', 'ghidra']     # the method's order
+ORDER = ['disc', 'pe', 'dos', 'triage', 'emu', 'formats', 'verify', 'ghidra']     # the method's order
 
 
 @dataclass

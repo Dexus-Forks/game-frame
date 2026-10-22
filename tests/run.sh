@@ -283,6 +283,46 @@ expect "compare_trees finds the changed file, ignoring case" "DIFFERENT  DATA/LE
 expect "compare_trees counts identical files" "1 identical, 1 different" "$PYTHON" tools/triage/compare_trees.py "$I/a" "$I/b"
 rm -rf "$I"
 
+echo "Discs, file kinds, similarity, obfuscation, timestamps"
+D="$(mktemp -d)"
+"$PYTHON" tests/make_disc.py "$D"
+expect "discinfo lists a data track and an audio track" "track  2  audio AUDIO       start 00:02:40  length 00:02:00" "$PYTHON" tools/disc/discinfo.py "$D/test.cue"
+expect "discinfo reads the ISO 9660 creation date" "1995-11-03 14:30:00 UTC+01:00" "$PYTHON" tools/disc/discinfo.py "$D/test.iso"
+expect "discinfo reads Joliet names and finds the hidden file" "Secret Data.dat" "$PYTHON" tools/disc/discinfo.py "$D/test.cue" --files
+expect "extract-installer hands a CUE sheet to discinfo" "CD image -> discinfo" scripts/extract-installer.sh --detect "$D/test.cue"
+"$PYTHON" tools/disc/discinfo.py "$D/test.cue" --extract "$D/x" --audio "$D/wav" >/dev/null
+[[ "$(cat "$D/x/ReadMe File.txt")" == "hello from the disc" && $(wc -c < "$D/wav/track02.wav") -eq 352844 ]] \
+  && ok "discinfo copies the files and writes the audio track as WAV" || bad "discinfo --extract --audio"
+expect "filetypes names a PE executable" "executable (PE, Windows)" "$PYTHON" tools/triage/filetypes.py $B/game.exe
+head -c 65536 /dev/urandom > "$D/noise.dat"
+expect "filetypes flags a high-entropy file" "compressed or encrypted" "$PYTHON" tools/triage/filetypes.py "$D/noise.dat"
+expect "similar scores a file against itself" "100" "$PYTHON" tools/triage/similar.py $B/game.exe $B/game.exe
+"$PYTHON" - "$D" <<'PY'
+import random, sys
+d = sys.argv[1]; r = random.Random(7); data = bytes(r.randrange(256) for _ in range(100000))
+open(f'{d}/v1.dat', 'wb').write(data); open(f'{d}/v2.dat', 'wb').write(data[:40000] + b'patch' * 20 + data[40000:])
+sys.path.insert(0, 'tools/formats'); from xorscan import decode
+open(f'{d}/hidden.txt', 'wb').write(decode(open('README.md', 'rb').read()[:4000], 'xor-key:1f2e3d4c'))
+PY
+s=$("$PYTHON" tools/triage/similar.py "$D/v1.dat" "$D/v2.dat" | awk '{print $1}')
+(( s >= 90 && s < 100 )) && ok "similar sees a patched file as close but changed ($s)" || bad "similar on a patched file" "$s"
+"$PYTHON" - "$D" <<'PY'
+import random, struct, sys
+d = sys.argv[1]; r = random.Random(5); mem = bytearray(r.randbytes(65536))
+for i, gold in enumerate((500, 480, 480, 612)):
+    for _ in range(200): mem[r.randrange(len(mem))] = r.randrange(256)
+    struct.pack_into('<H', mem, 0x1235, gold); struct.pack_into('<I', mem, 0x4000, 0x21235)
+    open(f'{d}/m{i}.bin', 'wb').write(mem)
+PY
+expect "memscan narrows dumps to the one address that holds the value" "0x00021235  u16  500 -> 480 -> 480 -> 612" "$PYTHON" tools/triage/memscan.py "$D/m0.bin:=500" "$D/m1.bin:=480" "$D/m2.bin:same" "$D/m3.bin:up" --base 0x20000
+expect "memscan finds a pointer to the value" "0x00024000" "$PYTHON" tools/triage/memscan.py "$D/m3.bin" --pointers 0x21235 --base 0x20000
+expect "xorscan finds a repeating XOR key" "xor-key:1f2e3d4c " "$PYTHON" tools/formats/xorscan.py "$D/hidden.txt" --top 1
+expect "timestamps reads a FAT date" "dos       1995-11-03 14:30:10" "$PYTHON" tools/formats/timestamps.py 0x1F6373C5
+expect "reader reads LEB128 and big-endian numbers" "624485 -123456 4660" "$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/formats'); from reader import Reader
+r = Reader(bytes([0xe5, 0x8e, 0x26, 0xc0, 0xbb, 0x78, 0x12, 0x34])); print(r.uleb(), r.sleb(), r.u16be()); r.done()"
+rm -rf "$D"
+
 echo "Ledger and coverage"
 L="$(mktemp -d)"; mkdir -p "$L/src/build" "$L/export/game.exe"
 printf '/// Original: `FUN_140001090`\nfn grow() {}\n// Deviation: the time comes in as an argument,\n// so tests can fix it.\nfn tick() {}\n// Not ported: the debug overlay.\n' > "$L/src/world.rs"
