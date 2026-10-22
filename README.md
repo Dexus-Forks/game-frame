@@ -147,6 +147,11 @@ Eight task agents do one job each, in any stage: `re-identifier` (engine and lib
 library against the game), `re-editor` (documents to the writing rules) and `re-checker`
 (claims and sources). `re-start` ("Task agents") has their table.
 
+[Agent teams](docs/teams/README.md) shows how the agents work together: seven teams for
+common pieces of work (start-up, an exact system, a data format, the main loop, the interface,
+sound and hardware, documentation), each with a diagram of its hand-offs, the data passed
+between agents, the outcome, and the failure path.
+
 ## Scripts
 
 | Script | What it does |

@@ -30,7 +30,7 @@ cp "$ROOT/requirements.txt" "$ROOT/.mcp.json" "$ROOT/gameframe" "$dir/"
 cp "$ROOT/templates/project/licences/LICENSE-APACHE" "$ROOT/templates/project/licences/LICENSE-CC0-1.0" "$dir/"
 # The reference documents the skills point to (docs/DOS.md, docs/ABI.md, ...).
 for f in ABI GAME-PATTERNS DOS LEGAL OUTPUTS SETUP; do cp "$ROOT/docs/$f.md" "$dir/docs/"; done
-for d in games observe engines hardware consoles working case-studies; do cp -R "$ROOT/docs/$d" "$dir/docs/"; done
+for d in games observe engines hardware consoles working teams case-studies; do cp -R "$ROOT/docs/$d" "$dir/docs/"; done
 cp "$ROOT/templates/project/gitignore" "$dir/.gitignore"
 cp "$ROOT/templates/project/labels/"*.tsv "$dir/labels/"
 for f in AGENTS.md README.md docs/FINDINGS.md docs/CHECKLIST.md; do

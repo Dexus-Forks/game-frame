@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process'
 import { createRequire } from 'node:module'
 import path from 'node:path'
 import { defineConfig } from 'vitepress'
+import { withMermaid } from 'vitepress-plugin-mermaid'
 import { EXCLUDE, GITHUB, ROOT, rewrite } from './repo.mts'
 import { repoLinks } from './links.mts'
 import { home, textLinks, writeLlmsFiles } from './llms.mts'
@@ -11,6 +12,7 @@ import { sidebar } from './sidebar.mts'
 // They live outside site/, where the server build cannot find vue/server-renderer by itself.
 const require = createRequire(import.meta.url)
 const vueDir = path.dirname(require.resolve('vue/package.json'))
+const siteModules = path.resolve(path.dirname(require.resolve('vitepress-plugin-mermaid')), '../..')
 
 /** The time (ms) of the newest commit touching any of these repository paths, or undefined. */
 function gitTime(...paths: string[]): number | undefined {
@@ -28,7 +30,8 @@ const SITE_SOURCES = ['README.md', 'docs', '.claude/skills', 'examples/*/README.
 // The workflow sets SITE_BASE to the Pages path (/game-frame/); locally it is /.
 const base = process.env.SITE_BASE || '/'
 
-export default defineConfig({
+// withMermaid renders ```mermaid blocks (the agent teams' diagrams), as GitHub does.
+export default withMermaid(defineConfig({
   title: 'GameFrame',
   description: 'An agentic framework for reverse engineering games: a method, skills and tools for AI agents and people who rebuild games exactly.',
   base,
@@ -58,6 +61,8 @@ export default defineConfig({
     resolve: {
       alias: [
         { find: /^vue$/, replacement: path.join(vueDir, 'dist/vue.runtime.esm-bundler.js') },
+        { find: /^vitepress-plugin-mermaid\/Mermaid\.vue$/, replacement: path.join(siteModules, 'vitepress-plugin-mermaid/dist/Mermaid.vue') },
+        { find: /^mermaid$/, replacement: path.join(siteModules, 'mermaid') },
         { find: /^vue\/server-renderer$/, replacement: path.join(vueDir, 'server-renderer/index.mjs') },
       ],
     },
@@ -80,6 +85,7 @@ export default defineConfig({
           { text: 'Handhelds', link: '/handhelds/' },
           { text: 'Arcade', link: '/arcade/' },
           { text: 'Observing the original', link: '/observe/' },
+          { text: 'Agent teams', link: '/teams/' },
           { text: 'Working as an agent', link: '/working/agents' },
         ],
       },
@@ -103,4 +109,4 @@ export default defineConfig({
       message: 'Code: Apache 2.0. Content: CC0 1.0. No game material: bring your own copy.',
     },
   },
-})
+}))

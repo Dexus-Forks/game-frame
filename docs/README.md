@@ -48,6 +48,11 @@ the order of this page and of each folder's `README.md` is the order of the site
 - [Observing the original](observe/README.md): running the original, inputs, the interface,
   an object model of the game.
 
+## Agent teams
+
+- [Agent teams](teams/README.md): how the agents work together, the hand-off, where the data
+  lives, and seven teams with diagrams.
+
 ## Working on a project
 
 - [Working on a project](working/README.md): how agents work well on this, and how to write

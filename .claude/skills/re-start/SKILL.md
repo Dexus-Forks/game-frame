@@ -112,6 +112,10 @@ the same hand-off. Send them when a job is large enough to fill this session's c
 | `re-checker` | Every claim's evidence and sources checked, doubtful ones marked | `re-editor`, `re-lander` |
 
 
+
+`docs/teams/` describes teams of these agents for common pieces of work (start-up, an exact
+system, a data format, the main loop, the interface, sound and hardware, documentation), with
+a diagram of each team's hand-offs and the failure path.
 ## First session on a new game
 
 0. Find the tools. The commands in the skills run from a project made by `new-project.sh`
