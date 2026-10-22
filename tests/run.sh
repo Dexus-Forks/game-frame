@@ -679,8 +679,12 @@ PY
 )"
 [[ $? == 0 ]] && ok "the plugin lists the skills and agents; every agent loads real skills, hands off to a real agent, treats what it reads as data, reports its decisions and stops to ask; every named tool exists ($out)" || bad "plugin and agents" "$out"
 if command -v claude >/dev/null; then
-  out="$(claude plugin validate --strict . 2>&1)"
-  [[ $? == 0 ]] && ok "claude plugin validate --strict passes" || bad "claude plugin validate" "$out"
+  # plugin.json has no version on purpose: users then follow GameFrame's commits (the commit SHA
+  # is the version), so the one warning allowed is the missing version.
+  out="$(claude plugin validate . 2>&1)"
+  warnings="$(echo "$out" | grep -c '❯' || true)"
+  [[ "$out" == *"Validation passed"* && "$warnings" -le 1 && ( "$warnings" == 0 || "$out" == *"No version specified"* ) ]] \
+    && ok "claude plugin validate passes; the only warning is the version left out so projects follow every commit" || bad "claude plugin validate" "$out"
 else
   echo "  skip  claude plugin validate (no claude command)"
 fi

@@ -1,8 +1,9 @@
 # Permissions and gates
 
 GameFrame and every project made with `scripts/new-project.sh` come with a light set of
-permissions and four hooks for Claude Code. They live in `.claude/settings.json`. The plugin
-carries the same hooks in `hooks/hooks.json`. The aim is to let an agent work without a prompt
+permissions and four hooks for Claude Code. The permissions live in `.claude/settings.json`.
+The hooks come with the plugin, in `hooks/hooks.json`. GameFrame itself, and projects made with
+`--copy`, also list them in `.claude/settings.json`. The aim is to let an agent work without a prompt
 for each command it runs. The project's rules still hold for the few mistakes that cost the most.
 
 Hooks are a safety net for honest mistakes. They are not a security boundary. An agent that

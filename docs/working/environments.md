@@ -88,8 +88,8 @@ licence and the provider's terms allow it.
 
 - Keep the game's files, extracted assets, decompiled code and analysis output outside every
   git checkout.
-- `scripts/new-project.sh DIR "Name"` without a game path creates the project and copies
-  nothing. Put the game's files in the project's ignored `target/` folder only where you are
+- `scripts/new-project.sh DIR "Name"` without a game path creates the project and copies no
+  game files. Put the game's files in the project's ignored `target/` folder only where you are
   allowed to.
 - Each cloud task usually runs in its own copy, so a git worktree is rarely needed.
 

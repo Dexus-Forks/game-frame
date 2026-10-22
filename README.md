@@ -82,13 +82,19 @@ The skills and the stage agents are also a Claude Code plugin. In Claude Code:
 /plugin install gameframe@game-frame
 ```
 
-The plugin brings the skills, the agents and the MCP servers in `.mcp.json`. The tools still
-run from a clone of GameFrame or from a project made with it: `re-start` says so first.
+The plugin brings the skills, the agents, the gates and the MCP servers in `.mcp.json`. A
+project made with `scripts/new-project.sh` enables it in its `.claude/settings.json`, with
+auto-update on, and runs the toolkit through its own `./gameframe` launcher, which finds
+GameFrame in a clone or in the plugin's install. `plugin.json` has no version on purpose: Claude
+Code then uses the commit, so every project follows GameFrame's latest commit. A project's own
+tools and scripts sit beside the launcher, and GameFrame never touches them.
 
 ## Find your way with `gameframe`
 
 `./gameframe` is a small command for help and discovery. It reads the skills and the tools'
-own help from the files, so it never goes out of date. It needs only Python 3. Every new project gets a copy.
+own help from the files, so it never goes out of date. It needs only Python 3. Every new
+project gets a small launcher of the same name, which runs this command and the toolkit on the
+project (`./gameframe run NAME`, `./gameframe python FILE`, `./gameframe root`).
 
 ```bash
 ./gameframe steps                      # the method's loop, each step with its skill
@@ -161,8 +167,8 @@ between agents, the outcome, and the failure path.
 |---|---|
 | `scripts/setup.sh [--install] [--rea]` | Checks every tool; installs what is missing; shows REA's registration plan |
 | `source scripts/env.sh` | Sets `GAMEFRAME_ROOT`, loads `.env`, puts `gameframe` and the `.venv` Python on `PATH`, for each shell or agent session |
-| `scripts/new-project.sh DIR "Name" [GAME]` | Creates a project for one game: rules, skills, tools, ignored folders for the game and its derivatives |
-| `scripts/update-project.sh DIR [--dry-run]` | Brings a project made earlier up to GameFrame's current version: adds what is missing, replaces older copies, keeps the project's own edits |
+| `scripts/new-project.sh DIR "Name" [GAME] [--copy]` | Creates a project for one game: rules, the plugin enabled, the `./gameframe` launcher, ignored folders for the game and its derivatives. `--copy` copies the toolkit, skills and guides instead, for agents without Claude Code plugins |
+| `scripts/update-project.sh DIR [--plugin] [--dry-run]` | Keeps a project current. For a plugin project, refreshes the launcher and settings. For a copied project, adds what is missing, replaces older copies and keeps the project's own edits; `--plugin` moves it to the plugin and removes only GameFrame's own files |
 | `scripts/ghidra-export.sh [--labels FILE] BINARY...` | Headless Ghidra analysis and a text export: pseudocode, functions, strings, imports, exports; names applied from a labels file |
 | `scripts/ghidra-run.sh BINARY decompile\|named\|refs\|vtable\|labels\|callargs\|blocks OUT ARGS` | One-off jobs in the analysed project, without re-analysis: also every call with its arguments, and raw memory pieces |
 | `scripts/extract-installer.sh [--detect] INSTALLER OUT` | Unpacks an installer or package without running it: Inno Setup (GOG), NSIS, InstallShield, MSI, archives, `.dmg`, `.pkg`, GOG's `.sh`, CD images |
