@@ -46,6 +46,12 @@ export function sidebar(): Item[] {
     items: [{ text: 'All skills', link: '/skills/' }, ...skills().map(s => ({ text: s.name, link: `/skills/${s.name}` }))],
   })
   groups.push({
+    text: 'In your browser',
+    collapsed: true,
+    items: [{ text: 'Overview', link: '/lab/' }, { text: 'File explorer', link: '/lab/files' },
+      { text: 'Pixel explorer', link: '/lab/pixels' }],
+  })
+  groups.push({
     text: 'Agents',
     collapsed: true,
     items: [{ text: 'All agents', link: '/agents/' }, ...agents().map(a => ({ text: a.name, link: `/agents/${a.name}` }))],

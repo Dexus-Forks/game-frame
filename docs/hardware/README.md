@@ -18,7 +18,8 @@ Find the hardware layer. Copy this prompt into your coding agent:
 In my GameFrame project, find every place the game touches hardware.
 
 1. Read docs/hardware/README.md and the pages for this game's devices.
-2. In the disassembly, find IN, OUT and INT instructions and writes to A000, B800 and 0040.
+2. In the disassembly, find IN, OUT and INT instructions (tools/triage/insns.py lists them)
+   and writes to A000, B800 and 0040.
    For a Windows game, list the imports from DirectX, Glide, OpenGL and WinMM.
 3. Name the driver functions (set a mode, set a palette, play a sound, read the joystick).
 4. List the values the game reads back from the hardware. They are inputs.
@@ -35,13 +36,18 @@ In my GameFrame project, find every place the game touches hardware.
   NVIDIA, Direct3D and OpenGL, and software renderers.
 - [Sound](sound.md): the PC speaker, AdLib and OPL FM synthesis, Sound Blaster, Gravis
   Ultrasound, MIDI devices, DirectSound, A3D and EAX.
+- [Pixel-exact software rendering](software-rendering.md): fill rules, edge stepping, lines,
+  texture mapping, lookup tables and drawing order, and how to measure each in the original.
+- [Working with the real hardware](real-hardware.md): dumping your own media and firmware,
+  capturing video and sound, logic analysers, and working safely.
 - [Memory, storage, input and networks](other.md): EMS, XMS and DOS extenders, CD audio, the
   game port, IPX, serial links and modems.
 
 ## General rules for hardware code
 
 1. **Find every place the game touches hardware.** In DOS games, search the disassembly for
-   `IN`, `OUT`, `INT` and writes to segments `A000`, `B800` and `0040`. In Windows games, list
+   `IN`, `OUT`, `INT` and writes to segments `A000`, `B800` and `0040`
+   (`tools/triage/insns.py BINARY '^(in|out) ' '^int '` lists them). In Windows games, list
    the imports from DirectX, Glide, OpenGL, WinMM and the card makers' DLLs.
 2. **Label the driver layer.** Most games wrap hardware access in a small set of functions
    (set a mode, set a palette, play a sample, read the joystick). Name them, and treat the rest

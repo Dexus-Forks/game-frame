@@ -15,6 +15,7 @@
 //   site/agents/[agent].md            -> /agents/<agent>, one per agents/<agent>.md
 //   site/tools/[tool].md              -> /tools/<tool>, one per tool or script (its own help)
 //   site/[section]/index.md           -> /skills/, /agents/, /tools/ (catalog.mts has all four)
+//   site/lab/*.md                     -> /lab/...: tools that run in the reader's browser
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -34,7 +35,7 @@ export const EXCLUDE = [
 export function rewrite(id: string): string {
   if (id === 'README.md') return 'overview.md'
   if (id === 'site/index.md') return 'index.md'
-  if (/^site\/(skills|agents|tools|\[section\])\//.test(id)) return id.slice('site/'.length)
+  if (/^site\/(skills|agents|tools|lab|\[section\])\//.test(id)) return id.slice('site/'.length)
   if (id === 'docs/README.md') return 'guide.md'
   let m = id.match(/^crates\/([^/]+)\/README\.md$/)
   if (m) return `crates/${m[1]}.md`

@@ -25,6 +25,28 @@ Ghidra's Function ID and library signatures name many runtime functions. Strings
 a runtime error message ("R6002", "Runtime error") sits in the runtime. The game's own strings lead to the game's own code. `tools/triage/similar.py` against a build of the same
 runtime shows how much of an executable is library code.
 
+## Naming library code by signature
+
+A DOS game has no import table for its runtime: printf, the file functions and the long
+arithmetic helpers are copied into the executable. The compiler's own libraries can name them.
+Those libraries are OMF `.LIB` files. Each holds the code of every runtime function, its public
+name, and the fixups: the bytes the linker changes when it places the code. `tools/dos/omf.py`
+turns a library into signatures, with the fixup bytes as wildcards. `tools/triage/sigscan.py`
+finds them in the game and writes a labels file:
+
+```bash
+python3 tools/dos/omf.py BC31/LIB/CL.LIB --sigs > derived/bc31-large.sigs
+python3 tools/triage/sigscan.py scan derived/bc31-large.sigs target/GAME.EXE --labels derived/runtime.tsv
+scripts/ghidra-run.sh GAME.EXE labels analysis/notes/runtime.txt derived/runtime.tsv
+```
+
+Use the library of the same compiler, version and memory model (small, medium, compact,
+large). `tools/dos/dosinfo.py` names the compiler. The same tool makes signatures from a build
+you have already named (`sigscan.py make BINARY --names labels/names.tsv`), to find those
+functions in a patch or another release without exporting it first. A signature covers only a
+function's first bytes, so two functions can match one signature. The tool says when it
+matches more than once.
+
 ## Optimised arithmetic
 
 | In the machine code | In the source |
@@ -101,6 +123,25 @@ jump after it reads them. The jump names give the signedness of the comparison.
 The port must use the same signedness, whatever type Ghidra declares. On older code, an x87
 comparison stores its result with `fnstsw ax`, then tests bits of `ah` (`test ah, 41h`,
 `sahf`). [ABI](ABI.md) explains how to read these.
+
+## When the decompiler is wrong
+
+A decompiler rebuilds source from machine code in stages. It separates code from data, finds
+the basic blocks and the control flow graph, follows the data through registers and flags,
+then rebuilds loops and conditions. Each stage can go wrong on code of this era. Cristina
+Cifuentes's thesis *Reverse Compilation Techniques* (1994) describes the stages and their
+limits. These are the usual cases, and how to check each one:
+
+| What the decompiler shows | What is often true | Check |
+|---|---|---|
+| A function that ends early, or junk instructions after a jump | Data inside the code: a jump table, a string, a table of constants | The bytes as data; references to them; `tools/pe/readdata.py` |
+| Variables named `unaff_`, `in_` or `extraout_` | Arguments or results passed in registers, as hand-written assembly does | Set the function's calling convention, or custom storage for its parameters, in Ghidra |
+| A bool that comes from nowhere after a call | A result returned in the carry flag (`stc` or `clc` before `ret`), common in DOS and BIOS code | The callee's last instructions, and the `jc` or `jnc` after the call |
+| `goto` statements and loops entered in the middle | Control flow with no structured form (irreducible), from hand-written code or optimised `switch` code | Read the graph in Ghidra's function graph view. Port it with the same flow, not a guessed loop |
+| A long chain of 16-bit operations | 32-bit arithmetic on register pairs (`add`, `adc`; `sub`, `sbb`), or calls to the runtime's long helpers | Treat the pair as one 32-bit value |
+| Code that writes to its own instructions | Self-modifying code: patched constants or jump targets, used for speed in many DOS games | Write references into the code segment; run the function under emulation to see both versions |
+| Two functions sharing their last instructions | The linker merged tails, or the code jumps into another function | The references into the middle of a function |
+| A wrong type everywhere a value goes | One wrong type at the start, propagated through every call | Fix the first type; Ghidra then corrects the rest |
 
 ## Debug builds, release builds and symbols
 

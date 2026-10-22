@@ -89,6 +89,9 @@ scripts/ghidra-run.sh boot.bin blocks    analysis/notes/blocks.txt derived/loadm
 
 Ghidra locks a project: run one job per project at a time.
 
+Signatures carry names without an export: `tools/triage/sigscan.py make BINARY --names
+labels/names.tsv > SIGS`, then `sigscan.py scan SIGS NEW_BINARY --labels OUT.tsv`.
+
 A new build of the game? `tools/triage/match_functions.py OLD_EXPORT NEW_EXPORT --labels
 labels/names.tsv --out labels/names-new.tsv` matches the functions and carries your labels to
 the new addresses. `docs/working/ghidra.md` covers this, Version Tracking, BSim, Function ID

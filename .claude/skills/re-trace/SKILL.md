@@ -45,6 +45,8 @@ Work outward from something you can see. In rough order of usefulness:
    (`docs/observe/memory.md`).
 7. **Known constants.** `tools/triage/constants.py BINARY` names the random generators,
    checksums, hashes and decompressors by their constants and gives each address.
+   `tools/triage/tables.py BINARY` finds sine and cosine tables. `tools/triage/insns.py
+   BINARY '^(in|out) ' '^int '` lists every port access and interrupt: the hardware layer.
 8. **Calls with their arguments.** `scripts/ghidra-run.sh BINARY callargs OUT FUNCTION...`
    lists every call to a function with its constant arguments: the sound ids, the file names,
    the random ranges. A log of the original's system calls shows the same from outside

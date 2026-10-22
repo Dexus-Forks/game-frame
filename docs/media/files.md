@@ -37,6 +37,36 @@ Entropy measures how evenly the byte values are used. It runs from 0 to 8 bits p
 values is compressed entries. A header or a directory shows as a dip. In an executable, a
 high run where the code should be suggests a packed program ([Packed and protected code](protection.md)).
 
+## A picture of the file
+
+`tools/triage/binview.py` draws a file one pixel per byte. Black is zero, blue is text, red is
+bytes above 0x7F, and green is control bytes. Compressed data is red speckle. A table of
+fixed-size records shows as stripes, and lines up when the width is a multiple of the record
+size. `--colour entropy` colours by entropy instead. `--layout hilbert` keeps neighbouring
+bytes together, so each region of the file is a patch.
+
+```bash
+python3 tools/triage/binview.py target/data/level1.dat derived/level1.png --width 24
+python3 tools/triage/binview.py target/GAME.EXE derived/game.png --layout hilbert --colour entropy
+```
+
+The [file explorer](https://tanepiper.github.io/game-frame/lab/files) does the same in the
+browser, with an entropy graph and a hex view of any place you click.
+
+## Pictures in the data
+
+A block of a data file, or a dump of video memory, may be a picture with no header. Try it as
+one with `tools/formats/rawimage.py`: 8 bits per pixel (VGA mode 13h), Mode X planes, EGA bit
+planes, CGA, packed 4, 2 or 1 bit pixels, and 16-bit colour, with a palette from a file or the
+hardware's default. A wrong width shows as slanted stripes. Change it until the picture stands
+straight. The [pixel explorer](https://tanepiper.github.io/game-frame/lab/pixels) does this
+interactively.
+
+```bash
+python3 tools/formats/rawimage.py target/data/TITLE.SCR derived/title.png --mode linear8 --palette target/data/GAME.PAL
+python3 tools/formats/rawimage.py derived/vga-planes.bin derived/frame.png --mode modex --palette derived/dac.bin
+```
+
 ## Structure, from the numbers
 
 Before any code is read, the numbers in a file often show its layout.
@@ -50,6 +80,9 @@ Before any code is read, the numbers in a file often show its layout.
 - **Strings.** A byte or a 16-bit or 32-bit value followed by that many printable bytes is a
   length-prefixed string. A run of printable bytes ending in `00` is a C string. Text in pairs
   with zero bytes between letters is UTF-16. Japanese games may use Shift-JIS.
+- **Bit fields.** Flags, small counts and packed coordinates often share a byte. Codes in
+  compressed data and passwords run across byte boundaries. `reader.py`'s `bits(n)` reads
+  them, low bits first by default, or high bits first.
 - **Byte order.** Values like `00 00 01 2C` (300 big-endian) suggest a big-endian format: Amiga,
   Atari ST, classic Mac, most consoles and network data. `tools/formats/reader.py` reads both
   orders and LEB128 variable-length numbers.
@@ -87,7 +120,8 @@ start of the common LZSS decompressor. `tools/triage/constants.py` searches for 
 python3 tools/triage/constants.py target/GAME.EXE
 ```
 
-A hit names the algorithm and gives the address. The function at that address is often the
+A hit names the algorithm and gives the address. `tools/triage/tables.py` finds the sine and
+cosine tables, and says how each was made: steps per circle, scale, type and rounding. The function at that address is often the
 random number generator, the checksum of the save files, or the decompressor of the data
 files. Confirm it in the code before you port it.
 

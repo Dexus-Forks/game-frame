@@ -47,6 +47,16 @@ names, such as `kernel32.CreateFileA;kernel32.ReadFile`. Other useful channels a
   log each call and then pass it on to the real DLL. Wrappers such as DxWnd and dgVoodoo work
   this way. Use a proxy only on a copy of the game, and record it with the evidence.
 
+## Hooking a function inside the game
+
+The game's own functions can be logged the same way: replace the first instructions of a
+function with a jump to your code, log the arguments, then run the original. Frida does this
+for Windows, Linux and macOS programs from a short script, with no change to the files on disk.
+Detours libraries do it from a DLL loaded into the game. Use it to log every call to the
+random generator with its result, every sound the game plays, or every state change of an
+object you are tracing. Use hooks only on your own copy, in single-player games, for
+observation. Online games forbid them, and their anti-cheat systems detect them.
+
 ## Native Linux and macOS games
 
 - `strace -f -tt -e trace=file,read,write,ioctl ./game` records system calls with times

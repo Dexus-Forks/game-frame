@@ -9,10 +9,17 @@ import HomeHeroImage from './HomeHeroImage.vue'
 import HomeLastUpdated from './HomeLastUpdated.vue'
 import HomeSetupPrompt from './HomeSetupPrompt.vue'
 import MarkdownLink from './MarkdownLink.vue'
+import FileExplorer from './lab/FileExplorer.vue'
+import PixelExplorer from './lab/PixelExplorer.vue'
 import './custom.css'
 
 export default {
   extends: DefaultTheme,
+  enhanceApp({ app }) {
+    // The browser tools of /lab/, used in its pages.
+    app.component('FileExplorer', FileExplorer)
+    app.component('PixelExplorer', PixelExplorer)
+  },
   Layout: () => h(DefaultTheme.Layout, null, {
     'home-hero-image': () => h(HomeHeroImage),
     'home-hero-after': () => h(HomeSetupPrompt),

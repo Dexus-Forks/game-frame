@@ -26,6 +26,9 @@ python3 tools/formats/xorscan.py target/data/script.dat                 # a simp
 python3 tools/formats/timestamps.py --scan saves/slot1.sav --from 1996 --to 1998   # a saved date?
 python3 tools/triage/similar.py saves/before.sav saves/after.sav                  # how much changed
 python3 tools/triage/constants.py target/GAME.EXE        # the decompressor or checksum, by its constants
+python3 tools/triage/binview.py target/data/units.dat derived/units.png --width 24   # records show as stripes
+python3 tools/formats/rawimage.py target/data/TITLE.SCR derived/title.png --mode linear8   # a raw picture?
+python3 tools/formats/markers.py plant saves/slot1.sav derived/marked.sav --from 0x40   # follow fields into memory
 ```
 
 Text that turns readable under one XOR byte or a short key is a common way games hid their
@@ -88,7 +91,7 @@ def decode(r):                       # r is a tools/formats/reader.py Reader
 
 `reader.py` gives bounds-checked reads (`u8 u16 u32 i32 u64 f32 f64 bool bytes cstr pstr8
 pstr32 wstr`), big-endian reads (`u16be i16be u32be i32be f32be`) for Amiga, Mac and console
-data, variable-length numbers (`uleb sleb`), `magic()`, and `block(size)` for a length-prefixed section that must be consumed
+data, variable-length numbers (`uleb sleb`), bit fields (`bits(n)`, `align()`), `magic()`, and `block(size)` for a length-prefixed section that must be consumed
 exactly. Then run it over every file:
 
 ```bash

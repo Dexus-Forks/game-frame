@@ -25,6 +25,26 @@ first, for example with UNP or by dumping memory from DOSBox-X after the unpacke
 Data appended after the MZ load image is an overlay (Borland `.OVR` data starts with `FBOV`),
 a packed payload, or debug symbols.
 
+### Overlays
+
+A program larger than conventional memory could keep parts of its code on disk and load each
+part when it was called, into a region shared with other parts. These are overlays. Borland's
+VROOMM, Microsoft's linkers and others such as RTLink and Blinker each had their own scheme.
+They all work the same way in outline. The overlaid code sits in a separate file (`.OVR`) or
+after the load image. A call into it goes through a small stub in the resident code, which
+loads the part if needed, then jumps to it. Several parts can occupy the same addresses at
+different times.
+
+- Find the overlay manager and its stubs: interrupt `3Fh` calls in Microsoft-style overlays,
+  stub segments in Borland's. The stubs name each part and the offset of each entry point.
+- Load each part into Ghidra at the address where it runs, as an overlay block, so parts that
+  share an address range stay apart (`tools/ghidra/AddMemoryBlocks.java`;
+  [Getting more from Ghidra](working/ghidra.md#code-that-is-not-an-executable-file)).
+- Label each stub with the entry point it leads to. Calls through stubs then read as calls to
+  the real functions.
+- The port has no need for overlays. Port the functions. Record each part's number and file
+  offset, so that every address in the findings can be traced to its bytes.
+
 ## 2. Addresses: always Ghidra's numbering
 
 Write every address as `seg:off` the way Ghidra prints it, in docs, labels and tests:

@@ -76,6 +76,29 @@ class Reader:
             if not b & 0x80:
                 return n - (1 << shift) if b & 0x40 else n
 
+    def bits(self, n, msb_first=False):
+        """The next n bits as a number. Bits are read from the low end of each byte by
+        default (LZW and many compressors); msb_first=True reads from the high end (Huffman
+        codes in many formats, packed pixels, passwords). Call align() to return to a byte."""
+        if not hasattr(self, '_bitbuf') or self._bitorder != msb_first:
+            self._bitbuf, self._bitcount, self._bitorder = 0, 0, msb_first
+        out = 0
+        for i in range(n):
+            if self._bitcount == 0:
+                self._bitbuf, self._bitcount = self.u8(), 8
+            if msb_first:
+                bit = (self._bitbuf >> (self._bitcount - 1)) & 1
+                out = (out << 1) | bit
+            else:
+                bit = (self._bitbuf >> (8 - self._bitcount)) & 1
+                out |= bit << i
+            self._bitcount -= 1
+        return out
+
+    def align(self):
+        """Drop the bits left in the current byte."""
+        self._bitcount = 0
+
     def magic(self, expected):
         got = self.bytes(len(expected))
         if got != expected:

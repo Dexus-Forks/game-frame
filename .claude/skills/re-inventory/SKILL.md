@@ -72,7 +72,13 @@ Havok, Steam/GOG SDKs): document what they are and move on.
 python3 tools/triage/constants.py target/GAME.EXE             # random generators, CRCs, hashes, LZSS
 .venv/bin/python tools/pe/stackstrings.py target/GAME.EXE     # text built on the stack
 python3 tools/formats/swfinfo.py target/game.exe              # a Flash projector, or an SWF
+python3 tools/triage/binview.py target/GAME.EXE derived/game.png --layout hilbert   # its layout, as a picture
 ```
+
+For a DOS game, name the compiler's runtime before reading any code: build signatures from the
+same compiler's libraries with `tools/dos/omf.py LIB --sigs`, then
+`tools/triage/sigscan.py scan SIGS GAME.EXE --labels derived/runtime.tsv`
+(`docs/COMPILED-CODE.md`, "Naming library code by signature").
 
 The version information names the product and the build. The constants name the algorithms
 inside and give their addresses. A Flash or Shockwave game needs a different route

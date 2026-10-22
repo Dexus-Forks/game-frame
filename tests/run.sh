@@ -363,6 +363,58 @@ PY
 expect "match_functions carries labels to the new build's addresses" "402300	unit_spawn	matched from A 401100 (exact 1.0)" cat "$W/names-b.tsv"
 rm -rf "$W"
 
+echo "Pictures, tables, signatures, pointers, markers, instructions"
+W="$(mktemp -d)"
+"$PYTHON" -c "
+d = bytes((x ^ y) & 255 for y in range(200) for x in range(320)); open('$W/screen.bin', 'wb').write(d)"
+"$PYTHON" tools/formats/rawimage.py "$W/screen.bin" "$W/screen.png" --mode linear8 >/dev/null
+[[ "$(head -c 8 "$W/screen.png" | xxd -p)" == 89504e470d0a1a0a ]] && ok "rawimage writes a mode 13h screen as PNG" || bad "rawimage"
+expect "rawimage decodes Mode X planes" "640 x 480, mode modex" "$PYTHON" tools/formats/rawimage.py "$W/screen.bin" "$W/x.png" --mode modex --scale 2
+expect "binview draws a file as a picture" "512 x 512, 1 byte(s) per pixel" "$PYTHON" tools/triage/binview.py $B/game.exe "$W/bv.png" --layout hilbert
+"$PYTHON" -c "
+import math, os, struct
+a = os.urandom(999) + b''.join(struct.pack('<h', round(math.sin(2 * math.pi * i / 1024) * 16384)) for i in range(1280))
+open('$W/sine.bin', 'wb').write(a)"
+expect "tables finds a sine table and its shape" "sine table: 1024 steps per circle, scale 16384, i16, nearest; 1024 entries match" "$PYTHON" tools/triage/tables.py "$W/sine.bin"
+expect "tables sees the cosine table inside the sine table" "the cosine table is the same table from entry 256 on" "$PYTHON" tools/triage/tables.py "$W/sine.bin"
+printf "140001000\ttree_update\n140001090\tsimulate\n" > "$W/names.tsv"
+"$PYTHON" tools/triage/sigscan.py make $B/game.exe --names "$W/names.tsv" > "$W/game.sigs"
+expect "sigscan makes signatures that wildcard addresses" "48 8D 15 ?? ?? ?? ??" cat "$W/game.sigs"
+printf 'static int pad(int x){return x*7+1;}\nint first(int x){return pad(x)+pad(x+1);}\n' > "$W/pad.c"
+cat "$W/pad.c" $S/game.c > "$W/game2.c"
+if zig cc -target x86_64-windows-gnu -O2 "$W/game2.c" $B/engine.lib -o "$W/game2.exe" >/dev/null 2>&1; then
+  expect "sigscan finds the named functions in a rebuilt game at new addresses" "simulate" "$PYTHON" tools/triage/sigscan.py scan "$W/game.sigs" "$W/game2.exe"
+else bad "sigscan: zig could not build the second game"; fi
+"$PYTHON" tests/make_omf.py "$W"
+expect "omf lists a library's public names" "_puts                            _TEXT:0013" "$PYTHON" tools/dos/omf.py "$W/RT.LIB"
+expect "omf turns a fixup into wildcards" "_puts: 55 8B EC FF 76 04 E8 ?? ??" "$PYTHON" tools/dos/omf.py "$W/RT.LIB" --sigs
+"$PYTHON" tools/dos/omf.py "$W/RT.LIB" --sigs > "$W/rt.sigs"
+expect "sigscan names a library function inside a DOS program" "_puts                            1000:0051" "$PYTHON" tools/triage/sigscan.py scan "$W/rt.sigs" "$W/GAME.EXE"
+expect "insns lists the interrupts of a DOS program" "1000:0003  int 0x21" "$PYTHON" tools/triage/insns.py "$W/GAME.EXE" '^int '
+"$PYTHON" - "$W" <<'PY'
+import random, struct, sys
+d = sys.argv[1]
+for run, (w, p) in enumerate([(0x1001000, 0x1003000), (0x1005400, 0x1002200)]):
+    r = random.Random(run)
+    mem = bytearray(0x10000); heap = bytearray(0x10000)
+    for i in range(0, 0x10000, 4):
+        struct.pack_into('<I', mem, i, r.randrange(0, 0x3fffff)); struct.pack_into('<I', heap, i, r.randrange(0, 0x3fffff))
+    struct.pack_into('<I', mem, 0x4000, w); struct.pack_into('<I', heap, w - 0x1000000 + 0x18, p)
+    struct.pack_into('<I', heap, p - 0x1000000 + 0x24, 500)
+    open(f'{d}/run{run}.bin', 'wb').write(mem + bytes(0x1000000 - 0x410000) + heap)
+PY
+expect "pointerpaths finds the chain that survives a restart" "[0x404000] -> +0x18 -> +0x24" "$PYTHON" tools/triage/pointerpaths.py "$W/run0.bin@0x400000:0x1003024" "$W/run1.bin@0x400000:0x1002224" --static 0x400000-0x40ffff
+"$PYTHON" -c "
+import struct; d = bytearray(64); struct.pack_into('<IH', d, 16, 1234, 77); open('$W/save.dat', 'wb').write(d)"
+"$PYTHON" tools/formats/markers.py plant "$W/save.dat" "$W/save-m.dat" --from 16 --to 24 >/dev/null
+"$PYTHON" -c "
+m = bytearray(4096); m[100:104] = open('$W/save-m.dat', 'rb').read()[20:24]; open('$W/dump.bin', 'wb').write(m)"
+expect "markers maps a file's field to its address in memory" "file 0x000014  marker 0xc0de0001  ->  0x20064" "$PYTHON" tools/formats/markers.py find "$W/save-m.dat.markers" "$W/dump.bin@0x20000"
+expect "reader reads bit fields in both orders" "4 22 5 20" "$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/formats'); from reader import Reader
+a = Reader(bytes([0b10110100])); b = Reader(bytes([0b10110100])); print(a.bits(3), a.bits(5), b.bits(3, True), b.bits(5, True))"
+rm -rf "$W"
+
 echo "Ledger and coverage"
 L="$(mktemp -d)"; mkdir -p "$L/src/build" "$L/export/game.exe"
 printf '/// Original: `FUN_140001090`\nfn grow() {}\n// Deviation: the time comes in as an argument,\n// so tests can fix it.\nfn tick() {}\n// Not ported: the debug overlay.\n' > "$L/src/world.rs"

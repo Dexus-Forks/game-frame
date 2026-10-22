@@ -166,7 +166,7 @@ between agents, the outcome, and the failure path.
 | `scripts/extract-installer.sh [--detect] INSTALLER OUT` | Unpacks an installer or package without running it: Inno Setup (GOG), NSIS, InstallShield, MSI, archives, `.dmg`, `.pkg`, GOG's `.sh`, CD images |
 | `scripts/dosbox-run.sh [--fileio] [--break] [--mcp PORT] DIR PROGRAM` | Runs a DOS program in DOSBox-X without a window: exit code, file I/O log, debugger control |
 | `./gameframe COMMAND` | Help and discovery: the steps, the skills, every tool's own help; runs a tool with the `.venv` |
-| `tests/run.sh [--ghidra]` | 124 checks (136 with `--ghidra`) of every tool against the two sample games |
+| `tests/run.sh [--ghidra]` | 140 checks (152 with `--ghidra`) of every tool against the two sample games |
 
 ## Tools
 
@@ -175,6 +175,11 @@ between agents, the outcome, and the failure path.
 | `tools/disc/discinfo.py` | A CD image (CUE/BIN, ISO): tracks, CD audio, Mode 2 sectors, ISO 9660, Joliet, HFS, El Torito, dates; copies files and audio out |
 | `tools/triage/filetypes.py` | What each file is from its bytes: signature, entropy, compressed or packed |
 | `tools/triage/similar.py` | How much two files or two releases share, even when they differ; renamed files |
+| `tools/triage/binview.py` | A file drawn as a picture, one pixel per byte, by kind of byte or by entropy |
+| `tools/triage/tables.py` | Sine and cosine lookup tables, with their steps, scale, type and rounding |
+| `tools/triage/sigscan.py` | Byte signatures with wildcards: make them from named functions, find them in another build or a game |
+| `tools/triage/insns.py` | Every instruction of a kind: port access, interrupts, timers, divisions |
+| `tools/triage/pointerpaths.py` | A chain of pointers from a global to a value that moves between runs |
 | `tools/triage/constants.py` | Random generators, checksums, hashes, ciphers and decompressors named by their constants, with addresses |
 | `tools/triage/match_functions.py` | The same functions in two builds, from two Ghidra exports; your labels carried to the new addresses |
 | `tools/triage/memscan.py` | Where a running game keeps a value, from memory dumps taken as it changes; pointers to it |
@@ -191,6 +196,9 @@ between agents, the outcome, and the failure path.
 | `tools/emu/call_trace.py` | The calls an emulated function makes (random draws), in order, with call sites |
 | `tools/formats/reader.py`, `validate.py` | Prototype a format decoder; prove it consumes every byte of every file |
 | `tools/formats/xorscan.py` | The key of a simply obfuscated file: XOR, add, stepping and chained keys |
+| `tools/formats/rawimage.py` | Raw pixels to PNG: VGA 13h, Mode X, EGA planes, CGA, packed and 16-bit, with palettes |
+| `tools/formats/markers.py` | Unique values planted in a file's fields, then found in memory dumps |
+| `tools/dos/omf.py` | OMF object files and libraries (.OBJ, .LIB): publics, and signatures of the runtime for `sigscan.py` |
 | `tools/formats/swfinfo.py` | A Flash game: SWF version, compression, ActionScript version, classes, content; the movie inside a projector |
 | `tools/formats/timestamps.py` | A number read as every common timestamp; timestamps found inside a file |
 | `tools/verify/bitcompare.py` | Ground truth against reimplementation, bit for bit, with ULP distance |

@@ -97,6 +97,7 @@ export default withMermaid(defineConfig({
           { text: 'Skills', link: '/skills/' },
           { text: 'Agents', link: '/agents/' },
           { text: 'Tools', link: '/tools/' },
+          { text: 'In your browser', link: '/lab/' },
         ],
       },
       { text: 'Case studies', link: '/case-studies/' },

@@ -67,6 +67,41 @@ neighbours are the other fields of the same record.
 Write each field into the findings with its offset, its type and the evidence. Then the
 object model ([A model to query](object-model.md)) can read the original's state from a dump.
 
+## A path to a value that moves
+
+An object on the heap sits at a different address in every run. `tools/triage/pointerpaths.py`
+finds a chain of pointers from a fixed address, such as a global variable, to the value. It
+takes a dump and the value's address from each of two or more runs, and keeps the chains that
+lead to the value in all of them:
+
+```bash
+python3 tools/triage/pointerpaths.py derived/mem/run1.bin@0x400000:0x1a2b3c4 \
+    derived/mem/run2.bin@0x400000:0x1b0c0e8 --static 0x400000-0x4fffff
+# [0x4a1f30] -> +0x18 -> +0x24
+```
+
+Read the result as "the pointer stored at `0x4a1f30`, plus `0x18`, holds a pointer; that
+pointer plus `0x24` is the value". The first pointer is usually a global such as the world or
+the player list. Each offset is a field of a structure. A test or an object model can follow
+the chain in any run ([A model to query](object-model.md)).
+
+## From the file to memory
+
+A value that comes from a data file or a save can be followed from the file into memory with a
+marker. `tools/formats/markers.py` writes unique values into a copy of the file, one per field.
+After the game loads the copy, a dump shows where each marker went:
+
+```bash
+python3 tools/formats/markers.py plant saves/slot1.sav derived/slot1-marked.sav --from 0x40 --to 0x200
+# load derived/slot1-marked.sav in the game, then dump its memory
+python3 tools/formats/markers.py find derived/slot1-marked.sav.markers derived/mem/after-load.bin@0x400000
+```
+
+Each line pairs a file offset with the memory addresses where its marker appears. That maps
+the file's fields onto the game's structures. A memory breakpoint on one of those addresses
+finds the code that uses the field. Plant markers in a few fields at a time. A marker in a
+count, an offset or a checksum can make the game reject the file or crash.
+
 ## Getting dumps
 
 | Where the game runs | How to dump |

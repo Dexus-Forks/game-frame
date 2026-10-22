@@ -38,7 +38,8 @@ material.
 | Capture | How |
 |---|---|
 | Frames | video memory in the emulator; screenshots; `screencapture -l` of a window |
-| State | memory dumps at chosen points; the game's own saves; `tools/triage/memscan.py` finds a value's address across dumps (`docs/observe/memory.md`) |
+| State | memory dumps at chosen points; the game's own saves; `tools/triage/memscan.py` finds a value's address across dumps, `tools/triage/pointerpaths.py` a chain of pointers that finds it in every run, `tools/formats/markers.py` where a file's fields land (`docs/observe/memory.md`) |
+| Frames | `tools/formats/rawimage.py` turns a dump of video memory into a PNG in the original's mode and palette |
 | Inputs | the game's demo or replay files; breakpoints on input reads |
 | Calls and random draws | `tools/emu/call_trace.py`; debugger traces |
 | File reads | `tools/dos/fileio_trace.py` on DOSBox-X logs; Process Monitor; Wine's `WINEDEBUG=+file` (`docs/observe/system-calls.md`) |
