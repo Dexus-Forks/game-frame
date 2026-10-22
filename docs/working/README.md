@@ -20,6 +20,8 @@ work that spans several steps and several sessions.
   project's own viewer on the port's readers, so people and agents can check decoded content.
 - [Building the port](building-the-port.md): the core and the platform layer, time, input,
   drawing, sound, the player's data, browser builds and round trips of the original's formats.
+- [Replacing the original one routine at a time](hybrid-port.md): running the original inside
+  the port, the port contract, instruction counts, declining, shadow verification.
 - [Practising on games with source](practice.md): practice targets, a ladder of exercises,
   and testing agents on games whose answers can be checked.
 - [Keeping a game for the long term](preservation.md): archive packages, fixity with BagIt,

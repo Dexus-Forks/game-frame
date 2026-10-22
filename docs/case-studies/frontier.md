@@ -54,6 +54,22 @@ one file per binary, because every overlay is numbered from `1000:0000`. Made fr
 own citations by `tools/triage/cite_labels.py --module`, they label 97.8 % of `EL2MATH3`'s code,
 97.6 % of `EL2ADLIB` and 23.0 % of `EL2MCGA3`, where before nothing was labelled.
 
+## Generators and text
+
+Most of Frontier's world is generated, so the generators were ported next, each checked by
+calling the original with random inputs: the random number generator, the density of stars in
+each sector, the stars in a sector and their names (three syllables chosen by a hash), the data
+of each system (hand-made records first, then templates chosen by distance from Sol), and the
+market's price and stock formulas. The text system was ported too: the dispatcher of text ids,
+the expander with its escape bytes, every module's string handler and the number, date and time
+formatters. In a real session the text calls the original still ran fell from 14,651 to 15 of
+30,850 (*measured*).
+
+Every port returns the count of instructions the original would have run, so the game's timing
+does not change. A port can decline an input it does not cover, and the original then runs.
+[Replacing the original one routine at a time](../working/hybrid-port.md) describes the method
+in general.
+
 ## What it teaches
 
 - When the original is small enough to emulate, running it inside the port gives a playable
@@ -61,6 +77,10 @@ own citations by `tools/triage/cite_labels.py --module`, they label 97.8 % of `E
 - Replace the original from the bottom up (maths, then drawing, then rules), checking each
   routine as it replaces the original, while the game keeps running.
 - Do the same for the drivers: a ported sound driver can be compared sample for sample.
+- Count what each test compared. Several early tests passed while comparing nothing, because
+  every call was declined or skipped.
+- Count the calls that still go to the original in a real session. The largest counts show
+  what to port next.
 
 OpenRCT2 and OpenLoco used the same idea on Windows: new code linked into the original
 program, replacing it function by function ([Management](../games/management.md)).

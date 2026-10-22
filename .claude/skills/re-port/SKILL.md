@@ -134,6 +134,14 @@ These are the details that make a reimplementation drift, in order of how often 
     order"). Copy each decision from the binary.
 12. **Uninitialised and stale state.** The original may read a field before writing it, or keep
    a value from the last frame. That is behaviour too.
+13. **Assembly ported at the register level.** Ports that replace routines inside a running
+    original (`docs/working/hybrid-port.md`) must
+    leave every register as the original does, scratch registers too. They must also set the
+    flags that callers test after the return. On the 386 a shift count is masked to 5 bits, so
+    `SHL AX,CL` with `CL` = 33 shifts by 1. The overflow flag is defined only for 1-bit
+    shifts and rotates (for `SHL`/`RCL` by 1 it is the new top bit xor the carry). A routine
+    may also be entered by falling through from the one above it, or only through a jump table.
+    Such entries need their own port or hook.
 
 ## Deviations
 

@@ -47,6 +47,8 @@ proposed again.
 - [x] Tables in place of maths
 - [x] Actors as coroutines
 - [x] Angles stored as integers, and the order of rotations
+- [x] Procedural generation: seeds from coordinates, density maps, hand-made exceptions, templates, syllable names
+- [x] Text ids by range, recursive escapes and formatters
 
 ## Graphics ([graphics-2d.md](docs/hardware/graphics-2d.md), [software-rendering.md](docs/hardware/software-rendering.md))
 
@@ -89,6 +91,9 @@ proposed again.
 - [x] `tools/triage/hashnames.py`: ROR-13
 - [x] `tools/formats/catalog.py`: a first resource viewer (every file, decoder results,
   pictures, format coverage), with the `re-browse` skill and [the guide](docs/working/viewer.md)
+- [x] `tools/triage/coverage.py --module`: coverage of one overlay or module whose code is numbered from a shared base
+- [x] `ExportDisasm.java` (`ghidra-run.sh disasm`): straight-line disassembly of code Ghidra did not make a function
+- [x] Ports that run inside the original, with instruction counts and declines ([the guide](docs/working/hybrid-port.md))
 
 ## Out of scope
 

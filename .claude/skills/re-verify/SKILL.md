@@ -70,6 +70,23 @@ few event types). To cover the rest:
 This finds what reading misses: loops that start at 0 instead of 1, writes one past an
 array, branches only one mode takes.
 
+### Fuzzing pitfalls
+
+- **Stay inside the real input domain.** Random registers can send the original down a path no
+  real caller takes, where it crashes or runs an unported branch. A difference there proves
+  nothing. Limit the inputs to what callers pass, and cover the rest with tests from real
+  states.
+- **Count what was compared.** A test that skips every case (no game files, every call
+  declined, the module not loaded) passes in milliseconds. Assert a minimum number of
+  compared cases. Print the compared, declined and mismatched counts.
+- **Compare everything the routine touches.** That means registers, flags that callers test,
+  every written byte and the instruction count, when the port reports one.
+- **Bound the port's loops.** Random memory makes cyclic chains and self-referencing tables.
+  The original may only hang the emulated machine. The port must stop at a bound and decline,
+  or it hangs the test runner.
+- **Commit only after the tests pass.** Chain the commit after the test command with `&&`.
+  With `;` the commit runs even when the tests fail.
+
 ### Capturing fragments of a main loop
 
 A capture saves the state when execution reaches a fragment's start and again at its end,

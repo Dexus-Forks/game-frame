@@ -107,6 +107,10 @@ Several agent sessions can work on one project at the same time.
 Rules for parallel sessions:
 
 - Each session stages only its own files (`git add path`). Never `git add -A`.
+- Sessions in one checkout share one git index. A plain `git commit` also takes files another
+  session has staged. Commit with a pathspec (`git commit -m "..." -- path1 path2`), which
+  commits only those paths. Before pushing, run `git pull --rebase --autostash` so other
+  sessions' uncommitted work is kept.
 - Two sessions never edit the same file at the same time. When they must, one waits, or one
   works in a worktree and rebases.
 - A session that changes shared documents tells the others which sections it changed.

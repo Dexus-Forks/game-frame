@@ -61,6 +61,27 @@ functions that have an emulator test. Each function falls in one of three groups
 ported but not measured, or measured. Callers reached only from a debug window or a cheat menu
 are not part of normal play; record them and leave them out.
 
+## Procedural generation
+
+Many games store a seed and a few hand-made exceptions, and make the rest when it is needed: a
+galaxy, a map, the names of places, a market's prices. The parts are usually these:
+
+| Part | How to recognise it |
+|---|---|
+| A seed from coordinates | Adds, rotations and exclusive-ors of a position (a sector's `x` and `y`, an object's index), with no call to the shared generator |
+| A density map | A small table read by coarse position, deciding how many objects a cell holds |
+| Hand-made exceptions | A table of records keyed by id or position, searched first. The generated rule applies only when the search fails |
+| Templates by distance or class | A few records chosen by thresholds (a squared distance from a centre, a type). Many places then share one record |
+| Names from syllables | A table of short strings, two or three chosen by bits of a hash, and the first letter made a capital |
+| Jitter | The low bits of an id or seed added to a distance or a price, so neighbours differ |
+
+Some values come from a pure function of the seed. Others draw from the shared generator, so
+they depend on everything drawn before them. A market made on arrival, for example, can depend
+on the generator's state at that moment. Note which kind each value is. Port and fuzz the pure
+functions first: the same input always gives the same output, so random inputs prove them
+completely. For values that draw from the shared generator, record the draw order as well
+([Random number generators](#random-number-generators)).
+
 ## Entities and components
 
 ![Entities as ids, an array per kind of component, and systems that walk them in order](assets/diagrams/entity-components.svg)
@@ -216,6 +237,19 @@ may keep only the formatted text. A reimplementation that keeps the arguments fo
 the same way; one that loads a save shows the stored text as it is. Text in the player's
 language comes from data, so never hard-code an English string where the original reads a
 table.
+
+Older games often have one text routine that takes a numeric text id. Ranges of ids select the
+source:
+- a table in the main program;
+- a table loaded with the current language;
+- each module's own strings;
+- formatters that print an argument (a number with a fixed count of decimals, a date, a
+  time, a name).
+
+The strings hold escape bytes. One escape includes another string by its id, so expansion
+is recursive. Others pass control codes (colour, position) through to the renderer. Port the
+expander and the number printer early: most screens call them. Bound the recursion depth in the
+port, because a table that is not set up yet can point at itself.
 
 ## Saves
 

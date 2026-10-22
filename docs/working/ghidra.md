@@ -53,6 +53,24 @@ an address range. The script analyses the new blocks. `ExportAll.java` then writ
 text export. [Floppy disks and booter games](../media/floppies.md) describes how to make the
 load map.
 
+## Code reached only through tables
+
+Ghidra finds a function when something calls it or jumps to it in a way it can follow. Code
+reached only through a table of handlers, a far pointer in data or a fall-through from the
+routine above stays as undefined bytes. Such code is not in the export. Its addresses then
+appear in a run-time coverage log (`docs/observe/debuggers.md`) but in no function.
+
+`ExportDisasm.java` writes the disassembly of chosen code to a text file:
+
+```bash
+scripts/ghidra-run.sh game.exe disasm analysis/notes/handler.asm 1000:2f3a 1000:3000-1000:3080
+```
+
+An address gives the function that contains it, which the script creates if none does. A
+range `START-END` is decoded in a straight line, whatever Ghidra knows about it. Bytes that do
+not decode are written as `??`. Use a range for table-only code. When the range turns out to
+be a routine, name it in `labels/` so the next export makes it a function.
+
 ## Carrying labels to a new build
 
 ![Labels moved from build 1.0 to build 1.1 by matching functions](../assets/diagrams/label-carry.svg)

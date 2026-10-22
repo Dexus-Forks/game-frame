@@ -540,6 +540,10 @@ echo "// Deviation: new" >> "$L/src/tool.py"
 expect "deviations --check finds a stale ledger" "out of date" "$PYTHON" tools/triage/deviations.py --out "$L/DEV.md" --check "$L/src"
 expect "coverage counts addresses and names, not thunks" "2 of 3 functions cited (66.7 %), 340 of 360 bytes (94.4 % by size)" "$PYTHON" tools/triage/coverage.py --export "$L/export" "$L/src"
 expect "coverage lists the largest uncited function" "140001200" "$PYTHON" tools/triage/coverage.py --export "$L/export" "$L/src"
+mkdir -p "$L/export/OVL2.OVL" "$L/mod"
+printf '1000:0100\t30\tadd\t\n1000:0200\t70\tmul\t\n' > "$L/export/OVL2.OVL/functions.tsv"
+printf '/// Port of `OVL2:0100` (add); not of 1000:0200.\nfn add() {}\n' > "$L/mod/ovl.rs"
+expect "coverage --module counts NAME:offset citations only" "1 of 2 functions cited (50.0 %), 30 of 100 bytes" "$PYTHON" tools/triage/coverage.py --export "$L/export" --module OVL2 "$L/mod"
 rm -rf "$L"
 
 echo "Project scaffold"
@@ -765,6 +769,9 @@ if [[ "${1:-}" == --ghidra ]]; then
   scripts/ghidra-run.sh game.exe callargs analysis/notes/callargs.tsv rng_seed printf >/dev/null 2>&1
   expect "ghidra-run callargs resolves a constant argument" "0x4d2 (1234)" cat analysis/notes/callargs.tsv
   expect "ghidra-run callargs resolves a string argument" '"after 10 s: %f' cat analysis/notes/callargs.tsv
+  scripts/ghidra-run.sh game.exe disasm analysis/notes/sim.asm 0x140001090 0x140001090-0x1400010a0 >/dev/null 2>&1
+  expect "ghidra-run disasm lists a function by name" "140001090 simulate" cat analysis/notes/sim.asm
+  expect "ghidra-run disasm decodes a range in order" "// ==== 140001090-1400010a0" cat analysis/notes/sim.asm
   "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe labels > analysis/notes/dos-labels.tsv
   scripts/ghidra-export.sh --project analysis/ghidra-dos --out analysis/export-dos --labels analysis/notes/dos-labels.tsv \
     $D/sample-td.exe $D/sample-mz.exe >/dev/null 2>&1 && ok "ghidra-export exports a 16-bit NE and an MZ" || bad "ghidra-export (16-bit)"

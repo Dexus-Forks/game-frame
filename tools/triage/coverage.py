@@ -7,11 +7,17 @@ them with the functions in a Ghidra export, to show how much of the original is 
 where the largest uncovered functions are.
 
 Usage:
-  coverage.py [--export DIR] [--binary NAME] [--top N] [--list-cited] SOURCE_DIR ...
+  coverage.py [--export DIR] [--binary NAME] [--module NAME [--segment SEG]] [--top N]
+              [--list-cited] SOURCE_DIR ...
 
   SOURCE_DIR    the reimplementation's folders to read
   --export      the Ghidra export (default: analysis/export)
   --binary      the binary in the export (default: the only one, or the first .exe)
+  --module NAME count citations written as NAME:offset (or NAME.EXT:offset), the form used for
+                overlays and modules that Ghidra numbers from the same segment, as
+                cite_labels.py --module does; the offset is read as SEG:offset (--segment,
+                1000 by default). Plain addresses are then ignored, because every module would
+                claim them. The binary defaults to NAME with any extension.
   --top N       list the N largest functions nobody cites (default 20; 0 for none)
   --list-cited  also list every cited function
 
@@ -62,8 +68,10 @@ def labels(path='labels/names.tsv'):
     return out
 
 
-def citations(dirs, by_name):
-    """Every address the sources cite, with the first file and line that cites it."""
+def citations(dirs, by_name, module=None, segment='1000'):
+    """Every address the sources cite, with the first file and line that cites it. With
+    `module`, only `MODULE:offset` citations count, read as `segment:offset`."""
+    mod = re.compile(r'\b' + re.escape(module) + r'(?:\.\w+)?:([0-9a-fA-F]{4})\b') if module else None
     cited = {}
     for top in dirs:
         for dirpath, subdirs, files in os.walk(top):
@@ -75,9 +83,12 @@ def citations(dirs, by_name):
                 except (UnicodeDecodeError, OSError):
                     continue
                 for i, line in enumerate(lines, 1):
-                    found = [parse_addr(t) for t in ADDRESS.findall(line)]
-                    for m in ORIGINAL.finditer(line):
-                        found += [by_name[t] for t in TICKED.findall(m.group(1)) if t in by_name]
+                    if mod:
+                        found = [parse_addr(f'{segment}:{o}') for o in mod.findall(line)]
+                    else:
+                        found = [parse_addr(t) for t in ADDRESS.findall(line)]
+                        for m in ORIGINAL.finditer(line):
+                            found += [by_name[t] for t in TICKED.findall(m.group(1)) if t in by_name]
                     for a in found:
                         cited.setdefault(a, f'{path}:{i}')
     return cited
@@ -88,22 +99,30 @@ def main(argv):
         print(__doc__)
         return 0
     export, binary, top, list_cited, dirs = 'analysis/export', None, 20, False, []
+    module, segment = None, '1000'
     args = iter(argv)
     for a in args:
         if a == '--export':
             export = next(args)
         elif a == '--binary':
             binary = next(args)
+        elif a == '--module':
+            module = next(args)
+        elif a == '--segment':
+            segment = next(args)
         elif a == '--top':
             top = int(next(args))
         elif a == '--list-cited':
             list_cited = True
         else:
             dirs.append(a)
+    if module and not binary:
+        match = [n for n in sorted(os.listdir(export)) if n.split('.')[0].lower() == module.lower()]
+        binary = match[0] if match else None
     binary, fns = functions(export, binary)
     by_name = {name: a for a, (_, name) in fns.items()}
     by_name.update(labels())
-    cited = {a: where for a, where in citations(dirs, by_name).items() if a in fns}
+    cited = {a: where for a, where in citations(dirs, by_name, module, segment).items() if a in fns}
     total = sum(s for s, _ in fns.values())
     done = sum(fns[a][0] for a in cited)
     print(f'{binary}: {len(cited)} of {len(fns)} functions cited '
