@@ -6,6 +6,8 @@ port must handle the mode the game used.
 
 ## The video standards
 
+![The PC video modes drawn to scale, with the colours each shows](../assets/diagrams/video-standards.svg)
+
 | Standard | Year | Modes games used | Notes |
 |---|---|---|---|
 | CGA | 1981 | 320 × 200 in 4 colours from fixed palettes; 640 × 200 in 2 colours; text modes | Memory at `B800:0000`, even and odd lines in two banks |
@@ -17,6 +19,8 @@ port must handle the mode the game used.
 Most DOS games from 1990 to 1996 use Mode 13h or Mode X. Later games use VESA modes.
 
 ## Mode 13h
+
+![Mode 13h: the pixel at x, y is the byte at y x 320 + x](../assets/diagrams/mode13h-address.svg)
 
 One byte per pixel, 320 bytes per line, at `A000:0000`, 64,000 bytes in all. It is the easiest
 mode to port: the game's screen is an array of palette indexes.
@@ -44,6 +48,8 @@ page flipping.
 
 ## Palettes
 
+![The VGA palette, two 6-to-8-bit conversions, and colour cycling](../assets/diagrams/vga-palette.svg)
+
 The VGA palette is written through ports `3C8h` (start index) and `3C9h` (red, green, blue,
 6 bits each). Values range from 0 to 63.
 
@@ -57,6 +63,8 @@ The VGA palette is written through ports `3C8h` (start index) and `3C9h` (red, g
 
 ## The vertical retrace
 
+![The beam, the vertical retrace and port 3DAh bit 3](../assets/diagrams/vga-retrace.svg)
+
 Port `3DAh` bit 3 is set while the screen is in its vertical retrace. Games wait for it to avoid
 tearing and to time their frames.
 
@@ -69,12 +77,16 @@ tearing and to time their frames.
 
 ## Text modes
 
+![A text-mode cell: a character byte and an attribute byte](../assets/diagrams/text-cell.svg)
+
 Menus, setup programs and some games use text mode 3 (80 × 25, 16 colours) at `B800:0000`, two
 bytes per cell: the character and the attribute. The font is the card's 8 × 16 font, which a
 game can replace. Port text screens with the original's code page 437 characters and the VGA
 palette for text.
 
 ## Windows 2D
+
+![A surface's pitch, and the 5-6-5 and 5-5-5 pixel formats](../assets/diagrams/pixel-formats.svg)
 
 Windows games used GDI (slow), WinG (1994), and from 1995 DirectDraw. DirectDraw gives the game
 a pointer to a surface in video memory, so the drawing code is often the same as in a DOS game.

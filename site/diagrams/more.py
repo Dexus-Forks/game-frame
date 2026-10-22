@@ -337,7 +337,7 @@ def console_timeline():
     return s.render()
 
 
-MORE = {
+DIAGRAMS = {
     'game-families.svg': game_families, 'team-handoff.svg': team_handoff, 'abi-stack.svg': abi_stack,
     'fixed-step.svg': fixed_step, 'unpacking.svg': unpacking, 'jump-table.svg': jump_table,
     'scene-graph.svg': scene_graph, 'opl2-operators.svg': opl2_operators, 'console-timeline.svg': console_timeline,

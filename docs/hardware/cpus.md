@@ -24,6 +24,8 @@ plain path. The game chose one at start-up by testing the CPU with `CPUID`. Find
 
 ## Number formats
 
+![Float to integer and signed division, rounded three ways](../assets/diagrams/rounding-table.svg)
+
 ### Integers and fixed point
 
 Before the Pentium, floating point was slow or absent, so most games used **fixed point**: an
@@ -40,6 +42,8 @@ bits, as in Doom), 8.8 and 24.8.
   it.
 
 ### The x87 FPU
+
+![The 80-bit x87 format beside the 64-bit and 32-bit formats](../assets/diagrams/float-formats.svg)
 
 From the 486DX until SSE2 became common (around 2004), floating point meant the x87 FPU. Before
 the 486DX, the FPU was a separate chip (8087, 287, 387) that few players owned.
@@ -87,6 +91,8 @@ fast. Turbo Pascal's `CRT` unit is the best-known case: its start-up calibration
   or tick clock.
 
 ## Code that changes itself
+
+![A loop's immediate operand patched before the loop runs](../assets/diagrams/self-modifying.svg)
 
 Some games of the 1990s wrote into their own code to make inner loops faster: they patched
 constants into instructions before running a loop (for example a texture's width into the

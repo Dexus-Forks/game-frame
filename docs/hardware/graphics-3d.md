@@ -69,6 +69,8 @@ machine. They are the best reference for the port's renderer, and the easiest to
 
 ## How to approach a game with several renderers
 
+![One game with Glide, Direct3D, OpenGL and software renderers](../assets/diagrams/renderer-paths.svg)
+
 1. List the renderers: separate DLLs (Unreal's `GlideDrv.dll`, `D3DDrv.dll`, `SoftDrv.dll`) or
    code paths chosen in the options.
 2. Find the interface between the game and its renderers. It is usually a table of functions

@@ -9,6 +9,8 @@ page covers finding the shaders, reading them, and porting them.
 
 ## Where they are
 
+![The forms shaders shipped in, by year](../assets/diagrams/shader-forms.svg)
+
 | Form | Era and API | How to find it |
 |---|---|---|
 | Fixed-function state | Direct3D 7 and earlier, OpenGL 1.x | Calls that set texture stages, blend modes, fog and lights. Log them with a frame capture tool or an API trace |

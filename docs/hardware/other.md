@@ -5,6 +5,8 @@ in a game's code.
 
 ## Memory in DOS
 
+![The memory map of a DOS PC](../assets/diagrams/dos-memory.svg)
+
 A DOS program runs in real mode with 640 KB of conventional memory. Games used several ways to
 get more.
 

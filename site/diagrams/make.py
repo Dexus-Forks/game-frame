@@ -14,6 +14,7 @@ Standard library only.
 import math
 import os
 import sys
+from xml.etree import ElementTree
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -403,12 +404,17 @@ DIAGRAMS = {
 }
 
 
-from more import MORE  # noqa: E402  (the second set of diagrams)
+# Every other module in this folder that defines DIAGRAMS adds its set: more.py, runtime.py,
+# and one module per section of the guides. A new set needs no change here.
+import importlib  # noqa: E402
 
-DIAGRAMS.update(MORE)
-from runtime import RUNTIME  # noqa: E402  (the third set)
-
-DIAGRAMS.update(RUNTIME)
+for _file in sorted(os.listdir(os.path.dirname(os.path.abspath(__file__)))):
+    if _file.endswith('.py') and _file not in ('make.py', 'svg.py'):
+        _set = getattr(importlib.import_module(_file[:-3]), 'DIAGRAMS', {})
+        _clash = set(_set) & set(DIAGRAMS)
+        if _clash:
+            sys.exit(f'{_file}: diagram names already used: {", ".join(sorted(_clash))}')
+        DIAGRAMS.update(_set)
 
 
 def main(argv):
@@ -417,6 +423,10 @@ def main(argv):
     for name, fn in DIAGRAMS.items():
         path = os.path.join(OUT, name)
         svg = fn()
+        try:
+            ElementTree.fromstring(svg)
+        except ElementTree.ParseError as e:
+            sys.exit(f'{name}: not valid XML: {e}')
         old = open(path, encoding='utf-8').read() if os.path.exists(path) else None
         if '--check' in argv:
             if old != svg:

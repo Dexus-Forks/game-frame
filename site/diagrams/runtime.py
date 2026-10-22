@@ -272,7 +272,7 @@ def cpp_containers():
     return s.render()
 
 
-RUNTIME = {
+DIAGRAMS = {
     'ram-compare.svg': ram_compare, 'skeleton-parents.svg': skeleton_parents, 'handle-bits.svg': handle_bits,
     'pool-freelist.svg': pool_freelist, 'cpp-containers.svg': cpp_containers,
 }

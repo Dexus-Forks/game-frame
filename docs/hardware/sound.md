@@ -35,6 +35,8 @@ which frequency, which instrument settings, key on and key off. The chip turns t
 
 ## Digital sound (Sound Blaster DSP)
 
+![Sound Blaster DMA: one half plays while the game fills the other](../assets/diagrams/sb-dma.svg)
+
 The game sets up a DMA transfer from a buffer to the card and tells the card's DSP the sample
 rate. When the buffer has played, the card raises an interrupt. The game then refills
 the buffer.
@@ -46,6 +48,8 @@ the buffer.
 - If the game counts sound interrupts to time anything, that count is an input.
 
 ## MIDI
+
+![MIDI messages: status bytes, data bytes and running status](../assets/diagrams/midi-messages.svg)
 
 MIDI music is a list of note and controller events, often stored in a game's own format or as
 standard MIDI files. The sound depends entirely on the synthesiser. The same music sounds very
