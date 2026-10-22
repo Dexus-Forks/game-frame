@@ -55,6 +55,10 @@ after a year.
   button by its name survive layout changes; tests that click pixel positions or wait fixed
   times do not.
 
+The platform layer around the core (time, input, drawing, sound, the player's files, the
+browser build) is in `docs/working/building-the-port.md`. Shaders and fixed-function state are
+part of what the player sees: port them exactly (`docs/hardware/shaders.md`).
+
 ## Additions the original does not have
 
 Most reimplementations add things: multiplayer, a server, mod support, a debug probe, a new

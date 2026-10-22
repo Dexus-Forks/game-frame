@@ -18,6 +18,11 @@ You make one file format fully understood and proven. Extracted data stays in `d
    prototype a decoder with `tools/formats/reader.py`.
 2. Prove it with `validate.py` against every file of that type: all bytes consumed.
 3. Write the format, field by field, into `docs/` with evidence labels.
+4. For models and animation, find skeletons and poses with `tools/formats/skeleton.py`
+   (`docs/engines/animation.md`). For graphics, find the shaders with
+   `tools/formats/shaders.py` (`docs/hardware/shaders.md`).
+5. If the project writes the format too, prove the writer with a round trip: read every file,
+   write it back, compare the bytes (`docs/working/building-the-port.md`).
 
 ## Where it ends
 

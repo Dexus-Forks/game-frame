@@ -10,6 +10,9 @@ Commands:
   find TEXT             the functions whose pseudocode contains TEXT (a string, a constant...)
   strings TEXT          defined strings containing TEXT, and the functions that use each
   writers OFFSET        the functions that store to `+ OFFSET` of a pointer (who sets a field?)
+  layout FN[:VAR] ...   a structure's fields from the functions that use it: each offset with
+                        its sizes, types, reads, writes and users, then a C struct to start
+                        from. VAR is the pointer to it in that function (default param_1)
   biggest [N]           the N largest functions not yet labelled (where the work is)
   stats                 functions, labelled share by count and by size
 
@@ -122,6 +125,41 @@ class Export:
         return FUN.sub(sub, text)
 
 
+SIZES = {'char': 1, 'byte': 1, 'bool': 1, 'undefined': 1, 'undefined1': 1, 'uchar': 1, 'sbyte': 1,
+         'short': 2, 'ushort': 2, 'word': 2, 'undefined2': 2, 'wchar_t': 2, 'wchar16': 2,
+         'int': 4, 'uint': 4, 'long': 4, 'ulong': 4, 'dword': 4, 'float': 4, 'undefined4': 4,
+         'longlong': 8, 'ulonglong': 8, 'qword': 8, 'double': 8, 'undefined8': 8, 'pointer': 8,
+         'float10': 10, 'undefined16': 16}
+
+
+def size_of(t, ptr):
+    t = t.strip()
+    if t.endswith('*'):
+        return ptr
+    return SIZES.get(t, 0)
+
+
+def accesses(body, var, ptr):
+    """(offset, size, type, written) for each use of VAR as a pointer to a structure."""
+    decl = re.search(r'([A-Za-z_][\w ]*?\s*\**)\s*\b%s\b\s*[,);]' % re.escape(var), body)
+    vtype = decl.group(1).strip() if decl else ''
+    elem = vtype[:-1].strip() if vtype.endswith('*') else ''
+    scale = size_of(elem, ptr) or 1 if elem else 1
+    out = []
+    cast = re.compile(r'\*\(([A-Za-z_][\w ]*?(?:\s*\*)*)\s*\*\)\s*\(\s*(\([\w ]+\**\)\s*)?%s\s*\+\s*(0x[0-9a-fA-F]+|\d+)\s*\)'
+                      r'(\s*=[^=])?' % re.escape(var))
+    for m in cast.finditer(body):
+        off = int(m.group(3), 0) * (1 if m.group(2) else scale)
+        t = m.group(1).strip()
+        out.append((off, size_of(t, ptr), t, bool(m.group(4))))
+    if elem:
+        for m in re.finditer(r'\b%s\[(0x[0-9a-fA-F]+|\d+)\](\s*=[^=])?' % re.escape(var), body):
+            out.append((int(m.group(1), 0) * scale, size_of(elem, ptr), elem, bool(m.group(2))))
+        for m in re.finditer(r'(?<![\w)\]])\*%s\b(\s*=[^=])?' % re.escape(var), body):
+            out.append((0, size_of(elem, ptr), elem, bool(m.group(1))))
+    return out
+
+
 def load_labels():
     labels = {}
     path = os.path.join(ROOT, 'labels', 'names.tsv')
@@ -199,6 +237,36 @@ def main(argv):
         for a, body in sorted(ex.bodies.items()):
             if pat.search(body):
                 print(f'{ex.fmt(a)}  {ex.name(a)}')
+    elif cmd == 'layout':
+        ptr = 4 if '--ptr4' in args else 8
+        fields = {}  # offset -> {(size, type): [reads, writes, users]}
+        for spec in (a for a in args if not a.startswith('--')):
+            fn, _, var = spec.partition(':')
+            addr = ex.resolve(fn)
+            for off, size, t, written in accesses(ex.bodies.get(addr, ''), var or 'param_1', ptr):
+                entry = fields.setdefault(off, {}).setdefault((size, t), [0, 0, set()])
+                entry[1 if written else 0] += 1
+                entry[2].add(ex.name(addr))
+        if not fields:
+            sys.exit('no field accesses found: check the variable name (param_1, this, a local)')
+        print(f'{"offset":>8}  {"size":>4}  {"type":24} {"reads":>5} {"writes":>6}  used by')
+        for off in sorted(fields):
+            for (size, t), (r, w, users) in sorted(fields[off].items()):
+                print(f'{off:#8x}  {size:4}  {t:24} {r:5} {w:6}  {", ".join(sorted(users))[:60]}')
+        print('\nstruct draft {')
+        at = 0
+        for off in sorted(fields):
+            if off < at:
+                print(f'    /* {off:#x}: overlaps the field before (a union, or two sizes of one field) */')
+                continue
+            if off > at:
+                print(f'    undefined1 gap_{at:x}[{off - at:#x}];')
+            (size, t), _ = max(fields[off].items(), key=lambda kv: (kv[0][0], kv[1][0] + kv[1][1]))
+            size = size or 1
+            name = 'ptr' if t.endswith('*') else 'f'
+            print(f'    {t:24} {name}_{off:x};{"" if len(fields[off]) == 1 else "  /* also read as " + ", ".join(sorted(x for _, x in fields[off] if x != t)) + " */"}')
+            at = off + size
+        print('};  /* the size is at least %#x; the allocation call (operator new, malloc) gives the whole size */' % at)
     elif cmd == 'biggest':
         n = int(args[0]) if args else 30
         todo = sorted(((size, a) for a, (_, size) in ex.functions.items()

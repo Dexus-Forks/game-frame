@@ -71,6 +71,8 @@ the order of this page and of each folder's `README.md` is the order of the site
 - [Calling conventions and floating point](ABI.md): the details a bit-exact port must copy.
 - [Reading compiled code](COMPILED-CODE.md): what compilers make of common source, and how to
   find the game's own code past the runtime.
+- [Recovering types](TYPES.md): structures, classes, lists, trees, enumerations and the C++
+  standard containers, from the code that uses them.
 - [What a project can ship](OUTPUTS.md): documents, a website, programs, releases.
 - [Setup](SETUP.md): the toolchain.
 - [Legal](LEGAL.md): working within the law and with respect for the original.

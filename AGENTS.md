@@ -60,7 +60,7 @@ These rules are for changes to GameFrame itself, which is a public repository.
 | Path | What |
 |---|---|
 | `.claude/skills/re-*/SKILL.md` | One skill per step of the method |
-| `agents/re-*.md` | One agent per stage and eight task agents, which hand off to each other (`.claude/agents` links here) |
+| `agents/re-*.md` | One agent per stage and nine task agents, which hand off to each other (`.claude/agents` links here) |
 | `.claude/settings.json`, `scripts/hooks/gate.py`, `hooks/hooks.json` | Permissions and the gates (hooks) for Claude Code: [docs/working/gates.md](docs/working/gates.md) |
 | `.claude-plugin/` | The Claude Code plugin and its marketplace: the skills and the agents |
 | `gameframe`, `tools/gameframe/` | The help and discovery command. It reads the skills and each tool's own help, so a new tool needs no entry there |

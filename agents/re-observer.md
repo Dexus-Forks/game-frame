@@ -19,6 +19,9 @@ or port code.
 2. Capture what the brief asks for: frames, state, inputs, file reads, sound, timings. Keep
    captures in `derived/` and describe them in `docs/`.
 3. When the brief asks for it, list every input from outside and every interface screen.
+4. In an emulator, start each run from a save state, record its inputs as a movie, and dump
+   the game's memory after each frame for `ramdiff.py`. Check Data Crystal, The Cutting Room
+   Floor and TASVideos for RAM maps and mechanics first (`docs/observe/emulators.md`).
 
 ## Where it ends
 

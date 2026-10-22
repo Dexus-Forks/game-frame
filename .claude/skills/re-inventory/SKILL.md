@@ -156,6 +156,11 @@ Also record the hardware the game was written for: the minimum CPU, the video mo
 APIs, the sound devices and the input devices it supports (`docs/hardware/`). Its setup program
 and its readme list them.
 
+Record the version too: the build the player has, the other versions that exist (patches,
+regions, re-releases, demos), and which one the port follows (`docs/working/versions.md`).
+Comparing builds is often the quickest way to find a rule: a patch note names it, and the
+function that changed between two builds is it.
+
 ## 6. Classify the game
 
 Look at the game itself, not only its files: play it or watch it played. Then place it in the

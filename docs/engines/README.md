@@ -42,6 +42,11 @@ Knowing the engine helps in several ways.
 - [Engine structures in machine code](engine-structures.md): type records, reference
   counting, factories, streaming, scene graphs, controllers and level of detail, as they
   appear in the binary.
+- [Run-time systems in machine code](engine-runtime.md): allocators, names stored as hashes,
+  handles, the resource registry, settings, the order of updates, events, threads, streaming
+  and debugging aids left in the build.
+- [Skeletons and animation](animation.md): skeletons, poses, clips, blending, compression and
+  the state machines that pick clips.
 
 ## Web players
 

@@ -47,6 +47,8 @@ Work outward from something you can see. In rough order of usefulness:
    checksums, hashes and decompressors by their constants and gives each address.
    `tools/triage/tables.py BINARY` finds sine and cosine tables. `tools/triage/insns.py
    BINARY '^(in|out) ' '^int '` lists every port access and interrupt: the hardware layer.
+   `tools/triage/hashnames.py BINARY` finds the hash function behind names stored as numbers
+   and names each hash constant (`docs/engines/engine-runtime.md`).
 8. **Calls with their arguments.** `scripts/ghidra-run.sh BINARY callargs OUT FUNCTION...`
    lists every call to a function with its constant arguments: the sound ids, the file names,
    the random ranges. A log of the original's system calls shows the same from outside
@@ -73,6 +75,13 @@ C runtime's start-up.
 - **Serializers first.** A `Save`/`Load`/`Serialize` function reads or writes every field in
   order with its type: the cleanest field list you will get.
 - **Who writes a field:** `decomp_query.py writers 0x44`, then skip constructors and copies.
+- **All the fields at once:** `decomp_query.py layout CTOR SERIALIZER USER:param_2` merges every
+  access to one pointer across functions into a table and a draft struct. The allocation size
+  (`operator new(0x148)`) gives the whole size. `docs/TYPES.md` has the shapes of lists, trees,
+  hash tables and the C++ containers. Send `re-typer` for many structures at once.
+- **Names stored as hashes:** a constant compared where a name would be is often a hash.
+  `tools/triage/hashnames.py BINARY` finds the function and names the constants
+  (`docs/engines/engine-runtime.md`).
 - **Nested offsets** (`array + i * 0x1f0 + 0x90`): find getters that return sub-objects, subtract,
   and continue inside the sub-object.
 - **vtables:** a constructor's first store is `*this = &vtable`. List it (`re-ghidra` `vtable`);

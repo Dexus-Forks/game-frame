@@ -21,8 +21,10 @@ You find out what the game is built from, so that later stages trace only the ga
    RTTI names (`tools/pe/peinfo.py`, `tools/dos/dosinfo.py`).
 3. Name the engine and its version, each middleware library and the compiler. Write each into
    `docs/FINDINGS.md` with the evidence that shows it.
-4. Label the library code with a prefix in `labels/names.tsv` (`zlib_`, `bink_`, `crt_`).
-5. If the engine's source was released, record its version and licence. Ask the user before
+4. Find the hash function that names things, if the game stores names as numbers, with
+   `tools/triage/hashnames.py`, and record it (`docs/engines/engine-runtime.md`).
+5. Label the library code with a prefix in `labels/names.tsv` (`zlib_`, `bink_`, `crt_`).
+6. If the engine's source was released, record its version and licence. Ask the user before
    anyone reads it.
 
 ## Where it ends

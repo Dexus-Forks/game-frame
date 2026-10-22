@@ -17,8 +17,11 @@ docs and the ground truth; you do not trace new code.
 
 1. Follow `re-port`. Mirror the original's structure, types, order of operations, draw order
    and iteration order. Cite the original function on every item.
-2. Mark every intentional difference as a Deviation.
-3. When something is missing (an untraced callee, a constant you cannot see), stop and hand
+2. Keep the core free of platform code. Time, input, drawing, sound and the player's files
+   belong to the platform layer (`docs/working/building-the-port.md`). Port shaders and
+   fixed-function state exactly (`docs/hardware/shaders.md`).
+3. Mark every intentional difference as a Deviation.
+4. When something is missing (an untraced callee, a constant you cannot see), stop and hand
    off to `re-tracer` or `re-measurer` with the exact question.
 
 ## Where it ends

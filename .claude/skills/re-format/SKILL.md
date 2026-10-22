@@ -30,6 +30,8 @@ python3 tools/triage/binview.py target/data/units.dat derived/units.png --width 
 python3 tools/formats/rawimage.py target/data/TITLE.SCR derived/title.png --mode linear8   # a raw picture?
 python3 tools/formats/markers.py plant saves/slot1.sav derived/marked.sav --from 0x40   # follow fields into memory
 python3 tools/formats/fields.py target/data/units.dat --stride 24 --png derived/units.png   # what each offset holds
+python3 tools/formats/skeleton.py target/models/hero.mdl    # parent arrays, quaternions, joint names
+python3 tools/formats/shaders.py target/data/shaders.pak --dump derived/shaders   # compiled and source shaders
 ```
 
 Text that turns readable under one XOR byte or a short key is a common way games hid their
@@ -109,6 +111,10 @@ Port the decoder to the reimplementation's language as a plain reader with no de
 function per type, documenting each field's meaning and naming the original reader function.
 Its test opens the real files from the player's game, **skips with a message when they are not
 there** (they are never committed), parses every file and spot-checks a known value.
+
+If the project writes the format too (an editor, a mod tool, saves), prove the writer with a
+round trip: read every file, write it back, and compare the bytes. Each difference is a field
+the writer loses.
 
 ## 6. Save games
 

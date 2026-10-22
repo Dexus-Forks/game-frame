@@ -50,6 +50,7 @@ $P $T callees 1400be770          # what it calls, labelled and largest first
 $P $T find 'Saves/'              # functions whose pseudocode contains a string or constant
 $P $T strings savegame           # strings containing a word, and the functions that use them
 $P $T writers 0x44               # functions that store to +0x44 (who sets this field?)
+$P $T layout 140010a0 140011f0   # one structure's fields from several functions, and a draft struct
 $P $T biggest 40                 # the largest unlabelled functions (where the work is)
 ```
 

@@ -180,6 +180,14 @@ Make the reimplementation's pictures with its headless runner (a save, scripted 
 times, a capture at a fixed time), never by hand, so the same picture can be made again after
 every change. The same runner makes the screenshots and short videos for documentation.
 
+### Memory frame by frame (console and computer games)
+
+Run the same input movie in the emulator and in the port. Dump the game's memory after each
+frame in both, the port writing its state in the original's layout, and compare with
+`tools/verify/ramdiff.py ORIGINAL PORT --size N --map ram.map --ignore 0x100-0x1ff`. It gives the
+first frame and the first named addresses that differ. Fix that one and run again. Keep the
+movie and its dumps as a test (`docs/observe/emulators.md`).
+
 ## 6. Version against version
 
 When you optimise or restructure the reimplementation, the results must not change: run fixed

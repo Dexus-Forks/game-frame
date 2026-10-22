@@ -22,7 +22,9 @@ it is, so the later stages know where to start.
    native, managed, scripted or packed, engine and middleware, data containers, save files.
 3. Classify the game with `docs/games/README.md` and its family page: the kind of game, its
    time model, how exact the interface must be.
-4. Write all of it to `docs/FINDINGS.md`, and the first rows of `docs/CHECKLIST.md`.
+4. Identify the version and build of the copy, list the other versions that exist, and
+   record which one the port follows (`docs/working/versions.md`).
+5. Write all of it to `docs/FINDINGS.md`, and the first rows of `docs/CHECKLIST.md`.
 
 ## Where it ends
 

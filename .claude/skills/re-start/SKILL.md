@@ -107,6 +107,7 @@ the same hand-off. Send them when a job is large enough to fill this session's c
 | `re-listener` | Every input from outside, and the port's input record | `re-porter`, `re-observer` |
 | `re-cataloguer` | Every screen of the interface, with captures | `re-tracer`, `re-porter` |
 | `re-mapper` | Hardware registers, memory banks and RAM variables, named | `re-tracer`, `re-listener` |
+| `re-typer` | Structures, classes and enumerations, with sizes, fields and evidence | `re-tracer`, `re-decoder`, `re-porter` |
 | `re-matcher` | A crate, library or released source compared with the game's version | `re-porter`, `re-tracer` |
 | `re-editor` | Documents edited to the writing rules, wording only | `re-checker`, `re-lander` |
 | `re-checker` | Every claim's evidence and sources checked, doubtful ones marked | `re-editor`, `re-lander` |

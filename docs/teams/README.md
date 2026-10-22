@@ -1,6 +1,6 @@
 # Agent teams
 
-GameFrame has 17 agents. Nine stage agents follow the steps of the method. Eight task agents
+GameFrame has 18 agents. Nine stage agents follow the steps of the method. Nine task agents
 do one job each. A team is a set of agents that work on one piece of a game in a fixed order,
 each one handing its results to the next. This section describes the teams, what each agent
 receives and produces, and what a team delivers at the end.
@@ -95,6 +95,7 @@ Next: <agent name> - <one-line brief for it>
 | `re-listener` | task | The export | The inputs table and the proposed input record |
 | `re-cataloguer` | task | The running game | The screen inventory with captures |
 | `re-mapper` | task | The export and the platform's register list | Named hardware registers, banks and RAM variables |
+| `re-typer` | task | The export | Structures, classes and enumerations in Ghidra and `labels/fields.tsv` |
 | `re-matcher` | task | A crate, library or released source | A bit-for-bit comparison with the game's version |
 | `re-editor` | task | Documents | The same documents in plain English |
 | `re-checker` | task | Documents | Checked claims, doubtful ones marked |

@@ -19,7 +19,9 @@ port.
    code against ground truth; check simple code against recorded frames.
 2. Run the parity tests (`bitcompare.py`, `seqdiff.py`), determinism and digests, and
    saves or pictures where they apply.
-3. For each difference, give the first input that differs and the first value that differs.
+3. For a game run in an emulator, compare the game's memory frame by frame on the same inputs
+   with `tools/verify/ramdiff.py` (`docs/observe/emulators.md`).
+4. For each difference, give the first input that differs and the first value that differs.
 
 ## Where it ends
 

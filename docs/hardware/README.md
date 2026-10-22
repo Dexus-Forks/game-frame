@@ -38,6 +38,8 @@ In my GameFrame project, find every place the game touches hardware.
   NVIDIA, Direct3D and OpenGL, and software renderers.
 - [Sound](sound.md): the PC speaker, AdLib and OPL FM synthesis, Sound Blaster, Gravis
   Ultrasound, MIDI devices, DirectSound, A3D and EAX.
+- [Shaders](shaders.md): finding compiled and source shaders with `shaders.py`, reading them,
+  capturing frames, and porting them exactly.
 - [Pixel-exact software rendering](software-rendering.md): fill rules, edge stepping, lines,
   texture mapping, lookup tables and drawing order, and how to measure each in the original.
 - [Working with the real hardware](real-hardware.md): dumping your own media and firmware,

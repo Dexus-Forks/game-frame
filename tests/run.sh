@@ -471,6 +471,29 @@ scripts/new-project.sh "$tmp" "Test Game" $B >/dev/null 2>&1
   && ok "new-project creates a repository, keeps target/ out of git" || bad "new-project scaffold" "$(ls -la "$tmp" 2>&1)"
 expect "gameframe works in a new project" "tools/pe/peinfo.py  (program)" "$tmp/gameframe" tool peinfo
 
+echo "Engine run-time: hashed names, skeletons, structures, shaders, memory per frame"
+W="$(mktemp -d)"
+"$PYTHON" tests/make_engine.py "$W"
+expect "hashnames finds the game's hash function" "fnv1a-32: 7 names" "$PYTHON" tools/triage/hashnames.py "$W/game.bin"
+expect "hashnames names a hash constant" "0x062a102a  fnv1a-32 (as is): door_open" "$PYTHON" tools/triage/hashnames.py "$W/game.bin" --value 0x062a102a
+expect "hashnames reports an unknown constant" "0x12345678  unknown" "$PYTHON" tools/triage/hashnames.py "$W/game.bin" --value 0x12345678
+expect "skeleton finds a 16-bit parent array" "16-bit LE  17 joints, 1 root(s), depth 5, 5 leaves" "$PYTHON" tools/formats/skeleton.py "$W/rig.mdl"
+expect "skeleton finds the bind pose quaternions" "17 quaternions, 32 bytes apart, 17 different" "$PYTHON" tools/formats/skeleton.py "$W/rig.mdl"
+expect "skeleton lists joint names" "Bip01 Pelvis" "$PYTHON" tools/formats/skeleton.py "$W/rig.mdl"
+expect "skeleton prints a parent array as a tree" "        4" "$PYTHON" tools/formats/skeleton.py "$W/rig.mdl" --at 0x15e --width 2
+expect "decomp_query layout merges a structure's fields" "0x18     4  int                          2      1  FUN_140001000, FUN_140001100" "$PYTHON" tools/triage/decomp_query.py --export tests/fixtures/export-layout layout FUN_140001000 FUN_140001100
+expect "decomp_query layout scales indexes of an int pointer" "    int                      f_1c;  /* also read as char */" "$PYTHON" tools/triage/decomp_query.py --export tests/fixtures/export-layout layout FUN_140001000 FUN_140001100
+expect "shaders finds a Direct3D 9 pixel shader and its constant" "FogColor" "$PYTHON" tools/formats/shaders.py "$W/shaders.bin"
+expect "shaders reads a DXBC container's stage and version" "DXBC pixel 4.0 [RDEF SHDR]" "$PYTHON" tools/formats/shaders.py "$W/shaders.bin"
+expect "shaders reads SPIR-V names" "names: main, Albedo" "$PYTHON" tools/formats/shaders.py "$W/shaders.bin"
+expect "shaders finds GLSL source" "GLSL source" "$PYTHON" tools/formats/shaders.py "$W/shaders.bin"
+expect "shaders finds all four" "4 shaders" "$PYTHON" tools/formats/shaders.py "$W/shaders.bin"
+expect "ramdiff finds the first frame that differs" "first difference at frame 6" "$PYTHON" tools/verify/ramdiff.py "$W/orig.ram" "$W/port.ram" --size 2048 --map "$W/ram.map" --ignore 0x9-0x9
+expect "ramdiff names the address from a RAM map" "player_y" "$PYTHON" tools/verify/ramdiff.py "$W/orig.ram" "$W/port.ram" --size 2048 --map "$W/ram.map" --ignore 0x9-0x9
+expect "ramdiff counts the frames that differ" "4 of 10 frames differ" "$PYTHON" tools/verify/ramdiff.py "$W/orig.ram" "$W/port.ram" --size 2048 --map "$W/ram.map" --ignore 0x9-0x9
+"$PYTHON" tools/verify/ramdiff.py "$W/orig.ram" "$W/orig.ram" --size 2048 >/dev/null && ok "ramdiff exits 0 for identical runs" || bad "ramdiff identical"
+rm -rf "$W"
+
 echo "Gates (scripts/hooks/gate.py)"
 out="$("$PYTHON" - <<'PY' 2>&1
 import json, os, subprocess, tempfile

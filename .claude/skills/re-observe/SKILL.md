@@ -29,6 +29,11 @@ model, how exact the interface must be. They decide what to capture.
 Prefer headless, scripted runs for evidence. Use windowed runs to see what happens and where to
 look. `docs/observe/running-the-original.md` has the full table.
 
+In an emulator, start every run from a save state, record the inputs as a movie, and have a
+script dump the game's memory after each frame. Those dumps are ground truth for
+`tools/verify/ramdiff.py`. Search Data Crystal, The Cutting Room Floor and TASVideos for RAM
+maps and mechanics before measuring (`docs/observe/emulators.md`).
+
 ## 3. Capture, with the inputs that made it
 
 For every capture, write next to it the game version (hash), settings, seed, and the inputs

@@ -143,9 +143,10 @@ that block game material, decompiled code and commits by other agents.
 `re-porter` → `re-verifier` → `re-lander`, and back to the tracer or the porter when a check
 fails.
 
-Eight task agents do one job each, in any stage: `re-identifier` (engine and libraries),
+Nine task agents do one job each, in any stage: `re-identifier` (engine and libraries),
 `re-randomiser` (random generators and draw order), `re-listener` (every input),
-`re-cataloguer` (every screen), `re-mapper` (hardware and memory), `re-matcher` (a crate or
+`re-cataloguer` (every screen), `re-mapper` (hardware and memory), `re-typer` (structures and
+classes), `re-matcher` (a crate or
 library against the game), `re-editor` (documents to the writing rules) and `re-checker`
 (claims and sources). `re-start` ("Task agents") has their table.
 
@@ -183,6 +184,7 @@ between agents, the outcome, and the failure path.
 | `tools/triage/coverdiff.py` | The code that ran only with an action: two coverage logs (drcov or address lists) compared, by function |
 | `tools/triage/fixity.py` | A BagIt bag of a game copy with checksums; manifests in place; verification over time |
 | `tools/triage/constants.py` | Random generators, checksums, hashes, ciphers and decompressors named by their constants, with addresses |
+| `tools/triage/hashnames.py` | Which hash function names things, and the name behind each hash constant |
 | `tools/triage/match_functions.py` | The same functions in two builds, from two Ghidra exports; your labels carried to the new addresses |
 | `tools/triage/memscan.py` | Where a running game keeps a value, from memory dumps taken as it changes; pointers to it |
 | `tools/triage/compare_trees.py` | Two copies or releases compared file by file (SHA-256, case-insensitive paths); hashes to publish |
@@ -192,6 +194,7 @@ between agents, the outcome, and the failure path.
 | `tools/pe/readdata.py` | The real value of a `DAT_` constant or table |
 | `tools/pe/vtable.py` | The functions in a table of function pointers |
 | `tools/triage/decomp_query.py` | A function with your labels; callers; callees; who uses a string; who writes a field; where the work is |
+| `tools/triage/decomp_query.py layout` | A structure's fields from the functions that use it, merged, with a draft C struct |
 | `tools/triage/deviations.py` | Every `Deviation:` and `not ported` comment in the reimplementation, as one ledger; `--check` for tests |
 | `tools/triage/coverage.py` | How much of the original (by count and by size) the reimplementation cites, and the largest functions nobody cites yet |
 | `tools/emu/pe_emu.py` | Call any function of a Windows x64 EXE or DLL with chosen inputs and read the result |
@@ -203,9 +206,12 @@ between agents, the outcome, and the failure path.
 | `tools/dos/omf.py` | OMF object files and libraries (.OBJ, .LIB): publics, and signatures of the runtime for `sigscan.py` |
 | `tools/formats/pcap.py` | A network capture (pcap, pcapng) split into flows and messages, or joined into TCP streams |
 | `tools/formats/fields.py` | Many records or messages side by side: constants, counters, lengths and types, and a heatmap |
+| `tools/formats/skeleton.py` | Skeletons in a model file: parent index arrays as trees, runs of quaternions, joint names |
+| `tools/formats/shaders.py` | Shaders inside a file: Direct3D 9 bytecode, DXBC, DXIL, SPIR-V, GLSL, HLSL and ARB, with their names |
 | `tools/formats/swfinfo.py` | A Flash game: SWF version, compression, ActionScript version, classes, content; the movie inside a projector |
 | `tools/formats/timestamps.py` | A number read as every common timestamp; timestamps found inside a file |
 | `tools/verify/bitcompare.py` | Ground truth against reimplementation, bit for bit, with ULP distance |
+| `tools/verify/ramdiff.py` | Memory frame by frame from the original and the port: the first frame and address that differ, named from a RAM map |
 | `tools/verify/seqdiff.py` | The first random draw (or any event) where two traces differ |
 | `tools/ghidra/*.java` | The Ghidra scripts the shell scripts run (`ApplyLabels.java` names functions and creates missed ones) |
 | `tools/dos/dosinfo.py` | What is this DOS binary: MZ, NE or LE; segments with Ghidra's selectors; imports; compiler, extender, packer fingerprints; debug symbols; Pascal strings |
@@ -268,6 +274,8 @@ The documentation is in [docs/](docs/README.md). It is also built as a website
 - [docs/DOS.md](docs/DOS.md): 16-bit DOS programs, Borland debug symbols, the DOS emulators.
 - [docs/ABI.md](docs/ABI.md): calling conventions, C++ layout, floating-point and integer details
   that a bit-exact port must copy.
+- [docs/TYPES.md](docs/TYPES.md): structures, classes, enumerations and the C++ standard
+  containers, recovered from the code that uses them.
 - [docs/OUTPUTS.md](docs/OUTPUTS.md): what a project can ship: documents, a website, programs
   for each system built by CI and attached to releases, a browser version, a server, tools.
 - [docs/LEGAL.md](docs/LEGAL.md): working from your own copy, sharing none of the game's files,

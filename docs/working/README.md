@@ -12,6 +12,10 @@ work that spans several steps and several sessions.
   files on someone else's machine.
 - [Getting more from Ghidra](ghidra.md): every call with its arguments, code that is not an
   executable, carrying labels to a new build, Function ID, types, processors.
+- [Versions, patches and builds](versions.md): choosing the version to copy, comparing builds,
+  and reading several versions' data in one port.
+- [Building the port](building-the-port.md): the core and the platform layer, time, input,
+  drawing, sound, the player's data, browser builds and round trips of the original's formats.
 - [Practising on games with source](practice.md): practice targets, a ladder of exercises,
   and testing agents on games whose answers can be checked.
 - [Keeping a game for the long term](preservation.md): archive packages, fixity with BagIt,
