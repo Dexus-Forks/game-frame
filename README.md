@@ -196,6 +196,7 @@ between agents, the outcome, and the failure path.
 | `tools/pe/vtable.py` | The functions in a table of function pointers |
 | `tools/pe/relocs.py` | The pointers in a PE's data, from its base relocations: vtables and tables of functions, strings and records |
 | `tools/triage/dates.py` | Dates and times in a file, in nine stored forms (Unix, FILETIME, DOS, HFS, OLE, ISO 9660, SYSTEMTIME), near a date you give |
+| `tools/live/frida_trace.py` | Calls to chosen functions in a running game, with Frida, in the same format as the emulator's call traces |
 | `tools/emu/mem_trace.py` | Which instructions read and write chosen memory while an emulated function runs. It is the first step of taint analysis |
 | `tools/triage/decomp_query.py` | A function with your labels; callers; callees; who uses a string; who writes a field; where the work is |
 | `tools/triage/decomp_query.py layout` | A structure's fields from the functions that use it, merged, with a draft C struct |

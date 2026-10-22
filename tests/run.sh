@@ -52,6 +52,19 @@ PY
 expect "hashnames gives the ROR-13 hash of an import name" "0xec0e4e8e" "$PYTHON" tools/triage/hashnames.py --hash LoadLibraryA
 expect "relocs finds the vtable as a run of code pointers" "$vt  .rdata      2 pointers  (2 code)" "$PYTHON" tools/pe/relocs.py $B/game.exe
 
+echo "Live tracing"
+if "$PYTHON" -c "import frida" 2>/dev/null && command -v cc >/dev/null; then
+  T="$(mktemp -d)"
+  printf '%s\n' '__attribute__((noinline)) int draw(int *s, int r) { *s = *s * 1103515245 + 12345; return (unsigned)(*s >> 16) % r; }' \
+    '__attribute__((noinline)) int spawn(int *s) { return draw(s, 10) + draw(s, 20); }' \
+    'int main(void) { int s = 7, t = 0; for (int i = 0; i < 3; i++) t += spawn(&s) + draw(&s, 5); return t == 0; }' > "$T/target.c"
+  cc -O1 -o "$T/target" "$T/target.c"
+  expect "frida_trace logs outermost calls with their call sites" "draw(" "$PYTHON" tools/live/frida_trace.py \
+    --hook 'target!draw' --hook 'target!spawn' --args 2 --spawn "$T/target"
+else
+  echo "  skip  live tracing (run: scripts/setup.sh --install for Frida; needs a C compiler)"
+fi
+
 echo "Emulator"
 expect "RNG matches MSVC rand() from seed 1" "[41, 18467, 6334]" "$PYTHON" - <<'PY'
 import sys; sys.path.insert(0, 'tools/emu')

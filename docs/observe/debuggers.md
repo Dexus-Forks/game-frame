@@ -75,6 +75,24 @@ action once. The blocks in the second run and not the first are the action's cod
 Keep the two runs alike: the same save, the same menus, the same length. Every extra
 difference adds functions to the list.
 
+## Tracing calls in the running game
+
+`tools/live/frida_trace.py` traces calls to chosen functions while the game runs on its own
+platform. Name each function by module and offset, or by export:
+
+```bash
+.venv/bin/python tools/live/frida_trace.py --hook 'game.exe+0x1a2b30=rng_next' --args 1 \
+  --out derived/live.trace --attach game.exe
+tools/verify/seqdiff.py derived/live.trace derived/port.trace
+```
+
+Each call is one line with its label, its first arguments and its call site. The format is the
+one `tools/emu/call_trace.py` writes, so `seqdiff.py` compares the trace with the port's. Use it
+for what the emulator cannot reach: a whole level played by hand, calls that depend on the
+graphics or sound system, and timing between frames. Frida is installed by
+`scripts/setup.sh --install`. It runs on Windows, Linux, macOS and Android. Some protected games
+detect it. On macOS, signed programs need a copy without the hardened runtime.
+
 ## Going backwards: time-travel debugging
 
 A recording debugger saves everything a program does, then lets you step backwards as well as
