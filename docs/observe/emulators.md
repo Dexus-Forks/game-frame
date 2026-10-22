@@ -25,6 +25,8 @@ functions are in [re-emulate](../../.claude/skills/re-emulate/SKILL.md).
 
 ## Ground truth, frame by frame
 
+![Memory compared frame by frame: the first frame and address where the port differs](../assets/diagrams/ram-compare.svg)
+
 The strongest check of a port of a console game is to run the same inputs in both and compare
 the game's state after every frame:
 

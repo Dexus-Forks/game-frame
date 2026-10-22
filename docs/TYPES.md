@@ -55,6 +55,8 @@ Use the best source that exists, in this order:
 
 ## The C++ standard containers
 
+![The layouts of vector, string, list and a map node in 64-bit MSVC release builds](assets/diagrams/cpp-containers.svg)
+
 Games written in C++ use the standard library's containers, and their layouts repeat in every
 structure that holds one. These are the release-build layouts of 64-bit programs. A 32-bit
 build has the same fields with 4-byte pointers. Check the layout for your compiler with a small

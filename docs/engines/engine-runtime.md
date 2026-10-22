@@ -21,6 +21,8 @@ systems from the builder's side.
 | Frame (scratch) | A stack reset once per frame, often two of them swapped each frame (double buffering) | Which data lives for one frame and which for two |
 | Heap with relocation | Blocks moved to close gaps, with handles updated after each move | That objects are found by handle. The addresses do not matter |
 
+![A pool allocator: allocating takes the head of the free list, and freeing puts a slot back as the head](../assets/diagrams/pool-freelist.svg)
+
 To find the allocators, look for the functions called with a size by most `new` sites
 (Ghidra's references to `operator new` lead to them), and for an alignment mask applied to a
 size. A freelist pop is a load of `[head]` followed by a store of that value back into `head`.
@@ -49,6 +51,8 @@ field in a data file. The text is often gone.
   names make the code readable, and data files written by modders use them.
 
 ## Handles and references
+
+![A 32-bit handle: 12 bits of generation and 20 bits of index](../assets/diagrams/handle-bits.svg)
 
 Objects that may be deleted are referred to by handle, not by pointer. A handle is an index
 into a table plus a generation counter that changes each time the slot is reused, packed into

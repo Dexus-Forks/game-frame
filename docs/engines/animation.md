@@ -21,6 +21,8 @@ the drawing.
 
 ## The skeleton
 
+![A skeleton as an array of parent indices, and the tree it makes](../assets/diagrams/skeleton-parents.svg)
+
 A skeleton is an array of joints. Each joint holds its parent's index, and the array is sorted
 so that every parent comes before its children. The root's parent is -1. Computing world
 positions is then one pass from the start of the array, multiplying each joint's local

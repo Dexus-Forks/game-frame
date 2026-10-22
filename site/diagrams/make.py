@@ -406,6 +406,9 @@ DIAGRAMS = {
 from more import MORE  # noqa: E402  (the second set of diagrams)
 
 DIAGRAMS.update(MORE)
+from runtime import RUNTIME  # noqa: E402  (the third set)
+
+DIAGRAMS.update(RUNTIME)
 
 
 def main(argv):
