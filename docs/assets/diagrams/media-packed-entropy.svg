@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="330" viewBox="0 0 900 330" role="img" aria-label="The entropy of each block of an executable: an ordinary program varies between code, data and resources, while a packed program is above 7.5 almost everywhere, after a small stub">
-<title>The entropy of each block of an executable: an ordinary program varies between code, data and resources, while a packed program is above 7.5 almost everywhere, after a small stub</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="330" viewBox="0 0 900 330" role="img" aria-label="The entropy of each block of an executable. An ordinary program varies between code, data and resources. A packed program is above 7.5 almost everywhere after a small stub">
+<title>The entropy of each block of an executable. An ordinary program varies between code, data and resources. A packed program is above 7.5 almost everywhere after a small stub</title>
 <rect x="0.5" y="0.5" width="899" height="329" rx="10" fill="#0d1b1e" stroke="#1f3d40"/>
 <defs><marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" fill="#8fa9a5"/></marker></defs>
-<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">A PACKED PROGRAM, BY ITS ENTROPY</text>
+<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">THE ENTROPY OF A PACKED PROGRAM</text>
 <text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">filetypes.py --blocks 4096 gives the entropy of each block, from 0 to 8 bits per byte.</text>
 <text x="24.0" y="110.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#e2ece9" text-anchor="start">an ordinary program</text>
 <path d="M200.0 180.0L860.0 180.0" stroke="#1f3d40" stroke-width="1" fill="none"/>
@@ -94,5 +94,5 @@
 <rect x="843.5" y="266.0" width="14.0" height="24.0" rx="1" fill="#f87171" stroke="none" fill-opacity="0.55"/>
 <text x="24.0" y="140.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#8fa9a5" text-anchor="start">code, data, resources</text>
 <text x="24.0" y="250.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#8fa9a5" text-anchor="start">a stub, then compressed</text>
-<text x="24.0" y="316.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#8fa9a5" text-anchor="start">The bars are illustrative shapes. Other signs: very few imports, sections named UPX0 and UPX1, almost no strings.</text>
+<text x="24.0" y="316.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#8fa9a5" text-anchor="start">The bars are illustrative shapes. Other signs are very few imports, sections named UPX0 and UPX1, and almost no strings.</text>
 </svg>

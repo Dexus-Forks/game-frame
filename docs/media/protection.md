@@ -47,7 +47,7 @@ unpacked code is game material and stays in `analysis/` or `derived/`.
 
 ## Obfuscated data
 
-![A decoder loop after a file read; stop after it and save the buffer](../assets/diagrams/media-decoder-loop.svg)
+![A decoder loop runs after a file read. The buffer is saved when the loop ends](../assets/diagrams/media-decoder-loop.svg)
 
 Data files can be hidden too. [Identifying unknown files](files.md#simple-obfuscation) covers the
 weak schemes that `xorscan.py` finds. Stronger schemes need the decoder in the code. Signs of

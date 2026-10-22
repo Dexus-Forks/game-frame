@@ -2,8 +2,8 @@
 <title>Wolfenstein 3D casts one ray per screen column against the tile grid. The distance to the wall it hits sets the height of that column's wall slice</title>
 <rect x="0.5" y="0.5" width="899" height="379" rx="10" fill="#0d1b1e" stroke="#1f3d40"/>
 <defs><marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" fill="#8fa9a5"/></marker></defs>
-<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">WOLFENSTEIN 3D: ONE RAY PER COLUMN</text>
-<text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">The world is a grid of tiles. Each screen column casts a ray; the nearer the wall, the taller the slice.</text>
+<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">RAY CASTING IN WOLFENSTEIN 3D</text>
+<text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">The world is a grid of tiles. Each screen column casts one ray. The height of its slice depends on the distance to the wall.</text>
 <rect x="40.0" y="92.0" width="19.0" height="19.0" rx="1" fill="#60a5fa" stroke="none" fill-opacity="0.45"/>
 <rect x="60.0" y="92.0" width="19.0" height="19.0" rx="1" fill="#60a5fa" stroke="none" fill-opacity="0.45"/>
 <rect x="80.0" y="92.0" width="19.0" height="19.0" rx="1" fill="#60a5fa" stroke="none" fill-opacity="0.45"/>
@@ -210,7 +210,7 @@
 <path d="M90.0 242.0L148.9 230.6" stroke="#f59e0b" stroke-width="1" fill="none" stroke-dasharray="3 3" opacity="0.6"/>
 <circle cx="90.0" cy="242.0" r="5" fill="#f59e0b"/>
 <text x="40.0" y="312.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="start">a part of the 64 x 64 tile map, from above</text>
-<text x="330.0" y="314.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="start">the screen: one slice per column, drawn left to right</text>
+<text x="330.0" y="314.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="start">the screen, with one slice per column, drawn from left to right</text>
 <text x="330.0" y="336.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="start">Light and dark faces show whether the ray crossed a vertical or a horizontal grid line.</text>
 <text x="24.0" y="364.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#e2ece9" text-anchor="start">Sprites are drawn after the walls, clipped against the distance stored for each column. Game time runs at 70 ticks a second.</text>
 </svg>

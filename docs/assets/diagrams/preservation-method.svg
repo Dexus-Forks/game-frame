@@ -1,9 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="330" viewBox="0 0 900 330" role="img" aria-label="GameFrame's method as a loop: read the owner's copy and cite each address, run the original's functions under emulation for exact answers, write the port, and test that it gives the same answers to the last bit, writing documents along the way">
-<title>GameFrame's method as a loop: read the owner's copy and cite each address, run the original's functions under emulation for exact answers, write the port, and test that it gives the same answers to the last bit, writing documents along the way</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="330" viewBox="0 0 900 330" role="img" aria-label="GameFrame's method as a loop. Read the owner's copy and cite each address, run the original's functions under emulation for exact answers, write the port, test that it gives the same answers to the last bit, and write documents along the way">
+<title>GameFrame's method as a loop. Read the owner's copy and cite each address, run the original's functions under emulation for exact answers, write the port, test that it gives the same answers to the last bit, and write documents along the way</title>
 <rect x="0.5" y="0.5" width="899" height="329" rx="10" fill="#0d1b1e" stroke="#1f3d40"/>
 <defs><marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" fill="#8fa9a5"/></marker></defs>
 <text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">DOCUMENTS OF HOW THE GAME WORKS</text>
-<text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">Each finding cites the original. The port must match it to the last bit.</text>
+<text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">Each finding cites the place in the original that it comes from. The port must give the same results to the last bit.</text>
 <rect x="40.0" y="96.0" width="240.0" height="56.0" rx="4" fill="#64748b" stroke="none" fill-opacity="0.22"/>
 <text x="160.0" y="121.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#e2ece9" text-anchor="middle">the owner's copy</text>
 <text x="160.0" y="137.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#8fa9a5" text-anchor="middle">the only source</text>
@@ -34,6 +34,6 @@
 <path d="M616.0 242.0L572.0 242.0" stroke="#8fa9a5" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
 <path d="M326.0 242.0L282.0 242.0" stroke="#8fa9a5" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
 <path d="M450 212C 450 190 450 176 450 156" stroke="#f87171" stroke-width="1.5" fill="none" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
-<text x="458.0" y="188.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#f87171" text-anchor="start">no match: back to the evidence</text>
+<text x="458.0" y="188.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#f87171" text-anchor="start">if the results differ, go back to the evidence</text>
 <text x="24.0" y="312.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#e2ece9" text-anchor="start">MAME calls its code documentation of the machines. GameFrame applies the idea to one game.</text>
 </svg>

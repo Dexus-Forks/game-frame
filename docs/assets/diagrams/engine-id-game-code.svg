@@ -1,9 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="380" viewBox="0 0 900 380" role="img" aria-label="Where the game code lives in id's engines: Quake interprets QuakeC byte code in progs.dat, Quake II calls a native game DLL through tables, and Quake III runs QVM byte code three ways">
-<title>Where the game code lives in id's engines: Quake interprets QuakeC byte code in progs.dat, Quake II calls a native game DLL through tables, and Quake III runs QVM byte code three ways</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="380" viewBox="0 0 900 380" role="img" aria-label="Quake interprets QuakeC byte code in progs.dat. Quake II calls a native game DLL through tables. Quake III runs QVM byte code in three ways">
+<title>Quake interprets QuakeC byte code in progs.dat. Quake II calls a native game DLL through tables. Quake III runs QVM byte code in three ways</title>
 <rect x="0.5" y="0.5" width="899" height="379" rx="10" fill="#0d1b1e" stroke="#1f3d40"/>
 <defs><marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" fill="#8fa9a5"/></marker></defs>
-<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">WHERE THE GAME CODE LIVES</text>
-<text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">The engine stays much the same between games. The game code moved from byte code to a DLL and back.</text>
+<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">WHERE THE GAME CODE LIVES IN ID'S ENGINES</text>
+<text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">The engine changes little between games. Quake uses byte code, Quake II uses a DLL, and Quake III can use either.</text>
 <text x="24.0" y="90.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#60a5fa" text-anchor="start">Quake (1996)</text>
 <rect x="24.0" y="102.0" width="268.0" height="44.0" rx="4" fill="#64748b" stroke="none" fill-opacity="0.25"/>
 <text x="158.0" y="121.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#e2ece9" text-anchor="middle">the engine</text>
@@ -46,8 +46,8 @@
 <text x="742.0" y="258.7" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="600" fill="#e2ece9" text-anchor="middle">compiled on load</text>
 <rect x="790.0" y="240.0" width="86.0" height="30.0" rx="4" fill="#64748b" stroke="none" fill-opacity="0.3"/>
 <text x="833.0" y="258.7" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="600" fill="#e2ece9" text-anchor="middle">native DLL</text>
-<text x="608.0" y="296.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#8fa9a5" text-anchor="start">The same code three ways.</text>
+<text x="608.0" y="296.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#8fa9a5" text-anchor="start">The same code can run in three ways.</text>
 <text x="608.0" y="312.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#8fa9a5" text-anchor="start">Data is in .pk3 files, which are ZIP</text>
 <text x="608.0" y="328.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#8fa9a5" text-anchor="start">archives.</text>
-<text x="24.0" y="360.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#e2ece9" text-anchor="start">In each case, read the game code first. Most of a licensee's changes are there.</text>
+<text x="24.0" y="360.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#e2ece9" text-anchor="start">In each case, read the game code first, because most of a licensee's changes are in it.</text>
 </svg>

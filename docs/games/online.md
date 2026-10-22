@@ -35,7 +35,7 @@ approximations rebuilt from what players observed.
 
 ## The rule set
 
-![The client predicts and the server decides](../assets/diagrams/games-online-split.svg)
+![The client shows a predicted result at once and then follows the result that the server sends](../assets/diagrams/games-online-split.svg)
 
 **What must be exact.** The protocol: message formats, encryption or obfuscation, ordering and
 timing, so the original client accepts the server. Server rules can only be as exact as the

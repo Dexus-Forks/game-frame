@@ -1,19 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360" role="img" aria-label="A shoot 'em up level's event script: records that say at which scroll position to do what fire as the level scrolls, starting waves and changing speed; actors live in slots updated in slot order">
-<title>A shoot 'em up level's event script: records that say at which scroll position to do what fire as the level scrolls, starting waves and changing speed; actors live in slots updated in slot order</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360" role="img" aria-label="The event script of a shoot 'em up level. Each record fires at a scroll position, starting waves and changing speed. Actors live in slots that are updated in slot order">
+<title>The event script of a shoot 'em up level. Each record fires at a scroll position, starting waves and changing speed. Actors live in slots that are updated in slot order</title>
 <rect x="0.5" y="0.5" width="899" height="359" rx="10" fill="#0d1b1e" stroke="#1f3d40"/>
 <defs><marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" fill="#8fa9a5"/></marker></defs>
-<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">ARCADE: THE LEVEL IS AN EVENT SCRIPT</text>
-<text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">As the screen scrolls, each record fires at its position. Actors fill slots in order.</text>
+<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">THE EVENT SCRIPT OF AN ARCADE LEVEL</text>
+<text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">Each record fires when the screen scrolls to its position. Each new actor takes the first free slot.</text>
 <rect x="40.0" y="92.0" width="760.0" height="40.0" rx="3" fill="#64748b" stroke="none" fill-opacity="0.15"/>
 <path d="M160.0 88.0L160.0 136.0" stroke="#f59e0b" stroke-width="1.5" fill="none"/>
 <text x="164.0" y="104.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" font-weight="400" fill="#f59e0b" text-anchor="start">120</text>
-<text x="164.0" y="124.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">wave 1: 5 fighters</text>
+<text x="164.0" y="124.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">wave 1, 5 fighters</text>
 <path d="M340.0 88.0L340.0 136.0" stroke="#f59e0b" stroke-width="1.5" fill="none"/>
 <text x="344.0" y="104.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" font-weight="400" fill="#f59e0b" text-anchor="start">300</text>
 <text x="344.0" y="124.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">speed up</text>
 <path d="M460.0 88.0L460.0 136.0" stroke="#f59e0b" stroke-width="1.5" fill="none"/>
 <text x="464.0" y="104.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" font-weight="400" fill="#f59e0b" text-anchor="start">420</text>
-<text x="464.0" y="124.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">wave 2: turrets</text>
+<text x="464.0" y="124.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">wave 2, turrets</text>
 <path d="M640.0 88.0L640.0 136.0" stroke="#f59e0b" stroke-width="1.5" fill="none"/>
 <text x="644.0" y="104.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" font-weight="400" fill="#f59e0b" text-anchor="start">600</text>
 <text x="644.0" y="124.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">boss music</text>

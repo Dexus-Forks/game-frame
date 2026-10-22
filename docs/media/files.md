@@ -61,7 +61,7 @@ browser, with an entropy graph and a hex view of any place you click.
 
 ## Pictures in the data
 
-![The same bytes drawn at three widths; only the right one stands straight](../assets/diagrams/media-raw-width.svg)
+![The same bytes drawn at three widths, where only the right width makes the picture stand straight](../assets/diagrams/media-raw-width.svg)
 
 A block of a data file, or a dump of video memory, may be a picture with no header. Try it as
 one with `tools/formats/rawimage.py`: 8 bits per pixel (VGA mode 13h), Mode X planes, EGA bit

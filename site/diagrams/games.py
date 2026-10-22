@@ -15,9 +15,9 @@ FAMILIES = ['arcade', 'first-person', 'racing', 'vehicle sims', 'management', 's
 
 # ---------------------------------------------------------------- README: connections
 def connections():
-    s = Svg(900, 500, 'Shared systems and the families of games where each matters most, as a grid: a large dot where '
-                      'the system matters most, a small dot where it also appears')
-    s.heading('Systems shared between families', 'Trace a system once. A large dot marks the families where it matters most.')
+    s = Svg(900, 514, 'A grid of shared systems and families of games. A large dot marks a family where a system matters most. A small dot marks a family where it also appears')
+    s.heading('Systems that several kinds of game share',
+              'A large dot marks the kinds of game where a system matters most. A small dot marks the others where it appears.')
     rows = [('Fixed-step frame loop', {'arcade', 'first-person', 'racing', 'vehicle sims', 'management', 'strategy'}, set()),
             ('Input recorded per frame', {'arcade', 'first-person', 'racing', 'strategy'}, set()),
             ('Lockstep determinism', {'strategy', 'management', 'arcade'}, set()),
@@ -33,7 +33,7 @@ def connections():
             ('A world simulated unseen', {'management', 'strategy', 'RPG', 'online'}, set()),
             ('Saves of the whole world', {'management', 'strategy', 'RPG'}, set()),
             ('Event scripts in levels', {'arcade', 'first-person', 'RPG'}, set())]
-    x0, cw, y0, rh = 230, 64, 96, 24
+    x0, cw, y0, rh = 230, 64, 110, 24
     for k, f in enumerate(FAMILIES):
         x = x0 + k * cw + cw / 2
         s.add(f'<text x="{x:.1f}" y="{y0 - 8}" font-family="ui-sans-serif, Helvetica, Arial, sans-serif" font-size="10.5" '
@@ -52,21 +52,21 @@ def connections():
     s.add(f'<circle cx="30" cy="{y0 + 10 + len(rows) * rh + 16}" r="7" fill="{TEAL}"/>')
     s.text(44, y0 + 14 + len(rows) * rh + 16, 'matters most', 11, DIM)
     s.add(f'<circle cx="160" cy="{y0 + 10 + len(rows) * rh + 16}" r="3" fill="{DIM}"/>')
-    s.text(172, y0 + 14 + len(rows) * rh + 16, 'also appears (random draws: every family; fixed point: DOS-era games of every family)',
+    s.text(172, y0 + 14 + len(rows) * rh + 16, 'also appears (random draws in every family, fixed point in DOS-era games of every family)',
            11, DIM)
     return s.render()
 
 
 # ---------------------------------------------------------------- README: approaches
 def approaches():
-    s = Svg(900, 340, 'Four approaches seen in other projects: a reimplementation, an engine reimplementation, a '
-                      'matching decompilation and a source port, with what each starts from and what it produces')
-    s.heading('Four routes other projects took', 'What each starts from, what it makes, and what you can learn from it.')
+    s = Svg(900, 340, 'Four approaches seen in other projects, which are a reimplementation, an engine reimplementation, a matching decompilation and a source port, with what each starts from and what it makes')
+    s.heading('Four routes that other projects took',
+              'Each row shows what a route starts from, what it makes and what you can learn from it.')
     rows = [('Reimplementation', 'the shipped program', 'new code, checked against it', 'method, structure, verification', TEAL),
             ('Engine reimplementation', 'the game\'s data', 'a new engine that runs it', 'how the data and scripts work', BLUE),
-            ('Matching decompilation', 'the shipped program', 'source that compiles to the same bytes', 'the exact structure; slowest',
+            ('Matching decompilation', 'the shipped program', 'source that compiles to the same bytes', 'the exact structure, slowly',
              PURPLE),
-            ('Source port', 'source the owner released', 'the same code on new systems', 'how it was built; no RE needed', AMBER)]
+            ('Source port', 'source the owner released', 'the same code on new systems', 'how the original was built', AMBER)]
     s.text(24, 88, 'route', 11, DIM)
     s.text(230, 88, 'starts from', 11, DIM)
     s.text(430, 88, 'makes', 11, DIM)
@@ -79,16 +79,15 @@ def approaches():
         arrow(s, 398, y + 22, 424, y + 22)
         box(s, 428, y + 7, 236, 30, colour, out, op=0.3, size=11)
         s.text(680, y + 27, learn, 11, DIM)
-    s.text(24, 322, 'A clean-room project reads other projects\' documents and method. It does not copy their code.', 12, TEXT)
+    s.text(24, 322, 'A clean-room project reads other projects\' documents and method without copying their code.', 12, TEXT)
     return s.render()
 
 
 # ---------------------------------------------------------------- interaction: the game's own clock (animated)
 def own_clock():
-    s = Svg(900, 380, 'A game that runs on its own clock: each frame reads the input state once, updates in a fixed '
-                      'order and draws, with everything from outside passed in as one record per frame and the '
-                      'picture and sounds passed out')
-    s.heading('A game that runs on its own clock', 'One loop, every frame, in a fixed order. Everything from outside comes in through one record.')
+    s = Svg(900, 380, 'A game that runs on its own clock. Each frame reads the input state once, updates in a fixed order and draws. Everything from outside comes in as one record per frame. The picture and sounds go out the same way')
+    s.heading('A game that runs on its own clock',
+              'The game runs one loop in a fixed order every frame. Everything from outside the game comes in through one record per frame.')
     dur = 4.0
     steps = [('read input state', TEAL), ('move the player', BLUE), ('move enemies, shots', BLUE),
              ('collisions', BLUE), ('scroll, spawn waves', BLUE), ('draw the frame and HUD', AMBER)]
@@ -120,12 +119,12 @@ def own_clock():
 
 # ---------------------------------------------------------------- interaction: waiting for the player (animated)
 def waits():
-    s = Svg(900, 320, 'A game that waits for the player: nothing changes until a command arrives; the rules resolve it '
-                      'in a fixed order into a new state, while an animation loop runs without changing the state')
-    s.heading('A game that waits for the player', 'Nothing happens until a command. Then the rules resolve it, in order, into a new state.')
+    s = Svg(900, 320, 'A game that waits for the player. Nothing changes until a command arrives. The rules then resolve it in a fixed order into a new state. An animation loop may run without changing the state')
+    s.heading('A game that waits for the player',
+              'Nothing changes until the player gives a command. The rules then resolve the command, in a fixed order, into a new state.')
     dur = 6.0
     box(s, 24, 110, 170, 60, GREY, 'state', 'board, flags, inventory', op=0.3)
-    s.add(group(scratch(lambda t: box(t, 24, 200, 170, 40, AMBER, 'command: "open door"', op=0.35, size=11)), 0.2, 0.98, dur))
+    s.add(group(scratch(lambda t: box(t, 24, 200, 170, 40, AMBER, 'the command "open door"', op=0.35, size=11)), 0.2, 0.98, dur))
     s.add(f'<path d="M110 198L110 174" stroke="{AMBER}" stroke-width="2" marker-end="url(#arrow)" opacity="0">'
           f'{during(0.25, 0.98, dur)}</path>')
     res = ['check it is allowed', 'apply effects in order', 'draw random numbers', 'run scripts it triggers']
@@ -134,20 +133,19 @@ def waits():
         body = scratch(lambda t, x=x, name=name: box(t, x, 118, 150, 44, BLUE, name, op=0.3, size=11))
         s.add(group(body, 0.3 + k * 0.1, 0.98, dur))
         s.rect(x, 118, 150, 44, BLUE, rx=4, extra=' fill-opacity="0.08"')
-    s.add(group(scratch(lambda t: box(t, 236, 190, 636, 34, TEAL, 'the new state; wait again', op=0.3, size=11.5)), 0.72, 0.98, dur))
+    s.add(group(scratch(lambda t: box(t, 236, 190, 636, 34, TEAL, 'the new state, then wait again', op=0.3, size=11.5)), 0.72, 0.98, dur))
     s.text(236, 100, 'resolving one move', 11, DIM)
     lines(s, 24, 264, ['An animation loop may run while the game waits. Find which parts only animate and which change the state.',
                        'A recording is the list of commands.'], 11.5, DIM, gap=18)
-    s.text(24, 304, 'Check the rules move by move: the same command on the same state must give the same new state.', 12, TEXT)
+    s.text(24, 304, 'Check the rules move by move. The same command on the same state must give the same new state.', 12, TEXT)
     return s.render()
 
 
 # ---------------------------------------------------------------- interaction: the four kinds (animated)
 def four_kinds():
-    s = Svg(900, 400, 'What happens over time in each of the four kinds: a stream with events every frame, a simulation '
-                      'stepping steadily with occasional commands, an environment with triggers on entering areas, and '
-                      'turns that resolve only after a move')
-    s.heading('The four kinds, seen over time', 'Each row is a strip of time. Marks are what changes the game, and who caused it.')
+    s = Svg(900, 400, 'What happens over time in each of the four kinds of game. A stream has events every frame. A simulation steps steadily with occasional commands. An environment has triggers on entering areas. Turns resolve only after a move')
+    s.heading('The four kinds of game over time',
+              'Each row is a strip of time. The marks show what changes the game and who caused the change.')
     dur = 6.0
     x0, w = 250, 620
     rows = [('A stream with controls', 'Tyrian, Doom', TEAL), ('Software over a simulation', 'SimCity 2000, Banished', BLUE),
@@ -160,21 +158,21 @@ def four_kinds():
         if r == 0:
             for k in range(60):
                 s.rect(x0 + k * w / 60, y + 14, 6, 24, colour, rx=1, extra=' fill-opacity="0.55"')
-            s.text(x0, y + 54, 'every frame: input read, things move, shots, collisions', 10.5, DIM)
+            s.text(x0, y + 54, 'input, movement, shots and collisions in every frame', 10.5, DIM)
         elif r == 1:
             for k in range(30):
                 s.rect(x0 + k * w / 30, y + 20, 4, 12, colour, rx=1, extra=' fill-opacity="0.45"')
             for k in (6, 17, 23):
                 s.add(f'<path d="M{x0 + k * w / 30 + 2:.1f} {y + 2}L{x0 + k * w / 30 + 2:.1f} {y + 18}" stroke="{AMBER}" '
                       f'stroke-width="2" marker-end="url(#arrow)"/>')
-            s.text(x0, y + 54, 'steady steps; a click becomes a command at one step', 10.5, DIM)
+            s.text(x0, y + 54, 'steady steps, with each click applied as a command at one step', 10.5, DIM)
         elif r == 2:
             for k in range(40):
                 s.rect(x0 + k * w / 40, y + 22, 3, 8, colour, rx=1, extra=' fill-opacity="0.35"')
             for k, label in ((10, 'enter area'), (25, 'seen'), (33, 'talk')):
                 s.rect(x0 + k * w / 40 - 4, y + 12, 12, 28, RED if label != 'talk' else AMBER, rx=2, extra=' fill-opacity="0.7"')
                 s.text(x0 + k * w / 40 + 2, y + 8, label, 9.5, DIM, 'middle')
-            s.text(x0, y + 54, 'free movement; triggers fire on areas and sight, choices on use', 10.5, DIM)
+            s.text(x0, y + 54, 'free movement, with triggers on areas and sight, and choices on use', 10.5, DIM)
         else:
             for k, (a, b) in enumerate(((60, 120), (250, 300), (470, 540))):
                 s.rect(x0 + a, y + 14, b - a, 24, colour, rx=3, extra=' fill-opacity="0.5"')
@@ -188,9 +186,9 @@ def four_kinds():
 
 # ---------------------------------------------------------------- interaction: mixed games
 def mixed_modes():
-    s = Svg(900, 300, 'Games that mix kinds: X-COM alternates a real-time world map with turn-based battles. '
-                      'Frontier mixes real-time flight with docked screens that wait; a state switches between modes')
-    s.heading('Mixed games: one state switches the mode', 'Name each mode, find the state that switches, and treat each mode by its kind.')
+    s = Svg(900, 300, 'X-COM alternates a real-time world map with turn-based battles. Frontier mixes real-time flight with docked screens that wait. In each game, a state variable switches between the modes')
+    s.heading('Games that switch between modes',
+              'A state variable switches the game from one mode to another. Treat each mode as the kind of game it is.')
     for k, (game, a, ka, b, kb) in enumerate((('X-COM', 'world map', 'real time', 'battle', 'turns'),
                                               ('Frontier: Elite II', 'flight', 'real time, a stream', 'docked screens',
                                                'software that waits'),
@@ -207,11 +205,11 @@ def mixed_modes():
 
 # ---------------------------------------------------------------- arcade: an event script (animated)
 def arcade_events():
-    s = Svg(900, 360, 'A shoot \'em up level\'s event script: records that say at which scroll position to do what fire as the level '
-                      'scrolls, starting waves and changing speed; actors live in slots updated in slot order')
-    s.heading('Arcade: the level is an event script', 'As the screen scrolls, each record fires at its position. Actors fill slots in order.')
+    s = Svg(900, 360, 'The event script of a shoot \'em up level. Each record fires at a scroll position, starting waves and changing speed. Actors live in slots that are updated in slot order')
+    s.heading('The event script of an arcade level',
+              'Each record fires when the screen scrolls to its position. Each new actor takes the first free slot.')
     dur = 8.0
-    events = [(120, 'wave 1: 5 fighters'), (300, 'speed up'), (420, 'wave 2: turrets'), (600, 'boss music'),
+    events = [(120, 'wave 1, 5 fighters'), (300, 'speed up'), (420, 'wave 2, turrets'), (600, 'boss music'),
               (700, 'boss')]
     x0, w = 40, 760
     s.rect(x0, 92, w, 40, GREY, rx=3, extra=' fill-opacity="0.15"')
@@ -244,9 +242,9 @@ def arcade_events():
 
 # ---------------------------------------------------------------- first-person: per-tick commands (animated)
 def fps_tics():
-    s = Svg(900, 330, 'First-person games: mouse movement adds up between ticks; at each tick the game reads the total '
-                      'and builds one command of forward move, side move, turn and buttons, which a demo stores')
-    s.heading('First-person: one command per tick', 'Mouse movement adds up between ticks. At each tick the total becomes a command.')
+    s = Svg(900, 330, 'In first-person games, mouse movement adds up between ticks. At each tick the game reads the total and builds one command of forward move, side move, turn and buttons, which a demo stores')
+    s.heading('One command per tick in a first-person game',
+              'Mouse movement adds up between ticks. At each tick, the game turns the total into a command.')
     dur = 4.0
     x0, w, ticks = 130, 740, 6
     tw = w / ticks
@@ -267,7 +265,7 @@ def fps_tics():
         s.add(group(body, (k - 0.02) / ticks, 0.99, dur))
     s.add(f'<rect y="100" width="2" height="120" fill="{TEXT}"><animate attributeName="x" values="{x0};{x0 + w}" dur="{dur}s" '
           f'repeatCount="indefinite"/></rect>')
-    lines(s, 40, 262, ['Doom ticks 35 times a second. The renderer draws as often as it can; the tick must be exact, the drawing need not.',
+    lines(s, 40, 262, ['Doom ticks 35 times a second. The renderer draws as often as it can. The ticks must match the original exactly.',
                        'A demo stores these commands. Playing them back runs the same game, if the thinkers update in the same order.'],
           11.5, DIM, gap=18)
     s.text(40, 314, 'Movement (acceleration, friction, step-up, sliding) is in the game\'s units, often 16.16 fixed point.', 12, TEXT)
@@ -276,9 +274,9 @@ def fps_tics():
 
 # ---------------------------------------------------------------- management: steps, speeds and slices (animated)
 def management_steps():
-    s = Svg(900, 360, 'A management game\'s simulation: game speed sets how many fixed steps run per frame, some systems '
-                      'run every n steps, and work spread over steps updates one slice of the map each step')
-    s.heading('Management: steps, speeds and slices', 'Speed changes how many steps run in a frame. Some work is spread over many steps.')
+    s = Svg(900, 360, 'In a management game, the game speed sets how many fixed steps run per frame. Some systems run every n steps. Work that is spread over steps updates one slice of the map each step')
+    s.heading('Steps, speeds and slices in a management game',
+              'The game speed sets how many steps run in a frame. Some work is spread over many steps.')
     dur = 5.0
     for k, (speed, n) in enumerate((('speed 1', 1), ('speed 2', 2), ('speed 3', 4))):
         y = 92 + k * 34
@@ -302,7 +300,7 @@ def management_steps():
     systems = [('agents', 1), ('growth', 4), ('births and deaths', 10)]
     for k, (name, every) in enumerate(systems):
         y = 252 + k * 22
-        s.text(24, y + 12, f'{name}: every {every}', 10.5, DIM)
+        s.text(24, y + 12, f'{name}, every {every}', 10.5, DIM)
         for st in range(30):
             on = st % every == 0
             s.rect(170 + st * 12, y, 10, 14, BLUE if on else GREY, rx=1, extra=f' fill-opacity="{0.6 if on else 0.12}"')
@@ -314,9 +312,9 @@ def management_steps():
 
 # ---------------------------------------------------------------- strategy: lockstep (animated)
 def lockstep():
-    s = Svg(900, 330, 'Lockstep multiplayer: each command is tagged with the tick it takes effect and sent to every '
-                      'player; every machine runs the same simulation with the same commands at the same tick')
-    s.heading('Strategy: lockstep commands', 'Only commands travel. Each carries the tick it takes effect, so every machine runs the same ticks.')
+    s = Svg(900, 330, 'In lockstep multiplayer, each command is tagged with the tick at which it takes effect and is sent to every player. Every machine runs the same commands at the same tick')
+    s.heading('Lockstep commands in a strategy game',
+              'Only commands travel between the machines. Each command carries the tick at which it takes effect.')
     dur = 6.0
     x0, w, n = 160, 700, 10
     for row, (name, y) in enumerate((('player 1', 110), ('player 2', 230))):
@@ -331,7 +329,7 @@ def lockstep():
     s.add(f'<circle r="8" fill="{AMBER}"><animateMotion path="M{x0 + 2.5 * w / n} 124L{x0 + 4 * w / n} 190L{x0 + 5.5 * w / n} 244" '
           f'keyPoints="0;0;1;1" keyTimes="0;0.2;0.5;1" calcMode="linear" dur="{dur}s" repeatCount="indefinite"/></circle>')
     s.text(x0 + 4 * w / n, 180, 'the network carries only commands', 10.5, DIM, 'middle')
-    s.text(x0 + 2.5 * w / n, 100, 'issued at tick 2: "move unit 14 to (40, 22)", for tick 5', 11, AMBER, 'middle')
+    s.text(x0 + 2.5 * w / n, 100, 'issued at tick 2 for tick 5, "move unit 14 to (40, 22)"', 11, AMBER, 'middle')
     s.text(x0 + 5.5 * w / n, 280, 'both run it at tick 5', 11, AMBER, 'middle')
     s.add(f'<rect y="104" width="2" height="160" fill="{TEXT}"><animate attributeName="x" values="{x0};{x0 + w}" dur="{dur}s" '
           f'repeatCount="indefinite"/></rect>')
@@ -341,9 +339,9 @@ def lockstep():
 
 # ---------------------------------------------------------------- RPG: a cosmetic draw
 def rpg_draws():
-    s = Svg(900, 300, 'In a role-playing game one generator serves every draw; a draw spent on a cosmetic idle '
-                      'animation moves every later draw, so the to-hit and damage rolls change')
-    s.heading('RPG: every draw counts, even cosmetic ones', 'One generator. A port that skips an idle animation\'s draw changes the fight.')
+    s = Svg(900, 300, 'In a role-playing game, one generator serves every draw. A draw spent on a cosmetic idle animation moves every later draw, so the to-hit and damage rolls change')
+    s.heading('How a cosmetic random draw changes a fight',
+              'The game uses one generator for every draw. A port that leaves out the draw for an idle animation changes every later draw.')
     rows = [('the original', [('idle animation', PURPLE, '#1'), ('to-hit roll', TEAL, '#2: hits'), ('damage roll', TEAL, '#3: 7'),
                               ('loot', TEAL, '#4: sword')]),
             ('a port without the idle draw', [('to-hit roll', RED, '#1: misses'), ('damage roll', RED, 'skipped'),
@@ -360,9 +358,9 @@ def rpg_draws():
 
 # ---------------------------------------------------------------- adventure: the interpreter (animated)
 def adventure_interpreter():
-    s = Svg(900, 340, 'An adventure game interpreter: a loop reads the next opcode from a script, looks it up in a '
-                      'dispatch table, and runs one handler that changes variables, flags and objects')
-    s.heading('Adventure: a loop over opcodes', 'The executable is mostly an interpreter. The game is the scripts.')
+    s = Svg(900, 340, 'An adventure game interpreter reads the next opcode from a script, looks it up in a dispatch table and runs one handler that changes variables, flags and objects')
+    s.heading('The opcode loop of an adventure game',
+              'The executable reads the scripts one opcode at a time and runs a handler for each opcode.')
     dur = 6.0
     ops = [('op A', '2 operands'), ('op B', '1 operand'), ('op C', 'a jump'), ('op D', 'wait for input')]
     x0 = 40
@@ -391,7 +389,7 @@ def adventure_interpreter():
     arrow(s, 488, 220, 528, 220)
     box(s, 532, 170, 344, 100, BLUE, None, op=0.15)
     s.text(546, 192, 'state the handlers change', 12, TEXT, weight='600')
-    lines(s, 546, 214, ['variables and flags', 'objects: where they are, who holds them', 'rooms, actors, the cursor'],
+    lines(s, 546, 214, ['variables and flags', 'objects, where they are and who holds them', 'rooms, actors, the cursor'],
           11, DIM, gap=18)
     s.text(40, 316, 'Find the dispatch table first. Check that your decoder consumes every byte of every script file.', 12, TEXT)
     return s.render()
@@ -399,9 +397,9 @@ def adventure_interpreter():
 
 # ---------------------------------------------------------------- racing: a small difference grows
 def racing_divergence():
-    s = Svg(900, 330, 'In racing physics a tiny difference at the first tick grows quickly: the distance between the '
-                      'original\'s car and the port\'s car rises steeply over the ticks')
-    s.heading('Racing: small differences grow fast', 'Compare from the first tick. Stop at the first difference. A late check finds only noise.')
+    s = Svg(900, 330, 'In racing physics, a tiny difference at the first tick grows quickly. The distance between the original\'s car and the port\'s car rises steeply over the ticks')
+    s.heading('Why racing games need checks from the first tick',
+              'A difference in the last bit of a value grows every tick. Compare from the first tick and stop at the first difference.')
     x0, y0, w, h = 80, 90, 520, 200
     s.line(x0, y0 + h, x0 + w, y0 + h, DIM, 1)
     s.line(x0, y0, x0, y0 + h, DIM, 1)
@@ -415,12 +413,12 @@ def racing_divergence():
         pts.append(f'{x0 + t * w:.1f} {y0 + h - v * h:.1f}')
     s.add(f'<path d="M{"L".join(pts)}" fill="none" stroke="{RED}" stroke-width="2.5"/>')
     s.add(f'<circle cx="{x0 + 4}" cy="{y0 + h - 1}" r="5" fill="{AMBER}"/>')
-    s.text(x0 + 14, y0 + h - 10, 'tick 1: last bit of one float', 10.5, AMBER)
-    s.text(x0 + w - 6, y0 + 14, 'a different line', 10.5, RED, 'end')
-    s.text(x0 + w - 6, y0 + 30, 'through the corner', 10.5, RED, 'end')
+    s.text(x0 + 14, y0 + h - 10, 'tick 1, a difference in the last bit of one float', 10.5, AMBER)
+    s.text(x0 + w - 70, y0 + 14, 'a different line', 10.5, RED, 'end')
+    s.text(x0 + w - 70, y0 + 30, 'through the corner', 10.5, RED, 'end')
     s.text(x0, y0 + h + 34, 'The shape is illustrative.', 10.5, DIM)
-    lines(s, 640, 100, ['Causes to check first:', '- x87 versus SSE rounding', '- the order of integration', '- grip curves: read them from',
-                        '  the tables', '- collision against track', '  segments in a different order', '',
+    lines(s, 640, 100, ['Causes to check first:', '- x87 versus SSE rounding', '- the order of integration', '- grip curves that were not read',
+                        '  from the tables', '- collision against track', '  segments in a different order', '',
                         'Replays are recorded inputs', 'plus the seed, so the physics', 'must repeat exactly.'],
           11.5, DIM, gap=18)
     return s.render()
@@ -428,9 +426,9 @@ def racing_divergence():
 
 # ---------------------------------------------------------------- vehicle sims: a world from a seed
 def vehicle_seed():
-    s = Svg(900, 320, 'A generated world is stored only as a seed: the generator draws numbers in order to make each '
-                      'star system, so one wrong draw changes that system and every one after it')
-    s.heading('Vehicle and space sims: a world from a seed', 'The galaxy is not stored. One wrong draw changes every system after it.')
+    s = Svg(900, 320, 'A generated world is stored only as a seed. The generator draws numbers in order to make each star system, so one wrong draw changes that system and every one after it')
+    s.heading('A world generated from a seed',
+              'The game stores only the seed. If one draw differs, every system generated after it also differs.')
     box(s, 24, 110, 110, 44, AMBER, 'seed', op=0.35)
     arrow(s, 136, 132, 166, 132)
     for row, (name, bad) in enumerate((('the original', None), ('one wrong draw', 2))):
@@ -440,20 +438,20 @@ def vehicle_seed():
             colour = RED if (bad is not None and k >= bad) else TEAL
             box(s, 170 + k * 116, y + 6, 108, 50, colour, f'system {k + 1}', 'name, star, planets', op=0.25, size=11.5)
     s.text(170 + 2 * 116 + 54, 270, 'from here on, every name differs', 10.5, RED, 'middle')
-    lines(s, 24, 296, ['Emulate the generator on many seeds and compare every field. Players remember the names.'], 12, TEXT)
+    lines(s, 24, 296, ['Emulate the generator on many seeds and compare every field, including the names.'], 12, TEXT)
     return s.render()
 
 
 # ---------------------------------------------------------------- puzzle: a bag and a gravity table
 def puzzle_bag():
-    s = Svg(900, 330, 'Puzzle game rules from tables and generators: a seven-piece bag deals each piece once before '
-                      'refilling, and gravity is a table of frames per row for each level, from NES Tetris')
-    s.heading('Puzzle: generators and frame tables', 'Small rules that players know by heart. Copy them exactly.')
+    s = Svg(900, 330, 'A seven-piece bag deals each piece once before it is refilled. Gravity in NES Tetris is a table of frames per row for each level')
+    s.heading('Generators and frame tables in puzzle games',
+              'Players notice small changes in these rules, so the port must use the same values.')
     pieces = ['I', 'O', 'T', 'S', 'Z', 'J', 'L']
     colours = {'I': TEAL, 'O': AMBER, 'T': PURPLE, 'S': GREEN, 'Z': RED, 'J': BLUE, 'L': '#fb923c'}
     import random
     rnd = random.Random(3)
-    s.text(24, 92, 'A seven-piece bag: each piece once, in a shuffled order, then a new bag', 12, TEXT, weight='600')
+    s.text(24, 92, 'A seven-piece bag deals each piece once in a shuffled order, then starts a new bag', 12, TEXT, weight='600')
     x = 24
     for b in range(3):
         bag = pieces[:]
@@ -462,8 +460,8 @@ def puzzle_bag():
         for k, p in enumerate(bag):
             box(s, x + k * 34, 106, 30, 34, colours[p], p, op=0.45, size=13, mono=True)
         x += 7 * 34 + 14
-    s.text(24, 164, 'as in later Tetris games; other games use plain random draws or an anti-repeat rule', 10.5, DIM)
-    s.text(24, 196, 'Gravity in NES Tetris: frames for a piece to fall one row', 12, TEXT, weight='600')
+    s.text(24, 164, 'Later Tetris games use a bag. Other games use plain random draws or an anti-repeat rule.', 10.5, DIM)
+    s.text(24, 196, 'Gravity in NES Tetris, in frames for a piece to fall one row', 12, TEXT, weight='600')
     table = [48, 43, 38, 33, 28, 23, 18, 13, 8, 6]
     for k, v in enumerate(table):
         x = 24 + k * 64
@@ -477,22 +475,22 @@ def puzzle_bag():
 
 # ---------------------------------------------------------------- online: client and server (animated)
 def online_split():
-    s = Svg(900, 330, 'An online game splits the rules: the client sends input, predicts and shows results. The '
-                      'server holds the authority and sends back the true state, which the client follows')
-    s.heading('Online: the rules are split', 'The client predicts. The server decides. A port must follow the protocol and give the server\'s answers.')
+    s = Svg(900, 330, 'In an online game, the client sends input, predicts and shows results. The server holds the authority and sends back the true state, which the client follows')
+    s.heading('How an online game splits its rules',
+              'The client shows a predicted result at once and then follows the result that the server sends.')
     dur = 4.0
     box(s, 24, 100, 300, 170, BLUE, None, op=0.14)
     s.text(40, 124, 'the client', 13, TEXT, weight='600')
-    lines(s, 40, 148, ['the interface and rendering', 'prediction: moves at once', 'some formulas, to show numbers',
+    lines(s, 40, 148, ['the interface and rendering', 'prediction, which moves at once', 'some formulas, to show numbers',
                        'data tables the server also uses'], 11.5, DIM, gap=20)
     box(s, 576, 100, 300, 170, AMBER, None, op=0.14)
     s.text(592, 124, 'the server', 13, TEXT, weight='600')
-    lines(s, 592, 148, ['the authority: what really', 'happened', 'server ticks', 'only evidence: captured traffic,',
-                        'marked inferred'], 11.5, DIM, gap=20)
+    lines(s, 592, 148, ['the authority on what', 'really happened', 'server ticks', 'known only from captured',
+                        'traffic, marked inferred'], 11.5, DIM, gap=20)
     s.line(330, 150, 570, 150, DIM, 1.5, ' marker-end="url(#arrow)"')
     s.line(570, 220, 330, 220, DIM, 1.5, ' marker-end="url(#arrow)"')
-    s.text(450, 142, 'input: "attack target"', 10.5, TEXT, 'middle')
-    s.text(450, 240, 'result: "hit for 12"', 10.5, TEXT, 'middle')
+    s.text(450, 142, 'input, "attack target"', 10.5, TEXT, 'middle')
+    s.text(450, 240, 'result, "hit for 12"', 10.5, TEXT, 'middle')
     s.add(f'<circle r="6" fill="{TEAL}"><animateMotion path="M330 150L570 150" keyPoints="0;1;1" keyTimes="0;0.4;1" '
           f'calcMode="linear" dur="{dur}s" repeatCount="indefinite"/></circle>')
     s.add(f'<circle r="6" fill="{AMBER}"><animateMotion path="M570 220L330 220" keyPoints="0;0;1;1" keyTimes="0;0.5;0.9;1" '

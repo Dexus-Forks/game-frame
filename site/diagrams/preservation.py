@@ -10,9 +10,9 @@ from svg import AMBER, BG, BLUE, DIM, EDGE, GREEN, GREY, MONO, PURPLE, RED, TEAL
 
 # ---------------------------------------------------------------- out of print
 def in_print():
-    s = Svg(900, 330, 'Games still in print, from the 2023 study of 1,500 US games released before 2010: 13% overall, '
-                      '5.87% of the Game Boy library, 4.5% of Commodore 64 games, and fewer than 3% of games from before 1985')
-    s.heading('How many old games you can still buy', 'The Video Game History Foundation and Software Preservation Network study, July 2023.')
+    s = Svg(900, 330, 'Games still in print, from the 2023 study of 1,500 US games released before 2010. 13% of the sample is in print, with 5.87% of the Game Boy library, 4.5% of Commodore 64 games and fewer than 3% of games from before 1985')
+    s.heading('How many old games can still be bought',
+              'From the study by the Video Game History Foundation and the Software Preservation Network, July 2023.')
     rows = [('All 1,500 games sampled', 13.0, '13%', TEAL), ('Game Boy library', 5.87, '5.87%', BLUE),
             ('Commodore 64 games', 4.5, '4.5%', BLUE), ('Games from before 1985', 3.0, 'fewer than 3%', AMBER)]
     x0, scale = 250, 6.0
@@ -23,17 +23,16 @@ def in_print():
         s.add(f'<rect x="{x0}" y="{y + 6}" height="24" rx="3" fill="{colour}" fill-opacity="0.7" width="{pct * scale:.1f}">'
               f'<animate attributeName="width" values="0;{pct * scale:.1f}" dur="1.2s"/></rect>')
         s.text(x0 + pct * scale + 8, y + 23, label, 12, TEXT, weight='600')
-    s.text(x0, 288, 'Each bar is out of 100%: the grey is the games you cannot buy today.', 11, DIM)
+    s.text(x0, 288, 'Each bar is out of 100%. The grey part is the games that cannot be bought today.', 11, DIM)
     s.text(24, 314, 'About 1,000 more games left sale when Nintendo closed the 3DS and Wii U eShops in March 2023.', 11.5, TEXT)
     return s.render()
 
 
 # ---------------------------------------------------------------- games that stop running
 def breaks():
-    s = Svg(900, 330, 'Changes that stopped bought games from running: 64-bit Windows without 16-bit programs, Windows 10 '
-                      'without SafeDisc drivers, macOS Catalina without 32-bit apps, Windows 11 with no 32-bit edition, '
-                      'The Crew\'s servers closing, and Rosetta 2 being retired')
-    s.heading('When a new system stops an old game', 'The game did not change. The computer around it did.')
+    s = Svg(900, 330, 'Changes that stopped bought games from running. 64-bit Windows runs no 16-bit programs. Windows 10 has no SafeDisc drivers. macOS Catalina runs no 32-bit apps. Windows 11 has no 32-bit edition. The Crew\'s servers closed. Rosetta 2 is being retired')
+    s.heading('System changes that stopped old games running',
+              'Each of these changes to Windows, macOS or an online service stopped some bought games from running.')
     events = [(2005, '64-bit Windows', 'no 16-bit programs', BLUE, 0), (2015, 'Windows 10', 'no SafeDisc drivers', BLUE, 1),
               (2019, 'macOS Catalina', 'no 32-bit apps', PURPLE, 0), (2021, 'Windows 11', 'no 32-bit edition', BLUE, 1),
               (2024, 'The Crew', 'servers closed 31 March', RED, 0), (2027, 'macOS 28', 'Rosetta 2 only in part', PURPLE, 1)]
@@ -55,9 +54,9 @@ def breaks():
 
 # ---------------------------------------------------------------- on sale, not updated
 def not_updated():
-    s = Svg(900, 266, 'Banished: released on 18 February 2014 by a studio of one person, last build 1.0.7 dated '
-                      '14 September 2017, and still on sale on Steam and GOG with no updates since')
-    s.heading('On sale, but nobody updates it', 'Banished, as an example. If a new system breaks it, there may be no fix.')
+    s = Svg(900, 266, 'Banished was released on 18 February 2014 by a studio of one person. Its last build, 1.0.7, is dated 14 September 2017. It is still on sale on Steam and GOG with no updates since')
+    s.heading('A game on sale that nobody updates',
+              'Banished is one example. If a new system breaks it, there may be no update to fix it.')
     lo, hi, x0, x1 = 2013.5, 2027, 60, 860
     X = lambda yr: x0 + (yr - lo) / (hi - lo) * (x1 - x0)
     s.line(x0, 196, x1, 196, DIM, 1.5)
@@ -68,24 +67,24 @@ def not_updated():
     s.rect(a, 156, b - a, 28, TEAL, rx=3, extra=' fill-opacity="0.45"')
     s.text((a + b) / 2, 175, 'updates', 11, TEXT, 'middle', '600')
     s.rect(b, 156, X(2026.8) - b, 28, GREY, rx=3, extra=' fill-opacity="0.25"')
-    s.text((b + X(2026.8)) / 2, 175, 'on sale on Steam and GOG, no updates', 11, DIM, 'middle')
-    for x, label, sub in ((a, '18 February 2014', 'released'), (b, '14 September 2017', 'build 1.0.7, the last')):
+    s.text((b + X(2026.8)) / 2, 175, 'on sale on Steam and GOG with no updates', 11, DIM, 'middle')
+    for x, label, sub in ((a, '18 February 2014', 'released'), (b, '14 September 2017', 'the last build, 1.0.7')):
         s.line(x, 110, x, 156, AMBER, 1.5)
         s.text(x, 98, label, 11.5, AMBER, 'middle', '600')
         s.text(x, 84 + 0, sub, 10.5, DIM, 'middle')
-    s.text(24, 244, 'Nobody has counted how many games are in this position. Many games from small studios are.', 11.5, TEXT)
+    s.text(24, 244, 'Nobody has counted how many games are in this position. Many of them come from small studios.', 11.5, TEXT)
     return s.render()
 
 
 # ---------------------------------------------------------------- lost source and media
 def lost():
-    s = Svg(900, 264, 'Where a game can be lost: the studio\'s source code and data, the discs that decay, the rights '
-                      'nobody can establish, and the copies players bought, which are often all that is left')
-    s.heading('Lost source code and media', 'When the studio\'s copy is gone, the players\' copies are often all that is left.')
-    items = [('The studio\'s source', 'Silent Hill 2 and 3: final code gone;', 'Kingdom Hearts: data recreated', RED),
-             ('The discs', 'recordable discs last from a few', 'years to a century', AMBER),
-             ('The rights', 'No One Lives Forever: no clear', 'owner, not on sale in 2025', AMBER),
-             ('Players\' copies', 'often all that is left;', 'GameFrame works from them', TEAL)]
+    s = Svg(900, 264, 'Where a game can be lost. The studio\'s source code and data, the discs that decay and the rights that nobody can establish are shown beside the copies players bought, which are often all that is left')
+    s.heading('Lost source code and media',
+              'When a studio loses its source code, the copies that players bought are often all that is left.')
+    items = [('The studio\'s source', 'The final code of Silent Hill 2', 'and 3 is gone.', RED),
+             ('The discs', 'Recordable discs last from a few', 'years to a century.', AMBER),
+             ('The rights', 'No One Lives Forever has no clear', 'owner and was not sold in 2025.', AMBER),
+             ('Players\' copies', 'They are often all that is left.', 'GameFrame works from them.', TEAL)]
     for k, (title, a, b, colour) in enumerate(items):
         x = 24 + k * 216
         s.rect(x, 90, 200, 110, colour, rx=6, extra=' fill-opacity="0.16"')
@@ -99,10 +98,9 @@ def lost():
 
 # ---------------------------------------------------------------- what GameFrame does: the method (animated)
 def method():
-    s = Svg(900, 330, 'GameFrame\'s method as a loop: read the owner\'s copy and cite each address, run the original\'s '
-                      'functions under emulation for exact answers, write the port, and test that it gives the same '
-                      'answers to the last bit, writing documents along the way')
-    s.heading('Documents of how the game works', 'Each finding cites the original. The port must match it to the last bit.')
+    s = Svg(900, 330, 'GameFrame\'s method as a loop. Read the owner\'s copy and cite each address, run the original\'s functions under emulation for exact answers, write the port, test that it gives the same answers to the last bit, and write documents along the way')
+    s.heading('Documents of how the game works',
+              'Each finding cites the place in the original that it comes from. The port must give the same results to the last bit.')
     dur = 8.0
     steps = [('the owner\'s copy', 'the only source', GREY, 40, 96), ('read and cite', 'each claim names its address', BLUE, 330, 96),
              ('emulate', 'exact answers for chosen inputs', PURPLE, 620, 96), ('port', 'new code', AMBER, 620, 214),
@@ -118,17 +116,16 @@ def method():
     arrow(s, 326, 242, 282, 242)
     s.add(f'<path d="M450 212C 450 190 450 176 450 156" stroke="{RED}" stroke-width="1.5" fill="none" stroke-dasharray="4 3" '
           f'marker-end="url(#arrow)"/>')
-    s.text(458, 188, 'no match: back to the evidence', 10.5, RED)
+    s.text(458, 188, 'if the results differ, go back to the evidence', 10.5, RED)
     s.text(24, 312, 'MAME calls its code documentation of the machines. GameFrame applies the idea to one game.', 11.5, TEXT)
     return s.render()
 
 
 # ---------------------------------------------------------------- who keeps what
 def who_keeps():
-    s = Svg(900, 300, 'Which part of a game each group keeps: museums and archives keep hardware, media and papers; '
-                      'emulators keep the machine; matching decompilations keep source code; reimplementations keep '
-                      'the game running from its data')
-    s.heading('Other preservation work', 'Different groups keep different parts of a game. GameFrame belongs to the last row.')
+    s = Svg(900, 300, 'Which part of a game each group keeps. Museums and archives keep hardware, media and papers. Emulators keep the machine. Matching decompilations keep source code. Reimplementations keep the game running from its data')
+    s.heading('Other preservation work',
+              'Different groups keep different parts of a game. GameFrame works in the same way as the reimplementations in the last row.')
     cols = ['hardware, boxes, papers', 'the machine', 'the original program runs', 'source code', 'runs on current systems']
     rows = [('Museums and archives', [1, 0, 0, 2, 0]), ('Emulators', [0, 1, 1, 0, 1]),
             ('Matching decompilations', [0, 0, 0, 1, 0]), ('Reimplementations', [0, 0, 0, 0, 1])]
@@ -146,17 +143,16 @@ def who_keeps():
                 s.add(f'<circle cx="{cx}" cy="{y + 17}" r="6" fill="none" stroke="{TEAL}" stroke-width="2"/>')
     s.add(f'<circle cx="30" cy="284" r="6" fill="none" stroke="{TEAL}" stroke-width="2"/>')
     s.text(42, 288, 'sometimes', 11, DIM)
-    s.text(140, 288, 'Examples: The Strong, the VGHF; MAME, DOSBox, Dolphin; Super Mario 64; ScummVM, OpenRCT2, DevilutionX.',
+    s.text(140, 288, 'Examples are The Strong and the VGHF, MAME, DOSBox and Dolphin, Super Mario 64, and ScummVM, OpenRCT2 and DevilutionX.',
            11, DIM)
     return s.render()
 
 
 # ---------------------------------------------------------------- what a project ships
 def ships():
-    s = Svg(900, 290, 'What a GameFrame project publishes and what stays on the owner\'s computer: new code and documents '
-                      'are published; the game\'s files, extracted assets and decompiled code are never published. '
-                      'Players bring their own copy')
-    s.heading('What a project ships', 'New code and documents go out. Nothing from the game does.')
+    s = Svg(900, 290, 'What a GameFrame project publishes and what stays on the owner\'s computer. New code and documents are published. The game\'s files, extracted assets and decompiled code are never published. Players bring their own copy')
+    s.heading('What a project ships',
+              'A project publishes only its own code and documents.')
     s.rect(24, 86, 410, 150, TEAL, rx=6, extra=' fill-opacity="0.14"')
     s.text(40, 112, 'published', 13, TEAL, weight='600')
     lines(s, 40, 138, ['the project\'s own new code', 'its documents of how the game works', 'its tests and tools'], 12, TEXT, gap=22)
@@ -169,9 +165,9 @@ def ships():
 
 # ---------------------------------------------------------------- AI: the checks (animated)
 def ai_gates():
-    s = Svg(900, 250, 'The checks GameFrame puts on an agent\'s work: the original is required, results are measured, '
-                      'the port must match, every claim is cited, a person reviews each commit, and nothing from the game is shared')
-    s.heading('What GameFrame asks of an agent', 'Each piece of work passes every check before it lands.')
+    s = Svg(900, 250, 'The checks GameFrame puts on an agent\'s work. The original is required, results are measured, the port must match, every claim is cited, a person reviews each commit, and nothing from the game is shared')
+    s.heading('What GameFrame asks of an agent',
+              'Each piece of work must pass every check before it is committed.')
     dur = 7.0
     gates = [('the original', 'is required'), ('results', 'are measured'), ('the port', 'must match'),
              ('every claim', 'is cited'), ('a person', 'reviews it'), ('nothing', 'is shared')]
@@ -190,9 +186,9 @@ def ai_gates():
 
 # ---------------------------------------------------------------- one function at a time (animated)
 def function_swap():
-    s = Svg(900, 300, 'Replacing a program one function at a time: the original program keeps running while its '
-                      'functions are replaced by new ones, each checked against the original before the next')
-    s.heading('One function at a time', 'OpenRCT2 and dethrace replaced the original program piece by piece, while the game kept running.')
+    s = Svg(900, 300, 'Replacing a program one function at a time. The original program keeps running while its functions are replaced by new ones. Each new function is checked against the original before the next')
+    s.heading('Replacing a program one function at a time',
+              'OpenRCT2 and dethrace replaced the original program piece by piece while the game kept running.')
     dur = 8.0
     n = 24
     for k in range(n):

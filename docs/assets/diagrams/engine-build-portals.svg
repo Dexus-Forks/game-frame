@@ -1,9 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="400" viewBox="0 0 900 400" role="img" aria-label="Build engine sectors: each wall points to the next wall of its sector. A portal wall points to the neighbouring sector; the renderer walks from the player's sector through portals">
-<title>Build engine sectors: each wall points to the next wall of its sector. A portal wall points to the neighbouring sector; the renderer walks from the player's sector through portals</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="400" viewBox="0 0 900 400" role="img" aria-label="In the Build engine, each wall points to the next wall of its sector. A portal wall also points to the sector next to it. The renderer walks from the player's sector through the portals">
+<title>In the Build engine, each wall points to the next wall of its sector. A portal wall also points to the sector next to it. The renderer walks from the player's sector through the portals</title>
 <rect x="0.5" y="0.5" width="899" height="399" rx="10" fill="#0d1b1e" stroke="#1f3d40"/>
 <defs><marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" fill="#8fa9a5"/></marker></defs>
-<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">BUILD: SECTORS JOINED BY PORTALS</text>
-<text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">Walls form a loop around each sector. A red wall is a portal into the sector beside it.</text>
+<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">SECTORS JOINED BY PORTALS IN THE BUILD ENGINE</text>
+<text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">The walls of each sector form a loop. A red wall is a portal into the sector next to it.</text>
 <path d="M60 220L200 220L200 330L60 330Z" fill="#64748b" fill-opacity="0.12" stroke="#60a5fa" stroke-width="2"/>
 <path d="M60 220L200 220L200 330L60 330Z" fill="#2dd4bf" opacity="0"><animate attributeName="opacity" values="0;0.3;0" keyTimes="0;0.0800;0.9500" dur="7.0s" calcMode="discrete" repeatCount="indefinite"/></path>
 <text x="130.0" y="271.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#e2ece9" text-anchor="middle">sector 0</text>
@@ -33,9 +33,9 @@
 <path d="M570 190L700 190L700 300L570 300Z" fill="#60a5fa" fill-opacity="0.2" stroke="#60a5fa" stroke-width="2" stroke-dasharray="5 3"/>
 <text x="526.0" y="170.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">sector 7</text>
 <text x="640.0" y="292.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">sector 9</text>
-<text x="520.0" y="326.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#8fa9a5" text-anchor="start">Two sectors can share the same place on the map.</text>
-<text x="520.0" y="342.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#8fa9a5" text-anchor="start">The engine never checks. The player</text>
-<text x="520.0" y="358.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#8fa9a5" text-anchor="start">never sees both from one spot.</text>
+<text x="520.0" y="326.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#8fa9a5" text-anchor="start">Two sectors can share the same place</text>
+<text x="520.0" y="342.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#8fa9a5" text-anchor="start">on the map. The engine does not check</text>
+<text x="520.0" y="358.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#8fa9a5" text-anchor="start">this. The player never sees both at once.</text>
 <text x="720.0" y="120.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#8fa9a5" text-anchor="start">Each wall stores:</text>
 <text x="720.0" y="137.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#8fa9a5" text-anchor="start">- the next wall of</text>
 <text x="720.0" y="154.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#8fa9a5" text-anchor="start">  its sector</text>
