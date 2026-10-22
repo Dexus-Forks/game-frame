@@ -12,8 +12,10 @@
 #   tools/, scripts/          GameFrame's toolkit, requirements.txt, .mcp.json (REA)
 #   gameframe                 the help and discovery command (./gameframe help)
 #   docs/FINDINGS.md, docs/CHECKLIST.md, labels/names.tsv, labels/fields.tsv
-#   docs/DOS.md, ABI.md, GAME-PATTERNS.md, LEGAL.md, OUTPUTS.md, SETUP.md   the reference documents
-#   docs/games/, observe/, engines/, hardware/, consoles/, working/, case-studies/   the guides
+#   docs/DOS.md, ABI.md, GAME-PATTERNS.md, COMPILED-CODE.md, TYPES.md, LEGAL.md, OUTPUTS.md, SETUP.md
+#                             the reference documents
+#   docs/games/, observe/, working/ and the other guides, with their diagrams in docs/assets/
+# scripts/update-project.sh brings a project made earlier up to GameFrame's current version.
 #   target/, analysis/, derived/   for the game, Ghidra output and ground truth: ignored by git
 # With PATH/TO/GAME it copies the game's executables and DLLs into target/ (data files are
 # left where they are: point the tools at them) and prints a first look at each binary.
@@ -32,8 +34,11 @@ cp "$ROOT/requirements.txt" "$ROOT/.mcp.json" "$ROOT/gameframe" "$dir/"
 # Code is Apache 2.0; documentation and other prose are CC0 1.0 (as in GameFrame).
 cp "$ROOT/templates/project/licences/LICENSE-APACHE" "$ROOT/templates/project/licences/LICENSE-CC0-1.0" "$dir/"
 # The reference documents the skills point to (docs/DOS.md, docs/ABI.md, ...).
-for f in ABI GAME-PATTERNS DOS LEGAL OUTPUTS SETUP; do cp "$ROOT/docs/$f.md" "$dir/docs/"; done
-for d in games observe engines hardware consoles working teams case-studies; do cp -R "$ROOT/docs/$d" "$dir/docs/"; done
+for f in ABI GAME-PATTERNS DOS LEGAL OUTPUTS SETUP COMPILED-CODE TYPES; do cp "$ROOT/docs/$f.md" "$dir/docs/"; done
+# The guides, and the diagrams and pictures they show (docs/assets/).
+for d in games observe engines hardware consoles handhelds computers arcade media working teams case-studies preservation assets; do
+  cp -R "$ROOT/docs/$d" "$dir/docs/"
+done
 cp "$ROOT/templates/project/gitignore" "$dir/.gitignore"
 cp "$ROOT/templates/project/labels/"*.tsv "$dir/labels/"
 for f in AGENTS.md README.md docs/FINDINGS.md docs/CHECKLIST.md; do
