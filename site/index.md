@@ -52,6 +52,14 @@ Each step has a skill. The steps run in order. When a check fails, you go back t
 
 ![The method as a loop. Inventory, observe, decompile, trace, format, emulate, reimplement, verify and land, each with its skill. When a check fails, the work goes back to the trace.](../docs/assets/method-loop.svg)
 
+## Checked against the original
+
+Every result is checked against the original game. The test suite runs the original's own
+functions under emulation and compares the port with them, value by value and random draw by
+random draw. A port that is only close fails.
+
+![tests/run.sh --ghidra: the port matches the original bit for bit, draws random numbers in the original's order, and the naive port is caught. 104 passed, 0 failed.](../docs/assets/captures/hero.svg)
+
 Agents can also read this site as plain text. [llms.txt](/llms.txt) lists every
 page with a short description, and [llms-full.txt](/llms-full.txt) holds all
 of them in one file. Each page has a Markdown copy at the same address with `.md` at the end,

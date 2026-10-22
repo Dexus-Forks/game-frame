@@ -1,5 +1,7 @@
 # Strategy: real time, turns and tactics
 
+![A strategy map with two armies, their castles, a river and fog of war](../assets/diagrams/art-rts.svg)
+
 Games where the player commands many units against opponents: real-time strategy (RTS),
 turn-based empire games (4X), and squad tactics. Real-time strategy is [software over a
 simulation](interaction.md#the-four-kinds) that must stay identical on every player's machine;

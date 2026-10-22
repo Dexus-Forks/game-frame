@@ -1,5 +1,7 @@
 # Role-playing games
 
+![An RPG battle in which a party of four faces a dragon in a dungeon](../assets/diagrams/art-rpg.svg)
+
 Games where the player builds characters and explores a world: computer RPGs, dungeon
 crawlers, roguelikes and Japanese RPGs. They are [environments](interaction.md#the-four-kinds)
 the player moves through, often with [turn-based](interaction.md#the-four-kinds) battles,

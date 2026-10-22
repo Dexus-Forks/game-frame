@@ -1,5 +1,7 @@
 # Working on a project
 
+![A terminal where an agent works through the steps of the method](../assets/diagrams/banner-working.svg)
+
 These pages describe how to organise the work of reverse engineering a game, for agents and
 the people who direct them. The skills describe each step of the method. These pages cover the
 work that spans several steps and several sessions.

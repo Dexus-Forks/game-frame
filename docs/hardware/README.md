@@ -1,5 +1,7 @@
 # Hardware of the era
 
+![A circuit board with a CPU, a video chip, a sound chip and memory](../assets/diagrams/banner-hardware.svg)
+
 ![A timeline of PC graphics, sound and CPU features, 1981 to 1999](../assets/diagrams/pc-timeline.svg)
 
 A PC game from 1985 to 2005 uses its hardware far more directly than a modern program. DOS

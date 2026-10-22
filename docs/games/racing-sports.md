@@ -1,5 +1,7 @@
 # Racing and sports
 
+![A racing game seen from behind the car, with the road curving to a sunset](../assets/diagrams/art-race.svg)
+
 Driving games and simulations of sports: the player controls a car or a team, the game runs
 physics and AI opponents. They are [streams with controls](interaction.md#the-four-kinds),
 with a large share of simulation (opponents, a championship, transfers in a football game).

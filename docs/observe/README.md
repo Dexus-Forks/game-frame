@@ -1,3 +1,5 @@
+![A magnifying glass over a hex dump, with one value found](../assets/diagrams/banner-observe.svg)
+
 ## Ask your agent
 
 Run and capture the original. Copy this prompt into your coding agent:

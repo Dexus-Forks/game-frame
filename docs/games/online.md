@@ -1,5 +1,7 @@
 # Online games
 
+![Players around the world connected to a server](../assets/diagrams/art-online.svg)
+
 Massively multiplayer games and other games where a server owned by the publisher holds the
 world. The main rules (combat results, loot, the economy) run on a server you do not
 have. They are [environments](interaction.md#the-four-kinds)

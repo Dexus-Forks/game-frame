@@ -1,5 +1,7 @@
 # First-person and 3D action
 
+![A first-person view down a corridor, drawn by a ray caster](../assets/diagrams/art-fps.svg)
+
 Shooters and action games seen from the player's eyes or just behind them: Wolfenstein 3D to
 Half-Life, and the immersive simulations (System Shock, Thief). They are [streams with
 controls](interaction.md#the-four-kinds) in the fight, and [environments](interaction.md) in

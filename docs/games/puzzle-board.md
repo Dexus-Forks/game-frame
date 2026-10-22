@@ -1,5 +1,7 @@
 # Puzzle, board and card games
 
+![A falling-block puzzle with a full line about to clear](../assets/diagrams/art-puzzle.svg)
+
 Falling-block and logic puzzles, board games, card games, and the small games that shipped
 with operating systems. Board and card games are [turns and
 choices](interaction.md#the-four-kinds); action puzzles (Tetris, Lemmings) are [streams with

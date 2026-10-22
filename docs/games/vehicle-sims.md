@@ -1,5 +1,7 @@
 # Vehicle and space simulations
 
+![A ship flying past a ringed planet and its moon, with a radar scanner](../assets/diagrams/art-space.svg)
+
 Flight simulators, space combat and space trading games: the player flies something through a
 large world simulated in 3D. They mix a [stream with controls](interaction.md#the-four-kinds)
 (combat, landing) with an [environment](interaction.md#the-four-kinds) the player moves

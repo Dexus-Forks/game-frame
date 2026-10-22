@@ -1,5 +1,7 @@
 # Media, files and protection
 
+![Floppy disks, a compact disc in its case and a cassette tape](../assets/diagrams/banner-media.svg)
+
 These pages cover what a game came on and what its files are, before the code that reads them
 is traced. Read them during [re-inventory](../../.claude/skills/re-inventory/SKILL.md) and
 [re-format](../../.claude/skills/re-format/SKILL.md).

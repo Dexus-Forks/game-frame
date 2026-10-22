@@ -1,5 +1,7 @@
 # Console games
 
+![A television showing a platform game, with a game pad and a cartridge](../assets/diagrams/banner-consoles.svg)
+
 A home console game runs on fixed hardware with little or no operating system. The game
 controls the hardware directly. It writes to the video chip's registers, starts DMA transfers,
 reads the controllers from memory-mapped ports and times everything to the display's vertical

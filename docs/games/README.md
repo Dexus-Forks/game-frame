@@ -1,5 +1,7 @@
 # A taxonomy of games
 
+![Ten families of games: arcade action, first-person, racing, vehicle and space simulations, management, strategy, RPG, adventure, puzzle and online games](../assets/diagrams/art-games.svg)
+
 Games are not all reverse engineered the same way. The hard part differs by kind of game:
 the frame loop in a shooter, the simulation and saves in a city builder, the script engine in
 an adventure game. This

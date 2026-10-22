@@ -1,5 +1,7 @@
 # Home computers and the PC
 
+![An 8-bit home computer with its monitor, cassette deck and disk drive](../assets/diagrams/banner-computers.svg)
+
 This section covers the home computers, the PC and the Mac that games were written for. Each
 page covers one family of machines. An exact reimplementation of a game needs three facts
 about its machine: the CPU family and its arithmetic quirks, the memory and banking state when

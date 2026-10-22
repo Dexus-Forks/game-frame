@@ -1,5 +1,7 @@
 # Game preservation
 
+![Archive shelves of big-box games, CDs in jewel cases, floppy disks and archive boxes](../assets/diagrams/banner-preservation.svg)
+
 Many older games can no longer be bought. Many games people own no longer run on current
 computers. Some games are still on sale, but nobody has updated them in years. GameFrame
 helps the owner of such a game keep it playable. It works from the copy the owner bought. It rebuilds the game in new code that behaves exactly like the original. Along the way, it writes down how the game works.

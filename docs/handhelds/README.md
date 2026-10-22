@@ -1,5 +1,7 @@
 # Handhelds
 
+![Two handheld game machines, one with a green screen and one with a colour screen](../assets/diagrams/banner-handhelds.svg)
+
 This section covers the handheld game machines, from the mask-ROM LCD games of 1979 to the PC
 handhelds of today. Each page covers one family. The home consoles are in
 [Console games](../consoles/README.md). The arcade boards are in [Arcade](../arcade/README.md).

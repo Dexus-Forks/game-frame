@@ -1,5 +1,7 @@
 # Arcade action: shoot 'em ups, platformers, beat 'em ups, fighting
 
+![A side-scrolling shooter: a ship fires at a formation of aliens](../assets/diagrams/art-arcade.svg)
+
 Games where things come at the player every frame and the player steers, jumps, fires and
 dodges. They are [streams with controls](interaction.md#the-four-kinds): the game drives and the
 player reacts. The game runs its rules inside one frame loop at a fixed rate.

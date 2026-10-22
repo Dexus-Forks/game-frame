@@ -1,5 +1,7 @@
 # Software engines and middleware
 
+![A wireframe landscape under a striped sun, with a spinning wireframe shape](../assets/diagrams/banner-engines.svg)
+
 Most games from the 1980s and early 1990s were written from scratch. Each studio had its own
 drawing code, its own file formats and its own tools. From the mid-1990s, more and more games
 were built on a licensed engine (Build, the Quake engines, Unreal) or on an engine the studio

@@ -1,5 +1,7 @@
 # Arcade games
 
+![A row of arcade cabinets with glowing screens and marquees](../assets/diagrams/banner-arcade.svg)
+
 This section covers arcade boards from discrete logic to the PC-based systems. Each page covers
 one era or one family of boards. Many boards were built for one game or a few games. The MAME
 driver source for a board lists its chips, its crystals, its clock dividers and its screen

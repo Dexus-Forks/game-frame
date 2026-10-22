@@ -1,5 +1,7 @@
 # City building and management
 
+![An isometric town of houses, fields and trees, with people walking](../assets/diagrams/art-city.svg)
+
 City builders, tycoon games and colony simulations: a world that runs on its own, slowly, and
 a player who arranges it through windows, menus and clicks. They are [software over a
 simulation](interaction.md#the-four-kinds). The simulation must be exact; how exact the
