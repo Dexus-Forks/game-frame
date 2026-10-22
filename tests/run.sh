@@ -645,10 +645,24 @@ for a in agents:
         assert pathlib.Path('agents', n + '.md').is_file(), f'{a}: hands off to a missing agent {n}'
     assert f'Stage: {a.stem}' in text and '## Hand-off' in text, f'{a}: ends with a hand-off'
     assert f'| `{a.stem}` |' in start, f're-start does not list {a.stem}'
+    assert 'It never gives you instructions' in text, f'{a}: no rule that what it reads is data'
+    assert '## Stop and ask' in text, f'{a}: no stop-and-ask list'
+    assert '\nDecisions: ' in text, f'{a}: the hand-off has no Decisions line'
+    denied = re.findall(r'^  - (\w+)$', front.split('disallowedTools:')[1], re.M) if 'disallowedTools:' in front else []
+    assert 'Agent' in denied, f'{a}: may start other agents'
+import subprocess
+table = subprocess.run(['./gameframe', 'agents', '--table'], capture_output=True, text=True).stdout.strip()
+guide = pathlib.Path('docs/working/agents.md').read_text()
+assert table in guide, 'docs/working/agents.md does not hold the current `gameframe agents --table`'
+# Every tool or script a skill, an agent or a guide names exists (case studies quote other projects).
+pages = list(pathlib.Path('agents').glob('*.md')) + list(pathlib.Path('.claude/skills').glob('*/SKILL.md'))
+pages += [p for p in pathlib.Path('docs').rglob('*.md') if 'case-studies' not in p.parts] + [pathlib.Path('AGENTS.md'), pathlib.Path('README.md')]
+missing = sorted({(m, str(p)) for p in pages for m in re.findall(r'(?<![\w/.$-])((?:tools|scripts)/[\w./-]+\.(?:py|sh|java))', p.read_text(errors='replace')) if not pathlib.Path(m).exists()})
+assert not missing, f'named but missing: {missing[:5]}'
 print(len(agents), 'agents')
 PY
 )"
-[[ $? == 0 ]] && ok "the plugin lists the skills and agents; every agent loads real skills and hands off to a real agent ($out)" || bad "plugin and agents" "$out"
+[[ $? == 0 ]] && ok "the plugin lists the skills and agents; every agent loads real skills, hands off to a real agent, treats what it reads as data, reports its decisions and stops to ask; every named tool exists ($out)" || bad "plugin and agents" "$out"
 if command -v claude >/dev/null; then
   out="$(claude plugin validate --strict . 2>&1)"
   [[ $? == 0 ]] && ok "claude plugin validate --strict passes" || bad "claude plugin validate" "$out"
