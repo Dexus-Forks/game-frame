@@ -10,6 +10,8 @@ random generators, entities) are on [Game patterns](GAME-PATTERNS.md).
 
 ## Finding the game's own code
 
+![From the entry point through the C runtime to main](assets/diagrams/crt-startup.svg)
+
 An executable starts in the C runtime's start-up code, which then calls the program's `main`,
 `WinMain` or Pascal main block. Skip past the runtime.
 
@@ -26,6 +28,8 @@ a runtime error message ("R6002", "Runtime error") sits in the runtime. The game
 runtime shows how much of an executable is library code.
 
 ## Naming library code by signature
+
+![A library function as a signature with wildcards, found in a game](assets/diagrams/signature-match.svg)
 
 A DOS game has no import table for its runtime: printf, the file functions and the long
 arithmetic helpers are copied into the executable. The compiler's own libraries can name them.
@@ -48,6 +52,8 @@ function's first bytes, so two functions can match one signature. The tool says 
 matches more than once.
 
 ## Optimised arithmetic
+
+![Division by 10 as a multiplication and a shift](assets/diagrams/magic-division.svg)
 
 | In the machine code | In the source |
 |---|---|
@@ -114,6 +120,8 @@ each.
 - **Shared code.** The linker can merge identical functions. One body may then serve two names. Its callers may expect different meanings.
 
 ## The flags
+
+![One compare read as signed by jl and as unsigned by jb](assets/diagrams/cpu-flags.svg)
 
 Each arithmetic instruction sets the flags: zero, sign, carry and overflow. The conditional
 jump after it reads them. The jump names give the signedness of the comparison.

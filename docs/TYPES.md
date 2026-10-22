@@ -23,6 +23,8 @@ Use the best source that exists, in this order:
 
 ## Reading a structure from its uses
 
+![A structure merged from the accesses of three functions](assets/diagrams/struct-from-uses.svg)
+
 - **The size.** The call that allocates an object passes its size: `operator new(0x148)`,
   `malloc(0x30)`, or `size * count` for an array. A `memset` or `memcpy` of an object gives the
   size too.

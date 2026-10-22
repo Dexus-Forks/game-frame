@@ -27,6 +27,8 @@ a packed payload, or debug symbols.
 
 ### Overlays
 
+![Overlays taking turns in one area of memory](assets/diagrams/overlays.svg)
+
 A program larger than conventional memory could keep parts of its code on disk and load each
 part when it was called, into a region shared with other parts. These are overlays. Borland's
 VROOMM, Microsoft's linkers and others such as RTLink and Blinker each had their own scheme.
@@ -46,6 +48,8 @@ different times.
   offset, so that every address in the findings can be traced to its bytes.
 
 ## 2. Addresses: always Ghidra's numbering
+
+![Segment and offset pairs that name the same byte](assets/diagrams/segment-address.svg)
 
 Write every address as `seg:off` the way Ghidra prints it, in docs, labels and tests:
 

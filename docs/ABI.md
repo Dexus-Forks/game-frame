@@ -26,6 +26,8 @@ If pseudocode seems to use a value from nowhere, it may be one of these, kept ac
 
 ## C++ layout (MSVC)
 
+![An object, its vtable and its RTTI in an MSVC program](assets/diagrams/vtable-layout.svg)
+
 - An object with virtual methods starts with a pointer to its vtable (`+0x00`). Multiple
   inheritance adds one vtable pointer per base with virtual methods.
 - A vtable is an array of function pointers; MSVC puts a pointer to the RTTI "complete object
@@ -38,6 +40,8 @@ If pseudocode seems to use a value from nowhere, it may be one of these, kept ac
   (`c++filt` understands Itanium names; for MSVC use `llvm-undname` or Ghidra) turns them back.
 
 ## Floating point
+
+![The 80-bit x87 format beside the 64-bit and 32-bit formats](assets/diagrams/float-formats.svg)
 
 A reimplementation is exact only if it copies these details:
 
@@ -60,6 +64,8 @@ A reimplementation is exact only if it copies these details:
   enable flush-to-zero for speed; check the start-up code for `ldmxcsr` or `_controlfp`.
 
 ## Integers
+
+![Float to integer and signed division, rounded three ways](assets/diagrams/rounding-table.svg)
 
 - Division rounds toward zero in C (`-7 / 2 == -3`); Python's `//` rounds down (`-4`).
 - `sar` is an arithmetic (signed) shift, `shr` a logical one; Ghidra shows both as `>>`.

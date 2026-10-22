@@ -32,6 +32,8 @@ update function's callees.
 
 ## Random number generators
 
+![MSVC rand(): the state, the formula and the first draws from seed 1](assets/diagrams/msvc-rand.svg)
+
 Random number generators are usually small and self-contained. Emulate them first.
 
 | Kind | How to recognise it |
@@ -54,6 +56,8 @@ range, a "tolerance" around a value) each have their own rounding; emulate them 
 
 ## Entities and components
 
+![Entities as ids, an array per kind of component, and systems that walk them in order](assets/diagrams/entity-components.svg)
+
 - **Class hierarchies:** `Entity` → `Unit` → `Soldier`, with behaviour in virtual methods.
   Recover the hierarchy from vtables (shared early slots) and RTTI.
 - **Entity-component systems:** an entity is an id or a small object holding a list of
@@ -63,6 +67,8 @@ range, a "tolerance" around a value) each have their own rounding; emulate them 
 - **Handles:** an index plus a generation counter, packed into 32 or 64 bits.
 
 ## Resources and data
+
+![An archive: a header, an entry table and the data](assets/diagrams/package-archive.svg)
 
 - **Packages:** an archive (header, entry table, data), possibly compressed per entry. Entry
   names may be stored as hashes; the hash function is in the lookup code.
@@ -77,6 +83,8 @@ range, a "tolerance" around a value) each have their own rounding; emulate them 
 
 ## Time
 
+![The drift of a 32-bit float clock over an hour, computed](assets/diagrams/float-time.svg)
+
 Games keep time as integer ticks (milliseconds or microseconds) or as float seconds, and the
 calendar of a simulation (days, seasons, years) is derived from it. Float time gathers
 rounding error. If the original keeps time as a float, the reimplementation must do the same.
@@ -85,6 +93,8 @@ Use the game's own calendar and its own names. A game's year may have twelve "mo
 seasons (Early Spring to Late Winter), or eight, or none; its tenth month is not October. Read the names from the game's string tables. Use them in docs, tests and examples.
 
 ## Physics
+
+![A spring with explicit Euler, semi-implicit Euler and the exact solution, computed](assets/diagrams/integrators.svg)
 
 Movement, collisions and forces run in a fixed order of small steps. The port must take the
 same steps in the same order with the same numbers, or objects drift apart within seconds.
@@ -109,6 +119,8 @@ same steps in the same order with the same numbers, or objects drift apart withi
 
 ## Passwords, level codes and cheat codes
 
+![A password as alphabet indexes, bits and packed fields](assets/diagrams/password-bits.svg)
+
 Before memory cards and save files, many games gave the player a password to continue from a
 level. The password encodes the game state: the level, the lives, the items, often with a
 checksum so that a typed password can be checked. Cheat codes are input sequences, compared
@@ -130,6 +142,8 @@ with a table as the player types.
 
 ## Messages and text
 
+![A message type and arguments formatted through a string table](assets/diagrams/message-format.svg)
+
 Event logs, notifications and tooltips usually store a message type and its arguments (a
 person, a building, a number), and format the text from a string table when it is shown. Saves
 may keep only the formatted text. A reimplementation that keeps the arguments formats the text
@@ -139,12 +153,16 @@ table.
 
 ## Saves
 
+![Saving pointers as ids, and loading in two passes](assets/diagrams/save-fixup.svg)
+
 A save is the serialized world: often the same serializers as the data files, plus the random
 generator states, the clock, and object references written as indices or ids. Pointers between
 objects need a fix-up pass on load. Loading a real save is the best test of a reimplementation,
 because a save holds the state of every system.
 
 ## Rendering and UI
+
+![The forms shaders shipped in, by year](assets/diagrams/shader-forms.svg)
 
 - Shaders ship compiled (DXBC for Direct3D 9-11, DXIL for 12, SPIR-V for Vulkan): disassemble
   them (fxc's `/dumpbin`, `dxc -dumpbin`, `spirv-dis`) to read the maths. Check constant buffer layouts against the CPU code that fills them.
@@ -155,6 +173,8 @@ because a save holds the state of every system.
   constant values of a real frame. A capture is the fastest way to understand a rendering pass.
 
 ## Networking (if any)
+
+![Lockstep sends inputs; client-server sends state](assets/diagrams/net-models.svg)
 
 Messages are usually serialized with the same stream classes as saves. Lockstep games send only
 inputs and depend on exact determinism; client-server games send state. Never test against a
