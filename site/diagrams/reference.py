@@ -481,6 +481,50 @@ def struct_from_uses():
     return s.render()
 
 
+# ---------------------------------------------------------------- what each compiler stage removes
+def compile_stages():
+    s = Svg(900, 300, 'The stages of a compiler from source to machine code, and what each stage removes from the program')
+    s.heading('What each stage removes', 'A decompiler gets back the structure. The removed parts come from other evidence.')
+    stages = [('scanner', 'text to tokens', 'comments, macros', GREY), ('parser', 'tokens to a tree', 'parentheses', BLUE),
+              ('semantic analysis', 'names and types', 'names, types', PURPLE), ('optimiser', 'a simpler tree', 'constant sums',
+              AMBER), ('code generator', 'machine code', 'open orders', TEAL)]
+    s.text(30, 108, 'source', 12, TEXT, weight='600')
+    for k, (name, does, loses, colour) in enumerate(stages):
+        x = 96 + k * 160
+        arrow(s, x - 22, 128, x - 2, 128)
+        box(s, x, 96, 140, 64, colour, name, does, op='0.3')
+        s.line(x + 70, 162, x + 70, 196, RED, 1.5, ' stroke-dasharray="3 3"')
+        s.rect(x + 8, 198, 124, 30, RED, rx=4, extra=' fill-opacity="0.16"')
+        s.text(x + 70, 218, loses, 12, TEXT, 'middle')
+    s.text(30, 270, 'Strings, symbols, RTTI, debug builds and save formats keep some of what the stages remove.', 12, DIM)
+    return s.render()
+
+
+# ---------------------------------------------------------------- order of evaluation
+def eval_order():
+    s = Svg(900, 300, 'Two random draws as the arguments of one call: the binary makes the second argument\'s draw first, '
+                      'so the port makes its calls in the same order')
+    s.heading('Order of evaluation', 'The language leaves the order of arguments open. The binary shows the order this build used.')
+    s.rect(30, 84, 260, 40, '#12282a', rx=6)
+    s.text(46, 109, 'spawn(rand() % w, rand() % h);', 13, TEXT, mono=True)
+    s.text(30, 146, 'the source (not available)', 11, DIM)
+    s.rect(330, 84, 250, 132, '#12282a', rx=6)
+    asm = [('call  rand', AMBER), ('...   % h', DIM), ('push  eax', TEXT), ('call  rand', AMBER), ('...   % w', DIM),
+           ('push  eax', TEXT)]
+    for i, (line, colour) in enumerate(asm):
+        s.text(346, 106 + i * 19, line, 12, colour, mono=True)
+    s.text(330, 236, 'the binary: the height draw comes first', 11, DIM)
+    s.rect(620, 84, 250, 132, '#12282a', rx=6)
+    port = [('let y = rand() % h;', TEXT), ('let x = rand() % w;', TEXT), ('spawn(x, y);', TEXT)]
+    for i, (line, colour) in enumerate(port):
+        s.text(636, 116 + i * 30, line, 12, colour, mono=True)
+    s.text(620, 236, 'the port: one statement per draw', 11, DIM)
+    arrow(s, 292, 104, 326, 104)
+    arrow(s, 582, 150, 616, 150)
+    s.text(30, 276, 'A port that computes arguments from left to right without this would give every later draw a different value.', 12, DIM)
+    return s.render()
+
+
 DIAGRAMS = {
     'msvc-rand.svg': msvc_rand, 'entity-components.svg': entity_components, 'package-archive.svg': package_archive,
     'float-time.svg': float_time, 'integrators.svg': integrators, 'password-bits.svg': password_bits,
@@ -488,4 +532,5 @@ DIAGRAMS = {
     'vtable-layout.svg': vtable_layout, 'crt-startup.svg': crt_startup, 'signature-match.svg': signature_match,
     'magic-division.svg': magic_division, 'cpu-flags.svg': cpu_flags, 'segment-address.svg': segment_address,
     'overlays.svg': overlays, 'struct-from-uses.svg': struct_from_uses,
+    'compile-stages.svg': compile_stages, 'eval-order.svg': eval_order,
 }

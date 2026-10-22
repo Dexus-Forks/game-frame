@@ -8,6 +8,28 @@ calling conventions, C++ layout and floating point are on
 [Calling conventions and floating point](ABI.md). The game-level structures (the main loop,
 random generators, entities) are on [Game patterns](GAME-PATTERNS.md).
 
+## What compiling removes
+
+![The stages of a compiler, and what each one removes from the program](assets/diagrams/compile-stages.svg)
+
+A compiler works in stages. The front end reads the source. The scanner splits the text into
+tokens, and the parser builds a tree from them. Semantic analysis looks up each name in the
+symbol table and checks its type. The back end may optimise the tree. Then it chooses machine
+instructions for it. Each stage removes something that a decompiler cannot get back from the
+code alone.
+
+| Stage | What it removes | Where to look for it |
+|---|---|---|
+| Scanning | Comments, layout, macro names (`#define`) and the preprocessor's choices (`#if`) | Strings, assert messages, a debug build, other platforms' builds |
+| Parsing | Parentheses and precedence: the tree fixes the order of every operation | The order of the instructions |
+| Semantic analysis | Names and declared types. Types become sizes, offsets and the choice of instruction (`imul` against `mul`, `jl` against `jb`) | Symbols, RTTI, save formats, the uses of each value ([Types](TYPES.md)) |
+| Optimisation | Expressions with constant results, repeated sub-expressions, code that is never reached, small functions (inlined) | Constants that are the result of a sum, code repeated in many places |
+| Code generation | Statement boundaries and the order the language left open | The order of calls and memory writes in the binary |
+
+The machine code is the evidence for everything the program does. The source the developers
+wrote is only one of many that compile to it. A port copies what the machine code does. Where
+the source language left a choice to the compiler, the binary shows the choice it made.
+
 ## Finding the game's own code
 
 ![From the entry point through the C runtime to main](assets/diagrams/crt-startup.svg)
@@ -68,6 +90,14 @@ matches more than once.
 | `test eax, eax` then `jz` | `if (x == 0)` |
 | `sub eax, 3`, `cmp eax, 5`, `ja` | A range test `if (x < 3 \|\| x > 8)`: subtracting the low bound and comparing unsigned tests both bounds at once |
 | `mov dword [ebp-0x10], 0x45564153` and more stores of printable values | A local character array initialised in place: here the text "SAVE" |
+| One constant where you expect an expression, such as `0x3eaaaaab` (1/3 as a 32-bit float) or 450 for `15 * 30` | An expression the compiler computed at build time (constant folding), often from a `#define` or `sizeof` |
+| `mulss` by a constant where the source probably divides | Division by a constant turned into multiplication by its reciprocal. This is allowed only with fast-maths options. The two give different results |
+
+A folded float constant is exact in the binary. Copy its bits into the port
+(`f32::from_bits(0x3eaaaaab)`) or write a literal that gives the same bits. A float expression
+in the port's source can be folded with a different precision or a different order. For
+integers, write the expression you recovered when you know it, so the port reads like the
+original source.
 
 When the source divides by a constant, the port should divide by that constant, with the same
 signedness. The multiply-and-shift form comes from the compiler. It gives the same result.
@@ -91,6 +121,8 @@ Name them once. Then each call reads as one operation.
 | A tree of compares on the same value | `switch` with cases far apart, compiled as a binary search |
 | A chain of conditional jumps to the same false target | `&&` |
 | A chain of conditional jumps to the same true target | `\|\|` |
+| A pointer increased by the same amount on each pass | An array index `a[i]`: the compiler replaced the multiplication by `i` with an addition (strength reduction). The amount is the element size |
+| A value computed before the loop and used inside it | An expression in the loop body that does not change between passes, moved out of the loop |
 
 Ghidra recovers most jump tables. When a `switch` shows as a computed jump without cases, find
 the table's address and size from the bounds check, and read its entries with
@@ -118,6 +150,27 @@ each.
   GetProcAddress`). Games did this for optional parts such as DirectX versions, force feedback
   and voice chat.
 - **Shared code.** The linker can merge identical functions. One body may then serve two names. Its callers may expect different meanings.
+
+## Order of evaluation
+
+![Two random draws as the arguments of one call, made in the order the binary shows](assets/diagrams/eval-order.svg)
+
+C and C++ leave some orders to the compiler. The order in which a call's arguments are computed
+is one of them. So is the order of the two operands of `+`, and the moment when `x++` writes
+`x` before the end of the statement. The compiler chooses each order when it builds the game.
+The binary shows the choice. Another compiler, or the same compiler with other options, can
+choose differently.
+
+This matters when two parts of one expression change shared state. Examples are two calls to
+the random generator in one call's arguments (`spawn(rand() % w, rand() % h)`), two calls that
+read and advance the same pointer, and `i++` used twice in one statement. Rust and most modern
+languages compute arguments from left to right. Many x86 compilers that pass arguments on the
+stack compute them from right to left. In the example above, the port's first draw might then
+give the original's height. Every later draw is then different.
+
+In the port, give each such call its own statement, in the order the binary makes the calls.
+Name the results. A comment can cite the address of the call that comes first. The tests then
+compare the same draws (the `re-verify` skill, "Random draw order").
 
 ## The flags
 
@@ -152,6 +205,7 @@ limits. These are the usual cases, and how to check each one:
 | Code that writes to its own instructions | Self-modifying code: patched constants or jump targets, used for speed in many DOS games | Write references into the code segment; run the function under emulation to see both versions |
 | Two functions sharing their last instructions | The linker merged tails, or the code jumps into another function | The references into the middle of a function |
 | A wrong type everywhere a value goes | One wrong type at the start, propagated through every call | Fix the first type; Ghidra then corrects the rest |
+| A call that seems to return twice, or code after a call that runs only after an error | `setjmp` and `longjmp`: an error or a restart far inside the game jumps back to a saved point, such as the main menu | The callers of `setjmp` in the runtime's labels; the buffer passed to it |
 
 ## Debug builds, release builds and symbols
 
@@ -161,9 +215,39 @@ functions and types. Look for these before reading an optimised build alone. The
 function in two builds, matched with `similar.py` and its strings, gives the readable version
 of the optimised one.
 
+Code from a compiler that does not optimise has a recognisable form. Every value is loaded from
+memory at each use. Intermediate results are pushed on the stack and popped again. The same
+expression is computed again in the next statement. Early DOS compilers without optimisation,
+and many C compilers for 8-bit machines, produce this code. It keeps the statements of the
+source in their order. One statement usually becomes one short group of instructions, so the
+structure of the source is easy to read. The reverse also helps. Code that does none of this
+was optimised, or was written in assembly.
+
+## Code compiled by the game's own tools
+
+A compiler can translate into a form that another program runs, as well as into machine code.
+Many games carry such programs. Their machine code is then an interpreter, and the game's logic
+is in its data.
+
+- **Bytecode from the developers' compilers.** Scripting systems such as SCUMM, AGI, QuakeC and
+  UnrealScript compile scripts into bytecode with a tool that did not ship. To read the
+  bytecode, reverse that compiler's last stage. Find the interpreter's dispatch table and name
+  the handler of each opcode. Then write a disassembler. A decompiler for the bytecode rebuilds
+  expressions from the stack operations, as the parser built the tree in the other direction.
+  [Adventure games](games/adventure.md) and [Engines](engines/README.md) cover these
+  interpreters.
+- **Tokenised BASIC.** A home computer stores a BASIC program as tokens. Each keyword is one
+  byte with its top bit set. The table of keywords is in the machine's BASIC ROM. A Commodore
+  64 line starts with a pointer to the next line and a two-byte line number, and ends with a
+  zero byte. A ZX Spectrum line starts with a big-endian line number and a length. Each number
+  in its text is followed by a hidden binary form after a `0x0E` byte. A program can change the
+  hidden form so that the listing shows a different number than the one the program uses.
+  Detokenise with the table from the same ROM version.
+
 ## What to record
 
 - The compiler and runtime, with the evidence (`peinfo.py`, `dosinfo.py`, runtime strings).
 - The address of the game's entry past the runtime.
 - Each runtime helper you named, in the labels file, so the export reads cleanly.
-- Each recovered constant (a divisor, a jump table) with how you confirmed it.
+- Each recovered constant (a divisor, a jump table, a folded float) with how you confirmed it.
+- The order of calls inside expressions that change shared state, such as random draws.
