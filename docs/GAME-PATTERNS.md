@@ -163,6 +163,17 @@ same steps in the same order with the same numbers, or objects drift apart withi
   against B gives different positions from the reverse. Record the order and the sort.
 - **Iterations.** Solvers for stacked or jointed objects repeat a fixed number of times. The
   count is part of the rule.
+- **Angles as integers.** Many games store an angle as a fraction of a full turn, not in
+  degrees or radians. Doom uses 32 bits for one turn, so an angle wraps by itself when it
+  overflows. The PlayStation's geometry hardware uses 4096 units for one turn. 8-bit and 16-bit
+  games often use 256. A shift turns the angle into an index into a sine table. Keep the
+  original's unit and its wrap. A port that converts to floating-point radians rounds
+  differently and drifts.
+- **The order of rotations.** Yaw, pitch and roll give different results depending on the
+  order they are applied. Read the order from the code that builds the matrix, and from which
+  sine and cosine meet in each element. Quaternions and matrices give the same rotation in
+  theory, but each conversion rounds. Keep the form the original stores, and convert where it
+  converts.
 
 ## Passwords, level codes and cheat codes
 

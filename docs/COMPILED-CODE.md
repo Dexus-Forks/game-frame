@@ -86,6 +86,9 @@ matches more than once.
 | `cdq`, `and edx, 7`, `add`, `sar eax, 3` | Signed division by 8, rounded toward zero |
 | `neg eax`, `sbb eax, eax` | `x != 0 ? -1 : 0`, often then `and` with a value to select it |
 | `setcc al`, `movzx eax, al` | A comparison stored as 0 or 1 |
+| `daa` or `das` after an 8-bit `add` or `sub`; `aaa`, `aas`, `aam`, `aad` | Decimal numbers stored two digits to a byte (packed BCD) or one digit to a byte. Scores, money and timers kept in this form are shown digit by digit with no division. The port keeps the stored form, because a save or a memory dump holds it |
+| `fbstp` | An x87 value stored as 18 packed BCD digits, usually to print a large number |
+| `fprem` in a loop that tests bit C2 of the status word | `fmod`: the remainder with the sign of the dividend, the same result as C's `fmod`. `fprem1` gives the IEEE remainder instead, rounded to the nearest quotient, so the result can be negative where `fmod`'s is positive. Port each with the matching function |
 | `cmovcc` | A `?:` or a short `if` without a jump |
 | `test eax, eax` then `jz` | `if (x == 0)` |
 | `sub eax, 3`, `cmp eax, 5`, `ja` | A range test `if (x < 3 \|\| x > 8)`: subtracting the low bound and comparing unsigned tests both bounds at once |
