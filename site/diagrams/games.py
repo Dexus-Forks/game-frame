@@ -404,8 +404,7 @@ def racing_divergence():
     s.line(x0, y0 + h, x0 + w, y0 + h, DIM, 1)
     s.line(x0, y0, x0, y0 + h, DIM, 1)
     s.text(x0 + w, y0 + h + 18, 'ticks', 10.5, DIM, 'end')
-    s.add(f'<text x="{x0 - 12}" y="{y0 + h / 2}" font-family="ui-sans-serif, Helvetica, Arial, sans-serif" font-size="10.5" '
-          f'fill="{DIM}" text-anchor="middle" transform="rotate(-90 {x0 - 12} {y0 + h / 2})">distance between the two cars</text>')
+    s.text(x0 + 8, y0 + 8, 'distance between the two cars', 10.5, DIM)
     pts = []
     for k in range(101):
         t = k / 100
