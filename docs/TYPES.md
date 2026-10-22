@@ -17,7 +17,7 @@ Use the best source that exists, in this order:
 | Debug symbols | Everything: a PDB from a demo or a leaked build, Borland Turbo Debugger records ([DOS games](DOS.md)), DWARF in a Linux or Mac build, a linker map file. A related build with symbols (a demo, a port, a sequel on the same engine) carries over with `match_functions.py` |
 | RTTI | Class names and the class tree. MSVC writes a type descriptor named `.?AVName@@` for each class with virtual functions. GCC and Clang write `_ZTS` names. Ghidra applies MSVC's RTTI on its own |
 | Mangled names | Exports and imports with C++ names give each parameter's type |
-| The program's own text | Assertions with expressions (`pUnit->m_health > 0`), log messages that print fields, serialisers that write field names to text files, script bindings that register fields by name |
+| The program's own text | Assertions with expressions (`pUnit->m_health > 0`), log messages that print fields (each `%d`, `%u`, `%f`, `%s` or `%p` in the format string gives the type of one argument), serialisers that write field names to text files, script bindings that register fields by name |
 | Data files and saves | A record in a file is often the structure in memory, written whole. Its layout fixes the order and sizes of the fields |
 | The code | Every access to a field: its offset, its size, its type, and whether it is read or written. The rest of this page |
 
@@ -54,6 +54,7 @@ Use the best source that exists, in this order:
 | Enumeration | Comparisons with small constants, switches, and tables indexed by the value (often a table of name strings, which names every value) |
 | Fixed point | Shifts by 8, 12 or 16 after multiplications, and multiplications by 256 or 65536 ([Compiled code](COMPILED-CODE.md)) |
 | String | A pointer passed to string functions, or a small buffer passed with its size |
+| A header before the data | Reads at negative offsets from a pointer (`[eax-4]`). The pointer points past a header: an allocator's block size, a string's length or reference count, an array's element count. Pascal code can also point one element before an array so that indices start at 1 |
 
 ## The C++ standard containers
 

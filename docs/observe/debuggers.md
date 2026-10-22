@@ -93,6 +93,21 @@ graphics or sound system, and timing between frames. Frida is installed by
 `scripts/setup.sh --install`. It runs on Windows, Linux, macOS and Android. Some protected games
 detect it. On macOS, signed programs need a copy without the hardened runtime.
 
+## Adding code to the original
+
+Some answers need code inside the original game. Examples are writing the game state to a
+file every frame, or logging each message a function sends. On your own copy, for analysis
+only, there are three ways in:
+
+- **Frida**, above. It needs no change to the files and is the first choice.
+- **A proxy DLL.** Windows loads a DLL from the game's folder before the system's copy. A DLL
+  named like one the game imports (`dinput8.dll`, `d3d9.dll`, `winmm.dll`) can pass every call
+  on to the real one and log what it needs. Graphics tools such as apitrace work this way.
+- **A code cave.** Unused bytes in the executable, often padding at the end of a section, can
+  hold a few new instructions. A jump placed over an existing instruction leads there. The new
+  code repeats the instruction it replaced, does its work, and jumps back. Record each change
+  as for any patch.
+
 ## Going backwards: time-travel debugging
 
 A recording debugger saves everything a program does, then lets you step backwards as well as

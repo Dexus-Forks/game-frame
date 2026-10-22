@@ -244,6 +244,7 @@ limits. These are the usual cases, and how to check each one:
 | A long chain of 16-bit operations | 32-bit arithmetic on register pairs (`add`, `adc`; `sub`, `sbb`), or calls to the runtime's long helpers | Treat the pair as one 32-bit value |
 | Code that writes to its own instructions | Self-modifying code: patched constants or jump targets, used for speed in many DOS games | Write references into the code segment; run the function under emulation to see both versions |
 | Two functions sharing their last instructions | The linker merged tails, or the code jumps into another function | The references into the middle of a function |
+| Code that seems pointless: a second jump that can never be taken, a value stored and stored again | A quirk of the compiler, which a later pass did not clean up. It is rarely a sign of hidden meaning. A real compiler bug that changes a result is the original's behaviour, so the port computes the same result | Run the function under emulation with inputs that reach the code |
 | A wrong type everywhere a value goes | One wrong type at the start, propagated through every call | Fix the first type; Ghidra then corrects the rest |
 | A call that seems to return twice, or code after a call that runs only after an error | `setjmp` and `longjmp`: an error or a restart far inside the game jumps back to a saved point, such as the main menu | The callers of `setjmp` in the runtime's labels; the buffer passed to it |
 

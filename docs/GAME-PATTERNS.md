@@ -82,6 +82,7 @@ and a port must copy each.
 | A pool of fixed size | Which slot a new object takes, and so its id and its place in the update order. A free list reuses the last freed slot first. A scan reuses the lowest free slot | The allocate function. The full case matters too: refuse, remove the oldest or quietest, or grow |
 | An event or message queue | Whether a reaction happens at once or at a later point in the frame. Events sent while the queue is processed may run in the same pass or the next one. Listeners run in the order they registered | The send function: a direct call, or a write into a ring buffer read later |
 | A value cached with a dirty flag | When the value is computed again: when it is read, or at a fixed point in the frame. If the computation uses random numbers or rounds floats, the moment matters | A flag set by the setters and tested before the computation |
+| Groups updated in turn | Whether a rider sees its vehicle's new position. Some engines update objects in groups (buckets): vehicles and platforms, then characters, then objects attached to them. An object read by one in an earlier group is a frame behind | A loop over a short list of lists, or several update passes with a group number |
 | A spatial grid | The order of objects found near a point: the order of the cells, then the order within each cell. A list that adds at its head returns objects in reverse order of insertion | The query function's loops, and how objects are linked into a cell |
 
 Record each decision with the address that shows it. A port that gets one of these wrong can
@@ -106,6 +107,17 @@ look right for minutes, then drift once an object dies in the middle of a frame.
   child once, when the file is read. Two details then become rules of the game. A loader that
   treats 0 or an empty string as "not set" gives the parent's value to a child that set 0. The
   order the loader reads the types decides which parent values exist yet. Copy both.
+- **Start-up order:** an engine starts its subsystems in a fixed order, usually by explicit
+  calls from `main` or the engine's start function. A subsystem that reads another's value
+  before that one has started sees a default value. That is the original's behaviour. Copy the
+  order from the start function's calls.
+- **Tables in place of maths:** sine and cosine tables, square roots, reciprocals, distances.
+  The table decides the result, including its rounding and how the angle becomes an index.
+  Copy the table from the binary, and copy the index arithmetic.
+- **Actors as coroutines:** some games give each actor or script its own small stack. The actor
+  runs until it waits for something, then saves its stack pointer and switches to the next
+  one. In the code, a `mov` into `esp` or `sp` from an object's field marks the switch. The
+  order in which the actors are resumed is their update order.
 - **Objects made from a template:** a spawner can copy a whole template object, then change a
   few fields. Every field the template holds, including counters and timers, starts with the
   template's value. The port must copy all of them.
@@ -117,6 +129,12 @@ look right for minutes, then drift once an object dies in the middle of a frame.
 Games keep time as integer ticks (milliseconds or microseconds) or as float seconds, and the
 calendar of a simulation (days, seasons, years) is derived from it. Float time gathers
 rounding error. If the original keeps time as a float, the reimplementation must do the same.
+
+Many games keep more than one clock. Real time drives the menus, the cursor and the sound.
+Game time drives the simulation. It stops when the game is paused and runs faster or slower
+with the speed setting. The game loop keeps running while game time is stopped. Record which
+clock each system reads. A port that pauses the whole loop stops animations that the original
+kept running.
 
 Use the game's own calendar and its own names. A game's year may have twelve "months" that are
 seasons (Early Spring to Late Winter), or eight, or none; its tenth month is not October. Read the names from the game's string tables. Use them in docs, tests and examples.
