@@ -9,6 +9,8 @@ CD-ROM XA and El Torito specifications.
 
 ## Sectors and tracks
 
+![A CD sector of 2352 bytes in four kinds, drawn to scale](../assets/diagrams/cd-sectors.svg)
+
 A CD is a list of sectors of 2352 bytes. 75 sectors play in one second, so positions are
 written as minutes, seconds and sectors (`MM:SS:FF`). The table of contents lists the tracks.
 Each track is audio or data.

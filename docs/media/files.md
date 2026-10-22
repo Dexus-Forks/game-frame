@@ -24,6 +24,8 @@ name in the executable's strings and the code that opens it say more than its by
 
 ## Entropy
 
+![The entropy scale from 0 to 8 bits per byte](../assets/diagrams/entropy-scale.svg)
+
 Entropy measures how evenly the byte values are used. It runs from 0 to 8 bits per byte.
 
 | Entropy | Usually |
@@ -38,6 +40,8 @@ values is compressed entries. A header or a directory shows as a dip. In an exec
 high run where the code should be suggests a packed program ([Packed and protected code](protection.md)).
 
 ## A picture of the file
+
+![A Hilbert curve keeps neighbouring bytes together](../assets/diagrams/hilbert.svg)
 
 `tools/triage/binview.py` draws a file one pixel per byte. Black is zero, blue is text, red is
 bytes above 0x7F, and green is control bytes. Compressed data is red speckle. A table of

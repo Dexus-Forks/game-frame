@@ -11,6 +11,10 @@ techniques as the programmers of the time used them.
 
 ## Where pixels differ
 
+![Two triangles that share an edge, and which pixels each draws](../assets/diagrams/fill-rule.svg)
+
+![A 16.16 fixed-point number, bit by bit](../assets/diagrams/fixed-point.svg)
+
 | Decision | What varies between renderers | How to find the original's choice |
 |---|---|---|
 | Fill rule | Which pixels on a polygon's edge are drawn. A common rule draws a pixel whose centre lies on a left or top edge and leaves it for a right or bottom edge, so two polygons that share an edge never both draw it. Many games used their own rule | Draw two polygons that share an edge in the original, and look for gaps or double-drawn pixels |

@@ -9,6 +9,8 @@ keeps the game itself, and the knowledge gained about it, for as long as possibl
 
 ## Three packages
 
+![Three packages: received, kept and given to players](../assets/diagrams/oais-packages.svg)
+
 The OAIS model names the package received from a producer (the submission package), the
 package the archive keeps (the archival package), and the package it gives to users (the
 dissemination package). In a game project:

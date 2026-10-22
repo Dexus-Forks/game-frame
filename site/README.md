@@ -40,7 +40,13 @@ Links between files stay
 relative, as GitHub needs them; the site turns them into page URLs (`.vitepress/links.mts`).
 A link to a tool or a script, and inline code that starts with a tool's path
 (`tools/triage/memscan.py`), lead to that tool's page. Other files link to GitHub.
-`.vitepress/catalog.mts` builds the skills', agents' and tools' pages. The build fails on a link to a page
+`.vitepress/catalog.mts` builds the skills', agents' and tools' pages.
+
+The guides' diagrams are SVG files in `docs/assets/diagrams/`, drawn by `site/diagrams/make.py`
+from the numbers they illustrate. Some are animated with SVG's own animation, which plays on
+GitHub and on the site with no script. Change a diagram in `make.py`, then run
+`python3 site/diagrams/make.py`. The tests fail when a file differs from what the generator
+draws. The build fails on a link to a page
 that does not exist.
 
 After the build, `.vitepress/llms.mts` writes text for AI agents into the output, with no extra

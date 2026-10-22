@@ -56,6 +56,8 @@ the hardware the function reads.
 
 ## Code coverage: what runs when
 
+![Coverage of two runs: the action's code is what ran only in the second](../assets/diagrams/coverage-diff.svg)
+
 A game runs most of its code every frame. The code for one action, such as buying a unit,
 saving or opening a door, runs only when that action happens. Coverage shows it. Record which
 basic blocks run while you play without the action. Then record again, doing the same and the

@@ -28,6 +28,8 @@ mode to port: the game's screen is an array of palette indexes.
 
 ## Mode X and other unchained modes
 
+![Mode X stores pixel x in plane x mod 4](../assets/diagrams/modex-planes.svg)
+
 The game turns off the VGA's "chain 4" setting, so each byte address covers four pixels, one in
 each of four planes. The game selects planes with the sequencer's map mask (port `3C4h`, index
 2) before writing. Mode X allows 320 × 240 with square pixels and several screen pages for

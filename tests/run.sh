@@ -574,6 +574,8 @@ printf '$ tests/run.sh\n  ok    a check <&>\n' | "$PYTHON" site/captures/term_sv
   && grep -q '&lt;&amp;&gt;' "$svg" && grep -q '>ok</tspan>' "$svg" \
   && ok "term_svg draws terminal text as SVG, escaped and coloured" || bad "term_svg"
 rm -f "$svg"
+out="$("$PYTHON" site/diagrams/make.py --check 2>&1)" && ok "the guides' diagrams match their generator" \
+  || bad "the guides' diagrams differ: run python3 site/diagrams/make.py" "$out"
 if [[ -d site/node_modules ]]; then
   out="$(npm --prefix site run build 2>&1)"
   [[ $? == 0 && -f site/.vitepress/dist/games/interaction.html && -f site/.vitepress/dist/skills/re-observe.html ]] \

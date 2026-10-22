@@ -19,6 +19,8 @@ in the game, second by second, so a message can be matched to an action.
 
 ## Reading the messages
 
+![A message byte by byte, and many messages as rows](../assets/diagrams/message-anatomy.svg)
+
 ```bash
 python3 tools/formats/pcap.py derived/net/lobby.pcapng                       # the flows
 python3 tools/formats/pcap.py derived/net/lobby.pcapng --flow 0 --dir b --dump derived/net/msgs

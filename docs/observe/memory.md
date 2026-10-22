@@ -69,6 +69,8 @@ object model ([A model to query](object-model.md)) can read the original's state
 
 ## A path to a value that moves
 
+![A chain of pointers from a global to the gold](../assets/diagrams/pointer-chain.svg)
+
 An object on the heap sits at a different address in every run. `tools/triage/pointerpaths.py`
 finds a chain of pointers from a fixed address, such as a global variable, to the value. It
 takes a dump and the value's address from each of two or more runs, and keeps the chains that

@@ -1,5 +1,7 @@
 # Hardware of the era
 
+![A timeline of PC graphics, sound and CPU features, 1981 to 1999](../assets/diagrams/pc-timeline.svg)
+
 A PC game from 1985 to 2005 uses its hardware far more directly than a modern program. DOS
 games program the timer, the video card, the sound card and the joystick port themselves.
 Windows games of the late 1990s use DirectX or a card maker's own 3D API. The hardware a game was

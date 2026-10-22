@@ -10,6 +10,8 @@ formats and protections: [Amiga](../computers/amiga.md), [Atari ST](../computers
 
 ## Three levels of image
 
+![Three levels of disk image, from sectors to flux](../assets/diagrams/floppy-levels.svg)
+
 | Level | Examples | What it holds | Enough for |
 |---|---|---|---|
 | Sectors in order | PC `.img` and `.ima`, Amiga `.adf`, Atari `.st`, Apple `.dsk`, C64 `.d64` | The data of each standard sector, in a fixed order | A game that reads its disk through the system |
