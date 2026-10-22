@@ -27,6 +27,8 @@ it is, so the later stages know where to start.
 4. Identify the version and build of the copy, list the other versions that exist, and
    record which one the port follows (`docs/working/versions.md`).
 5. Write all of it to `docs/FINDINGS.md`, and the first rows of `docs/CHECKLIST.md`.
+   Run the catalogue (`tools/formats/catalog.py target/game derived/catalog`, `re-browse`
+   section 1) and copy its coverage line into the checklist.
 
 ## Where it ends
 

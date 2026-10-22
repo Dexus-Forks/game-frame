@@ -16,6 +16,8 @@ work that spans several steps and several sessions.
   executable, carrying labels to a new build, Function ID, types, processors.
 - [Versions, patches and builds](versions.md): choosing the version to copy, comparing builds,
   and reading several versions' data in one port.
+- [A resource viewer from the first day](viewer.md): the catalogue of every file, then the
+  project's own viewer on the port's readers, so people and agents can check decoded content.
 - [Building the port](building-the-port.md): the core and the platform layer, time, input,
   drawing, sound, the player's data, browser builds and round trips of the original's formats.
 - [Practising on games with source](practice.md): practice targets, a ladder of exercises,

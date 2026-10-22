@@ -21,6 +21,8 @@ You make one file format fully understood and proven. Extracted data stays in `d
 1. Follow `re-format`: find the reading code (from the tracer's notes or `re-trace`),
    prototype a decoder with `tools/formats/reader.py`.
 2. Prove it with `validate.py` against every file of that type: all bytes consumed.
+   Then look at its output in the catalogue (`re-browse`: `tools/formats/catalog.py` with
+   `--decoder`, and `images(result)` for pictures) and name in the hand-off what you opened.
 3. Write the format, field by field, into `docs/` with evidence labels.
 4. For models and animation, find skeletons and poses with `tools/formats/skeleton.py`
    (`docs/engines/animation.md`). For graphics, find the shaders with

@@ -152,6 +152,13 @@ segment with no bytes in the file, which is uninitialised data): the binaries ta
 engine and middleware with the evidence for each (the import or string that showed it), the
 data containers, and the open questions. Add the first lines to `docs/CHECKLIST.md`.
 
+Then run the catalogue, the first resource viewer (`re-browse`), and copy its summary line
+into `docs/CHECKLIST.md` as the starting format coverage:
+
+```bash
+python3 tools/formats/catalog.py target/game derived/catalog
+```
+
 Also record the hardware the game was written for: the minimum CPU, the video modes, the 3D
 APIs, the sound devices and the input devices it supports (`docs/hardware/`). Its setup program
 and its readme list them.

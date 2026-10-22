@@ -81,6 +81,11 @@ session by reading `docs/CHECKLIST.md` and searching `docs/` and `labels/` for t
 and names you are about to work on. `./gameframe find WORD` shows which skills and
 tools cover a subject, and `./gameframe tool NAME` prints a tool's usage.
 
+Keep a resource viewer from the first day (`re-browse`): the catalogue
+(`./gameframe run catalog target/game derived/catalog --decoder GLOB=DECODER.py`) until the
+port has readers, then the project's own viewer on them. Look at every decoder's output there
+before porting it, and copy the catalogue's coverage line into `docs/CHECKLIST.md`.
+
 Work a subsystem at a time and verify by risk (`re-start`, "Spend effort where it pays";
 `re-verify` section 0): fuzz only maths, random draws and branchy code; check the rest
 against recorded frames.

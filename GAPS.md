@@ -87,6 +87,8 @@ proposed again.
 - [x] `tools/pe/peinfo.py`: delay-loaded imports, relocation count
 - [x] `tools/triage/compare_trees.py --similar`: shared content, renamed files
 - [x] `tools/triage/hashnames.py`: ROR-13
+- [x] `tools/formats/catalog.py`: a first resource viewer (every file, decoder results,
+  pictures, format coverage), with the `re-browse` skill and [the guide](docs/working/viewer.md)
 
 ## Out of scope
 

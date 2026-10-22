@@ -160,6 +160,14 @@ expect "the sample decoder consumes every byte" "1 of 1 files decode completely"
 printf 'SMPL\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x3f\x03oakEXTRA' > $B/broken.dat
 expect "validate fails a file with unread bytes" "5 bytes left unread" "$PYTHON" tools/formats/validate.py $S/decode_sample.py $B/broken.dat
 rm -f $B/broken.dat
+C=$(mktemp -d)
+mkdir "$C/game" && cp $B/sample.dat "$C/game/"
+printf 'def decode(r):\n    r.magic(b"PIC0"); w, h = r.u16(), r.u16()\n    return (w, h, r.bytes(w * h))\ndef images(p):\n    return [("title", p[0], p[1], p[2])]\n' > "$C/pic.py"
+"$PYTHON" -c "import struct,sys;open(sys.argv[1],'wb').write(b'PIC0'+struct.pack('<HH',8,4)+bytes(range(32)))" "$C/game/TITLE.PIC"
+printf 'unknown bytes' > "$C/game/notes.bin"
+expect "catalog decodes, counts coverage and draws a picture" "2 of 3 files decode completely" "$PYTHON" tools/formats/catalog.py "$C/game" "$C/out" --decoder "*.dat=$S/decode_sample.py" --decoder "*.pic=$C/pic.py"
+[[ -f "$C/out/index.html" && "$(head -c 8 "$C/out/f0-0.png" | xxd -p)" == 89504e470d0a1a0a ]] && ok "catalog writes the page and the decoder's picture" || bad "catalog page or picture missing"
+rm -rf "$C"
 
 echo "16-bit DOS tools (examples/dos-sample)"
 D=examples/dos-sample/build

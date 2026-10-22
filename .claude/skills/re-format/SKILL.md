@@ -105,6 +105,17 @@ Every file must report complete. A failure says where it stopped and shows the n
 missed field, a wrong type or a version branch. `examples/sample-game/decode_sample.py` is a
 complete small example.
 
+Then look at what the decoder found (`re-browse`). Add `images(result)` to the decoder when the
+format holds pictures, and run the catalogue with it:
+
+```bash
+python3 tools/formats/catalog.py target/game derived/catalog --decoder '*.unit=decoders/units.py'
+```
+
+Open `derived/catalog/index.html`: a wrong width slants a picture, a wrong palette changes its
+colours, a misread type shows absurd values. When the port has a viewer, add a view for the
+format there too.
+
 ## 5. Port and test
 
 Port the decoder to the reimplementation's language as a plain reader with no dependencies, one

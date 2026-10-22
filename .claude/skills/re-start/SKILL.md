@@ -60,6 +60,7 @@ inventory -> observe -> decompile -> trace -> format -> emulate -> reimplement -
 |---|---|---|
 | Set up | Are Ghidra, Java, Python, Unicorn and REA ready? | `re-setup` |
 | Inventory | Which files hold the game's own code? Which engine, which protection, which data containers? What kind of game is it? | `re-inventory` |
+| View | Can a person and an agent see every file and what the decoders make of it? | `re-browse` |
 | Observe | What does the original actually do? Run it, drive it, capture frames, state, inputs; list every input and screen | `re-observe` |
 | Investigate with REA | Quick, evidence-backed answers about a binary, package, browser or Electron app | `re-rea` |
 | Decompile | Turn machine code into searchable pseudocode, and run one-off decompiles | `re-ghidra` |
@@ -141,13 +142,19 @@ a diagram of each team's hand-offs and the failure path.
 5. Classify the game: read `docs/games/README.md` and its family page, and write the kind of
    game, its time model and how exact the interface must be into `docs/FINDINGS.md`. Copy the
    family's rule set into the project's `AGENTS.md`.
-6. `re-observe`: get the original running where you can watch, drive and capture it.
-7. `re-ghidra`: export the game's own binaries (`scripts/ghidra-export.sh`).
-8. Pick the foundations first: the random number generator, the maths helpers, the game clock
+6. `re-browse`: run the catalogue (`tools/formats/catalog.py target/game derived/catalog`)
+   so the person and you can see every file, and grow it into the project's viewer as the
+   decoders come (`docs/working/viewer.md`).
+7. `re-observe`: get the original running where you can watch, drive and capture it.
+8. `re-ghidra`: export the game's own binaries (`scripts/ghidra-export.sh`).
+9. Pick the foundations first: the random number generator, the maths helpers, the game clock
    and the data container. Everything else depends on them. They are small enough to emulate and verify in one session.
 
 ## Spend effort where it pays
 
+- **Build a viewer on day one** (`re-browse`): every file listed, every decoder's output
+  drawn or tabled. A wrong width, palette or vertex layout shows in a picture at once, and the
+  person directing the work can check content without reading code.
 - **Shape the reimplementation on day one** (`re-port`, "Build it so it can be checked"): an
   exact core with no drawing or network, every player action as a command, a state digest and
   a headless runner. They cost little at the start and a great deal to add later.
