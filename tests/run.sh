@@ -537,17 +537,32 @@ rm -rf "$L"
 echo "Project scaffold"
 tmp="$(mktemp -d)/re-test"
 scripts/new-project.sh "$tmp" "Test Game" $B >/dev/null 2>&1
-[[ -f "$tmp/AGENTS.md" && -f "$tmp/README.md" && -f "$tmp/LICENSE-APACHE" && -f "$tmp/LICENSE-CC0-1.0" && ! -e "$tmp/LICENSE-CC-BY-4.0" && ! -e "$tmp/LICENSE-MIT" && -f "$tmp/docs/DOS.md" && -f "$tmp/docs/OUTPUTS.md" && -f "$tmp/docs/games/README.md" && -f "$tmp/docs/observe/inputs.md" && -f "$tmp/docs/working/agents.md" && -f "$tmp/docs/hardware/cpus.md" && -f "$tmp/.cargo/config.toml" && -f "$tmp/.claude/skills/re-start/SKILL.md" && -f "$tmp/.claude/agents/re-tracer.md" && -f "$tmp/.claude/settings.json" && -f "$tmp/requirements-live.txt" && -f "$tmp/scripts/hooks/gate.py" && -f "$tmp/target/game.exe" && -d "$tmp/.git" ]] \
-  && grep -q "Test Game" "$tmp/AGENTS.md" && ! (cd "$tmp" && git ls-files | grep -q '^target/') \
-  && ok "new-project creates a repository, keeps target/ out of git" || bad "new-project scaffold" "$(ls -la "$tmp" 2>&1)"
-expect "gameframe works in a new project" "tools/pe/peinfo.py  (program)" "$tmp/gameframe" tool peinfo
-[[ -f "$tmp/docs/assets/diagrams/fixed-step.svg" && -f "$tmp/docs/TYPES.md" && -f "$tmp/docs/media/README.md" ]] && ok "new-project copies the guides' diagrams and every section they link to" || bad "new-project guides"
+[[ -f "$tmp/AGENTS.md" && -f "$tmp/README.md" && -f "$tmp/LICENSE-APACHE" && -f "$tmp/LICENSE-CC0-1.0" && ! -e "$tmp/LICENSE-CC-BY-4.0" && ! -e "$tmp/LICENSE-MIT" && -f "$tmp/.cargo/config.toml" && -f "$tmp/.claude/settings.json" && -x "$tmp/gameframe" && -f "$tmp/target/game.exe" && -d "$tmp/.git" && ! -e "$tmp/tools" && ! -e "$tmp/scripts" && ! -e "$tmp/.claude/skills" && ! -e "$tmp/docs/DOS.md" ]] \
+  && grep -q "Test Game" "$tmp/AGENTS.md" && grep -q '"gameframe@game-frame": true' "$tmp/.claude/settings.json" && ! grep -q "gate.py" "$tmp/.claude/settings.json" \
+  && ! (cd "$tmp" && git ls-files | grep -q '^target/') \
+  && ok "new-project makes a plugin project: settings enable the plugin, no copied toolkit, target/ out of git" || bad "new-project scaffold" "$(ls -la "$tmp" 2>&1)"
+expect "the launcher finds GameFrame and runs its tools on the project" "EXE, x64 (64-bit)" sh -c "cd '$tmp' && GAMEFRAME_ROOT='$(pwd)' ./gameframe run peinfo target/game.exe"
+expect "the launcher runs a project script with the toolkit on its path" "pe_emu ok" sh -c "cd '$tmp' && printf 'import pe_emu\\nprint(\"pe_emu ok\")\\n' > probe.py && GAMEFRAME_ROOT='$(pwd)' ./gameframe python probe.py"
+expect "the session hook says where GameFrame's guides are" "read docs/NAME.md as" sh -c "echo '{\"cwd\": \"$tmp\"}' | python3 scripts/hooks/gate.py session"
+out="$("$PWD/scripts/update-project.sh" "$tmp" 2>&1)"
+[[ "$out" == *"Plugin project: the gameframe launcher is current"* ]] && ok "update-project leaves a plugin project's launcher and settings current" || bad "update-project on a plugin project" "$out"
+
+tmp="$(mktemp -d)/re-copy"
+scripts/new-project.sh "$tmp" "Test Game" $B --copy >/dev/null 2>&1
+[[ -f "$tmp/docs/DOS.md" && -f "$tmp/docs/games/README.md" && -f "$tmp/.claude/skills/re-start/SKILL.md" && -f "$tmp/.claude/agents/re-tracer.md" && -f "$tmp/requirements-live.txt" && -f "$tmp/scripts/hooks/gate.py" && -f "$tmp/docs/assets/diagrams/fixed-step.svg" ]] \
+  && ok "new-project --copy copies the toolkit, skills, agents, gates and guides" || bad "new-project --copy" "$(ls -la "$tmp" 2>&1)"
+expect "gameframe works in a copied project" "tools/pe/peinfo.py  (program)" "$tmp/gameframe" tool peinfo
 echo "# a local note" >> "$tmp/tools/triage/memscan.py"
 rm "$tmp/.claude/skills/re-trace/SKILL.md"
 out="$(cd "$tmp" && "$OLDPWD/scripts/update-project.sh" . 2>&1)"
 [[ -f "$tmp/.claude/skills/re-trace/SKILL.md" && "$out" == *"1 files were added"* && "$out" == *"tools/triage/memscan.py"* ]] \
   && grep -q "a local note" "$tmp/tools/triage/memscan.py" \
   && ok "update-project restores a missing file and keeps a file the project changed" || bad "update-project" "$out"
+(cd "$tmp" && git add -A && git commit -qm copy)
+out="$("$PWD/scripts/update-project.sh" "$tmp" --plugin 2>&1)"
+[[ ! -e "$tmp/.claude/skills/re-start" && ! -e "$tmp/scripts" && ! -e "$tmp/docs/DOS.md" && -f "$tmp/tools/triage/memscan.py" && ! -e "$tmp/tools/pe" && "$out" == *"tools/triage/memscan.py"* ]] \
+  && grep -q "GAMEFRAME_PROJECT" "$tmp/gameframe" && grep -q '"gameframe@game-frame": true' "$tmp/.claude/settings.json" && ! grep -q "gate.py" "$tmp/.claude/settings.json" \
+  && ok "update-project --plugin removes the copies, keeps the project's changes, enables the plugin" || bad "update-project --plugin" "$out"
 
 echo "Engine run-time: hashed names, skeletons, structures, shaders, memory per frame"
 W="$(mktemp -d)"

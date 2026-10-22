@@ -8,7 +8,7 @@ under Open questions.
 
 | File | Role | Architecture | Notes |
 |---|---|---|---|
-| | | | (fill from `tools/pe/peinfo.py target/...`) |
+| | | | (fill from `./gameframe run peinfo target/...`) |
 
 ## Engine and middleware
 

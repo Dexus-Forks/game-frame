@@ -1,7 +1,12 @@
 # Shared settings for the scripts: where Ghidra, Java and the Python environment are.
-# Override any of them in the environment, or in a `.env` file at the repository's root.
+# Override any of them in the environment, or in a `.env` file at the project's root.
+# ROOT is GameFrame (a clone or the plugin's install). PROJECT is the game's project, where the
+# scripts write: the project's own `gameframe` launcher sets GAMEFRAME_PROJECT. In GameFrame
+# itself, or in a project that holds a copy of the toolkit, the two are the same folder.
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-[[ -f "$ROOT/.env" ]] && set -a && . "$ROOT/.env" && set +a
+PROJECT="${GAMEFRAME_PROJECT:-$ROOT}"
+if [[ -f "$PROJECT/.env" ]]; then set -a; . "$PROJECT/.env"; set +a
+elif [[ -f "$ROOT/.env" ]]; then set -a; . "$ROOT/.env"; set +a; fi
 
 find_ghidra() {
   for d in "${GHIDRA_INSTALL_DIR:-}" /opt/homebrew/opt/ghidra/libexec /usr/local/opt/ghidra/libexec \
@@ -17,7 +22,10 @@ find_java21() {
   done
 }
 
-PYTHON="${PYTHON:-$ROOT/.venv/bin/python}"
+if [[ -z "${PYTHON:-}" ]]; then
+  PYTHON="$PROJECT/.venv/bin/python"
+  [[ -x "$PYTHON" ]] || PYTHON="$ROOT/.venv/bin/python"
+fi
 
 # A folder path for a Ghidra project that Ghidra accepts. Ghidra refuses project paths with a
 # folder that starts with "." (a worktree in .claude/worktrees/, a checkout under ~/.cache):

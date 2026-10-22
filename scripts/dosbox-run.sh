@@ -32,7 +32,7 @@
 # screenshots or feed keys: see docs/DOS.md for those.
 set -euo pipefail
 . "$(dirname "$0")/lib.sh"
-out="$ROOT/analysis/dosbox"; time=60; window=0; inplace=0; flags=(); sets=(); after=(); prefix=""; tty=0; confs=()
+out="$PROJECT/analysis/dosbox"; time=60; window=0; inplace=0; flags=(); sets=(); after=(); prefix=""; tty=0; confs=()
 
 while [[ "${1:-}" == --* ]]; do
   case "$1" in

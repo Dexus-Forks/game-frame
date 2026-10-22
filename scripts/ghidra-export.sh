@@ -15,12 +15,12 @@
 # a module (RTM) whose file next to it (RTM.EXE) is a plain DOS program.
 set -euo pipefail
 . "$(dirname "$0")/lib.sh"
-project="$ROOT/analysis/ghidra-project"; out="$ROOT/analysis/export"; labels=()
+project="$PROJECT/analysis/ghidra-project"; out="$PROJECT/analysis/export"; labels=()
 while [[ "${1:-}" == --* ]]; do
   case "$1" in
     --project) project="$2"; shift 2 ;;
     --out) out="$2"; shift 2 ;;
-    --labels) labels=(-postScript ApplyLabels.java "$ROOT/analysis/labels-report.txt" "$(cd "$(dirname "$2")" && pwd)/$(basename "$2")"); shift 2 ;;
+    --labels) labels=(-postScript ApplyLabels.java "$PROJECT/analysis/labels-report.txt" "$(cd "$(dirname "$2")" && pwd)/$(basename "$2")"); shift 2 ;;
     *) echo "unknown option $1" >&2; exit 2 ;;
   esac
 done
@@ -29,7 +29,7 @@ ghidra="$(find_ghidra)"; java="$(find_java21)"
 [[ -n "$ghidra" ]] || { echo "Ghidra not found: run scripts/setup.sh, or set GHIDRA_INSTALL_DIR" >&2; exit 1; }
 [[ -n "$java" ]] || { echo "JDK 21 not found: run scripts/setup.sh, or set JAVA_HOME" >&2; exit 1; }
 bins=(); for b in "$@"; do bins+=("$(cd "$(dirname "$b")" && pwd)/$(basename "$b")"); done
-mkdir -p "$project" "$out" "$ROOT/analysis"
+mkdir -p "$project" "$out" "$PROJECT/analysis"
 log="$(dirname "$project")/headless.log"
 project="$(ghidra_project_dir "$project")"
 echo "Analysing ${#bins[@]} binaries into $project (log: $log)"

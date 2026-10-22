@@ -64,8 +64,9 @@ if command -v dosbox-x >/dev/null && ! dosbox_has_debug_channel; then
   row "dosbox-x debugger" OLD "$(dosbox_version) has no debugger control channel (needs 2026.10+): build a current one, see the re-setup skill"
 fi
 
-if [[ ! -x "$ROOT/.venv/bin/python" && $install == 1 ]]; then
-  python3 -m venv "$ROOT/.venv" && "$ROOT/.venv/bin/pip" install -q -r "$ROOT/requirements.txt"
+if [[ ! -x "$PROJECT/.venv/bin/python" && $install == 1 ]]; then
+  python3 -m venv "$PROJECT/.venv" && "$PROJECT/.venv/bin/pip" install -q -r "$ROOT/requirements.txt"
+  PYTHON="$PROJECT/.venv/bin/python"
 fi
 if "$PYTHON" -c "import unicorn, pefile, capstone" 2>/dev/null; then
   row .venv ok "unicorn $("$PYTHON" -c 'import unicorn; print(unicorn.__version__)'), pefile, capstone"
@@ -73,8 +74,8 @@ else
   row .venv MISSING "run scripts/setup.sh --install (python3 -m venv .venv; pip install -r requirements.txt)"
   missing=$((missing + 1))
 fi
-if [[ -x "$ROOT/.venv/bin/python" && $install == 1 ]] && ! "$PYTHON" -c "import frida" 2>/dev/null; then
-  "$ROOT/.venv/bin/pip" install -q -r "$ROOT/requirements-live.txt"
+if [[ -x "$PROJECT/.venv/bin/python" && $install == 1 ]] && ! "$PYTHON" -c "import frida" 2>/dev/null; then
+  "$PROJECT/.venv/bin/pip" install -q -r "$ROOT/requirements-live.txt"
 fi
 if "$PYTHON" -c "import frida" 2>/dev/null; then
   row frida ok "$("$PYTHON" -c 'import frida; print(frida.__version__)') (live tracing)"
@@ -84,8 +85,8 @@ else
 fi
 
 # The environment file the scripts and .mcp.json read.
-if [[ -n "$(find_ghidra)" && -n "$(find_java21)" && ! -f "$ROOT/.env" ]]; then
-  printf 'GHIDRA_INSTALL_DIR=%s\nJAVA_HOME=%s\n' "$(find_ghidra)" "$(find_java21)" > "$ROOT/.env"
+if [[ -n "$(find_ghidra)" && -n "$(find_java21)" && ! -f "$PROJECT/.env" ]]; then
+  printf 'GHIDRA_INSTALL_DIR=%s\nJAVA_HOME=%s\n' "$(find_ghidra)" "$(find_java21)" > "$PROJECT/.env"
   echo "  wrote .env (GHIDRA_INSTALL_DIR, JAVA_HOME)"
 fi
 

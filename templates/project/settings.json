@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "extraKnownMarketplaces": {
+    "game-frame": {
+      "source": {
+        "source": "github",
+        "repo": "tanepiper/game-frame"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "gameframe@game-frame": true
+  },
+  "permissions": {
+    "allow": [
+      "Bash(./gameframe *)",
+      "Bash(.venv/bin/python truth/*)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git pull *)"
+    ],
+    "ask": [
+      "Bash(git push *)",
+      "Bash(./gameframe doctor --install *)",
+      "Bash(npx -y rea-agents@6.4.0 setup *)",
+      "Bash(brew install *)",
+      "Bash(sudo *)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Bash(cargo install *)"
+    ],
+    "deny": [
+      "Bash(git add -f *)",
+      "Bash(git add --force *)",
+      "Bash(git push --force *)",
+      "Bash(git push -f *)"
+    ]
+  }
+}

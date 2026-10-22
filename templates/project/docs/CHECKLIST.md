@@ -8,8 +8,8 @@ ground truth). Keep it short; details belong in the topic documents.
 
 ## Inventory
 
-- [ ] Every binary identified (`tools/pe/peinfo.py`)
-- [ ] Ghidra export of the game's own binaries (`scripts/ghidra-export.sh`)
+- [ ] Every binary identified (`./gameframe run peinfo`)
+- [ ] Ghidra export of the game's own binaries (`./gameframe run ghidra-export`)
 - [ ] Data containers identified and listed
 
 ## Foundations (usually first: everything else depends on them)

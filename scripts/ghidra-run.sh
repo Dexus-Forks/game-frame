@@ -24,7 +24,7 @@
 # per project at a time.
 set -euo pipefail
 . "$(dirname "$0")/lib.sh"
-project="$ROOT/analysis/ghidra-project"
+project="$PROJECT/analysis/ghidra-project"
 [[ "${1:-}" == --project ]] && { project="$2"; shift 2; }
 [[ $# -ge 3 ]] || { sed -n '2,27p' "$0"; exit 2; }
 binary="$(basename "$1")"; script="$2"; output="$3"; shift 3

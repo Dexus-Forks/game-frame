@@ -2,9 +2,12 @@
 
 Rules for every agent (Claude Code, Codex, Cursor and others) and every person working here.
 The method and the tools come from GameFrame. GameFrame is an agentic framework for reverse
-engineering games. Its playbook of skills and agents runs inside your coding agent. Its toolkit of tested tools checks every result against the original. Its skills are in
-`.claude/skills/` (agents without skill support: read each `SKILL.md`). Its stage agents are
-in `.claude/agents/`: each does one step and hands off to the next (`re-start`, "Stage agents").
+engineering games. Its playbook of skills and agents runs inside your coding agent. Its toolkit of tested tools checks every result against the original. The skills, the
+stage agents, the gates and the MCP servers come from GameFrame's Claude Code plugin, enabled
+in `.claude/settings.json`, so they stay current. Each agent does one step and hands off to the
+next (`re-start`, "Stage agents"). `./gameframe` runs the toolkit on this project.
+Agents without plugin support read the skills in GameFrame's `.claude/skills/*/SKILL.md`
+(`./gameframe root` prints where GameFrame is).
 
 ## The goal
 
@@ -37,7 +40,7 @@ user may change any of them.
    the original under the emulator (`re-emulate`), bit for bit.
 4. **Mark every intentional difference** from the original in a code comment containing
    `Deviation:` (and a piece left out with `not ported`), then regenerate the ledger:
-   `tools/triage/deviations.py --out docs/DEVIATIONS.md SOURCE_DIR`.
+   `./gameframe run deviations --out docs/DEVIATIONS.md SOURCE_DIR`.
 5. **Keep the core exact and the additions apart.** The part that decides what happens (rules,
    clock, random numbers, saves) does not draw, play sound or use the network. Anything the
    original does not have (multiplayer, mod code, debug tools) is an addition behind a build
@@ -65,11 +68,9 @@ user may change any of them.
 | `docs/FINDINGS.md` | The overview: binaries, engine, formats, systems, with links |
 | `docs/CHECKLIST.md` | What is traced, measured and reimplemented, and what is next |
 | `labels/names.tsv`, `labels/fields.tsv` | Names for original functions and struct fields, read by the tools |
-| `tools/`, `scripts/` | GameFrame's toolkit: https://github.com/tanepiper/game-frame |
-| `./gameframe` | Help on the method and the tools: `steps`, `skills`, `skill NAME`, `tools`, `tool NAME`, `run NAME ARGS`, `find WORD`, `doctor` |
-| `docs/DOS.md`, `docs/ABI.md`, `docs/GAME-PATTERNS.md`, `docs/OUTPUTS.md` | GameFrame's reference documents (DOS games: start with DOS.md; what to ship: OUTPUTS.md) |
-| `docs/games/`, `docs/observe/`, `docs/engines/`, `docs/hardware/`, `docs/consoles/`, `docs/working/` | GameFrame's taxonomy of games (with this game's family and its rule set) and how to observe the original: inputs, interface, object model |
-| `.mcp.json` | MCP servers for the agent: REA, and `dosbox` (DOSBox-X's debugger, for DOS games) |
+| `./gameframe` | Runs GameFrame's toolkit here: `run NAME ARGS`, `python FILE`, `doctor`, and help on the method: `steps`, `skills`, `agents`, `tools`, `tool NAME`, `find WORD`. `root` prints where GameFrame is |
+| `.claude/settings.json` | Enables GameFrame's plugin: the skills, the agents, the gates, and the MCP servers (REA, and `dosbox` for DOS games) |
+| GameFrame's `docs/` | The reference documents and guides the skills name (`docs/DOS.md`, `docs/ABI.md`, `docs/games/` and the rest), in GameFrame's folder and on https://tanepiper.github.io/game-frame/ |
 
 ## The loop
 
