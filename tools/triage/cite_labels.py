@@ -129,7 +129,7 @@ def render(labels, existing):
         seen.add(addr)
         rows.append(f'{addr}\t{name}\t{where}')
     head = ('# Labels made from the port\'s citations by tools/triage/cite_labels.py: address, the item that cites\n'
-            '# it, file:line. Do not edit: label by hand in names.tsv, which wins over this file.\n')
+            '# it, and where it is cited. Do not edit: label by hand in names.tsv, which wins over this file.\n')
     return head + '\n'.join(rows) + '\n', len(rows)
 
 
