@@ -65,6 +65,8 @@ Find your game's value on each of these axes. The values show where most of the 
 
 ## Connections
 
+![Systems shared between families of games, and where each matters most](../assets/diagrams/games-connections.svg)
+
 Many systems appear in several families. A family page says "see also" when a system it
 describes also appears in another kind of game. You trace such a system once. The table shows the main shared systems and
 where to read about each.
@@ -88,6 +90,8 @@ where to read about each.
 | Event and trigger scripts in levels | shoot 'em ups, first-person, RPGs | [Arcade action](arcade-action.md) |
 
 ## Approaches you will see in other projects
+
+![Four routes other projects took, with what each starts from and makes](../assets/diagrams/games-approaches.svg)
 
 The family pages list public projects that rebuilt games. What you can learn from each one depends on the route it took.
 

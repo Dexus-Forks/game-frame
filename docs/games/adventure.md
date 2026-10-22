@@ -29,6 +29,8 @@ formats and interpreter quirks.
 
 ## The rule set
 
+![An interpreter loop fetches an opcode, looks it up and runs its handler](../assets/diagrams/games-adventure-interpreter.svg)
+
 **What must be exact.** The interpreter: every opcode, its operand formats, its effect on
 variables, flags and objects, and its timing where scripts wait. Text, parsers and verb
 handling. The object and room state that saves record.

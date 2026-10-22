@@ -29,6 +29,8 @@ through (a galaxy, a theatre of war), and often with docked screens that wait fo
 
 ## The rule set
 
+![In a world generated from a seed, one wrong draw changes every system after it](../assets/diagrams/games-vehicle-seed.svg)
+
 **What must be exact.** The maths core: fixed-point or float formats, multiply and divide
 helpers, square roots, trigonometry tables, matrix and vector routines, and 64-bit positions
 where the world is large. Orbits and physics integration (the step and its order). Generation

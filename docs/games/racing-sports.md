@@ -25,6 +25,8 @@ with a large share of simulation (opponents, a championship, transfers in a foot
 
 ## The rule set
 
+![A tiny difference in racing physics grows quickly over the ticks](../assets/diagrams/games-racing-divergence.svg)
+
 **What must be exact.** The physics step: integration order, friction and grip curves (often
 tables), collision response, and the tick rate. AI drivers and players: their decisions per
 tick and their random draws. The race state: positions, laps, timing to the tick.

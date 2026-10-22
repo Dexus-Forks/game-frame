@@ -18,6 +18,8 @@ is traced. Read them during [re-inventory](../../.claude/skills/re-inventory/SKI
 [Handling the game as evidence](../working/evidence.md) covers the habits that keep each
 result repeatable: identifying the copy, keeping it unchanged, and tying findings to it.
 
+![From a disc or disk image to the files, then to the code](../assets/diagrams/media-overview.svg)
+
 ## Ask your agent
 
 ```text

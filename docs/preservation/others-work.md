@@ -5,6 +5,8 @@ below needs the player's own copy of the game and links to a store that sells it
 
 ## Projects
 
+![A program replaced one function at a time while it keeps running](../assets/diagrams/preservation-function-swap.svg)
+
 | Project | Game | What it does |
 |---|---|---|
 | [ScummVM](https://www.scummvm.org/) | over 325 adventure games | Rewrites the games' engines in new code. It began in 2001 and celebrated 25 years in 2026 |

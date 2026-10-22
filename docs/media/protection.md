@@ -10,6 +10,8 @@ The law on working around copy protection differs by country ([Legal](../LEGAL.m
 
 ## Recognising a packed program
 
+![The entropy of an ordinary program and of a packed program, block by block](../assets/diagrams/media-packed-entropy.svg)
+
 | Sign | Where to see it |
 |---|---|
 | A packer's name or mark in the first kilobyte (`LZ91`, `PKLITE`, `UPX!`) | `filetypes.py`, `dosinfo.py`, `peinfo.py` |
@@ -45,6 +47,8 @@ unpacked code is game material and stays in `analysis/` or `derived/`.
 
 ## Obfuscated data
 
+![A decoder loop after a file read; stop after it and save the buffer](../assets/diagrams/media-decoder-loop.svg)
+
 Data files can be hidden too. [Identifying unknown files](files.md#simple-obfuscation) covers the
 weak schemes that `xorscan.py` finds. Stronger schemes need the decoder in the code. Signs of
 the decoder are a loop over a buffer straight after a file read, constants used as keys, and
@@ -55,6 +59,8 @@ buffer. Port the decoder like any other function,
 with its constants and its order of operations, and check it with `re-emulate`.
 
 ## Obfuscated code
+
+![A function's blocks turned into the cases of one switch in a loop](../assets/diagrams/media-flattening.svg)
 
 Some protection systems also change the code itself, so that it is hard to read.
 
@@ -76,6 +82,8 @@ outputs ([re-emulate](../../.claude/skills/re-emulate/SKILL.md)).
 
 ## Checks against debuggers and emulators
 
+![A debugger makes the gap between two clock reads long, so a timing check fails](../assets/diagrams/media-timing-check.svg)
+
 Some games check whether they run under a debugger or have been changed. Common checks are:
 
 - **Timing.** Read a clock before and after a short piece of code. A debugger stepping through
@@ -93,6 +101,8 @@ own code during play, note the check, its address and what it covers. Then the p
 can leave the check out.
 
 ## Copy protection
+
+![Copy protection in the floppy, CD and online eras](../assets/diagrams/media-protection-eras.svg)
 
 | Era | Kinds | What the port needs |
 |---|---|---|

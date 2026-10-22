@@ -37,6 +37,8 @@ exists, read it before reverse engineering.
 
 ## The rule set
 
+![In lockstep, a command tagged with a tick runs on every machine at that tick](../assets/diagrams/games-lockstep.svg)
+
 **What must be exact.** For real time: the simulation tick, the order units are updated, every
 random draw, pathfinding and its tie-breaks, combat formulas, and integer rounding. Lockstep
 multiplayer and replays fail on the first difference. For turns: the rules of each action,

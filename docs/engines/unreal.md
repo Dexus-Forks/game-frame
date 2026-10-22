@@ -15,6 +15,8 @@ public headers came with the editing tools and some patches. Unreal Tournament's
 
 ## How the engine is organised
 
+![An Unreal package holds a header, a name table, an import table and an export table](../assets/diagrams/engine-unreal-package.svg)
+
 - **Packages.** Everything is in package files: code (`.u`), textures (`.utx`), sounds
   (`.uax`), music (`.umx`), meshes (`.usx` in UE2) and maps (`.unr`, `.ut2`). A package has a
   header, a name table, an import table and an export table. Objects refer to each other by
@@ -29,6 +31,8 @@ public headers came with the editing tools and some patches. Unreal Tournament's
   renderer is a separate DLL (`GlideDrv.dll`, `D3DDrv.dll`, `OpenGLDrv.dll`, `SoftDrv.dll`). Each audio device is one too (`Galaxy.dll`).
 
 ## What to note
+
+![UnrealScript byte code calls native C++ functions through a table of fixed numbers](../assets/diagrams/engine-unreal-natives.svg)
 
 - The DLLs export many C++ functions with their mangled names. Demangle them to get the class
   and method names before you start tracing. `tools/pe/peinfo.py` lists exports.

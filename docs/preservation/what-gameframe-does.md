@@ -6,6 +6,8 @@ the same results as the original, measured on the original's own code.
 
 ## Documents of how the game works
 
+![GameFrame's loop of reading, emulating, porting, testing and writing documents](../assets/diagrams/preservation-method.svg)
+
 MAME, the arcade emulator, describes its own source code as documentation of the machines it
 emulates. The MAME team says that playing a game mainly shows that the documentation is right
 ([MAME](https://github.com/mamedev/mame)). GameFrame applies this idea to a single game.
@@ -22,6 +24,8 @@ emulates. The MAME team says that playing a game mainly shows that the documenta
 A later project can use the documents without the port's code.
 
 ## Other preservation work
+
+![Which part of a game each group of preservers keeps](../assets/diagrams/preservation-who-keeps.svg)
 
 Different groups preserve different parts of a game.
 
@@ -47,6 +51,8 @@ function at a time.
   together.
 
 ## What a project ships
+
+![What a project publishes and what stays on the owner's computer](../assets/diagrams/preservation-ships.svg)
 
 A project made with GameFrame may publish its own new code and its documents. It never
 publishes the game's files, extracted assets or decompiled code. Players bring their own copy

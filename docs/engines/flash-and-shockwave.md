@@ -10,6 +10,8 @@ to read their code and their assets, and the routes to a working version.
 
 ## What a Flash game is
 
+![An SWF file starts with a header, followed by tags that each have a code and a length](../assets/diagrams/engine-swf-layout.svg)
+
 A Flash game is an SWF file, sometimes several. It holds vector shapes, bitmaps, sounds, fonts,
 a timeline of frames, and compiled scripts. Adobe published the format as the SWF File Format
 Specification (version 19 is the last) and the script machine as the AVM2 Overview.
@@ -21,6 +23,8 @@ Specification (version 19 is the last) and the script machine as the AVM2 Overvi
 | ActionScript 1 and 2 | `DoAction`, `DoInitAction` tags | Byte code for the first script machine (AVM1). Scripts sit on frames, buttons and clips |
 | ActionScript 3 | `DoABC` tags | Byte code for AVM2, introduced with Flash Player 9 in 2006. Classes, linked to library symbols by `SymbolClass` |
 | Saves | Local shared objects (`.sol` files) | Written by `SharedObject`, encoded in AMF0 or AMF3, in Flash Player's `#SharedObjects` folder |
+
+![A Flash projector is the player program with the movie and 8 bytes added at the end](../assets/diagrams/engine-flash-projector.svg)
 
 A Flash **projector** is a standalone program with the movie inside. A Windows projector is
 the Flash Player program with the SWF appended at the end. The last 8 bytes hold the marker
@@ -67,6 +71,8 @@ Things to look for in the code:
   methods to meaningless or unprintable names and adds junk code. FFDec has options to rename
   identifiers and to remove some of the junk. The behaviour is still all there.
 
+![Slow frames start late, so a game that counts frames runs slower](../assets/diagrams/engine-flash-frames.svg)
+
 ## Running the original
 
 [Ruffle](https://ruffle.rs/) is a Flash Player emulator written in Rust. It runs in a browser
@@ -83,6 +89,8 @@ settings. It is often the best place to find a game's files and the other files 
 
 ## Routes to a port
 
+![Three routes for a Flash game, through Ruffle, a reimplementation or a rebuilt project](../assets/diagrams/engine-flash-routes.svg)
+
 1. **Run it in Ruffle.** This is preservation. The game stays as it was. It needs no port.
    Where Ruffle lacks a feature the game uses, the work is in Ruffle, and Ruffle's
    developers welcome reports and fixes.
@@ -95,6 +103,8 @@ settings. It is often the best place to find a game's files and the other files 
    project decides.
 
 ## Shockwave and Director
+
+![Director files in their editable, protected, Shockwave and projector forms](../assets/diagrams/engine-director-files.svg)
 
 Macromedia Director made CD-ROM games and Shockwave web games, with scripts in Lingo.
 

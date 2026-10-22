@@ -29,6 +29,8 @@ from observation, and many clones copy only the idea. Two kinds of work are usef
 
 ## The rule set
 
+![A seven-piece bag and the NES Tetris gravity table](../assets/diagrams/games-puzzle-bag.svg)
+
 **What must be exact.** The random generator and how it picks pieces, cards or mines (with any
 "bag" or anti-repeat rule); the rules of legal moves; scoring; timers and delays in frames.
 

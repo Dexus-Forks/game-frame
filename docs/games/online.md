@@ -35,6 +35,8 @@ approximations rebuilt from what players observed.
 
 ## The rule set
 
+![The client predicts and the server decides](../assets/diagrams/games-online-split.svg)
+
 **What must be exact.** The protocol: message formats, encryption or obfuscation, ordering and
 timing, so the original client accepts the server. Server rules can only be as exact as the
 evidence: captured traffic, client-side formulas, players' documentation. Mark them *inferred*.

@@ -6,6 +6,8 @@ from 2D maps with heights. They are called 2.5D engines. The map is a set of pol
 column by column and floors and ceilings row by row. Most of these engines added features that
 Doom lacked: sloped floors, rooms over rooms, mirrors.
 
+![A 2.5D renderer draws walls column by column, then floors and ceilings row by row](../assets/diagrams/engine-columns-rows.svg)
+
 ## Build
 
 Ken Silverman wrote the Build engine for 3D Realms. It was licensed widely.
@@ -25,6 +27,8 @@ player's sector through portals, drawing what it can see. Two sectors may overla
 because the engine never checks that the world is consistent, so rooms can be in the same place
 on the map. Sprites can be flat on the floor or on a wall, or face the camera.
 
+![Build sectors joined by portal walls, and two sectors in the same place on the map](../assets/diagrams/engine-build-portals.svg)
+
 **What to note.**
 
 - Positions are integers. Heights use a different scale from horizontal positions (a factor
@@ -37,11 +41,15 @@ on the map. Sprites can be flat on the floor or on a wall, or face the camera.
 - Files are packed in `.GRP` archives. Art is in `.ART` files with a shared palette and
   shade tables (`PALETTE.DAT`, `LOOKUP.DAT`).
 
+![Duke Nukem 3D's two scales for positions and its 120 Hz timer with 30 logic updates a second](../assets/diagrams/engine-build-timing.svg)
+
 **Projects to learn from.** EDuke32 (a source port that keeps old CON scripts working), NBlood
 (Blood's game code reimplemented from reverse engineering, on EDuke32's engine), and Raze
 (several Build games in one modern engine).
 
 ## The Jedi engine
+
+![An INF elevator as a small state machine with two stops and a switch](../assets/diagrams/engine-jedi-elevator.svg)
 
 LucasArts wrote the Jedi engine for Star Wars: Dark Forces (1995) and reused a much changed
 version of it for Outlaws (1997). Like Build, it has sectors with floor and ceiling heights, plus rooms above rooms and
@@ -55,6 +63,8 @@ version of it for Outlaws (1997). Like Build, it has sectors with floor and ceil
   engineering. Its documents explain the formats and the INF language.
 
 ## Other engines of the type
+
+![Voxel Space draws terrain from a height map and a colour map, one column at a time](../assets/diagrams/engine-voxel-space.svg)
 
 | Engine | Games | Notes |
 |---|---|---|

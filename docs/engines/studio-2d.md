@@ -6,6 +6,8 @@ share formats and code, so work on one game helps with the others.
 
 ## Westwood Studios
 
+![A Westwood MIX archive stores a hash of each file name in its index](../assets/diagrams/engine-mix-archive.svg)
+
 Dune II (1992), Lands of Lore (1993), Command & Conquer (1995), Red Alert (1996) and Dune 2000
 (1998) share many formats. The formats changed between games, so check each header.
 
@@ -19,6 +21,8 @@ Dune II (1992), Lands of Lore (1993), Command & Conquer (1995), Red Alert (1996)
   two games, read the source before you reverse engineer.
 
 ## Blizzard Entertainment
+
+![Finding a file in an MPQ archive through its hash table](../assets/diagrams/engine-mpq-lookup.svg)
 
 Diablo (1996), StarCraft (1998), Diablo II (2000) and Warcraft III (2002) share `storm.dll`
 and the MPQ archive format.
@@ -34,6 +38,8 @@ and the MPQ archive format.
   platforms and beta versions sometimes kept symbols.
 
 ## The Infinity Engine (BioWare)
+
+![chitin.key lists every resource and the BIF archive that holds it](../assets/diagrams/engine-infinity-key.svg)
 
 Baldur's Gate (1998), Planescape: Torment (1999), Icewind Dale (2000) and their sequels.
 
@@ -62,6 +68,8 @@ Point-and-click adventures almost always ran on a script interpreter. See
 ScummVM, which reimplements most of them.
 
 ## How to approach a studio engine
+
+![Four steps for a studio engine, from the archives to the native code](../assets/diagrams/engine-studio-approach.svg)
 
 1. Find the archive format and list every file. These formats are usually documented already.
 2. Read the rule tables and text formats before any code. In these games, many of the

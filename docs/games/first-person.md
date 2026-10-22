@@ -33,6 +33,8 @@ takes to keep every quirk. Old demos play in sync only when every quirk is kept.
 
 ## The rule set
 
+![Mouse movement adds up between ticks and becomes one command per tick](../assets/diagrams/games-fps-tics.svg)
+
 **What must be exact.** Movement: acceleration, friction, step-up height, sliding along walls,
 all in the game's units (often 16.16 fixed point). The tick rate and the order of thinkers
 (the per-object update functions). Hit scans and projectile collision. Random draws: Doom reads

@@ -21,6 +21,8 @@ the original.
 
 ## What GameFrame does about it
 
+![The checks each piece of an agent's work passes](../assets/diagrams/preservation-ai-gates.svg)
+
 GameFrame asks an agent for evidence at every step.
 
 - **The original is required.** Every project starts from the owner's own copy. The agent reads

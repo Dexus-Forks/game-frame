@@ -36,6 +36,8 @@ dialogue that waits for choices, and a large world state.
 
 ## The rule set
 
+![A cosmetic random draw shifts the to-hit and damage rolls after it](../assets/diagrams/games-rpg-draws.svg)
+
 **What must be exact.** Character rules: attributes, levels, experience curves, skill checks,
 hit and damage formulas, every random draw and its order. Item and monster generation.
 Dialogue and quest state: which flags a conversation reads and sets. Turn order in battle.

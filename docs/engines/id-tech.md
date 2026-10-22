@@ -14,6 +14,8 @@ are the best documented of the era. Use them to learn how a game engine of the t
 
 ## Wolfenstein 3D
 
+![Wolfenstein 3D casts one ray per screen column across the tile grid](../assets/diagrams/engine-wolf3d-raycast.svg)
+
 The world is a 64 × 64 grid of tiles. The renderer casts one ray per screen column against the
 grid and draws a scaled wall slice for each. Sprites are drawn after the walls, clipped against
 a per-column depth buffer. Game time runs at 70 ticks per second, from the reprogrammed timer.
@@ -26,6 +28,8 @@ What to note when you study a game built on it:
 - Maps are compressed with RLEW and Carmack compression; graphics use Huffman compression.
 
 ## id Tech 1 (Doom)
+
+![Doom walks its BSP tree from front to back, visiting the player's side of each split first](../assets/diagrams/engine-doom-bsp.svg)
 
 The world is a 2D map of sectors with floor and ceiling heights. A precomputed binary space
 partition (BSP) tree orders the walls from front to back, so the renderer draws each screen
@@ -46,10 +50,16 @@ column once. All world positions are 16.16 fixed point.
   (`THINGS`, `LINEDEFS`, `SIDEDEFS`, `VERTEXES`, `SEGS`, `SSECTORS`, `NODES`, `SECTORS`,
   `REJECT`, `BLOCKMAP`).
 
+![A WAD file holds a header, the lumps and a directory of names, offsets and sizes](../assets/diagrams/engine-doom-wad.svg)
+
+![P_Random reads a table of 256 numbers through an index, so one extra call shifts every later number](../assets/diagrams/engine-doom-random.svg)
+
 Heretic, Hexen and Strife licensed this engine and changed it. Hexen added a byte-code script
 language (ACS) and a different map format.
 
 ## Quake
+
+![Quake stores, for each leaf of the BSP tree, which leaves can be seen from it](../assets/diagrams/engine-quake-pvs.svg)
 
 Quake has a true 3D world in a BSP tree with precomputed visibility (PVS) and light maps. The
 game logic is written in **QuakeC** and compiled to `progs.dat`, a byte-code file the engine
@@ -66,6 +76,8 @@ interprets. Even single-player Quake runs as a client and a server in one proces
 
 ## Quake II
 
+![Where the game code lives in Quake, Quake II and Quake III](../assets/diagrams/engine-id-game-code.svg)
+
 The game logic moved from byte code to a native DLL, `gamex86.dll`, written in C. The engine calls it through a table of functions. It calls the engine through another table. Licensees
 replaced the DLL to make their own games. When you study a Quake II-engine game, start at the
 DLL's single export, `GetGameAPI`, which returns the table of game functions.
@@ -81,6 +93,8 @@ Licensees changed it heavily. Call of Duty's engine began as id Tech 3 and chang
 game.
 
 ## How to use the released source
+
+![Functions in the binary matched to the released source, with the licensee's changes left over](../assets/diagrams/engine-released-source.svg)
 
 1. Find the version of the source that matches the game. Patches changed behaviour; the
    released code is usually the last patch.

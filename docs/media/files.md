@@ -8,6 +8,8 @@ result here is a lead. Confirm it in the code that reads the file ([re-format](.
 
 ## Kind, from the first bytes
 
+![The first bytes of common file formats](../assets/diagrams/media-magic.svg)
+
 Most formats start with a fixed signature. `filetypes.py` knows the common ones: executables
 (MZ, NE, LE, PE, ELF, Mach-O), archives (ZIP, RAR, 7-Zip, cabinets, LHA, ARJ), game archives
 (WAD, PAK, GRP, MPQ, BIF, Unreal and Unity packages), pictures (PCX, BMP, GIF, PNG, IFF ILBM,
@@ -59,6 +61,8 @@ browser, with an entropy graph and a hex view of any place you click.
 
 ## Pictures in the data
 
+![The same bytes drawn at three widths; only the right one stands straight](../assets/diagrams/media-raw-width.svg)
+
 A block of a data file, or a dump of video memory, may be a picture with no header. Try it as
 one with `tools/formats/rawimage.py`: 8 bits per pixel (VGA mode 13h), Mode X planes, EGA bit
 planes, CGA, packed 4, 2 or 1 bit pixels, and 16-bit colour, with a palette from a file or the
@@ -72,6 +76,8 @@ python3 tools/formats/rawimage.py derived/vga-planes.bin derived/frame.png --mod
 ```
 
 ## Structure, from the numbers
+
+![A size, a count, offsets and a string, read from the bytes of a file](../assets/diagrams/media-structure.svg)
 
 Before any code is read, the numbers in a file often show its layout.
 
@@ -95,6 +101,8 @@ Before any code is read, the numbers in a file often show its layout.
 
 ## Two files compared
 
+![Two saves that differ in two bytes, which hold the gold](../assets/diagrams/media-save-diff.svg)
+
 Comparing two versions of a file is often faster than reading one. Make a save, change one
 thing in the game, and save again. The bytes that changed hold that thing.
 
@@ -116,6 +124,8 @@ identical.
 
 ## Algorithms, from their constants
 
+![Constants that name CRC-32, MD5, rand, FNV and LZSS](../assets/diagrams/media-constants.svg)
+
 Many algorithms carry numbers found nowhere else: the multiplier of a random number
 generator, the first entries of a CRC table, the start values of MD5, the 4078-byte window
 start of the common LZSS decompressor. `tools/triage/constants.py` searches for them:
@@ -131,6 +141,8 @@ files. Confirm it in the code before you port it.
 
 ## Resources inside executables
 
+![The resource tree of a Windows executable, and string table blocks](../assets/diagrams/media-pe-resources.svg)
+
 A Windows executable carries resources: version information, string tables, dialogs, menus,
 icons, bitmaps, and data the developer packed in as `RCDATA`. `tools/pe/peres.py` lists them,
 prints the version information and the string tables, and extracts each one:
@@ -145,6 +157,8 @@ The ids in a string table are the numbers the code passes to `LoadString`. Searc
 for an id to find the code that shows the text.
 
 ## Simple obfuscation
+
+![XOR with one byte turns zero bytes into the key](../assets/diagrams/media-xor.svg)
 
 Some games hide text, scripts and tables from casual viewing. The common schemes are weak: XOR
 with one byte or a short repeating key, adding a constant, a key that changes by a fixed step
@@ -165,6 +179,8 @@ compressed or uses a real cipher. Then find the decoder in the code that reads t
 for a loop that changes each byte of a buffer right after the file is read.
 
 ## Timestamps
+
+![One 32-bit value read as a Unix, Mac and FAT time](../assets/diagrams/media-timestamps.svg)
 
 Saves record when they were made. Executables record when they were linked. Archives and file
 systems record each file's date.

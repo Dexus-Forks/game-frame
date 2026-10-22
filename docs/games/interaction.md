@@ -7,6 +7,8 @@ each kind of game.
 
 ## Games that run on their own clock
 
+![A frame loop with one record of inputs in and the picture and sounds out](../assets/diagrams/games-own-clock.svg)
+
 Most software waits for the user. It shows a window, the user presses a button, and the program
 reacts through an event handler. Most games work the other way round. The game makes things
 happen on its own clock (enemies arrive, shots fly, the level scrolls, the town grows), and the
@@ -38,6 +40,8 @@ player reacts through the few controls the game gives. This affects the code in 
 
 ## Games that wait for the player
 
+![In a game that waits, each command is resolved by the rules into a new state](../assets/diagrams/games-waits.svg)
+
 Turn-based games, adventure games, puzzle and board games, visual novels and most menus work
 like ordinary software: nothing happens until the player acts. The code is a set of handlers
 around a state, or a script interpreter that stops at each choice. Here:
@@ -53,6 +57,8 @@ Many real-time games also wait at times: a pause, a dialogue, an inventory scree
 state that switches between "the game runs" and "the game waits".
 
 ## The four kinds
+
+![The four kinds of game seen as strips of time](../assets/diagrams/games-four-kinds.svg)
 
 Look at the game before its code. Play it, or watch it played. Then decide which kind (or which mix) you have.
 
@@ -71,6 +77,8 @@ and function, but it should say so in its deviations ledger. Decide this at the 
 write it in the project's `AGENTS.md`.
 
 ## Mixed games
+
+![X-COM, Frontier and a shooter, each switching between two modes](../assets/diagrams/games-mixed-modes.svg)
 
 Many games mix the kinds. A shooter's menus and shop are software that waits; a strategy game's
 battles may be a stream; X-COM alternates a real-time world map with turn-based battles;

@@ -25,6 +25,8 @@ games share. [Recognising an engine](recognising.md) covers telling engines apar
 
 ## How to work with them
 
+![Type records, the factory table, the stream loader and the update order, in turn](../assets/diagrams/engine-structures-steps.svg)
+
 1. **Find the type records first.** Search the strings for class names, then the references to them. Each lands in a type record. The parent pointers link the records into the class
    tree. With MSVC RTTI present, Ghidra names the classes already. An engine with its own
    system needs the records labelled by hand.

@@ -6,6 +6,8 @@ behaviour of the library, such as its random numbers, its rounding or its timing
 
 ## Common libraries of the era
 
+![Middleware libraries around a game, with the signs of each](../assets/diagrams/engine-middleware-map.svg)
+
 | Job | Library | Signs in the files | In the port |
 |---|---|---|---|
 | Video | Smacker (RAD Game Tools, 1994) | `.SMK` files starting `SMK2` or `SMK4`; `smackw32.dll` | FFmpeg decodes Smacker |
@@ -24,6 +26,8 @@ behaviour of the library, such as its random numbers, its rounding or its timing
 | Protection | SafeDisc, SecuROM, StarForce, CD checks | `.icd` files, `secdrv.sys`, `~df394b.tmp`; checks for a disc label | Breaking it is restricted in many countries ([Legal](../LEGAL.md)); the port reads the player's files and does not need it |
 
 ## When the port must match the middleware
+
+![A library that calls rand() takes numbers from the game's sequence](../assets/diagrams/engine-shared-rand.svg)
 
 Most middleware can be replaced freely. A few cases need care:
 

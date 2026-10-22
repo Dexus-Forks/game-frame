@@ -41,6 +41,8 @@ decompress them, and the game may ask for a disk by its volume label.
 
 ## Booter games on the PC
 
+![The BIOS loads the boot sector, which loads the rest of the game with INT 13h](../assets/diagrams/media-booter.svg)
+
 Some early PC games boot from their own disk without DOS. The BIOS reads the first sector of
 the disk (the boot sector, 512 bytes) to address `0000:7C00` and jumps there. That code loads
 the rest of the game with interrupt `13h`, sector by sector, to addresses it chooses. There is

@@ -20,6 +20,8 @@ Knowing the engine helps in several ways.
 - Middleware is library code from another company. Identify it early and leave it out of your analysis.
   Replace it in the port with a library that does the same job.
 
+![A game built on an engine in five layers, with the work each layer needs](../assets/diagrams/engine-layers.svg)
+
 ## Finding the engine
 
 - [Recognising an engine](recognising.md): strings, file names, magic numbers, libraries and
@@ -70,6 +72,8 @@ Knowing the engine helps in several ways.
 | Verify | Compare with the original | Also compare with the engine's own demos, test maps and tools |
 
 ## A warning about versions
+
+![The Build engine and Unreal Engine 1, each changed by the studios that licensed them](../assets/diagrams/engine-licensee-versions.svg)
 
 Licensees changed the engines they bought. Duke Nukem 3D, Shadow Warrior and Blood all use the Build engine. Each of them changed its code. Deus Ex runs Unreal Engine 1 with Ion Storm's
 changes. A released engine source shows one version. Confirm every detail against the binary

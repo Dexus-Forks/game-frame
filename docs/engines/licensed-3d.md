@@ -5,6 +5,8 @@ and early 2000s. Each has well-known file formats that modders documented.
 
 ## GoldSrc
 
+![GoldSrc and LithTech load the game code from separate DLLs](../assets/diagrams/engine-game-dlls.svg)
+
 Valve built GoldSrc for Half-Life (1998), starting from the Quake engine and adding parts of
 Quake II's code and its own systems.
 
@@ -30,6 +32,8 @@ games include No One Lives Forever (2000) and Aliens versus Predator 2 (2001).
 
 ## NetImmerse and Gamebryo
 
+![A NIF file is a list of blocks that refer to each other by number](../assets/diagrams/engine-nif-blocks.svg)
+
 NetImmerse, from Numerical Design Limited (NDL), was renamed Gamebryo in 2003. NDL became part
 of Emergent Game Technologies in 2005. It is a scene-graph library more than a full engine. Studios wrote the game around it.
 
@@ -42,6 +46,8 @@ of Emergent Game Technologies in 2005. It is a scene-graph library more than a f
   on to the game's own classes.
 
 ## RenderWare
+
+![A RenderWare model as nested chunks, each with a type, a size and a version](../assets/diagrams/engine-rw-chunks.svg)
 
 Criterion Software's RenderWare was a cross-platform graphics library used on PC and consoles
 (PlayStation 2, Xbox, GameCube). Games include Grand Theft Auto III (2001), Vice City (2002),

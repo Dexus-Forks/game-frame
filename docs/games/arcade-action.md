@@ -30,6 +30,8 @@ player reacts. The game runs its rules inside one frame loop at a fixed rate.
 
 ## The rule set
 
+![A level's event script fires as the screen scrolls, and actors fill slots in order](../assets/diagrams/games-arcade-events.svg)
+
 **What must be exact.** The order of the steps in a frame; positions in the game's own units
 (often fixed point, sub-pixels); collision boxes and the order of collision tests; animation
 frame counts; every random draw. Speedrunners and players notice a one-frame difference.

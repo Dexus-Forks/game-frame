@@ -33,6 +33,8 @@ Sector numbers inside the file systems (LBAs) start at that point. The start col
 
 ## Kinds of disc
 
+![The layout of each kind of disc, from data only to bootable](../assets/diagrams/media-disc-kinds.svg)
+
 | Kind | Layout | What it means for the port |
 |---|---|---|
 | Data only | One data track | All the game is in the files |
@@ -48,6 +50,8 @@ game uses MCI, such as `mciSendCommand` with the `cdaudio` device. Find those ca
 the game's table of track numbers, which says which music plays where.
 
 ## File systems
+
+![Where ISO 9660 keeps its system area, volume descriptor, tables and files](../assets/diagrams/media-iso9660.svg)
 
 | File system | Names | Notes |
 |---|---|---|
@@ -84,6 +88,8 @@ Four more checks show what a file list alone misses:
   mastered. A file dated later suggests changed dates or a wrong clock.
 
 ## Images
+
+![What each disc image format keeps and loses](../assets/diagrams/media-disc-images.svg)
 
 | Image | What it keeps | What it loses |
 |---|---|---|

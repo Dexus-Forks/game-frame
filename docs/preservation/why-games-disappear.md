@@ -6,6 +6,8 @@ discs can decay or go missing.
 
 ## Games that are out of print
 
+![The share of old games still in print, from the 2023 study](../assets/diagrams/preservation-in-print.svg)
+
 In July 2023 the Video Game History Foundation and the Software Preservation Network published
 a study of the US reissue market. It sampled 1,500 games released in the US before 2010. Only
 13% of them can be bought today
@@ -20,6 +22,8 @@ The 13% figure counts the games you can legally buy and play today. Many of the 
 exist on original discs and cartridges that nobody sells today.
 
 ## Games that stop running
+
+![Changes to Windows and macOS, and a closed server, that stopped games running](../assets/diagrams/preservation-breaks.svg)
 
 A game bought years ago can stop running on a new computer or a new operating system.
 
@@ -44,6 +48,8 @@ A game that needs an online service stops working when the service closes. Ubiso
 
 ## Games on sale that nobody updates
 
+![Banished had three years of updates and is still on sale with none since](../assets/diagrams/preservation-not-updated.svg)
+
 Some games are still sold, but their makers have stopped working on them. Banished is one
 example. Shining Rock Software, a studio of one person, released it on 18 February 2014
 ([Wikipedia](https://en.wikipedia.org/wiki/Banished_(video_game))). Its last build, 1.0.7, is
@@ -55,6 +61,8 @@ Nobody has counted how many games are in this position. Many games from small st
 [Un-Banished](../case-studies/banished.md) is GameFrame's case study of one.
 
 ## Lost source code and media
+
+![The studio's source, the discs, the rights and the players' copies](../assets/diagrams/preservation-lost.svg)
 
 Studios lose their own code. Konami no longer had the final code of Silent Hill 2 and 3. Its HD
 Collection was built from incomplete code

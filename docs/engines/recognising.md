@@ -24,6 +24,8 @@ In my GameFrame project, identify the engine and the libraries the game uses.
 
 ## Where to look
 
+![The places in a game's files that name its engine](../assets/diagrams/engine-recognise-clues.svg)
+
 | Place | What to look for | How |
 |---|---|---|
 | File extensions and archive magic | `.WAD` with `IWAD`/`PWAD`, `.PAK` with `PACK`, `.GRP` with `KenSilverman`, `.u` packages | `xxd FILE | head`, the table below |
@@ -64,6 +66,8 @@ match, compare the header layout with the engine's documented format. A changed 
 or one extra field is common.
 
 ## Libraries that are not the engine
+
+![Library code labelled first, leaving the game and its engine](../assets/diagrams/engine-library-code.svg)
 
 The executable often contains code from libraries the game linked in. Ghidra cannot tell your
 game's functions from a library's. Find and label the library code first, so you do not trace

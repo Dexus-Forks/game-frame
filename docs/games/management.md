@@ -38,6 +38,8 @@ replaced function could be compared.
 
 ## The rule set
 
+![Game speed sets the steps per frame, and some work is spread over many steps](../assets/diagrams/games-management-steps.svg)
+
 **What must be exact.** The simulation step and its order of systems; every random draw and
 its order; time and the calendar in the game's own units; the economy (prices, stock, demand);
 agent decisions (where a worker goes, what a guest wants). The save format, if the project
