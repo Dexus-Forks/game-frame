@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360" role="img" aria-label="The five taxonomies GameFrame uses: kinds of code, kinds of data, kinds of values, kinds of evidence and kinds of difference between the port and the original">
+<title>The five taxonomies GameFrame uses: kinds of code, kinds of data, kinds of values, kinds of evidence and kinds of difference between the port and the original</title>
+<rect x="0.5" y="0.5" width="899" height="359" rx="10" fill="#0d1b1e" stroke="#1f3d40"/>
+<defs><marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" fill="#8fa9a5"/></marker></defs>
+<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">FIVE SETS OF SHARED NAMES</text>
+<text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">Every function, file, value, claim and difference gets one name from its set.</text>
+<rect x="24.0" y="84.0" width="162.0" height="256.0" rx="6" fill="#2dd4bf" stroke="none" fill-opacity="0.12"/>
+<text x="36.0" y="108.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#2dd4bf" text-anchor="start">Code</text>
+<rect x="34.0" y="120.0" width="142.0" height="18.0" rx="3" fill="#2dd4bf" stroke="none" fill-opacity="0.22"/>
+<text x="42.0" y="133.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">game rules</text>
+<rect x="34.0" y="141.0" width="142.0" height="18.0" rx="3" fill="#2dd4bf" stroke="none" fill-opacity="0.22"/>
+<text x="42.0" y="154.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">interface</text>
+<rect x="34.0" y="162.0" width="142.0" height="18.0" rx="3" fill="#2dd4bf" stroke="none" fill-opacity="0.22"/>
+<text x="42.0" y="175.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">engine</text>
+<rect x="34.0" y="183.0" width="142.0" height="18.0" rx="3" fill="#2dd4bf" stroke="none" fill-opacity="0.22"/>
+<text x="42.0" y="196.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">middleware</text>
+<rect x="34.0" y="204.0" width="142.0" height="18.0" rx="3" fill="#2dd4bf" stroke="none" fill-opacity="0.22"/>
+<text x="42.0" y="217.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">runtime library</text>
+<rect x="34.0" y="225.0" width="142.0" height="18.0" rx="3" fill="#2dd4bf" stroke="none" fill-opacity="0.22"/>
+<text x="42.0" y="238.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">compiler helpers</text>
+<rect x="34.0" y="246.0" width="142.0" height="18.0" rx="3" fill="#2dd4bf" stroke="none" fill-opacity="0.22"/>
+<text x="42.0" y="259.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">protection</text>
+<rect x="34.0" y="267.0" width="142.0" height="18.0" rx="3" fill="#2dd4bf" stroke="none" fill-opacity="0.22"/>
+<text x="42.0" y="280.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">debug and dead code</text>
+<rect x="196.0" y="84.0" width="162.0" height="256.0" rx="6" fill="#60a5fa" stroke="none" fill-opacity="0.12"/>
+<text x="208.0" y="108.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#60a5fa" text-anchor="start">Data</text>
+<rect x="206.0" y="120.0" width="142.0" height="18.0" rx="3" fill="#60a5fa" stroke="none" fill-opacity="0.22"/>
+<text x="214.0" y="133.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">assets</text>
+<rect x="206.0" y="141.0" width="142.0" height="18.0" rx="3" fill="#60a5fa" stroke="none" fill-opacity="0.22"/>
+<text x="214.0" y="154.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">rule tables</text>
+<rect x="206.0" y="162.0" width="142.0" height="18.0" rx="3" fill="#60a5fa" stroke="none" fill-opacity="0.22"/>
+<text x="214.0" y="175.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">scripts</text>
+<rect x="206.0" y="183.0" width="142.0" height="18.0" rx="3" fill="#60a5fa" stroke="none" fill-opacity="0.22"/>
+<text x="214.0" y="196.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">levels and maps</text>
+<rect x="206.0" y="204.0" width="142.0" height="18.0" rx="3" fill="#60a5fa" stroke="none" fill-opacity="0.22"/>
+<text x="214.0" y="217.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">saves</text>
+<rect x="206.0" y="225.0" width="142.0" height="18.0" rx="3" fill="#60a5fa" stroke="none" fill-opacity="0.22"/>
+<text x="214.0" y="238.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">settings</text>
+<rect x="206.0" y="246.0" width="142.0" height="18.0" rx="3" fill="#60a5fa" stroke="none" fill-opacity="0.22"/>
+<text x="214.0" y="259.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">derived data</text>
+<rect x="206.0" y="267.0" width="142.0" height="18.0" rx="3" fill="#60a5fa" stroke="none" fill-opacity="0.22"/>
+<text x="214.0" y="280.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">messages</text>
+<rect x="368.0" y="84.0" width="162.0" height="256.0" rx="6" fill="#c084fc" stroke="none" fill-opacity="0.12"/>
+<text x="380.0" y="108.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#c084fc" text-anchor="start">Values</text>
+<rect x="378.0" y="120.0" width="142.0" height="18.0" rx="3" fill="#c084fc" stroke="none" fill-opacity="0.22"/>
+<text x="386.0" y="133.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">position</text>
+<rect x="378.0" y="141.0" width="142.0" height="18.0" rx="3" fill="#c084fc" stroke="none" fill-opacity="0.22"/>
+<text x="386.0" y="154.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">angle</text>
+<rect x="378.0" y="162.0" width="142.0" height="18.0" rx="3" fill="#c084fc" stroke="none" fill-opacity="0.22"/>
+<text x="386.0" y="175.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">time</text>
+<rect x="378.0" y="183.0" width="142.0" height="18.0" rx="3" fill="#c084fc" stroke="none" fill-opacity="0.22"/>
+<text x="386.0" y="196.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">count</text>
+<rect x="378.0" y="204.0" width="142.0" height="18.0" rx="3" fill="#c084fc" stroke="none" fill-opacity="0.22"/>
+<text x="386.0" y="217.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">ratio</text>
+<rect x="378.0" y="225.0" width="142.0" height="18.0" rx="3" fill="#c084fc" stroke="none" fill-opacity="0.22"/>
+<text x="386.0" y="238.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">identifier</text>
+<rect x="378.0" y="246.0" width="142.0" height="18.0" rx="3" fill="#c084fc" stroke="none" fill-opacity="0.22"/>
+<text x="386.0" y="259.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">flags</text>
+<rect x="378.0" y="267.0" width="142.0" height="18.0" rx="3" fill="#c084fc" stroke="none" fill-opacity="0.22"/>
+<text x="386.0" y="280.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">enumeration</text>
+<rect x="378.0" y="288.0" width="142.0" height="18.0" rx="3" fill="#c084fc" stroke="none" fill-opacity="0.22"/>
+<text x="386.0" y="301.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">random state</text>
+<rect x="378.0" y="309.0" width="142.0" height="18.0" rx="3" fill="#c084fc" stroke="none" fill-opacity="0.22"/>
+<text x="386.0" y="322.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">reference</text>
+<rect x="378.0" y="330.0" width="142.0" height="18.0" rx="3" fill="#c084fc" stroke="none" fill-opacity="0.22"/>
+<text x="386.0" y="343.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">text</text>
+<rect x="540.0" y="84.0" width="162.0" height="256.0" rx="6" fill="#f59e0b" stroke="none" fill-opacity="0.12"/>
+<text x="552.0" y="108.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#f59e0b" text-anchor="start">Evidence</text>
+<rect x="550.0" y="120.0" width="142.0" height="18.0" rx="3" fill="#f59e0b" stroke="none" fill-opacity="0.22"/>
+<text x="558.0" y="133.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">observed</text>
+<rect x="550.0" y="141.0" width="142.0" height="18.0" rx="3" fill="#f59e0b" stroke="none" fill-opacity="0.22"/>
+<text x="558.0" y="154.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">measured</text>
+<rect x="550.0" y="162.0" width="142.0" height="18.0" rx="3" fill="#f59e0b" stroke="none" fill-opacity="0.22"/>
+<text x="558.0" y="175.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">inferred</text>
+<rect x="550.0" y="183.0" width="142.0" height="18.0" rx="3" fill="#f59e0b" stroke="none" fill-opacity="0.22"/>
+<text x="558.0" y="196.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">unknown</text>
+<rect x="712.0" y="84.0" width="162.0" height="256.0" rx="6" fill="#f87171" stroke="none" fill-opacity="0.12"/>
+<text x="724.0" y="108.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#f87171" text-anchor="start">Differences</text>
+<rect x="722.0" y="120.0" width="142.0" height="18.0" rx="3" fill="#f87171" stroke="none" fill-opacity="0.22"/>
+<text x="730.0" y="133.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">not ported</text>
+<rect x="722.0" y="141.0" width="142.0" height="18.0" rx="3" fill="#f87171" stroke="none" fill-opacity="0.22"/>
+<text x="730.0" y="154.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">deviation</text>
+<rect x="722.0" y="162.0" width="142.0" height="18.0" rx="3" fill="#f87171" stroke="none" fill-opacity="0.22"/>
+<text x="730.0" y="175.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">not yet verified</text>
+<rect x="722.0" y="183.0" width="142.0" height="18.0" rx="3" fill="#f87171" stroke="none" fill-opacity="0.22"/>
+<text x="730.0" y="196.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">known difference</text>
+<rect x="722.0" y="204.0" width="142.0" height="18.0" rx="3" fill="#f87171" stroke="none" fill-opacity="0.22"/>
+<text x="730.0" y="217.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#e2ece9" text-anchor="start">original bug kept</text>
+</svg>

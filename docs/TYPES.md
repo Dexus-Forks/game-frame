@@ -6,7 +6,8 @@ classes, arrays, lists and enumerations of the original program. Once a structur
 function that uses it reads better at once. This page lists where type information comes from,
 the shapes that common structures leave in code, and the layouts of the C++ standard
 containers. Names go in `labels/fields.tsv` (structure, offset, name, type, evidence), which the
-tools and the next session read.
+tools and the next session read. The meaning, unit and range of each field go in the [data
+dictionary](DATA-DICTIONARY.md).
 
 ## Where types come from
 

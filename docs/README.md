@@ -75,6 +75,10 @@ the order of this page and of each folder's `README.md` is the order of the site
   find the game's own code past the runtime.
 - [Recovering types](TYPES.md): structures, classes, lists, trees, enumerations and the C++
   standard containers, from the code that uses them.
+- [Taxonomies](TAXONOMIES.md): shared names for kinds of code, data, values, evidence and
+  differences between the port and the original.
+- [The data dictionary](DATA-DICTIONARY.md): one record per value the rules use, with its
+  place, type, unit, range, meaning and evidence.
 - [What a project can ship](OUTPUTS.md): documents, a website, programs, releases.
 - [Setup](SETUP.md): the toolchain.
 - [Legal](LEGAL.md): working within the law and with respect for the original.

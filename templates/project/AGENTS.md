@@ -47,7 +47,8 @@ user may change any of them.
    option, reaches the core only through commands, events and queries, and can be switched off
    for a run (`re-port`, "Additions the original does not have").
 6. **Write it down.** Findings go into `docs/`, function names into `labels/names.tsv`, struct
-   fields into `labels/fields.tsv`, progress into `docs/CHECKLIST.md`. An undocumented finding
+   fields into `labels/fields.tsv`, the meaning, unit and range of each value into
+   `labels/dictionary.tsv`, progress into `docs/CHECKLIST.md`. An undocumented finding
    is re-derived by the next session.
 7. **Several sessions may work at once.** Stage only your own files (`git add path`), never `git add -A`. Never revert work you did not do.
 8. **Ask before downloading** anything; say the file, the source and the size.
@@ -68,6 +69,7 @@ user may change any of them.
 | `docs/FINDINGS.md` | The overview: binaries, engine, formats, systems, with links |
 | `docs/CHECKLIST.md` | What is traced, measured and reimplemented, and what is next |
 | `labels/names.tsv`, `labels/fields.tsv` | Names for original functions and struct fields, read by the tools |
+| `labels/dictionary.tsv` | The data dictionary: the meaning, unit, range and evidence of each value the rules use |
 | `./gameframe` | Runs GameFrame's toolkit here: `run NAME ARGS`, `python FILE`, `doctor`, and help on the method: `steps`, `skills`, `agents`, `tools`, `tool NAME`, `find WORD`. `root` prints where GameFrame is |
 | `.claude/settings.json` | Enables GameFrame's plugin: the skills, the agents, the gates, and the MCP servers (REA, and `dosbox` for DOS games) |
 | GameFrame's `docs/` | The reference documents and guides the skills name (`docs/DOS.md`, `docs/ABI.md`, `docs/games/` and the rest), in GameFrame's folder and on https://tanepiper.github.io/game-frame/ |
