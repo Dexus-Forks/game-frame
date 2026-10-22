@@ -2,8 +2,8 @@
 <title>A spring simulated with explicit Euler, semi-implicit Euler and the exact solution, computed with a step of 0.1: explicit Euler gains energy and the swing grows</title>
 <rect x="0.5" y="0.5" width="899" height="359" rx="10" fill="#0d1b1e" stroke="#1f3d40"/>
 <defs><marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" fill="#8fa9a5"/></marker></defs>
-<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">TWO INTEGRATORS, ONE SPRING</text>
-<text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">x'' = -x from x = 1, step 0.1. Swapping two lines of code changes the motion. Computed.</text>
+<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">EULER INTEGRATION OF A SPRING</text>
+<text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">x'' = -x from x = 1 with a step of 0.1. The two methods differ only in the order of two lines. The values are computed.</text>
 <rect x="70.0" y="90.0" width="600.0" height="210.0" rx="4" fill="#0f2427" stroke="none"/>
 <path d="M70.0 300.0L670.0 300.0" stroke="#1f3d40" stroke-width="1" fill="none"/>
 <text x="64.0" y="304.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#8fa9a5" text-anchor="end">-3</text>

@@ -26,7 +26,7 @@ def bits(s, x, y, fields, unit, h=30):
 # ---------------------------------------------------------------- the video standards
 def video_standards():
     s = Svg(900, 400, 'The PC video standards drawn to scale by resolution, with the colours each could show')
-    s.heading('PC video modes, to scale', 'Each box is a mode\'s resolution, to scale. Below it, the colours it shows at once.')
+    s.heading('PC video modes', 'Each box shows a mode\'s resolution. Below it are the colours the mode shows at once.')
     modes = [('CGA', '320 x 200', 320, 200, 'CGA'), ('EGA', '640 x 350', 640, 350, 'EGA'),
              ('VGA Mode 13h', '320 x 200', 320, 200, 'VGA'), ('Mode X', '320 x 240', 320, 240, 'VGA'),
              ('VESA', '640 x 480', 640, 480, 'VGA')]
@@ -56,7 +56,7 @@ def video_standards():
 # ---------------------------------------------------------------- Mode 13h addresses
 def mode13h_address():
     s = Svg(900, 330, 'Mode 13h: one byte per pixel, 320 bytes per line, so the pixel at x, y is at offset y times 320 plus x')
-    s.heading('Mode 13h: a pixel is a byte', 'Offset = y x 320 + x, from A000:0000. The byte is an index into the palette.')
+    s.heading('Mode 13h addresses', 'Offset = y x 320 + x, from A000:0000. The byte is an index into the palette.')
     x0, y0, c = 40, 90, 22
     for yy in range(6):
         for xx in range(14):
@@ -120,7 +120,7 @@ def vga_palette():
                         'the original.', 11, DIM)
     # Colour cycling: the same pixels, a rotating palette.
     y = 280
-    s.text(40, y, 'Colour cycling: the pixels stay, the palette entries rotate', 13, TEXT, weight='600')
+    s.text(40, y, 'Colour cycling rotates the palette entries and leaves the pixels unchanged', 13, TEXT, weight='600')
     blues = ['#0b2a6b', '#12408f', '#1b5ab5', '#2a78d6', '#46a0f0', '#7cc4ff', '#46a0f0', '#2a78d6']
     for i in range(24):
         x = 40 + i * 34
@@ -154,10 +154,10 @@ def vga_retrace():
     s.text(gx + gw * 0.88, gy - 4, 'set', 11, TEAL)
     s.add(f'<rect x="{gx}" y="{gy - 6}" width="2" height="54" fill="{AMBER}"><animate attributeName="x" '
           f'values="{gx};{gx + gw}" dur="{dur}s" repeatCount="indefinite"/></rect>')
-    s.text(gx, gy + 70, 'A game waits here: read the port until bit 3 is set, then', 12, DIM)
-    s.text(gx, gy + 88, 'flip pages or write the palette, with no tearing.', 12, DIM)
-    s.text(gx, gy + 122, 'If the game waits every frame, the refresh rate is its speed:', 12, TEXT)
-    s.text(gx, gy + 140, '70 Hz in Mode 13h, 60 Hz in Mode X 320 x 240.', 12, TEXT)
+    s.text(gx, gy + 70, 'A game reads the port until bit 3 is set. Then it can', 12, DIM)
+    s.text(gx, gy + 88, 'flip pages or write the palette without tearing.', 12, DIM)
+    s.text(gx, gy + 122, 'A game that waits every frame runs at the refresh rate,', 12, TEXT)
+    s.text(gx, gy + 140, 'which is 70 Hz in Mode 13h and 60 Hz in Mode X 320 x 240.', 12, TEXT)
     s.text(gx, gy + 166, 'Bit 0 is set during either blanking, for raster effects.', 12, DIM)
     return s.render()
 
@@ -166,7 +166,7 @@ def vga_retrace():
 def text_cell():
     s = Svg(900, 330, 'A text-mode cell: two bytes at B800, the character code and the attribute, whose bits give '
                       'blink, background colour, bright and foreground colour')
-    s.heading('A text-mode cell: two bytes', 'Mode 3 is 80 x 25 cells at B800:0000. Even bytes are characters, odd bytes are attributes.')
+    s.heading('A text-mode cell', 'Mode 3 is 80 x 25 cells at B800:0000. Even bytes are characters, odd bytes are attributes.')
     s.text(40, 100, 'B800:0000', 11, DIM, mono=True)
     s.rect(40, 108, 110, 40, GREY, rx=3, extra=' fill-opacity="0.25"')
     s.text(95, 133, "0x41 'A'", 13, TEXT, 'middle', '600', mono=True)
@@ -196,7 +196,7 @@ def text_cell():
 def pixel_formats():
     s = Svg(900, 360, 'A DirectDraw surface whose pitch is wider than its row of pixels, and the 5-6-5 and 5-5-5 '
                       '16-bit pixel formats')
-    s.heading('Surfaces: pitch and pixel formats', 'Lock gives a pointer and a pitch. The next row starts a pitch later, not a width later.')
+    s.heading('Surface pitch and pixel formats', 'Lock gives a pointer and a pitch. Each row starts one pitch after the row before it.')
     x0, y0 = 40, 90
     for r in range(5):
         s.rect(x0, y0 + r * 26, 300, 22, TEAL, rx=2, extra=' fill-opacity="0.3"')
@@ -223,7 +223,7 @@ def pixel_formats():
 def float_formats():
     s = Svg(900, 330, 'The x87 80-bit extended format beside the 64-bit double and 32-bit float formats, '
                       'and rounding when a value is stored to memory')
-    s.heading('x87 registers keep more bits than memory', 'A value is rounded only when it is stored. Widths are to scale.')
+    s.heading('x87 registers keep more bits than memory', 'A value is rounded only when it is stored to memory.')
     unit = 10.5
     rows = [('80-bit extended (x87 registers)', [('s', 1, RED), ('exponent 15', 15, AMBER), ('i', 1, PURPLE),
                                                  ('fraction 63', 63, BLUE)]),
@@ -245,7 +245,7 @@ def float_formats():
 def rounding_table():
     s = Svg(900, 390, 'Float to integer conversion and signed division by two, rounded three ways: toward zero, '
                       'to nearest even, and toward minus infinity')
-    s.heading('One value, three roundings', 'The same source can compile to any of these. Each differs from the others somewhere.')
+    s.heading('Rounding toward zero, to nearest and down', 'The same source can compile to any of these three. The bright cells differ from rounding toward zero.')
     xs = [-2.5, -1.5, -1.0, -0.5, 0.5, 1.0, 1.5, 2.5]
 
     def trunc(v):
@@ -325,7 +325,7 @@ def self_modifying():
 def sb_dma():
     s = Svg(900, 330, 'Sound Blaster auto-initialised DMA: the card plays one half of a buffer while the game fills the '
                       'other, with an interrupt at the end of each half')
-    s.heading('Sound Blaster: double buffering with DMA', 'The card reads one half while the game fills the other. An interrupt marks each half\'s end.')
+    s.heading('Sound Blaster double buffering with DMA', 'The card reads one half while the game fills the other. An interrupt marks each half\'s end.')
     x0, y0, w = 60, 110, 760
     s.rect(x0, y0, w / 2 - 2, 60, TEAL, rx=4, extra=' fill-opacity="0.18"')
     s.rect(x0 + w / 2 + 2, y0, w / 2 - 2, 60, BLUE, rx=4, extra=' fill-opacity="0.18"')
@@ -345,8 +345,8 @@ def sb_dma():
               f'begin="{beg * dur}s" repeatCount="indefinite"/></g>')
     s.text(60, 288, 'The block size set on the card is half the buffer. Its length, and the sample rate, set the delay between '
                     'a sound', 11, DIM)
-    s.text(60, 304, 'starting in the game and reaching the speaker. Record them: a port\'s mixer is free, but the timing of '
-                    'events is not.', 11, DIM)
+    s.text(60, 304, 'starting in the game and reaching the speaker. Record both. The port may mix sound in its own way if each sound '
+                    'starts at the same time as in the original.', 11, DIM)
     return s.render()
 
 
@@ -402,7 +402,7 @@ def dos_memory():
             s.text(24, y + 11, '640 KB' if addr == 'A0000' else '1 MB', 11, AMBER, weight='600')
         s.text(x + 272, y + h / 2 + 4, label, 12, TEXT)
         y += h
-    s.text(24, 464, 'Not to scale. A game that needs more than 640 KB uses EMS (pages swapped into the frame), XMS (copies), '
+    s.text(24, 464, 'A game that needs more than 640 KB uses EMS (pages swapped into the frame), XMS (copies), '
                     'or a DOS extender (DOS/4GW).', 11, DIM)
     return s.render()
 
@@ -411,7 +411,7 @@ def dos_memory():
 def renderer_paths():
     s = Svg(900, 330, 'One game with several renderers: the game code calls a renderer interface implemented for Glide, '
                       'Direct3D, OpenGL and software; each looks slightly different, and the port chooses one reference')
-    s.heading('One game, several renderers', 'The rules are shared. The pictures differ: pick one renderer as the reference.')
+    s.heading('A game with several renderers', 'Each renderer draws slightly different pictures. Choose one of them as the reference for the port.')
     s.rect(330, 82, 240, 44, TEAL, rx=6, extra=' fill-opacity="0.22"')
     s.text(450, 109, 'game code', 14, TEXT, 'middle', '600')
     s.rect(330, 150, 240, 40, GREY, rx=6, extra=' fill-opacity="0.25"')

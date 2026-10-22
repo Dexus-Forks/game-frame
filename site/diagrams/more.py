@@ -10,7 +10,7 @@ from svg import AMBER, BG, BLUE, DIM, GREEN, GREY, PURPLE, RED, TEAL, TEXT, Svg
 # ---------------------------------------------------------------- kinds of games
 def game_families():
     s = Svg(900, 420, 'Families of games and who drives each: a stream, a simulation, an environment, or turns')
-    s.heading('Who drives each family of games', 'Where the behaviour lives decides where the reverse engineering work is.')
+    s.heading('Who drives each family of games', 'Each family keeps its behaviour in a different place, and the reverse engineering work follows it there.')
     cols = [('a stream', 'the frame loop', TEAL), ('a simulation', 'the simulation step', AMBER),
             ('an environment', 'triggers and scripts', BLUE), ('turns', 'handlers and scripts', PURPLE)]
     rows = [('Arcade action', [0]), ('First-person and 3D action', [0, 2]), ('Racing and sports', [0]),
@@ -96,7 +96,7 @@ def abi_stack():
         ('e (fifth argument)', '[rsp+0x28]', AMBER), ('shadow space for d', '[rsp+0x20]', GREY),
         ('shadow space for c', '[rsp+0x18]', GREY), ('shadow space for b', '[rsp+0x10]', GREY),
         ('shadow space for a', '[rsp+0x08]', GREY), ('return address', '[rsp]', RED)])
-    s.text(620, 86, 'x64: the first four in registers', 14, TEXT, weight='600')
+    s.text(620, 86, 'x64 passes the first four in registers', 14, TEXT, weight='600')
     y = 100
     for label, reg in [('a', 'rcx'), ('b', 'rdx'), ('c', 'r8'), ('d', 'r9')]:
         s.rect(620, y, 230, 30, BLUE, rx=3, extra=' fill-opacity="0.22"')
@@ -116,7 +116,7 @@ def abi_stack():
 # ---------------------------------------------------------------- fixed-step loop (animated)
 def fixed_step():
     s = Svg(900, 330, 'A fixed-step loop: frames of different lengths add time to an accumulator, and each full step runs one update')
-    s.heading('The fixed-step main loop', 'Frames take different times. The game still updates in equal steps of 1/60 second (16.7 ms).')
+    s.heading('The fixed-step main loop', 'The game updates in equal steps of 1/60 second (16.7 ms), whatever time each frame takes.')
     frames = [12, 22, 16, 34, 9, 18, 15, 25]
     step = 1000 / 60
     x0, scale, y = 100, 4.2, 96
@@ -146,7 +146,7 @@ def fixed_step():
     dur = sum(frames) / 40
     s.add(f'<path d="M{x0} {y - 4}V{y + 102}" stroke="{TEXT}" stroke-width="2"><animateTransform attributeName="transform" '
           f'type="translate" from="0 0" to="{total:.1f} 0" dur="{dur:.2f}s" repeatCount="indefinite"/></path>')
-    s.text(24, 300, 'One frame may run no update, another two. A port must keep the same accumulator, or its results drift.', 12, DIM)
+    s.text(24, 300, 'A frame may run no update, one update or two. The port must keep the original\'s accumulator to get the same results.', 12, DIM)
     return s.render()
 
 
@@ -181,7 +181,7 @@ def unpacking():
 # ---------------------------------------------------------------- jump table
 def jump_table():
     s = Svg(900, 330, 'A switch statement compiled to a jump table: a bounds check, then an indirect jump through a table of addresses')
-    s.heading('A switch as a jump table', 'One bounds check, then one indirect jump. The table holds an address for each case.')
+    s.heading('A switch as a jump table', 'The code checks the bounds, then jumps through the table. The table holds an address for each case.')
     code = [('cmp   eax, 4', TEXT), ('ja    default', TEXT), ('jmp   [table + eax*4]', AMBER)]
     s.rect(40, 84, 250, 96, '#12282a', rx=6)
     for i, (line, colour) in enumerate(code):
@@ -213,7 +213,7 @@ def jump_table():
 # ---------------------------------------------------------------- scene graph update (animated)
 def scene_graph():
     s = Svg(900, 340, 'A scene graph update: world transforms are computed going down the tree, then bounds are merged going up')
-    s.heading('Updating a scene graph', 'Down the tree: each node\'s world transform from its parent\'s. Back up: each node\'s bounds from its children.')
+    s.heading('Updating a scene graph', 'The first pass computes world transforms from the root down. The second pass merges bounds from the leaves up.')
     nodes = {'world': (450, 100), 'town': (270, 180), 'camera': (630, 180), 'house': (170, 260), 'tree': (370, 260),
              'citizen': (560, 260), 'cart': (720, 260)}
     edges = [('world', 'town'), ('world', 'camera'), ('town', 'house'), ('town', 'tree'), ('camera', 'citizen'), ('camera', 'cart')]
@@ -243,7 +243,7 @@ def scene_graph():
 # ---------------------------------------------------------------- OPL2 operators (animated)
 def opl2_operators():
     s = Svg(900, 330, 'An OPL2 voice: a modulator operator with feedback changes the phase of a carrier operator; each has an envelope')
-    s.heading('An OPL2 voice: two operators', 'Nine voices, each a modulator and a carrier. Music is a stream of writes to their registers.')
+    s.heading('The two operators of an OPL2 voice', 'Nine voices, each a modulator and a carrier. Music is a stream of writes to their registers.')
     s.rect(40, 100, 170, 70, PURPLE, rx=8, extra=' fill-opacity="0.2"')
     s.text(125, 130, 'modulator', 14, TEXT, 'middle', '600')
     s.text(125, 150, 'operator 1', 11, DIM, 'middle')
@@ -285,7 +285,7 @@ def opl2_operators():
 # ---------------------------------------------------------------- consoles by generation
 def console_timeline():
     s = Svg(900, 380, 'Home consoles by year of first release, from the NES in 1983 to the PlayStation 5 in 2020, coloured by CPU family')
-    s.heading('Home consoles by generation', 'Year of first release. The colour is the CPU family, which decides the tools.')
+    s.heading('Home consoles by generation', 'The year of first release. The colour shows the CPU family, which sets the tools that apply.')
     cpu = {'6502': TEAL, 'Z80': GREY, '68000': BLUE, 'SH': PURPLE, 'MIPS': AMBER, 'PowerPC': GREEN, 'x86': RED, 'ARM': '#f472b6'}
     items = [(1983, 'NES', '6502'), (1985, 'Master System', 'Z80'), (1987, 'PC Engine', '6502'), (1988, 'Mega Drive', '68000'),
              (1990, 'SNES', '6502'), (1994, 'Saturn', 'SH'), (1994, 'PlayStation', 'MIPS'), (1996, 'Nintendo 64', 'MIPS'),

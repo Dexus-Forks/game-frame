@@ -86,5 +86,5 @@
 <rect x="646.0" y="376.0" width="177.0" height="30.0" rx="3" fill="#c084fc" stroke="none" fill-opacity="0.22"/>
 <text x="734.5" y="395.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="middle">key, value</text>
 <text x="170.0" y="430.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="start">std::map and std::set hold a pointer to a head node and the count. A colour byte next to three pointers is a red-black tree.</text>
-<text x="24.0" y="456.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="start">Debug builds add a pointer at +0 of each container. libstdc++ differs: docs/TYPES.md has both.</text>
+<text x="24.0" y="456.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="start">Debug builds add a pointer at +0 of each container. docs/TYPES.md also gives the libstdc++ layouts.</text>
 </svg>

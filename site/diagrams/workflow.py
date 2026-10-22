@@ -107,7 +107,7 @@ def frame_capture():
 def emulation_levels():
     s = Svg(900, 340, 'Levels at which the original can be replaced: low-level emulation copies the chips, high-level '
                       'emulation copies the system software, a reimplementation copies the game')
-    s.heading('What each approach replaces', 'The same stack, replaced at different heights.')
+    s.heading('What each approach replaces', 'Each approach replaces a different set of the original\'s layers.')
     layers = [('the game\'s rules and data', TEAL), ('the game\'s engine code', TEAL),
               ('system software: OS, sound driver, graphics microcode', PURPLE), ('the chips: CPU, video, sound', GREY)]
     for k, (name, colour) in enumerate(layers):
@@ -118,14 +118,14 @@ def emulation_levels():
         s.text(x + 60, 80, name, 11, colour, 'middle', '600')
         s.rect(x, 86 + a * 58, 120, (b - a + 1) * 58 - 8, colour, rx=6, extra=' fill-opacity="0.3"')
         s.text(x + 60, 86 + a * 58 + ((b - a + 1) * 58 - 8) / 2 + 4, 'new code', 12, TEXT, 'middle', '600')
-    s.text(40, 330, 'Above each column the original code still runs. A reimplementation runs none of it.', 12, DIM)
+    s.text(40, 330, 'The original\'s code still runs in the layers above each new block. A reimplementation runs none of it.', 12, DIM)
     return s.render()
 
 
 # ---------------------------------------------------------------- the kinds of input
 def input_sources():
     s = Svg(900, 360, 'Every input the game reads from outside, gathered through one entry point into the port\'s core')
-    s.heading('Everything the game reads from outside', 'Controls are only one input. Each source goes through one entry point in the port.')
+    s.heading('Everything the game reads from outside', 'The game reads controls, time, randomness, files, the system and the network. The port takes each through one entry point.')
     box(s, 350, 160, 200, 70, TEAL, 'the core', 'one input record per step', op='0.3')
     srcs = [('controls', 'keys, mouse, pads', 60, 90), ('time', 'clock, timers, frame time', 60, 180),
             ('randomness', 'seeds from the clock', 60, 270), ('files', 'data, saves, settings', 690, 90),
@@ -143,7 +143,7 @@ def input_sources():
 def input_record():
     s = Svg(900, 300, 'A recording of inputs: for each step, the commands and time the core received; replaying it '
                       'gives the same game')
-    s.heading('An input record', 'Each step lists what the core received. Replayed, it gives the same game, step by step.')
+    s.heading('An input record', 'Each step lists what the core received. Replaying the record gives the same game.')
     rows = [(0, 'seed 1234567'), (1, ''), (2, 'place house at 41, 17'), (3, ''), (4, 'speed 3'),
             (5, ''), (6, ''), (7, 'assign 2 workers to farm 9')]
     n, dur = len(rows), 6.4
@@ -241,7 +241,7 @@ def ui_inventory():
         s.rect(x - 60, y - 18, 120, 36, BG, rx=18)
         s.rect(x - 60, y - 18, 120, 36, TEAL if name != 'the map' else GREEN, rx=18, extra=' fill-opacity="0.35"')
         s.text(x, y + 5, name, 12, TEXT, 'middle', '600')
-    s.text(40, 300, 'States of one screen: empty, full, disabled buttons, error messages, each language. Each is a capture.',
+    s.text(40, 300, 'A screen has several states, such as empty, full, disabled buttons, error messages and each language. Capture each state.',
            12, DIM)
     return s.render()
 
@@ -250,7 +250,7 @@ def ui_inventory():
 def session_loop():
     s = Svg(900, 300, 'The loop of a working session: read what is known, trace, measure, port, verify, write it down, '
                       'commit, and start the next slice')
-    s.heading('A working session', 'Every session starts by reading what earlier sessions wrote, and ends by writing it down.')
+    s.heading('A working session', 'A session reads what earlier sessions wrote before it starts. It writes down its own results at the end.')
     steps = [('read', 'docs, labels', GREY), ('trace', 'the code', BLUE), ('measure', 'the original', AMBER),
              ('port', 'new code', TEAL), ('verify', 'against truth', GREEN), ('land', 'docs, commit', PURPLE)]
     flow(s, 110, steps, w=120, gap=26)
@@ -264,7 +264,7 @@ def session_loop():
 def core_platforms():
     s = Svg(900, 330, 'The exact core in the middle, with no drawing, sound or windows, wrapped by replaceable platform '
                       'layers: desktop, browser, headless tests and a server')
-    s.heading('One core, several platforms', 'The core decides what happens. Each platform gives it time, input and files.')
+    s.heading('The core and its platforms', 'The core decides what happens. Each platform gives it time, input and files.')
     box(s, 330, 130, 240, 90, TEAL, 'the core', 'rules, data, clock, random', op='0.32')
     plats = [('desktop', 'window, GPU, sound', 40, 90), ('browser', 'WebAssembly, canvas', 40, 200),
              ('headless tests', 'scripted, no window', 660, 90), ('server', 'rooms, replays', 660, 200)]
@@ -284,7 +284,7 @@ def core_platforms():
 def browser_files():
     s = Svg(900, 280, 'In a browser build, the player picks the game folder, the page keeps the files in the browser\'s '
                       'own storage, and the WebAssembly core reads them there; nothing is uploaded')
-    s.heading('The player\'s files in a browser', 'The files go from the player\'s disk to the browser\'s storage. Nothing leaves the machine.')
+    s.heading('The player\'s files in a browser', 'The files go from the player\'s disk to the browser\'s storage, on the same machine.')
     flow(s, 110, [('the game folder', 'on the player\'s disk', GREY), ('a file picker', 'or a dropped folder', AMBER),
                   ('browser storage', 'IndexedDB or OPFS', PURPLE), ('the core', 'WebAssembly', TEAL)], w=180, gap=40)
     s.rect(30, 200, 840, 34, RED, rx=4, extra=' fill-opacity="0.12"')
@@ -296,7 +296,7 @@ def browser_files():
 def round_trip():
     s = Svg(900, 280, 'A writer proved by a round trip: read every file, write it back, compare the bytes; each '
                       'difference is a field the writer loses')
-    s.heading('A round trip proves a writer', 'Read every file, write it back, compare. Any difference is a field the writer loses.')
+    s.heading('A round trip test', 'Read every file, write it back, compare. Any difference is a field the writer loses.')
     flow(s, 100, [('original file', 'from the game', GREY), ('read', 'the port\'s reader', BLUE),
                   ('write', 'the port\'s writer', AMBER), ('compare', 'byte by byte', GREEN)], w=180, gap=40)
     s.text(40, 210, 'byte 0x1c: 00 vs 7f  -> an unknown flag the reader dropped', 12, RED, mono=True)
@@ -308,7 +308,7 @@ def round_trip():
 def evidence_labels():
     s = Svg(900, 300, 'Evidence labels from strongest to weakest: measured by running the original, observed in its '
                       'code, inferred from other facts, assumed with no evidence')
-    s.heading('How strong is a claim?', 'Every finding carries one label. A port is built on measured and observed claims.')
+    s.heading('Evidence labels', 'Every finding carries one label. A port is built on measured and observed claims.')
     labels = [('measured', 'produced by running the original', GREEN, 1.0), ('observed', 'read in the code or the data', TEAL, 0.8),
               ('inferred', 'follows from other facts, not checked', AMBER, 0.5), ('assumed', 'no evidence yet', RED, 0.25)]
     for k, (name, sub, colour, strength) in enumerate(labels):
@@ -369,7 +369,7 @@ def label_carry():
         s.text(572, y + 22, f'{a2}  {n2 if ok else "no match: changed"}', 12, TEXT if ok else DIM, mono=True)
         if ok:
             arrow(s, 342, y + 17, 556, y + 17, GREEN)
-    s.text(60, 300, 'match_functions.py matches two Ghidra exports. A function with no match changed: read it first.', 12, DIM)
+    s.text(60, 300, 'match_functions.py matches two Ghidra exports. A function with no match has changed, so read it first.', 12, DIM)
     return s.render()
 
 
@@ -392,7 +392,7 @@ def practice_ladder():
 def fixity_check():
     s = Svg(900, 300, 'A fixity check: each file\'s checksum is recorded once, then recomputed later; a mismatch shows '
                       'that a file changed')
-    s.heading('Fixity: has anything changed?', 'Record each file\'s checksum once. Recompute it later and compare.')
+    s.heading('Fixity checks', 'Record each file\'s checksum once. Recompute it later and compare.')
     files = [('GAME.EXE', 'a3f0...91c2', True), ('DATA.PAK', '7be1...04aa', True), ('MUSIC.PAK', '19c4...ee70', False),
              ('README.TXT', '00d9...5b13', True)]
     for k, (name, h, ok) in enumerate(files):
@@ -425,7 +425,7 @@ def version_tree():
     for name, sub, x, y, c in pts:
         box(s, x, y, 120, 50, c, name, sub, op='0.28', size=12)
     s.text(570, 186, 'the port follows this one', 11, GREEN, 'middle')
-    s.text(40, 284, 'A patch note names a rule. The function that changed between two builds is that rule.', 12, DIM)
+    s.text(40, 284, 'A patch note names a changed rule. Comparing the two builds finds the function that changed.', 12, DIM)
     return s.render()
 
 
@@ -433,7 +433,7 @@ def version_tree():
 def outputs_map():
     s = Svg(900, 320, 'What a project can ship: findings as documents and a website, the reimplementation as programs '
                       'for each system, a browser version and a server, and tools for players')
-    s.heading('What a project ships', 'Everything here is new work. None of it contains the game\'s files.')
+    s.heading('What a project ships', 'A project ships only new work, with none of the game\'s files.')
     box(s, 350, 84, 200, 56, TEAL, 'the project', op='0.3')
     outs = [('documents', 'findings, guides', 40, 200, BLUE), ('a website', 'built from the docs', 210, 200, BLUE),
             ('programs', 'Windows, macOS, Linux', 380, 200, GREEN), ('a browser version', 'on the player\'s files', 550, 200, GREEN),
@@ -449,7 +449,7 @@ def outputs_map():
 def shared_kept():
     s = Svg(900, 320, 'What goes into the public repository (new code, documents, tools, labels) and what stays on the '
                       'player\'s machine (the game\'s files, captures, decompiled output)')
-    s.heading('Shared and kept', 'The repository holds new work. The game and everything made from it stays on your machine.')
+    s.heading('What is shared and what is kept', 'The left column goes into the public repository. The right column stays on your machine.')
     s.rect(40, 84, 390, 200, GREEN, rx=8, extra=' fill-opacity="0.12"')
     s.text(60, 110, 'the public repository', 14, GREEN, weight='600')
     for k, t in enumerate(['new code, written from documented behaviour', 'documents and findings, in prose and tables',

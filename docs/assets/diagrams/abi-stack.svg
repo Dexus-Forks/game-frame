@@ -48,7 +48,7 @@
 <rect x="330.0" y="270.0" width="4.0" height="30.0" rx="1" fill="#f87171" stroke="none"/>
 <text x="344.0" y="290.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#e2ece9" text-anchor="start">return address</text>
 <text x="556.0" y="290.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="400" fill="#8fa9a5" text-anchor="end">[rsp]</text>
-<text x="620.0" y="86.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#e2ece9" text-anchor="start">x64: the first four in registers</text>
+<text x="620.0" y="86.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#e2ece9" text-anchor="start">x64 passes the first four in registers</text>
 <rect x="620.0" y="100.0" width="230.0" height="30.0" rx="3" fill="#60a5fa" stroke="none" fill-opacity="0.22"/>
 <rect x="620.0" y="100.0" width="4.0" height="30.0" rx="1" fill="#60a5fa" stroke="none"/>
 <text x="634.0" y="120.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#e2ece9" text-anchor="start">a</text>

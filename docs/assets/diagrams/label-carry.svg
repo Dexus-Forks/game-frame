@@ -25,5 +25,5 @@
 <text x="72.0" y="264.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="400" fill="#e2ece9" text-anchor="start">0x414000  save_game</text>
 <rect x="560.0" y="242.0" width="280.0" height="34.0" rx="4" fill="#64748b" stroke="none" fill-opacity="0.15"/>
 <text x="572.0" y="264.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="400" fill="#8fa9a5" text-anchor="start">0x414200  no match: changed</text>
-<text x="60.0" y="300.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#8fa9a5" text-anchor="start">match_functions.py matches two Ghidra exports. A function with no match changed: read it first.</text>
+<text x="60.0" y="300.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#8fa9a5" text-anchor="start">match_functions.py matches two Ghidra exports. A function with no match has changed, so read it first.</text>
 </svg>

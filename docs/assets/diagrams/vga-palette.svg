@@ -177,7 +177,7 @@
 <rect x="840.0" y="180.0" width="9.0" height="16.0" rx="1" fill="#ffffff" stroke="none"/>
 <rect x="840.0" y="202.0" width="9.0" height="16.0" rx="1" fill="#ffffff" stroke="none"/>
 <text x="210.0" y="244.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="start">red marks: v = 33 gives 133 by the first and 134 by the second. Compare with captures of the original.</text>
-<text x="40.0" y="280.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#e2ece9" text-anchor="start">Colour cycling: the pixels stay, the palette entries rotate</text>
+<text x="40.0" y="280.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#e2ece9" text-anchor="start">Colour cycling rotates the palette entries and leaves the pixels unchanged</text>
 <rect x="40" y="292" width="32" height="40" rx="2" fill="#0b2a6b"><animate attributeName="fill" values="#0b2a6b;#12408f;#1b5ab5;#2a78d6;#46a0f0;#7cc4ff;#46a0f0;#2a78d6;#0b2a6b" dur="1.6s" calcMode="discrete" repeatCount="indefinite"/></rect>
 <rect x="74" y="292" width="32" height="40" rx="2" fill="#12408f"><animate attributeName="fill" values="#12408f;#1b5ab5;#2a78d6;#46a0f0;#7cc4ff;#46a0f0;#2a78d6;#0b2a6b;#12408f" dur="1.6s" calcMode="discrete" repeatCount="indefinite"/></rect>
 <rect x="108" y="292" width="32" height="40" rx="2" fill="#1b5ab5"><animate attributeName="fill" values="#1b5ab5;#2a78d6;#46a0f0;#7cc4ff;#46a0f0;#2a78d6;#0b2a6b;#12408f;#1b5ab5" dur="1.6s" calcMode="discrete" repeatCount="indefinite"/></rect>

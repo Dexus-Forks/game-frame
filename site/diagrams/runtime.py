@@ -126,8 +126,8 @@ def skeleton_parents():
 def handle_bits():
     s = Svg(900, 360, 'A 32-bit handle: 12 bits of generation and 20 bits of index; a lookup compares the generation '
                       'in the handle with the one in the slot')
-    s.heading('A handle: an index and a generation',
-              'The index picks a slot. The generation must match the slot\'s, or the object is gone.')
+    s.heading('The bits of a handle',
+              'The index selects a slot. A lookup compares the generation in the handle with the generation in the slot.')
     x0, bw, y = 40, 25, 86
     value = 0x00300042
     for b in range(32):
@@ -155,7 +155,7 @@ def handle_bits():
     s.text(x0, ty + 86, '0x00300042 -> slot 66, generation 3 = 3: the citizen', 12, GREEN, mono=True)
     s.text(x0, ty + 108, '0x00200042 -> slot 66, generation 2 != 3: the old object was freed; the lookup returns null',
            12, RED, mono=True)
-    s.text(x0, ty + 140, 'In the code: a mask (and eax, 0xFFFFF) for the index, a shift (shr eax, 20) for the generation, '
+    s.text(x0, ty + 140, 'The code takes the index with a mask (and eax, 0xFFFFF) and the generation with a shift (shr eax, 20), '
                          'then a compare with the slot.', 11, DIM)
     return s.render()
 
@@ -268,7 +268,7 @@ def cpp_containers():
     cells(170, y, f, PURPLE)
     s.text(170, y + 54, 'std::map and std::set hold a pointer to a head node and the count. A colour byte next to three '
                         'pointers is a red-black tree.', 11, DIM)
-    s.text(24, 456, 'Debug builds add a pointer at +0 of each container. libstdc++ differs: docs/TYPES.md has both.', 11, DIM)
+    s.text(24, 456, 'Debug builds add a pointer at +0 of each container. docs/TYPES.md also gives the libstdc++ layouts.', 11, DIM)
     return s.render()
 
 

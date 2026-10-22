@@ -53,7 +53,7 @@ def plot(s, x, y, w, h, series, xr, yr, xlabel, ylabel, ticks_x, ticks_y):
 def msvc_rand():
     s = Svg(900, 330, 'MSVC rand(): the state is multiplied by 214013 and 2531011 is added; the draw is bits 16 to 30 '
                       'of the new state. From srand(1), the first draws are 41, 18467, 6334, 26500 and 19169')
-    s.heading('A random generator: MSVC rand()', 'state = state x 214013 + 2531011, then the draw is bits 16 to 30. Seeded with 1.')
+    s.heading('The MSVC rand() generator', 'state = state x 214013 + 2531011, then the draw is bits 16 to 30. Seeded with 1.')
     state, rows = 1, []
     for _ in range(5):
         state = (state * 214013 + 2531011) & 0xFFFFFFFF
@@ -134,7 +134,7 @@ def package_archive():
         s.rect(x2, 90, w2 - 4, 40, BLUE, rx=3, extra=' fill-opacity="0.35"')
         s.add(f'<path d="M700 {ty + 20 + r * 22}C 760 {ty + 20 + r * 22} {x2 + w2 / 2} 170 {x2 + w2 / 2} 134" fill="none" '
               f'stroke="{DIM}" stroke-width="1.2" marker-end="url(#arrow)"/>')
-    s.text(40, 300, 'An example layout. The lookup code hashes a file name and searches the table: hashnames.py finds the '
+    s.text(40, 300, 'An example layout. The lookup code hashes a file name and searches the table. hashnames.py finds the '
                     'hash function.', 11, DIM)
     return s.render()
 
@@ -143,7 +143,7 @@ def package_archive():
 def float_time():
     s = Svg(900, 360, 'The clock error from adding 1/60 of a second to a 32-bit float once per frame for an hour, '
                       'computed: the error reaches about 2.8 seconds')
-    s.heading('Float time drifts', 'A clock kept as a 32-bit float, adding 1/60 s each frame, against the true time. Computed.')
+    s.heading('Float time drifts', 'A clock kept as a 32-bit float, adding 1/60 s each frame, compared with the true time. The values are computed.')
     t, step, pts = 0.0, f32(1 / 60), [(0, 0)]
     for i in range(1, 216001):
         t = f32(t + step)
@@ -167,7 +167,7 @@ def float_time():
 def integrators():
     s = Svg(900, 360, 'A spring simulated with explicit Euler, semi-implicit Euler and the exact solution, computed '
                       'with a step of 0.1: explicit Euler gains energy and the swing grows')
-    s.heading('Two integrators, one spring', 'x\'\' = -x from x = 1, step 0.1. Swapping two lines of code changes the motion. Computed.')
+    s.heading('Euler integration of a spring', 'x\'\' = -x from x = 1 with a step of 0.1. The two methods differ only in the order of two lines. The values are computed.')
     dt, steps = 0.1, 200
     ex, sm, exact = [(0, 1)], [(0, 1)], []
     x, v = 1.0, 0.0
@@ -198,7 +198,7 @@ def integrators():
 def password_bits():
     s = Svg(900, 330, 'A level password decoded: each character is an index into the game\'s alphabet, each index '
                       'gives five bits, and the bits are packed fields with a checksum')
-    s.heading('A password is packed bits', 'Each letter is an index into the game\'s alphabet. The bits hold the state and a checksum.')
+    s.heading('The bits of a password', 'Each letter is an index into the game\'s alphabet. The bits hold the state and a checksum.')
     alphabet = 'BCDFGHJKLMNPQRSTVWXYZ0123456789!'
     s.text(40, 92, 'alphabet:', 11, DIM)
     s.text(110, 92, alphabet, 13, TEXT, mono=True)
@@ -220,7 +220,7 @@ def password_bits():
         s.text(x + (w - 4) / 2, 233, allbits[pos:pos + n], 13, TEXT, 'middle', '600', mono=True)
         x += w
         pos += n
-    s.text(40, 270, 'An example layout. The game\'s checker shows the real one: the alphabet string, the shifts and the '
+    s.text(40, 270, 'An example layout. The game\'s checker shows the real layout in its alphabet string, its shifts and its '
                     'checksum.', 11, DIM)
     s.text(40, 290, 'Port the encoder and the decoder, and test them on passwords the original accepts.', 11, DIM)
     return s.render()
@@ -230,7 +230,7 @@ def password_bits():
 def message_format():
     s = Svg(900, 300, 'A message stored as a type and arguments, formatted through the string table of the player\'s '
                       'language when it is shown')
-    s.heading('Messages: a type and its arguments', 'The text is made when the message is shown, from the language\'s string table.')
+    s.heading('Messages from a string table', 'The text is made when the message is shown, from the language\'s string table.')
     box(s, 40, 100, 220, 70, AMBER, 'message 0x12', 'person 41, building 7', op='0.25')
     box(s, 330, 100, 240, 70, PURPLE, 'string 0x12 (English)', '"%1 has moved into %2."', op='0.25')
     box(s, 630, 100, 240, 70, TEAL, '"Ana has moved into', 'the Stone House."', op='0.25', size=12)
@@ -245,7 +245,7 @@ def message_format():
 def save_fixup():
     s = Svg(900, 330, 'Saving and loading objects that point at each other: pointers are written as ids, loading '
                       'creates every object, then a second pass turns ids back into pointers')
-    s.heading('Saves: pointers become ids', 'Writing turns each pointer into the target\'s id. Loading reads all objects, then fixes the ids.')
+    s.heading('Pointers in a save', 'Writing turns each pointer into the target\'s id. Loading reads all objects, then fixes the ids.')
     objs = [('#1 farmer', 'home: #2'), ('#2 house', 'owner: #1'), ('#3 field', 'worker: #1')]
     for k, (name, ref) in enumerate(objs):
         x = 60 + k * 270
@@ -270,7 +270,7 @@ def save_fixup():
 def net_models():
     s = Svg(900, 330, 'Two network models: lockstep sends only inputs and needs exact determinism; client-server sends '
                       'the state from the server')
-    s.heading('Lockstep and client-server', 'What travels on the network decides what must be exact.')
+    s.heading('Lockstep and client-server', 'Lockstep games exchange the players\' inputs. In client-server games, the server sends the state to each client.')
     s.text(40, 92, 'Lockstep', 14, TEAL, weight='600')
     for k, name in enumerate(('player A', 'player B')):
         box(s, 40 + k * 260, 110, 160, 60, TEAL, name, 'runs the whole game')
@@ -278,8 +278,8 @@ def net_models():
           f'<path d="M298 150H204" stroke="{AMBER}" stroke-width="2" marker-end="url(#arrow)"/>')
     s.text(250, 124, 'inputs', 11, AMBER, 'middle')
     s.text(40, 200, 'Each machine computes the same game', 12, DIM)
-    s.text(40, 218, 'from the same inputs. One different bit', 12, DIM)
-    s.text(40, 236, 'and the games split apart.', 12, DIM)
+    s.text(40, 218, 'from the same inputs. A difference of one bit', 12, DIM)
+    s.text(40, 236, 'makes the games diverge.', 12, DIM)
     s.text(500, 92, 'Client-server', 14, BLUE, weight='600')
     box(s, 500, 110, 160, 60, BLUE, 'server', 'runs the game')
     box(s, 740, 110, 130, 60, GREY, 'client', 'draws it')
@@ -287,9 +287,9 @@ def net_models():
           f'<path d="M738 150H664" stroke="{AMBER}" stroke-width="2" marker-end="url(#arrow)"/>')
     s.text(700, 124, 'state', 11, AMBER, 'middle')
     s.text(700, 166, 'inputs', 11, AMBER, 'middle')
-    s.text(500, 200, 'Only the server must be exact. Clients', 12, DIM)
-    s.text(500, 218, 'predict and correct. A port must speak the', 12, DIM)
-    s.text(500, 236, 'protocol to play with original clients.', 12, DIM)
+    s.text(500, 200, 'The server must be exact. Clients show', 12, DIM)
+    s.text(500, 218, 'a prediction until it arrives. A port must use', 12, DIM)
+    s.text(500, 236, 'the same protocol to play with original clients.', 12, DIM)
     return s.render()
 
 
@@ -325,7 +325,7 @@ def vtable_layout():
 def crt_startup():
     s = Svg(900, 260, 'An executable starts in the C runtime: the entry point initialises the runtime and the static '
                       'constructors, then calls WinMain or main, where the game begins')
-    s.heading('From the entry point to the game', 'Skip past the runtime. The game starts where main or WinMain is called.')
+    s.heading('From the entry point to the game', 'The C runtime runs first. The game\'s own code starts where main or WinMain is called.')
     steps = [('entry point', 'from the PE header', GREY), ('security cookie', 'VC++ 2005 and later', GREY),
              ('runtime set-up', 'heap, I/O, locale', GREY), ('static constructors', '_initterm table', PURPLE),
              ('WinMain / main', 'the game', TEAL)]
@@ -343,7 +343,7 @@ def crt_startup():
 def signature_match():
     s = Svg(900, 320, 'A library function turned into a byte signature, with the bytes the linker changes as wildcards, '
                       'and the signature found in a game')
-    s.heading('A signature with wildcards', 'The bytes the linker fills in (addresses) become ??. The rest must match exactly.')
+    s.heading('A signature with wildcards', 'The bytes the linker fills in (addresses) become ??. Every other byte must match.')
     lib = ['55', '8B', 'EC', 'FF', '76', '04', '9A', '00', '00', '00', '00', '59', '5D', 'C3']
     wild = {7, 8, 9, 10}
     game = ['55', '8B', 'EC', 'FF', '76', '04', '9A', '3C', '01', 'A2', '1B', '59', '5D', 'C3']
@@ -360,7 +360,7 @@ def signature_match():
             colour = AMBER if w else (GREEN if row == 2 else BLUE)
             s.rect(x, y, 46, 30, colour, rx=3, extra=f' fill-opacity="{0.35 if w else 0.22}"')
             s.text(x + 23, y + 20, v, 12, TEXT, 'middle', '600', mono=True)
-    s.text(170 + 7 * 50, 266, 'a far call\'s address: a fixup', 11, AMBER)
+    s.text(170 + 7 * 50, 266, 'the fixup for a far call\'s address', 11, AMBER)
     s.text(40, 300, 'omf.py makes signatures from a library. sigscan.py finds them in the game and writes labels.', 12, DIM)
     return s.render()
 
@@ -369,7 +369,7 @@ def signature_match():
 def magic_division():
     s = Svg(900, 320, 'Unsigned division by 10 compiled as a multiplication by 0xCCCCCCCD and a shift by 35; '
                       'the results equal x / 10 for every 32-bit x')
-    s.heading('Division by a constant', 'The compiler turns x / 10 into a multiply and a shift. The results are the same.')
+    s.heading('Division by a constant', 'The compiler turns x / 10 into a multiply and a shift, which give the same result.')
     s.text(40, 100, 'mov eax, 0xCCCCCCCD', 14, TEXT, mono=True)
     s.text(40, 122, 'mul ecx            ; edx:eax = x * 0xCCCCCCCD', 14, TEXT, mono=True)
     s.text(40, 144, 'shr edx, 3         ; edx = x / 10', 14, TEXT, mono=True)
@@ -390,7 +390,7 @@ def magic_division():
 def cpu_flags():
     s = Svg(900, 300, 'cmp eax, 1 with eax = -1 sets the flags once; jl reads them as signed and jumps, jb reads them '
                       'as unsigned and does not')
-    s.heading('One compare, two meanings', 'The flags are the same. The jump that reads them decides signed or unsigned.')
+    s.heading('Signed and unsigned jumps', 'jl and jb read the same flags after one cmp. jl compares signed numbers. jb compares unsigned numbers.')
     s.text(40, 104, 'eax = 0xFFFFFFFF', 14, TEXT, mono=True)
     s.text(40, 128, 'cmp eax, 1', 14, TEXT, mono=True)
     for k, (f, v, c) in enumerate((('ZF', 0, GREY), ('SF', 1, AMBER), ('CF', 0, BLUE), ('OF', 0, GREY))):
@@ -408,7 +408,7 @@ def cpu_flags():
 def segment_address():
     s = Svg(900, 300, 'A real-mode address: the segment times 16 plus the offset, so 1234:0010 and 1235:0000 are the '
                       'same byte at 12350h')
-    s.heading('Real-mode addresses: segment and offset', 'linear = segment x 16 + offset. Different pairs can name the same byte.')
+    s.heading('Segment and offset addresses', 'linear = segment x 16 + offset. Different pairs can name the same byte.')
     rows = [('1234:0010', 0x1234, 0x10), ('1235:0000', 0x1235, 0), ('1000:2350', 0x1000, 0x2350)]
     for k, (txt, seg, off) in enumerate(rows):
         y = 100 + k * 44
@@ -457,7 +457,7 @@ def overlays():
 def struct_from_uses():
     s = Svg(900, 320, 'Several functions each touch some offsets of one structure; merged, their accesses give the '
                       'structure\'s fields, sizes and types')
-    s.heading('A structure read from its uses', 'Each function shows a few fields. Together they show the layout.')
+    s.heading('A structure read from its uses', 'Each function uses a few fields. Merging the accesses of several functions gives the layout.')
     fns = [('constructor', [(0, 8, 'vtable'), (8, 4, 'int'), (16, 4, 'float'), (24, 8, 'ptr')], TEAL),
            ('Save', [(8, 4, 'int'), (12, 4, 'int'), (16, 4, 'float')], AMBER),
            ('Update', [(16, 4, 'float'), (20, 1, 'byte'), (24, 8, 'ptr')], PURPLE)]

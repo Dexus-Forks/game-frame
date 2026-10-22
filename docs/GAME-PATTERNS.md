@@ -174,7 +174,7 @@ because a save holds the state of every system.
 
 ## Networking (if any)
 
-![Lockstep sends inputs; client-server sends state](assets/diagrams/net-models.svg)
+![The data that lockstep and client-server games send over the network](assets/diagrams/net-models.svg)
 
 Messages are usually serialized with the same stream classes as saves. Lockstep games send only
 inputs and depend on exact determinism; client-server games send state. Never test against a

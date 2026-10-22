@@ -29,5 +29,5 @@
 <rect x="120.0" y="348.0" width="260.0" height="108.0" rx="2" fill="#4ade80" stroke="none" fill-opacity="0.3"/>
 <text x="112.0" y="359.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="end">10FFF0</text>
 <text x="392.0" y="407.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#e2ece9" text-anchor="start">extended memory: XMS blocks, or a DOS extender's flat 32-bit memory</text>
-<text x="24.0" y="464.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="start">Not to scale. A game that needs more than 640 KB uses EMS (pages swapped into the frame), XMS (copies), or a DOS extender (DOS/4GW).</text>
+<text x="24.0" y="464.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="start">A game that needs more than 640 KB uses EMS (pages swapped into the frame), XMS (copies), or a DOS extender (DOS/4GW).</text>
 </svg>

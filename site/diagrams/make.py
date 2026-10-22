@@ -28,7 +28,7 @@ from svg import (AMBER, BG, BLUE, DIM, EDGE, FONT, GREEN, GREY, MONO, PURPLE, RE
 # ---------------------------------------------------------------- CDs and DVDs
 def cd_sectors():
     s = Svg(900, 400, 'A CD sector of 2352 bytes in four kinds: audio, Mode 1, Mode 2 Form 1 and Mode 2 Form 2')
-    s.heading('A CD sector: 2352 bytes', 'Where the user data sits in each kind of sector. Widths are to scale.')
+    s.heading('The layouts of a CD sector', 'A sector holds 2352 bytes. The widths show where the user data sits in each kind of sector.')
     rows = [
         ('Audio', [(2352, 'audio samples: 588 stereo pairs, 16-bit', BLUE)]),
         ('Mode 1', [(12, 'sync', GREY), (4, 'hdr', PURPLE), (2048, 'user data: 2048', TEAL), (4, 'EDC', AMBER), (8, '', GREY), (276, 'ECC 276', RED)]),
@@ -54,7 +54,7 @@ def cd_sectors():
         s.rect(ex, y, w - 2, 30, colour, rx=2, extra=' fill-opacity="0.85"')
         s.text(ex + 8, y + 20, label, 12, BG, weight='600')
         ex += w
-    s.text(x0, y + 54, 'EDC and ECC: error detection and correction, which audio sectors lack. Bit 5 of the subheader marks Form 2.', 11, DIM)
+    s.text(x0, y + 54, 'EDC and ECC are the error detection and correction codes. Audio sectors have neither. Bit 5 of the subheader marks Form 2.', 11, DIM)
     s.text(x0, y + 72, 'A cooked .iso keeps only the 2048 user bytes of Mode 1 and Form 1 sectors. A raw .bin keeps all 2352.', 11, DIM)
     return s.render()
 
@@ -119,7 +119,7 @@ def entropy_scale():
 # ---------------------------------------------------------------- Mode X planes (animated)
 def modex_planes():
     s = Svg(900, 330, 'Mode X: pixel x of a row goes to plane x mod 4, at byte x divided by 4')
-    s.heading('Mode X: four planes', 'Pixel x is stored in plane x mod 4, at offset x / 4. The highlight follows each pixel to its plane.')
+    s.heading('Mode X planes', 'Pixel x is stored in plane x mod 4, at offset x / 4. The highlight follows each pixel to its plane.')
     colours = [TEAL, AMBER, BLUE, RED]
     x0, y0, cw = 60, 86, 44
     s.text(x0, y0 - 8, 'the screen row', 11, DIM)
@@ -212,14 +212,14 @@ def fill_rule():
         s.text(lx + (28 if colour else 28), 112 + i * 30 - (8 if not colour else 0), label, 13, TEXT)
     s.text(lx, 250, 'Without a rule, both triangles draw that diagonal (a seam of', 12, DIM)
     s.text(lx, 268, 'double-drawn pixels) or neither does (a crack). Games of the era', 12, DIM)
-    s.text(lx, 286, 'chose their own rule. Measure it, then copy it.', 12, DIM)
+    s.text(lx, 286, 'chose their own rule. Measure the game\'s rule and copy it.', 12, DIM)
     return s.render()
 
 
 # ---------------------------------------------------------------- pointer chain (animated)
 def pointer_chain():
     s = Svg(900, 250, 'A pointer chain: a global holds the world, the world at +0x18 holds the player, the player at +0x24 holds the gold')
-    s.heading('A path to a value that moves', 'The global stays put; the objects move each run. Following the chain finds the gold in any run.')
+    s.heading('A path to a value that moves', 'The chain starts at a global with a fixed address. Following its pointers finds the gold in every run.')
     boxes = [('global', '0x4a1f30', 'static', TEAL), ('world', '+0x18', 'heap', BLUE), ('player', '+0x24', 'heap', BLUE),
              ('gold', '500', 'the value', AMBER)]
     x, y = 40, 100
@@ -244,7 +244,7 @@ def pointer_chain():
 # ---------------------------------------------------------------- coverage diff
 def coverage_diff():
     s = Svg(900, 300, 'Code coverage of two runs: the blocks that ran only with the action are the action\'s code')
-    s.heading('Coverage: what ran only with the action', 'Two runs alike in all but one action. Most code runs in both.')
+    s.heading('Coverage of two runs', 'The two runs differ in one action. The code that ran only in the second run handles that action.')
     cx1, cx2, cy, r = 330, 470, 185, 90
     s.add(f'<circle cx="{cx1}" cy="{cy}" r="{r}" fill="{BLUE}" fill-opacity="0.25" stroke="{BLUE}"/>')
     s.add(f'<circle cx="{cx2}" cy="{cy}" r="{r}" fill="{AMBER}" fill-opacity="0.25" stroke="{AMBER}"/>')
@@ -343,7 +343,7 @@ def message_anatomy():
 # ---------------------------------------------------------------- OAIS packages
 def oais_packages():
     s = Svg(900, 260, 'Three packages: the copy as received, the copy kept with checksums and findings, and what is given to players')
-    s.heading('Keeping a game: three packages', 'The words come from the OAIS reference model that archives use.')
+    s.heading('The three packages of an archive', 'The words come from the OAIS reference model that archives use.')
     boxes = [('Received', 'the installer or disc image,', 'as bought, and where from', GREY),
              ('Kept', 'a bag with checksums, provenance,', 'hashes and the findings', TEAL),
              ('Given to players', 'the port and its documents,', 'run with the player\'s own copy', AMBER)]
@@ -365,7 +365,7 @@ def oais_packages():
 # ---------------------------------------------------------------- PC hardware timeline
 def pc_timeline():
     s = Svg(900, 350, 'A timeline of PC graphics, sound and CPU features from 1981 to 1999')
-    s.heading('The PC games hardware, 1981 to 1999', 'When each standard arrived. A game targets what was common when it shipped.')
+    s.heading('The PC games hardware, 1981 to 1999', 'The year each standard arrived. A game usually supports the hardware that was common when it was released.')
     y0, x0, x1, y_axis = 0, 60, 860, 160
     lo, hi = 1981, 1999
     X = lambda yr: x0 + (yr - lo) / (hi - lo) * (x1 - x0)

@@ -115,5 +115,5 @@
 <text x="398.0" y="194.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#e2ece9" text-anchor="start">for which it is a left or top edge</text>
 <text x="370.0" y="250.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#8fa9a5" text-anchor="start">Without a rule, both triangles draw that diagonal (a seam of</text>
 <text x="370.0" y="268.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#8fa9a5" text-anchor="start">double-drawn pixels) or neither does (a crack). Games of the era</text>
-<text x="370.0" y="286.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#8fa9a5" text-anchor="start">chose their own rule. Measure it, then copy it.</text>
+<text x="370.0" y="286.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#8fa9a5" text-anchor="start">chose their own rule. Measure the game's rule and copy it.</text>
 </svg>

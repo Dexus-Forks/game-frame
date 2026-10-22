@@ -37,5 +37,5 @@
 <path d="M700 222C 760 222 534.0 170 534.0 134" fill="none" stroke="#8fa9a5" stroke-width="1.2" marker-end="url(#arrow)"/>
 <rect x="568.0" y="90.0" width="296.0" height="40.0" rx="3" fill="#60a5fa" stroke="none" fill-opacity="0.35"/>
 <path d="M700 244C 760 244 718.0 170 718.0 134" fill="none" stroke="#8fa9a5" stroke-width="1.2" marker-end="url(#arrow)"/>
-<text x="40.0" y="300.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="start">An example layout. The lookup code hashes a file name and searches the table: hashnames.py finds the hash function.</text>
+<text x="40.0" y="300.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="start">An example layout. The lookup code hashes a file name and searches the table. hashnames.py finds the hash function.</text>
 </svg>
