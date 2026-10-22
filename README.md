@@ -136,6 +136,8 @@ to produce, and the pitfalls that cost time.
 One agent per stage of the method, in [agents/](agents/). Each has its skills preloaded, does only its
 stage and ends with a hand-off that names the next agent. The main session sends them one at a
 time; only the lander commits. `re-start` ("Stage agents") has the table of hand-offs.
+[Permissions and gates](docs/working/gates.md) lists what runs without asking and the hooks
+that block game material, decompiled code and commits by other agents.
 
 `re-surveyor` → `re-observer`, `re-decompiler` → `re-tracer` → `re-decoder`, `re-measurer` →
 `re-porter` → `re-verifier` → `re-lander`, and back to the tracer or the porter when a check

@@ -301,10 +301,39 @@ rm -rf "$L"
 echo "Project scaffold"
 tmp="$(mktemp -d)/re-test"
 scripts/new-project.sh "$tmp" "Test Game" $B >/dev/null 2>&1
-[[ -f "$tmp/AGENTS.md" && -f "$tmp/README.md" && -f "$tmp/LICENSE-APACHE" && -f "$tmp/LICENSE-CC0-1.0" && ! -e "$tmp/LICENSE-CC-BY-4.0" && ! -e "$tmp/LICENSE-MIT" && -f "$tmp/docs/DOS.md" && -f "$tmp/docs/OUTPUTS.md" && -f "$tmp/docs/games/README.md" && -f "$tmp/docs/observe/inputs.md" && -f "$tmp/docs/working/agents.md" && -f "$tmp/docs/hardware/cpus.md" && -f "$tmp/.cargo/config.toml" && -f "$tmp/.claude/skills/re-start/SKILL.md" && -f "$tmp/.claude/agents/re-tracer.md" && -f "$tmp/target/game.exe" && -d "$tmp/.git" ]] \
+[[ -f "$tmp/AGENTS.md" && -f "$tmp/README.md" && -f "$tmp/LICENSE-APACHE" && -f "$tmp/LICENSE-CC0-1.0" && ! -e "$tmp/LICENSE-CC-BY-4.0" && ! -e "$tmp/LICENSE-MIT" && -f "$tmp/docs/DOS.md" && -f "$tmp/docs/OUTPUTS.md" && -f "$tmp/docs/games/README.md" && -f "$tmp/docs/observe/inputs.md" && -f "$tmp/docs/working/agents.md" && -f "$tmp/docs/hardware/cpus.md" && -f "$tmp/.cargo/config.toml" && -f "$tmp/.claude/skills/re-start/SKILL.md" && -f "$tmp/.claude/agents/re-tracer.md" && -f "$tmp/.claude/settings.json" && -f "$tmp/scripts/hooks/gate.py" && -f "$tmp/target/game.exe" && -d "$tmp/.git" ]] \
   && grep -q "Test Game" "$tmp/AGENTS.md" && ! (cd "$tmp" && git ls-files | grep -q '^target/') \
   && ok "new-project creates a repository, keeps target/ out of git" || bad "new-project scaffold" "$(ls -la "$tmp" 2>&1)"
 expect "gameframe works in a new project" "tools/pe/peinfo.py  (program)" "$tmp/gameframe" tool peinfo
+
+echo "Gates (scripts/hooks/gate.py)"
+out="$("$PYTHON" - <<'PY' 2>&1
+import json, os, subprocess, tempfile
+G = os.path.abspath('scripts/hooks/gate.py')
+def run(mode, event):
+    return subprocess.run(['python3', G, mode], input=json.dumps(event), capture_output=True, text=True).returncode
+d = tempfile.mkdtemp()
+git = lambda *a: subprocess.run(['git', *a], cwd=d, capture_output=True, check=True)
+git('init', '-q'); os.makedirs(f'{d}/target'); os.makedirs(f'{d}/docs')
+open(f'{d}/target/GAME.EXE', 'w').write('x'); git('add', '-f', 'target/GAME.EXE')
+c = {'cwd': d, 'tool_input': {'command': 'git commit -m x'}}
+assert run('commit', c) == 2, 'a commit of target/GAME.EXE is blocked'
+git('rm', '-q', '--cached', 'target/GAME.EXE')
+open(f'{d}/docs/a.md', 'w').write('FUN_1400be770 reads +0x44 (observed).\n'); git('add', 'docs/a.md')
+assert run('commit', c) == 0, 'a commit of prose is allowed'
+assert run('commit', dict(c, agent_type='gameframe:re-tracer')) == 2, 're-tracer may not commit'
+assert run('commit', dict(c, agent_type='re-lander')) == 0, 're-lander may commit'
+p = {'cwd': d, 'tool_input': {'command': 'git push'}}
+assert run('push', dict(p, agent_type='re-porter')) == 2 and run('push', p) == 0, 'push gate'
+pseudo = 'undefined8 uVar1;\nuVar1 = CONCAT44(a, b);\n'
+w = lambda path: {'cwd': d, 'tool_input': {'file_path': f'{d}/{path}', 'content': pseudo}}
+assert run('write', w('docs/f.md')) == 2 and run('write', w('analysis/f.c')) == 0, 'write gate'
+s = subprocess.run(['python3', G, 'session'], input=json.dumps({'cwd': d}), capture_output=True, text=True)
+assert json.loads(s.stdout)['hookSpecificOutput']['hookEventName'] == 'SessionStart', 'session context'
+print('commit, push, write and session gates')
+PY
+)"
+[[ $? == 0 ]] && ok "the gates block game material, decompiled code and non-lander commits ($out)" || bad "gates" "$out"
 
 echo "Claude Code plugin"
 out="$("$PYTHON" - <<'PY' 2>&1

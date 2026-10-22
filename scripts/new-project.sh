@@ -7,7 +7,8 @@
 #   AGENTS.md (+ CLAUDE.md)   the rules, with the game's name; edit the goal paragraph first
 #   README.md, LICENSE-APACHE, LICENSE-CC0-1.0   front page (build/run per part); code Apache 2.0, content CC0 1.0
 #   .claude/skills/           the re-* skills (every step of the method)
-#   .claude/agents/           the stage agents (re-surveyor ... re-lander), which hand off to each other
+#   .claude/agents/           the stage and task agents, which hand off to each other
+#   .claude/settings.json     light permissions and the gates (scripts/hooks/gate.py)
 #   tools/, scripts/          GameFrame's toolkit, requirements.txt, .mcp.json (REA)
 #   gameframe                 the help and discovery command (./gameframe help)
 #   docs/FINDINGS.md, docs/CHECKLIST.md, labels/names.tsv, labels/fields.tsv
@@ -25,6 +26,8 @@ mkdir -p "$dir"/{target,analysis,derived,docs,labels,.claude}
 cp -R "$ROOT/tools" "$ROOT/scripts" "$dir/"
 cp -R "$ROOT/.claude/skills" "$dir/.claude/"
 cp -R "$ROOT/agents" "$dir/.claude/agents"
+# The permissions and the gates (scripts/hooks/gate.py): docs/working/gates.md.
+cp "$ROOT/.claude/settings.json" "$dir/.claude/settings.json"
 cp "$ROOT/requirements.txt" "$ROOT/.mcp.json" "$ROOT/gameframe" "$dir/"
 # Code is Apache 2.0; documentation and other prose are CC0 1.0 (as in GameFrame).
 cp "$ROOT/templates/project/licences/LICENSE-APACHE" "$ROOT/templates/project/licences/LICENSE-CC0-1.0" "$dir/"

@@ -1,0 +1,27 @@
+{
+  "description": "GameFrame's gates: no game material or decompiled code in commits or tracked files, only re-lander commits and pushes, and a short status at the start of a session. See docs/working/gates.md.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "python3", "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/hooks/gate.py", "session"], "timeout": 10 }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "if": "Bash(git commit *)", "command": "python3", "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/hooks/gate.py", "commit"], "timeout": 30 },
+          { "type": "command", "if": "Bash(git push *)", "command": "python3", "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/hooks/gate.py", "push"], "timeout": 10 }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          { "type": "command", "command": "python3", "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/hooks/gate.py", "write"], "timeout": 10 }
+        ]
+      }
+    ]
+  }
+}
