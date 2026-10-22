@@ -3,6 +3,7 @@ bank switching, the video and maths chips, the CPUs that share a game, container
 routes to a port, the tools, and the handhelds' memory maps, screens, saves and executables.
 site/diagrams/make.py writes them with the other sets.
 """
+import math
 import re
 
 from svg import AMBER, BG, BLUE, DIM, FONT, GREEN, GREY, MONO, PURPLE, RED, TEAL, TEXT, Svg, esc
@@ -41,7 +42,8 @@ def box(s, x, y, w, h, colour, title='', lines=(), size=13, op=0.2, mono=False):
         s.text(x + w / 2, ty, title, size, TEXT, 'middle', '600')
         ty += size + 5
     for t in lines:
-        s.text(x + w / 2, ty, t, 11, DIM, 'middle', mono=mono)
+        if t:
+            s.text(x + w / 2, ty, t, 11, DIM, 'middle', mono=mono)
         ty += 15
 
 
@@ -117,7 +119,8 @@ def timeline(s, items, lo, hi, x0, x1, ya, colours, step=5):
     """Dots on a year axis with labels stacked so they do not touch. ITEMS: (year, label, key)."""
     X = lambda yr: x0 + (yr - lo) / (hi - lo) * (x1 - x0)
     s.line(x0, ya, x1, ya, GREY, 2)
-    for yr in range(int(lo) + (step - int(lo) % step) % step, int(hi) + 1, step):
+    first = -(-math.ceil(lo) // step) * step
+    for yr in range(first, math.floor(hi) + 1, step):
         s.line(X(yr), ya - 4, X(yr), ya + 4, GREY, 1)
         s.text(X(yr), ya + 20, str(yr), 11, DIM, 'middle', mono=True)
     placed, labels = [], []
@@ -950,7 +953,8 @@ def ghidra_adc():
     hdr = ['', 'A + operand + C', 'result', 'real 6502', 'Ghidra p-code']
     xs = [40, 190, 390, 500, 680]
     for x, t in zip(xs, hdr):
-        s.text(x, 98, t, 11, DIM)
+        if t:
+            s.text(x, 98, t, 11, DIM)
     cases = [('signed overflow', '$50 + $50 + 0', '$A0', 'V = 1, C = 0', 'V = 0 (copied from C)'),
              ('incoming carry', '$FF + $00 + 1', '$00', 'C = 1', 'C = 0 (carry-in ignored)')]
     for i, (name, op, res, real, ghidra) in enumerate(cases):
