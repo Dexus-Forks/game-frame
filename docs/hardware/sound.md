@@ -18,6 +18,8 @@ the sound exactly, you need to know which device the game wrote for and how it d
 
 ## FM synthesis (OPL2 and OPL3)
 
+![An OPL2 voice: a modulator, a carrier and their envelopes](../assets/diagrams/opl2-operators.svg)
+
 Music for AdLib and Sound Blaster is a stream of writes to the chip's registers: which voice,
 which frequency, which instrument settings, key on and key off. The chip turns these into sound.
 

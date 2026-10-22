@@ -23,6 +23,8 @@ In my GameFrame project, run the <team name> team on <subject>.
 
 ## How a team works
 
+![The main session sends a brief to one agent at a time and reads its hand-off](../assets/diagrams/team-handoff.svg)
+
 The main session coordinates. It sends one agent at a time, reads the agent's hand-off, checks
 it, and sends the next agent. Agents never call each other directly. The data moves through
 files in the project, and the hand-off names them.

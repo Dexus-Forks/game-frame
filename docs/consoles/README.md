@@ -27,6 +27,8 @@ In my GameFrame project, start work on a game for <console>.
 
 ## Platforms by generation
 
+![Home consoles by year of first release, coloured by CPU family](../assets/diagrams/console-timeline.svg)
+
 - [Early consoles](early-consoles.md): the Odyssey, Atari 2600, Intellivision, ColecoVision,
   Atari 5200 and 7800, and Vectrex.
 - [Console platforms](platforms.md): the home consoles from the NES to the sixth generation,

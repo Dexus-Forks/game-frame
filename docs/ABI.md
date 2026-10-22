@@ -6,6 +6,8 @@ linked at the end.
 
 ## Calling conventions
 
+![The stack at a function's first instruction, for x86 cdecl and Windows x64](assets/diagrams/abi-stack.svg)
+
 | Platform | Integer and pointer arguments | Float arguments | Return | `this` | Stack |
 |---|---|---|---|---|---|
 | Windows x64 (all 64-bit Windows games) | rcx, rdx, r8, r9, then stack | xmm0-xmm3 (by position: the 2nd argument is rdx *or* xmm1) | rax, xmm0 | rcx | caller reserves 32 bytes of shadow space; stack 16-byte aligned at the call |

@@ -26,6 +26,8 @@ part is separated ([DOS games](../DOS.md)).
 
 ## Getting the code out
 
+![A packed program: the stub rebuilds the code in memory, then jumps to it](../assets/diagrams/unpacking.svg)
+
 1. **Use the packer's own tool when there is one.** `upx -d` restores a UPX program exactly.
    UNP and similar tools restore the common DOS packers.
 2. **Let the program unpack itself, then dump the memory.** Run it in an emulator until the

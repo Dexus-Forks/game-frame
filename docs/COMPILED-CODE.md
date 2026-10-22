@@ -73,6 +73,8 @@ Name them once. Then each call reads as one operation.
 
 ## Branches and loops
 
+![A switch statement compiled to a bounds check and a jump table](assets/diagrams/jump-table.svg)
+
 | In the machine code | In the source |
 |---|---|
 | A compare, a conditional jump over a block | `if` |

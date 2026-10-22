@@ -21,6 +21,8 @@ games share. [Recognising an engine](recognising.md) covers telling engines apar
 | Render state | Objects for blending, depth, culling and materials, pushed and popped as the scene graph is drawn | Which state applies to which object, and the draw order |
 | Level of detail | Switch nodes that choose a child by distance, or meshes that collapse edges step by step | The distances and the measure of distance: from the camera or its plane, squared or not |
 
+![A scene graph update: transforms go down the tree, bounds come back up](../assets/diagrams/scene-graph.svg)
+
 ## How to work with them
 
 1. **Find the type records first.** Search the strings for class names, then the references to them. Each lands in a type record. The parent pointers link the records into the class

@@ -10,6 +10,8 @@ them from the running original, see [Observing the original](observe/README.md).
 
 ## The main loop
 
+![A fixed-step loop runs equal updates from frames of different lengths](assets/diagrams/fixed-step.svg)
+
 `WinMain` → engine set-up → a loop that, each frame, reads input, updates the game, draws, and
 presents. Find it from the entry point, or from `PeekMessage`/`GetMessage` (the Windows message
 pump sits inside it) and the present call (`IDirect3DDevice9::Present`, `IDXGISwapChain::Present`,

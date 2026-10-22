@@ -48,6 +48,8 @@ Find your game's value on each of these axes. The values show where most of the 
 
 ## Families
 
+![Families of games and what drives each one](../assets/diagrams/game-families.svg)
+
 | Family | Who drives | Typical time model | The hardest part |
 |---|---|---|---|
 | [Arcade action](arcade-action.md): shoot 'em ups, platformers, beat 'em ups, fighting | stream | fixed step, 60 or 70 per second | frame-exact order, collision, demo sync |
