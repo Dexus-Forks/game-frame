@@ -32,6 +32,24 @@ expect "readdata reads a float table" "0.05000000074505806, 0.125, 0.33333331346
 vt=$("$PYTHON" -c "import pefile;p=pefile.PE('$B/game.exe');print(hex(p.OPTIONAL_HEADER.ImageBase+[e.address for e in p.DIRECTORY_ENTRY_EXPORT.symbols if e.name==b'tree_vtbl'][0]))")
 expect "vtable lists two slots" "+0x008" "$PYTHON" tools/pe/vtable.py $B/game.exe "$vt"
 expect "peinfo counts the base relocations" "base relocations: " "$PYTHON" tools/pe/peinfo.py $B/game.exe
+expect "dates finds a FILETIME and a DOS date" "0x00000b  filetime   2026-10-22 14:30:00" "$PYTHON" - <<'PY'
+import struct, datetime as dt, subprocess, sys, tempfile
+t = dt.datetime(2026, 10, 22, 14, 30, tzinfo=dt.timezone.utc); u = int(t.timestamp())
+data = b'HEAD' + struct.pack('<I', u) + b'\0' * 3 + struct.pack('<Q', (u + 11644473600) * 10**7)
+data += struct.pack('<HH', (14 << 11) | (30 << 5), ((2026 - 1980) << 9) | (10 << 5) | 22)
+f = tempfile.NamedTemporaryFile(suffix='.bin', delete=False); f.write(data); f.close()
+print(subprocess.run([sys.executable, 'tools/triage/dates.py', f.name, '--near', '2026-10-22T14:00'],
+                     capture_output=True, text=True).stdout)
+PY
+expect "compare_trees pairs a renamed file by its content" "like NEW.PAK in B" "$PYTHON" - <<'PY'
+import os, random, subprocess, sys, tempfile
+r = random.Random(1); d = bytes(r.getrandbits(8) for _ in range(100000)); t = tempfile.mkdtemp()
+os.makedirs(f'{t}/a'); os.makedirs(f'{t}/b')
+open(f'{t}/a/OLD.PAK', 'wb').write(d); open(f'{t}/b/NEW.PAK', 'wb').write(d[:60000] + b'patch' + d[60000:])
+print(subprocess.run([sys.executable, 'tools/triage/compare_trees.py', f'{t}/a', f'{t}/b', '--similar'],
+                     capture_output=True, text=True).stdout)
+PY
+expect "hashnames gives the ROR-13 hash of an import name" "0xec0e4e8e" "$PYTHON" tools/triage/hashnames.py --hash LoadLibraryA
 expect "relocs finds the vtable as a run of code pointers" "$vt  .rdata      2 pointers  (2 code)" "$PYTHON" tools/pe/relocs.py $B/game.exe
 
 echo "Emulator"
@@ -41,6 +59,16 @@ from pe_emu import Emu
 emu = Emu('examples/sample-game/build/game.exe', ['examples/sample-game/build/engine.dll'])
 r = emu.malloc(4); emu.call(emu.export('engine.dll', 'rng_seed'), r, 1)
 print([emu.call(emu.export('engine.dll', 'rng_next'), r) for _ in range(3)])
+PY
+expect "mem_trace lists the loader's reads of the file buffer" "('file', 'r', 0, 1, 'game.exe+0x" "$PYTHON" - <<'PY'
+import sys; sys.path.insert(0, 'tools/emu')
+from pe_emu import Emu
+from mem_trace import MemTrace
+emu = Emu('examples/sample-game/build/game.exe', ['examples/sample-game/build/engine.dll'])
+data = open('examples/sample-game/build/sample.dat', 'rb').read(); w = emu.malloc(64); buf = emu.bytes_in(data)
+t = MemTrace(emu, [(buf, len(data), 'file')])
+emu.call_i32(emu.export('game.exe', 'load_records'), buf, len(data), w)
+print(t.log[0])
 PY
 expect "data loader runs on emulated memory" "3 (0.5, 1.25, 2.0)" "$PYTHON" - <<'PY'
 import sys; sys.path.insert(0, 'tools/emu')

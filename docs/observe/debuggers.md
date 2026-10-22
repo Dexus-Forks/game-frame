@@ -75,6 +75,23 @@ action once. The blocks in the second run and not the first are the action's cod
 Keep the two runs alike: the same save, the same menus, the same length. Every extra
 difference adds functions to the list.
 
+## Going backwards: time-travel debugging
+
+A recording debugger saves everything a program does, then lets you step backwards as well as
+forwards. The common question becomes one step. A value is wrong now, so which instruction
+last wrote it? Set a watchpoint on the value and run backwards.
+
+- **WinDbg's Time Travel Debugging** records a Windows process into a trace file. Queries over
+  the trace list every call to a function, or every write to an address, across the whole run.
+- **rr** records a Linux x86 process. `gdb` then runs over the recording with `reverse-continue`
+  and `reverse-step`.
+- **Emulators.** Many console and computer emulators can rewind, and some write a trace log of
+  every instruction. A save state taken just before the moment, with a trace log, gives the same
+  answer for older games.
+
+A recording is large and the program runs slower while it records. Record only the few seconds
+around the event, starting from a save that reaches it quickly.
+
 ## Following a value: taint
 
 Coverage shows which code ran. Taint shows which code used a value. Mark some bytes as the
@@ -86,9 +103,10 @@ path through the game.
 - **Questions it answers.** Which code reads this byte of the save file? Which decisions does
   this random draw affect? Which part of the score comes from the difficulty setting?
 - **Tools.** libdft (on Intel Pin) taints a running x86 program on Linux. On other platforms,
-  write the rule into an emulator: `tools/emu/pe_emu.py` and Unicorn give a hook on each
-  instruction, with its reads and writes. A short taint pass for one function is often
-  enough.
+  use an emulator. `tools/emu/mem_trace.py` marks memory in `pe_emu.py`, calls a function, and
+  lists each instruction that read or wrote the marked bytes. It follows copies made by one
+  instruction, such as `rep movs`. Values that pass through a register are not followed, so
+  start from the instructions it lists and read their code.
 - **Several sources at once.** Give each source its own colour (a bit in the mark). One pass
   then shows which values come from the save file, which from the random generator, and which
   from both.

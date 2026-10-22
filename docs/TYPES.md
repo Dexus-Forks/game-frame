@@ -80,6 +80,27 @@ checking, which moves every field by 8 bytes. Older compilers have their own lay
 many engines wrote to avoid the standard library, have their own layouts: find them with
 the shapes above.
 
+## Dates and times in data
+
+Saves, archives, high-score tables and replays often hold a date. The load menu shows it, or the
+game uses it to order saves. The port must read and write the same form.
+
+| Form | Size | Counts from | Seen in |
+|---|---|---|---|
+| Unix time | 4 or 8 bytes | seconds since 1970-01-01 | C `time_t`. A 32-bit value ends in January 2038 |
+| Unix milliseconds | 8 bytes | milliseconds since 1970-01-01 | Java, JavaScript, many engines' save headers |
+| FILETIME | 8 bytes | 100 ns units since 1601-01-01 | Windows file times, `GetSystemTimeAsFileTime` |
+| SYSTEMTIME | 16 bytes | eight 16-bit fields: year, month, weekday, day, hour, minute, second, ms | Windows saves that store `GetLocalTime`'s result whole |
+| DOS date and time | 2 + 2 bytes | year from 1980 in 7 bits, month, day; hour, minute, seconds halved | FAT, ZIP, DOS games' saves |
+| HFS | 4 bytes, big-endian | seconds since 1904-01-01 | Classic Mac OS files and games |
+| OLE `DATE` | 8-byte float | days since 1899-12-30 | Windows COM, MFC `COleDateTime` |
+| ISO 9660 | 7 bytes | years since 1900, then month, day, hour, minute, second, time zone | CD directory records |
+
+To find one, save the game, note the time, and run `tools/triage/dates.py SAVE --near
+2026-10-22T14:30`. It reads every offset in each form and lists the values within a day of that
+time. Save again a few minutes later. The offset whose value moved by those minutes is the
+date. Check whether the game stores local time or UTC. Their difference is the time zone.
+
 ## Working through a program
 
 1. Apply what exists: symbols, RTTI, known library structures. In Ghidra, parse a header

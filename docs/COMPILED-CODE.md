@@ -296,6 +296,16 @@ help with the whole program.
   a list for that DLL version. Delay-loaded DLLs are not in the import table. Their slots first
   point to a helper (`__delayLoadHelper2`) that loads the DLL on the first call. Their names
   are in the delay-load directory. `tools/pe/peinfo.py BINARY --imports` lists both kinds.
+- **Shared libraries on Linux and macOS.** An ELF program calls a library function through a
+  stub in the procedure linkage table (`printf@plt`). The stub jumps through a slot in the
+  global offset table, which the dynamic linker fills on the first call. 32-bit
+  position-independent code first finds its own address, with a call to
+  `__x86.get_pc_thunk.bx` or a `call` to the next instruction and a `pop`. It then reads every
+  global through `ebx`. Give `ebx` that value in Ghidra, and the globals resolve. Mach-O
+  programs use `__stubs` and lazy pointers the same way. Library constructors (`.init_array`,
+  `DllMain`, Mach-O initialisers) run before `main`, so an engine library can set up its
+  globals before the game starts. Linux ports often shipped their own copies of libraries.
+  Record the exact versions, because a later version can behave differently.
 - **Weak and common symbols.** A weak symbol is a default that another definition replaces.
   An uninitialised global declared in several files can become one shared block (common). A
   global that seems to belong to two source files may be one of these.
