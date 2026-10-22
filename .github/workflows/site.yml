@@ -1,4 +1,5 @@
-# Builds the documentation site (site/, VitePress) from docs/, the skills and the examples,
+# Builds the documentation site (site/, VitePress) from docs/, the skills, the agents, the
+# tools' own help (read with python3 tools/gameframe) and the examples,
 # and publishes it to GitHub Pages. Runs on every push to main that touches them, and by hand.
 name: Site
 
@@ -8,6 +9,9 @@ on:
     paths:
       - 'docs/**'
       - '.claude/skills/**'
+      - 'agents/**'
+      - 'tools/**'
+      - 'scripts/**'
       - 'examples/*/README.md'
       - 'README.md'
       - 'site/**'

@@ -12,6 +12,9 @@
 //   crates/<name>/README.md           -> /crates/<name>
 //   site/index.md                     -> /            (the home page, the one page written for the site)
 //   site/skills/[skill].md            -> /skills/<skill>, one per .claude/skills/<skill>/SKILL.md
+//   site/agents/[agent].md            -> /agents/<agent>, one per agents/<agent>.md
+//   site/tools/[tool].md              -> /tools/<tool>, one per tool or script (its own help)
+//   site/[section]/index.md           -> /skills/, /agents/, /tools/ (catalog.mts has all four)
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -31,7 +34,7 @@ export const EXCLUDE = [
 export function rewrite(id: string): string {
   if (id === 'README.md') return 'overview.md'
   if (id === 'site/index.md') return 'index.md'
-  if (id.startsWith('site/skills/')) return id.slice('site/'.length)
+  if (/^site\/(skills|agents|tools|\[section\])\//.test(id)) return id.slice('site/'.length)
   if (id === 'docs/README.md') return 'guide.md'
   let m = id.match(/^crates\/([^/]+)\/README\.md$/)
   if (m) return `crates/${m[1]}.md`
@@ -49,6 +52,8 @@ export function rewrite(id: string): string {
 export function pageUrl(repoPath: string): string | null {
   const skill = repoPath.match(/^\.claude\/skills\/([^/]+)(\/SKILL\.md)?\/?$/)
   if (skill) return `/skills/${skill[1]}`
+  const agent = repoPath.match(/^agents\/([\w-]+)\.md$/)
+  if (agent && fs.existsSync(path.join(ROOT, repoPath))) return `/agents/${agent[1]}`
   let p = repoPath.replace(/\/$/, '')
   if (!p.endsWith('.md')) {
     if (fs.existsSync(path.join(ROOT, p, 'README.md'))) p = `${p}/README.md`

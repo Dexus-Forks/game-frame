@@ -91,7 +91,14 @@ export default withMermaid(defineConfig({
         ],
       },
       { text: 'Crates', link: '/crates/' },
-      { text: 'Skills', link: '/skills/re-start' },
+      {
+        text: 'Skills and tools',
+        items: [
+          { text: 'Skills', link: '/skills/' },
+          { text: 'Agents', link: '/agents/' },
+          { text: 'Tools', link: '/tools/' },
+        ],
+      },
       { text: 'Case studies', link: '/case-studies/' },
     ],
     sidebar: sidebar(),
@@ -100,10 +107,10 @@ export default withMermaid(defineConfig({
     search: { provider: 'local' },
     socialLinks: [{ icon: 'github', link: GITHUB }],
     editLink: {
-      // Runs in the browser, so it cannot use GITHUB from repo.mts. Skill pages come from
-      // the dynamic route; their source is the SKILL.md.
+      // Runs in the browser, so it cannot use GITHUB from repo.mts. Pages made by a dynamic
+      // route (skills, agents, tools, the indexes) carry their source file in params.source.
       pattern: ({ filePath, params }) => 'https://github.com/tanepiper/game-frame/edit/main/'
-        + (params?.skill ? `.claude/skills/${params.skill}/SKILL.md` : filePath),
+        + (params?.source ?? (params?.skill ? `.claude/skills/${params.skill}/SKILL.md` : filePath)),
       text: 'Edit this page on GitHub',
     },
     footer: {

@@ -16,7 +16,10 @@ npm --prefix site run build    # site/.vitepress/dist
 | `/guide` and the menu's sections | `docs/README.md`: each `## ` section is a menu group, in order |
 | `/games/`, `/observe/`, `/case-studies/` and their pages | `docs/<folder>/README.md` and the files it links to, in the order it links them |
 | `/game-patterns`, `/dos`, `/abi`, `/setup`, `/legal` | `docs/*.md` (URLs in lower case) |
-| `/skills/<name>` | `.claude/skills/<name>/SKILL.md`, through the dynamic route `site/skills/[skill].md` |
+| `/skills/<name>` | `.claude/skills/<name>/SKILL.md`, through the dynamic route `site/skills/[skill].md`, followed by the agents that preload it and the tools it names |
+| `/agents/<name>` | `agents/<name>.md`, through `site/agents/[agent].md` |
+| `/tools/<name>` | The tool's own help (its docstring or header comment, as `./gameframe tool NAME` prints it), through `site/tools/[tool].md` |
+| `/skills/`, `/agents/`, `/tools/` | Index pages made from the same files, through `site/[section]/index.md` |
 | `/examples/<name>` | `examples/<name>/README.md` |
 
 `.github/workflows/site.yml` builds it on every push to `main` that changes the docs, the
@@ -34,8 +37,10 @@ group; a heading with one page shows that page. A `docs/README.md` section that 
 folders shows each folder as its own group.
 
 Links between files stay
-relative, as GitHub needs them; the site turns them into page URLs, and links to tools and
-scripts into links to GitHub (`.vitepress/links.mts`). The build fails on a link to a page
+relative, as GitHub needs them; the site turns them into page URLs (`.vitepress/links.mts`).
+A link to a tool or a script, and inline code that starts with a tool's path
+(`tools/triage/memscan.py`), lead to that tool's page. Other files link to GitHub.
+`.vitepress/catalog.mts` builds the skills', agents' and tools' pages. The build fails on a link to a page
 that does not exist.
 
 After the build, `.vitepress/llms.mts` writes text for AI agents into the output, with no extra

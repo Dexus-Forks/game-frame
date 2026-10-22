@@ -5,11 +5,13 @@
 // A section with several folders shows each as its own group; a folder README whose page list
 // is split under "## " headings shows those headings as groups; a subfolder's README linked
 // from it opens into its pages too.
-// The skills follow, in the order of the README's skills table, then the examples.
+// The skills follow, in the order of the README's skills table, then the agents, the tools
+// (grouped by folder) and the examples.
 import fs from 'node:fs'
 import path from 'node:path'
 import type { DefaultTheme } from 'vitepress'
 import { ROOT, pageUrl, skills, title } from './repo.mts'
+import { GROUP_TITLES, agents, tools } from './catalog.mts'
 
 type Item = DefaultTheme.SidebarItem
 
@@ -41,7 +43,20 @@ export function sidebar(): Item[] {
   groups.push({
     text: 'Skills',
     collapsed: true,
-    items: skills().map(s => ({ text: s.name, link: `/skills/${s.name}` })),
+    items: [{ text: 'All skills', link: '/skills/' }, ...skills().map(s => ({ text: s.name, link: `/skills/${s.name}` }))],
+  })
+  groups.push({
+    text: 'Agents',
+    collapsed: true,
+    items: [{ text: 'All agents', link: '/agents/' }, ...agents().map(a => ({ text: a.name, link: `/agents/${a.name}` }))],
+  })
+  groups.push({
+    text: 'Tools',
+    collapsed: true,
+    items: [{ text: 'All tools', link: '/tools/' }, ...Object.entries(GROUP_TITLES).map(([group, text]) => ({
+      text, collapsed: true,
+      items: tools().filter(t => t.group === group).map(t => ({ text: t.name, link: `/tools/${t.name}` })),
+    })).filter(g => g.items.length)],
   })
   const examples = fs.readdirSync(path.join(ROOT, 'examples'))
     .filter(n => fs.existsSync(path.join(ROOT, 'examples', n, 'README.md')))

@@ -14,6 +14,7 @@ import path from 'node:path'
 import type MarkdownIt from 'markdown-it'
 import type { DefaultTheme, SiteConfig } from 'vitepress'
 import { ROOT, githubUrl, pageUrl, skills } from './repo.mts'
+import { SECTIONS, agentPage, agents, indexPage, skillExtras, toolPage, toolUrl, tools } from './catalog.mts'
 import { sidebar } from './sidebar.mts'
 
 type Page = { url: string, out: string, title: string, description: string, text: string }
@@ -29,7 +30,7 @@ export function writeLlmsFiles(config: SiteConfig) {
 
   const pages: Page[] = []
   for (const source of config.pages) {
-    if (source.startsWith('site/skills/')) continue // the skill route, done below
+    if (/^site\/(skills|agents|tools|\[section\])\//.test(source)) continue // generated routes, done below
     const out = config.rewrites.map[source] ?? source
     const url = '/' + out.replace(/(^|\/)index\.md$/, '$1').replace(/\.md$/, '')
     const raw = fs.readFileSync(path.join(ROOT, source), 'utf8')
@@ -40,7 +41,19 @@ export function writeLlmsFiles(config: SiteConfig) {
     const source = path.relative(ROOT, file)
     const body = relink(stripFrontMatter(fs.readFileSync(file, 'utf8')), source, href)
       .replace(/^(# .*\n)/m, `$1\n> **Skill \`${name}\`.** ${description}\n`)
-    pages.push({ url: `/skills/${name}`, out: `skills/${name}.md`, title: describe(body).title, description, text: body })
+    const text = body + skillExtras(name, body)
+    pages.push({ url: `/skills/${name}`, out: `skills/${name}.md`, title: describe(body).title, description, text })
+  }
+  for (const a of agents()) {
+    const text = agentPage(a, (body, file) => relink(body, path.relative(ROOT, file), href))
+    pages.push({ url: `/agents/${a.name}`, out: `agents/${a.name}.md`, title: a.name, description: a.description, text })
+  }
+  for (const t of tools()) {
+    pages.push({ url: `/tools/${t.name}`, out: `tools/${t.name}.md`, title: t.name, description: t.summary, text: toolPage(t) })
+  }
+  for (const section of SECTIONS) {
+    const text = indexPage(section)
+    pages.push({ url: `/${section}/`, out: `${section}/index.md`, ...describe(text), text })
   }
 
   for (const page of pages) {
@@ -121,7 +134,7 @@ function relink(text: string, source: string, href: (url: string) => string): st
     /\]\((?![a-z]+:|\/|#)([^)\s]+)\)/gi, (whole, link: string) => {
       const [file, hash] = path.posix.normalize(path.posix.join(path.posix.dirname(source), link)).split('#')
       if (!fs.existsSync(path.join(ROOT, file))) return whole
-      const page = pageUrl(file)
+      const page = pageUrl(file) ?? toolUrl(file)
       return `](${page ? href(page) : githubUrl(file)}${hash ? `#${hash}` : ''})`
     })).join('')
 }
