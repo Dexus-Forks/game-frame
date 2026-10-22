@@ -737,7 +737,7 @@ def hero():
                     f'fill="#fff"/><animateTransform attributeName="transform" type="translate" values="0 0;30 0;0 0" dur="12s" '
                     f'repeatCount="indefinite"/></g>')
     level = ['...............', '...............', '..........ccc..', '....?.?........', '...............',
-             '.........BBBB..', '..BB?BB........', '............P..', 'GGGGGGG..GGGGGG', 'DDDDDDD..DDDDDD']
+             '.........BBBB..', '..BB?BB........', '..........P....', 'GGGGGGG..GGGGGG', 'DDDDDDD..DDDDDD']
     pal = {'G': '#4ade80', 'D': '#a0522d', 'B': '#c2410c', '?': '#f59e0b', 'P': '#15803d'}
     cells = [(r, c) for r in range(10) for c in range(15) if level[r][c] != '.']
     rng.shuffle(cells)
@@ -758,13 +758,33 @@ def hero():
         t0 = 0.03 + 0.3 * k / n
         game.append(f'<g opacity="1">{body}<animate attributeName="opacity" values="1;0;0;1;1" '
                     f'keyTimes="0;0.01;{t0:.3f};{t0 + 0.01:.3f};1" calcMode="discrete" dur="{dur}s" repeatCount="indefinite"/></g>')
-    game.append(f'<path d="M{gx + 13 * t + 16} {gy + 2 * t}V{gy + 8 * t}" stroke="#e5e7eb" stroke-width="4"/>'
-                f'<path d="M{gx + 13 * t + 18} {gy + 2 * t}h30l-10 10l10 10h-30z" fill="#ef4444"/>')
+    # The hero runs the level once the blocks are in: onto both platforms, a jump at the pole, then a slide to the
+    # ground with the flag. Times are seconds in the blocks' cycle; the sprite stands 36 above what it stands on.
+    pole, slide = gx + 13 * t + 16, (6.2, 7.2)
+    stand = lambda top: top - 36
+    path = [(0, gx + 10, stand(gy + 8 * t)), (3.2, gx + 10, stand(gy + 8 * t)), (3.5, gx + 24, stand(gy + 8 * t))]
+    def jump(t1, x1, y1, h):
+        t0, x0, y0 = path[-1]
+        for i in range(1, 9):
+            f = i / 8
+            path.append((t0 + (t1 - t0) * f, x0 + (x1 - x0) * f, y0 + (y1 - y0) * f - 4 * h * f * (1 - f)))
+    jump(4.1, gx + 84, stand(gy + 6 * t), 60)
+    path.append((4.8, gx + 196, stand(gy + 6 * t)))
+    jump(5.4, gx + 312, stand(gy + 5 * t), 50)
+    path.append((5.7, gx + 356, stand(gy + 5 * t)))
+    jump(slide[0], pole - 28, gy + 2 * t + 16, 40)
+    path += [(slide[1], pole - 28, stand(gy + 8 * t)), (dur, pole - 28, stand(gy + 8 * t))]
+    drop = 6 * t - 24
+    game.append(f'<path d="M{pole} {gy + 2 * t}V{gy + 8 * t}" stroke="#e5e7eb" stroke-width="4"/>'
+                f'<g><path d="M{pole + 2} {gy + 2 * t}h30l-10 10l10 10h-30z" fill="#ef4444"/><animateTransform '
+                f'attributeName="transform" type="translate" values="0 0;0 0;0 {drop};0 {drop}" '
+                f'keyTimes="0;{slide[0] / dur:.3f};{slide[1] / dur:.3f};1" dur="{dur}s" repeatCount="indefinite"/></g>')
     hero_sprite = sprite(['.rrrr.', 'rrrrrr', '.ssss.', '.sesss'[:6], 'tttttt', 'tt..tt', 'bb..bb'],
                          {'r': '#ef4444', 's': '#fcd5b4', 'e': '#1f2937', 't': '#2563eb', 'b': '#7c2d12'}, 0, 0, 5)
     game.append(f'<g opacity="1">{hero_sprite}<animateTransform attributeName="transform" type="translate" '
-                f'values="{gx + 30} {gy + 8 * t - 36};{gx + 150} {gy + 4 * t};{gx + 300} {gy + 8 * t - 36};{gx + 30} {gy + 8 * t - 36}" '
-                f'dur="3s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0;0;1;1" keyTimes="0;0.01;0.34;0.35;1" calcMode="discrete" '
+                f'values="{";".join(f"{x:.0f} {y:.0f}" for _, x, y in path)}" '
+                f'keyTimes="{";".join(f"{k / dur:.4f}" for k, _, _ in path)}" dur="{dur}s" repeatCount="indefinite"/>'
+                f'<animate attributeName="opacity" values="1;0;0;1;1" keyTimes="0;0.01;0.34;0.35;1" calcMode="discrete" '
                 f'dur="{dur}s" repeatCount="indefinite"/></g>')
     a.add(f'<g clip-path="url(#{cid})">{"".join(game)}</g>')
     a.add(f'<rect x="{gx}" y="{gy}" width="{15 * t}" height="{10 * t}" rx="12" fill="none" stroke="#2dd4bf" stroke-width="3"{a.glow}/>')
