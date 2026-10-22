@@ -37,6 +37,11 @@ Knowing the engine helps in several ways.
 - [Studio engines for 2D and isometric games](studio-2d.md): Westwood, Blizzard, the Infinity
   Engine, the Fallout engine, the adventure engines.
 
+## Web players
+
+- [Flash and Shockwave games](flash-and-shockwave.md): SWF files and projectors, ActionScript,
+  JPEXS, Ruffle, Flashpoint, Director and Lingo, and the routes to a port.
+
 ## Libraries
 
 - [Middleware](middleware.md): video, sound, physics, compression, scripting and online

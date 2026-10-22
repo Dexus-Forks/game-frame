@@ -65,6 +65,22 @@ A file record can be marked hidden. Some discs also list files whose sectors lie
 volume's stated size, or give two files the same sectors. Some copy protections use these
 tricks. `discinfo.py` reports hidden files and files outside the volume.
 
+Four more checks show what a file list alone misses:
+
+- **Sectors no file uses.** A mastered disc accounts for nearly every sector. `--map` reads
+  every sector of the data track and lists the runs that hold data but belong to no
+  descriptor, path table, directory or file, with a guess at what each run holds. A file left
+  over from development, a second copy of a file, or data the game reads by sector number can
+  sit there.
+- **The system area.** Sectors 0 to 15 are empty on a PC disc. On a console disc they hold the
+  licence text and the boot code: the PlayStation, the Saturn, the Mega-CD and the Dreamcast
+  each use them. `discinfo.py` names what it finds.
+- **Two trees that differ.** The ISO 9660 and Joliet trees usually list the same files. A file
+  missing from the Joliet tree is hidden from Windows. A mastering tool can leave files out on
+  purpose. `discinfo.py` lists each file that only one tree has, and copies it with the rest.
+- **Files dated after the volume.** The volume descriptor is written last when a disc is
+  mastered. A file dated later suggests changed dates or a wrong clock.
+
 ## Images
 
 | Image | What it keeps | What it loses |
@@ -76,7 +92,10 @@ tricks. `discinfo.py` reports hidden files and files outside the volume.
 | `.chd` (MAME) | Raw sectors, compressed | Nothing. `chdman extractcd` writes CUE and BIN |
 
 Work from a raw image when the disc has audio or Mode 2 data. A `.iso` of such a disc lacks the
-music and the video. Some protections read the subchannel. One example is LibCrypt on PAL
+music and the video. A file of Mode 2 Form 2 sectors, such as a PlayStation STR video or XA
+sound file, is marked in its directory record. `discinfo.py --extract` copies such a file as
+whole 2352-byte sectors, the form the tools for those formats read. A copy of 2048 bytes per
+sector would lose part of every sector. Some protections read the subchannel. One example is LibCrypt on PAL
 PlayStation discs. For those, keep the `.sub` file or the SBI data that [Redump](http://redump.org/)
 publishes for each disc.
 
@@ -92,6 +111,7 @@ extract it again with `--swap`.
 python3 tools/disc/discinfo.py target/cd/GAME.CUE                 # tracks, file systems, dates
 python3 tools/disc/discinfo.py target/cd/GAME.CUE --files          # every file with its sector and date
 python3 tools/disc/discinfo.py target/cd/GAME.CUE --extract target/cd/files --audio target/cd/audio
+python3 tools/disc/discinfo.py target/cd/GAME.CUE --map            # data in sectors no file uses
 python3 tools/disc/discinfo.py target/cd/GAME.CUE --json > derived/disc.json
 ```
 

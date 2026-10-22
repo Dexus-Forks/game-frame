@@ -38,6 +38,8 @@ runtime shows how much of an executable is library code.
 | `setcc al`, `movzx eax, al` | A comparison stored as 0 or 1 |
 | `cmovcc` | A `?:` or a short `if` without a jump |
 | `test eax, eax` then `jz` | `if (x == 0)` |
+| `sub eax, 3`, `cmp eax, 5`, `ja` | A range test `if (x < 3 \|\| x > 8)`: subtracting the low bound and comparing unsigned tests both bounds at once |
+| `mov dword [ebp-0x10], 0x45564153` and more stores of printable values | A local character array initialised in place: here the text "SAVE" |
 
 When the source divides by a constant, the port should divide by that constant, with the same
 signedness. The multiply-and-shift form comes from the compiler. It gives the same result.
@@ -64,6 +66,10 @@ Ghidra recovers most jump tables. When a `switch` shows as a computed jump witho
 the table's address and size from the bounds check, and read its entries with
 `tools/pe/readdata.py`. Each entry is one case.
 
+Text built in place on the stack, as in the last row, is in no string list.
+`tools/pe/stackstrings.py BINARY` joins those stores back into text and gives the address of
+each.
+
 ## Functions
 
 - **Inlined functions.** A small function, or one called once, can be copied into its caller.
@@ -75,6 +81,12 @@ the table's address and size from the bounds check, and read its entries with
   result.
 - **No frame pointer.** Optimised code addresses locals from `esp` or `rsp`. The offsets change after each `push`. Ghidra tracks this. When a local looks wrong, check the stack depth
   at that instruction.
+- **Functions looked up by name.** A program can load a library and look up its functions at
+  run time with `LoadLibrary` and `GetProcAddress` (`dlopen` and `dlsym` elsewhere). Those
+  functions are not in the import table. The names are usually in the strings: find the
+  callers of `GetProcAddress` and their string arguments (`ghidra-run.sh BINARY callargs OUT
+  GetProcAddress`). Games did this for optional parts such as DirectX versions, force feedback
+  and voice chat.
 - **Shared code.** The linker can merge identical functions. One body may then serve two names. Its callers may expect different meanings.
 
 ## The flags

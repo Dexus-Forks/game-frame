@@ -77,6 +77,35 @@ pieces that match. An inserted or removed block changes only the pieces around i
 `tools/triage/compare_trees.py` answers the simpler question of whether two copies are
 identical.
 
+## Algorithms, from their constants
+
+Many algorithms carry numbers found nowhere else: the multiplier of a random number
+generator, the first entries of a CRC table, the start values of MD5, the 4078-byte window
+start of the common LZSS decompressor. `tools/triage/constants.py` searches for them:
+
+```bash
+python3 tools/triage/constants.py target/GAME.EXE
+```
+
+A hit names the algorithm and gives the address. The function at that address is often the
+random number generator, the checksum of the save files, or the decompressor of the data
+files. Confirm it in the code before you port it.
+
+## Resources inside executables
+
+A Windows executable carries resources: version information, string tables, dialogs, menus,
+icons, bitmaps, and data the developer packed in as `RCDATA`. `tools/pe/peres.py` lists them,
+prints the version information and the string tables, and extracts each one:
+
+```bash
+python3 tools/pe/peres.py target/GAME.EXE                     # every resource, and the version
+python3 tools/pe/peres.py target/GAME.EXE --strings           # the string tables, with their ids
+python3 tools/pe/peres.py target/GAME.EXE --extract derived/resources
+```
+
+The ids in a string table are the numbers the code passes to `LoadString`. Search the export
+for an id to find the code that shows the text.
+
 ## Simple obfuscation
 
 Some games hide text, scripts and tables from casual viewing. The common schemes are weak: XOR

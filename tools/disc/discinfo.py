@@ -2,10 +2,12 @@
 """First look at a CD image (CUE/BIN, raw BIN or ISO): its tracks, its file systems, its dates,
 and the files on it. It can also copy the files and the audio tracks out.
 
-Usage: discinfo.py IMAGE [--files] [--extract DIR] [--audio DIR] [--swap] [--json]
+Usage: discinfo.py IMAGE [--files] [--map] [--extract DIR] [--audio DIR] [--swap] [--json]
 
   IMAGE           a .cue sheet (its BIN files beside it), a raw .bin, or a .iso
   --files         list every file: disc sector, size, date, path
+  --map           list the runs of sectors that hold data but belong to no file (slower: it
+                  reads every sector of the data tracks)
   --extract DIR   copy every file of the first readable volume into DIR (Joliet names if present)
   --audio DIR     write each audio track as a WAV file (44,100 Hz, 16-bit stereo) into DIR
   --swap          the audio was ripped big-endian: swap the bytes of each sample
@@ -22,6 +24,10 @@ What it reports, and why it matters for a port:
   two pressings apart.
 - Mode 2 Form 2 sectors (video, streamed sound) in a data track, which a cooked .iso drops.
 - hidden files and files outside the volume's size, which some copy protections use.
+- files in Mode 2 Form 2 (XA): PlayStation STR video and XA sound, for example. --extract
+  copies these as whole 2352-byte sectors, because a copy of 2048 bytes per sector loses data.
+- the system area (sectors 0 to 15): empty on a PC disc, the licence and boot data on a console.
+- files that only one of the ISO 9660 and Joliet trees lists, and files dated after the volume.
 
 It reads the image only. The files it copies are game material: extract into target/ (or
 another folder git ignores). Standard library only.
@@ -34,6 +40,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from image import open_image  # noqa: E402
 from volumes import scan  # noqa: E402
+from checks import late_dates, system_area, tree_differences, unused_data  # noqa: E402
 
 
 def wav(path, pcm, swap):
@@ -97,10 +104,30 @@ def main(argv):
             outside = [e.path for e in files if limit and e.lba + (e.size + 2047) // 2048 > limit]
             if outside:
                 entry['outside_volume'] = outside[:20]
+            form2 = [e.path for e in files if e.form2]
+            if form2:
+                entry['form2_files'] = form2[:20]
+            late = late_dates(v)
+            if late:
+                entry['dated_after_volume'] = late[:20]
             if '--files' in flags:
                 entry['list'] = [{'sector': e.lba, 'size': e.size, 'date': e.date,
-                                  'path': e.path + ('/' if e.directory else '')} for e in files]
+                                  'path': e.path + ('/' if e.directory else '') + (' [XA Form 2]' if e.form2 else '')}
+                                 for e in files]
         report['volumes'].append(entry)
+
+    for t in disc.tracks:
+        if not t.audio and any(v.track is t for v in volumes):
+            area = system_area(t)
+            if area:
+                report['notes'].append(f'track {t.number}: the system area (sectors 0 to 15) holds {area}')
+            if '--map' in flags:
+                spare = unused_data(t, volumes)
+                report['unused_data'] = [{'track': t.number, 'first': a, 'last': b, 'kind': k} for a, b, k in spare]
+                if not spare:
+                    report['notes'].append(f'track {t.number}: every sector with data belongs to the file system')
+    for a, b, only in tree_differences(volumes):
+        report['notes'].append(f'{len(only)} files in the {a} tree are missing from the {b} tree: {", ".join(only[:5])}')
 
     if '--extract' in opts:
         readable = [v for v in volumes if v.root is not None]
@@ -109,14 +136,21 @@ def main(argv):
             report['notes'].append('--extract: no ISO 9660 volume to copy from')
         else:
             n = 0
-            for e in chosen.entries():
+            # The chosen tree's files, then any file another tree lists and this one leaves out.
+            listed = {e.lba for e in chosen.entries()}
+            extra = [(v, e) for v in readable if v is not chosen for e in v.entries()
+                     if not e.directory and e.lba not in listed]
+            for src, e in [(chosen, e) for e in chosen.entries()] + extra:
                 dest = safe_join(opts['--extract'], e.path)
                 if e.directory:
                     os.makedirs(dest, exist_ok=True)
                     continue
                 os.makedirs(os.path.dirname(dest), exist_ok=True)
                 with open(dest, 'wb') as f:
-                    f.write(chosen.file(e))
+                    if e.form2 and src.track.size in (2336, 2352):
+                        f.write(src.track.raw(e.lba - src.base, e.sectors))   # whole sectors
+                    else:
+                        f.write(src.file(e))
                 n += 1
             report['notes'].append(f'--extract: {n} files from the {chosen.kind} volume into {opts["--extract"]}')
     if '--audio' in opts and audio:
@@ -143,6 +177,8 @@ def main(argv):
             print(f'  {k:16s} {val}')
         for f in entry.get('list', []):
             print(f'    {f["sector"]:8d} {f["size"]:11,d}  {f["date"] or "":25s} {f["path"]}')
+    for u in report.get('unused_data', []):
+        print(f'unused  track {u["track"]} sectors {u["first"]}-{u["last"]} ({u["last"] - u["first"] + 1}): {u["kind"]}')
     for note in report['notes']:
         print(f'note: {note}')
     return 0

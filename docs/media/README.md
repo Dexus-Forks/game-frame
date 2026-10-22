@@ -10,6 +10,8 @@ is traced. Read them during [re-inventory](../../.claude/skills/re-inventory/SKI
   protection, PC games that boot without DOS.
 - [Identifying unknown files](files.md): signatures, entropy, structure from the numbers,
   comparing two files, simple obfuscation, timestamps.
+- [Flash and Shockwave games](../engines/flash-and-shockwave.md): web games whose player no
+  longer runs, SWF files and projectors, `swfinfo.py`.
 - [Packed and protected code](protection.md): packers, getting the code out, data decoders,
   debugger checks, copy protection and the port.
 

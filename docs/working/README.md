@@ -10,6 +10,8 @@ work that spans several steps and several sessions.
 - [Linux, cloud and container environments](environments.md): what an agent installs on Linux
   or in a cloud workspace, `scripts/env.sh` for each session, headless runs, REA, and game
   files on someone else's machine.
+- [Getting more from Ghidra](ghidra.md): every call with its arguments, code that is not an
+  executable, carrying labels to a new build, Function ID, types, processors.
 - [Handling the game as evidence](evidence.md): identifying the copy, keeping it unchanged,
   tying each finding to it, and making each result repeatable.
 - [Permissions and gates](gates.md): the commands an agent may run without asking, the ones

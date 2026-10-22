@@ -69,6 +69,8 @@ scripts/ghidra-run.sh Game.exe decompile analysis/notes/ai.txt 0x1400be770 0x140
 scripts/ghidra-run.sh Game.exe named     analysis/notes/rand.txt Random Rand
 scripts/ghidra-run.sh Game.exe refs      analysis/notes/refs.txt 0x140178000
 scripts/ghidra-run.sh Game.exe vtable    analysis/notes/vt.txt Citizen 0x140165120 40
+scripts/ghidra-run.sh Game.exe callargs  analysis/notes/sfx.tsv PlaySound play_sfx
+scripts/ghidra-run.sh boot.bin blocks    analysis/notes/blocks.txt derived/loadmap.tsv
 ```
 
 - `decompile` also **creates** functions Ghidra missed: callbacks reached only through tables
@@ -79,7 +81,18 @@ scripts/ghidra-run.sh Game.exe vtable    analysis/notes/vt.txt Citizen 0x1401651
 - `vtable` lists a table of function pointers. `tools/pe/vtable.py BINARY 0xTABLE --names
   analysis/export/BINARY/functions.tsv` does the same without Ghidra.
 
+- `callargs` lists every call to the named functions with the constant, string and global
+  arguments at each call, from P-Code, for any processor: every sound and its id, every file
+  name, every random range in one pass.
+- `blocks` adds raw pieces of memory from a load map (a booter, a memory dump, ROM banks) and
+  analyses them.
+
 Ghidra locks a project: run one job per project at a time.
+
+A new build of the game? `tools/triage/match_functions.py OLD_EXPORT NEW_EXPORT --labels
+labels/names.tsv --out labels/names-new.tsv` matches the functions and carries your labels to
+the new addresses. `docs/working/ghidra.md` covers this, Version Tracking, BSim, Function ID
+and processors Ghidra lacks.
 
 ## 4. Constants and data
 

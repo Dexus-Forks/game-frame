@@ -39,6 +39,11 @@ Random number generators are usually small and self-contained. Emulate them firs
 | xorshift | `x ^= x << 13; x ^= x >> 17; x ^= x << 5` and variants |
 | Mersenne Twister | a 624-word state, the constant 0x9908B0DF, tempering masks 0x9D2C5680, 0xEFC60000 |
 | WELL, PCG, SplitMix | constants such as 0x5851F42D4C957F2D (PCG), 0x9E3779B97F4A7C15 (SplitMix) |
+| LCG (Borland C, Turbo Pascal and Delphi) | multipliers 22695477 (Borland C) and 134775813 (`0x08088405`, Pascal `Random`) |
+
+`tools/triage/constants.py BINARY` searches a binary for these constants and many others
+(checksums, hashes, decompressors). In 16-bit code it also finds a 32-bit constant loaded as
+two 16-bit halves. The address of a hit is the place to start reading.
 
 Games often have several generators (one for the simulation, one for effects or sound) and
 may seed them from the clock. Find every instance and who draws from each. A draw from the wrong
@@ -76,6 +81,27 @@ rounding error. If the original keeps time as a float, the reimplementation must
 
 Use the game's own calendar and its own names. A game's year may have twelve "months" that are
 seasons (Early Spring to Late Winter), or eight, or none; its tenth month is not October. Read the names from the game's string tables. Use them in docs, tests and examples.
+
+## Passwords, level codes and cheat codes
+
+Before memory cards and save files, many games gave the player a password to continue from a
+level. The password encodes the game state: the level, the lives, the items, often with a
+checksum so that a typed password can be checked. Cheat codes are input sequences, compared
+with a table as the player types.
+
+- **Find the checker.** Look for the code that runs after the player enters a code: a loop
+  over the typed characters, a lookup in an alphabet string ("BCDFGHJKLMNPQRSTVWXYZ0123456789"
+  and similar), bit shifts that pack values, and a comparison with a checksum.
+- **Port the encoder and the decoder.** The port must accept every password the original
+  accepts, and give the same password for the same state. Port both directions with their bit
+  layout and their checksum, and test them against passwords from the original.
+- **Measure, then generate.** Run the checker in an emulator ([re-emulate](../.claude/skills/re-emulate/SKILL.md))
+  with chosen codes to confirm the layout. A checker with a small key space can be run over
+  every code. A checker that is a set of equations can be solved with a solver such as Z3 or
+  angr, which find the inputs that pass. The original's accepted codes become the port's test
+  cases.
+- **Cheat codes.** Find the input buffer and the table it is compared with. List every entry.
+  A port keeps them, as they are part of the game.
 
 ## Messages and text
 

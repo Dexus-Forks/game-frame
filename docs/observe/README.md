@@ -25,6 +25,10 @@ does, so each claim about the port can cite a measurement. Read them after you h
   takes them through one entry point.
 - [Capturing the interface](ui.md): why game interfaces are custom, how to inventory every
   screen, and how to capture and rebuild them.
+- [Tracing calls to the system](system-calls.md): logging the files, clock, sound and
+  libraries the original uses, with Wine, Process Monitor, strace and proxy libraries.
+- [Debugging the original](debuggers.md): debuggers and GDB stubs for each kind of game,
+  Ghidra's debugger and emulator, and patching a copy.
 - [Finding values in memory](memory.md): scanning memory dumps for a value you can see,
   confirming the address, and finding the structure around it.
 - [A model to query](object-model.md): an object model of the game, like a web page's, with

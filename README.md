@@ -162,11 +162,11 @@ between agents, the outcome, and the failure path.
 | `source scripts/env.sh` | Sets `GAMEFRAME_ROOT`, loads `.env`, puts `gameframe` and the `.venv` Python on `PATH`, for each shell or agent session |
 | `scripts/new-project.sh DIR "Name" [GAME]` | Creates a project for one game: rules, skills, tools, ignored folders for the game and its derivatives |
 | `scripts/ghidra-export.sh [--labels FILE] BINARY...` | Headless Ghidra analysis and a text export: pseudocode, functions, strings, imports, exports; names applied from a labels file |
-| `scripts/ghidra-run.sh BINARY decompile\|named\|refs\|vtable\|labels OUT ARGS` | One-off jobs in the analysed project, without re-analysis |
+| `scripts/ghidra-run.sh BINARY decompile\|named\|refs\|vtable\|labels\|callargs\|blocks OUT ARGS` | One-off jobs in the analysed project, without re-analysis: also every call with its arguments, and raw memory pieces |
 | `scripts/extract-installer.sh [--detect] INSTALLER OUT` | Unpacks an installer or package without running it: Inno Setup (GOG), NSIS, InstallShield, MSI, archives, `.dmg`, `.pkg`, GOG's `.sh`, CD images |
 | `scripts/dosbox-run.sh [--fileio] [--break] [--mcp PORT] DIR PROGRAM` | Runs a DOS program in DOSBox-X without a window: exit code, file I/O log, debugger control |
 | `./gameframe COMMAND` | Help and discovery: the steps, the skills, every tool's own help; runs a tool with the `.venv` |
-| `tests/run.sh [--ghidra]` | 111 checks of every tool against the two sample games |
+| `tests/run.sh [--ghidra]` | 124 checks (136 with `--ghidra`) of every tool against the two sample games |
 
 ## Tools
 
@@ -175,9 +175,13 @@ between agents, the outcome, and the failure path.
 | `tools/disc/discinfo.py` | A CD image (CUE/BIN, ISO): tracks, CD audio, Mode 2 sectors, ISO 9660, Joliet, HFS, El Torito, dates; copies files and audio out |
 | `tools/triage/filetypes.py` | What each file is from its bytes: signature, entropy, compressed or packed |
 | `tools/triage/similar.py` | How much two files or two releases share, even when they differ; renamed files |
+| `tools/triage/constants.py` | Random generators, checksums, hashes, ciphers and decompressors named by their constants, with addresses |
+| `tools/triage/match_functions.py` | The same functions in two builds, from two Ghidra exports; your labels carried to the new addresses |
 | `tools/triage/memscan.py` | Where a running game keeps a value, from memory dumps taken as it changes; pointers to it |
 | `tools/triage/compare_trees.py` | Two copies or releases compared file by file (SHA-256, case-insensitive paths); hashes to publish |
 | `tools/pe/peinfo.py` | What is this binary: architecture, compiler, PDB path, imports, exports, RTTI, engine and packer fingerprints |
+| `tools/pe/peres.py` | Version information, string tables, dialogs, bitmaps and data inside a Windows executable |
+| `tools/pe/stackstrings.py` | Text the code builds on the stack, which no string list shows |
 | `tools/pe/readdata.py` | The real value of a `DAT_` constant or table |
 | `tools/pe/vtable.py` | The functions in a table of function pointers |
 | `tools/triage/decomp_query.py` | A function with your labels; callers; callees; who uses a string; who writes a field; where the work is |
@@ -187,6 +191,7 @@ between agents, the outcome, and the failure path.
 | `tools/emu/call_trace.py` | The calls an emulated function makes (random draws), in order, with call sites |
 | `tools/formats/reader.py`, `validate.py` | Prototype a format decoder; prove it consumes every byte of every file |
 | `tools/formats/xorscan.py` | The key of a simply obfuscated file: XOR, add, stepping and chained keys |
+| `tools/formats/swfinfo.py` | A Flash game: SWF version, compression, ActionScript version, classes, content; the movie inside a projector |
 | `tools/formats/timestamps.py` | A number read as every common timestamp; timestamps found inside a file |
 | `tools/verify/bitcompare.py` | Ground truth against reimplementation, bit for bit, with ULP distance |
 | `tools/verify/seqdiff.py` | The first random draw (or any event) where two traces differ |

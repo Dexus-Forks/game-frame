@@ -67,6 +67,17 @@ name and many exports or imports between them. Leave out operating-system DLLs, 
 runtime (`msvcp140.dll`, `vcruntime140.dll`), and known middleware (FMOD, Wwise, Bink, PhysX,
 Havok, Steam/GOG SDKs): document what they are and move on.
 
+```bash
+.venv/bin/python tools/pe/peres.py target/GAME.EXE            # version information, resources
+python3 tools/triage/constants.py target/GAME.EXE             # random generators, CRCs, hashes, LZSS
+.venv/bin/python tools/pe/stackstrings.py target/GAME.EXE     # text built on the stack
+python3 tools/formats/swfinfo.py target/game.exe              # a Flash projector, or an SWF
+```
+
+The version information names the product and the build. The constants name the algorithms
+inside and give their addresses. A Flash or Shockwave game needs a different route
+(`docs/engines/flash-and-shockwave.md`).
+
 Engines often ship a runtime DLL that exports C++ class names (`?Rand@Random@System@@...`). Its
 exports are free, accurate names: decompile it together with the EXE.
 

@@ -43,7 +43,13 @@ Work outward from something you can see. In rough order of usefulness:
    that changes during play (gold, health) can be found in memory dumps with
    `tools/triage/memscan.py`. The code that writes that address is the rule
    (`docs/observe/memory.md`).
-7. **The main loop.** From `WinMain`/`main` (or the entry point) find the per-frame update; the
+7. **Known constants.** `tools/triage/constants.py BINARY` names the random generators,
+   checksums, hashes and decompressors by their constants and gives each address.
+8. **Calls with their arguments.** `scripts/ghidra-run.sh BINARY callargs OUT FUNCTION...`
+   lists every call to a function with its constant arguments: the sound ids, the file names,
+   the random ranges. A log of the original's system calls shows the same from outside
+   (`docs/observe/system-calls.md`).
+9. **The main loop.** From `WinMain`/`main` (or the entry point) find the per-frame update; the
    systems hang off it in a fixed order, which you will need anyway (see `docs/GAME-PATTERNS.md`).
 
 ## 2. Read the function

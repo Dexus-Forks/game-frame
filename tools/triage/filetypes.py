@@ -47,6 +47,9 @@ SIGNATURES = [
     (0, b'SMK2', 'Smacker video'), (0, b'SMK4', 'Smacker video'), (0, b'BIK', 'Bink video'),
     (0, b'KB2', 'Bink 2 video'), (0, b'\x1aE\xdf\xa3', 'Matroska or WebM'),
     (0, b'Microsoft C/C++ MSF 7.00', 'Microsoft debug symbols (PDB)'), (0, b'!<arch>\n', 'library (ar or COFF .lib)'),
+    (0, b'FWS', 'Flash movie (SWF, uncompressed)'), (0, b'CWS', 'Flash movie (SWF, zlib)'),
+    (0, b'ZWS', 'Flash movie (SWF, LZMA)'), (0, b'RIFX', 'Shockwave Director (big-endian)'),
+    (0, b'XFIR', 'Shockwave Director (little-endian)'),
     (0, b'SQLite format 3', 'SQLite database'), (0, b'<?xml', 'XML'),
     (0, b'\xef\xbb\xbf', 'text (UTF-8 with BOM)'), (0, b'\xff\xfe', 'text (UTF-16LE with BOM)'),
     (0x8001, b'CD001', 'ISO 9660 image'), (0, b'\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x00', 'raw CD image (BIN)'),
@@ -117,7 +120,7 @@ def verdict(kind, h):
     if h < 1.0:
         return 'mostly one value (padding, empty or sparse)'
     packed = any(k in kind for k in ('ZIP', 'RAR', '7-Zip', 'cabinet', 'gzip', 'bzip2', 'xz', 'PNG', 'JPEG',
-                                     'Ogg', 'MP3', 'FLAC', 'video', 'GIF', 'LHA', 'ARJ', 'MPQ'))
+                                     'Ogg', 'MP3', 'FLAC', 'video', 'GIF', 'LHA', 'ARJ', 'MPQ', 'zlib', 'LZMA'))
     if packed and h > 6.5:
         return 'compressed (expected)'
     if h > 7.5:

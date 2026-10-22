@@ -25,6 +25,7 @@ python3 tools/triage/filetypes.py target/data/units.dat --blocks 4096   # where 
 python3 tools/formats/xorscan.py target/data/script.dat                 # a simple XOR or add key?
 python3 tools/formats/timestamps.py --scan saves/slot1.sav --from 1996 --to 1998   # a saved date?
 python3 tools/triage/similar.py saves/before.sav saves/after.sav                  # how much changed
+python3 tools/triage/constants.py target/GAME.EXE        # the decompressor or checksum, by its constants
 ```
 
 Text that turns readable under one XOR byte or a short key is a common way games hid their

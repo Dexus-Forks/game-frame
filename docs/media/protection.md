@@ -36,6 +36,8 @@ part is separated ([DOS games](../DOS.md)).
 3. **Load the dump into Ghidra.** Give it the dump as raw memory at the right base address.
    Record the address of the real entry point and the state at the moment of the dump.
 
+`tools/ghidra/AddMemoryBlocks.java` loads a dump, or several pieces of one, at their addresses
+([Getting more from Ghidra](../working/ghidra.md#code-that-is-not-an-executable-file)).
 Record which way you took, and the hash of the dump, so another person can repeat it. The
 unpacked code is game material and stays in `analysis/` or `derived/`.
 
@@ -44,7 +46,10 @@ unpacked code is game material and stays in `analysis/` or `derived/`.
 Data files can be hidden too. [Identifying unknown files](files.md#simple-obfuscation) covers the
 weak schemes that `xorscan.py` finds. Stronger schemes need the decoder in the code. Signs of
 the decoder are a loop over a buffer straight after a file read, constants used as keys, and
-XOR, rotate or add instructions in a tight loop. Port the decoder like any other function,
+XOR, rotate or add instructions in a tight loop. `constants.py` finds the known ciphers and
+hashes by their constants. Another way to get the plain data is to let the game decode it.
+Stop the game, or an emulated call of the decoder, just after the loop ends, and save the
+buffer. Port the decoder like any other function,
 with its constants and its order of operations, and check it with `re-emulate`.
 
 ## Obfuscated code

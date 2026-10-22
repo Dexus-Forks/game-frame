@@ -41,9 +41,20 @@ def dec_date7(b):
 
 
 class Entry:
-    def __init__(self, path, lba, size, date, directory, hidden):
+    def __init__(self, path, lba, size, date, directory, hidden, xa=0):
         self.path, self.lba, self.size, self.date = path, lba, size, date
         self.directory, self.hidden = directory, hidden
+        self.xa = xa                    # CD-ROM XA attributes from the system use area, or 0
+
+    @property
+    def form2(self):
+        """Mode 2 Form 2 or interleaved sectors (streamed video and sound): a copy of 2048 bytes
+        per sector loses part of each sector."""
+        return bool(self.xa & 0x3000)
+
+    @property
+    def sectors(self):
+        return (self.size + 2047) // 2048
 
 
 class Volume:
@@ -83,12 +94,45 @@ class Volume:
             if name.endswith('.') and not self.joliet:
                 name = name[:-1]
             flags = r[25]
+            use = r[33 + name_len + (1 - name_len % 2):]   # the system use area, after padding
+            xa = struct.unpack_from('>H', use, 4)[0] if len(use) >= 8 and use[6:8] == b'XA' else 0
             e = Entry(prefix + name, struct.unpack_from('<I', r, 2)[0],
                       struct.unpack_from('<I', r, 10)[0], dec_date7(r[18:25]),
-                      bool(flags & 2), bool(flags & 1))
+                      bool(flags & 2), bool(flags & 1), xa)
             out.append(e)
             if e.directory:
                 self._walk((e.lba, e.size), e.path + '/', out, seen)
+
+    def used(self):
+        """The sectors this volume's own structures and files occupy: the system area, the
+        descriptors, the path tables, the directories and the files."""
+        used = set(range(0, 16))
+        if self.root is None:
+            return used
+        i = 16
+        while True:
+            used.add(i)
+            try:
+                d = self.read(i)
+            except EOFError:
+                break
+            if d[1:6] != b'CD001' or d[0] == 255:
+                break
+            if d[0] in (1, 2):
+                size = struct.unpack_from('<I', d, 132)[0]
+                for at in (140, 144):
+                    p = struct.unpack_from('<I', d, at)[0]
+                    if p:
+                        used.update(range(p, p + (size + 2047) // 2048))
+                for at in (148, 152):
+                    p = struct.unpack_from('>I', d, at)[0]
+                    if p:
+                        used.update(range(p, p + (size + 2047) // 2048))
+            i += 1
+        used.update(range(self.root[0], self.root[0] + (self.root[1] + 2047) // 2048))
+        for e in self.entries():
+            used.update(range(e.lba, e.lba + max(1, e.sectors)))
+        return used
 
     def read(self, lba, count=1):
         return self.track.read(lba - self.base, count)

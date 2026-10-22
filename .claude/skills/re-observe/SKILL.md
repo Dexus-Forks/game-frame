@@ -41,7 +41,9 @@ material.
 | State | memory dumps at chosen points; the game's own saves; `tools/triage/memscan.py` finds a value's address across dumps (`docs/observe/memory.md`) |
 | Inputs | the game's demo or replay files; breakpoints on input reads |
 | Calls and random draws | `tools/emu/call_trace.py`; debugger traces |
-| File reads | `tools/dos/fileio_trace.py` on DOSBox-X logs; Process Monitor |
+| File reads | `tools/dos/fileio_trace.py` on DOSBox-X logs; Process Monitor; Wine's `WINEDEBUG=+file` (`docs/observe/system-calls.md`) |
+| Calls to the system | Wine's relay log, strace, a proxy library (`docs/observe/system-calls.md`) |
+| Values at a moment | a debugger or an emulator's GDB stub, with memory breakpoints (`docs/observe/debuggers.md`) |
 | Sound | the chip's register writes; WAV recordings |
 
 ## 4. List every input

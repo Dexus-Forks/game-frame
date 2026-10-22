@@ -284,29 +284,29 @@ expect "compare_trees counts identical files" "1 identical, 1 different" "$PYTHO
 rm -rf "$I"
 
 echo "Discs, file kinds, similarity, obfuscation, timestamps"
-D="$(mktemp -d)"
-"$PYTHON" tests/make_disc.py "$D"
-expect "discinfo lists a data track and an audio track" "track  2  audio AUDIO       start 00:02:40  length 00:02:00" "$PYTHON" tools/disc/discinfo.py "$D/test.cue"
-expect "discinfo reads the ISO 9660 creation date" "1995-11-03 14:30:00 UTC+01:00" "$PYTHON" tools/disc/discinfo.py "$D/test.iso"
-expect "discinfo reads Joliet names and finds the hidden file" "Secret Data.dat" "$PYTHON" tools/disc/discinfo.py "$D/test.cue" --files
-expect "extract-installer hands a CUE sheet to discinfo" "CD image -> discinfo" scripts/extract-installer.sh --detect "$D/test.cue"
-"$PYTHON" tools/disc/discinfo.py "$D/test.cue" --extract "$D/x" --audio "$D/wav" >/dev/null
-[[ "$(cat "$D/x/ReadMe File.txt")" == "hello from the disc" && $(wc -c < "$D/wav/track02.wav") -eq 352844 ]] \
+W="$(mktemp -d)"
+"$PYTHON" tests/make_disc.py "$W"
+expect "discinfo lists a data track and an audio track" "track  2  audio AUDIO       start 00:02:40  length 00:02:00" "$PYTHON" tools/disc/discinfo.py "$W/test.cue"
+expect "discinfo reads the ISO 9660 creation date" "1995-11-03 14:30:00 UTC+01:00" "$PYTHON" tools/disc/discinfo.py "$W/test.iso"
+expect "discinfo reads Joliet names and finds the hidden file" "Secret Data.dat" "$PYTHON" tools/disc/discinfo.py "$W/test.cue" --files
+expect "extract-installer hands a CUE sheet to discinfo" "CD image -> discinfo" scripts/extract-installer.sh --detect "$W/test.cue"
+"$PYTHON" tools/disc/discinfo.py "$W/test.cue" --extract "$W/x" --audio "$W/wav" >/dev/null
+[[ "$(cat "$W/x/ReadMe File.txt")" == "hello from the disc" && $(wc -c < "$W/wav/track02.wav") -eq 352844 ]] \
   && ok "discinfo copies the files and writes the audio track as WAV" || bad "discinfo --extract --audio"
 expect "filetypes names a PE executable" "executable (PE, Windows)" "$PYTHON" tools/triage/filetypes.py $B/game.exe
-head -c 65536 /dev/urandom > "$D/noise.dat"
-expect "filetypes flags a high-entropy file" "compressed or encrypted" "$PYTHON" tools/triage/filetypes.py "$D/noise.dat"
+head -c 65536 /dev/urandom > "$W/noise.dat"
+expect "filetypes flags a high-entropy file" "compressed or encrypted" "$PYTHON" tools/triage/filetypes.py "$W/noise.dat"
 expect "similar scores a file against itself" "100" "$PYTHON" tools/triage/similar.py $B/game.exe $B/game.exe
-"$PYTHON" - "$D" <<'PY'
+"$PYTHON" - "$W" <<'PY'
 import random, sys
 d = sys.argv[1]; r = random.Random(7); data = bytes(r.randrange(256) for _ in range(100000))
 open(f'{d}/v1.dat', 'wb').write(data); open(f'{d}/v2.dat', 'wb').write(data[:40000] + b'patch' * 20 + data[40000:])
 sys.path.insert(0, 'tools/formats'); from xorscan import decode
 open(f'{d}/hidden.txt', 'wb').write(decode(open('README.md', 'rb').read()[:4000], 'xor-key:1f2e3d4c'))
 PY
-s=$("$PYTHON" tools/triage/similar.py "$D/v1.dat" "$D/v2.dat" | awk '{print $1}')
+s=$("$PYTHON" tools/triage/similar.py "$W/v1.dat" "$W/v2.dat" | awk '{print $1}')
 (( s >= 90 && s < 100 )) && ok "similar sees a patched file as close but changed ($s)" || bad "similar on a patched file" "$s"
-"$PYTHON" - "$D" <<'PY'
+"$PYTHON" - "$W" <<'PY'
 import random, struct, sys
 d = sys.argv[1]; r = random.Random(5); mem = bytearray(r.randbytes(65536))
 for i, gold in enumerate((500, 480, 480, 612)):
@@ -314,14 +314,54 @@ for i, gold in enumerate((500, 480, 480, 612)):
     struct.pack_into('<H', mem, 0x1235, gold); struct.pack_into('<I', mem, 0x4000, 0x21235)
     open(f'{d}/m{i}.bin', 'wb').write(mem)
 PY
-expect "memscan narrows dumps to the one address that holds the value" "0x00021235  u16  500 -> 480 -> 480 -> 612" "$PYTHON" tools/triage/memscan.py "$D/m0.bin:=500" "$D/m1.bin:=480" "$D/m2.bin:same" "$D/m3.bin:up" --base 0x20000
-expect "memscan finds a pointer to the value" "0x00024000" "$PYTHON" tools/triage/memscan.py "$D/m3.bin" --pointers 0x21235 --base 0x20000
-expect "xorscan finds a repeating XOR key" "xor-key:1f2e3d4c " "$PYTHON" tools/formats/xorscan.py "$D/hidden.txt" --top 1
+expect "memscan narrows dumps to the one address that holds the value" "0x00021235  u16  500 -> 480 -> 480 -> 612" "$PYTHON" tools/triage/memscan.py "$W/m0.bin:=500" "$W/m1.bin:=480" "$W/m2.bin:same" "$W/m3.bin:up" --base 0x20000
+expect "memscan finds a pointer to the value" "0x00024000" "$PYTHON" tools/triage/memscan.py "$W/m3.bin" --pointers 0x21235 --base 0x20000
+expect "xorscan finds a repeating XOR key" "xor-key:1f2e3d4c " "$PYTHON" tools/formats/xorscan.py "$W/hidden.txt" --top 1
 expect "timestamps reads a FAT date" "dos       1995-11-03 14:30:10" "$PYTHON" tools/formats/timestamps.py 0x1F6373C5
 expect "reader reads LEB128 and big-endian numbers" "624485 -123456 4660" "$PYTHON" -c "
 import sys; sys.path.insert(0, 'tools/formats'); from reader import Reader
 r = Reader(bytes([0xe5, 0x8e, 0x26, 0xc0, 0xbb, 0x78, 0x12, 0x34])); print(r.uleb(), r.sleb(), r.u16be()); r.done()"
-rm -rf "$D"
+expect "discinfo --map finds data in a sector no file uses" "sectors 34-34 (1): ZIP archive" "$PYTHON" tools/disc/discinfo.py "$W/test.cue" --map
+expect "discinfo finds a file the Joliet tree leaves out" "missing from the Joliet tree: NOJOLIET.TXT" "$PYTHON" tools/disc/discinfo.py "$W/test.cue"
+expect "discinfo reads a PlayStation-style system area" "PlayStation licence text" "$PYTHON" tools/disc/discinfo.py "$W/xa.cue"
+"$PYTHON" tools/disc/discinfo.py "$W/xa.cue" --extract "$W/xa" >/dev/null
+[[ $(wc -c < "$W/xa/MOVIE.STR") -eq 4704 && -f "$W/xa/NOJOLIET.TXT" ]] \
+  && ok "discinfo copies an XA Form 2 file as whole sectors, and files only ISO 9660 lists" || bad "discinfo XA extract"
+rm -rf "$W"
+
+echo "Constants, resources, stack strings, Flash, function matching"
+W="$(mktemp -d)"
+expect "constants finds the MSVC-style random generator in the engine" "MSVC rand() multiplier 214013" "$PYTHON" tools/triage/constants.py $B/engine.dll
+printf 'int main(void){return 0;}\n' > "$W/m.c"
+if zig cc -target x86_64-windows-gnu "$W/m.c" tests/fixtures/resources.rc -o "$W/res.exe" >/dev/null 2>&1; then
+  expect "peres reads the version information" "OriginalFilename         SAMPLE.EXE" "$PYTHON" tools/pe/peres.py "$W/res.exe"
+  expect "peres reads a string table" "17  'Insert disc 2'" "$PYTHON" tools/pe/peres.py "$W/res.exe" --strings
+else bad "peres: zig could not compile tests/fixtures/resources.rc"; fi
+if zig cc -target x86-windows-gnu -O1 -fno-sanitize=undefined tests/fixtures/stackstring.c -o "$W/ss.exe" >/dev/null 2>&1; then
+  expect "stackstrings finds text built on the stack" "'SAVE'" "$PYTHON" tools/pe/stackstrings.py "$W/ss.exe"
+else bad "stackstrings: zig could not compile tests/fixtures/stackstring.c"; fi
+"$PYTHON" tests/make_swf.py "$W"
+expect "swfinfo reads an LZMA SWF and sees ActionScript 3" "3 (DoABC: AVM2)" "$PYTHON" tools/formats/swfinfo.py "$W/game-zws.swf"
+expect "swfinfo lists the classes linked to symbols" "GameMain" "$PYTHON" tools/formats/swfinfo.py "$W/game-cws.swf"
+"$PYTHON" tools/formats/swfinfo.py "$W/projector.exe" --extract "$W/out.swf" >/dev/null
+cmp -s "$W/out.swf" "$W/game-cws.swf" && ok "swfinfo extracts the movie from a projector" || bad "swfinfo --extract"
+expect "filetypes names a compressed Flash movie" "Flash movie (SWF, zlib)" "$PYTHON" tools/triage/filetypes.py "$W/game-cws.swf"
+"$PYTHON" - "$W" <<'PY'
+import os, sys
+d = sys.argv[1]
+body = {'update': 'void FUN_{a}(int *p)\n{{\n  p[1] = p[1] + p[2] * 3;\n  if (p[1] > 100) {{\n    FUN_{b}(p, DAT_{c});\n  }}\n  return;\n}}\n',
+        'spawn': 'void FUN_{b}(int *p, int n)\n{{\n  int i;\n  for (i = 0; i < n; i = i + 1) {{\n    p[i + 4] = i * 7 + 0x10;\n  }}\n  return;\n}}\n'}
+for build, (a, b, c) in (('A', ('401000', '401100', '409000')), ('B', ('402000', '402300', '40a000'))):
+    os.makedirs(f'{d}/{build}', exist_ok=True)
+    with open(f'{d}/{build}/decomp.c', 'w') as f:
+        f.write(f'// ==== {a} FUN_{a}\n' + body['update'].format(a=a, b=b, c=c))
+        f.write(f'// ==== {b} FUN_{b}\n' + body['spawn'].format(b=b))
+    open(f'{d}/{build}/functions.tsv', 'w').write(f'{a}\t60\tFUN_{a}\t\n{b}\t40\tFUN_{b}\t\n')
+open(f'{d}/names.tsv', 'w').write('401000\tunit_update\tgrows by 3 a tick\n401100\tunit_spawn\t\n')
+PY
+"$PYTHON" tools/triage/match_functions.py "$W/A" "$W/B" --labels "$W/names.tsv" --out "$W/names-b.tsv" >/dev/null
+expect "match_functions carries labels to the new build's addresses" "402300	unit_spawn	matched from A 401100 (exact 1.0)" cat "$W/names-b.tsv"
+rm -rf "$W"
 
 echo "Ledger and coverage"
 L="$(mktemp -d)"; mkdir -p "$L/src/build" "$L/export/game.exe"
@@ -473,6 +513,9 @@ if [[ "${1:-}" == --ghidra ]]; then
   rm -rf "$C"
   scripts/ghidra-run.sh game.exe decompile analysis/notes/test.txt 0x140001090 >/dev/null 2>&1
   expect "ghidra-run decompiles by address" "FUNCTION 140001090 simulate" cat analysis/notes/test.txt
+  scripts/ghidra-run.sh game.exe callargs analysis/notes/callargs.tsv rng_seed printf >/dev/null 2>&1
+  expect "ghidra-run callargs resolves a constant argument" "0x4d2 (1234)" cat analysis/notes/callargs.tsv
+  expect "ghidra-run callargs resolves a string argument" '"after 10 s: %f' cat analysis/notes/callargs.tsv
   "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe labels > analysis/notes/dos-labels.tsv
   scripts/ghidra-export.sh --project analysis/ghidra-dos --out analysis/export-dos --labels analysis/notes/dos-labels.tsv \
     $D/sample-td.exe $D/sample-mz.exe >/dev/null 2>&1 && ok "ghidra-export exports a 16-bit NE and an MZ" || bad "ghidra-export (16-bit)"
