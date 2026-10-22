@@ -2,7 +2,7 @@
 <title>The HuC6280 MMU maps eight 8 KB pages of the CPU onto 256 banks of a 2 MB space</title>
 <rect x="0.5" y="0.5" width="899" height="419" rx="10" fill="#0d1b1e" stroke="#1f3d40"/>
 <defs><marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" fill="#8fa9a5"/></marker></defs>
-<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">PC ENGINE: THE HUC6280 MAPS 64 KB ONTO 2 MB</text>
+<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">HUC6280 MEMORY MAPPING</text>
 <text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">Eight registers, MPR0 to MPR7, each choose one of 256 banks of 8 KB.</text>
 <text x="40.0" y="84.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#e2ece9" text-anchor="start">the CPU's 64 KB</text>
 <text x="40.0" y="114.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="start">$0000</text>
@@ -58,6 +58,6 @@
 <g opacity="1"><rect x="520" y="130.0" width="340" height="8" fill="#f59e0b" fill-opacity="0.8"/><path d="M292 236C 400 236 440 134.0 517 134.0" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow)"/><animate attributeName="opacity" values="1;0;0" keyTimes="0.0000;0.3333;0.6667" dur="5s" calcMode="discrete" repeatCount="indefinite"/></g>
 <g opacity="0"><rect x="520" y="131.0" width="340" height="8" fill="#f59e0b" fill-opacity="0.8"/><path d="M292 236C 400 236 440 135.0 517 135.0" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow)"/><animate attributeName="opacity" values="0;1;0" keyTimes="0.0000;0.3333;0.6667" dur="5s" calcMode="discrete" repeatCount="indefinite"/></g>
 <g opacity="0"><rect x="520" y="132.0" width="340" height="8" fill="#f59e0b" fill-opacity="0.8"/><path d="M292 236C 400 236 440 136.0 517 136.0" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow)"/><animate attributeName="opacity" values="0;0;1" keyTimes="0.0000;0.3333;0.6667" dur="5s" calcMode="discrete" repeatCount="indefinite"/></g>
-<text x="520.0" y="382.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="start">TAM writes a register: MPR4 = $10, then $11, then $12.</text>
+<text x="520.0" y="382.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="start">In this example, TAM sets MPR4 to $10, then $11, then $12.</text>
 <text x="40.0" y="404.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#8fa9a5" text-anchor="start">Physical address = bank x 8 KB + offset. Ghidra's 65C02 mis-reads TAM and TMA. The HuC6280 extension fixes them.</text>
 </svg>

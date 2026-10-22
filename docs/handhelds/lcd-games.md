@@ -88,7 +88,7 @@ Mattel's LCD games of 1976 to 1977 are not covered here. Their CPUs are not conf
 
 ### Hardware
 
-![The Microvision base unit has no CPU. Each cartridge holds its own](../assets/diagrams/microvision-cartridge.svg)
+![Each Microvision cartridge holds its own CPU with the program inside](../assets/diagrams/microvision-cartridge.svg)
 
 Milton Bradley's Microvision came out in November 1979. It was discontinued in 1981. **The base
 unit has no CPU.** Each cartridge holds its own processor with the program masked into it. That

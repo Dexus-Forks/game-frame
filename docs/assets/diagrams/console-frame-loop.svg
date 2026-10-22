@@ -2,14 +2,14 @@
 <title>The reset vector, the main loop and the vertical blank interrupt of a console game</title>
 <rect x="0.5" y="0.5" width="899" height="359" rx="10" fill="#0d1b1e" stroke="#1f3d40"/>
 <defs><marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" fill="#8fa9a5"/></marker></defs>
-<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">THE FRAME ON A CONSOLE</text>
-<text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">No operating system. The game drives the hardware itself, in time with the display.</text>
+<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">THE CONSOLE FRAME LOOP</text>
+<text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">A console game has no operating system, so it drives the hardware itself in time with the display.</text>
 <rect x="40.0" y="92.0" width="334.0" height="26.0" rx="3" fill="#60a5fa" stroke="none" fill-opacity="0.22"/>
-<text x="208.0" y="109.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="middle">visible lines: the chip draws the picture</text>
+<text x="208.0" y="109.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="middle">visible lines, drawn by the video chip</text>
 <rect x="376.0" y="92.0" width="62.0" height="26.0" rx="3" fill="#f59e0b" stroke="none" fill-opacity="0.5"/>
 <text x="408.0" y="109.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#e2ece9" text-anchor="middle">vblank</text>
 <rect x="440.0" y="92.0" width="334.0" height="26.0" rx="3" fill="#60a5fa" stroke="none" fill-opacity="0.22"/>
-<text x="608.0" y="109.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="middle">visible lines: the chip draws the picture</text>
+<text x="608.0" y="109.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="middle">visible lines, drawn by the video chip</text>
 <rect x="776.0" y="92.0" width="62.0" height="26.0" rx="3" fill="#f59e0b" stroke="none" fill-opacity="0.5"/>
 <text x="808.0" y="109.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#e2ece9" text-anchor="middle">vblank</text>
 <rect x="40" y="87" width="3" height="36" fill="#e2ece9"><animate attributeName="x" values="40;837" dur="3.2s" repeatCount="indefinite"/></rect>

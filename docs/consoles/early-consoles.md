@@ -38,7 +38,7 @@ the discrete-logic arcade games.
 
 ### Hardware
 
-![Racing the beam on the Atari 2600, with one scanline of 76 CPU cycles and one NTSC frame of 262 lines](../assets/diagrams/atari2600-beam.svg)
+![Drawing on the Atari 2600, with one scanline of 76 CPU cycles and one NTSC frame of 262 lines](../assets/diagrams/atari2600-beam.svg)
 
 The 6507 is a 6502 with 8 KB of address space and no interrupts
 ([Wikipedia: MOS Technology 6502](https://en.wikipedia.org/wiki/MOS_Technology_6502)). The TIA

@@ -122,7 +122,7 @@ clock state ([Handheld practices](practices.md)).
 
 ### Hardware
 
-![The Game Boy screen inside the SNES picture, drawn to scale, and the fast SGB clock](../assets/diagrams/sgb-layout.svg)
+![The Game Boy screen inside the SNES picture, with the fast SGB clock](../assets/diagrams/sgb-layout.svg)
 
 The Super Game Boy is a SNES cartridge that holds a Game Boy chip, an ICD2 bridge and SNES-side
 system software. It shows the 160 by 144 screen inside a 256 by 224 SNES picture. The border uses

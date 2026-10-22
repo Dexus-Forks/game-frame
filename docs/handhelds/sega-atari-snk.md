@@ -5,7 +5,7 @@ and Lynx use CPUs that Ghidra builds in. The Neo Geo Pocket's TLCS-900/H has no 
 
 ## The devices
 
-![Handheld screens drawn to scale](../assets/diagrams/handheld-screens.svg)
+![The sizes of handheld screens in pixels](../assets/diagrams/handheld-screens.svg)
 
 | Device | Years | CPU and clock | Media and format | Ghidra support | Emulator with a debugger |
 |---|---|---|---|---|---|

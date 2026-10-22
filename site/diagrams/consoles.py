@@ -148,15 +148,14 @@ def screen(s, x, y, w, h, label, colour, sub=None):
 
 # ================================================================ docs/consoles/README.md
 def console_frame_loop():
-    s = Svg(900, 360, 'The console frame loop: the reset vector starts the game, the main loop runs the logic, and the '
-                      'vertical blank interrupt writes the video chip, starts DMA and reads the controller')
-    s.heading('The frame on a console', 'No operating system. The game drives the hardware itself, in time with the display.')
+    s = Svg(900, 360, '')
+    s.heading('The console frame loop', 'A console game has no operating system, so it drives the hardware itself in time with the display.')
     # The display's time: visible lines, then the vertical blank, twice.
     x0, y0, fw = 40, 92, 400
     for f in range(2):
         x = x0 + f * fw
         s.rect(x, y0, fw * 0.84 - 2, 26, BLUE, rx=3, extra=' fill-opacity="0.22"')
-        s.text(x + fw * 0.42, y0 + 17, 'visible lines: the chip draws the picture', 11, TEXT, 'middle')
+        s.text(x + fw * 0.42, y0 + 17, 'visible lines, drawn by the video chip', 11, TEXT, 'middle')
         s.rect(x + fw * 0.84, y0, fw * 0.16 - 2, 26, AMBER, rx=3, extra=' fill-opacity="0.5"')
         s.text(x + fw * 0.92, y0 + 17, 'vblank', 11, TEXT, 'middle', '600')
     s.add(f'<rect x="{x0}" y="{y0 - 5}" width="3" height="36" fill="{TEXT}"><animate attributeName="x" '
@@ -181,9 +180,8 @@ def console_frame_loop():
 
 
 def console_first_steps():
-    s = Svg(900, 300, 'Six first steps on a console game, from the exact revision of the ROM to the map of the main '
-                      'variables in RAM')
-    s.heading('Where to start on a console game', 'Each step gives the next one what it needs.')
+    s = Svg(900, 300, '')
+    s.heading('First steps on a console game', 'The six steps follow the list under Where to start on this page.')
     steps = [('1. Identify', ['console, region, revision', 'and the checksum'], GREY),
              ('2. Emulator', ['an accurate one', 'with a debugger'], TEAL),
              ('3. Ghidra', ['right processor and', 'memory map, bank by bank'], BLUE),
@@ -197,16 +195,15 @@ def console_first_steps():
             arrow(s, x - 38, y + 35, x - 3, y + 35)
     s.add(f'<path d="M800 {84 + 72}C 800 172 160 160 160 {184 - 3}" fill="none" stroke="{DIM}" stroke-width="1.5" '
           'marker-end="url(#arrow)"/>')
-    s.text(40, 284, 'Then the usual loop: trace, emulate, port, verify.', 12, DIM)
+    s.text(40, 284, 'After these steps, the work follows the usual loop of trace, emulate, port and verify.', 12, DIM)
     return s.render()
 
 
 # ================================================================ docs/consoles/platforms.md
 def nes_bank_switching():
     dur = 6
-    s = Svg(900, 400, 'NES bank switching: the mapper puts one 16 KB bank of the cartridge at 8000 to BFFF while the '
-                      'last bank stays at C000 to FFFF, so the same address holds different code at different times')
-    s.heading('Bank switching on the NES', 'The CPU sees 32 KB of cartridge ROM. A mapper chip such as MMC1 chooses which banks are there.')
+    s = Svg(900, 400, '')
+    s.heading('NES bank switching', 'A mapper chip such as MMC1 chooses which banks fill the 32 KB of cartridge ROM that the CPU sees.')
     s.text(40, 92, 'what the CPU sees', 12, TEXT, weight='600')
     s.text(40, 114, '$8000', 11, DIM, mono=True)
     s.text(40, 236, '$C000', 11, DIM, mono=True)
@@ -238,9 +235,8 @@ def nes_bank_switching():
 
 
 def n64_rcp():
-    s = Svg(900, 330, 'Nintendo 64 graphics: the game on the VR4300 builds display lists, the RSP runs microcode on '
-                      'them, and the RDP draws the triangles into the frame buffer; a port interprets the display lists')
-    s.heading('Nintendo 64: graphics are microcode', 'The game builds a list of commands. The RCP\'s two halves turn it into pixels.')
+    s = Svg(900, 330, '')
+    s.heading('Nintendo 64 graphics microcode', 'The game builds a list of commands, which the two halves of the RCP turn into pixels.')
     y, h = 96, 76
     steps = [('VR4300 (game)', ['builds a display list', 'in RDRAM'], BLUE),
              ('Display list', ['matrices, vertices,', 'triangles, textures'], GREY),
@@ -257,10 +253,8 @@ def n64_rcp():
 
 
 def psx_gte():
-    s = Svg(900, 340, 'The PlayStation GTE: a vertex of 16-bit integers is rotated by a fixed-point matrix where 4096 '
-                      'means 1.0, translated, then divided by depth to give screen coordinates; a flag register records '
-                      'overflow')
-    s.heading('PlayStation: the GTE does 3D in fixed point', 'Coprocessor 2. No floating point anywhere on the console.')
+    s = Svg(900, 340, '')
+    s.heading('PlayStation GTE fixed-point maths', 'The GTE is coprocessor 2. The PlayStation has no floating-point unit, so the GTE works in fixed point.')
     y = 96
     box(s, 30, y, 150, 80, BLUE, 'Vertex V', ['X, Y, Z: 16-bit', 'integers'], mono=False)
     s.text(196, y + 46, 'x', 18, DIM, 'middle')
@@ -271,7 +265,7 @@ def psx_gte():
     box(s, 578, y, 140, 80, AMBER, 'Divide by Z', ['H / Z: the', 'projection'])
     arrow(s, 722, y + 40, 752, y + 40)
     box(s, 756, y, 114, 80, TEAL, 'SX, SY', ['screen', 'coordinates'])
-    s.text(30, y + 112, 'Example: one matrix entry of 2048 halves a coordinate. 2048 / 4096 = 0.5.', 12, TEXT, mono=False)
+    s.text(30, y + 112, 'For example, a matrix entry of 2048 halves a coordinate, because 2048 / 4096 = 0.5.', 12, TEXT, mono=False)
     box(s, 30, 240, 400, 66, RED, 'FLAG register', ['overflow and saturation of each step,', 'with the GTE\'s own rounding'])
     para(s, 460, 254, 'Some games use GTE results for collision and positions. There a port must give the same '
                       'integers bit for bit. psx-spx describes every GTE operation.', 410)
@@ -279,9 +273,8 @@ def psx_gte():
 
 
 def ps2_ee_iop():
-    s = Svg(900, 380, 'The PlayStation 2: the Emotion Engine with its R5900 core and two vector units feeds the '
-                      'Graphics Synthesizer; the IOP handles input, sound and discs; its floats differ from IEEE 754')
-    s.heading('PlayStation 2: three kinds of processor', 'Game code runs on the R5900 and the vector units. The IOP runs the input, sound and disc side.')
+    s = Svg(900, 380, '')
+    s.heading('PlayStation 2 processors', 'Game code runs on the R5900 and the vector units. The IOP handles input, sound and discs.')
     box(s, 30, 84, 450, 150, BLUE, '', op=0.08)
     s.text(46, 104, 'Emotion Engine', 13, TEXT, weight='600')
     box(s, 46, 116, 150, 100, BLUE, 'R5900 core', ['MIPS with 128-bit', 'integer instructions', 'and an FPU'])
@@ -302,15 +295,14 @@ def ps2_ee_iop():
         s.text(30, yy, a, 12, col, mono=r > 0)
         s.text(260, yy, b, 12, TEAL if r else DIM)
         s.text(460, yy, c, 12, AMBER if r else DIM)
-    s.text(30, y + 104, 'Rounding also differs. A port with normal floats differs at the edges. PCSX2 documents each case.', 12, DIM)
+    s.text(30, y + 104, 'Rounding also differs, so a port with normal floats gives different results at the edges. PCSX2 documents each case.', 12, DIM)
     return s.render()
 
 
 # ================================================================ docs/consoles/early-consoles.md
 def early_console_timeline():
-    s = Svg(900, 300, 'The early consoles by year of release, from the Magnavox Odyssey in 1972 to the Atari 7800 in '
-                      '1986, coloured by CPU family')
-    s.heading('Early consoles', 'Year of release, coloured by CPU family. Ghidra builds in all four CPU families.')
+    s = Svg(900, 300, '')
+    s.heading('Early consoles by year', 'Each dot is a year of release, coloured by CPU family. Ghidra builds in all four CPU families.')
     cols = {'none': GREY, '6502': TEAL, 'CP1600': PURPLE, 'Z80': BLUE, '6809': AMBER}
     items = [(1972.7, 'Odyssey', 'none'), (1977.7, 'Atari 2600', '6502'), (1980, 'Intellivision', 'CP1600'),
              (1982.6, 'ColecoVision', 'Z80'), (1982.85, 'Atari 5200', '6502'), (1982.85, 'Vectrex', '6809'),
@@ -321,9 +313,8 @@ def early_console_timeline():
 
 
 def atari2600_beam():
-    s = Svg(900, 380, 'Racing the beam on the Atari 2600: a scanline is 228 colour clocks or 76 CPU cycles, and the '
-                      'program writes the TIA registers in time with each line of the frame')
-    s.heading('Atari 2600: racing the beam', 'No frame buffer. The program writes the TIA while the beam moves, every line.')
+    s = Svg(900, 380, '')
+    s.heading('Drawing on the Atari 2600', 'The Atari 2600 has no frame buffer, so the program writes the TIA as the beam moves along each line.')
     # One scanline.
     x0, y0, w = 40, 104, 560
     hb = w * 68 / 228
@@ -350,16 +341,15 @@ def atari2600_beam():
         y += h
     s.add(f'<rect x="{fx}" y="{fy + 20}" width="110" height="2" fill="{AMBER}"><animate attributeName="y" '
           f'values="{fy + 20};{y - 2}" dur="4s" repeatCount="indefinite"/></rect>')
-    para(s, 40, 300, 'Game logic runs in the VBLANK and overscan lines. During the visible lines the code is the '
+    para(s, 40, 300, 'Game logic runs in the VBLANK and overscan lines. During the visible lines, the code writes the TIA to draw the '
                      'drawing. A port must model the CPU cycles in each line, so take ground truth from cycle-exact '
                      'emulator traces.', 580)
     return s.render()
 
 
 def cp1610_words():
-    s = Svg(900, 340, 'The Intellivision CP1610: ROM words are 10 bits wide, and the SDBD prefix builds a 16-bit '
-                      'operand from the low 8 bits of two ROM words; R6 is the stack pointer and R7 the program counter')
-    s.heading('Intellivision: 10-bit ROM words', 'The CP1610 addresses 16-bit words. Cartridge ROM gives 10 bits of each.')
+    s = Svg(900, 340, '')
+    s.heading('Intellivision ROM words', 'The CP1610 addresses 16-bit words. Cartridge ROM gives 10 bits of each word.')
     s.text(40, 96, 'one ROM word', 12, TEXT, weight='600')
     bitrow(s, 40, 106, [('unused', 6, GREY), ('10 bits of data', 10, BLUE)], 22)
     s.text(40, 172, 'SDBD, then an instruction with an immediate operand', 12, TEXT, weight='600')
@@ -384,9 +374,8 @@ def cp1610_words():
 
 
 def colecovision_blocks():
-    s = Svg(900, 280, 'The ColecoVision: a Z80A with 1 KB of RAM and an 8 KB BIOS, a TMS9928A video chip with its own '
-                      '16 KB of VRAM, an SN76489A for sound and the cartridge')
-    s.heading('ColecoVision: the parts', 'A Z80A at 3.58 MHz. The video chip has its own memory, reached through ports.')
+    s = Svg(900, 280, '')
+    s.heading('ColecoVision parts', 'A Z80A runs at 3.58 MHz. The video chip has its own memory, which the CPU reaches through ports.')
     s.line(40, 150, 860, 150, GREY, 3)
     s.text(44, 142, 'CPU bus', 11, DIM)
     parts = [(50, 'Z80A', ['3.58 MHz'], BLUE), (190, 'RAM', ['1 KB'], GREY), (330, 'BIOS', ['8 KB'], PURPLE),
@@ -401,9 +390,8 @@ def colecovision_blocks():
 
 
 def atari7800_clock():
-    s = Svg(900, 330, 'The Atari 7800: the CPU runs at 1.79 MHz and slows to 1.19 MHz when it touches the TIA or the '
-                      'RIOT; NTSC consoles check the cartridge signature and PAL consoles skip the check')
-    s.heading('Atari 7800: a clock that changes', 'SALLY runs at 1.79 MHz. Each access to the TIA or the RIOT runs at 1.19 MHz.')
+    s = Svg(900, 330, '')
+    s.heading('Atari 7800 CPU clock', 'SALLY runs at 1.79 MHz and slows to 1.19 MHz for each access to the TIA or the RIOT.')
     x, y = 40, 104
     seq = [('RAM', 1.79), ('ROM', 1.79), ('TIA', 1.19), ('RAM', 1.79), ('RIOT', 1.19), ('ROM', 1.79), ('ROM', 1.79), ('TIA', 1.19)]
     for name, mhz in seq:
@@ -427,9 +415,8 @@ def atari7800_clock():
 
 
 def vectrex_beam():
-    s = Svg(900, 330, 'The Vectrex: the 6809 sets the beam position through a DAC and the beam draws lines; the 6809 '
-                      'joins A and B into the 16-bit D register and multiplies A by B into D')
-    s.heading('Vectrex: the CPU draws', 'No video memory. The 68A09 steers the beam through a DAC, line by line.')
+    s = Svg(900, 344, '')
+    s.heading('Vectrex drawing', 'The Vectrex has no video memory, so the 68A09 steers the beam through a DAC, line by line.')
     box(s, 40, 96, 110, 56, BLUE, '68A09', ['1.5 MHz'])
     arrow(s, 152, 124, 196, 124)
     box(s, 200, 96, 110, 56, AMBER, 'DAC', ['X, Y, brightness'])
@@ -443,20 +430,19 @@ def vectrex_beam():
     rx = 610
     s.text(rx, 96, '6809 registers', 12, TEXT, weight='600')
     bitrow(s, rx, 108, [('A', 8, AMBER), ('B', 8, TEAL)], 12)
-    s.text(rx + 202, 128, '= D, 16-bit', 13, TEXT, weight='600', mono=True)
+    s.text(rx + 202, 128, '= D', 13, TEXT, weight='600', mono=True)
     for i, r in enumerate(('X', 'Y', 'U', 'S')):
         s.rect(rx, 150 + i * 24, 240, 20, GREY, rx=3, extra=' fill-opacity="0.3"')
         s.text(rx + 8, 164 + i * 24, f'{r}  16-bit', 11, TEXT, mono=True)
     s.text(rx, 260, 'MUL: A x B gives D, in hardware', 12, TEXT)
-    para(s, rx, 284, 'Game code does the drawing. Trace it like the logic.', 250)
+    para(s, rx, 284, 'The game code draws the picture, so trace the drawing code like the game logic.', 250)
     return s.render()
 
 
 # ================================================================ docs/consoles/cd-add-ons.md
 def console_code_upload():
-    s = Svg(900, 300, 'Code for a second CPU: the main CPU copies it from the disc or cartridge into the second CPU\'s '
-                      'RAM, so take it from a RAM dump and load the dump into Ghidra at its address')
-    s.heading('Code that only exists in RAM', 'On the Sega CD, the 32X and the Jaguar, the main CPU uploads code for another CPU.')
+    s = Svg(900, 300, '')
+    s.heading('Code uploaded into RAM', 'On the Sega CD, the 32X and the Jaguar, the main CPU uploads code for another CPU.')
     y = 100
     box(s, 40, y, 150, 70, GREY, 'Disc or cartridge', ['the code, maybe packed'])
     box(s, 260, y, 150, 70, BLUE, 'Main CPU', ['copies it'])
@@ -477,9 +463,8 @@ def console_code_upload():
 
 
 def segacd_word_ram():
-    s = Svg(900, 330, 'The Mega-CD: a second 68000 at 12.5 MHz with 512 KB of program RAM, and 256 KB of word RAM '
-                      'shared with the Mega Drive\'s 68000')
-    s.heading('Mega-CD: two 68000s share word RAM', 'The add-on brings its own 68000, its own RAM, a PCM chip and the BIOS.')
+    s = Svg(900, 330, '')
+    s.heading('Mega-CD word RAM', 'The add-on brings its own 68000, its own RAM, a PCM chip and the BIOS.')
     box(s, 30, 84, 280, 210, BLUE, '', op=0.07)
     s.text(46, 106, 'Mega Drive', 13, TEXT, weight='600')
     box(s, 46, 120, 120, 60, BLUE, 'Main 68000', ['the game\'s', 'main code'])
@@ -501,24 +486,22 @@ def segacd_word_ram():
 
 
 def sega_32x_cpus():
-    s = Svg(900, 300, 'The Sega 32X: two SH-2s at 23 MHz with 256 KB of SDRAM, a frame buffer and PWM sound, beside the '
-                      'Mega Drive\'s 68000 and Z80, so a game can run code on four CPUs')
-    s.heading('Sega 32X: four CPUs, four programs', 'The Mega Drive keeps running. The 32X adds two SH-2s beside it.')
+    s = Svg(900, 300, '')
+    s.heading('Sega 32X CPUs', 'The 32X adds two SH-2 CPUs beside the Mega Drive CPUs, which keep running.')
     cpus = [('SH-2 master', '23 MHz', PURPLE), ('SH-2 slave', '23 MHz', PURPLE), ('68000', 'Mega Drive', BLUE), ('Z80', 'Mega Drive sound', GREY)]
     for i, (t, sub, c) in enumerate(cpus):
         x = 40 + i * 210
         box(s, x, 90, 180, 60, c, t, [sub])
         arrow(s, x + 90, 152, x + 90, 190)
         box(s, x, 194, 180, 40, GREEN, '', [f'Ghidra program {i + 1}'])
-    s.text(40, 270, 'Shared by the SH-2s: 256 KB of SDRAM, the frame buffer, PWM sound. Export each CPU\'s code separately.', 12, DIM)
+    s.text(40, 270, 'The SH-2s share 256 KB of SDRAM, the frame buffer and PWM sound. Export the code of each CPU separately.', 12, DIM)
     return s.render()
 
 
 def huc6280_mmu():
     dur = 5
-    s = Svg(900, 420, 'The HuC6280 MMU: eight mapping registers each put one 8 KB bank of a 2 MB space into one page of '
-                      'the CPU\'s 64 KB; the TAM instruction changes a register')
-    s.heading('PC Engine: the HuC6280 maps 64 KB onto 2 MB', 'Eight registers, MPR0 to MPR7, each choose one of 256 banks of 8 KB.')
+    s = Svg(900, 420, '')
+    s.heading('HuC6280 memory mapping', 'Eight registers, MPR0 to MPR7, each choose one of 256 banks of 8 KB.')
     x0, y0, ph = 40, 90, 32
     s.text(x0, y0 - 6, 'the CPU\'s 64 KB', 12, TEXT, weight='600')
     mpr = ['$FF  I/O', '$F8  RAM', '...', '...', None, '...', '...', '$00  ROM']
@@ -548,15 +531,14 @@ def huc6280_mmu():
               f'fill-opacity="0.8"/><path d="M292 {y0 + 4 + 4 * ph + 14}C 400 {y0 + 4 + 4 * ph + 14} 440 {yy + 24} '
               f'{px - 3} {yy + 24}" fill="none" stroke="{AMBER}" stroke-width="2" marker-end="url(#arrow)"/>'
               f'{phase(3, k, dur)}</g>')
-    s.text(px, y0 + 292, 'TAM writes a register: MPR4 = $10, then $11, then $12.', 11, DIM)
+    s.text(px, y0 + 292, 'In this example, TAM sets MPR4 to $10, then $11, then $12.', 11, DIM)
     s.text(40, 404, 'Physical address = bank x 8 KB + offset. Ghidra\'s 65C02 mis-reads TAM and TMA. The HuC6280 extension fixes them.', 12, DIM)
     return s.render()
 
 
 def cdi_os9():
-    s = Svg(900, 270, 'The Philips CD-i: programs are OS-9 modules on CD-RTOS; load each module with Ghidra\'s 68000 '
-                      'language and run the programs in MAME or CeDImu')
-    s.heading('CD-i: programs are OS-9 modules', 'The player runs CD-RTOS, built on Microware OS-9, on an SCC68070.')
+    s = Svg(900, 270, '')
+    s.heading('CD-i OS-9 modules', 'The player runs CD-RTOS, which is built on Microware OS-9, on an SCC68070.')
     box(s, 40, 90, 180, 130, GREY, 'CD-i disc', ['files on the disc'])
     arrow(s, 222, 155, 262, 155)
     box(s, 266, 90, 300, 130, BLUE, '', op=0.08)
@@ -572,9 +554,8 @@ def cdi_os9():
 
 # ================================================================ docs/consoles/32-bit-oddities.md
 def jaguar_cpus():
-    s = Svg(900, 340, 'The Atari Jaguar: the 68000 runs the main loop from 2 MB of RAM and uploads code into the local '
-                      'RAM of Tom and Jerry, two RISC cores at 26.59 MHz with 4 KB and 8 KB')
-    s.heading('Atari Jaguar: one 68000, two RISC cores', 'RISC code runs badly from main RAM, so it is copied into each core\'s own small RAM.')
+    s = Svg(900, 340, '')
+    s.heading('Atari Jaguar CPUs', 'RISC code runs badly from main RAM, so it is copied into the small RAM of each core.')
     box(s, 40, 96, 200, 80, BLUE, '68000', ['13.295 MHz', 'runs the main loop'])
     box(s, 40, 200, 200, 80, GREY, 'Main RAM', ['2 MB'])
     s.line(140, 178, 140, 198, DIM, 1.5)
@@ -592,9 +573,8 @@ def jaguar_cpus():
 
 
 def arm_versions_3do():
-    s = Svg(900, 300, 'The 3DO\'s ARM60 is ARMv3, one version older than the first ARM language Ghidra builds in; ARMv4 '
-                      'added halfword and signed byte loads and stores')
-    s.heading('3DO: an ARM older than Ghidra\'s', 'Ghidra\'s ARM languages start at v4. The ARM60 is v3.')
+    s = Svg(900, 300, '')
+    s.heading('3DO ARM version', 'The ARM60 in the 3DO is v3. The ARM languages in Ghidra start at v4.')
     vers = [('ARMv3', ['ARM60 (3DO)', '26-bit and 32-bit modes'], AMBER), ('ARMv4', ['adds LDRH, STRH,', 'LDRSB, LDRSH'], BLUE),
             ('ARMv4T', ['adds Thumb', 'ARM7TDMI (GBA)'], BLUE), ('ARMv5 and later', ['ARM9 (DS) onward'], BLUE)]
     x = 40
@@ -614,9 +594,8 @@ def arm_versions_3do():
 
 # ================================================================ docs/consoles/matching-decomp.md
 def matching_loop():
-    s = Svg(900, 400, 'A matching decompilation: split the program, write C for one function, compile it with the '
-                      'original compiler, compare, and when it matches replace the assembly; the build stays identical')
-    s.heading('Matching decompilation, one function at a time', 'The build must give the identical program after every change.')
+    s = Svg(900, 400, '')
+    s.heading('The matching decompilation loop', 'After every change, the build must give the identical program.')
     box(s, 30, 90, 170, 60, GREY, '1. Compiler', ['exact version', 'and settings'])
     arrow(s, 202, 120, 240, 120)
     box(s, 244, 90, 170, 60, BLUE, '2. Split', ['splat, decomp-toolkit:', 'code, data, assets'])
@@ -632,8 +611,8 @@ def matching_loop():
         box(s, x - 75, y - 24, 150, 48, c, t, [sub], 12, op=0.35)
     s.text(cx, cy + 4, '3. one function', 12, DIM, 'middle')
     arrow(s, cx + 40, cy + 118, cx + 40, cy + 140)
-    box(s, cx - 60, cy + 142, 260, 34, GREEN, '4. Match: C replaces the assembly', [], 12)
-    para(s, 30, 190, 'The build still gives the identical program, which proves the match. Then 5: name the '
+    box(s, cx - 60, cy + 142, 260, 34, GREEN, '4. On a match, C replaces the assembly', [], 12)
+    para(s, 30, 190, 'The build still gives the identical program, which proves the match. Step 5 names the '
                      'variables, structures and functions.', 360)
     para(s, 30, 270, 'Old compilers are sensitive to statement order, temporary types and register use. Some '
                      'functions take days.', 360)
@@ -641,9 +620,8 @@ def matching_loop():
 
 
 def matching_choice():
-    s = Svg(900, 366, 'Choosing a route: an existing decompilation, a matching decompilation, or disassembly and '
-                      'reimplementation, by what the game is written in and what you need to publish')
-    s.heading('When to choose a matching decompilation', 'Three questions decide the route.')
+    s = Svg(900, 366, '')
+    s.heading('Choosing a matching decompilation', 'A yes to a question leads to the route on its right.')
     q = [(40, 92, 'Is the game mostly hand-written assembly?'), (40, 182, 'Has a community already started a decompilation?'),
          (40, 272, 'Must the port be exactly the original, bugs included?')]
     for x, y, t in q:
@@ -658,15 +636,14 @@ def matching_choice():
     for y in (142, 232):
         arrow(s, 230, y + 2, 230, y + 38)
         s.text(240, y + 26, 'no', 11, RED)
-    s.text(500, 348, 'If no: reimplement from documented behaviour.', 11, DIM)
+    s.text(500, 348, 'If every answer is no, reimplement from documented behaviour.', 11, DIM)
     return s.render()
 
 
 # ================================================================ docs/consoles/modern.md
 def modern_containers():
-    s = Svg(900, 376, 'Signed and encrypted containers from the Xbox 360 on: XEX2 wraps a PE, SELF wraps an ELF, Wii '
-                      'discs are AES-encrypted, RPX is an ELF variant; each needs a decrypted dump and a loader')
-    s.heading('Seventh generation onward: unwrap first', 'Each executable sits in a signed vendor container. Most are encrypted.')
+    s = Svg(900, 376, '')
+    s.heading('Containers from the Xbox 360 onward', 'Each executable sits in a signed vendor container. Most of these containers are encrypted.')
     rows = [('Xbox 360', 'XEX2, signed, usually encrypted', 'PE, PowerPC', 'XEXLoaderWV'),
             ('PlayStation 3', 'SELF / SPRX, signed, encrypted', 'ELF: PPU and SPU code', 'GhidraSPU for the SPU'),
             ('Wii', 'disc, AES-encrypted', 'DOL and REL', 'Ghidra-GameCube-Loader'),
@@ -690,9 +667,8 @@ def modern_containers():
 
 
 def modern_status():
-    s = Svg(900, 376, 'Tool status from the Xbox 360 to the Series consoles: which have a Ghidra loader and which have '
-                      'an emulator that runs commercial games')
-    s.heading('Seventh generation onward: what exists', 'From the table on this page. Pin an exact emulator build and keep a copy.')
+    s = Svg(900, 376, '')
+    s.heading('Tools from the Xbox 360 onward', 'This table repeats the table on this page. Pin an exact emulator build and keep a copy.')
     rows = [('Xbox 360', 'XEXLoaderWV', 'Xenia Canary'), ('PlayStation 3', 'GhidraSPU (SPU only)', 'RPCS3'),
             ('Wii', 'GameCube loader', 'Dolphin'), ('Wii U', 'GhidraRPXLoader', 'Cemu'), ('PlayStation 4', 'GhidraPS4Loader', 'shadPS4'),
             ('Xbox One', None, None), ('PlayStation 5', None, None), ('Xbox Series', None, None)]
@@ -712,9 +688,8 @@ def modern_status():
 
 
 def ps3_cell():
-    s = Svg(900, 360, 'The PlayStation 3 Cell: one PPE and six SPEs for games; each SPE has 256 KiB of local store and '
-                      'reaches main memory only by DMA; SPU floats differ from IEEE')
-    s.heading('PlayStation 3: the Cell', 'The PPE runs the main code. Each SPU works only on its own local store.')
+    s = Svg(900, 360, '')
+    s.heading('The PlayStation 3 Cell', 'The PPE runs the main code. Each SPU works on the data in its own local store.')
     box(s, 40, 92, 180, 90, BLUE, 'PPE', ['PowerPC core', 'the main program'])
     box(s, 40, 206, 180, 64, GREY, 'Main memory', [])
     s.line(130, 184, 130, 204, DIM, 1.5)
@@ -732,9 +707,8 @@ def ps3_cell():
 
 
 def xenon_recomp():
-    s = Svg(900, 300, 'Static recompilation of an Xbox 360 game: XenonRecomp turns the PowerPC code into C++ and '
-                      'XenosRecomp turns the shaders into HLSL; the player\'s own game files complete the PC port')
-    s.heading('Xbox 360: static recompilation', 'How Unleashed Recompiled was made. The project ships no game files.')
+    s = Svg(900, 300, '')
+    s.heading('Xbox 360 static recompilation', 'This is how Unleashed Recompiled was made. The project ships no game files.')
     box(s, 40, 100, 160, 60, RED, 'XEX2', ['the player\'s copy'])
     arrow(s, 202, 120, 246, 105)
     arrow(s, 202, 140, 246, 175)
@@ -752,9 +726,8 @@ def xenon_recomp():
 
 
 def gekko_paired_singles():
-    s = Svg(900, 340, 'GameCube and Wii paired singles: one register holds two floats, and a quantised load turns '
-                      'small integers into floats with a type and a scale set in a GQR register')
-    s.heading('Gekko and Broadway: paired singles', 'One floating-point register holds two single floats, ps0 and ps1. One instruction works on both.')
+    s = Svg(900, 340, '')
+    s.heading('Gekko and Broadway paired singles', 'One floating-point register holds two single floats, ps0 and ps1. One instruction works on both of them.')
     bitrow(s, 40, 92, [('ps0', 16, BLUE), ('ps1', 16, TEAL)], 12)
     s.text(440, 112, 'one 64-bit register', 11, DIM)
     s.text(40, 166, 'A quantised load (psq_l) reads compact values and converts them', 12, TEXT, weight='600')
@@ -763,17 +736,16 @@ def gekko_paired_singles():
     box(s, 260, 180, 230, 60, AMBER, 'GQR register', ['load type: u8', 'load scale: 7'])
     arrow(s, 492, 210, 536, 210)
     box(s, 540, 180, 200, 60, BLUE, 'ps0 = 1.5625', ['200 / 2^7 = 200 / 128'])
-    s.text(40, 270, 'Types: u8, u16, s8, s16 or float. The value is divided by 2 to the power of the scale.', 12, DIM)
-    para(s, 40, 296, 'So the same code gives different results under a different GQR setup. Confirm the setup '
+    s.text(40, 270, 'The type is u8, u16, s8, s16 or float. The loaded value is divided by 2 to the power of the scale.', 12, DIM)
+    para(s, 40, 296, 'The same code gives different results under a different GQR setup. Confirm the setup '
                      'against Dolphin\'s code.', 820)
     return s.render()
 
 
 # ================================================================ docs/consoles/porting.md
 def port_routes():
-    s = Svg(900, 330, 'Four routes to a port compared: emulation, static recompilation, matching decompilation and '
-                      'reimplementation, by effort and by what the project can publish')
-    s.heading('Four routes to a port', 'They differ in effort and in what the project may publish.')
+    s = Svg(900, 330, '')
+    s.heading('Four routes to a port', 'The routes differ in effort and in what the project may publish.')
     rows = [('Emulation', 1, 'the emulator', 'the game', TEAL), ('Static recompilation', 2, 'recompiler, hardware layer', 'the ROM', BLUE),
             ('Matching decomp, then port', 4, 'contested: derived C', 'the ROM', AMBER), ('Reimplementation', 3, 'the new code', 'the data', GREEN)]
     s.text(250, 88, 'effort', 11, DIM)
@@ -791,9 +763,8 @@ def port_routes():
 
 
 def port_fixed_rate():
-    s = Svg(900, 360, 'The logic keeps the original rate: on a faster display the port shows the latest logic frame '
-                      'again, and a lag frame is a frame where the original did no logic update')
-    s.heading('The frame and the clock', 'Run the logic at the original rate, such as 60.0988 Hz for an NTSC NES. Only the picture follows the display.')
+    s = Svg(900, 360, '')
+    s.heading('Logic rate and display rate', 'The logic runs at the original rate, such as 60.0988 Hz for an NTSC NES. Only the picture follows the display.')
     x0, w = 160, 700
     s.text(40, 108, 'logic updates', 12, TEXT, weight='600')
     s.text(40, 168, 'a faster display', 12, TEXT, weight='600')
@@ -821,9 +792,8 @@ def port_fixed_rate():
 
 
 def input_mask():
-    s = Svg(900, 300, 'The controller read: the buttons pressed this frame are the buttons held now that were not held '
-                      'in the previous frame')
-    s.heading('Input: held and pressed this frame', 'Many games keep last frame\'s buttons to find the ones that were just pressed.')
+    s = Svg(900, 300, '')
+    s.heading('Held and pressed buttons', 'Many games keep the buttons of the last frame to find the buttons that were just pressed.')
     names = ['A', 'B', 'Sel', 'Start', 'Up', 'Down', 'Left', 'Right']
     rows = [('previous frame', '10000010', GREY), ('this frame (held)', '11000100', BLUE),
             ('pressed = held AND NOT previous', '01000100', AMBER)]
@@ -837,15 +807,14 @@ def input_mask():
             on = b == '1'
             s.rect(x0 + k * 62, y, 58, 32, c if on else GREY, rx=3, extra=f' fill-opacity="{0.65 if on else 0.12}"')
             s.text(x0 + k * 62 + 29, y + 21, b, 13, TEXT if on else DIM, 'middle', '600', mono=True)
-    para(s, 40, 260, 'The NES order of the eight buttons is shown. Log this RAM each frame as the input record. Find every read: '
+    para(s, 40, 260, 'The NES order of the eight buttons is shown. Log this RAM each frame as the input record. Find every read, because '
                      'some games read the controller twice a frame or in an interrupt.', 820)
     return s.render()
 
 
 def video_kinds():
-    s = Svg(900, 330, 'Three kinds of console video and how a port draws each: tile and sprite chips, frame buffers '
-                      'with triangles, and display lists for a programmable GPU')
-    s.heading('Three kinds of console video', 'Each kind decides how the port draws the picture.')
+    s = Svg(900, 330, '')
+    s.heading('Three kinds of console video', 'The kind of video decides how the port draws the picture.')
     cols = [('Tiles, sprites, layers', 'NES to GBA, Mega Drive, Saturn VDP2', BLUE,
              ['Reimplement the video chip.', 'Each frame, read the tile,', 'map, sprite and palette', 'memory and draw it.', 'Exact output is possible.']),
             ('Frame buffer, triangles', 'PlayStation, Saturn VDP1', AMBER,
@@ -871,9 +840,8 @@ def video_kinds():
 
 
 def raster_split():
-    s = Svg(900, 340, 'A raster effect: the playfield scrolls while the status bar stays still, because an interrupt '
-                      'on one scanline rewrites the scroll register while the beam is drawing')
-    s.heading('Raster effects: registers changed mid-frame', 'An interrupt fires on a chosen line. The game writes a video register there.')
+    s = Svg(900, 340, '')
+    s.heading('Raster effects', 'An interrupt fires on a chosen line. The game writes a video register in the interrupt handler.')
     x0, y0, w, h, split = 40, 84, 360, 230, 170
     s.add(f'<clipPath id="pf"><rect x="{x0}" y="{y0}" width="{w}" height="{split}"/></clipPath>')
     hills = ''.join(f'<rect x="{x0 + k * 40}" y="{y0 + 120 - (k * 37) % 70}" width="30" height="{50 + (k * 37) % 70}" '
@@ -888,18 +856,17 @@ def raster_split():
           'dur="1.6s" repeatCount="indefinite"/></rect>')
     tx = 440
     s.text(tx, 120, f'line {split}: the interrupt fires', 13, AMBER, weight='600')
-    s.text(tx, 142, 'The handler sets the scroll back to 0. The lines below are drawn unscrolled.', 12, DIM)
-    s.text(tx, 182, 'Line interrupts', 13, TEXT, weight='600')
-    s.text(tx, 204, 'SNES: H-IRQ.  Game Boy: LYC.', 12, DIM, mono=True)
-    para(s, tx, 244, 'Apply the register change at the same line in the port. Drawing the whole frame from the final '
+    para(s, tx, 142, 'The handler sets the scroll back to 0, so the lines below are drawn without scrolling.', 420)
+    s.text(tx, 198, 'Line interrupts', 13, TEXT, weight='600')
+    s.text(tx, 220, 'Examples are H-IRQ on the SNES and LYC on the Game Boy.', 12, DIM)
+    para(s, tx, 258, 'Apply the register change at the same line in the port. Drawing the whole frame from the final '
                      'register values loses the effect.', 420)
     return s.render()
 
 
 def sound_cpu():
-    s = Svg(900, 300, 'Sound on a separate CPU: the game sends commands to a sound CPU that runs its own program and '
-                      'drives the sound chip; a port emulates that CPU and chip or ports the sound program')
-    s.heading('Sound with its own CPU', 'SNES: SPC700. Mega Drive: Z80. PS2: the IOP. The game carries the sound program.')
+    s = Svg(900, 300, '')
+    s.heading('Sound on its own CPU', 'The SNES uses the SPC700, the Mega Drive a Z80 and the PS2 the IOP. The game carries the sound program.')
     box(s, 40, 96, 160, 60, BLUE, 'Main CPU', ['the game'])
     arrow(s, 202, 126, 266, 126)
     s.text(234, 116, 'commands', 10, DIM, 'middle')
@@ -916,9 +883,8 @@ def sound_cpu():
 
 
 def console_saves():
-    s = Svg(900, 300, 'Three kinds of console save and how a port keeps each: battery RAM mapped to a file with the '
-                      'same layout, memory card calls turned into file calls, and passwords encoded exactly')
-    s.heading('Saves: keep the original format', 'Then saves move between the original, through an emulator, and the port.')
+    s = Svg(900, 300, '')
+    s.heading('Save formats in a port', 'With the original format, saves move between the original in an emulator and the port.')
     rows = [('Battery RAM (SRAM)', 'in the cartridge', 'a file with the same bytes', BLUE),
             ('Memory card', 'PlayStation, PS2, GameCube', 'card API calls become file calls', PURPLE),
             ('Password', 'the state as text', 'the same encoding, exactly', AMBER)]
@@ -932,9 +898,8 @@ def console_saves():
 
 
 def port_check():
-    s = Svg(900, 320, 'Checking the port: one input movie drives the original in an emulator and the port; both dump '
-                      'RAM every frame, and the comparison stops at the first frame that differs')
-    s.heading('Checking the port frame by frame', 'One input movie, two runs, one comparison.')
+    s = Svg(900, 320, '')
+    s.heading('Checking the port frame by frame', 'One input movie drives the original and the port. A script compares their memory after each frame.')
     box(s, 40, 120, 150, 60, AMBER, 'Input movie', ['per-frame input'])
     arrow(s, 192, 140, 246, 108)
     arrow(s, 192, 160, 246, 192)
@@ -958,9 +923,8 @@ def port_check():
 
 # ================================================================ docs/consoles/tools.md
 def nes_memory_map():
-    s = Svg(900, 420, 'The NES CPU memory map: 2 KB of RAM and its mirrors, the PPU registers from 2000, the APU and '
-                      'I/O registers from 4000, cartridge RAM at 6000 and cartridge ROM from 8000 with the vectors at the top')
-    s.heading('Set the memory map first: the NES', 'Give Ghidra each region and name the registers. Then the code shows PPUCTRL in place of 0x2000.')
+    s = Svg(900, 420, '')
+    s.heading('The NES memory map', 'Give Ghidra each region and name the registers. The code then shows PPUCTRL in place of 0x2000.')
     rows = [('$0000', 'RAM, 2 KB (mirrored to $1FFF)', 48, GREEN), ('$2000', 'PPU registers (mirrored to $3FFF)', 48, PURPLE),
             ('$4000', 'APU and I/O registers', 30, AMBER), ('$4020', 'cartridge expansion', 30, GREY),
             ('$6000', 'cartridge RAM (battery saves)', 40, TEAL), ('$8000', 'cartridge ROM (banked by the mapper)', 130, BLUE)]
@@ -981,9 +945,8 @@ def nes_memory_map():
 
 
 def ghidra_adc():
-    s = Svg(900, 330, 'Two cases where Ghidra\'s 6502 ADC p-code gives the wrong flags: signed overflow, which it copies '
-                      'from the carry, and an incoming carry it leaves out of the carry test')
-    s.heading('Why Ghidra\'s 6502 p-code is not ground truth', 'Its ADC has no decimal mode and computes two flags wrongly. Two worked cases follow.')
+    s = Svg(900, 330, '')
+    s.heading('Ghidra\'s 6502 ADC flags', 'The ADC p-code has no decimal mode and computes two flags wrongly, as these two cases show.')
     hdr = ['', 'A + operand + C', 'result', 'real 6502', 'Ghidra p-code']
     xs = [40, 190, 390, 500, 680]
     for x, t in zip(xs, hdr):
@@ -999,14 +962,13 @@ def ghidra_adc():
         s.text(500, y + 27, real, 13, GREEN, mono=True)
         s.text(680, y + 27, ghidra, 12, RED, mono=True)
     para(s, 40, 254, '80 + 80 = 160 does not fit a signed byte (-128 to 127), so the real V flag is set. Take 6502 '
-                     'ground truth from a tested core: py65, mre/mos6502, floooh/chips or MAME.', 820)
+                     'ground truth from a tested core such as py65, mre/mos6502, floooh/chips or MAME.', 820)
     return s.render()
 
 
 def cpu_support():
-    s = Svg(900, 520, 'Console CPUs and their support in Ghidra and in Unicorn: built in, by extension or none, as the '
-                      'tools page lists them')
-    s.heading('Console CPUs: Ghidra and Unicorn', 'Without a Unicorn backend, take ground truth from an emulator or a small core.')
+    s = Svg(900, 520, '')
+    s.heading('Console CPUs in Ghidra and Unicorn', 'Where Unicorn has no backend, take ground truth from an emulator or a small core.')
     rows = [('6502, 65C02', 'built in', 'no'), ('HuC6280', 'extension', 'no'), ('CP1600', 'built in', 'no'), ('6809', 'built in', 'no'),
             ('65C816', 'extension', 'no'), ('Z80', 'built in', 'no'), ('SM83', 'extension', 'no'), ('68000', 'built in', 'yes'),
             ('MIPS R3000, R4300', 'built in', 'yes'), ('MIPS R5900', 'extension', 'no'), ('SuperH', 'built in', 'no'),
@@ -1033,9 +995,8 @@ def cpu_support():
 
 def ram_search():
     dur = 6
-    s = Svg(900, 300, 'RAM search: start with every address, keep those equal to 3 while the player has 3 lives, then '
-                      'those equal to 2 after a life is lost, until one address is left')
-    s.heading('RAM search finds a variable', 'Filter the candidates each time the value you know changes.')
+    s = Svg(900, 300, '')
+    s.heading('RAM search', 'Filter the candidates each time the value you know changes.')
     steps = [('all of RAM', None), ('equal to 3 (3 lives)', 3), ('now equal to 2', 2), ('one address left: lives', 1)]
     keep = [set(range(64)), {3, 9, 17, 22, 30, 41, 46, 52, 60}, {17, 41, 52}, {41}]
     for k, (label, _) in enumerate(steps):
@@ -1055,9 +1016,8 @@ def ram_search():
 
 
 def unicorn_run():
-    s = Svg(900, 300, 'Running one console function under Unicorn: load the code at its address, fill RAM from a dump, '
-                      'set the registers, stub the hardware registers, call it and read the results')
-    s.heading('One original function, headless', 'For the CPUs Unicorn supports, the same method as pe_emu.py for Windows code.')
+    s = Svg(900, 300, '')
+    s.heading('One original function under Unicorn', 'For the CPUs that Unicorn supports, this is the same method that pe_emu.py uses for Windows code.')
     steps = [('1. Load code', ['ROM or segments', 'at their addresses'], BLUE), ('2. Map RAM', ['fill it from an', 'emulator dump'], GREEN),
              ('3. Set registers', ['the function\'s', 'arguments'], PURPLE), ('4. Stub hardware', ['the registers', 'it touches'], AMBER),
              ('5. Call, read', ['the results:', 'ground truth'], TEAL)]
@@ -1068,9 +1028,8 @@ def unicorn_run():
 
 
 def splat_flow():
-    s = Svg(900, 280, 'Splitting and rebuilding: splat or decomp-toolkit split the ROM by a configuration into code, data '
-                      'and assets, and the project builds them back into an identical ROM')
-    s.heading('Split, then rebuild the same bytes', 'The first build is all disassembly. It must already give the identical program.')
+    s = Svg(900, 280, '')
+    s.heading('Splitting and rebuilding a program', 'The first build is all disassembly. This build must already give the identical program.')
     box(s, 40, 100, 140, 70, GREY, 'ROM or EXE', ['the original'])
     arrow(s, 182, 135, 222, 135)
     box(s, 226, 100, 160, 70, BLUE, 'splat, dtk', ['a config of', 'addresses'])
@@ -1090,9 +1049,8 @@ def splat_flow():
 
 # ================================================================ docs/handhelds/README.md
 def handheld_groups():
-    s = Svg(900, 330, 'The four groups of handhelds: 4-bit LCD games with the program in the CPU, 8-bit cartridge '
-                      'systems, ARM machines with an operating system, and modern ARM64 and x86-64 machines')
-    s.heading('Handhelds in four groups', 'The group decides where the program lives and which tools read it.')
+    s = Svg(900, 330, '')
+    s.heading('Four groups of handhelds', 'The group decides where the program lives and which tools read it.')
     groups = [('4-bit LCD games', '1979 on', ['mask ROM inside the MCU', 'lit LCD segments', 'Game & Watch, Microvision'], GREY),
               ('8-bit and 16-bit carts', '1989 on', ['ROM in a cartridge', 'tiles and sprites', 'Game Boy, Lynx, Game Gear'], TEAL),
               ('ARM on an OS', '2001 on', ['files on cards or carts', 'OS calls to stub', 'GBA, DS, N-Gage, PSP'], BLUE),
@@ -1111,9 +1069,8 @@ def handheld_groups():
 
 # ================================================================ docs/handhelds/practices.md
 def mbc3_rtc():
-    s = Svg(900, 360, 'The Game Boy MBC3 clock: writing 08 to 0C into 4000 to 5FFF selects a clock register, writing 00 '
-                      'then 01 into 6000 to 7FFF latches the time, and the DH register holds day bit 8, halt and carry')
-    s.heading('MBC3: a real-time clock in the cartridge', 'A 32.768 kHz crystal and a battery keep it running with the power off.')
+    s = Svg(900, 360, '')
+    s.heading('The MBC3 real-time clock', 'A 32.768 kHz crystal and a battery keep the clock running when the power is off.')
     regs = [('$08', 'seconds'), ('$09', 'minutes'), ('$0A', 'hours'), ('$0B', 'day, low 8 bits'), ('$0C', 'DH')]
     s.text(40, 96, 'write to $4000-$5FFF to select', 12, TEXT, weight='600')
     for i, (v, n) in enumerate(regs):
@@ -1125,7 +1082,7 @@ def mbc3_rtc():
     for k in range(8):
         s.text(330 + k * 66 + 32, 154, str(7 - k), 10, DIM, 'middle', mono=True)
     para(s, 330, 180, 'The day counter is 9 bits, 0 to 511. Carry stays set until software clears it.', 520)
-    s.text(330, 230, 'latch: write $00, then $01, to $6000-$7FFF', 12, TEXT, weight='600')
+    s.text(330, 230, 'To latch the time, write $00, then $01, to $6000-$7FFF', 12, TEXT, weight='600')
     box(s, 330, 242, 110, 34, GREY, '$00', [], 12)
     arrow(s, 442, 259, 470, 259)
     box(s, 474, 242, 110, 34, GREY, '$01', [], 12)
@@ -1136,9 +1093,8 @@ def mbc3_rtc():
 
 
 def outside_inputs():
-    s = Svg(900, 300, 'Outside inputs a handheld test records and replays each frame beside the buttons: link cables, '
-                      'infrared, the real-time clock, sensors, touch and cartridge presence')
-    s.heading('Outside inputs to record', 'A test replays all of them, frame by frame, beside the buttons.')
+    s = Svg(900, 300, '')
+    s.heading('Outside inputs of a handheld', 'A test records these inputs beside the buttons and replays them frame by frame.')
     ins = [('buttons', BLUE), ('link cable', TEAL), ('infrared', TEAL), ('real-time clock', AMBER), ('shock, tilt', PURPLE),
            ('touchscreen', PURPLE), ('GPS, camera', PURPLE), ('Game-Key Card', GREY), ('mouse (Joy-Con 2)', GREY)]
     for i, (t, c) in enumerate(ins):
@@ -1149,14 +1105,13 @@ def outside_inputs():
     box(s, 524, 120, 160, 90, GREEN, 'Input record', ['one entry per frame'])
     arrow(s, 686, 165, 726, 165)
     box(s, 730, 120, 130, 90, TEAL, 'Replay', ['the original', 'and the port'])
-    s.text(40, 270, 'Examples: GBC infrared, the Pokémon mini shock sensor, the Game.com touchscreen, the Gizmondo GPS.', 12, DIM)
+    s.text(40, 270, 'Examples include GBC infrared, the Pokémon mini shock sensor, the Game.com touchscreen and the Gizmondo GPS.', 12, DIM)
     return s.render()
 
 
 def lcd_ghosting():
-    s = Svg(900, 300, 'Sprite flicker and a slow LCD: the game draws two sprites on alternate frames and the slow LCD '
-                      'blends them; tests compare the raw frames and leave blending to the presentation')
-    s.heading('LCD behaviour: compare the raw frames', 'Some games flicker sprites and rely on the slow LCD to blend them.')
+    s = Svg(900, 300, '')
+    s.heading('Sprite flicker on a slow LCD', 'Some games flicker sprites and rely on the slow LCD to blend them.')
     for k, (label, ax, bx) in enumerate((('frame 1: sprite A', 1, 0), ('frame 2: sprite B', 0, 1))):
         x = 40 + k * 200
         s.rect(x, 96, 170, 130, GREEN, rx=4, extra=' fill-opacity="0.12"')
@@ -1169,7 +1124,7 @@ def lcd_ghosting():
     for dx, vals in ((30, '0.9;0.25;0.9'), (100, '0.25;0.9;0.25')):
         s.add(f'<rect x="{x + dx}" y="140" width="40" height="40" rx="3" fill="{TEXT}" fill-opacity="0.6">'
               f'<animate attributeName="fill-opacity" values="{vals}" dur="0.5s" repeatCount="indefinite"/></rect>')
-    s.text(x, 246, 'on the LCD: both, half bright', 12, TEXT)
+    s.text(x, 246, 'on the LCD, both at half brightness', 12, TEXT)
     para(s, 690, 110, 'The test compares frame 1 and frame 2 as drawn. Blend only in the presentation layer.', 180)
     s.text(40, 284, 'On a Game & Watch, the test compares which LCD segments are lit.', 12, DIM)
     return s.render()
@@ -1178,9 +1133,8 @@ def lcd_ghosting():
 # ================================================================ docs/handhelds/game-boy.md
 def gb_memory_map():
     dur = 6
-    s = Svg(900, 420, 'The Game Boy memory map: ROM bank 0 at 0000, a switchable ROM bank at 4000, VRAM, cartridge RAM, '
-                      'work RAM, sprite attributes, I/O registers and high RAM')
-    s.heading('Game Boy: the memory map', 'The mapper changes which ROM bank sits at $4000-$7FFF. Name functions bank:address.')
+    s = Svg(900, 420, '')
+    s.heading('The Game Boy memory map', 'The mapper changes which ROM bank sits at $4000-$7FFF, so functions are named bank:address.')
     rows = [('$0000', 'ROM bank 0 (fixed)', 54, TEAL), ('$4000', 'ROM bank n (switchable)', 54, AMBER), ('$8000', 'VRAM: tiles and maps', 30, PURPLE),
             ('$A000', 'cartridge RAM (battery)', 30, GREEN), ('$C000', 'work RAM', 30, GREY), ('$E000', 'echo of work RAM', 22, GREY),
             ('$FE00', 'OAM: 40 sprites', 22, PURPLE), ('$FF00', 'I/O registers', 22, BLUE), ('$FF80', 'high RAM', 22, GREY)]
@@ -1204,9 +1158,8 @@ def gb_memory_map():
 
 
 def gbc_modes():
-    s = Svg(900, 330, 'Game Boy Color modes: the header byte at 0143 decides whether a cartridge runs in colour, in '
-                      'both modes, or in the monochrome mode; double speed doubles the CPU clock')
-    s.heading('Game Boy Color: the header byte picks the mode', 'The boot ROM reads $0143 and sets the mode before the game starts.')
+    s = Svg(900, 330, '')
+    s.heading('Game Boy Color modes', 'The boot ROM reads $0143 and sets the mode before the game starts.')
     rows = [('$80', 'supports both systems', 'black "dual mode" cartridge', TEAL), ('$C0', 'CGB only', 'clear cartridge', BLUE),
             ('other', 'monochrome "Non CGB" mode', 'grey DMG cartridge', GREY)]
     for i, (v, mode, cart, c) in enumerate(rows):
@@ -1218,15 +1171,13 @@ def gbc_modes():
     s.text(40, 266, 'Speed', 13, TEXT, weight='600')
     bitrow(s, 120, 250, [('normal: 4.194304 MHz', 10, BLUE)], 22, 26)
     bitrow(s, 120, 282, [('double: 8.388608 MHz', 20, AMBER)], 22, 26)
-    s.text(580, 270, 'A dual-mode game has two code paths.', 12, DIM)
-    s.text(580, 300, 'A port needs both.', 12, DIM)
+    para(s, 580, 270, 'A port of a dual-mode game needs both of its code paths.', 280)
     return s.render()
 
 
 def gbc_hdma():
-    s = Svg(900, 360, 'Game Boy Color VRAM DMA: general-purpose DMA copies everything at once and halts the CPU, '
-                      'HBlank DMA copies 16 bytes in each horizontal blank while the game runs')
-    s.heading('CGB VRAM DMA: two modes', 'HDMA5 bit 7 picks the mode. Each moves $10 to $800 bytes into VRAM.')
+    s = Svg(900, 360, '')
+    s.heading('Game Boy Color VRAM DMA', 'Bit 7 of HDMA5 picks the mode. Each mode moves $10 to $800 bytes into VRAM.')
     # General purpose.
     s.text(40, 98, 'bit 7 clear: general-purpose DMA', 12, TEXT, weight='600')
     s.rect(40, 110, 520, 28, BLUE, rx=3, extra=' fill-opacity="0.2"')
@@ -1245,17 +1196,16 @@ def gbc_hdma():
               'repeatCount="indefinite"/></rect>')
     s.text(40, 236, 'Blue is a line being drawn while the game runs. Amber is one block copied in its HBlank.', 11, DIM)
     s.text(40, 274, 'Double speed', 13, TEXT, weight='600')
-    s.text(40, 296, 'speeds up: the CPU, timers, serial port, OAM DMA', 12, AMBER)
-    s.text(40, 316, 'stays the same: the LCD, VRAM DMA, sound', 12, TEAL)
-    s.text(420, 296, 'KEY1 ($FF4D): set bit 0, execute stop.', 12, DIM, mono=False)
+    s.text(40, 296, 'The CPU, timers, serial port and OAM DMA run twice as fast.', 12, AMBER)
+    s.text(40, 316, 'The LCD, VRAM DMA and sound keep normal timing.', 12, TEAL)
+    s.text(420, 296, 'To switch, the game sets bit 0 of KEY1 ($FF4D) and executes stop.', 12, DIM, mono=False)
     s.text(420, 316, 'The switch pauses the CPU for 2050 M-cycles.', 12, DIM)
     return s.render()
 
 
 def sgb_layout():
-    s = Svg(900, 380, 'The Super Game Boy picture: the 160 by 144 Game Boy screen inside a 256 by 224 SNES picture with a '
-                      'border, palettes per cell of a 20 by 18 grid, and a clock taken from the SNES that runs fast')
-    s.heading('Super Game Boy: a Game Boy inside a SNES', 'Drawn to scale. The border is SNES tiles. Palettes can change per cell.')
+    s = Svg(900, 380, '')
+    s.heading('The Super Game Boy picture', 'The border is made of SNES tiles. A game can set a palette for each cell.')
     k = 1.2
     x0, y0 = 40, 84
     s.rect(x0, y0, 256 * k, 224 * k, PURPLE, PURPLE, rx=3, extra=' fill-opacity="0.2" stroke-opacity="0.7"')
@@ -1267,10 +1217,10 @@ def sgb_layout():
     for r in range(19):
         s.line(gx, gy + r * 8 * k, gx + 160 * k, gy + r * 8 * k, GREEN, 0.4, ' stroke-opacity="0.5"')
     s.rect(gx + 5 * 8 * k, gy + 6 * 8 * k, 4 * 8 * k, 3 * 8 * k, AMBER, rx=1, extra=' fill-opacity="0.5"')
-    s.text(gx + 4, gy + 144 * k - 6, 'Game Boy 160 x 144: a 20 x 18 grid of cells', 10, TEXT)
+    s.text(gx + 4, gy + 144 * k - 6, 'Game Boy 160 x 144, a grid of 20 x 18 cells', 10, TEXT)
     tx = 400
     s.text(tx, 104, 'What a game can add', 13, TEXT, weight='600')
-    for i, t in enumerate(('a palette per cell (amber: one area)', 'up to 24 SNES sprites', 'four joypads, read separately',
+    for i, t in enumerate(('a palette per cell (amber shows one area)', 'up to 24 SNES sprites', 'four joypads, read separately',
                            'SNES sound effects', 'code uploaded and run on the SNES CPU')):
         s.text(tx, 128 + i * 20, t, 12, TEXT)
     s.text(tx, 248, 'The clock comes from the SNES', 13, TEXT, weight='600')
@@ -1285,9 +1235,8 @@ def sgb_layout():
 
 
 def gba_blocks():
-    s = Svg(900, 280, 'The Game Boy Advance: an ARM7TDMI runs GBA games and an SM83 runs Game Boy games, with tile and '
-                      'bitmap video modes and four Game Boy sound channels plus two sample channels')
-    s.heading('Game Boy Advance: two CPUs, one at a time', 'The ARM7TDMI runs GBA games. The SM83 is there for Game Boy games.')
+    s = Svg(900, 280, '')
+    s.heading('Game Boy Advance CPUs', 'The ARM7TDMI runs GBA games. The SM83 runs Game Boy games.')
     box(s, 40, 90, 200, 70, BLUE, 'ARM7TDMI', ['ARM and Thumb', 'GBA games'])
     box(s, 40, 176, 200, 60, GREY, 'SM83', ['Game Boy games'])
     box(s, 300, 90, 260, 70, PURPLE, 'Video', ['tile modes and', 'bitmap modes'])
@@ -1300,9 +1249,8 @@ def gba_blocks():
 
 # ================================================================ docs/handhelds/lcd-games.md
 def gw_segments():
-    s = Svg(900, 330, 'A Game & Watch: the 4-bit MCU holds the ROM, the RAM and the LCD driver; bits in its LCD RAM '
-                      'light fixed printed segments, and a test compares which segments are lit each frame')
-    s.heading('Game & Watch: lit segments', 'Every image is a fixed printed segment. The program turns segments on and off.')
+    s = Svg(900, 330, '')
+    s.heading('Game & Watch segments', 'Every image is a fixed printed segment, which the program turns on and off.')
     box(s, 40, 90, 260, 190, GREY, '', op=0.08)
     s.text(56, 112, 'Sharp SM5xx MCU, 4-bit', 13, TEXT, weight='600')
     box(s, 56, 124, 110, 50, BLUE, 'mask ROM', ['1,792 to 4,032 B'])
@@ -1329,9 +1277,8 @@ def gw_segments():
 
 
 def microvision():
-    s = Svg(900, 260, 'The Microvision: the base unit has the LCD, keypad and paddle but no CPU; each cartridge holds its '
-                      'own processor with the program masked inside it')
-    s.heading('Microvision: the CPU is in the cartridge', 'The cartridge connector gives no normal ROM dump. The program is inside the chip.')
+    s = Svg(900, 260, '')
+    s.heading('The Microvision cartridge CPU', 'The program is inside the CPU chip, so the cartridge connector gives no normal ROM dump.')
     box(s, 40, 90, 360, 130, GREY, '', op=0.1)
     s.text(56, 112, 'Base unit: no CPU', 13, TEXT, weight='600')
     box(s, 56, 126, 110, 80, GREEN, 'LCD', ['16 x 16 pixels'])
@@ -1348,9 +1295,8 @@ def microvision():
 
 # ================================================================ docs/handhelds/sega-atari-snk.md and others
 def handheld_screens():
-    s = Svg(900, 470, 'Handheld screens drawn to scale, from the Pokemon mini at 96 by 64 to the Virtual Boy at 384 by '
-                      '224 for each eye')
-    s.heading('Handheld screens, to scale', 'Pixels of the picture each machine draws. The Game Gear shows part of a Master System picture.')
+    s = Svg(900, 470, '')
+    s.heading('Handheld screen sizes', 'Each box is the picture a machine draws, in pixels. The Game Gear shows part of a Master System picture.')
     k = 0.75
     items = [('Pokémon mini', 96, 64, GREY), ('Lynx', 160, 102, AMBER), ('Game Boy, GBC', 160, 144, GREEN),
              ('Game Gear', 160, 144, BLUE), ('Neo Geo Pocket', 160, 152, PURPLE), ('Game.com', 200, 160, TEAL),
@@ -1369,9 +1315,8 @@ def handheld_screens():
 
 
 def lynx_blocks():
-    s = Svg(900, 280, 'The Atari Lynx: Mikey holds the 65SC02 at 4 MHz, Suzy is a blitter that scales sprites with a '
-                      'maths unit, and the boot ROM decrypts the cartridge loader')
-    s.heading('Atari Lynx: Mikey and Suzy', 'The CPU sits inside Mikey. Suzy draws and does maths.')
+    s = Svg(900, 280, '')
+    s.heading('Atari Lynx chips', 'The CPU sits inside the Mikey chip. The Suzy chip draws sprites and does maths.')
     box(s, 40, 90, 240, 80, BLUE, 'Mikey', ['65SC02 at 4 MHz', 'timers, sound, display'])
     box(s, 320, 90, 240, 80, PURPLE, 'Suzy', ['blitter: scaled sprites', 'maths unit'])
     s.line(282, 130, 318, 130, DIM, 1.5)
@@ -1386,9 +1331,8 @@ def lynx_blocks():
 
 
 def wonderswan_path():
-    s = Svg(900, 250, 'The WonderSwan path: the V30MZ is a 16-bit x86, so Ghidra\'s x86 real-mode language reads it and '
-                      'Unicorn runs its functions, as for DOS code')
-    s.heading('WonderSwan: x86 tools apply', 'The NEC V30MZ at 3.072 MHz runs 16-bit x86 code.')
+    s = Svg(900, 250, '')
+    s.heading('WonderSwan tools', 'The NEC V30MZ at 3.072 MHz runs 16-bit x86 code, so x86 tools read it.')
     steps = [('Cartridge', ['V30MZ code'], GREY), ('Ghidra', ['x86 real mode', '+ ghidra-wonderswan'], BLUE),
              ('Unicorn', ['x86 16-bit', 'one function'], PURPLE), ('Ground truth', ['as for DOS games'], TEAL)]
     flow(s, 40, 96, 186, 70, 26, steps)
@@ -1397,9 +1341,8 @@ def wonderswan_path():
 
 
 def virtualboy_eyes():
-    s = Svg(900, 260, 'The Virtual Boy: the V810 at 20 MHz drives two red LED displays of 384 by 224 pixels, one for '
-                      'each eye')
-    s.heading('Virtual Boy: one picture per eye', 'Two red displays, 384 x 224 each. A test compares both pictures.')
+    s = Svg(900, 260, '')
+    s.heading('Virtual Boy displays', 'Two red displays show 384 x 224 pixels each. A test compares both pictures.')
     k = 0.55
     for i, eye in enumerate(('left eye', 'right eye')):
         x = 40 + i * (384 * k + 30)
@@ -1412,9 +1355,8 @@ def virtualboy_eyes():
 
 
 def pokemini_blocks():
-    s = Svg(900, 300, 'The Pokemon mini: an Epson S1C88 at 4 MHz with 4 KB of SRAM shared with video, a 4 KB BIOS, '
-                      'cartridges up to 2 MB, a 96 by 64 LCD at 30 frames a second, and sensors')
-    s.heading('Pokémon mini: small, with outside inputs', 'An 8-bit core with 16-bit instructions. No Ghidra module, no Unicorn.')
+    s = Svg(900, 300, '')
+    s.heading('Pokémon mini parts', 'The S1C88 is an 8-bit core with 16-bit instructions. It has no Ghidra module and no Unicorn backend.')
     box(s, 40, 90, 180, 70, BLUE, 'Epson S1C88', ['4 MHz'])
     box(s, 240, 90, 180, 70, GREEN, 'SRAM 4 KB', ['shared with video'])
     box(s, 440, 90, 180, 70, GREY, 'BIOS 4 KB', ['start-up, power'])
@@ -1427,9 +1369,8 @@ def pokemini_blocks():
 
 
 def gamecom_touch():
-    s = Svg(900, 300, 'The Game.com screen: 200 by 160 pixels in 4 grey levels, with a touchscreen of 12 by 10 cells over '
-                      'it')
-    s.heading('Game.com: a coarse touchscreen', 'A Sharp SM8521 at 10 MHz. The touch grid is much coarser than the pixels.')
+    s = Svg(900, 300, '')
+    s.heading('The Game.com touchscreen', 'The Game.com uses a Sharp SM8521 at 10 MHz. Its touch grid is much coarser than its pixels.')
     k = 1.2
     x0, y0 = 40, 84
     greys = ['#1b2a28', '#4c6461', '#8fa9a5', '#d8e4e1']
@@ -1452,9 +1393,8 @@ def gamecom_touch():
 
 # ================================================================ docs/handhelds/ds-and-3ds.md
 def ds_cartridge():
-    s = Svg(900, 300, 'A Nintendo DS cartridge holds an ARM9 binary, an ARM7 binary, overlays and the NitroFS file '
-                      'system; load the ARM9 and ARM7 code into Ghidra as separate programs')
-    s.heading('Nintendo DS: one game, two CPUs', 'The ARM946E-S at 67 MHz and the ARM7TDMI at 33 MHz each run their own binary.')
+    s = Svg(900, 300, '')
+    s.heading('Nintendo DS cartridge contents', 'The ARM946E-S at 67 MHz and the ARM7TDMI at 33 MHz each run their own binary.')
     parts = [('header', 70, GREY), ('ARM9 binary', 170, BLUE), ('ARM7 binary', 120, PURPLE), ('overlays', 140, AMBER),
              ('NitroFS files', 260, TEAL)]
     x = 40
@@ -1471,9 +1411,8 @@ def ds_cartridge():
 
 
 def n3ds_containers():
-    s = Svg(900, 300, 'Nintendo 3DS containers: an NCSD or CCI card image holds NCCH partitions, and an NCCH holds the '
-                      'ExeFS with the code; the contents are AES-encrypted with keys in the ARM9 boot ROM')
-    s.heading('Nintendo 3DS: containers inside containers', 'The code is in the ExeFS of an NCCH. Everything is AES-encrypted.')
+    s = Svg(900, 300, '')
+    s.heading('Nintendo 3DS containers', 'The code is in the ExeFS of an NCCH. All of the contents are AES-encrypted.')
     box(s, 40, 86, 820, 150, RED, '', op=0.06)
     s.text(56, 106, 'NCSD / CCI: the card image (CIA for installed titles)', 12, TEXT, weight='600')
     box(s, 56, 118, 520, 104, AMBER, '', op=0.08)
@@ -1487,9 +1426,8 @@ def n3ds_containers():
 
 
 def n3ds_lineage():
-    s = Svg(900, 260, 'The 3DS emulators: Citra was taken down in March 2024, and Lime3DS and PabloMK7\'s fork merged into '
-                      'Azahar in late 2024, with first releases in early 2025')
-    s.heading('3DS emulators since 2024', 'Repositories can disappear. Pin an exact build and keep a local copy.')
+    s = Svg(900, 260, '')
+    s.heading('3DS emulators since 2024', 'Repositories can disappear, so pin an exact build and keep a local copy.')
     box(s, 40, 100, 160, 60, RED, 'Citra', ['taken down March 2024'])
     box(s, 300, 80, 200, 44, BLUE, 'Lime3DS', [], 12)
     box(s, 300, 136, 200, 44, BLUE, 'PabloMK7\'s fork', [], 12)
@@ -1504,9 +1442,8 @@ def n3ds_lineage():
 
 # ================================================================ docs/handhelds/psp-and-vita.md
 def psp_vita_exec():
-    s = Svg(900, 280, 'PSP and PS Vita executables: an encrypted ~PSP ELF in EBOOT.BIN and PRX files, and a SELF wrapping '
-                      'an ARM ELF with SUPRX modules; each needs a decrypted file and a Ghidra extension')
-    s.heading('PSP and PS Vita: signed and encrypted', 'Decrypt your own copy first. Then each needs a Ghidra extension.')
+    s = Svg(900, 280, '')
+    s.heading('PSP and PS Vita executables', 'The executables of both are signed and encrypted. After decryption, each needs a Ghidra extension.')
     rows = [('PSP', 'EBOOT.BIN, PRX: "~PSP" encrypted', 'MIPS32 + VFPU ELF', 'ghidra-allegrex', 'PPSSPP'),
             ('PS Vita', 'SELF, SUPRX modules', 'ARM ELF (Cortex-A9)', 'VitaLoaderRedux', 'Vita3K')]
     for i, (p, wrap, inner, ld, emu) in enumerate(rows):
@@ -1523,9 +1460,8 @@ def psp_vita_exec():
 
 # ================================================================ docs/handhelds/switch-family.md
 def switch_nca():
-    s = Svg(900, 300, 'A Switch game: the NSO executable sits in the ExeFS of an encrypted NCA; the keys come from the '
-                      'user\'s own console and Ghidra-Switch-Loader loads the NSO')
-    s.heading('Nintendo Switch: NSO inside an NCA', 'Four Cortex-A57 cores at 1.02 GHz. AArch64 code.')
+    s = Svg(900, 300, '')
+    s.heading('Nintendo Switch executables', 'The Switch has four Cortex-A57 cores at 1.02 GHz that run AArch64 code.')
     box(s, 40, 86, 520, 150, RED, '', op=0.06)
     s.text(56, 106, 'NCA, encrypted', 12, TEXT, weight='600')
     box(s, 56, 118, 300, 104, AMBER, '', op=0.08)
@@ -1541,9 +1477,8 @@ def switch_nca():
 
 
 def switch_timeline():
-    s = Svg(900, 290, 'Switch emulators from 2024 to 2026: the yuzu settlement in March 2024, Ryubing in maintenance in '
-                      'February 2026, takedown notices to at least 13 projects, and Eden and Citron as the active forks')
-    s.heading('Switch emulators since 2024', 'From secondary 2026 coverage. Pin an exact build and keep a local copy.')
+    s = Svg(900, 290, '')
+    s.heading('Switch emulators since 2024', 'These events come from secondary coverage in 2026. Pin an exact build and keep a local copy.')
     cols = {'end': RED, 'fork': BLUE, 'event': AMBER}
     items = [(2024.17, 'March 2024: yuzu settles, Citra goes', 'end'), (2024.4, 'Suyu, an early fork', 'fork'),
              (2025.2, 'Eden and Citron, the active forks', 'fork'), (2026.1, 'Feb 2026: Ryubing in maintenance', 'end'),
@@ -1554,9 +1489,8 @@ def switch_timeline():
 
 
 def switch2_rate():
-    s = Svg(900, 300, 'A fixed 60 Hz display shows a frame every 16.7 ms, while the Switch 2 display with VRR shows a '
-                      'frame when the game finishes it, up to 120 Hz, so a test records the rate')
-    s.heading('Switch 2: the game sets its own frame rate', 'With VRR, a frame shows when it is ready, up to 120 Hz.')
+    s = Svg(900, 300, '')
+    s.heading('Switch 2 frame rate', 'With VRR, a frame shows when it is ready, at up to 120 Hz.')
     x0, w = 200, 640
     s.text(40, 112, 'fixed 60 Hz', 12, TEXT, weight='600')
     for i in range(8):
@@ -1578,9 +1512,8 @@ def switch2_rate():
 
 # ================================================================ the other handheld pages
 def arm_os_stubs():
-    s = Svg(900, 280, 'An ARM-OS handheld game calls the operating system; to run one function under Unicorn, replace '
-                      'each OS call it makes with a stub that returns what the OS would')
-    s.heading('ARM on an OS: stub the OS calls', 'Study the imports and OS calls as closely as the CPU code, as for a Windows game.')
+    s = Svg(900, 280, '')
+    s.heading('OS calls on ARM handhelds', 'Study the imports and OS calls as closely as the CPU code, as for a Windows game.')
     box(s, 40, 90, 220, 120, BLUE, 'Game function', ['ARM code'])
     oss = [('N-Gage', 'Symbian OS 6.1'), ('Gizmondo', 'Windows CE'), ('GP2X', 'Linux')]
     for i, (dev, os_) in enumerate(oss):
@@ -1594,9 +1527,8 @@ def arm_os_stubs():
 
 
 def steamdeck_path():
-    s = Svg(900, 274, 'The Steam Deck runs Windows games through Proton on SteamOS, so GameFrame\'s Windows PE path '
-                      'applies: Ghidra, Unicorn x86-64 and Wine')
-    s.heading('PC handhelds: the PC path', 'An x86-64 PC with a built-in screen. The games are PC games.')
+    s = Svg(900, 274, '')
+    s.heading('PC handheld tools', 'A PC handheld is an x86-64 PC with a built-in screen. Its games are PC games.')
     steps = [('Windows game', ['a PE file'], BLUE), ('Proton', ['on SteamOS 3'], GREY), ('GameFrame', ['Ghidra, Unicorn', 'x86-64, Wine'], TEAL)]
     flow(s, 40, 96, 220, 66, 40, steps)
     box(s, 40, 190, 380, 44, AMBER, 'LCD model: 60 Hz panel', [], 12)
@@ -1606,9 +1538,8 @@ def steamdeck_path():
 
 
 def j2me_builds():
-    s = Svg(900, 344, 'One J2ME game often shipped as many builds for different handsets, each a separate .jar to treat '
-                      'as its own target')
-    s.heading('Phones: one game, many builds', 'Each handset got its own .jar. Treat each build as a separate target.')
+    s = Svg(900, 344, '')
+    s.heading('J2ME builds', 'Each handset got its own .jar, so treat each build as a separate target.')
     box(s, 375, 80, 150, 44, GREY, 'One game', [])
     s.line(450, 126, 450, 142, DIM, 1.5)
     s.line(130, 142, 740, 142, DIM, 1.5)
@@ -1624,16 +1555,15 @@ def j2me_builds():
 
 
 def brew_signing():
-    s = Svg(900, 240, 'A downloaded BREW game is signed for one handset, so a copy does not run on another handset and '
-                      'most were never dumped')
-    s.heading('BREW: signed for one handset', 'Downloaded apps (.mif and .mod files) carry a signature tied to the phone.')
+    s = Svg(900, 240, '')
+    s.heading('BREW signatures', 'Downloaded apps (.mif and .mod files) carry a signature tied to the phone.')
     box(s, 40, 100, 170, 60, GREY, 'Download', ['.mif, .mod'])
     arrow(s, 212, 130, 256, 130)
     box(s, 260, 100, 200, 60, GREEN, 'Handset A', ['the signature matches'])
     arrow(s, 462, 130, 506, 130, dash=True)
     s.text(484, 120, 'copy', 10, DIM, 'middle')
     box(s, 510, 100, 200, 60, RED, 'Handset B', ['does not run'])
-    para(s, 730, 112, 'So most BREW games were never dumped.', 140)
+    para(s, 730, 112, 'For this reason, most BREW games were never dumped.', 140)
     s.text(40, 212, 'Melange (Android) is in early development. Zeebo games became playable through @Tuxality\'s work in 2024.', 12, DIM)
     return s.render()
 
@@ -1719,7 +1649,7 @@ LABELS = {
     'psx-gte.svg': 'The PlayStation GTE rotates, translates and projects vertices in fixed point',
     'ps2-ee-iop.svg': 'The PlayStation 2 Emotion Engine, vector units and IOP, and how its floats differ from IEEE 754',
     'console-early-timeline.svg': 'The early consoles by year of release, coloured by CPU family',
-    'atari2600-beam.svg': 'Racing the beam on the Atari 2600, with one scanline of 76 CPU cycles and one NTSC frame of 262 lines',
+    'atari2600-beam.svg': 'Drawing on the Atari 2600, with one scanline of 76 CPU cycles and one NTSC frame of 262 lines',
     'intellivision-words.svg': 'Intellivision ROM words are 10 bits wide. SDBD builds a 16-bit operand from two of them',
     'colecovision-parts.svg': 'The ColecoVision parts on the CPU bus, with the video chip and its own VRAM',
     'atari7800-clock.svg': 'The Atari 7800 clock slows for TIA and RIOT access. NTSC consoles check the cartridge signature',
@@ -1739,7 +1669,7 @@ LABELS = {
     'xbox360-recomp.svg': 'Static recompilation of an Xbox 360 game into a native PC port',
     'gamecube-paired-singles.svg': 'Paired singles hold two floats in one register. A GQR register sets the quantised load',
     'console-port-routes.svg': 'Four routes to a port, by effort and by what can be published',
-    'console-fixed-rate.svg': 'The logic keeps the original rate on a faster display. A lag frame has no update',
+    'console-fixed-rate.svg': 'The logic rate stays the same on a faster display, with a lag frame shown as a frame without an update',
     'console-input-mask.svg': 'Buttons pressed this frame are the held buttons that were not held in the previous frame',
     'console-video-kinds.svg': 'Three kinds of console video and how a port draws each',
     'console-raster-split.svg': 'A raster effect, where an interrupt on one line rewrites the scroll register',
@@ -1759,11 +1689,11 @@ LABELS = {
     'gameboy-memory-map.svg': 'The Game Boy memory map, with the switchable ROM bank at 4000',
     'gbc-modes.svg': 'The header byte at 0143 picks the Game Boy Color mode. Double speed doubles the clock',
     'gbc-hdma.svg': 'General-purpose DMA and HBlank DMA on the Game Boy Color, and what double speed changes',
-    'sgb-layout.svg': 'The Game Boy screen inside the SNES picture, drawn to scale, and the fast SGB clock',
+    'sgb-layout.svg': 'The Game Boy screen inside the SNES picture, with the fast SGB clock',
     'gba-parts.svg': 'The Game Boy Advance CPUs, video, sound and tools',
     'gamewatch-segments.svg': 'A Game & Watch MCU lights fixed printed segments from its LCD RAM',
-    'microvision-cartridge.svg': 'The Microvision base unit has no CPU. Each cartridge holds its own',
-    'handheld-screens.svg': 'Handheld screens drawn to scale',
+    'microvision-cartridge.svg': 'Each Microvision cartridge holds its own CPU with the program inside',
+    'handheld-screens.svg': 'The sizes of handheld screens in pixels',
     'lynx-parts.svg': 'The Lynx chips Mikey and Suzy, and the boot ROM that decrypts the loader',
     'wonderswan-path.svg': 'The WonderSwan path through Ghidra x86 real mode and Unicorn',
     'virtualboy-eyes.svg': 'The Virtual Boy draws one 384 by 224 picture for each eye',

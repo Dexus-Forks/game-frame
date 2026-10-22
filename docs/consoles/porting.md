@@ -37,7 +37,7 @@ Every route needs code on the new system that replaces the console's hardware. S
 
 ### The frame and the clock
 
-![The logic keeps the original rate on a faster display. A lag frame has no update](../assets/diagrams/console-fixed-rate.svg)
+![The logic rate stays the same on a faster display, with a lag frame shown as a frame without an update](../assets/diagrams/console-fixed-rate.svg)
 
 - The game's logic runs once per vertical blank. Keep one logic update per frame, at the
   original's rate (60.0988 Hz for an NTSC NES, 59.94 Hz or 50 Hz for most others). Find the
