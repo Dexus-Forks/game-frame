@@ -22,7 +22,7 @@ dir="$1"; dry="${2:-}"
 [[ -d "$dir/.git" || -f "$dir/.git" ]] || { echo "$dir is not a git repository" >&2; exit 1; }
 "${PYTHON:-python3}" - "$ROOT" "$dir" "$dry" <<'PY'
 import os, shutil, subprocess, sys
-root, dest, dry = sys.argv[1], sys.argv[2], sys.argv[3] == '--dry-run'
+root, dest, dry = os.path.abspath(sys.argv[1]), os.path.abspath(sys.argv[2]), sys.argv[3] == '--dry-run'
 
 def blob(path):
     return subprocess.run(['git', '-C', root, 'hash-object', path], capture_output=True, text=True).stdout.strip()

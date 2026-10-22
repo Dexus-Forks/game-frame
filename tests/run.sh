@@ -473,7 +473,7 @@ expect "gameframe works in a new project" "tools/pe/peinfo.py  (program)" "$tmp/
 [[ -f "$tmp/docs/assets/diagrams/fixed-step.svg" && -f "$tmp/docs/TYPES.md" && -f "$tmp/docs/media/README.md" ]] && ok "new-project copies the guides' diagrams and every section they link to" || bad "new-project guides"
 echo "# a local note" >> "$tmp/tools/triage/memscan.py"
 rm "$tmp/.claude/skills/re-trace/SKILL.md"
-out="$(scripts/update-project.sh "$tmp" 2>&1)"
+out="$(cd "$tmp" && "$OLDPWD/scripts/update-project.sh" . 2>&1)"
 [[ -f "$tmp/.claude/skills/re-trace/SKILL.md" && "$out" == *"1 files were added"* && "$out" == *"tools/triage/memscan.py"* ]] \
   && grep -q "a local note" "$tmp/tools/triage/memscan.py" \
   && ok "update-project restores a missing file and keeps a file the project changed" || bad "update-project" "$out"
