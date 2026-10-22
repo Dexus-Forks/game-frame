@@ -488,6 +488,10 @@ expect "skeleton prints a parent array as a tree" "        4" "$PYTHON" tools/fo
 expect "cite_labels names a function from its citation" "1400c9560	tick	lib.rs:4" "$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --existing tests/fixtures/cite/names.tsv
 expect "cite_labels names a method with its type" "1400ca000	Clock::seconds" "$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --existing tests/fixtures/cite/names.tsv
 expect "cite_labels numbers a second function cited by one item" "1400c9e00	Clock_2" "$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --existing tests/fixtures/cite/names.tsv
+expect "cite_labels reads an overlay's MODULE:offset citations as SEG:offset" $'1000:1cf5\tdivide' "$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --module EL2MATH3 --functions tests/fixtures/cite/functions.tsv
+out="$("$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --module EL2MATH3 --functions tests/fixtures/cite/functions.tsv 2>/dev/null)"
+[[ "$out" != *1000:2000* ]] && ok "cite_labels keeps only function starts with --functions" || bad "cite_labels --functions" "$out"
+expect "cite_labels --any takes the first address above an item" $'1000:f789\tdraw_background3' "$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --any --functions tests/fixtures/cite/functions.tsv
 expect "cite_labels gives the file alone with --no-lines" $'1400c9560\ttick\tlib.rs\n' "$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --no-lines
 out="$("$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --existing tests/fixtures/cite/names.tsv 2>/dev/null)"
 [[ "$out" != *1400ca100* && "$out" != *1400c9460* ]] && ok "cite_labels keeps a hand-made label, and skips a module note" || bad "cite_labels existing and module notes" "$out"

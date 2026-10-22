@@ -25,3 +25,9 @@ impl Clock {
         self.ticks = 0;
     }
 }
+
+/// Port of `EL2MATH3:1cf5` (slot `DS:02b4`), called from `EL2MATH3:2000`.
+pub fn divide() {}
+
+/// `starcon.DrawBackground3` (1000:f789, near): scroll layer 3, then draw it (1000:f789 to 1000:f800).
+pub fn draw_background3() {}

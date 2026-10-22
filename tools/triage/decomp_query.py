@@ -20,7 +20,9 @@ ADDR is an address as Ghidra prints it (1400be770, 0x1400be770 or FUN_1400be770;
 programs seg:off, 1000:873a or FUN_1000_873a). NAME is a
 Ghidra name or one of your labels. Labels come from labels/names.tsv (address<TAB>label<TAB>
 evidence): add a row every time you identify a function, and every later answer is easier to
-read. The labels are read from each --labels FILE (the first file to name an address wins), else from labels/names.tsv in the current folder
+read. A file of labels for this binary alone, labels/<binary name>.tsv in the current folder, is
+read first (for overlays and DLLs whose addresses overlap). The labels are then read from each
+--labels FILE (the first file to name an address wins), else from labels/names.tsv in the current folder
 (the project you work in), else from GameFrame's own. `--binary` picks a binary when the export holds several (default: the only one, or the
 first .exe).
 """
@@ -59,7 +61,9 @@ class Export:
             binary = names[0] if len(names) == 1 else (exes or names)[0]
         self.dir = os.path.join(export_dir, binary)
         self.binary = binary
-        self.labels = load_labels(labels_file)
+        own = os.path.join(os.getcwd(), 'labels', os.path.splitext(binary)[0] + '.tsv')
+        self.labels = load_one(own) if os.path.exists(own) else {}
+        self.labels.update({a: n for a, n in load_labels(labels_file).items() if a not in self.labels})
         self.functions = {}   # addr -> (name, size)
         self.segmented = False
         for line in open(os.path.join(self.dir, 'functions.tsv'), encoding='utf-8', errors='replace'):
