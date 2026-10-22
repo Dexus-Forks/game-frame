@@ -101,6 +101,14 @@ look right for minutes, then drift once an object dies in the middle of a frame.
   stream.
 - **Scripts and tables:** rules may live in data (XML, JSON, Lua, custom binary tables) rather
   than code. Read the data before reimplementing a rule by hand.
+- **Types defined in data:** a monster or building type is often a record in a data file, with
+  a parent type for the values it does not set. Many loaders copy the parent's values into the
+  child once, when the file is read. Two details then become rules of the game. A loader that
+  treats 0 or an empty string as "not set" gives the parent's value to a child that set 0. The
+  order the loader reads the types decides which parent values exist yet. Copy both.
+- **Objects made from a template:** a spawner can copy a whole template object, then change a
+  few fields. Every field the template holds, including counters and timers, starts with the
+  template's value. The port must copy all of them.
 
 ## Time
 

@@ -73,6 +73,16 @@ A reimplementation is exact only if it copies these details:
   need explicit wrapping.
 - `imul`/`idiv` are signed, `mul`/`div` unsigned. Take the type from the instruction, whatever
   type Ghidra declares.
+- `movsx` loads a byte or a 16-bit value as signed, `movzx` as unsigned. This shows whether a
+  `char` or `short` field is signed.
+- C widens `char` and `short` values to `int` before it computes with them. The result is cut
+  back only when it is stored. A sum of two 8-bit values can therefore go above 255 inside an
+  expression, and a compare sees that full value.
+- An operation on two types first converts one operand to the other's type. With an `int` and
+  a `float`, the `int` becomes a `float` (`cvtsi2ss`, `fild`) before the operation. Dividing
+  two `int` values, then storing the result in a `float`, divides as integers first. With a
+  signed and an unsigned value of the same width, the compare is unsigned, so `-1 < 0u` is
+  false. Convert at the same point as the original.
 
 ## Further reading
 

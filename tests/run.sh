@@ -31,6 +31,7 @@ table=$("$PYTHON" -c "import pefile;p=pefile.PE('$B/game.exe');print(hex(p.OPTIO
 expect "readdata reads a float table" "0.05000000074505806, 0.125, 0.3333333134651184, 1.0" "$PYTHON" tools/pe/readdata.py $B/game.exe f32 "$table" --count 4
 vt=$("$PYTHON" -c "import pefile;p=pefile.PE('$B/game.exe');print(hex(p.OPTIONAL_HEADER.ImageBase+[e.address for e in p.DIRECTORY_ENTRY_EXPORT.symbols if e.name==b'tree_vtbl'][0]))")
 expect "vtable lists two slots" "+0x008" "$PYTHON" tools/pe/vtable.py $B/game.exe "$vt"
+expect "peinfo counts the base relocations" "base relocations: " "$PYTHON" tools/pe/peinfo.py $B/game.exe
 expect "relocs finds the vtable as a run of code pointers" "$vt  .rdata      2 pointers  (2 code)" "$PYTHON" tools/pe/relocs.py $B/game.exe
 
 echo "Emulator"

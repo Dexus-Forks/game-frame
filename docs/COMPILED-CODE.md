@@ -119,10 +119,13 @@ Name them once. Then each call reads as one operation.
 | A test before the loop, then the body, then the test again | A loop the compiler rotated |
 | A bounds check, then `jmp [table + reg*4]` | `switch` with a jump table. The table holds one address per case |
 | A tree of compares on the same value | `switch` with cases far apart, compiled as a binary search |
+| A table of case values beside a table of addresses, searched by a short loop or a runtime helper | `switch` with cases far apart, in compilers that use one routine for every sparse `switch`. Read both tables: each value goes with the address at the same position |
 | A chain of conditional jumps to the same false target | `&&` |
 | A chain of conditional jumps to the same true target | `\|\|` |
 | A pointer increased by the same amount on each pass | An array index `a[i]`: the compiler replaced the multiplication by `i` with an addition (strength reduction). The amount is the element size |
 | A value computed before the loop and used inside it | An expression in the loop body that does not change between passes, moved out of the loop |
+| The same body two, four or eight times in a row, with the counter stepped by that number, and a short loop before or after it | One loop, unrolled. The short loop handles the passes left over. Port it as one loop |
+| A block at the end of the function, or far away in the binary, reached by a jump and jumping back | Code the compiler expected to run rarely (an error path, a first-time set-up), moved away from the common path. GCC names such parts `function.cold`. Ghidra may show them as separate functions |
 
 Ghidra recovers most jump tables. When a `switch` shows as a computed jump without cases, find
 the table's address and size from the bounds check, and read its entries with
@@ -150,6 +153,12 @@ each.
   GetProcAddress`). Games did this for optional parts such as DirectX versions, force feedback
   and voice chat.
 - **Shared code.** The linker can merge identical functions. One body may then serve two names. Its callers may expect different meanings.
+- **Checks the compiler added.** Pascal compilers can check each array index and each
+  arithmetic result (Turbo Pascal's `{$R+}` and `{$Q+}`). The check is a compare and a call to
+  the runtime's error routine, which stops the program with a run-time error (201 for a range
+  error). C++ compilers add stack checks (`__chkstk` for large frames, a security cookie
+  compared before `ret`). These checks are part of the compiled game. The port needs them only
+  where the game can reach them.
 
 ## Registers and stack slots
 
@@ -267,6 +276,26 @@ help with the whole program.
   pointers is found only when Ghidra finds the table. The relocations show where those tables
   are. A linear disassembler reads every byte in order instead. It finds such functions, but it
   also reads data between functions as code.
+- **What can break the link order.** Linkers that remove unused functions (`/OPT:REF`, or
+  `--gc-sections` with one section per function) keep only what is called. Identical functions
+  can be folded into one, which is common for C++ templates of different pointer types.
+  Link-time optimisation (`/LTCG`, `-flto`) can inline across source files and reorder them.
+  Profile-guided builds place hot functions together. In such builds, use the link order only
+  as a hint.
+- **Templates appear once.** Every source file that uses a C++ template compiles its own copy.
+  The linker keeps one of them. It can sit with any of those object files, often far from the
+  code that calls it.
+- **Incremental linking.** A debug build linked incrementally calls each function through a
+  table of `jmp` instructions, so that a function can move without changing its callers. The
+  gaps between functions are filled with `int3` (`0xCC`) bytes, left free for the next link.
+  Follow each jump to the real function. Ghidra names the jumps as thunks.
+- **Imports.** Each imported function has a slot in the import address table. The loader fills
+  it. A call either goes through a small `jmp [slot]` thunk or calls `[slot]` directly. An
+  import can name its function, or give only its number in the DLL (an ordinal, marked by the
+  top bit of the entry). For an ordinal, the name comes from the DLL's own export table, or from
+  a list for that DLL version. Delay-loaded DLLs are not in the import table. Their slots first
+  point to a helper (`__delayLoadHelper2`) that loads the DLL on the first call. Their names
+  are in the delay-load directory. `tools/pe/peinfo.py BINARY --imports` lists both kinds.
 - **Weak and common symbols.** A weak symbol is a default that another definition replaces.
   An uninitialised global declared in several files can become one shared block (common). A
   global that seems to belong to two source files may be one of these.

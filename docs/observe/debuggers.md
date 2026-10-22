@@ -89,6 +89,13 @@ path through the game.
   write the rule into an emulator: `tools/emu/pe_emu.py` and Unicorn give a hook on each
   instruction, with its reads and writes. A short taint pass for one function is often
   enough.
+- **Several sources at once.** Give each source its own colour (a bit in the mark). One pass
+  then shows which values come from the save file, which from the random generator, and which
+  from both.
+- **The static view.** Ghidra's decompiler can highlight a variable's backward slice: every
+  earlier operation that helped compute it. The forward slice shows everything it later
+  affects. A slice covers one function and every possible path. Taint covers one run across
+  the whole program.
 - **Limits.** Taint follows data. It does not follow a decision. If the value only chooses a
   branch, the values written in that branch are not marked. Mark the branch's condition as a
   second source when that matters. Tables indexed by a marked value spread the mark widely, so
@@ -102,6 +109,7 @@ make a chosen path run. angr and Triton do this for x86 and other processors.
 
 It suits small pieces of code with a clear goal: a password or level code check, a checksum
 over a save file, a key derived from a serial number, a branch that the tests never reach.
+It can also show that a branch can never run, when the solver finds no input that reaches it.
 Run it on one function at a time, with the memory it needs set up. Whole games are too large.
 The number of paths doubles at each branch that depends on an input. The result is an input
 that you then try in the original. The solver's answer is evidence only after that run
