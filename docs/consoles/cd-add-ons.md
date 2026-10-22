@@ -5,6 +5,8 @@ a standalone player, but its programs are OS-9 modules on a 68000-family CPU.
 
 ## The platforms
 
+![The main CPU uploads code for a second CPU, so the code is taken from a RAM dump](../assets/diagrams/console-code-upload.svg)
+
 | Platform | Year | CPU | Media | Ghidra module or loader | Emulator with a debugger |
 |---|---|---|---|---|---|
 | Mega-CD / Sega CD | December 1991 (JP) | Second 68000 at 12.5 MHz | CD; BIOS on the add-on | 68000 | Genesis Plus GX, PicoDrive, ares, MAME (not confirmed) |
@@ -22,6 +24,8 @@ separately. The second CPU's code is often taken from a RAM dump after the main 
 ## Mega-CD / Sega CD
 
 ### Hardware
+
+![The 68000 of the Mega Drive and the 68000 of the Mega-CD share word RAM](../assets/diagrams/segacd-word-ram.svg)
 
 The add-on has a second 68000 at 12.5 MHz. It holds 512 KB of program RAM and 256 KB of word
 RAM shared with the Mega Drive. An RF5C164 makes PCM sound. The BIOS is in the add-on. The
@@ -43,6 +47,8 @@ Trace both 68000s. Map which code runs on which CPU and how they share word RAM.
 
 ### Hardware
 
+![A 32X game runs code on four CPUs, each exported as its own program](../assets/diagrams/sega32x-cpus.svg)
+
 The 32X adds two SH-2 CPUs at 23 MHz, 256 KB of SDRAM, a frame buffer and PWM sound. The
 Mega Drive's own 68000 and Z80 keep running beside them.
 
@@ -59,6 +65,8 @@ separately.
 ## PC Engine CD-ROM²
 
 ### Hardware
+
+![The HuC6280 MMU maps eight 8 KB pages of the CPU onto 256 banks of a 2 MB space](../assets/diagrams/pcengine-mmu.svg)
 
 The HuC6280 runs at 7.16 MHz. It is a 65C02-style core with extra instructions, an MMU that maps
 64 KB onto 2 MB, a timer and a PSG
@@ -81,6 +89,8 @@ Record which System Card the game needs. The card sets which BIOS the game runs 
 ## Philips CD-i
 
 ### Hardware
+
+![CD-i programs are OS-9 modules, each loaded with the 68000 language](../assets/diagrams/cdi-os9.svg)
 
 The CPU is an SCC68070 at 15.5 MHz (not confirmed). The system runs CD-RTOS, which is built on
 Microware OS-9. Programs are OS-9 modules.

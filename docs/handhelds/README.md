@@ -16,6 +16,8 @@ after the first, games come on removable media.
 
 ## Handhelds by family
 
+![The four groups of handhelds and where each keeps its program](../assets/diagrams/handheld-groups.svg)
+
 - [LCD games and Game & Watch](lcd-games.md): Game & Watch, Tiger LCD games and the R-Zone,
   Elektronika, and the Microvision. Mask ROM in the MCU, MAME sets and lit segments.
 - [Game Boy family](game-boy.md): the Game Boy, Pocket, Light, Color, Super Game Boy and Game

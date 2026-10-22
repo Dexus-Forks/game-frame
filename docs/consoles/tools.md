@@ -8,6 +8,12 @@ emulators with debuggers. GameFrame's Unicorn emulator runs some console CPUs.
 
 ## Disassembly and decompilation
 
+![Console CPUs and their support in Ghidra and Unicorn](../assets/diagrams/console-cpu-support.svg)
+
+![The NES CPU memory map with its named registers and vectors](../assets/diagrams/nes-memory-map.svg)
+
+![Two cases where the 6502 ADC p-code in Ghidra gives the wrong flags](../assets/diagrams/console-6502-adc.svg)
+
 | CPU | Consoles | In Ghidra |
 |---|---|---|
 | 6502 and 65C02 | Atari 2600, 5200 and 7800, NES, Lynx, PC Engine (HuC6280 is close) | Built in (6502, 65C02). Extensions add NES ROM loaders and mappers. The `ADC` p-code is not exact (see below) |
@@ -70,6 +76,8 @@ a known binary.
 
 ## Emulators with debuggers
 
+![RAM search narrows the candidates until one address is left](../assets/diagrams/console-ram-search.svg)
+
 | Console | Emulators with good debuggers |
 |---|---|
 | NES, SNES, Game Boy, PC Engine | Mesen (NES; Mesen 2 adds SNES, Game Boy, PC Engine), bsnes-plus (SNES), BGB and SameBoy (Game Boy) |
@@ -120,6 +128,8 @@ What to use them for:
 
 ## GameFrame's Unicorn emulator
 
+![Five steps to run one original console function under Unicorn](../assets/diagrams/console-unicorn-run.svg)
+
 Unicorn 2 emulates ARM, ARM64, M68K, MIPS (32 and 64-bit), PowerPC, RISC-V, s390x, SPARC,
 TriCore and x86. It has no 6502, 65816, Z80 or SuperH. It has no R5900, no paired singles and
 no VMX128. Its MIPS likely does not model the R3000A load delay slot; this is untested. For the CPUs it supports, you can run one original function
@@ -140,6 +150,8 @@ carry `license:BSD-3-Clause` headers, though MAME as a whole is GPL-2.0. For the
 cores are short), or script a full emulator to run the function and dump the result.
 
 ## Splitting and building tools
+
+![Splitting a ROM into code, data and assets, then building the same bytes again](../assets/diagrams/console-splat-flow.svg)
 
 Projects that decompile console games built tools that also help a reimplementation:
 

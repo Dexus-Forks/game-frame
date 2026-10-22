@@ -23,6 +23,8 @@ The NEC V30MZ runs at 3.072 MHz and is compatible with 16-bit x86. The screen is
 
 ### Tools
 
+![The WonderSwan path through Ghidra x86 real mode and Unicorn](../assets/diagrams/wonderswan-path.svg)
+
 Load the code with Ghidra's x86 real-mode language.
 [ghidra-wonderswan](https://github.com/JidouGhost-TL/ghidra-wonderswan) adds a loader. The
 extension has few users, so test it on a known binary before trusting it.

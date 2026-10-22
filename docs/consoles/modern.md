@@ -6,6 +6,8 @@ are in the [Handhelds](../handhelds/README.md) section.
 
 ## The platforms
 
+![Which platforms from the Xbox 360 onward have a Ghidra loader and an emulator](../assets/diagrams/console-modern-status.svg)
+
 | Platform | Year | CPU | Executable | Ghidra module or loader | Emulator with a debugger |
 |---|---|---|---|---|---|
 | Xbox 360 | 22 November 2005 | Xenon, 3 PowerPC cores at 3.2 GHz, VMX128, big-endian | XEX2, signed, usually encrypted, wraps PE | [XEXLoaderWV](https://github.com/zeroKilo/XEXLoaderWV) | Xenia Canary |
@@ -22,6 +24,8 @@ and Series are x86-64. Many of their games also have PC releases, which may be e
 study.
 
 ## Keys and encrypted executables
+
+![Signed and encrypted containers around each executable, with the loader for each](../assets/diagrams/console-modern-containers.svg)
 
 - PS3 SELF files are signed and encrypted. RPCS3 needs the official firmware and a disc key
   (not confirmed) ([psdevwiki: SELF](https://www.psdevwiki.com/ps3/SELF_-_SPRX);
@@ -73,6 +77,8 @@ that wrap a PE. They are signed and usually encrypted
 
 ### Projects to learn from
 
+![Static recompilation of an Xbox 360 game into a native PC port](../assets/diagrams/xbox360-recomp.svg)
+
 hedge-dev's XenonRecomp (PowerPC to C++) and XenosRecomp (shaders to HLSL) produced Unleashed
 Recompiled, a native PC port of Sonic Unleashed revealed in March 2025. It ships without game
 files and was inspired by N64: Recompiled
@@ -86,6 +92,8 @@ Dragon and Ninja Gaiden 2. It is "in early development"
 ## PlayStation 3
 
 ### Hardware
+
+![The Cell with one PPE and six SPEs, each with 256 KiB of local store reached by DMA](../assets/diagrams/ps3-cell.svg)
 
 The Cell pairs one PPE with SPUs. Games get six SPEs. Each SPU has its own 128-bit instruction
 set, 256 KiB of local store and DMA-only access to main memory
@@ -136,6 +144,8 @@ decomp-toolkit
 [GitHub: Petari](https://github.com/Gota7/Petari); [decomp.dev](https://decomp.dev/)).
 
 ### For an exact reimplementation
+
+![Paired singles hold two floats in one register. A GQR register sets the quantised load](../assets/diagrams/gamecube-paired-singles.svg)
 
 Gekko paired-single results depend on the quantised load and store (GQR) setup. Confirm it
 against Dolphin's code. The PowerPC consoles share tooling, so you can treat big-endian

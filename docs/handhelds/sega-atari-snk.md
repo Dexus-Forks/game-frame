@@ -5,6 +5,8 @@ and Lynx use CPUs that Ghidra builds in. The Neo Geo Pocket's TLCS-900/H has no 
 
 ## The devices
 
+![Handheld screens drawn to scale](../assets/diagrams/handheld-screens.svg)
+
 | Device | Years | CPU and clock | Media and format | Ghidra support | Emulator with a debugger |
 |---|---|---|---|---|---|
 | Sega Game Gear | 6 October 1990 (JP) | Z80 at 3.58 MHz | Cartridge | Z80 built in | MAME, Emulicious |
@@ -32,6 +34,8 @@ Game Gear, with a profiler, tracer and source-level debugging
 ## Atari Lynx
 
 ### Hardware
+
+![The Lynx chips Mikey and Suzy, and the boot ROM that decrypts the loader](../assets/diagrams/lynx-parts.svg)
 
 The 65SC02 runs at 4 MHz inside the Mikey chip. The Suzy blitter scales sprites and has a maths
 unit ([Atari Lynx](https://en.wikipedia.org/wiki/Atari_Lynx)).

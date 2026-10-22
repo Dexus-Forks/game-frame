@@ -5,6 +5,8 @@ unit. The Vita runs ARM code. Both need a Ghidra extension or loader.
 
 ## The devices
 
+![The PSP and PS Vita executables and the Ghidra extension for each](../assets/diagrams/psp-vita-executables.svg)
+
 | Device | Years | CPU and clock | Media and format | Ghidra support | Emulator with a debugger |
 |---|---|---|---|---|---|
 | PSP | 12 December 2004 (JP) | Allegrex, MIPS32 with VFPU, 222 MHz default | EBOOT.BIN and PRX, encrypted "~PSP" ELF | [ghidra-allegrex](https://github.com/kotcrab/ghidra-allegrex) | PPSSPP |

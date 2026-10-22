@@ -8,6 +8,8 @@ run their functions
 
 ## The devices
 
+![Game code calls the OS, so Unicorn needs a stub for each call](../assets/diagrams/handheld-arm-os-stubs.svg)
+
 | Device | Years | CPU and clock | Media and format | Ghidra support | Emulator with a debugger |
 |---|---|---|---|---|---|
 | Nokia N-Gage, QD | 7 October 2003 to 26 November 2005 (West) | ARM920T at 104 MHz | MMC cards; Symbian OS 6.1, Series 60 | ARM built in | EKA2L1 (GDB stub not confirmed) |

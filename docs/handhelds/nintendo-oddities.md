@@ -15,6 +15,8 @@ no Unicorn backend, so take ground truth from PokeMini's trace.
 
 ### Hardware
 
+![The Virtual Boy draws one 384 by 224 picture for each eye](../assets/diagrams/virtualboy-eyes.svg)
+
 The NEC V810 runs at 20 MHz. It drives red LED displays with 384x224 pixels for each eye
 ([Virtual Boy](https://en.wikipedia.org/wiki/Virtual_Boy)).
 
@@ -29,6 +31,8 @@ debugger in its SDL front end
 ## Pokémon mini
 
 ### Hardware
+
+![The Pokémon mini parts and its outside inputs](../assets/diagrams/pokemini-parts.svg)
 
 The Pokémon mini came out on 16 November 2001 in North America. It reached Japan on 14 December
 2001 and Europe on 15 March 2002. Nintendo R&D3 designed it. Epson made it. The CPU is an Epson

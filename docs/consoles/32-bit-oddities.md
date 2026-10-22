@@ -16,6 +16,8 @@ section.
 
 ### Hardware
 
+![The Jaguar 68000 uploads code into the local RAM of the Tom and Jerry RISC cores](../assets/diagrams/jaguar-cpus.svg)
+
 The 68000 runs at 13.295 MHz. Tom and Jerry are 32-bit RISC cores at 26.591 MHz, with 4 KB and
 8 KB of local RAM. The console has 2 MB of RAM. A memory controller flaw makes it awkward to run
 RISC code from main RAM, so developers ran more of their code on the 68000
@@ -43,6 +45,8 @@ separately. The RISC code is often taken from a RAM dump after the 68000 uploads
 ## 3DO
 
 ### Hardware
+
+![The ARM60 is ARMv3, one version older than the first ARM language in Ghidra](../assets/diagrams/3do-arm-versions.svg)
 
 The ARM60 is an ARMv3 core at 12.5 MHz. The Madam and Clio chips hold the cel engine. Games run
 on the Portfolio OS

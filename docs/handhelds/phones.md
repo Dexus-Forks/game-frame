@@ -42,12 +42,16 @@ Preservation archive and the Cell Phone Game Preservation Wiki
 
 ### For an exact reimplementation
 
+![One J2ME game shipped as many builds, each its own target](../assets/diagrams/phone-j2me-builds.svg)
+
 One game often shipped in many builds for different handsets. Treat each build as a separate
 target. Record which build a test runs.
 
 ## BREW and the Zeebo
 
 ### Hardware
+
+![A downloaded BREW game is signed for one handset](../assets/diagrams/phone-brew-signing.svg)
 
 BREW apps use .mif and .mod files. **Downloaded BREW apps are tied to one handset by a digital
 signature, so most were never dumped.** Qualcomm shut the Brew MP developer site on 23 July 2021

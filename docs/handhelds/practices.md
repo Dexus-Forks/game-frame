@@ -7,6 +7,8 @@ state. Each family page covers its own hardware.
 
 ## Saves and real-time clocks
 
+![The MBC3 clock registers, the latch and the bits of the DH register](../assets/diagrams/gameboy-mbc3-rtc.svg)
+
 The Game Boy's MBC3 mapper holds up to 2 MB of ROM, RAM and a real-time clock. The clock needs
 a 32.768 kHz crystal and a battery
 ([Pan Docs: MBC3](https://gbdev.io/pandocs/MBC3.html)).
@@ -46,6 +48,8 @@ Pokémon trade protocol.
 
 ## Sensors and other inputs
 
+![Outside inputs a test records each frame beside the buttons](../assets/diagrams/handheld-outside-inputs.svg)
+
 - The Game.com has a touchscreen ([Wikipedia: Game.com](https://en.wikipedia.org/wiki/Game.com)).
 - The Gizmondo has GPS, GPRS and a camera ([Wikipedia: Gizmondo](https://en.wikipedia.org/wiki/Gizmondo)).
 - Switch 2 Game-Key Cards must stay inserted to launch. The Joy-Con 2 adds mouse input
@@ -57,6 +61,8 @@ Add each of these to the list of outside inputs that a test records and replays
 ([Inputs](../observe/inputs.md)).
 
 ## LCD behaviour
+
+![Flickered sprites blend on a slow LCD. The test compares the raw frames](../assets/diagrams/handheld-lcd-ghosting.svg)
 
 What a picture test compares depends on the LCD. Game & Watch graphics are fixed LCD segments.
 MAME draws them from SVG artwork

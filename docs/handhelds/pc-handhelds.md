@@ -32,6 +32,8 @@ confirmed).
 
 ### Tools
 
+![The Steam Deck runs Windows games through Proton, so the PC path applies](../assets/diagrams/steamdeck-pc-path.svg)
+
 Use GameFrame's Windows PE path: Ghidra, Unicorn x86-64 and Wine
 ([Home computers and the PC](../computers/README.md)).
 

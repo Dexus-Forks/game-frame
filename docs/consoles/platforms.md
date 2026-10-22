@@ -18,6 +18,8 @@ The Game Boy, Game Boy Advance and the other handhelds are in the
 
 ## 8-bit and 16-bit consoles
 
+![NES bank switching, where a mapper puts one 16 KB bank at 8000 while the last bank stays fixed](../assets/diagrams/nes-bank-switching.svg)
+
 | Console | Year | CPU | Video | Sound |
 |---|---|---|---|---|
 | NES / Famicom | 1983 | Ricoh 2A03 (6502 core without decimal mode), 1.79 MHz | PPU: tiles, 64 sprites, one background layer | Built into the 2A03 (2 pulse, triangle, noise, sample channel) |
@@ -49,6 +51,10 @@ The Game Boy, Game Boy Advance and the other handhelds are in the
 
 ## 32-bit and 64-bit consoles
 
+![The PlayStation GTE rotates, translates and projects vertices in fixed point](../assets/diagrams/psx-gte.svg)
+
+![Nintendo 64 graphics from display lists through RSP microcode and the RDP to the frame buffer](../assets/diagrams/n64-rcp.svg)
+
 | Console | Year | CPU | Graphics | Notes |
 |---|---|---|---|---|
 | Sega Saturn | 1994 | Two Hitachi SH-2, plus a 68000 for sound | VDP1 (sprites and quads) and VDP2 (backgrounds) | Hard to program; games use both SH-2s unevenly |
@@ -76,6 +82,8 @@ The Game Boy, Game Boy Advance and the other handhelds are in the
   the Saturn hardware manuals.
 
 ## The sixth generation
+
+![The PlayStation 2 Emotion Engine, vector units and IOP, and how its floats differ from IEEE 754](../assets/diagrams/ps2-ee-iop.svg)
 
 | Console | Year | CPU | Graphics | Notes |
 |---|---|---|---|---|

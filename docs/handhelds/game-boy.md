@@ -22,6 +22,8 @@ Community documents are Pan Docs for the Game Boy and GBATEK for the GBA and DS.
 
 ### Hardware
 
+![The Game Boy memory map, with the switchable ROM bank at 4000](../assets/diagrams/gameboy-memory-map.svg)
+
 The Sharp SM83 is similar to the Z80 and the 8080. The video has tiles, sprites, one background
 and a window. Sound has four channels. Cartridges hold more than the CPU can address, so a
 mapper chip switches banks. Name functions as `bank:address`
@@ -64,6 +66,8 @@ Boy to Mesen. Gambatte and mGBA debugger features are not covered here.
 
 ### Hardware
 
+![The header byte at 0143 picks the Game Boy Color mode. Double speed doubles the clock](../assets/diagrams/gbc-modes.svg)
+
 The Game Boy Color came out in Japan on 21 October 1998. It reached North America on 18 November
 1998 and Europe on 23 November 1998. Its Sharp SM83 runs at 4.194304 MHz. A double-speed mode
 runs it at 8.388608 MHz. It has 32 KiB of WRAM and 16 KiB of VRAM. The 160 by 144 reflective
@@ -79,6 +83,8 @@ systems. Clear carts are CGB-only
 ([Wikipedia: Game Boy Color](https://en.wikipedia.org/wiki/Game_Boy_Color)).
 
 ### The CGB registers
+
+![General-purpose DMA and HBlank DMA on the Game Boy Color, and what double speed changes](../assets/diagrams/gbc-hdma.svg)
 
 These registers control the CGB features a game uses
 ([Pan Docs: CGB Registers](https://gbdev.io/pandocs/CGB_Registers.html)).
@@ -116,6 +122,8 @@ clock state ([Handheld practices](practices.md)).
 
 ### Hardware
 
+![The Game Boy screen inside the SNES picture, drawn to scale, and the fast SGB clock](../assets/diagrams/sgb-layout.svg)
+
 The Super Game Boy is a SNES cartridge that holds a Game Boy chip, an ICD2 bridge and SNES-side
 system software. It shows the 160 by 144 screen inside a 256 by 224 SNES picture. The border uses
 4 bpp tiles in 16 colours per tile. Palettes can be set per cell of a 20 by 18 grid. A game can
@@ -136,6 +144,8 @@ and which region it ran on. Trace both CPUs' code.
 ## Game Boy Advance
 
 ### Hardware
+
+![The Game Boy Advance CPUs, video, sound and tools](../assets/diagrams/gba-parts.svg)
 
 The GBA has an ARM7TDMI plus an SM83. The video has tile modes and bitmap modes. Sound has the
 four Game Boy channels and two sample channels

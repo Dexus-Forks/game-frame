@@ -20,6 +20,8 @@ Unicorn supports none of these CPUs.
 
 ### Hardware
 
+![A Game & Watch MCU lights fixed printed segments from its LCD RAM](../assets/diagrams/gamewatch-segments.svg)
+
 Nintendo's Game & Watch first went on sale on 28 April 1980. Original production ran until
 1991. It has about 60 games in 11 series. The Multi Screen series uses two LCD panels.
 
@@ -85,6 +87,8 @@ Mattel's LCD games of 1976 to 1977 are not covered here. Their CPUs are not conf
 ## Microvision
 
 ### Hardware
+
+![The Microvision base unit has no CPU. Each cartridge holds its own](../assets/diagrams/microvision-cartridge.svg)
 
 Milton Bradley's Microvision came out in November 1979. It was discontinued in 1981. **The base
 unit has no CPU.** Each cartridge holds its own processor with the program masked into it. That

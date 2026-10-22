@@ -9,6 +9,10 @@ describes how these projects work and when to choose this route.
 
 ## How it works
 
+![The matching loop of writing C, compiling, comparing and editing until one function matches](../assets/diagrams/console-matching-loop.svg)
+
+![Splitting a ROM into code, data and assets, then building the same bytes again](../assets/diagrams/console-splat-flow.svg)
+
 1. **Identify the compiler.** Find the exact compiler and version the game was built with: SGI
    IDO 5.3 or 7.1 for many N64 games, GCC 2.x versions from the PsyQ SDK for the PlayStation,
    Metrowerks CodeWarrior versions for the GameCube, Microsoft's for the Xbox. Compiler
@@ -42,6 +46,8 @@ describes how these projects work and when to choose this route.
   user decides whether to publish such code ([Legal](../LEGAL.md)).
 
 ## When to choose it
+
+![Three questions that decide whether to choose a matching decompilation](../assets/diagrams/console-matching-choice.svg)
 
 | Situation | Route |
 |---|---|

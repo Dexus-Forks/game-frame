@@ -50,6 +50,8 @@ In my GameFrame project, start work on a game for <console>.
 
 ## How console work differs from PC work
 
+![The reset vector, the main loop and the vertical blank interrupt of a console game](../assets/diagrams/console-frame-loop.svg)
+
 | Topic | PC games | Console games |
 |---|---|---|
 | The program | An EXE with imports, sometimes symbols | A ROM or a disc image; code at fixed addresses, often banked; no imports |
@@ -63,6 +65,8 @@ In my GameFrame project, start work on a game for <console>.
 | Source and symbols | Sometimes symbols, rarely source | Sometimes symbol maps on discs and in prototypes; leaked source exists for some games; GameFrame's method does not use it ([Legal](../LEGAL.md)) |
 
 ## Where to start
+
+![Six first steps on a console game, from the ROM revision to the RAM map](../assets/diagrams/console-first-steps.svg)
 
 1. Identify the console, the region and the exact revision of the game. Regions differ in
    timing (50 or 60 Hz), text and sometimes code. Record the checksum of the ROM or disc.

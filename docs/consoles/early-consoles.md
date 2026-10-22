@@ -7,6 +7,8 @@ cycle-exact emulator traces.
 
 ## The consoles
 
+![The early consoles by year of release, coloured by CPU family](../assets/diagrams/console-early-timeline.svg)
+
 | Console | Year | CPU | Media | Ghidra module or loader | Emulator with a debugger |
 |---|---|---|---|---|---|
 | Magnavox Odyssey | September 1972 | None | Cards that rewire jumpers | Not applicable | None |
@@ -35,6 +37,8 @@ the discrete-logic arcade games.
 ## Atari 2600
 
 ### Hardware
+
+![Racing the beam on the Atari 2600, with one scanline of 76 CPU cycles and one NTSC frame of 262 lines](../assets/diagrams/atari2600-beam.svg)
 
 The 6507 is a 6502 with 8 KB of address space and no interrupts
 ([Wikipedia: MOS Technology 6502](https://en.wikipedia.org/wiki/MOS_Technology_6502)). The TIA
@@ -66,6 +70,8 @@ identifies it only together with its bank.
 
 ### Hardware
 
+![Intellivision ROM words are 10 bits wide. SDBD builds a 16-bit operand from two of them](../assets/diagrams/intellivision-words.svg)
+
 The CP1610 addresses only 16-bit words and uses 10 bits of each opcode. R7 is the program
 counter and R6 the stack pointer. SDBD builds a 16-bit operand from two 10-bit ROM reads
 ([Wikipedia: CP1600](https://en.wikipedia.org/wiki/General_Instrument_CP1600)). The STIC makes
@@ -92,6 +98,8 @@ the calls into it as well as the cartridge code.
 
 ### Hardware
 
+![The ColecoVision parts on the CPU bus, with the video chip and its own VRAM](../assets/diagrams/colecovision-parts.svg)
+
 The Z80A runs at 3.58 MHz. A TMS9928A with 16 KB of VRAM makes the video. An SN76489A makes
 the sound. The console has 1 KB of RAM and an 8 KB BIOS
 ([ColecoVision](https://en.wikipedia.org/wiki/ColecoVision)).
@@ -111,6 +119,8 @@ The SALLY 6502C runs at 1.79 MHz. ANTIC, GTIA and POKEY make the video and sound
 
 ### Hardware
 
+![The Atari 7800 clock slows for TIA and RIOT access. NTSC consoles check the cartridge signature](../assets/diagrams/atari7800-clock.svg)
+
 SALLY runs at 1.79 MHz and drops to 1.19 MHz when it accesses the TIA or the RIOT. MARIA makes
 the video. The TIA makes the sound. The console has 4 KB of RAM
 ([Atari 7800](https://en.wikipedia.org/wiki/Atari_7800)).
@@ -123,6 +133,8 @@ check.
 ## Vectrex
 
 ### Hardware
+
+![The Vectrex CPU steers the beam through a DAC, beside the 6809 registers](../assets/diagrams/vectrex-beam.svg)
 
 The 68A09 runs at 1.5 MHz. An AY-3-8912 makes the sound. The console has 1 KB of RAM. The
 CPU drives the vector beam through a DAC ([Vectrex](https://en.wikipedia.org/wiki/Vectrex)).

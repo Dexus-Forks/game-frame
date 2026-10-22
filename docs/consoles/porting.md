@@ -1,5 +1,7 @@
 # Routes to a port
 
+![Four routes to a port, by effort and by what can be published](../assets/diagrams/console-port-routes.svg)
+
 There are four ways to bring a console game to other systems. They differ in effort, in how
 close the result is to the original, and in what the project may publish. Choose one at the
 start and write it in the project's `AGENTS.md`.
@@ -35,6 +37,8 @@ Every route needs code on the new system that replaces the console's hardware. S
 
 ### The frame and the clock
 
+![The logic keeps the original rate on a faster display. A lag frame has no update](../assets/diagrams/console-fixed-rate.svg)
+
 - The game's logic runs once per vertical blank. Keep one logic update per frame, at the
   original's rate (60.0988 Hz for an NTSC NES, 59.94 Hz or 50 Hz for most others). Find the
   exact rate for your console and region.
@@ -48,6 +52,8 @@ Every route needs code on the new system that replaces the console's hardware. S
 
 ### Input
 
+![Buttons pressed this frame are the held buttons that were not held in the previous frame](../assets/diagrams/console-input-mask.svg)
+
 - The controller is read once a frame into RAM, often with a "pressed this frame" mask
   computed from the previous frame. Log that RAM as the input record. Port the read, and feed it
   from the new system's controllers.
@@ -56,6 +62,10 @@ Every route needs code on the new system that replaces the console's hardware. S
   the port for comparisons.
 
 ### Video
+
+![Three kinds of console video and how a port draws each](../assets/diagrams/console-video-kinds.svg)
+
+![A raster effect, where an interrupt on one line rewrites the scroll register](../assets/diagrams/console-raster-split.svg)
 
 | Console video | How to port it |
 |---|---|
@@ -71,6 +81,8 @@ Every route needs code on the new system that replaces the console's hardware. S
 
 ### Sound
 
+![Sound on its own CPU, and the two ways to port it](../assets/diagrams/console-sound-cpu.svg)
+
 - Sound often runs on a separate CPU with its own program (the SNES's SPC700, the Mega Drive's
   Z80, the PS2's IOP). The game includes that program. Either emulate the sound CPU and its
   chip with the original program, or trace and port the sound program.
@@ -80,6 +92,8 @@ Every route needs code on the new system that replaces the console's hardware. S
   writing your own.
 
 ### Saves
+
+![Battery RAM, memory cards and passwords, and how a port keeps each format](../assets/diagrams/console-saves.svg)
 
 - Battery-backed RAM (SRAM) in cartridges: map it to a file. Keep the same layout, so saves
   move between the original (through an emulator) and the port.
@@ -95,6 +109,8 @@ signatures and label them. Port the library functions the game calls. Do not cop
 the libraries into the port.
 
 ## Checking the port
+
+![One input movie drives the original and the port. The comparison stops at the first difference](../assets/diagrams/console-port-check.svg)
 
 Use the same checks as for PC games ([Running the original](../observe/running-the-original.md)):
 

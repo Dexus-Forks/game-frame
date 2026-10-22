@@ -16,6 +16,8 @@ Switch 2 adds Game-Key Cards and a display that runs up to 120 Hz with VRR.
 
 ### Hardware
 
+![The NSO of a Switch game inside the ExeFS of an encrypted NCA](../assets/diagrams/switch-nca.svg)
+
 The Switch has 4 Cortex-A57 cores at 1.02 GHz. Games ship as NSO files inside encrypted NCA
 containers. Homebrew uses NRO ([Nintendo Switch](https://en.wikipedia.org/wiki/Nintendo_Switch);
 [switchbrew NSO](https://switchbrew.org/wiki/NSO)).
@@ -45,6 +47,8 @@ The 2024 to 2026 cases ended in settlements. No court ruling on console emulator
 that period. The user decides how to obtain and use their own keys and dumps.
 
 ## Emulator status
+
+![Switch emulators from the yuzu settlement in 2024 to the takedowns of 2026](../assets/diagrams/switch-emulators.svg)
 
 Repositories can disappear, so pin an exact emulator build and keep a local copy.
 
@@ -89,6 +93,8 @@ The code is AArch64, which Ghidra's AARCH64 module and Unicorn's ARM64 support c
 security and homebrew status are not confirmed. No Switch 2 emulator is known.
 
 ### For an exact reimplementation
+
+![A fixed 60 Hz display compared with VRR up to 120 Hz](../assets/diagrams/switch2-frame-rate.svg)
 
 With VRR and up to 120 Hz, a Switch 2 game sets its own frame rate within what the display
 allows. Record that rate in each test. The Game-Key Card and the Joy-Con 2 mouse are

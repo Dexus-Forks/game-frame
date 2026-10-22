@@ -15,6 +15,8 @@ decrypted dump and the right Ghidra loader.
 
 ### Hardware
 
+![A DS cartridge holds ARM9 and ARM7 binaries, overlays and NitroFS](../assets/diagrams/ds-cartridge.svg)
+
 The DS has an ARM946E-S at 67 MHz and an ARM7TDMI at 33 MHz. A game ships ARM9 and ARM7
 binaries, overlays and a NitroFS file system
 ([Nintendo DS](https://en.wikipedia.org/wiki/Nintendo_DS);
@@ -42,10 +44,14 @@ NCSD/CCI, CIA and NCCH with ExeFS. Homebrew uses 3DSX
 
 ### Keys and encrypted executables
 
+![The 3DS containers NCSD or CCI, NCCH, ExeFS and RomFS](../assets/diagrams/3ds-containers.svg)
+
 3DS content is AES-encrypted, with keys in the ARM9 boot ROM ([3dbrew](https://www.3dbrew.org/)).
 The user decides how to obtain and use their own keys and dumps.
 
 ### Tools
+
+![The 3DS emulators since Citra was taken down in 2024](../assets/diagrams/3ds-emulators.svg)
 
 [ghidra-3ds](https://github.com/Stary2001/ghidra-3ds) loads 3DS files. Its analysis is
 described as "pretty broken".

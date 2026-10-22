@@ -14,6 +14,8 @@ SM8521. Unicorn has no backend for it either.
 
 ### Hardware
 
+![The Game.com screen with its 12 by 10 touch grid](../assets/diagrams/gamecom-touch.svg)
+
 Tiger's Game.com came out in the US on 12 September 1997. The Pocket Pro followed in mid-1999.
 It uses a Sharp SM8521 8-bit CPU at 10 MHz. The 200 by 160 screen has 4 grey levels and a 12 by
 10 grid touchscreen. The original had no backlight. One Pocket Pro model has one. The original
