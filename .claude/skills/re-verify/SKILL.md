@@ -168,6 +168,18 @@ write them back and compare bytes when the reimplementation writes saves. Contin
 save for a while in the reimplementation, then comparing with the original continuing the same
 save, is the strongest whole-system test you have.
 
+- Check what made each save before you use it as a reference. A save from a modded game, or
+  from another version, is not ground truth for the original rules.
+- Load each of the original's saves and write it again before you compare anything else. Some
+  fields may change on every load in the original too (a counter that grows each time).
+  Explain each of them, so that a later difference is not blamed on them.
+- Some state is not in the save (a smoothed value, a target, a cache). After a load, the
+  original rebuilds it or keeps its starting value. Record which, because the reimplementation
+  must do the same.
+- Two saves made by the original a known number of updates apart, with no player input between
+  them, test the whole simulation. Load the first, run the same number of updates, write a save,
+  and compare it with the second.
+
 ## 5. Pictures
 
 To compare rendering or interface with the original, capture the same view in both (same save,

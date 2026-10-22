@@ -22,7 +22,9 @@ You make sure the port draws the same random numbers in the same order as the or
 1. Find each generator from its constants (see `docs/GAME-PATTERNS.md`, Random number
    generators) and the helpers built on it (a range, a float, a tolerance).
 2. Record its state, where it is seeded and from what (the clock, a seed field, a save).
-3. List every caller of each generator, with the order the main loop reaches them.
+3. List every caller of each generator, with the order the main loop reaches them. Mark each one
+   not ported, ported but not measured, or measured (`docs/GAME-PATTERNS.md`, Random number
+   generators). Mark callers reached only from debug windows.
 4. Emulate the generator and its helpers on many seeds and save the results
    (`tools/emu/`, the `re-emulate` skill).
 5. Record a trace of the draws for a few frames with `tools/emu/call_trace.py`, as ground

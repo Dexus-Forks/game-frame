@@ -123,6 +123,7 @@ Name them once. Then each call reads as one operation.
 | A bounds check, then `jmp [table + reg*4]` | `switch` with a jump table. The table holds one address per case |
 | A tree of compares on the same value | `switch` with cases far apart, compiled as a binary search |
 | A table of case values beside a table of addresses, searched by a short loop or a runtime helper | `switch` with cases far apart, in compilers that use one routine for every sparse `switch`. Read both tables: each value goes with the address at the same position |
+| A call inside a loop, followed by a jump to the loop's exit | `break` after the action. Only the first item that matches is acted on. Pseudocode shows the `break`, but it is easy to read past. Check every exit of a loop before porting it |
 | A chain of conditional jumps to the same false target | `&&` |
 | A chain of conditional jumps to the same true target | `\|\|` |
 | A pointer increased by the same amount on each pass | An array index `a[i]`: the compiler replaced the multiplication by `i` with an addition (strength reduction). The amount is the element size |
@@ -230,6 +231,15 @@ The port must use the same signedness, whatever type Ghidra declares. On older c
 comparison stores its result with `fnstsw ax`, then tests bits of `ah` (`test ah, 41h`,
 `sahf`). [ABI](ABI.md) explains how to read these.
 
+SSE compares floats with `comiss` or `ucomiss` and sets the unsigned flags: carry for less, zero
+for equal. When either value is NaN, the comparison is unordered and sets carry, zero and parity
+together. So `jb`, `jbe` and `je` are taken for NaN, and `ja`, `jae` and `jne` are not. For an
+equality test, compilers usually add a `jp` first, which sends NaN to the not-equal side. Ghidra
+writes the test without NaN. A `comiss` followed by `jbe` can show as `if (0.0 <= x)`, which is
+false for NaN, while the machine code takes the branch. Port the condition under which the jump
+is taken, for example `if x < 0.0 { … } else { … }`, and test the function with NaN and with
+negative zero.
+
 ## When the decompiler is wrong
 
 A decompiler rebuilds source from machine code in stages. It separates code from data, finds
@@ -248,6 +258,7 @@ limits. These are the usual cases, and how to check each one:
 | Code that writes to its own instructions | Self-modifying code: patched constants or jump targets, used for speed in many DOS games | Write references into the code segment; run the function under emulation to see both versions |
 | Two functions sharing their last instructions | The linker merged tails, or the code jumps into another function | The references into the middle of a function |
 | Code that seems pointless: a second jump that can never be taken, a value stored and stored again | A quirk of the compiler, which a later pass did not clean up. It is rarely a sign of hidden meaning. A real compiler bug that changes a result is the original's behaviour, so the port computes the same result | Run the function under emulation with inputs that reach the code |
+| A float comparison such as `0.0 <= x` | A `comiss` and a conditional jump that is also taken when `x` is NaN | The jump instruction after the compare (see "The flags"); emulate the function with NaN |
 | A wrong type everywhere a value goes | One wrong type at the start, propagated through every call | Fix the first type; Ghidra then corrects the rest |
 | A call that seems to return twice, or code after a call that runs only after an error | `setjmp` and `longjmp`: an error or a restart far inside the game jumps back to a saved point, such as the main menu | The callers of `setjmp` in the runtime's labels; the buffer passed to it |
 

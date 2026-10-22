@@ -46,7 +46,14 @@ emu = Emu('target/Game.exe', ['target/Engine.dll'])  # loads, relocates, links i
    per independent case; many inputs (every cell of a small map, seeds 1 to 50, edge cases such
    as zero, negatives and borders); raw little-endian outputs into `derived/emu/<topic>/`
    (ignored by git, because ground truth is derived from the game).
-4. **Record the draws** when the function consumes the game's random number generator:
+4. **Test one rule at a time.** In the port, move the rule out of its system into a function
+   whose inputs are the fields the original reads. The generator script writes those fields;
+   the port's test calls that function with the same values. Choose about a tenth of the cases at
+   the edges: zero, values below zero, negative zero, NaN, lists out of order, empty lists.
+   Record floats as their bits, so that NaN and negative zero survive the file. To check the
+   draws without a call trace, compare the generator's state before and after the call, and
+   record its next draw after the call. Both must match the port's.
+5. **Record the draws** when the function consumes the game's random number generator:
    ```python
    from call_trace import CallTrace
    trace = CallTrace(emu, {emu.va('engine.dll', 0x180012340): 'Rand',
@@ -55,7 +62,7 @@ emu = Emu('target/Game.exe', ['target/Engine.dll'])  # loads, relocates, links i
    trace.write('derived/emu/ai/seed-1.trace')   # "Rand(10)<TAB>game.exe+0x9be55" per draw
    ```
    Only outermost calls are logged, so a float draw that calls the integer draw counts once.
-5. **Compare** the reimplementation's output with `re-verify` (`bitcompare.py`, `seqdiff.py`).
+6. **Compare** the reimplementation's output with `re-verify` (`bitcompare.py`, `seqdiff.py`).
    Not exact? Emulate intermediate functions separately and compare stage by stage, until the
    first stage that differs is small enough to read instruction by instruction.
 
@@ -63,6 +70,12 @@ emu = Emu('target/Game.exe', ['target/Engine.dll'])  # loads, relocates, links i
 
 - **Invalid memory access**: a pointer field you did not fill. Find which offset of which object
   from the reported code position and the disassembly there.
+- **Type checks on objects you built**: a function that asks whether an object derives from a
+  class (`IsDerivedFrom`, `dynamic_cast`) fails on a synthetic object. Hook the check to answer
+  yes when the object is the type the code expects.
+- **Engine constructors**: the engine's base object constructor may register the object and
+  draw its id from a generator of its own. Hook it to return the object. Never count those draws
+  as the game's.
 - **Thread-local storage**: the harness maps a TEB at GS; code that uses `__declspec(thread)`
   variables also needs the TLS slot array (`TEB+0x58`) pointing at a block for the module.
 - **Exceptions**: SEH and C++ exceptions do not unwind in the emulator; inputs that make the

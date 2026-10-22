@@ -25,6 +25,8 @@ Turbo Pascal's `Real`). Compare it with your game's version before you rely on i
   (from exports, RTTI or strings) and after its role otherwise.
 - Keep the data flow: if the original builds a menu from a data file, build it from the same
   data file; do not hand-code what the game ships as data.
+- When the port has the same small rule in several places, look for one original function that
+  all of them call. Port it once, as a function of its own, and cite it.
 - Keep constants with their source address, exactly as read: `0.33333331f`, not `1.0 / 3.0`.
 - Every reimplemented item names its original in a comment or doc comment, in one consistent
   form the tools can search, for example ``Original: `FUN_1400be680` ``. Mark guesses
@@ -35,6 +37,11 @@ Turbo Pascal's `Real`). Compare it with your game's version before you rely on i
 Decide the shape of the reimplementation early: these are cheap on day one and expensive to add
 after a year.
 
+- **The main loop's dispatcher first.** Port the loop that decides which object updates when
+  (its buckets, its per-object list of components) before the systems it calls. A port that
+  updates one system at a time over all objects draws random numbers in a different order from
+  an original that updates one object at a time. This is costly to change once many systems
+  exist.
 - **An exact core with nothing else in it.** Put everything that decides what happens (the
   world, its rules, the clock, the random generators, loading and writing saves) in one module or
   library that does not draw, play sound, open windows or use the network. It then runs headless,
@@ -69,7 +76,7 @@ camera, a browser version. Keep each one apart from the core:
   build);
 - it reaches the core only through a few small, named entry points (commands, events after each
   step, read-only queries), never by editing the core's code paths;
-- a run-time switch (for example `--pure`) turns every addition off for one run, so a player
+- a run-time switch (for example `--vanilla`) turns every addition off for one run, so a player
   can always get the original game;
 - anything that changes results is marked `Deviation:` and happens only when that addition is in
   use.
@@ -104,7 +111,10 @@ These are the details that make a reimplementation drift, in order of how often 
    runtimes. If the simulation depends on them, reimplement the original's runtime functions
    (emulate them for ground truth) instead of calling your platform's.
 4. **Random draws.** Same generator, same seed, same number of draws, same order. A draw moved
-   inside a condition, or skipped when a value is zero, changes everything after it.
+   inside a condition, or skipped when a value is zero, changes everything after it. Draws also
+   happen inside constructors and helpers: an object built with a random speed draws when it is
+   made. Make objects in the original's order. For example, a port that chooses what to carry
+   before it builds the walk, where the original builds the walk first, moves the walk's draw.
 5. **Iteration order.** Lists, arrays, hash maps: iterate in the original's order. Never let a
    hash map's order reach anything observable.
 6. **Sorting.** Unstable sorts (C `qsort`) order equal elements in a way that depends on the

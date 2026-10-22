@@ -52,7 +52,14 @@ two 16-bit halves. The address of a hit is the place to start reading.
 Games often have several generators (one for the simulation, one for effects or sound) and
 may seed them from the clock. Find every instance and who draws from each. A draw from the wrong
 generator changes the results as much as a draw out of order. Helpers built on the generator (a float in [0,1), a
-range, a "tolerance" around a value) each have their own rounding; emulate them too.
+range, a "tolerance" around a value) each have their own rounding; emulate them too. An engine
+may also keep a generator for itself, for example to give each new object an id.
+
+To see what is left to check, list every function that draws from the simulation's generator,
+from the calls through its global. Compare that list with the port's citations and with the
+functions that have an emulator test. Each function falls in one of three groups: not ported,
+ported but not measured, or measured. Callers reached only from a debug window or a cheat menu
+are not part of normal play; record them and leave them out.
 
 ## Entities and components
 
@@ -83,6 +90,7 @@ and a port must copy each.
 | An event or message queue | Whether a reaction happens at once or at a later point in the frame. Events sent while the queue is processed may run in the same pass or the next one. Listeners run in the order they registered | The send function: a direct call, or a write into a ring buffer read later |
 | A value cached with a dirty flag | When the value is computed again: when it is read, or at a fixed point in the frame. If the computation uses random numbers or rounds floats, the moment matters | A flag set by the setters and tested before the computation |
 | Groups updated in turn | Whether a rider sees its vehicle's new position. Some engines update objects in groups (buckets): vehicles and platforms, then characters, then objects attached to them. An object read by one in an earlier group is a frame behind | A loop over a short list of lists, or several update passes with a group number |
+| One object at a time, or one system at a time | The order of every random draw. An entity manager may visit each object and run all its components together, in buckets with their own quotas. A port that runs one system over all objects, then the next system, draws in another order | The manager's update loop: what the outer loop walks, objects or component types |
 | A spatial grid | The order of objects found near a point: the order of the cells, then the order within each cell. A list that adds at its head returns objects in reverse order of insertion | The query function's loops, and how objects are linked into a cell |
 
 Record each decision with the address that shows it. A port that gets one of these wrong can
