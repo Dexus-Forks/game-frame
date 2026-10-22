@@ -195,6 +195,7 @@ between agents, the outcome, and the failure path.
 | `tools/pe/vtable.py` | The functions in a table of function pointers |
 | `tools/triage/decomp_query.py` | A function with your labels; callers; callees; who uses a string; who writes a field; where the work is |
 | `tools/triage/decomp_query.py layout` | A structure's fields from the functions that use it, merged, with a draft C struct |
+| `tools/triage/cite_labels.py` | Function labels made from the port's own `Original: FUN_…` citations, for the decompiled code |
 | `tools/triage/deviations.py` | Every `Deviation:` and `not ported` comment in the reimplementation, as one ledger; `--check` for tests |
 | `tools/triage/coverage.py` | How much of the original (by count and by size) the reimplementation cites, and the largest functions nobody cites yet |
 | `tools/emu/pe_emu.py` | Call any function of a Windows x64 EXE or DLL with chosen inputs and read the result |

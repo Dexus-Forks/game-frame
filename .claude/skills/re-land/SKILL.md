@@ -25,6 +25,9 @@ work.
 - **Labels:** a row in `labels/names.tsv` for every function you identified
   (`1400be770<TAB>Citizen::ChooseJob<TAB>called from the AI tick, reads the job table`), a row in
   `labels/fields.tsv` for every field.
+  Functions the port cites with `Original: FUN_…` get labels automatically:
+  `tools/triage/cite_labels.py SRC --existing labels/names.tsv --out labels/names-from-port.tsv`,
+  then `decomp_query.py --labels labels/names.tsv --labels labels/names-from-port.tsv`.
 - **Checklist:** tick or add the items in `docs/CHECKLIST.md` and update its date.
 - **Ledgers:** if the change adds or removes a `Deviation:` or `not ported` comment, regenerate
   the ledger (`tools/triage/deviations.py --out docs/DEVIATIONS.md SOURCE_DIR`) and commit it

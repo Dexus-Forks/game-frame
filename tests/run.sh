@@ -485,6 +485,12 @@ expect "hashnames names a small hash when asked for it" "0x00305aa7  crc32-utf16
 expect "skeleton finds joints stored as records, with their names" "14 joints, 1 root(s), depth 5" "$PYTHON" tools/formats/skeleton.py "$W/bones.mdl"
 expect "skeleton reads the joint names before each record" "names: root, hips, spine, chest, neck, head" "$PYTHON" tools/formats/skeleton.py "$W/bones.mdl"
 expect "skeleton prints a parent array as a tree" "        4" "$PYTHON" tools/formats/skeleton.py "$W/rig.mdl" --at 0x15e --width 2
+expect "cite_labels names a function from its citation" "1400c9560	tick	lib.rs:4" "$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --existing tests/fixtures/cite/names.tsv
+expect "cite_labels names a method with its type" "1400ca000	Clock::seconds" "$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --existing tests/fixtures/cite/names.tsv
+expect "cite_labels numbers a second function cited by one item" "1400c9e00	Clock_2" "$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --existing tests/fixtures/cite/names.tsv
+out="$("$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --existing tests/fixtures/cite/names.tsv 2>/dev/null)"
+[[ "$out" != *1400ca100* && "$out" != *1400c9460* ]] && ok "cite_labels keeps a hand-made label, and skips a module note" || bad "cite_labels existing and module notes" "$out"
+expect "decomp_query reads labels from --labels FILE" "2 functions, 2 decompiled, 1 labelled" "$PYTHON" tools/triage/decomp_query.py --export tests/fixtures/export-layout --labels tests/fixtures/export-layout/names.tsv stats
 expect "decomp_query layout merges a structure's fields" "0x18     4  int                          2      1  FUN_140001000, FUN_140001100" "$PYTHON" tools/triage/decomp_query.py --export tests/fixtures/export-layout layout FUN_140001000 FUN_140001100
 expect "decomp_query layout scales indexes of an int pointer" "    int                      f_1c;  /* also read as char */" "$PYTHON" tools/triage/decomp_query.py --export tests/fixtures/export-layout layout FUN_140001000 FUN_140001100
 expect "shaders finds a Direct3D 9 pixel shader and its constant" "FogColor" "$PYTHON" tools/formats/shaders.py "$W/shaders.bin"

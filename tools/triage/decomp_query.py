@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Answer questions about a Ghidra export (scripts/ghidra-export.sh) without reading it whole.
 
-Usage: decomp_query.py [--binary NAME] [--export DIR] COMMAND ARGS
+Usage: decomp_query.py [--binary NAME] [--export DIR] [--labels FILE ...] COMMAND ARGS
 
 Commands:
   fn ADDR|NAME          one function's pseudocode, with your labels applied
@@ -20,7 +20,8 @@ ADDR is an address as Ghidra prints it (1400be770, 0x1400be770 or FUN_1400be770;
 programs seg:off, 1000:873a or FUN_1000_873a). NAME is a
 Ghidra name or one of your labels. Labels come from labels/names.tsv (address<TAB>label<TAB>
 evidence): add a row every time you identify a function, and every later answer is easier to
-read. `--binary` picks a binary when the export holds several (default: the only one, or the
+read. The labels are read from each --labels FILE (the first file to name an address wins), else from labels/names.tsv in the current folder
+(the project you work in), else from GameFrame's own. `--binary` picks a binary when the export holds several (default: the only one, or the
 first .exe).
 """
 import os
@@ -49,7 +50,7 @@ def fun_addr(m):
 
 
 class Export:
-    def __init__(self, export_dir, binary=None):
+    def __init__(self, export_dir, binary=None, labels_file=None):
         names = sorted(os.listdir(export_dir)) if os.path.isdir(export_dir) else []
         if not names:
             sys.exit(f'no export in {export_dir}: run scripts/ghidra-export.sh first')
@@ -58,7 +59,7 @@ class Export:
             binary = names[0] if len(names) == 1 else (exes or names)[0]
         self.dir = os.path.join(export_dir, binary)
         self.binary = binary
-        self.labels = load_labels()
+        self.labels = load_labels(labels_file)
         self.functions = {}   # addr -> (name, size)
         self.segmented = False
         for line in open(os.path.join(self.dir, 'functions.tsv'), encoding='utf-8', errors='replace'):
@@ -160,9 +161,18 @@ def accesses(body, var, ptr):
     return out
 
 
-def load_labels():
+def load_labels(paths=None):
     labels = {}
-    path = os.path.join(ROOT, 'labels', 'names.tsv')
+    if not paths:
+        here = os.path.join(os.getcwd(), 'labels', 'names.tsv')
+        paths = [here if os.path.exists(here) else os.path.join(ROOT, 'labels', 'names.tsv')]
+    for path in paths:
+        labels.update({a: n for a, n in load_one(path).items() if a not in labels})
+    return labels
+
+
+def load_one(path):
+    labels = {}
     if os.path.exists(path):
         for line in open(path, encoding='utf-8'):
             if line.startswith('#') or not line.strip():
@@ -177,18 +187,21 @@ def load_labels():
 
 def main(argv):
     export_dir = os.path.join(ROOT, 'analysis', 'export')
-    binary = None
+    binary, labels_file = None, []
     while argv and argv[0].startswith('--'):
         if argv[0] == '--binary':
             binary, argv = argv[1], argv[2:]
         elif argv[0] == '--export':
             export_dir, argv = argv[1], argv[2:]
+        elif argv[0] == '--labels':
+            labels_file.append(argv[1])
+            argv = argv[2:]
         else:
             sys.exit(f'unknown option {argv[0]}')
     if not argv:
         sys.exit(__doc__)
     cmd, args = argv[0], argv[1:]
-    ex = Export(export_dir, binary)
+    ex = Export(export_dir, binary, labels_file)
 
     if cmd == 'fn':
         addr = ex.resolve(args[0])
