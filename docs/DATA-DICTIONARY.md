@@ -87,6 +87,22 @@ In the file, every row has them.
    ([Identifying unknown files](media/files.md#two-files-compared)). Then change the label to
    *measured*.
 
+## Checking it
+
+`tools/triage/dictionary.py` checks the file. It reports rows without ten columns, places
+in an unknown form, kinds and evidence labels that are not in the [taxonomies](TAXONOMIES.md),
+and the same name and place twice. With `--fields labels/fields.tsv` it also reports structure
+fields that are missing from `fields.tsv` or have another type there, and counts the fields
+that have no row yet. `--markdown` prints the rows as a table for a findings document.
+
+```bash
+python3 tools/triage/dictionary.py labels/dictionary.tsv --fields labels/fields.tsv
+python3 tools/triage/dictionary.py labels/dictionary.tsv --markdown > docs/data.md
+```
+
+Run it before each commit that changes the dictionary. `--strict` turns warnings, such as an
+empty unit, into errors.
+
 ## Using it
 
 - **In the port.** Each field in the port's code carries the dictionary's name in its doc

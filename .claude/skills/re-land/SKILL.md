@@ -24,7 +24,9 @@ work.
     pairs, two clauses of the same shape joined by ", and", "and the ..." chains): see `docs/working/writing.md`.
 - **Labels:** a row in `labels/names.tsv` for every function you identified
   (`1400be770<TAB>Citizen::ChooseJob<TAB>called from the AI tick, reads the job table`), a row in
-  `labels/fields.tsv` for every field.
+  `labels/fields.tsv` for every field, and a row in `labels/dictionary.tsv` with the meaning,
+  unit and range of every value you learned about (`docs/DATA-DICTIONARY.md`). Check it with
+  `tools/triage/dictionary.py labels/dictionary.tsv --fields labels/fields.tsv`.
   Functions the port cites with `Original: FUN_…` get labels automatically:
   `tools/triage/cite_labels.py SRC --existing labels/names.tsv --out labels/names-from-port.tsv`,
   then `decomp_query.py --labels labels/names.tsv --labels labels/names-from-port.tsv`.

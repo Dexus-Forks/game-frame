@@ -1,0 +1,6 @@
+# name	where	type	kind	unit	range	meaning	written by	read by	evidence
+tree.stage	Entity+0x0c	int16	enumeration	-	0 to 3	The growth stage.	tree_update	tree_value	observed: indexes growth_table
+tree.stage	Entity+0x0c	int32	enumeration	-	0 to 3	The growth stage.	tree_update	tree_value	observed: indexes growth_table
+tree.mood	Entity+0x10	int32	feeling				-	-	guessed
+tree.x	somewhere	float	position	tiles	0 to 63	Column.	-	-	inferred: drawn there
+short	row

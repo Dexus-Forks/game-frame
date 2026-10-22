@@ -588,6 +588,11 @@ expect "cite_labels --any takes the first address above an item" $'1000:f789\tdr
 expect "cite_labels gives the file alone with --no-lines" $'1400c9560\ttick\tlib.rs\n' "$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --no-lines
 out="$("$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --existing tests/fixtures/cite/names.tsv 2>/dev/null)"
 [[ "$out" != *1400ca100* && "$out" != *1400c9460* ]] && ok "cite_labels keeps a hand-made label, and skips a module note" || bad "cite_labels existing and module notes" "$out"
+expect "dictionary checks a data dictionary against fields.tsv" "4 rows, 0 errors, 0 warnings; 2 of 3 fields" "$PYTHON" tools/triage/dictionary.py tests/fixtures/dictionary/dictionary.tsv --fields tests/fixtures/dictionary/fields.tsv
+out="$("$PYTHON" tools/triage/dictionary.py tests/fixtures/dictionary/bad.tsv --fields tests/fixtures/dictionary/fields.tsv 2>&1)"; code=$?
+[[ $code == 1 && "$out" == *"already on line 2"* && "$out" == *"not a kind of value"* && "$out" == *"not a known form of place"* && "$out" == *"2 columns"* && "$out" == *"int16 here and int32"* ]] && ok "dictionary reports bad rows and fails" || bad "dictionary bad rows" "$out"
+expect "dictionary prints a Markdown table" "| \`tree.stage\` | \`Entity+0x0c\` |" "$PYTHON" tools/triage/dictionary.py tests/fixtures/dictionary/dictionary.tsv --markdown
+expect "the project template's dictionary is valid" "0 rows, 0 errors" "$PYTHON" tools/triage/dictionary.py templates/project/labels/dictionary.tsv
 expect "decomp_query reads labels from --labels FILE" "2 functions, 2 decompiled, 1 labelled" "$PYTHON" tools/triage/decomp_query.py --export tests/fixtures/export-layout --labels tests/fixtures/export-layout/names.tsv stats
 expect "decomp_query layout merges a structure's fields" "0x18     4  int                          2      1  FUN_140001000, FUN_140001100" "$PYTHON" tools/triage/decomp_query.py --export tests/fixtures/export-layout layout FUN_140001000 FUN_140001100
 expect "decomp_query layout scales indexes of an int pointer" "    int                      f_1c;  /* also read as char */" "$PYTHON" tools/triage/decomp_query.py --export tests/fixtures/export-layout layout FUN_140001000 FUN_140001100

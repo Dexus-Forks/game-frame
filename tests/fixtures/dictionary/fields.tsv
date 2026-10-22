@@ -1,0 +1,4 @@
+# class or struct	offset	name	type	evidence
+Entity	0x08	age	float	observed: tree_update adds to it
+Entity	0x0c	stage	int32	observed: indexes growth_table
+Random	0x00	state	uint32	observed: rng_next

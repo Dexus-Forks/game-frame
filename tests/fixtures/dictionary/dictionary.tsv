@@ -1,0 +1,5 @@
+# name	where	type	kind	unit	range	meaning	written by	read by	evidence
+tree.stage	Entity+0x0c	int32	enumeration	-	0 to 3; stops at 3	The growth stage of a tree.	tree_update	tree_update, tree_value	measured: rises with each stage
+tree.age	Entity+0x08	float	ratio	one stage	0 up to 1, then the stage rises	The progress within the current stage.	tree_update	tree_update, tree_value	observed: tree_update adds dt x growth_table[stage]
+growth_table	export growth_table	float[4]	ratio	stages per second	0.05 to 1.0	How fast each stage grows.	-	tree_update	observed: readdata.py reads four floats
+record.weight	file:records.dat+4	float	ratio	-	as stored	The weight of one record.	-	load_records	observed: load_records reads a float at +4
