@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="450" viewBox="0 0 900 450" role="img" aria-label="What happens when a signed integer is divided by zero, and when the most negative value is divided by -1, on six CPUs and in four languages a port may use">
+<title>What happens when a signed integer is divided by zero, and when the most negative value is divided by -1, on six CPUs and in four languages a port may use</title>
+<rect x="0.5" y="0.5" width="899" height="449" rx="10" fill="#0d1b1e" stroke="#1f3d40"/>
+<defs><marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" fill="#8fa9a5"/></marker></defs>
+<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">TWO DIVISIONS THAT DIFFER EVERYWHERE</text>
+<text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">Each row gives the result of x / 0 and of the most negative value / -1 for 32-bit signed integers.</text>
+<text x="260.0" y="92.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#e2ece9" text-anchor="start">x / 0</text>
+<text x="560.0" y="92.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#e2ece9" text-anchor="start">most negative value / -1</text>
+<text x="24.0" y="119.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#e2ece9" text-anchor="start">x86 (idiv)</text>
+<rect x="260.0" y="102.0" width="290.0" height="24.0" rx="3" fill="#f87171" stroke="none" fill-opacity="0.28"/>
+<text x="270.0" y="118.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">divide error, crash</text>
+<rect x="560.0" y="102.0" width="290.0" height="24.0" rx="3" fill="#f87171" stroke="none" fill-opacity="0.28"/>
+<text x="570.0" y="118.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">divide error, crash</text>
+<text x="24.0" y="149.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#e2ece9" text-anchor="start">68000 (divs)</text>
+<rect x="260.0" y="132.0" width="290.0" height="24.0" rx="3" fill="#f87171" stroke="none" fill-opacity="0.28"/>
+<text x="270.0" y="148.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">trap, vector 5</text>
+<rect x="560.0" y="132.0" width="290.0" height="24.0" rx="3" fill="#f59e0b" stroke="none" fill-opacity="0.28"/>
+<text x="570.0" y="148.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">overflow flag, no change</text>
+<text x="24.0" y="179.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#e2ece9" text-anchor="start">MIPS (div)</text>
+<rect x="260.0" y="162.0" width="290.0" height="24.0" rx="3" fill="#f59e0b" stroke="none" fill-opacity="0.28"/>
+<text x="270.0" y="178.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">no trap, unpredictable</text>
+<rect x="560.0" y="162.0" width="290.0" height="24.0" rx="3" fill="#f59e0b" stroke="none" fill-opacity="0.28"/>
+<text x="570.0" y="178.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">no trap, unpredictable</text>
+<text x="24.0" y="209.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#e2ece9" text-anchor="start">PowerPC (divw)</text>
+<rect x="260.0" y="192.0" width="290.0" height="24.0" rx="3" fill="#f59e0b" stroke="none" fill-opacity="0.28"/>
+<text x="270.0" y="208.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">undefined result</text>
+<rect x="560.0" y="192.0" width="290.0" height="24.0" rx="3" fill="#f59e0b" stroke="none" fill-opacity="0.28"/>
+<text x="570.0" y="208.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">undefined result</text>
+<text x="24.0" y="239.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#e2ece9" text-anchor="start">ARMv7 and later (sdiv)</text>
+<rect x="260.0" y="222.0" width="290.0" height="24.0" rx="3" fill="#2dd4bf" stroke="none" fill-opacity="0.28"/>
+<text x="270.0" y="238.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">0</text>
+<rect x="560.0" y="222.0" width="290.0" height="24.0" rx="3" fill="#2dd4bf" stroke="none" fill-opacity="0.28"/>
+<text x="570.0" y="238.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">the most negative value</text>
+<text x="24.0" y="269.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#e2ece9" text-anchor="start">6502, Z80, early ARM</text>
+<rect x="260.0" y="252.0" width="290.0" height="24.0" rx="3" fill="#64748b" stroke="none" fill-opacity="0.28"/>
+<text x="270.0" y="268.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">the game's own routine</text>
+<rect x="560.0" y="252.0" width="290.0" height="24.0" rx="3" fill="#64748b" stroke="none" fill-opacity="0.28"/>
+<text x="570.0" y="268.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">the game's own routine</text>
+<path d="M24.0 279.0L876.0 279.0" stroke="#1f3d40" stroke-width="1.5" fill="none"/>
+<text x="24.0" y="299.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#e2ece9" text-anchor="start">Rust</text>
+<rect x="260.0" y="282.0" width="290.0" height="24.0" rx="3" fill="#f87171" stroke="none" fill-opacity="0.28"/>
+<text x="270.0" y="298.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">panic</text>
+<rect x="560.0" y="282.0" width="290.0" height="24.0" rx="3" fill="#f87171" stroke="none" fill-opacity="0.28"/>
+<text x="570.0" y="298.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">panic</text>
+<text x="24.0" y="329.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#e2ece9" text-anchor="start">JavaScript, then | 0</text>
+<rect x="260.0" y="312.0" width="290.0" height="24.0" rx="3" fill="#2dd4bf" stroke="none" fill-opacity="0.28"/>
+<text x="270.0" y="328.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">Infinity, then 0</text>
+<rect x="560.0" y="312.0" width="290.0" height="24.0" rx="3" fill="#2dd4bf" stroke="none" fill-opacity="0.28"/>
+<text x="570.0" y="328.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">2147483648, then the most negative</text>
+<text x="24.0" y="359.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#e2ece9" text-anchor="start">WebAssembly (i32.div_s)</text>
+<rect x="260.0" y="342.0" width="290.0" height="24.0" rx="3" fill="#f87171" stroke="none" fill-opacity="0.28"/>
+<text x="270.0" y="358.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">trap</text>
+<rect x="560.0" y="342.0" width="290.0" height="24.0" rx="3" fill="#f87171" stroke="none" fill-opacity="0.28"/>
+<text x="570.0" y="358.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">trap</text>
+<text x="24.0" y="389.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#e2ece9" text-anchor="start">C#</text>
+<rect x="260.0" y="372.0" width="290.0" height="24.0" rx="3" fill="#f87171" stroke="none" fill-opacity="0.28"/>
+<text x="270.0" y="388.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">DivideByZeroException</text>
+<rect x="560.0" y="372.0" width="290.0" height="24.0" rx="3" fill="#f87171" stroke="none" fill-opacity="0.28"/>
+<text x="570.0" y="388.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">OverflowException</text>
+<text x="24.0" y="410.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#8fa9a5" text-anchor="start">The first six rows are CPUs. The last four are languages a port may be written in.</text>
+<rect x="24.0" y="426.0" width="12.0" height="12.0" rx="2" fill="#f87171" stroke="none" fill-opacity="0.6"/>
+<text x="42.0" y="436.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="start">stops the program</text>
+<rect x="155.4" y="426.0" width="12.0" height="12.0" rx="2" fill="#f59e0b" stroke="none" fill-opacity="0.6"/>
+<text x="173.4" y="436.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="start">no defined result</text>
+<rect x="286.8" y="426.0" width="12.0" height="12.0" rx="2" fill="#2dd4bf" stroke="none" fill-opacity="0.6"/>
+<text x="304.8" y="436.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="start">a defined value</text>
+<rect x="405.8" y="426.0" width="12.0" height="12.0" rx="2" fill="#64748b" stroke="none" fill-opacity="0.6"/>
+<text x="423.8" y="436.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="start">depends on the routine</text>
+</svg>

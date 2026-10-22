@@ -51,6 +51,14 @@ Knowing the engine helps in several ways.
   and debugging aids left in the build.
 - [Skeletons and animation](animation.md): skeletons, poses, clips, blending, compression and
   the state machines that pick clips.
+- [Objects in script runtimes](script-objects.md): how Lua, ActionScript, UnrealScript, Python,
+  JavaScript and Mono store objects, and the order in which loops visit their entries.
+- [Script interpreters in machine code](interpreters.md): finding the dispatch loop, stack and
+  register machines, and what a port of an interpreter must keep.
+- [Coroutines and state machines after compiling](coroutines.md): C# iterators and Unity
+  coroutines, Lua coroutines, and state machines written by hand.
+- [Garbage collection the player can see](garbage-collection.md): finalisers, weak references,
+  pauses, and Unity's destroyed objects.
 
 ## Web players
 

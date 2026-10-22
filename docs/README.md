@@ -36,6 +36,8 @@ the order of this page and of each folder's `README.md` is the order of the site
   accelerators, sound, memory, storage, input and networks.
 - [Software engines and middleware](engines/README.md): recognising an engine, the id and
   Build engines, Unreal, other licensed engines, studio engines, middleware.
+- [Numbers, text and libraries](semantics/README.md): integer and floating-point behaviour on
+  each platform, C runtime functions whose results differ, and text encodings.
 
 ## Media and files
 

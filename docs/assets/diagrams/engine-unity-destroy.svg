@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="300" viewBox="0 0 900 300" role="img" aria-label="A Unity object destroyed during Update: it stays until the end of the Update loop, is destroyed before drawing, and afterwards compares equal to null while the C# object still exists">
+<title>A Unity object destroyed during Update: it stays until the end of the Update loop, is destroyed before drawing, and afterwards compares equal to null while the C# object still exists</title>
+<rect x="0.5" y="0.5" width="899" height="299" rx="10" fill="#0d1b1e" stroke="#1f3d40"/>
+<defs><marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" fill="#8fa9a5"/></marker></defs>
+<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">A DESTROYED UNITY OBJECT, FRAME BY FRAME</text>
+<text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">Destroy waits until the Update loop ends. After that, == null is true, but the C# object remains.</text>
+<rect x="200.0" y="90.0" width="162.0" height="44.0" rx="4" fill="#f59e0b" stroke="none" fill-opacity="0.3"/>
+<text x="281.0" y="115.7" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="600" fill="#e2ece9" text-anchor="middle">Update calls Destroy(enemy)</text>
+<rect x="368.0" y="90.0" width="162.0" height="44.0" rx="4" fill="#60a5fa" stroke="none" fill-opacity="0.3"/>
+<text x="449.0" y="115.7" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="600" fill="#e2ece9" text-anchor="middle">the rest of the Update loop</text>
+<rect x="536.0" y="90.0" width="162.0" height="44.0" rx="4" fill="#f87171" stroke="none" fill-opacity="0.3"/>
+<text x="617.0" y="115.7" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="600" fill="#e2ece9" text-anchor="middle">destroyed, before drawing</text>
+<rect x="704.0" y="90.0" width="162.0" height="44.0" rx="4" fill="#64748b" stroke="none" fill-opacity="0.3"/>
+<text x="785.0" y="115.7" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="600" fill="#e2ece9" text-anchor="middle">later frames</text>
+<rect x="24.0" y="152.0" width="852.0" height="24.0" rx="3" fill="#64748b" stroke="none" fill-opacity="0.08"/>
+<text x="36.0" y="168.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="400" fill="#f59e0b" text-anchor="start">enemy == null</text>
+<text x="281.0" y="168.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="middle">false</text>
+<text x="449.0" y="168.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="middle">false</text>
+<text x="785.0" y="168.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="middle">true</text>
+<rect x="24.0" y="180.0" width="852.0" height="24.0" rx="3" fill="#64748b" stroke="none" fill-opacity="0.08"/>
+<text x="36.0" y="196.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="400" fill="#f59e0b" text-anchor="start">enemy?.name</text>
+<text x="281.0" y="196.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="middle">works</text>
+<text x="449.0" y="196.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="middle">works</text>
+<text x="785.0" y="196.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="middle">throws</text>
+<rect x="24.0" y="208.0" width="852.0" height="24.0" rx="3" fill="#64748b" stroke="none" fill-opacity="0.08"/>
+<text x="36.0" y="224.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="400" fill="#f59e0b" text-anchor="start">FindObjectOfType</text>
+<text x="281.0" y="224.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="middle">finds it</text>
+<text x="449.0" y="224.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="middle">finds it</text>
+<text x="785.0" y="224.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="middle">does not</text>
+<rect x="24.0" y="236.0" width="852.0" height="24.0" rx="3" fill="#64748b" stroke="none" fill-opacity="0.08"/>
+<text x="36.0" y="252.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="400" fill="#f59e0b" text-anchor="start">its Update runs</text>
+<text x="281.0" y="252.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="middle">yes</text>
+<text x="449.0" y="252.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="middle">yes</text>
+<text x="785.0" y="252.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="middle">no</text>
+<text x="24.0" y="284.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#8fa9a5" text-anchor="start">A port must give each kind of check the same answer at the same point of the frame.</text>
+</svg>

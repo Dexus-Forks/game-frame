@@ -41,6 +41,9 @@ If pseudocode seems to use a value from nowhere, it may be one of these, kept ac
 
 ## Floating point
 
+[The same floats on every platform](semantics/floats.md) covers what still differs between
+CPUs, consoles, GPUs and WebAssembly, from the point of view of the port.
+
 ![The 80-bit x87 format beside the 64-bit and 32-bit formats](assets/diagrams/float-formats.svg)
 
 A reimplementation is exact only if it copies these details:
@@ -73,6 +76,9 @@ A reimplementation is exact only if it copies these details:
   enable flush-to-zero for speed; check the start-up code for `ldmxcsr` or `_controlfp`.
 
 ## Integers
+
+[Integers on every platform](semantics/integers.md) covers division by zero, overflow and
+shift counts on each CPU and in each port language.
 
 ![Float to integer and signed division, rounded three ways](assets/diagrams/rounding-table.svg)
 
