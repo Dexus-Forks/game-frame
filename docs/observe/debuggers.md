@@ -75,6 +75,38 @@ action once. The blocks in the second run and not the first are the action's cod
 Keep the two runs alike: the same save, the same menus, the same length. Every extra
 difference adds functions to the list.
 
+## Following a value: taint
+
+Coverage shows which code ran. Taint shows which code used a value. Mark some bytes as the
+source: a field read from the save file, the result of the random generator, a key press. Then
+follow each instruction. When an instruction reads a marked byte, the bytes it writes are
+marked too. At the end, the marked memory and the instructions that touched it are the value's
+path through the game.
+
+- **Questions it answers.** Which code reads this byte of the save file? Which decisions does
+  this random draw affect? Which part of the score comes from the difficulty setting?
+- **Tools.** libdft (on Intel Pin) taints a running x86 program on Linux. On other platforms,
+  write the rule into an emulator: `tools/emu/pe_emu.py` and Unicorn give a hook on each
+  instruction, with its reads and writes. A short taint pass for one function is often
+  enough.
+- **Limits.** Taint follows data. It does not follow a decision. If the value only chooses a
+  branch, the values written in that branch are not marked. Mark the branch's condition as a
+  second source when that matters. Tables indexed by a marked value spread the mark widely, so
+  start with few marked bytes.
+
+## Solving for an input: symbolic execution
+
+Symbolic execution runs code with unknown inputs. It keeps each value as a formula of the
+inputs. At each branch it records the condition. A solver such as Z3 then finds inputs that
+make a chosen path run. angr and Triton do this for x86 and other processors.
+
+It suits small pieces of code with a clear goal: a password or level code check, a checksum
+over a save file, a key derived from a serial number, a branch that the tests never reach.
+Run it on one function at a time, with the memory it needs set up. Whole games are too large.
+The number of paths doubles at each branch that depends on an input. The result is an input
+that you then try in the original. The solver's answer is evidence only after that run
+([Passwords, level codes and cheat codes](../GAME-PATTERNS.md#passwords-level-codes-and-cheat-codes)).
+
 ## Patching a copy
 
 Some questions are quicker to answer by changing the game. Examples are skipping a long intro

@@ -525,6 +525,50 @@ def eval_order():
     return s.render()
 
 
+# ---------------------------------------------------------------- update order
+def update_order():
+    s = Svg(900, 320, 'One pass of an update loop over five slots: an object added during the pass is updated or not, '
+                      'depending on where the loop reads the count')
+    s.heading('Objects added during an update', 'The loop reads the count once, or at each pass. The binary shows which.')
+    slots = [('player', TEAL), ('guard', BLUE), ('guard', BLUE), ('chest', GREY), ('coin (new)', AMBER)]
+    for row, (title, stop) in enumerate((('count read once: 4 objects run', 4), ('count read each pass: 5 objects run', 5))):
+        y = 92 + row * 100
+        s.text(30, y - 8, title, 12, TEXT, weight='600')
+        for k, (name, colour) in enumerate(slots):
+            x = 30 + k * 130
+            ran = k < stop
+            s.rect(x, y, 116, 44, colour, rx=6, extra=f' fill-opacity="{0.32 if ran else 0.08}"' + ('' if ran else ' stroke-dasharray="4 4"'))
+            s.text(x + 58, y + 27, name, 12, TEXT if ran else DIM, 'middle', '600' if ran else '400')
+        s.text(690, y + 27, 'the coin acts this frame' if stop == 5 else 'the coin waits a frame', 12, AMBER if stop == 5 else DIM)
+    s.text(30, 112 + 100 + 20 + 60, 'The second guard drops the coin. Removing an object in the middle raises the same question for the objects after it.', 12, DIM)
+    return s.render()
+
+
+# ---------------------------------------------------------------- link layout
+def link_layout():
+    s = Svg(900, 330, 'Object files and library members placed by the linker in order, with the relocation table marking '
+                      'the pointers in the data')
+    s.heading('What the linker leaves', 'Each file\'s code and data stay together, in link order. Library members come last.')
+    files = [('main.obj', TEAL), ('world.obj', BLUE), ('ai.obj', PURPLE), ('libc: printf', GREY), ('libc: rand', GREY)]
+    s.text(30, 96, 'code', 12, TEXT, weight='600')
+    s.text(30, 166, 'data', 12, TEXT, weight='600')
+    widths = [150, 180, 140, 120, 90]
+    x = 80
+    for (name, colour), w in zip(files, widths):
+        s.rect(x, 76, w - 6, 34, colour, rx=4, extra=' fill-opacity="0.3"')
+        s.text(x + (w - 6) / 2, 98, name, 12, TEXT, 'middle')
+        dw = w * 0.6
+        s.rect(x, 146, dw - 6, 34, colour, rx=4, extra=' fill-opacity="0.18"')
+        x += w
+    s.text(80, 214, '.reloc', 12, TEXT, weight='600')
+    for mx in (100, 112, 250, 262, 274, 440):
+        s.line(mx, 180, mx, 200, AMBER, 2)
+    s.text(140, 214, 'Each mark is an address the loader may change. In data, each one is a pointer.', 12, DIM)
+    s.text(30, 262, 'Three marks side by side are a table of three pointers: a vtable, a table of functions or a table of strings.', 12, DIM)
+    s.text(30, 286, 'tools/pe/relocs.py lists every run of pointers.', 12, DIM, mono=False)
+    return s.render()
+
+
 DIAGRAMS = {
     'msvc-rand.svg': msvc_rand, 'entity-components.svg': entity_components, 'package-archive.svg': package_archive,
     'float-time.svg': float_time, 'integrators.svg': integrators, 'password-bits.svg': password_bits,
@@ -533,4 +577,5 @@ DIAGRAMS = {
     'magic-division.svg': magic_division, 'cpu-flags.svg': cpu_flags, 'segment-address.svg': segment_address,
     'overlays.svg': overlays, 'struct-from-uses.svg': struct_from_uses,
     'compile-stages.svg': compile_stages, 'eval-order.svg': eval_order,
+    'update-order.svg': update_order, 'link-layout.svg': link_layout,
 }

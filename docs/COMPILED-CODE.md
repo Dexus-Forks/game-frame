@@ -151,6 +151,37 @@ each.
   and voice chat.
 - **Shared code.** The linker can merge identical functions. One body may then serve two names. Its callers may expect different meanings.
 
+## Registers and stack slots
+
+The compiler keeps a value in a register only while it is needed. The stretch from the moment
+a value is computed to its last use is its live range. The register allocator gives each live
+range a register. When there are not enough registers, it moves a value to a stack slot (a
+spill) and loads it again later. This changes what the decompiler shows.
+
+- **One variable, several places.** A source variable can live in a different register in each
+  part of a function. Ghidra joins them when it can. It may also show several variables for
+  one.
+- **One place, several variables.** A register or a stack slot can hold one variable, then
+  another one once the first is no longer used. Ghidra may give them one name and one type.
+  When a variable seems to change type halfway through a function, split it (Ghidra's *Split Out
+  As New Variable*).
+- **Statements mixed together.** The scheduler reorders instructions so that slow ones start
+  early. The instructions of two statements can then alternate. Follow the data from each
+  instruction to the next one that uses it. The order of the instructions alone does not give
+  the order of the statements. Memory writes and calls keep their order relative to each other.
+- **Writes that are missing.** The optimiser removes a write that nothing reads afterwards. A
+  structure field set in the source and never read may never be written. The port must not
+  depend on the value of such a field. If a save file or a later version reads it, look for the
+  write elsewhere.
+- **Copies of one function.** An optimiser can make a separate copy of a function for one
+  caller with a constant argument (procedure cloning). It can also make two copies of a loop,
+  one for each value of a condition that does not change inside it (unswitching). Two nearly
+  identical functions or loops can be one piece of source.
+- **Nested procedures.** Pascal allows a procedure inside another one. The inner procedure
+  reads the outer one's locals through the outer frame pointer, passed as a hidden extra
+  argument (the static link). In Turbo Pascal code, the caller pushes its own `bp` as the last
+  argument of a nested procedure. The callee loads it and reads the outer locals through it.
+
 ## Order of evaluation
 
 ![Two random draws as the arguments of one call, made in the order the binary shows](assets/diagrams/eval-order.svg)
@@ -207,6 +238,39 @@ limits. These are the usual cases, and how to check each one:
 | A wrong type everywhere a value goes | One wrong type at the start, propagated through every call | Fix the first type; Ghidra then corrects the rest |
 | A call that seems to return twice, or code after a call that runs only after an error | `setjmp` and `longjmp`: an error or a restart far inside the game jumps back to a saved point, such as the main menu | The callers of `setjmp` in the runtime's labels; the buffer passed to it |
 
+## What the linker leaves
+
+![Object files and library members placed by the linker, and the relocations that mark pointers](assets/diagrams/link-layout.svg)
+
+The linker joins the compiled object files into one executable. Its rules leave traces that
+help with the whole program.
+
+- **Source files stay together.** The linker places the code of each object file in one block,
+  in the order the files were given to it. Their data goes into the data section in the same
+  order. The functions of one source file are therefore next to each other, and so are its
+  globals and strings. A run of functions that call each other and use the same block of data
+  is usually one source file. Name the files when you can (a `__FILE__` string in an assert
+  helps). Then port each as one module.
+- **Library code comes last, in whole members.** The linker takes a member from a library only
+  when it defines a name that something still needs. It takes the whole member. Unused
+  functions can then sit next to used ones, if they were in the same member. A runtime function
+  that is missing was never needed. Some runtimes link floating-point support only when the
+  program uses floats (MSVC's `_fltused`). A program without it never prints a float.
+- **Relocations mark the pointers.** An image that can load at another base address lists each
+  absolute address it holds in its relocation table. The loader adds the difference to each
+  one. In the data sections, every entry is a pointer. Runs of pointers are tables: vtables,
+  tables of functions, tables of strings, tables of records. `tools/pe/relocs.py BINARY` lists
+  them. DLLs keep their relocations. Many 32-bit EXEs were linked without them (`/FIXED`). A
+  DOS `MZ` program lists its segment fixups in its header ([DOS](DOS.md)).
+- **Functions found only through tables.** Ghidra follows calls and jumps from the entry point
+  and from known functions (recursive disassembly). A function reached only through a table of
+  pointers is found only when Ghidra finds the table. The relocations show where those tables
+  are. A linear disassembler reads every byte in order instead. It finds such functions, but it
+  also reads data between functions as code.
+- **Weak and common symbols.** A weak symbol is a default that another definition replaces.
+  An uninitialised global declared in several files can become one shared block (common). A
+  global that seems to belong to two source files may be one of these.
+
 ## Debug builds, release builds and symbols
 
 A game may ship with more than one build, such as a debug build on a demo disc or a version for another platform. A debug build keeps local variables on the stack and does not reorder code,
@@ -251,3 +315,4 @@ is in its data.
 - Each runtime helper you named, in the labels file, so the export reads cleanly.
 - Each recovered constant (a divisor, a jump table, a folded float) with how you confirmed it.
 - The order of calls inside expressions that change shared state, such as random draws.
+- The source files you recognised from the link order, and the tables found from relocations.
