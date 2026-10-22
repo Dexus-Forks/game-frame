@@ -80,6 +80,14 @@ the game:
   Banished stores each bone as a record with a name. The tool now finds joints stored as records,
   and it finds the citizen's 27 bones by name.
 
+## Brought up to GameFrame's standard
+
+In October 2026 the project was brought up to the standard GameFrame now sets for a project. It
+enables GameFrame's Claude Code plugin (skills, agents and gates), keeps its labels in `labels/`,
+gives its state in `docs/CHECKLIST.md`, and runs GameFrame's tools from a clone with `tools/gf.sh`.
+Its labels made from its own citations raised the labelled share of the game's code from 10.2 % to
+28.2 % by size. Its report is `docs/develop/GAMEFRAME.md`.
+
 ## Numbers (October 2026)
 
 About 130,000 lines of Rust; 2,050 of 9,846 original functions traced (68 % of the game's code
@@ -94,5 +102,7 @@ by size); 170 of 170 resource types; around 45 documented deviations.
 | `tools/ghidra/`, `tools/emu/pe_emu.py` | `tools/ghidra/`, `tools/emu/pe_emu.py` (generalised) |
 | `tools/triage/` (`decomp.py`, `fnindex.py`, `rngdiff.py`, `deviations.py`, `coverage.py`) | `tools/triage/decomp_query.py`, `tools/verify/seqdiff.py`, `tools/triage/deviations.py`, `tools/triage/coverage.py` |
 | `tools/compat/`, `tools/test/run.py` | `re-verify` sections 3, 6 and 7 |
-| `crates/sim`, the cargo features, `--pure` | `re-port`, "Build it so it can be checked" and "Additions the original does not have" |
+| `crates/sim`, the cargo features, `--vanilla` | `re-port`, "Build it so it can be checked" and "Additions the original does not have" |
+| `labels/` (`names.tsv`, `fields.tsv`, `names-from-port.tsv`), `docs/CHECKLIST.md` | `labels/`, `docs/CHECKLIST.md`, `tools/triage/cite_labels.py` |
+| `.claude/settings.json` (GameFrame's plugin), `tools/gf.sh` | The plugin (skills, agents, gates) and the toolkit, run from a clone |
 | `docs/` (findings in evidence style) | `templates/project/docs/`, `re-land` |
