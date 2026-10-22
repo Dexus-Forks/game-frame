@@ -50,6 +50,17 @@ print(subprocess.run([sys.executable, 'tools/triage/compare_trees.py', f'{t}/a',
                      capture_output=True, text=True).stdout)
 PY
 expect "hashnames gives the ROR-13 hash of an import name" "0xec0e4e8e" "$PYTHON" tools/triage/hashnames.py --hash LoadLibraryA
+expect "screenmarks projects a point through the camera's matrices" "corner: 240.0, 50.0" "$PYTHON" - <<'PY'
+import struct, subprocess, sys, tempfile, zlib
+w, h = 320, 200
+raw = b''.join(b'\0' + b'\x20' * 3 * w for _ in range(h))
+def chunk(t, d): return struct.pack('>I', len(d)) + t + d + struct.pack('>I', zlib.crc32(t + d) & 0xffffffff)
+f = tempfile.NamedTemporaryFile(suffix='.png', delete=False)
+f.write(b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', w, h, 8, 2, 0, 0, 0)) + chunk(b'IDAT', zlib.compress(raw)) + chunk(b'IEND', b'')); f.close()
+print(subprocess.run([sys.executable, 'tools/triage/screenmarks.py', f.name, '--view', '1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1',
+                      '--proj', '1 0 0 0 0 1 0 0 0 0 1 1 0 0 0 0', '--point', '1,1,2=corner', '--out', f.name + '.svg'],
+                     capture_output=True, text=True).stdout)
+PY
 expect "relocs finds the vtable as a run of code pointers" "$vt  .rdata      2 pointers  (2 code)" "$PYTHON" tools/pe/relocs.py $B/game.exe
 
 echo "Live tracing"
@@ -61,6 +72,12 @@ if "$PYTHON" -c "import frida" 2>/dev/null && command -v cc >/dev/null; then
   cc -O1 -o "$T/target" "$T/target.c"
   expect "frida_trace logs outermost calls with their call sites" "draw(" "$PYTHON" tools/live/frida_trace.py \
     --hook 'target!draw' --hook 'target!spawn' --args 2 --spawn "$T/target"
+  printf '%s\n' '#include <unistd.h>' 'volatile int table[65536];' \
+    '__attribute__((noinline)) int touch(int i) { table[i] += 1; return table[i]; }' \
+    'int main(void) { int t = 0; for (int i = 0; i < 3; i++) { usleep(100000); t += touch(i * 4); } return t == 0; }' > "$T/watch.c"
+  cc -O1 -o "$T/watch" "$T/watch.c"
+  expect "frida_trace logs each access to watched memory" "table:r+0x20" "$PYTHON" tools/live/frida_trace.py \
+    --watch 'watch!table:262144=table' --spawn "$T/watch"
 else
   echo "  skip  live tracing (run: scripts/setup.sh --install for Frida; needs a C compiler)"
 fi
@@ -82,6 +99,17 @@ data = open('examples/sample-game/build/sample.dat', 'rb').read(); w = emu.mallo
 t = MemTrace(emu, [(buf, len(data), 'file')])
 emu.call_i32(emu.export('game.exe', 'load_records'), buf, len(data), w)
 print(t.log[0])
+PY
+expect "mem_trace follows the file through registers into the records" "marked records 3" "$PYTHON" - <<'PY'
+import sys; sys.path.insert(0, 'tools/emu')
+from pe_emu import Emu
+from mem_trace import MemTrace
+emu = Emu('examples/sample-game/build/game.exe', ['examples/sample-game/build/engine.dll'])
+data = open('examples/sample-game/build/sample.dat', 'rb').read(); w = emu.malloc(64); buf = emu.bytes_in(data)
+t = MemTrace(emu, [(buf, len(data), 'file')], registers=True)
+emu.call_i32(emu.export('game.exe', 'load_records'), buf, len(data), w)
+t.reg_log()
+print('marked records', sum(1 for a, _, _ in t.regions if w <= a < w + 64))
 PY
 expect "data loader runs on emulated memory" "3 (0.5, 1.25, 2.0)" "$PYTHON" - <<'PY'
 import sys; sys.path.insert(0, 'tools/emu')

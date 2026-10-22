@@ -89,7 +89,9 @@ tools/verify/seqdiff.py derived/live.trace derived/port.trace
 Each call is one line with its label, its first arguments and its call site. The format is the
 one `tools/emu/call_trace.py` writes, so `seqdiff.py` compares the trace with the port's. Use it
 for what the emulator cannot reach: a whole level played by hand, calls that depend on the
-graphics or sound system, and timing between frames. Frida is installed by
+graphics or sound system, and timing between frames. `--watch 'game.exe+0x2a1000:256=units'`
+logs each read and write of a block of memory with the instruction that made it, which finds
+the code behind a value seen in a memory scan. Frida is installed by
 `scripts/setup.sh --install`. It runs on Windows, Linux, macOS and Android. Some protected games
 detect it. On macOS, signed programs need a copy without the hardened runtime.
 
@@ -137,9 +139,9 @@ path through the game.
   this random draw affect? Which part of the score comes from the difficulty setting?
 - **Tools.** libdft (on Intel Pin) taints a running x86 program on Linux. On other platforms,
   use an emulator. `tools/emu/mem_trace.py` marks memory in `pe_emu.py`, calls a function, and
-  lists each instruction that read or wrote the marked bytes. It follows copies made by one
-  instruction, such as `rep movs`. Values that pass through a register are not followed, so
-  start from the instructions it lists and read their code.
+  lists each instruction that read or wrote the marked bytes. With `registers=True` it also
+  follows values through registers, using Capstone to know what each instruction reads and
+  writes, and marks the memory they reach. It can mark too much, never too little.
 - **Several sources at once.** Give each source its own colour (a bit in the mark). One pass
   then shows which values come from the save file, which from the random generator, and which
   from both.
