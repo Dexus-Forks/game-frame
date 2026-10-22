@@ -474,12 +474,16 @@ expect "gameframe works in a new project" "tools/pe/peinfo.py  (program)" "$tmp/
 echo "Engine run-time: hashed names, skeletons, structures, shaders, memory per frame"
 W="$(mktemp -d)"
 "$PYTHON" tests/make_engine.py "$W"
-expect "hashnames finds the game's hash function" "fnv1a-32: 7 names" "$PYTHON" tools/triage/hashnames.py "$W/game.bin"
+expect "hashnames finds the game's hash function" "fnv1a-32: 7 matches of 7 names" "$PYTHON" tools/triage/hashnames.py "$W/game.bin"
 expect "hashnames names a hash constant" "0x062a102a  fnv1a-32 (as is): door_open" "$PYTHON" tools/triage/hashnames.py "$W/game.bin" --value 0x062a102a
 expect "hashnames reports an unknown constant" "0x12345678  unknown" "$PYTHON" tools/triage/hashnames.py "$W/game.bin" --value 0x12345678
 expect "skeleton finds a 16-bit parent array" "16-bit LE  17 joints, 1 root(s), depth 5, 5 leaves" "$PYTHON" tools/formats/skeleton.py "$W/rig.mdl"
 expect "skeleton finds the bind pose quaternions" "17 quaternions, 32 bytes apart, 17 different" "$PYTHON" tools/formats/skeleton.py "$W/rig.mdl"
 expect "skeleton lists joint names" "Bip01 Pelvis" "$PYTHON" tools/formats/skeleton.py "$W/rig.mdl"
+expect "hashnames finds hashes made at start-up in data files, with names from the program" "crc32-utf16: 40 matches of 4 names" "$PYTHON" tools/triage/hashnames.py "$W/data" --aligned --names-from "$W/program.bin"
+expect "hashnames names a small hash when asked for it" "0x00305aa7  crc32-utf16 (as is): TutorialImage" "$PYTHON" tools/triage/hashnames.py "$W/program.bin" --value 0x00305aa7
+expect "skeleton finds joints stored as records, with their names" "14 joints, 1 root(s), depth 5" "$PYTHON" tools/formats/skeleton.py "$W/bones.mdl"
+expect "skeleton reads the joint names before each record" "names: root, hips, spine, chest, neck, head" "$PYTHON" tools/formats/skeleton.py "$W/bones.mdl"
 expect "skeleton prints a parent array as a tree" "        4" "$PYTHON" tools/formats/skeleton.py "$W/rig.mdl" --at 0x15e --width 2
 expect "decomp_query layout merges a structure's fields" "0x18     4  int                          2      1  FUN_140001000, FUN_140001100" "$PYTHON" tools/triage/decomp_query.py --export tests/fixtures/export-layout layout FUN_140001000 FUN_140001100
 expect "decomp_query layout scales indexes of an int pointer" "    int                      f_1c;  /* also read as char */" "$PYTHON" tools/triage/decomp_query.py --export tests/fixtures/export-layout layout FUN_140001000 FUN_140001100

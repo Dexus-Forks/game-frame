@@ -10,7 +10,15 @@ index, and every parent comes before its children. The root has no parent, writt
 bits set). This tool looks for that shape: a run that starts at -1 and in which every later
 entry is smaller than its own position. It tries 8-bit, 16-bit and 32-bit entries in both
 byte orders. A run of zeros also has the shape, so a run needs at least three different parents
-to count.
+to count. A run must also look like a skeleton: at most two roots, a depth of at least three,
+and no joint with more than sixteen children. Other data with the same shape (indices, flags)
+rarely passes all three.
+
+Many formats keep each joint as a record: a name, the parent index, then the pose. The parent
+indices are then spread through the file, often at varying spacing when the names differ in
+length. The tool also looks for these: a 32-bit parent index followed directly by a unit
+quaternion, repeated in file order with every parent before its child. The printable text just
+before each record is shown as the joint's name.
 
 Joint rotations are quaternions: four floats whose squares add up to one. A bind pose, or one
 sample of an animation, is a run of them at a fixed spacing, alone (16 bytes apart) or with a
@@ -49,9 +57,60 @@ def parent_runs(data, width, big, minimum):
                 j += 1
             run = vals[i:j]
             parents = [p for p in run if p >= 0]
-            if len(run) >= minimum and len(set(parents)) >= 3 and any(p != k - 1 for k, p in enumerate(run) if p >= 0):
+            if (len(run) >= minimum and len(set(parents)) >= 3 and any(p != k - 1 for k, p in enumerate(run) if p >= 0)
+                    and plausible(run)):
                 out.append((align + i * width, width, big, list(run)))
             i = j
+    return out
+
+
+def plausible(run):
+    """A parent array that looks like a skeleton: few roots, some depth, narrow forks."""
+    children = [0] * len(run)
+    for p in run:
+        if p >= 0:
+            children[p] += 1
+    return sum(1 for p in run if p < 0) <= 2 and max(depth(run)) >= 3 and max(children) <= 16
+
+
+def unit_quat(data, at):
+    if at + 16 > len(data):
+        return False
+    q = struct.unpack_from('<4f', data, at)
+    s = sum(v * v for v in q)
+    return abs(s - 1.0) < 1e-3 and not math.isnan(s)
+
+
+def bone_records(data, minimum):
+    """Joints stored as records: a 32-bit parent index directly followed by a unit quaternion."""
+    anchors = []
+    for at in range(0, len(data) - 20):
+        p = struct.unpack_from('<i', data, at)[0]
+        if -1 <= p < 1024 and unit_quat(data, at + 4):
+            anchors.append((at, p))
+    out, used = [], set()
+    for k, (at, p) in enumerate(anchors):
+        if p != -1 or at in used:
+            continue
+        run, offs, last = [p], [at], at
+        for at2, p2 in anchors[k + 1:]:
+            if at2 - last > 512:
+                break
+            if at2 - last < 20:
+                continue
+            if 0 <= p2 < len(run):
+                run.append(p2)
+                offs.append(at2)
+                last = at2
+            elif p2 == -1:
+                break
+        if len(run) >= minimum and plausible(run):
+            used.update(offs)
+            names = []
+            for o in offs:
+                m = re.search(rb'([\x20-\x7e]{2,64})\x00?$', data[max(0, o - 66):o].rstrip(b'\x00'))
+                names.append(m.group(1).decode('ascii') if m else '')
+            out.append((at, run, names))
     return out
 
 
@@ -157,6 +216,15 @@ def main(argv):
         print(f'  0x{off:08x}  {width * 8}-bit{order}  {describe(run)}')
         print(f'              {run[:24]}{" ..." if len(run) > 24 else ""}')
     if not found:
+        print('  none')
+    print(f'\njoint records (a parent index, then a rotation), at least {minimum} joints:')
+    records = bone_records(data, minimum)
+    for off, run, names in records:
+        print(f'  0x{off:08x}  {describe(run)}')
+        named = [n for n in names if n]
+        if named:
+            print(f'              names: {", ".join(named[:12])}{" ..." if len(named) > 12 else ""}')
+    if not records:
         print('  none')
     print(f'\nruns of unit quaternions (float32), at least {minimum}:')
     quats = quat_runs(data, minimum)

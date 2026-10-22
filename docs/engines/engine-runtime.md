@@ -40,6 +40,10 @@ field in a data file. The text is often gone.
   functions (CRC-32, FNV-1 and FNV-1a, djb2, sdbm, the x31 string hash, the ELF hash), as
   written and in lower and upper case, and counts the matches against the values in the file.
   The function with far more matches than chance is the game's. Each match names a constant.
+- Some engines compute their hashes when the game starts, so the code holds only the names and
+  the hashes appear only in the data files. Search the data folder and take the names from the
+  program: `hashnames.py DATA_DIR --aligned --names-from GAME.EXE`. Banished is an example: its
+  type ids are CRC-32 hashes of UTF-16 class names, found in the header of every resource.
 - Names missing from the binary may be in other places: a list in a mod tool, file names in
   an archive, debug symbols of a related build, another game on the same engine. Pass them
   with `--names FILE`.

@@ -63,3 +63,26 @@ for frame in range(10):
 open(f'{out}/orig.ram', 'wb').write(orig)
 open(f'{out}/port.ram', 'wb').write(port)
 open(f'{out}/ram.map', 'w').write('# address size name\n0x0075 1 player_x\n0x0076 1 player_y\n0x0100 2 score\n')
+
+# Hashes computed at start-up: the names are in a 'program', the hashes only in data files, as
+# type ids at the start of each record (CRC-32 of the UTF-16 name, as Banished does).
+import os  # noqa: E402
+import zlib  # noqa: E402
+classes = ['TerrainDescription', 'GraphicsMesh', 'ImageBuffer', 'SoundBuffer', 'TutorialImage']
+crc16 = lambda n: zlib.crc32(n.encode('utf-16-le')) & 0xFFFFFFFF
+prog = bytearray(noise(2048)) + b''.join(n.encode('utf-16-le') + b'\0\0' for n in classes) + noise(512)
+open(f'{out}/program.bin', 'wb').write(prog)
+os.makedirs(f'{out}/data', exist_ok=True)
+for k in range(40):
+    name = classes[k % 4]
+    open(f'{out}/data/res{k:02}.dat', 'wb').write(b'RSRC' + struct.pack('<II', 1, crc16(name)) + noise(60 + k))
+
+# A skeleton stored as records: a name, the parent index, then the rotation and translation.
+bones = [('root', -1), ('hips', 0), ('spine', 1), ('chest', 2), ('neck', 3), ('head', 4), ('leftArm', 3), ('leftHand', 6),
+         ('rightArm', 3), ('rightHand', 8), ('leftLeg', 1), ('leftFoot', 10), ('rightLeg', 1), ('rightFoot', 12)]
+rec = bytearray(noise(64)) + struct.pack('<I', len(bones))
+for k, (name, parent) in enumerate(bones):
+    a = 0.07 * k
+    rec += struct.pack('<I', len(name)) + name.encode() + struct.pack('<i', parent)
+    rec += struct.pack('<4f', 0.0, 0.0, math.sin(a / 2), math.cos(a / 2)) + struct.pack('<3f', 0, k, 0)
+open(f'{out}/bones.mdl', 'wb').write(rec + noise(64))

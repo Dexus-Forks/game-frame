@@ -22,6 +22,11 @@ page covers finding the shaders, reading them, and porting them.
 | SPIR-V | Vulkan, later OpenGL | Words starting with `0x07230203` |
 | GLSL and HLSL source | Any OpenGL game, and engines that compile when they load | Text: `#version`, `void main(`, `gl_FragColor`, `: SV_Target` |
 
+Some engines also keep shader source beside the compiled code. Banished's materials carry GLSL
+3.3 source generated from the engine's own shading language, next to the Direct3D 9 and 11
+bytecode, although the shipped game has no OpenGL renderer. Such source is the clearest reference
+for a port. Check that it matches the compiled shader the game uses before relying on it.
+
 `tools/formats/shaders.py FILE` finds all of these in an executable, an archive or a data file,
 prints each one's kind, version, size and names, and with `--dump DIR` writes each to its own
 file. Run it on the files that `filetypes.py` could not identify. Packed archives must be

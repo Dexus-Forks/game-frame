@@ -63,6 +63,23 @@ Direct3D 9 and 11 shaders, and a data-driven interface. Every step of the loop w
   ([A model to query](../observe/object-model.md)).
 - **Baselines.** Test scenarios drive the game with the probe and record the answers; a changed answer is a change in what the game does. Each one must be explained.
 
+## What GameFrame's later tools found in it
+
+GameFrame's tools were later run on Banished's files, as a test of the tools and a second look at
+the game:
+
+- `tools/triage/hashnames.py` found the hash scheme with no hint. Run over the 5,812 extracted
+  resources with names from the two binaries, CRC-32 of the UTF-16 name matched 6,323 values,
+  against 629 expected by chance. It named 169 of the 170 registered types. The run also showed
+  two gaps in the tool, both now fixed: names had to come from the file being searched, and an
+  explicit value below 2^24 was left out.
+- `tools/formats/shaders.py` found a Direct3D 9 and a Direct3D 11 version of every shader, and
+  268 GLSL 3.3 programs in 67 resources, generated from the engine's own shading language. The
+  project had not recorded the GLSL source.
+- `tools/formats/skeleton.py` found the animation keys at first. It missed the skeleton, because
+  Banished stores each bone as a record with a name. The tool now finds joints stored as records,
+  and it finds the citizen's 27 bones by name.
+
 ## Numbers (October 2026)
 
 About 130,000 lines of Rust; 2,050 of 9,846 original functions traced (68 % of the game's code
