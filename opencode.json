@@ -1,0 +1,26 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "rea": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "rea-agents@6.4.0",
+        "mcp"
+      ],
+      "enabled": true,
+      "environment": {
+        "GHIDRA_INSTALL_DIR": "{env:GHIDRA_INSTALL_DIR}",
+        "JAVA_HOME": "{env:JAVA_HOME}"
+      }
+    },
+    "dosbox": {
+      "type": "local",
+      "command": [
+        "dosbox-x-mcp-server"
+      ],
+      "enabled": true
+    }
+  }
+}

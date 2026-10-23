@@ -18,6 +18,14 @@ session, `source scripts/env.sh` sets up the paths.
 `./gameframe doctor` runs the same check. `./gameframe tools` then lists every tool with its
 first line of help, and `./gameframe tool NAME` prints the rest.
 
+The MCP servers (REA and DOSBox-X's debugger) are in `.mcp.json` for Claude Code. Codex,
+Gemini CLI, Cursor, GitHub Copilot in VS Code and OpenCode read the same servers from their own
+files: `.codex/config.toml`, `.gemini/settings.json`, `.cursor/mcp.json`, `.vscode/mcp.json` and
+`opencode.json`. `./gameframe mcp --emit all` writes them from `.mcp.json`. Codex, Cursor,
+VS Code and OpenCode do not expand defaults such as `${JAVA_HOME:-...}`. Start them after
+`source scripts/env.sh`.
+`scripts/setup.sh --rea --client codex` shows REA's own registration plan for one agent.
+
 ![tests/run.sh on the sample game. Each tool has a line marked ok, grouped by section, and the summary reads 94 passed, 0 failed.](assets/captures/run-tests.svg)
 
 When the setup is complete, the run ends like this. Each check runs a tool against the sample game. The summary line

@@ -75,4 +75,4 @@ These rules are for changes to GameFrame itself, which is a public repository.
 | `crates/` | A Cargo workspace of clean implementations taken from the case studies (OPL2, WMA, MSVC CRT, Turbo Pascal); rules in `docs/crates/README.md`. `cargo test --release` in `crates/` |
 | `GAPS.md` | Topics missing from the guides and tools, and where each is now covered. Tick an item when it is merged; add new gaps to it |
 | `site/` | The documentation website (VitePress). It builds from `docs/`, the skills and the examples where they are; it holds no copies of their content |
-| `.mcp.json` | REA for Claude Code, reading `GHIDRA_INSTALL_DIR` and `JAVA_HOME` |
+| `.mcp.json` | The MCP servers (REA, DOSBox-X) for Claude Code. `gameframe mcp --emit all` writes them into `.codex/config.toml`, `.gemini/settings.json`, `.cursor/mcp.json`, `.vscode/mcp.json` and `opencode.json` |

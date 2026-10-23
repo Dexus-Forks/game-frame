@@ -831,6 +831,41 @@ expect "gameframe run gives the same output as the tool" "$("$PYTHON" tools/pe/p
 expect "gameframe run passes the tool's exit code" "rc 1" sh -c "$G run bitcompare f32 $B/truth/seed-1.f32 $B/naive/seed-1.f32 >/dev/null; echo rc \$?"
 expect "gameframe run refuses a library and says why" "a library to import" $G run pe_emu
 expect "gameframe find names the skills and tools for a word" "tool vtable" $G find vtable
+expect "gameframe mcp: every agent's MCP file is current with .mcp.json" "rc 0" sh -c "$G mcp --emit all --check; echo rc \$?"
+out="$("$PYTHON" - <<'PY' 2>&1
+import json, re, subprocess, tomllib
+src = json.load(open('.mcp.json'))['mcpServers']
+files = {'.codex/config.toml': lambda t: tomllib.loads(t)['mcp_servers'],
+         '.gemini/settings.json': lambda t: json.loads(t)['mcpServers'],
+         '.cursor/mcp.json': lambda t: json.loads(t)['mcpServers'],
+         '.vscode/mcp.json': lambda t: json.loads(t)['servers'],
+         'opencode.json': lambda t: json.loads(t)['mcp']}
+for path, get in files.items():
+    servers = get(open(path).read())
+    assert set(servers) == set(src) >= {'rea', 'dosbox'}, f'{path} names {sorted(servers)}'
+    left = re.findall(r'\$\{\w+:-', json.dumps(servers))
+    assert path == '.gemini/settings.json' or not left, f'{path} keeps a default its client does not expand'
+assert json.load(open('.gemini/settings.json'))['context']['fileName'] == ['AGENTS.md'], 'Gemini CLI does not read AGENTS.md'
+assert tomllib.loads(open('.codex/config.toml').read())['mcp_servers']['rea']['env_vars'] == ['GHIDRA_INSTALL_DIR', 'JAVA_HOME']
+# A stale file is caught, and a rewrite keeps the file's other settings.
+keep = {p: open(p).read() for p in ('.vscode/mcp.json', '.codex/config.toml')}
+try:
+    open('.vscode/mcp.json', 'w').write(json.dumps({'servers': {}, 'inputs': []}))
+    open('.codex/config.toml', 'w').write('model = "x"\n')
+    r = subprocess.run(['./gameframe', 'mcp', '--emit', 'all', '--check'], capture_output=True, text=True)
+    assert r.returncode == 1 and '.vscode/mcp.json' in r.stderr and '.codex/config.toml' in r.stderr, r.stderr
+    subprocess.run(['./gameframe', 'mcp', '--emit', 'all'], check=True, capture_output=True)
+    assert json.load(open('.vscode/mcp.json'))['inputs'] == [], 'VS Code inputs were lost'
+    t = tomllib.loads(open('.codex/config.toml').read())
+    assert t['model'] == 'x' and set(t['mcp_servers']) == set(src), 'the Codex block did not merge'
+finally:
+    for p, text in keep.items():
+        open(p, 'w').write(text)
+print('mcp files ok')
+PY
+)"
+[[ "$out" == "mcp files ok" ]] && ok "the MCP files parse (TOML, JSON), name every server, and keep their other settings" || bad "MCP files" "$out"
+expect "setup.sh --client names the agent for REA's setup" "--client needs a name" scripts/setup.sh --client
 
 echo "Crates"
 if command -v cargo >/dev/null; then
