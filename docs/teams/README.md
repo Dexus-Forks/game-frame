@@ -97,6 +97,8 @@ Next: <agent name> - <one-line brief for it>
 | `re-mapper` | task | The export and the platform's register list | Named hardware registers, banks and RAM variables |
 | `re-typer` | task | The export | Structures, classes and enumerations in Ghidra and `labels/fields.tsv` |
 | `re-matcher` | task | A crate, library or released source | A bit-for-bit comparison with the game's version |
+| `re-vectoriser` | task | The exports of the CPU builds | SIMD routines by job, their plain twins, measurements |
+| `re-accelerator` | task | The exports of the card builds | API use, texture paths, per-build data fields, renderer profiles |
 | `re-editor` | task | Documents | The same documents in plain English |
 | `re-checker` | task | Documents | Checked claims, doubtful ones marked |
 

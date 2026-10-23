@@ -22,6 +22,8 @@ that stops when the thing happens is the one to trace. Groups that matter:
   '^int '                   BIOS and DOS services; the AH value set just before says which
   '^(rdtsc|cpuid)'          CPU timing and identification (also anti-debugging checks)
   '^(f|)i?div'              divisions, where rounding matters to a port
+  '^p[a-z]+ mm|^emms|^movq|^movd'   hand-written MMX code (docs/hardware/simd.md); with
+                            --functions, count hits per function to find the modules
 
 The disassembly is a linear sweep of the code sections, so data inside code can show as stray
 instructions: check each hit in Ghidra. Needs capstone (.venv).

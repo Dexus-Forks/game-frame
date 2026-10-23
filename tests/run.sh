@@ -141,6 +141,32 @@ except RuntimeError as e:
     print(e)
 PY
 
+expect "pe32_emu runs MMX machine code given its registers" "(32767, -32768, 12, 0)" "$PYTHON" - <<'PY'
+import struct, sys; sys.path.insert(0, 'tools/emu')
+from pe32_emu import Emu32
+emu = Emu32.raw(bytes.fromhex('0f6f06' '0fed07' '0f7f06' '0f77' 'c3'))  # movq, paddsw, movq, emms, ret
+a, b = emu.alloc(8), emu.alloc(8)
+emu.write(a, struct.pack('<4h', 32000, -32000, 5, -1)); emu.write(b, struct.pack('<4h', 1000, -1000, 7, 1))
+emu.call(0x401000, esi=a, edi=b); print(struct.unpack('<4h', emu.read(a, 8)))
+PY
+expect "pe32_emu calls a 32-bit DLL's stdcall export and stubs its imports" "(32767, -32768, 16383, 1) 47 KERNEL32.dll!GetTickCount, which has no handler" "$PYTHON" - <<'PY'
+import struct, sys, pefile; sys.path.insert(0, 'tools/emu')
+from pe32_emu import Emu32, EmuError
+path = 'examples/sample-game/build/mixer32.dll'
+p = pefile.PE(path); ex = {e.name.decode().split('@')[0]: p.OPTIONAL_HEADER.ImageBase + e.address for e in p.DIRECTORY_ENTRY_EXPORT.symbols}
+emu = Emu32(path, stubs={'GetTickCount': lambda e: 0x105})
+o, i = emu.alloc(8), emu.alloc(8)
+emu.write(o, struct.pack('<4h', 32000, 0, 0, 0)); emu.write(i, struct.pack('<4h', 32767, -32768, 16384, 2))
+emu.call(ex['mix4'], args=[o, i, 0xffff]); got = struct.unpack('<4h', emu.read(o, 8))
+ticks = emu.call(ex['add_ticks'], args=[40, 2])['eax']
+try:
+    Emu32(path).call(ex['add_ticks'], args=[1, 2]); msg = 'no stop'
+except EmuError as e:
+    msg = str(e).split('called ')[1]
+print(got, ticks, msg)
+PY
+expect "pe32_emu prints its usage with no arguments" "registers in" "$PYTHON" tools/emu/pe32_emu.py
+
 echo "Ground truth and the port"
 "$PYTHON" $S/ground_truth.py $B/truth >/dev/null && "$PYTHON" $S/port.py $B/port >/dev/null \
   && "$PYTHON" $S/port.py --naive $B/naive >/dev/null

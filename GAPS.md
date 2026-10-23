@@ -58,6 +58,9 @@ proposed again.
 - [x] Antialiased lines
 - [x] Polygons that are not convex: even-odd and non-zero rules
 - [x] Hidden surfaces: z-buffer compare, sorted spans, BSP, portals, PVS
+- [x] The card makers' 3D APIs in detail: Glide 2.x, ATI3DCIF, S3D Toolkit; one build per card ([card-apis.md](docs/hardware/card-apis.md), `gameframe-gpu-1997`, `re-accelerator`)
+- [x] Hand-written MMX code: finding it, matching it to the plain build, measuring, porting ([simd.md](docs/hardware/simd.md), `gameframe-mmx`, `re-vectoriser`)
+- [ ] PowerVR SGL, Rendition RRedline and Matrox MSI in the same detail
 
 ## Engines ([animation.md](docs/engines/animation.md))
 
@@ -96,6 +99,7 @@ proposed again.
 - [x] Ports that run inside the original, with instruction counts and declines ([the guide](docs/working/hybrid-port.md))
 - [x] `gameframe agents --emit`: the agents for Codex, Gemini CLI, Copilot and OpenCode ([the matrix](docs/working/agents.md#agents-in-every-client))
 - [x] `new-project.sh --copy` and `update-project.sh` copy the agents for clients other than Claude Code
+- [x] `tools/emu/pe32_emu.py`: 32-bit (x86) PE routines under Unicorn, with register inputs, MMX, and named import stubs
 
 ## Out of scope
 

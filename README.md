@@ -156,12 +156,14 @@ that block game material, decompiled code and commits by other agents.
 `re-porter` → `re-verifier` → `re-lander`, and back to the tracer or the porter when a check
 fails.
 
-Ten task agents do one job each, in any stage: `re-identifier` (engine and libraries),
+Twelve task agents do one job each, in any stage: `re-identifier` (engine and libraries),
 `re-randomiser` (random generators and draw order), `re-listener` (every input),
 `re-cataloguer` (every screen), `re-mapper` (hardware and memory), `re-typer` (structures and
 classes), `re-matcher` (a crate or
 library against the game), `re-editor` (documents to the writing rules), `re-checker`
-(claims and sources) and `re-publisher` (the project's site and diary). `re-start` ("Task agents") has their table.
+(claims and sources), `re-publisher` (the project's site and diary), and two hardware
+specialists, `re-vectoriser` (MMX and other SIMD code) and `re-accelerator` (the 3D card
+APIs). `re-start` ("Task agents") has their table.
 
 Claude Code, Cursor and VS Code read the agents in `agents/` (through `.claude/agents`). Codex,
 Gemini CLI, GitHub Copilot and OpenCode read copies in their own formats, which

@@ -1,0 +1,12 @@
+[package]
+name = "gameframe-mmx"
+description = "Exact semantics of the Intel MMX instructions (1997) on 64-bit values, for ports of hand-written MMX code"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["mmx", "simd", "x86", "emulation", "reverse-engineering"]
+categories = ["emulators"]
+
+[dependencies]

@@ -74,6 +74,8 @@ the 486DX, the FPU was a separate chip (8087, 287, 387) that few players owned.
   must reproduce the estimate exactly, usually with a table or by emulating it.
 - **SSE** adds `RCPSS` and `RSQRTSS` estimates. Intel specifies only a maximum error, so the
   exact bits differ between Intel and AMD CPUs and between models. If a game's rules depend on them, record the CPU the original ran on.
+- [MMX and other SIMD code](simd.md) is the method: find the routines, match each to its plain
+  twin, measure both, port with `gameframe-mmx`.
 - Games with several paths gave different results on different CPUs. Pick one path and
   document it as the reference.
 

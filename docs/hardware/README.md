@@ -38,6 +38,10 @@ In my GameFrame project, find every place the game touches hardware.
   vertical retrace.
 - [3D accelerators](graphics-3d.md): 3dfx and Glide, Rendition, PowerVR, S3, ATI, Matrox,
   NVIDIA, Direct3D and OpenGL, and software renderers.
+- [The card makers' 3D APIs](card-apis.md): Glide 2.x, ATI3DCIF and the S3D Toolkit in detail:
+  reading their calls, how textures reach each card, and games with one build per card.
+- [MMX and other SIMD code](simd.md): finding hand-written MMX routines, matching them to the
+  plain build, measuring both, and porting them exactly.
 - [Sound](sound.md): the PC speaker, AdLib and OPL FM synthesis, Sound Blaster, Gravis
   Ultrasound, MIDI devices, DirectSound, A3D and EAX.
 - [Shaders](shaders.md): finding compiled and source shaders with `shaders.py`, reading them,

@@ -1,0 +1,12 @@
+[package]
+name = "gameframe-gpu-1997"
+description = "Texture and pixel formats of 1997 PC 3D chips: 3dfx Glide 2.x (with NCC), ATI 3D Rage (ATI3DCIF), S3 ViRGE (S3D Toolkit)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["glide", "3dfx", "texture", "retro", "reverse-engineering"]
+categories = ["emulators", "graphics"]
+
+[dependencies]

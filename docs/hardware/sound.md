@@ -45,6 +45,8 @@ the buffer.
   rate that constant gives, which is not exactly the rate the game asked for. Compute it.
 - Games mix several effects into one buffer in software. If the sound must match, port
   the mixer's volume scaling and clipping exactly.
+  Games of 1997 to 1999 often had a second, MMX mixer that scales with `pmulhw` and clips
+  with `paddsw`, and its samples can differ from the plain build's ([SIMD code](simd.md)).
 - If the game counts sound interrupts to time anything, that count is an input.
 
 ## MIDI

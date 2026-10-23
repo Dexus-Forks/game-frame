@@ -61,7 +61,7 @@ These rules are for changes to GameFrame itself, which is a public repository.
 | Path | What |
 |---|---|
 | `skills/re-*/SKILL.md` | One skill per step of the method, in the Agent Skills format. `.claude/skills` and `.agents/skills` link here, so every agent finds the one copy |
-| `agents/re-*.md` | One agent per stage and ten task agents, which hand off to each other (`.claude/agents` links here). `gameframe agents --emit all` writes their copies for Codex, Gemini CLI, Copilot and OpenCode (`.codex/agents`, `.gemini/agents`, `.github/agents`, `.opencode/agents`); never edit those |
+| `agents/re-*.md` | One agent per stage and twelve task agents, which hand off to each other (`.claude/agents` links here). `gameframe agents --emit all` writes their copies for Codex, Gemini CLI, Copilot and OpenCode (`.codex/agents`, `.gemini/agents`, `.github/agents`, `.opencode/agents`); never edit those |
 | `.claude/settings.json`, `scripts/hooks/gate.py`, `scripts/hooks/gates/`, `scripts/hooks/git/pre-commit`, `hooks/hooks.json`, `.codex/hooks.json`, `.cursor/hooks.json`, `.github/hooks/gameframe.json`, `hooks/gemini-settings.json` | Permissions and the gates: the git pre-commit hook, and hooks for Claude Code, Codex, Gemini CLI, Cursor and Copilot: [docs/working/gates.md](docs/working/gates.md) |
 | `.claude-plugin/` | The Claude Code plugin and its marketplace: the skills and the agents |
 | `gameframe`, `tools/gameframe/` | The help and discovery command. It reads the skills and each tool's own help, so a new tool needs no entry there |

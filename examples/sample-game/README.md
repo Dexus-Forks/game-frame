@@ -6,7 +6,7 @@ allocator, a fixed-step simulation, a constant table, an object with a table of 
 vtable), and a data file loader.
 
 ```bash
-./build.sh                                   # build/game.exe, build/engine.dll, build/sample.dat (needs zig)
+./build.sh                                   # build/game.exe, build/engine.dll, build/mixer32.dll, build/sample.dat (needs zig)
 ../../.venv/bin/python ground_truth.py       # emulate the original: build/truth/seed-N.f32 and .trace
 ../../.venv/bin/python port.py               # the reimplementation: build/port/
 ../../.venv/bin/python ../../tools/verify/bitcompare.py f32 build/truth/seed-1.f32 build/port/seed-1.f32
@@ -28,3 +28,4 @@ from real games.
 | `ground_truth.py` | Runs `simulate` under the emulator for 20 seeds, with every random draw traced |
 | `port.py` | A reimplementation that matches bit for bit; `--naive` shows a common mistake |
 | `decode_sample.py` | A decoder for the data file, for `tools/formats/validate.py` |
+| `mixer32.c` | A 32-bit (x86) DLL: a stdcall mixer step and a function that calls Windows, for `tools/emu/pe32_emu.py` |

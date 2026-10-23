@@ -119,6 +119,8 @@ the same hand-off. Send them when a job is large enough to fill this session's c
 | `re-mapper` | Hardware registers, memory banks and RAM variables, named | `re-tracer`, `re-listener` |
 | `re-typer` | Structures, classes and enumerations, with sizes, fields and evidence | `re-tracer`, `re-decoder`, `re-porter` |
 | `re-matcher` | A crate, library or released source compared with the game's version | `re-porter`, `re-tracer` |
+| `re-vectoriser` | SIMD code (MMX, 3DNow!, SSE) and CPU builds: routines grouped, matched to their plain twins, measured | `re-porter`, `re-measurer`, `re-tracer` |
+| `re-accelerator` | 3D card APIs (Glide, ATI3DCIF, S3D): state calls named, texture paths, per-card builds and their data | `re-tracer`, `re-decoder`, `re-porter` |
 | `re-editor` | Documents edited to the writing rules, wording only | `re-checker`, `re-lander` |
 | `re-checker` | Every claim's evidence and sources checked, doubtful ones marked | `re-editor`, `re-lander` |
 | `re-publisher` | The project's site: a diary entry for a milestone, a page for each new document | `re-editor`, `re-checker`, `re-lander` |

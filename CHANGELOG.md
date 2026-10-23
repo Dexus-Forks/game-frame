@@ -7,6 +7,24 @@ Every release of GameFrame, newest first. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- Two hardware guides from the POD: Planet of Death (1997) project:
+  [MMX and other SIMD code](docs/hardware/simd.md) (finding hand-written MMX routines,
+  matching each to its plain twin through its callers, measuring both, porting exactly) and
+  [The card makers' 3D APIs](docs/hardware/card-apis.md) (Glide 2.x, ATI3DCIF and the S3D
+  Toolkit: reading their state calls, how textures reach each card, games with one build per
+  card, and renderer profiles for viewers).
+- Two crates: `gameframe-mmx`, the MMX instructions bit for bit, and `gameframe-gpu-1997`, the
+  texture formats and API constants of Glide 2.x (with NCC), ATI3DCIF and the S3D Toolkit,
+  with one texel decoder.
+- Two specialist task agents: `re-vectoriser` (SIMD code and CPU builds) and `re-accelerator`
+  (3D card APIs and per-card builds).
+- `tools/emu/pe32_emu.py` runs routines of 32-bit (x86) Windows games under Unicorn, with
+  inputs in registers or on the stack, MMX included, and stops at any import without a
+  handler, naming it. The sample game builds a 32-bit DLL (`mixer32.c`) to test it.
+- `tools/triage/insns.py` lists the pattern for MMX code among its groups.
+
 ### Changed
 
 - `re-site`, `re-publisher`, `re-land` and `docs/OUTPUTS.md` now allow screenshots of the

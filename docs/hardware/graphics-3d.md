@@ -23,6 +23,9 @@ picture the player saw depended on the card.
 
 ## Glide
 
+[The card makers' 3D APIs](card-apis.md) covers Glide 2.x, ATI3DCIF and the S3D Toolkit in
+detail: their texture paths, their state calls and the builds games shipped for each.
+
 3dfx's Glide was a thin API close to the Voodoo hardware. It was the most used of the card makers' APIs. Many games had a Glide renderer as their best-looking option.
 
 - Games load `glide.dll`, `glide2x.dll` or `glide3x.dll` and call functions such as
@@ -81,6 +84,11 @@ machine. They are the best reference for the port's renderer, and the easiest to
 4. Port the interface. Write one modern renderer behind it.
 5. Capture frames from the original with the reference renderer and compare. For hardware
    renderers, compare with a tolerance and look at the difference image.
+
+Games of 1996 and 1997 often shipped one executable per card instead of one renderer DLL per
+card, and a variant of their data files for some cards. The builds can differ in more than
+drawing: which data files they read, which fields of those files, and how much of the scene the
+chip draws ([The card makers' 3D APIs](card-apis.md), "One game, one build per card").
 
 ## Effects that depend on the card
 
