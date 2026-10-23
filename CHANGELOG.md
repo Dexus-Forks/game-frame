@@ -7,6 +7,11 @@ Every release of GameFrame, newest first. The format follows
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-23
+
+GameFrame 1.0.1 sets up projects for the coding agents they name, and adds a website with a
+diary of the work.
+
 ### Skills and agents
 
 - A new skill, `re-site`, builds and keeps a project's website: a VitePress site in
@@ -81,5 +86,6 @@ Copilot, Cursor and OpenCode can each use the skills, the agents, the gates and 
 - The Claude Code plugin now carries version `1.0.0`. Claude Code updates it when the version
   changes, so plugin projects move from release to release.
 
-[Unreleased]: https://github.com/tanepiper/game-frame/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/tanepiper/game-frame/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/tanepiper/game-frame/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/tanepiper/game-frame/releases/tag/v1.0.0
