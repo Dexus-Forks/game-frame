@@ -61,6 +61,9 @@ Every release of GameFrame, newest first. The format follows
 - `./gameframe run decomp_query` without `--export` reads the project's `analysis/export`
   (the folder `GAMEFRAME_PROJECT` names), and its `labels/names.tsv` after the current
   folder's. Before, it read GameFrame's own sample export.
+- `dosinfo.py --pstrings` prints a Pascal string's length byte address, the address code
+  uses, instead of the text's. It finds a string right after another one when the second's
+  length byte is a printable character.
 
 ## [1.0.1] - 2026-10-23
 

@@ -149,7 +149,7 @@ up to its size (a variant record), so check one offset in the code before relyin
 - **String constants sit just before their procedure.** Borland Pascal emits a procedure's
   string literals right before its first instruction, so the procedure that starts after a
   string usually uses it. Code refers to a Pascal string by its *length byte*: search for the
-  address one before the text that `dosinfo.py --pstrings` prints.
+  address that `dosinfo.py --pstrings` prints (the length byte's, one before the text).
 - **Constants that look like globals.** A 16-bit constant equal to an offset in DS shows up in
   pseudocode as `&someGlobal` (a `BlockRead` count of 0x138a printed as `&tempdat3`). Check
   the instruction (`tools/dos/nedis.py`) before believing a pointer.

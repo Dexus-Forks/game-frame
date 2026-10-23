@@ -16,7 +16,9 @@ The 16-bit counterpart of tools/pe/peinfo.py. It prints:
     video libraries) found in the bytes;
   - `--strings MIN`: C-style strings; `--pstrings MIN`: Pascal strings (a length byte, then the
     text). Ghidra does not find Pascal strings by itself, so this is how to see a Pascal
-    program's messages and file names with their addresses.
+    program's messages and file names with their addresses. The address printed is the length
+    byte's, which is the address the code uses. Strings that follow each other are all found,
+    even when a length byte is a printable character.
 
   - debug symbols: Borland Turbo Debugger symbols (read them with tdinfo.py) or a CodeView trailer.
 
@@ -79,16 +81,18 @@ def strings(data, minimum):
 
 
 def pascal_strings(data, minimum):
-    """Length-prefixed strings: a byte n, then n printable bytes (spaces and \\r\\n allowed)."""
-    i, n = 0, len(data)
+    """Length-prefixed strings: a byte n, then n printable bytes (spaces and \\r\\n allowed).
+    Yields the offset of the length byte. A printable length byte right after other text is taken
+    as a letter of that text, unless the text was a string found just before it."""
+    i, n, last_end = 0, len(data), -1
     while i < n:
         length = data[i]
-        inside_text = 32 <= length < 127 and i and 32 <= data[i - 1] < 127   # a letter of a longer text
+        inside_text = 32 <= length < 127 and i and 32 <= data[i - 1] < 127 and i != last_end
         if length >= minimum and i + 1 + length <= n and not inside_text:
             text = data[i + 1:i + 1 + length]
             if all(32 <= c < 127 or c in (9, 10, 13) for c in text) and sum(c > 32 for c in text) * 2 >= length:
                 yield i, text.decode('latin-1')
-                i += 1 + length
+                i = last_end = i + 1 + length
                 continue
         i += 1
 
@@ -159,7 +163,7 @@ def main(path, *flags):
             print(f'    {where(exe, off)}  {text}')
     if '--pstrings' in flags:
         for off, text in pascal_strings(data, int(flags[flags.index('--pstrings') + 1])):
-            print(f'    {where(exe, off + 1)}  [{len(text)}] {text!r}')
+            print(f'    {where(exe, off)}  [{len(text)}] {text!r}')
 
 
 if __name__ == '__main__':

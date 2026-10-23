@@ -34,6 +34,8 @@ EXPORTS = ['rng_seed', 'rng_next', 'sum_draws', 'checksum', 'get_data_seg', 'ask
 LABELS = ['main_loop', 'frame_top', 'draw', 'draw_even_end', 'draw_odd_end', 'event', 'event_end']
 DESCRIPTION = b'DOS sample for GameFrame'
 MESSAGE = b'\x0cDOS SAMPLE 1'   # a Pascal string: length byte first
+# Two Pascal strings back to back; the second's length byte (0x2a) is a printable '*'
+ADJACENT = b'\x05FIRST' + bytes([0x2a]) + b'SECOND STRING, ITS LENGTH BYTE IS A STAR!!'
 
 
 def assemble():
@@ -68,10 +70,10 @@ def read_elf(d):
 
 
 def data_segment():
-    """The data segment: the variables sample.s uses, then a Pascal string and a C string."""
+    """The data segment: the variables sample.s uses, then Pascal strings and a C string."""
     d = bytearray(0x10)
     d[0:4] = struct.pack('<I', 0x1234)       # RandSeed's initial value
-    d += MESSAGE + b'\0' + DESCRIPTION + b'\0'
+    d += MESSAGE + b'\0' + DESCRIPTION + b'\0' + ADJACENT + b'\0'
     d += bytes(0x80 - len(d))
     d += b'sample.txt\0'                     # FileName at 0x80 (read_file)
     d += bytes(0xB0 - len(d))                # FileBuf at 0x90; main_loop's words at 0xA0
