@@ -132,7 +132,11 @@ These are the details that make a reimplementation drift, in order of how often 
 11. **Update order.** Objects added or removed during an update, pools, queues, double
     buffers and dirty flags each decide what runs this frame (`docs/GAME-PATTERNS.md`, "Update
     order"). Copy each decision from the binary.
-12. **Uninitialised and stale state.** The original may read a field before writing it, or keep
+12. **Work handed to a caller.** When a ported function's comment says that a step of the
+   original "is the caller's" (to split a large function, or to avoid a borrow), check that a
+   caller really does it, at the original's point. Search the port for such phrases now and
+   then: a step that no caller took over is a behaviour the port silently lacks.
+13. **Uninitialised and stale state.** The original may read a field before writing it, or keep
    a value from the last frame. That is behaviour too.
 13. **Assembly ported at the register level.** Ports that replace routines inside a running
     original (`docs/working/hybrid-port.md`) must
