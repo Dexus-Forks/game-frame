@@ -11,8 +11,8 @@ api: [win32]
 symptom: [file-not-found, wont-start]
 tags: [cd-check, language, volume-label]
 signatures:
-  - 'insert\b.{0,40}\bcd\b'
-  - 'ins[eé]r(?:ez|er)\b.{0,40}\bcd\b'
+  - 'insert\s(?:[^\n]{0,40}\s)?(?:the\s)?cd(?:-rom)?\b'
+  - 'ins[eé]r(?:ez|er)\s(?:[^\n]{0,40}\s)?(?:le\s)?cd(?:-rom)?\b'
 tools: []
 skills: [re-observe, re-trace]
 docs: [docs/observe/system-calls.md, docs/knowhow/context-windows-9x-directdraw.md]

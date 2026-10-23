@@ -940,6 +940,7 @@ expect "advise --signatures leaves out entries found only by words" "rc 1" sh -c
 expect "advise says how to record what it does not know" "re-land --section know-how" env $K $G advise "nothing like this at all"
 expect "advise --entry prints the whole entry" "Count the widgets first." env $K $G advise --entry fixture-solved
 expect "advise --check passes GameFrame's own entries" "0 problems" $G advise --check
+expect "no signature matches the entries' own file names, as in a git diffstat" "rc 1" sh -c "ls docs/knowhow | sed 's|^|docs/knowhow/|; s|$| \| 40 +++|' | $G advise - --signatures >/dev/null; echo rc \$?"
 out="$("$PYTHON" - <<'PY' 2>&1
 import os, shutil, subprocess, tempfile
 d = tempfile.mkdtemp(); os.makedirs(f'{d}/docs/knowhow')
