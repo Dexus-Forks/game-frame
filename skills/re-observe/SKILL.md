@@ -92,6 +92,9 @@ nothing else. `docs/observe/object-model.md` has the rules and examples from thr
 
 - `docs/FINDINGS.md`: the kind of game, the inputs table, the screen inventory.
 - Capture scripts in the project (not one-off commands), so every capture can be repeated.
+- A capture script prints its usage for `--help` or no arguments and runs nothing. It writes
+  into a new folder or refuses to overwrite one, so checking its usage never truncates a capture
+  that took a quarter of an hour.
 - Labels (`labels/`) for every variable and function the captures name.
 
 ## Pitfalls

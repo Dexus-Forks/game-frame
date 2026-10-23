@@ -9,6 +9,9 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `re-observe`: a capture script prints its usage for `--help` and runs nothing, and never
+  overwrites an earlier capture. Seen when checking a script's usage started a 15-minute run
+  over the saved data.
 - `gameframe progress`: every agent keeps a progress log, one line per step, in
   `derived/progress/<agent>.log` (`gameframe progress <agent> --add TEXT`). `gameframe progress`
   shows each log's last lines, newest first, so the main session can answer "how is it going?"
