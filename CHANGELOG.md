@@ -7,6 +7,13 @@ Every release of GameFrame, newest first. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- `re-site`, `re-publisher`, `re-land` and `docs/OUTPUTS.md` now allow screenshots of the
+  original game and of the project's viewer in documents and on the site, a few at a time,
+  each captioned with its source. The game's files, extracted assets in bulk and decompiled
+  code still stay out of git.
+
 ## [1.0.1] - 2026-10-23
 
 GameFrame 1.0.1 sets up projects for the coding agents they name, and adds a website with a

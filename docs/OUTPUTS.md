@@ -11,8 +11,9 @@ contains the game's own files: every output reads the player's own copy (see
   addresses and labels. They are useful on their own to modders and to other projects.
 - **A website** made from those documents (VitePress, MkDocs or similar), built by CI on every
   push. The `re-site` skill makes one in `sites/<name>/`: a diary entry per milestone, and the
-  documents shown with `@include`. Pictures and short videos made by the reimplementation itself, never screenshots of the
-  original's assets.
+  documents shown with `@include`. Pictures and short videos illustrate the findings:
+  screenshots of the original and of the project's viewer, frames from the reimplementation,
+  each captioned with its source. The game's files themselves stay out.
 - **Readers for the formats** as a small library with no other dependencies, so modding tools
   can use them.
 

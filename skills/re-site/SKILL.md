@@ -126,9 +126,12 @@ The rules for an entry:
   link the compare range on the repository's host, once.
 - **No tool dumps.** Describe output in a sentence with the numbers that matter. A short table
   of measured values is fine when it is the point.
-- **Pictures by the project only.** Frames rendered by the port, diagrams, charts of measured
-  values. Never screenshots of the original game, its art, its text or its sounds. Put pictures
-  in `public/` (WebP, under 1 MB) and link them as `/name.webp`.
+- **Pictures that show the finding.** Screenshots of the original game, screenshots of the
+  project's viewer with a decoded file, frames rendered by the port, diagrams, charts of
+  measured values. Choose a few for each entry and caption each with what it shows and where it
+  comes from (`The original, track 3`, `Our viewer, CAR1.BIN`). Put them in `public/` (WebP,
+  under 1 MB) and link them as `/name.webp`. The game's files themselves stay out: no
+  extracted textures, sounds or text in bulk, no archives, no downloads of its data.
 - **Length.** Usually 300 to 1,500 words. Shorter is a note: fold it into the next entry.
   Longer usually means reference material that belongs in `docs/`.
 - **Plain English.** One idea per sentence, no rhetorical patterns (`docs/working/writing.md`).

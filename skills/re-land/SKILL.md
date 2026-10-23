@@ -44,8 +44,10 @@ git diff --stat
 ```
 
 Never stage anything from `target/`, `analysis/` or `derived/`, game files (`.exe .dll .pak
-.sav` and the game's own extensions), decompiled code, disassembly, emulator output, extracted
-assets or screenshots of the original game. `.gitignore` covers the folders: never force-add.
+.sav` and the game's own extensions), decompiled code, disassembly, emulator output or
+extracted assets. `.gitignore` covers the folders: never force-add. Screenshots chosen for a
+document or the site may be committed: copy each one out of `derived/`, compress it (WebP)
+and caption it where it is used.
 
 ## 3. Stage only your own work
 
