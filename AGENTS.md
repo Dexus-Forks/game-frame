@@ -61,7 +61,7 @@ These rules are for changes to GameFrame itself, which is a public repository.
 |---|---|
 | `.claude/skills/re-*/SKILL.md` | One skill per step of the method |
 | `agents/re-*.md` | One agent per stage and nine task agents, which hand off to each other (`.claude/agents` links here) |
-| `.claude/settings.json`, `scripts/hooks/gate.py`, `hooks/hooks.json` | Permissions and the gates (hooks) for Claude Code: [docs/working/gates.md](docs/working/gates.md) |
+| `.claude/settings.json`, `scripts/hooks/gate.py`, `scripts/hooks/gates/`, `scripts/hooks/git/pre-commit`, `hooks/hooks.json`, `.codex/hooks.json`, `.cursor/hooks.json`, `.github/hooks/gameframe.json`, `hooks/gemini-settings.json` | Permissions and the gates: the git pre-commit hook, and hooks for Claude Code, Codex, Gemini CLI, Cursor and Copilot: [docs/working/gates.md](docs/working/gates.md) |
 | `.claude-plugin/` | The Claude Code plugin and its marketplace: the skills and the agents |
 | `gameframe`, `tools/gameframe/` | The help and discovery command. It reads the skills and each tool's own help, so a new tool needs no entry there |
 | `scripts/` | setup, new-project, ghidra-export, ghidra-run, and `lib.sh` (paths and `.env`) |

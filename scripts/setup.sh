@@ -84,6 +84,16 @@ else
   missing=$((missing + 1))
 fi
 
+# The git pre-commit hook, the commit gate for people and every agent (docs/working/gates.md).
+# It is set only when core.hooksPath is unset, so a hooks folder of your own stays in place.
+hooks=""; for h in .githooks scripts/hooks/git; do [[ -x "$PROJECT/$h/pre-commit" ]] && { hooks="$h"; break; }; done
+if [[ -n "$hooks" ]] && git -C "$PROJECT" rev-parse --git-dir >/dev/null 2>&1; then
+  current="$(git -C "$PROJECT" config core.hooksPath || true)"
+  if [[ -z "$current" ]]; then git -C "$PROJECT" config core.hooksPath "$hooks" && row "git hook" set "core.hooksPath $hooks"
+  elif [[ "$current" == "$hooks" ]]; then row "git hook" ok "core.hooksPath $hooks"
+  else row "git hook" other "core.hooksPath is $current: call $hooks/pre-commit from there to check commits"; fi
+fi
+
 # The environment file the scripts and .mcp.json read.
 if [[ -n "$(find_ghidra)" && -n "$(find_java21)" && ! -f "$PROJECT/.env" ]]; then
   printf 'GHIDRA_INSTALL_DIR=%s\nJAVA_HOME=%s\n' "$(find_ghidra)" "$(find_java21)" > "$PROJECT/.env"

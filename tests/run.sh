@@ -555,6 +555,8 @@ scripts/new-project.sh "$tmp" "Test Game" $B >/dev/null 2>&1
   && ok "new-project makes a plugin project: settings enable the plugin, no copied toolkit, target/ out of git" || bad "new-project scaffold" "$(ls -la "$tmp" 2>&1)"
 expect "the launcher finds GameFrame and runs its tools on the project" "EXE, x64 (64-bit)" sh -c "cd '$tmp' && GAMEFRAME_ROOT='$(pwd)' ./gameframe run peinfo target/game.exe"
 expect "the launcher runs a project script with the toolkit on its path" "pe_emu ok" sh -c "cd '$tmp' && printf 'import pe_emu\\nprint(\"pe_emu ok\")\\n' > probe.py && GAMEFRAME_ROOT='$(pwd)' ./gameframe python probe.py"
+out="$(cd "$tmp" && git config core.hooksPath && git add -f target/game.exe && GAMEFRAME_ROOT="$OLDPWD" git commit -qm game 2>&1; git reset -q)"
+[[ "$out" == *".githooks"*"stages game material"* ]] && ok "a plugin project's git pre-commit hook finds GameFrame and blocks game material" || bad "plugin project pre-commit hook" "$out"
 expect "the session hook says where GameFrame's guides are" "read docs/NAME.md as" sh -c "echo '{\"cwd\": \"$tmp\"}' | python3 scripts/hooks/gate.py session"
 out="$("$PWD/scripts/update-project.sh" "$tmp" 2>&1)"
 [[ "$out" == *"Plugin project: the gameframe launcher is current"* ]] && ok "update-project leaves a plugin project's launcher and settings current" || bad "update-project on a plugin project" "$out"
@@ -621,7 +623,7 @@ rm -rf "$W"
 
 echo "Gates (scripts/hooks/gate.py)"
 out="$("$PYTHON" - <<'PY' 2>&1
-import json, os, subprocess, tempfile
+import json, os, shutil, subprocess, tempfile
 G = os.path.abspath('scripts/hooks/gate.py')
 def run(mode, event):
     return subprocess.run(['python3', G, mode], input=json.dumps(event), capture_output=True, text=True).returncode
@@ -643,10 +645,52 @@ w = lambda path: {'cwd': d, 'tool_input': {'file_path': f'{d}/{path}', 'content'
 assert run('write', w('docs/f.md')) == 2 and run('write', w('analysis/f.c')) == 0, 'write gate'
 s = subprocess.run(['python3', G, 'session'], input=json.dumps({'cwd': d}), capture_output=True, text=True)
 assert json.loads(s.stdout)['hookSpecificOutput']['hookEventName'] == 'SessionStart', 'session context'
-print('commit, push, write and session gates')
+# Each agent's own event: a commit by re-tracer is blocked, the same commit by re-lander passes.
+cmd = 'GAMEFRAME_AGENT=re-tracer git commit -m x'
+lander = 'GAMEFRAME_AGENT=re-lander git -C . commit -m x'
+events = {
+    'codex': lambda c: {'cwd': d, 'hook_event_name': 'PreToolUse', 'tool_name': 'Bash', 'tool_input': {'command': c}},
+    'gemini': lambda c: {'cwd': d, 'hook_event_name': 'BeforeTool', 'tool_name': 'run_shell_command', 'tool_input': {'command': c}},
+    'cursor': lambda c: {'hook_event_name': 'beforeShellExecution', 'command': c, 'cwd': d, 'workspace_roots': [d]},
+    'copilot': lambda c: {'timestamp': 1704614400000, 'cwd': d, 'toolName': 'bash', 'toolArgs': json.dumps({'command': c})},
+}
+for agent, ev in events.items():
+    assert run(agent, ev(cmd)) == 2, f'{agent}: re-tracer may not commit'
+    assert run(agent, ev(lander)) == 0, f'{agent}: re-lander may commit'
+    assert run(agent, ev('GAMEFRAME_AGENT=re-tracer git push')) == 2, f'{agent}: re-tracer may not push'
+    assert run(agent, ev('git status')) == 0, f'{agent}: other commands pass'
+git('add', '-f', 'target/GAME.EXE')
+assert all(run(a, ev('git commit -m x')) == 2 for a, ev in events.items()), 'every agent blocks game material'
+git('rm', '-q', '--cached', 'target/GAME.EXE')
+assert run('cursor', {'cwd': d, 'tool_name': 'Shell', 'tool_input': {'command': cmd, 'working_directory': d}}) == 2, 'cursor preToolUse'
+assert run('copilot', {'cwd': d, 'tool_name': 'bash', 'tool_input': {'command': cmd}}) == 2, 'copilot VS Code form'
+patch = '*** Begin Patch\n*** Add File: docs/f.md\n+' + pseudo.replace('\n', '\n+') + '\n*** End Patch\n'
+assert run('codex', {'cwd': d, 'tool_name': 'apply_patch', 'tool_input': {'command': patch}}) == 2, 'codex apply_patch'
+assert run('codex', {'cwd': d, 'tool_name': 'apply_patch', 'tool_input': {'command': patch.replace('docs/', 'analysis/')}}) == 0, 'codex apply_patch into analysis/'
+gw = lambda tool, args: {'cwd': d, 'tool_name': tool, 'tool_input': args}
+assert run('gemini', gw('write_file', {'file_path': 'docs/f.md', 'content': pseudo})) == 2, 'gemini write_file'
+assert run('gemini', gw('replace', {'file_path': f'{d}/docs/f.md', 'old_string': 'a', 'new_string': pseudo})) == 2, 'gemini replace'
+assert run('gemini', gw('write_file', {'file_path': 'analysis/f.c', 'content': pseudo})) == 0, 'gemini write into analysis/'
+# The git pre-commit hook, with no agent at all.
+git('config', 'core.hooksPath', os.path.abspath('scripts/hooks/git'))
+commit = lambda env={}: subprocess.run(['git', 'commit', '-qm', 'x'], cwd=d, capture_output=True, env={**os.environ, **env}).returncode
+os.makedirs(f'{d}/bin'); shutil.copy('examples/sample-game/build/game.exe', f'{d}/bin/game.exe'); git('add', 'bin/game.exe')
+assert commit() != 0, 'pre-commit blocks a staged sample binary'
+git('rm', '-q', '--cached', 'bin/game.exe')
+open(f'{d}/docs/b.md', 'w').write(pseudo); git('add', 'docs/b.md')
+assert commit() != 0, 'pre-commit blocks pseudocode lines'
+git('rm', '-q', '--cached', 'docs/b.md')
+assert commit({'GAMEFRAME_AGENT': 're-tracer'}) != 0, 'pre-commit blocks a commit by re-tracer'
+assert commit() == 0, 'pre-commit passes a clean commit'
+print('commit, push, write and session gates; Codex, Gemini, Cursor and Copilot events; the git pre-commit hook')
 PY
 )"
 [[ $? == 0 ]] && ok "the gates block game material, decompiled code and non-lander commits ($out)" || bad "gates" "$out"
+cfg=0
+for f in .codex/hooks.json .cursor/hooks.json .github/hooks/gameframe.json hooks/gemini-settings.json; do
+  "$PYTHON" -m json.tool "$f" >/dev/null 2>&1 && grep -q "gate.py" "$f" || { bad "hook config $f is valid JSON and runs gate.py"; cfg=1; }
+done
+[[ $cfg == 0 ]] && ok "the hook configs for Codex, Cursor, Copilot and Gemini CLI are valid JSON and run gate.py"
 
 echo "Claude Code plugin"
 out="$("$PYTHON" - <<'PY' 2>&1
