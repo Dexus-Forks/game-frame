@@ -13,7 +13,7 @@ signatures:
   - 'not (?:the )?foreground'
   - 'DIERR_NOTACQUIRED'
   - 'DIERR_INPUTLOST'
-tools: []
+tools: [winput]
 skills: [re-observe]
 docs: [docs/observe/inputs.md, docs/knowhow/wine-input-without-accessibility.md]
 seen: ['POD: Planet of Death (1997), 2026-10-23']

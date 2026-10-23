@@ -17,6 +17,13 @@
       "type": "stdio",
       "command": "dosbox-x-mcp-server",
       "args": []
+    },
+    "gameframe": {
+      "type": "stdio",
+      "command": "./gameframe",
+      "args": [
+        "serve"
+      ]
     }
   }
 }

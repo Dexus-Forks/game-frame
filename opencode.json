@@ -21,6 +21,14 @@
         "dosbox-x-mcp-server"
       ],
       "enabled": true
+    },
+    "gameframe": {
+      "type": "local",
+      "command": [
+        "./gameframe",
+        "serve"
+      ],
+      "enabled": true
     }
   }
 }

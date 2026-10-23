@@ -2,7 +2,18 @@
   "version": 1,
   "hooks": {
     "beforeShellExecution": [
-      { "command": "python3 scripts/hooks/gate.py cursor", "matcher": "git", "timeout": 30 }
+      {
+        "command": "python3 scripts/hooks/gate.py cursor",
+        "matcher": "git",
+        "timeout": 30
+      }
+    ],
+    "postToolUse": [
+      {
+        "command": "python3 scripts/hooks/advise.py cursor",
+        "matcher": "Shell",
+        "timeout": 10
+      }
     ]
   }
 }

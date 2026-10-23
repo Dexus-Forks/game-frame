@@ -50,7 +50,10 @@ See `re-rea` for when to use it.
 - **Claude Code:** this repository has a project `.mcp.json` that starts REA with
   `npx -y rea-agents@6.4.0 mcp`, passing `GHIDRA_INSTALL_DIR` and `JAVA_HOME`. Claude Code asks
   once to approve project MCP servers; after that the `mcp__rea__*` tools appear.
-- **Other agents:** the same servers (`rea` and `dosbox`) are in each agent's own file,
+- **GameFrame's own server:** `gameframe` (`./gameframe serve`) gives the know-how to any MCP
+  client. Its tools are `advise`, `knowhow_entry`, `knowhow_list` and `find`
+  (`docs/working/knowhow.md`).
+- **Other agents:** the same servers (`rea`, `dosbox` and `gameframe`) are in each agent's own file,
   written from `.mcp.json` by `./gameframe mcp --emit all`. Run it again after changing
   `.mcp.json`; `tests/run.sh` fails while a file is out of date.
 

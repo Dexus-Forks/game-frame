@@ -141,29 +141,54 @@ then, record each missed query in [GAPS.md](../../GAPS.md), so the decision rest
 
 ## Being told: the hook
 
-`scripts/hooks/advise.py` runs after every shell command in Claude Code (`PostToolUse` and
-`PostToolUseFailure`, matcher `Bash`, in `hooks/hooks.json` and `.claude/settings.json`). It
-reads the command and its output and looks for:
+`scripts/hooks/advise.py` runs after every shell command, in each agent that has a post-tool
+hook. It reads the command and its output. It looks for these entries:
 
-- entries whose error signature matches the last 40,000 characters of the output, whether the
-  command failed or not (Wine prints its errors and still exits 0);
-- context entries whose `commands` pattern matches the command line, such as `\bwine\b`.
+- entries whose error signature matches the last 40,000 characters of the output. The hook
+  checks the output even when the command succeeds, because Wine prints its errors and still
+  exits 0;
+- context entries whose `commands` pattern matches the first line of the command, such as a
+  command that starts Wine. The rest of a heredoc or a script does not count.
 
 It adds at most three entries to the agent's context, each as `advise` prints it. It names an
-entry once per session, so a repeated error does not repeat the note. It never blocks a command.
-When anything goes wrong inside the hook, it exits 0 and says nothing.
+entry once per session, so a repeated error does not bring the note back. It never blocks a
+command. When anything goes wrong inside the hook, it exits 0 and says nothing.
 
-Other agents can run the same check by hand (`... 2>&1 | ./gameframe advise - --signatures`).
-Their post-tool hooks (Codex, Gemini CLI, Cursor, Copilot) take a different event format. The
-next step is to add them to `scripts/hooks/advise.py`. That work follows the pattern of
-`scripts/hooks/gates/adapters.py`.
+Each agent uses its own field names for the event and the reply.
+`scripts/hooks/gates/post_events.py` reads them. `adapters.py` does the same for the gates.
 
-## The MCP tool (planned)
+| Agent | Config file | Event | Reply |
+|---|---|---|---|
+| Claude Code | `hooks/hooks.json`, `.claude/settings.json` | `PostToolUse`, `PostToolUseFailure` on `Bash` | `hookSpecificOutput.additionalContext` |
+| Codex | `.codex/hooks.json` | `PostToolUse` on `Bash` (also after a non-zero exit) | `hookSpecificOutput.additionalContext` |
+| Gemini CLI | `hooks/gemini-settings.json` | `AfterTool` on `run_shell_command` | `hookSpecificOutput.additionalContext` |
+| Cursor | `.cursor/hooks.json` | `postToolUse` on `Shell` | `additional_context` |
+| GitHub Copilot | `.github/hooks/gameframe.json` | `postToolUse`, `postToolUseFailure` | `additionalContext` |
 
-An MCP server `gameframe-knowhow` would give clients without shell hooks the same two calls:
-`advise(text, signatures_only)` and `entry(id)`, each returning the JSON of `advise --json`. It
-would wrap `tools/gameframe/advise.py`. It would need no index. It is not built yet.
-`./gameframe advise --json` serves every client that can run a command.
+A plugin project has no `scripts/` folder. Its hooks run `./gameframe advise-hook AGENT`. The
+launcher passes that command to GameFrame's `advise.py`. An agent without hooks can run the
+same check by hand with `... 2>&1 | ./gameframe advise - --signatures`.
+
+## The MCP server
+
+`./gameframe serve` is an MCP server on stdio (`tools/gameframe/serve.py`). `.mcp.json` names it
+`gameframe`. `./gameframe mcp --emit all` writes it into every other agent's file. It has four
+tools.
+
+| Tool | Gives |
+|---|---|
+| `advise(text, signatures_only, max)` | the matching entries, as `advise --json` gives them, each with its short text |
+| `knowhow_entry(id)` | one entry in full |
+| `knowhow_list()` | every entry with its status and title |
+| `find(word)` | which skills and tools mention a word, as `gameframe find --json` |
+
+It wraps `tools/gameframe/advise.py`. It needs no index and keeps no state.
+
+## A project's own entries
+
+`advise`, the hook and the server read GameFrame's `docs/knowhow/` and the project's own
+`docs/knowhow/`. A project's entry replaces GameFrame's entry with the same id. A project can
+keep a newer copy of an entry this way until the entry moves into GameFrame.
 
 ## Adding entries
 

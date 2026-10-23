@@ -67,6 +67,23 @@ print(subprocess.run([sys.executable, 'tools/triage/screenmarks.py', f.name, '--
 PY
 expect "relocs finds the vtable as a run of code pointers" "$vt  .rdata      2 pointers  (2 code)" "$PYTHON" tools/pe/relocs.py $B/game.exe
 
+echo "Input inside Wine (tools/live/winput)"
+if command -v zig >/dev/null; then
+  WI="$(mktemp -d)"
+  "$PYTHON" tools/live/winput.py build --out "$WI/winput.exe" >/dev/null && "$PYTHON" tools/live/winput.py host --out "$WI/winput-host" >/dev/null
+  expect "winput builds as a 32-bit Windows program that calls SendInput" "SendInput" "$PYTHON" tools/pe/peinfo.py "$WI/winput.exe" --imports
+  expect "peinfo --imports names each imported function" "EnumWindows" "$PYTHON" tools/pe/peinfo.py "$WI/winput.exe" --imports
+  expect "winput sends arrows as extended scancodes" "key down scancode 0x50 extended down" "$WI/winput-host" --dry-run key down:10
+  expect "winput types capitals with shift, and other characters as Unicode" $'key shift scancode 0x2a down\nkey a scancode 0x1e down' "$WI/winput-host" --dry-run type "Aé"
+  expect "winput types a character outside ASCII as one code point" "unicode U+00E9" "$WI/winput-host" --dry-run type "é"
+  expect "winput runs its steps in order" $'window POD\nmove 5 -3\nclick 10 20 right\nwait 5' "$WI/winput-host" --dry-run window POD move 5 -3 click 10 20 right wait 5
+  expect "winput refuses an unknown key" "rc 2" sh -c "'$WI/winput-host' --dry-run key nope 2>/dev/null; echo rc \$?"
+  expect "winput.py lists the key names" "enter" "$PYTHON" tools/live/winput.py keys
+  rm -rf "$WI"
+else
+  echo "  skip  winput (needs zig)"
+fi
+
 echo "Live tracing"
 if "$PYTHON" -c "import frida" 2>/dev/null && command -v cc >/dev/null; then
   T="$(mktemp -d)"
@@ -993,6 +1010,8 @@ assert hook({**ok, 'tool_response': {'stdout': 'all fine', 'stderr': ''}}) is No
 sid = uuid.uuid4().hex
 out = hook({**ok, 'tool_input': {'command': 'fixture-run --fast'}, 'tool_response': {'stdout': ''}})
 assert out and 'fixture-open' in out['additionalContext'], 'a context pattern matches the command'
+sid = uuid.uuid4().hex
+assert hook({**ok, 'tool_input': {'command': "cat > notes.md <<'EOF'\nfixture-run\nEOF"}, 'tool_response': {'stdout': ''}}) is None, 'only the first line of a command counts'
 r = subprocess.run(['python3', H, 'post'], input='not json', capture_output=True, text=True)
 assert r.returncode == 0 and not r.stdout, 'bad input is ignored'
 print('signatures after a failed and a passing command, once per session, command patterns, bad input')
@@ -1002,6 +1021,65 @@ PY
 for f in hooks/hooks.json .claude/settings.json; do
   grep -q '"PostToolUseFailure"' "$f" && grep -q 'advise.py' "$f" || bad "$f runs the know-how hook after Bash"
 done
+out="$("$PYTHON" - <<'PY' 2>&1
+import json, os, subprocess, uuid
+H = os.path.abspath('scripts/hooks/advise.py')
+env = {**os.environ, 'GAMEFRAME_KNOWHOW': os.path.abspath('tests/fixtures/knowhow')}
+LOG = 'widget overflow at 0xbeef'
+def hook(agent, event):
+    r = subprocess.run(['python3', H, agent], input=json.dumps(event), capture_output=True, text=True, env=env)
+    assert r.returncode == 0, r.stderr
+    return json.loads(r.stdout) if r.stdout.strip() else None
+s = lambda: uuid.uuid4().hex
+cases = {
+    'codex': ({'session_id': s(), 'hook_event_name': 'PostToolUse', 'tool_name': 'Bash', 'tool_input': {'command': 'x'}, 'tool_response': LOG},
+              lambda o: o['hookSpecificOutput']['additionalContext']),
+    'gemini': ({'session_id': s(), 'hook_event_name': 'AfterTool', 'tool_name': 'run_shell_command', 'tool_input': {'command': 'x'},
+                'tool_response': {'llmContent': LOG, 'returnDisplay': '', 'error': None}},
+               lambda o: o['hookSpecificOutput']['hookEventName'] == 'AfterTool' and o['hookSpecificOutput']['additionalContext']),
+    'cursor': ({'conversation_id': s(), 'tool_name': 'Shell', 'tool_input': {'command': 'x'}, 'tool_output': json.dumps({'output': LOG})},
+               lambda o: o['additional_context']),
+    'copilot': ({'sessionId': s(), 'toolName': 'bash', 'toolArgs': json.dumps({'command': 'x'}),
+                 'toolResult': {'resultType': 'success', 'textResultForLlm': LOG}}, lambda o: o['additionalContext']),
+}
+for agent, (event, get) in cases.items():
+    out = hook(agent, event)
+    assert out and 'fixture-solved' in get(out), (agent, out)
+fail = {'sessionId': s(), 'toolName': 'bash', 'toolArgs': json.dumps({'command': 'x'}), 'error': LOG}
+assert 'fixture-solved' in hook('copilot', fail)['additionalContext'], 'copilot postToolUseFailure'
+assert hook('gemini', {'session_id': s(), 'tool_name': 'read_file', 'tool_input': {}, 'tool_response': {'llmContent': LOG}}) is None, 'other tools are left alone'
+print('Codex, Gemini CLI, Cursor and Copilot events and replies')
+PY
+)"
+[[ $? == 0 ]] && ok "the know-how hook reads each agent's post-tool event and replies in its format ($out)" || bad "know-how hook for other agents" "$out"
+cfg=0
+for f in .codex/hooks.json .cursor/hooks.json .github/hooks/gameframe.json hooks/gemini-settings.json; do
+  grep -q "advise.py" "$f" || { bad "$f runs the know-how hook"; cfg=1; }
+done
+"$PYTHON" -c "import sys; sys.path.insert(0, 'scripts'); import clients; t = clients.via_launcher(open('.cursor/hooks.json').read()); assert './gameframe advise-hook cursor' in t" \
+  && grep -q 'advise-hook) shift; exec python3 "$gf/scripts/hooks/advise.py"' templates/project/gameframe || { bad "a plugin project runs the know-how hook through ./gameframe advise-hook"; cfg=1; }
+[[ $cfg == 0 ]] && ok "the other agents' hook configs run the know-how hook, through ./gameframe advise-hook in a plugin project"
+out="$("$PYTHON" - <<'PY' 2>&1
+import json, subprocess
+msgs = [{'jsonrpc': '2.0', 'id': 1, 'method': 'initialize', 'params': {'protocolVersion': '2025-06-18'}},
+        {'jsonrpc': '2.0', 'method': 'notifications/initialized'},
+        {'jsonrpc': '2.0', 'id': 2, 'method': 'tools/list'},
+        {'jsonrpc': '2.0', 'id': 3, 'method': 'tools/call', 'params': {'name': 'advise', 'arguments': {'text': 'A privileged instruction was executed', 'max': 1}}},
+        {'jsonrpc': '2.0', 'id': 4, 'method': 'tools/call', 'params': {'name': 'knowhow_entry', 'arguments': {'id': 'nothing-here'}}},
+        {'jsonrpc': '2.0', 'id': 5, 'method': 'nope'}]
+r = subprocess.run(['./gameframe', 'serve'], input=''.join(json.dumps(m) + '\n' for m in msgs), capture_output=True, text=True, timeout=30)
+out = {m['id']: m for m in map(json.loads, r.stdout.splitlines())}
+assert sorted(out) == [1, 2, 3, 4, 5], out.keys()
+assert out[1]['result']['capabilities'] == {'tools': {}}
+assert {t['name'] for t in out[2]['result']['tools']} == {'advise', 'knowhow_entry', 'knowhow_list', 'find'}
+hits = json.loads(out[3]['result']['content'][0]['text'])
+assert hits[0]['id'] == 'wine-privileged-instruction' and not out[3]['result']['isError']
+assert out[4]['result']['isError'] and out[5]['error']['code'] == -32601
+assert json.load(open('.mcp.json'))['mcpServers']['gameframe'] == {'command': './gameframe', 'args': ['serve']}
+print('initialize, tools/list, advise, a missing entry, an unknown method')
+PY
+)"
+[[ $? == 0 ]] && ok "gameframe serve answers MCP calls for the know-how ($out)" || bad "gameframe serve" "$out"
 out="$("$PYTHON" - <<'PY' 2>&1
 import json, re, subprocess, tomllib
 src = json.load(open('.mcp.json'))['mcpServers']

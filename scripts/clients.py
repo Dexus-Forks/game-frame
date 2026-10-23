@@ -17,8 +17,9 @@ write puts each chosen client's files into DEST:
 - the agents' copies: .codex/agents, .gemini/agents, .github/agents, .opencode/agents. Cursor
   reads .claude/agents in a copied project. A plugin project gets a copy in .cursor/agents,
   since agents in .claude/agents would stand beside the plugin's own in Claude Code;
-- the gate hooks: .codex/hooks.json, the hooks in .gemini/settings.json, .cursor/hooks.json,
-  .github/hooks/gameframe.json. In a plugin project they run the gates through ./gameframe gate;
+- the hooks (the gates and the know-how hook): .codex/hooks.json, the hooks in
+  .gemini/settings.json, .cursor/hooks.json, .github/hooks/gameframe.json. In a plugin project
+  they run through ./gameframe gate and ./gameframe advise-hook;
 - the MCP servers and the rules file: .codex/config.toml, .gemini/settings.json,
   .cursor/mcp.json, .vscode/mcp.json, opencode.json.
 For each file: missing, it is added; the same as what GameFrame writes now, it is left alone; a
@@ -77,10 +78,13 @@ def detect(dest):
 
 
 def via_launcher(text):
-    """Run the gates through the project's ./gameframe launcher instead of scripts/hooks/gate.py."""
-    text = re.sub(r'python3? \\"(.*?)scripts/hooks/gate\.py\\"', r'\\"\1gameframe\\" gate', text)
-    text = re.sub(r'"python scripts/hooks/gate\.py ', '"bash ./gameframe gate ', text)
-    return re.sub(r'python3? scripts/hooks/gate\.py ', './gameframe gate ', text)
+    """Run the hooks through the project's ./gameframe launcher instead of scripts/hooks/:
+    gate.py as `./gameframe gate`, advise.py as `./gameframe advise-hook`."""
+    for script, verb in (('gate', 'gate'), ('advise', 'advise-hook')):
+        text = re.sub(r'python3? \\"(.*?)scripts/hooks/' + script + r'\.py\\"', r'\\"\1gameframe\\" ' + verb, text)
+        text = re.sub(r'"python scripts/hooks/' + script + r'\.py ', '"bash ./gameframe ' + verb + ' ', text)
+        text = re.sub(r'python3? scripts/hooks/' + script + r'\.py ', './gameframe ' + verb + ' ', text)
+    return text
 
 
 def gemini_settings(plugin):

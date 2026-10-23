@@ -21,6 +21,7 @@ Commands:
       --list            every entry with its status
       --check           check every entry's fields, facets, links and sections
       --why             say why each entry matched; --max N entries (default 5)
+  serve                 GameFrame's MCP server on stdio: advise, knowhow_entry, knowhow_list, find
   agents                every agent: its skills, the tools it cannot use, its hand-offs
       --table           the Markdown table that docs/working/agents.md holds
       --emit CLIENT     write the agents in a client's format: codex, gemini, copilot, opencode or all
@@ -59,6 +60,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import commands  # noqa: E402
 import mcp  # noqa: E402
+import serve  # noqa: E402
 from paths import NAME  # noqa: E402
 
 PASS_ON = {'run', 'doctor'}      # commands whose arguments belong to the tool they start
@@ -99,6 +101,7 @@ def parser():
     s.add_argument('--why', action='store_true', help='say why each entry matched')
     s.add_argument('--max', type=int, default=5, metavar='N', help='entries shown (default 5)')
     s.add_argument('--json', action='store_true')
+    sub.add_parser('serve', help='GameFrame\'s MCP server on stdio (see tools/gameframe/serve.py)')
     s = sub.add_parser('mcp', help='write the MCP servers in each agent\'s format (see tools/gameframe/mcp.py)')
     s.add_argument('--emit', required=True, choices=(*mcp.CLIENTS, 'all'), metavar='CLIENT',
                    help=f'{", ".join(mcp.CLIENTS)} or all')
@@ -130,7 +133,7 @@ def main(argv):
         return 0
     return {'steps': commands.steps, 'skills': commands.list_skills, 'skill': commands.skill,
             'agents': commands.list_agents, 'tools': commands.list_tools, 'tool': commands.tool, 'find': commands.find, 'advise': commands.advise,
-            'mcp': mcp.emit,
+            'mcp': mcp.emit, 'serve': serve.serve,
             }[args.command](args)
 
 

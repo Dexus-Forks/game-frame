@@ -158,13 +158,15 @@ def load(path, project=False):
 
 
 def entries(cwd=None):
-    """Every entry of every folder searched, GameFrame's first."""
-    out = []
+    """Every entry of every folder searched, GameFrame's first. A project's entry replaces
+    GameFrame's entry of the same id, so a project can carry a newer copy."""
+    found = {}
     for folder, project in folders(cwd):
         for path in sorted(folder.glob('*.md')):
             if path.name != INDEX and not path.name.startswith('_'):
-                out.append(load(path, project))
-    return out
+                e = load(path, project)
+                found[e.id] = e
+    return list(found.values())
 
 
 def taxonomy(cwd=None):

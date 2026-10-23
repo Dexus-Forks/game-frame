@@ -107,11 +107,14 @@ def signature_hits(text, cwd=None):
 
 
 def command_hits(command, cwd=None):
-    """Entries whose `commands` pattern matches a shell command: the context for that work."""
+    """Entries whose `commands` pattern matches a shell command: the context for that work.
+
+    Only the command's first line counts, so the text of a heredoc or a script does not."""
+    first = (command or '').strip().split('\n', 1)[0]
     out = []
     for e in knowhow.entries(cwd):
         for pattern in e.get('commands'):
-            if _match(pattern, command or ''):
+            if _match(pattern, first):
                 out.append(Hit(e, FACET, [f'the command matches {pattern!r}']))
                 break
     return out

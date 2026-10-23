@@ -13,24 +13,35 @@ Every release of GameFrame, newest first. The format follows
   its symptoms, cause, evidence, status (solved, workaround, dead end, open) and what was tried
   ([the design](docs/working/knowhow.md), [the entries](docs/knowhow/README.md)).
   `gameframe advise "<error text or topic>"` finds entries by error signature, facet, alias and
-  word, reads a log on stdin, and checks every entry with `--check`. It reads a project's own
+  word. It reads a log on stdin. `--check` checks every entry. It reads a project's own
   `docs/knowhow/` too.
-- A Claude Code hook, `scripts/hooks/advise.py`, that names the matching entries after a shell
-  command (`PostToolUse` and `PostToolUseFailure`), once per session, and the context entry for
-  Wine when a command starts it.
-- Eighteen seed entries from the POD: Planet of Death project: privileged port probes under
-  Wine, DirectDraw mode tables, windowed mode on a 16-bit desktop, 16-bit back surfaces, "insert
-  the CD", ini paths, VirtualSize 0, `SuspendThread`, DirectInput focus, input inside Wine,
-  `DYLD_*` on macOS, `wineserver -w`, leftover processes, winedbg, and the open `wow64cpu` fault
-  under Rosetta with every attempt; and context for Windows 95 DirectDraw games, Wine on macOS
-  and Watcom programs.
+- A Claude Code hook, `scripts/hooks/advise.py`. It names the matching entries after a shell
+  command (`PostToolUse` and `PostToolUseFailure`), once per session. It names the context
+  entry for Wine when a command starts Wine.
+- Eighteen seed entries from the POD: Planet of Death project. The failure entries cover
+  privileged port probes under Wine, DirectDraw mode tables, windowed mode on a 16-bit desktop,
+  16-bit back surfaces, "insert the CD", ini paths, VirtualSize 0, `SuspendThread`, DirectInput
+  focus, input inside Wine, `DYLD_*` on macOS, `wineserver -w`, leftover processes, winedbg,
+  and the open `wow64cpu` fault under Rosetta with every attempt. The context entries cover
+  Windows 95 DirectDraw games, Wine on macOS and Watcom programs.
+- The know-how hook for Codex (`PostToolUse`), Gemini CLI (`AfterTool`), Cursor (`postToolUse`)
+  and GitHub Copilot (`postToolUse`, `postToolUseFailure`).
+  `scripts/hooks/gates/post_events.py` reads and answers each agent in its own format. A plugin
+  project runs the hook through `./gameframe advise-hook AGENT`.
+- `gameframe serve`, GameFrame's own MCP server, with the tools `advise`, `knowhow_entry`,
+  `knowhow_list` and `find`. `.mcp.json` names it `gameframe`.
+- `tools/live/winput.py` and `winput.c`, a small Windows program built with zig. It sends keys
+  as scancodes, relative mouse moves and clicks to a game from inside Wine. A `--dry-run` build
+  serves the tests.
+- Context entries for DOS games in DOSBox-X, games with a build per 3D card, and 16-bit
+  Windows programs.
 - The skills (`re-start`, `re-observe`, `re-land`'s new "Know-how" step), every agent and the
   project template suggest `gameframe advise` when a command fails or the work turns to a new
   era, runtime or hardware.
 
 - Two hardware guides from the POD: Planet of Death (1997) project:
   [MMX and other SIMD code](docs/hardware/simd.md) (finding hand-written MMX routines,
-  matching each to its plain twin through its callers, measuring both, porting exactly) and
+  matching each to its plain version through its callers, measuring both, porting exactly) and
   [The card makers' 3D APIs](docs/hardware/card-apis.md) (Glide 2.x, ATI3DCIF and the S3D
   Toolkit: reading their state calls, how textures reach each card, games with one build per
   card, and renderer profiles for viewers).
@@ -40,14 +51,18 @@ Every release of GameFrame, newest first. The format follows
 - Two specialist task agents: `re-vectoriser` (SIMD code and CPU builds) and `re-accelerator`
   (3D card APIs and per-card builds).
 - `tools/emu/pe32_emu.py` runs routines of 32-bit (x86) Windows games under Unicorn, with
-  inputs in registers or on the stack, MMX included, and stops at any import without a
-  handler, naming it. The sample game builds a 32-bit DLL (`mixer32.c`) to test it.
+  inputs in registers or on the stack, MMX included. It stops at any import without a handler
+  and names it. The sample game builds a 32-bit DLL (`mixer32.c`) to test it.
 - `tools/triage/insns.py` lists the pattern for MMX code among its groups.
 
 ### Changed
 
+- `peinfo --imports`, `--exports` and `--strings` list their items again. The section loop had
+  reused the name of the flags.
+- The hook matches context patterns against the first line of a command only.
+- A project's entry replaces GameFrame's entry of the same id.
 - `peinfo` and `vtable` use a section's raw size when its VirtualSize is 0, as Watcom's linker
-  writes it; `peinfo` marks such a section.
+  writes it. `peinfo` marks such a section.
 
 - `re-site`, `re-publisher`, `re-land` and `docs/OUTPUTS.md` now allow screenshots of the
   original game and of the project's viewer in documents and on the site, a few at a time,

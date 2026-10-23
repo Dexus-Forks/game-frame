@@ -10,6 +10,8 @@
 #   ./gameframe root                 print the GameFrame folder in use
 #   ./gameframe gate KIND            run GameFrame's gates (scripts/hooks/gate.py), for the hooks of
 #                                    Codex, Gemini CLI, Cursor and Copilot (scripts/clients.py)
+#   ./gameframe advise-hook AGENT    run GameFrame's know-how hook (scripts/hooks/advise.py) for
+#                                    the same agents' post-tool hooks
 #
 # GameFrame is found in $GAMEFRAME_ROOT, then a clone next to this project (../game-frame or
 # ../reverse-engineer-games), then ~/code, then the plugin's newest install in
@@ -35,6 +37,7 @@ fi
 case "${1:-help}" in
   root) echo "$gf" ;;
   gate) shift; exec python3 "$gf/scripts/hooks/gate.py" "$@" ;;
+  advise-hook) shift; exec python3 "$gf/scripts/hooks/advise.py" "$@" ;;
   python)
     shift
     export PYTHONPATH="$gf/tools/emu:$gf/tools/formats:$gf/tools/verify:$gf/tools/triage:$gf/tools/dos:$gf/tools/pe${PYTHONPATH:+:$PYTHONPATH}"

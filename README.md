@@ -220,6 +220,7 @@ between agents, the outcome, and the failure path.
 | `tools/pe/relocs.py` | The pointers in a PE's data, from its base relocations: vtables and tables of functions, strings and records |
 | `tools/triage/screenmarks.py` | Marks positions read from memory on a screenshot, through the camera's view and projection matrices |
 | `tools/triage/dates.py` | Dates and times in a file, in nine stored forms (Unix, FILETIME, DOS, HFS, OLE, ISO 9660, SYSTEMTIME), near a date you give |
+| `tools/live/winput.py` | Keys, mouse moves and clicks sent to a game from inside Wine with `SendInput`, for macOS, where synthetic input needs a permission and Wine windows belong to no app. Builds `winput.c` with zig |
 | `tools/live/frida_trace.py` | Calls to chosen functions, and accesses to chosen memory, in a running game, with Frida. Calls use the same format as the emulator's call traces |
 | `tools/emu/mem_trace.py` | Which instructions read and write chosen memory while an emulated function runs. It is the first step of taint analysis |
 | `tools/triage/decomp_query.py` | A function with your labels; callers; callees; who uses a string; who writes a field; where the work is |

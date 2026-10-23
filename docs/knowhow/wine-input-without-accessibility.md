@@ -8,7 +8,7 @@ runtime: [wine]
 api: [win32, directinput]
 symptom: [no-input]
 tags: [sendinput, accessibility, computer-use, automation, scancodes]
-tools: []
+tools: [winput]
 skills: [re-observe]
 docs: [docs/observe/inputs.md, docs/knowhow/context-wine-macos.md]
 seen: ['POD: Planet of Death (1997), 2026-10-23']
@@ -29,11 +29,12 @@ work by application cannot see them (*observed*).
 
 ## What to do
 
-Send the input from inside Wine. A small Windows program, built for 32-bit Windows with
-`zig cc -target x86-windows-gnu`, finds the game's window, brings it forward and calls
-`SendInput`. Send keys as scancodes (`KEYEVENTF_SCANCODE`), which DirectInput reads. Run it with
-the same Wine and prefix as the game. Then no step needs macOS's permission.
+Send the input from inside Wine with GameFrame's `winput`. It is a small Windows program that
+runs in the same Wine prefix as the game. It finds the game's window, brings it forward and
+calls `SendInput`. It sends keys as scancodes, which DirectInput reads. No step needs macOS's
+permission. Run `./gameframe run winput run --prefix derived/wine window "GAME" key enter`.
 
 Clicks work on Windows dialogs. A game that moves its own cursor from DirectInput's relative
 mouse movement ignores a warped cursor. Relative moves through `SendInput` may work in such a
-game. This is not tried yet. GameFrame has no such tool yet (GAPS.md).
+game (`winput ... move DX DY`). No one has tried this in a game yet. `./gameframe tool winput`
+lists every step.

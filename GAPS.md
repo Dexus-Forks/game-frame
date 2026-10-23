@@ -109,11 +109,12 @@ proposed again.
 - [x] Seed entries from running a 1997 Windows game under Wine on Apple silicon, and the
   context for Windows 95 DirectDraw games, Wine on macOS and Watcom programs
 - [x] PE tools fall back to `SizeOfRawData` when a section's VirtualSize is 0 (`peinfo`, `vtable`)
-- [ ] The same hook for Codex, Gemini CLI, Cursor and Copilot (their post-tool events)
-- [ ] An MCP tool for `advise`, for clients without shell hooks
-- [ ] A Wine-side input tool: a small Windows program that sends keys as scancodes and clicks
-  with `SendInput`, built from our own source
-- [ ] Context entries for DOS with DOSBox-X, 3D-card builds and 16-bit Windows
+- [x] The same hook for Codex, Gemini CLI, Cursor and Copilot (their post-tool events)
+- [x] An MCP server for `advise` (`gameframe serve`), for clients without shell hooks
+- [x] A Wine-side input tool (`tools/live/winput.py`): keys as scancodes, mouse moves and
+  clicks with `SendInput`, built from our own source
+- [x] Context entries for DOS with DOSBox-X, 3D-card builds and 16-bit Windows
+- [x] `peinfo --imports`, `--exports` and `--strings` work again (a variable shadowed the flags)
 - [ ] Queries that `advise` missed, to decide on embeddings (none recorded yet)
 
 ## Out of scope

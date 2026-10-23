@@ -15,6 +15,12 @@
     "dosbox": {
       "command": "${DOSBOX_X_MCP_SERVER:-dosbox-x-mcp-server}",
       "args": []
+    },
+    "gameframe": {
+      "command": "./gameframe",
+      "args": [
+        "serve"
+      ]
     }
   }
 }

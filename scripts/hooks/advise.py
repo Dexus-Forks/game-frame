@@ -1,20 +1,24 @@
 #!/usr/bin/env python3
 """GameFrame's know-how hook: after a shell command, name the known entries its output matches.
 
-Usage (Claude Code's hook JSON on stdin):
+Usage (the agent's hook JSON on stdin):
 
-    advise.py post     Claude Code PostToolUse or PostToolUseFailure, matcher Bash
+    advise.py post      Claude Code PostToolUse or PostToolUseFailure, matcher Bash
+    advise.py codex     Codex PostToolUse, matcher Bash
+    advise.py gemini    Gemini CLI AfterTool, matcher run_shell_command
+    advise.py cursor    Cursor postToolUse (Shell)
+    advise.py copilot   GitHub Copilot postToolUse and postToolUseFailure (bash)
 
-It reads the command and its output (tool_response's stdout and stderr after PostToolUse; the
-error text after PostToolUseFailure). Then it looks for two things in docs/knowhow/, GameFrame's
-and the project's (tools/gameframe/advise.py):
+A project made for the plugin runs it as ./gameframe advise-hook AGENT. It reads the command and
+its output from the event (scripts/hooks/gates/post_events.py has each agent's fields). Then it
+looks for two things in docs/knowhow/, GameFrame's and the project's (tools/gameframe/advise.py):
 
 - an entry whose error signature matches the output, such as "privileged instruction" or
   "nested exception on signal stack": a failure seen before, solved or not;
 - a context entry whose command pattern matches the command, such as `wine` or `winedbg`: what
   to know when work turns to that runtime, era or kind of hardware.
 
-It adds what it finds to the agent's context (hookSpecificOutput.additionalContext), with the
+It adds what it finds to the agent's context, in the reply each agent reads, with the
 command that reads each entry in full. It names each entry once per session: it keeps the ids it
 has named in a small file in the system's temporary folder, one per session_id.
 
@@ -32,20 +36,10 @@ import tempfile
 sys.dont_write_bytecode = True
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(ROOT, 'tools', 'gameframe'))
+sys.path.insert(0, os.path.join(ROOT, 'scripts', 'hooks', 'gates'))
+import post_events  # noqa: E402
 TAIL = 40000          # characters of output searched, from the end
 SHOWN_MAX = 3         # entries named after one command
-
-
-def output(event):
-    """The text a command printed, from either event's fields."""
-    r = event.get('tool_response')
-    parts = []
-    if isinstance(r, dict):
-        parts += [str(r.get(k) or '') for k in ('stdout', 'stderr', 'output', 'error')]
-    elif r:
-        parts.append(str(r))
-    parts.append(str(event.get('error') or ''))
-    return '\n'.join(p for p in parts if p)[-TAIL:]
 
 
 def memory(session):
@@ -53,13 +47,12 @@ def memory(session):
     return os.path.join(tempfile.gettempdir(), f'gameframe-advise-{name}.json')
 
 
-def note(event):
-    """The context to add for this event, or None."""
+def note(run):
+    """The context to add after this shell run, or None."""
     import advise
-    command = (event.get('tool_input') or {}).get('command', '')
-    cwd = event.get('cwd') or os.getcwd()
-    hits = advise.signature_hits(output(event), cwd) + advise.command_hits(command, cwd)
-    path = memory(event.get('session_id'))
+    cwd = run.cwd
+    hits = advise.signature_hits(run.output[-TAIL:], cwd) + advise.command_hits(run.command, cwd)
+    path = memory(run.session)
     try:
         with open(path, encoding='utf-8') as f:
             shown = set(json.load(f))
@@ -84,22 +77,24 @@ def note(event):
     return head + '\n\n' + '\n\n'.join(advise.brief(h.entry, launcher) for h in fresh)
 
 
-def main():
+def main(agent):
     try:
         event = json.load(sys.stdin)
         if not isinstance(event, dict):
             return 0
-        text = note(event)
+        run = post_events.read(agent, event)
+        text = note(run) if run else None
+        if text:
+            print(json.dumps(post_events.reply(agent, event, text)))
     except Exception:            # a hint must never break the agent's work
         return 0
-    if text:
-        name = event.get('hook_event_name') or 'PostToolUse'
-        print(json.dumps({'hookSpecificOutput': {'hookEventName': name, 'additionalContext': text}}))
     return 0
 
 
 if __name__ == '__main__':
-    if sys.argv[1:] != ['post']:
+    mode = sys.argv[1] if len(sys.argv) == 2 else None
+    agent = 'claude' if mode == 'post' else mode
+    if agent not in post_events.AGENTS:
         print(__doc__)
         sys.exit(0 if len(sys.argv) == 1 or sys.argv[1] in ('-h', '--help') else 2)
-    sys.exit(main())
+    sys.exit(main(agent))

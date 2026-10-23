@@ -8,6 +8,22 @@
         "powershell": "python scripts/hooks/gate.py copilot",
         "timeoutSec": 30
       }
+    ],
+    "postToolUse": [
+      {
+        "type": "command",
+        "bash": "python3 scripts/hooks/advise.py copilot",
+        "powershell": "python scripts/hooks/advise.py copilot",
+        "timeoutSec": 10
+      }
+    ],
+    "postToolUseFailure": [
+      {
+        "type": "command",
+        "bash": "python3 scripts/hooks/advise.py copilot",
+        "powershell": "python scripts/hooks/advise.py copilot",
+        "timeoutSec": 10
+      }
     ]
   }
 }

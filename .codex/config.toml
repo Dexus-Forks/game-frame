@@ -8,4 +8,8 @@ env_vars = ["GHIDRA_INSTALL_DIR", "JAVA_HOME"]
 [mcp_servers.dosbox]
 command = "dosbox-x-mcp-server"
 args = []
+
+[mcp_servers.gameframe]
+command = "./gameframe"
+args = ["serve"]
 # END gameframe mcp

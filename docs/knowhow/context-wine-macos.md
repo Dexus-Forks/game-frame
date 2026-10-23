@@ -7,7 +7,7 @@ platform: [macos, windows-9x]
 runtime: [wine, rosetta, wow64, apple-silicon]
 tags: [winedebug, winedbg, wineserver, crash-dialog, automation]
 commands:
-  - '(?:^|[\s;&|/])(?:wine|wine64|winedbg|wineserver|winecfg)(?:\s|$)'
+  - '(?:^|[;&|(]\s*|/|\bexec\s+|=\S*\s+)(?:wine|wine64|winedbg|wineserver|winecfg)(?=\s|$|")'
   - 'WINEDEBUG='
   - 'WINEPREFIX='
 tools: []

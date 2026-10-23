@@ -30,6 +30,9 @@ An entry has one of five statuses.
 | [Windows 95 and DirectDraw games](context-windows-9x-directdraw.md) | context |
 | [Wine on macOS with Apple silicon](context-wine-macos.md) | context |
 | [Watcom C/C++ programs](context-watcom.md) | context |
+| [DOS games in DOSBox-X](context-dos-dosbox.md) | context |
+| [Games with a build per 3D card](context-3d-card-builds.md) | context |
+| [16-bit Windows (Windows 3.x) programs](context-windows-3x.md) | context |
 | [A privileged instruction under Wine: port I/O](wine-privileged-instruction.md) | solved |
 | [A DirectDraw mode table overflows](directdraw-mode-table-overflow.md) | solved |
 | [A window only on a 16-bit desktop](directdraw-windowed-16bit-desktop.md) | solved |
@@ -80,6 +83,8 @@ a log names the value. `advise` matches an alias as a whole word or phrase.
 - `apple-silicon`: Macs with an Apple ARM CPU. Also: arm64, m1, m2, m3, m4.
 - `dosbox`: DOSBox and DOSBox-X. Also: dosbox-x.
 - `virtual-machine`: a real old Windows in a PC emulator or virtual machine. Also: 86box, pcem, virtualbox, qemu, vmware.
+- `winevdm`: otvdm (winevdm), which runs 16-bit Windows programs on 64-bit Windows and Wine. Also: otvdm.
+- `glide-wrapper`: programs that translate Glide calls to a modern API: dgVoodoo 2, nGlide, OpenGlide. Also: dgvoodoo, dgvoodoo2, nglide, openglide.
 - `unicorn`: GameFrame's emulators on Unicorn (pe_emu, pe32_emu, dos_emu). Also: pe_emu, pe32_emu, dos_emu.
 
 ### hardware
@@ -101,6 +106,9 @@ a log names the value. `advise` matches an alias as a whole word or phrase.
 - `directsound`: DirectSound. Also: dsound.
 - `direct3d`: Direct3D. Also: d3d, d3dim.
 - `glide`: 3dfx Glide. Also: glide2x, glide3x.
+- `ati3dcif`: ATI's 3D Rage interface. Also: ati3dcif.dll.
+- `s3d`: the S3D Toolkit for S3 ViRGE. Also: s3d toolkit, s3dtkw.
+- `dos-ints`: DOS and BIOS interrupts. Also: int 21h, int 10h, int 33h.
 - `mci`: the Media Control Interface: CD audio and video. Also: mcicda, mciavi.
 
 ### compiler

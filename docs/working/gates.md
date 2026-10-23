@@ -82,15 +82,15 @@ below follow each agent's documentation as of October 2026.
 | Agent | Config file | Event | What is checked |
 |---|---|---|---|
 | Claude Code | `hooks/hooks.json` (the plugin), `.claude/settings.json` | `PreToolUse` on `Bash`, `Write`, `Edit`; `SessionStart`; `PostToolUse` and `PostToolUseFailure` on `Bash` | Commit, push, write; a session note; known failures after a command |
-| Codex | `.codex/hooks.json` | `PreToolUse` on `Bash` and `apply_patch` | Commit, push; write (the added lines of each file in a patch) |
-| Gemini CLI | `hooks/gemini-settings.json`, merged into `.gemini/settings.json` | `BeforeTool` on `run_shell_command`, `write_file`, `replace` | Commit, push, write |
-| Cursor | `.cursor/hooks.json` | `beforeShellExecution` | Commit, push |
-| GitHub Copilot | `.github/hooks/gameframe.json` | `preToolUse` (`bash`) | Commit, push |
+| Codex | `.codex/hooks.json` | `PreToolUse` on `Bash` and `apply_patch`; `PostToolUse` on `Bash` | Commit, push; write (the added lines of each file in a patch); known failures after a command |
+| Gemini CLI | `hooks/gemini-settings.json`, merged into `.gemini/settings.json` | `BeforeTool` on `run_shell_command`, `write_file`, `replace`; `AfterTool` on `run_shell_command` | Commit, push, write; known failures after a command |
+| Cursor | `.cursor/hooks.json` | `beforeShellExecution`; `postToolUse` on `Shell` | Commit, push; known failures after a command |
+| GitHub Copilot | `.github/hooks/gameframe.json` | `preToolUse` (`bash`); `postToolUse`, `postToolUseFailure` | Commit, push; known failures after a command |
 
 A project gets these files for the agents it names with `--agent` (`scripts/clients.py`). In a
 project made with `--copy` they call the project's own `scripts/hooks/gate.py`. A plugin project
 has no `scripts/`, so its hooks call `./gameframe gate KIND` instead, and the launcher runs
-GameFrame's `gate.py`.
+GameFrame's `gate.py`. A plugin project's know-how hook calls `./gameframe advise-hook AGENT` in the same way.
 
 ### Claude Code
 
