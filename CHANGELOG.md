@@ -68,6 +68,7 @@ Every release of GameFrame, newest first. The format follows
   original game and of the project's viewer in documents and on the site, a few at a time,
   each captioned with its source. The game's files, extracted assets in bulk and decompiled
   code still stay out of git.
+
 ### Fixed
 
 - `readseg.py` stops with a clear message when an argument is not an address, such as a count
