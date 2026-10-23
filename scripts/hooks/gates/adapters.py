@@ -4,7 +4,8 @@ Each adapter takes the event (the JSON the agent writes on the hook's stdin) and
 of Check records, empty when the tool call is none of a commit, a push or a file write. The
 field names follow each agent's own documentation, as of October 2026:
 
-- Claude Code (PreToolUse): tool_input.command for Bash; tool_input.file_path with content
+- Claude Code (PreToolUse): tool_input.command for Bash, checked for the gate's git verb because
+  the hook's `if` filter also matches commands it cannot parse; tool_input.file_path with content
   (Write) or new_string (Edit); agent_type names the subagent.
 - Codex (PreToolUse): tool_name Bash with tool_input.command; tool_name apply_patch with the
   patch text in tool_input.command (*** Add File: / *** Update File: headers, + lines).
@@ -45,8 +46,11 @@ def claude(event, mode):
         return [Check('write', cwd, path=tool.get('file_path', ''),
                       text=tool.get('content') or tool.get('new_string') or '')]
     command = tool.get('command', '')
+    # Claude Code's `if: Bash(git commit *)` also matches commands it cannot parse (a heredoc, a
+    # shell variable, a for loop), so check that the command really runs the verb.
+    if mode not in git_verbs(command):
+        return []
     who = agent_name(event.get('agent_type')) or env_agent() or command_agent(command)
-    # The hook's `if` already chose the verb; keep it even when the command hides it.
     return [Check(mode, cwd, who, command=command)]
 
 

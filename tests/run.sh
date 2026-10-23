@@ -755,6 +755,11 @@ cmd = 'GAMEFRAME_AGENT=re-tracer git commit -m x'
 lander = 'GAMEFRAME_AGENT=re-lander git -C . commit -m x'
 events = {
     'codex': lambda c: {'cwd': d, 'hook_event_name': 'PreToolUse', 'tool_name': 'Bash', 'tool_input': {'command': c}},
+# Claude Code's `if` also matches commands it cannot parse: only a real git verb is checked.
+for other in ('for f in a b; do echo "$f"; done', 'cat <<EOF > x\ngit\nEOF', 'echo $HOME && git status'):
+    assert run('commit', {'cwd': d, 'agent_type': 're-tracer', 'tool_input': {'command': other}}) == 0, other
+    assert run('push', {'cwd': d, 'agent_type': 're-tracer', 'tool_input': {'command': other}}) == 0, other
+assert run('commit', {'cwd': d, 'agent_type': 're-tracer', 'tool_input': {'command': 'git commit -F - <<EOF\nx\nEOF'}}) == 2, 'heredoc commit'
     'gemini': lambda c: {'cwd': d, 'hook_event_name': 'BeforeTool', 'tool_name': 'run_shell_command', 'tool_input': {'command': c}},
     'cursor': lambda c: {'hook_event_name': 'beforeShellExecution', 'command': c, 'cwd': d, 'workspace_roots': [d]},
     'copilot': lambda c: {'timestamp': 1704614400000, 'cwd': d, 'toolName': 'bash', 'toolArgs': json.dumps({'command': c})},

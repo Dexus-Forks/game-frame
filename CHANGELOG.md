@@ -53,6 +53,11 @@ Every release of GameFrame, newest first. The format follows
   original game and of the project's viewer in documents and on the site, a few at a time,
   each captioned with its source. The game's files, extracted assets in bulk and decompiled
   code still stay out of git.
+### Fixed
+
+- The Claude Code commit and push gates check the command's own git verbs. Claude Code's
+  `if: Bash(git commit *)` also matches commands it cannot parse (a heredoc, a shell variable,
+  a for loop), so the gates fired on commands that neither commit nor push.
 
 ## [1.0.1] - 2026-10-23
 
