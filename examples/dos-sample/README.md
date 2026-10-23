@@ -10,7 +10,9 @@ involved.
   `tools/emu/fragments.py` (DPMI blocks, the VGA display, a file read each frame).
 - `make_exe.py OUT`: assembles it with `zig cc` (LLVM, `.code16`) and links it with Python into
   `sample.exe` (NE, 16-bit protected mode), `sample-td.exe` (the same with Turbo Debugger
-  symbols appended) and `sample-mz.exe` (real-mode MZ).
+  symbols appended) and `sample-mz.exe` (real-mode MZ). The data segment holds Pascal strings,
+  two of them back to back. The symbols include a variable and a type with anonymous records
+  inside, and an imported procedure (`host_call`) whose segment number is past the program's.
 
 `tests/run.sh` builds it and checks dosinfo, readseg, tdinfo, dos_emu, Ghidra and DOSBox-X
 against it. The first random draw from the built-in seed `0x1234` with range 100 is 23: the

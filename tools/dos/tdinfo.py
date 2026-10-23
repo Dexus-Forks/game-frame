@@ -5,10 +5,13 @@ Usage: tdinfo.py BINARY COMMAND [ARGS]
 
 Commands:
   summary            where the symbols are, their version and counts, and the modules (units)
-  labels             TSV for labels/names.tsv: every procedure and global as seg:off, name, evidence
+  labels             TSV for labels/names.tsv: every procedure and global as seg:off, name, evidence.
+                     Imported procedures (segment numbers past the program's) are left out
   procs [TEXT]       procedures: address, size, module, parameters and locals with their types
-  globals [TEXT]     global variables and typed constants: address, size, type
-  types [TEXT]       named types; records show each field with its offset (summed from sizes)
+  globals [TEXT]     global variables and typed constants: address, size, type; a variable
+                     declared as an anonymous record shows its fields
+  types [TEXT]       named types; records show each field with its offset (summed from sizes),
+                     and the fields of anonymous records inside them, indented
   lines [MODULE]     line numbers: address -> source file and line
   json OUT           everything above as one JSON file
   rust TYPE ...      Rust structs and readers for record types (and arrays of records), with a
@@ -173,8 +176,8 @@ class TDInfo:
             return (self.name(name) if depth else '') or f'record({size} bytes)'
         return self.name(name) or kind
 
-    def record_fields(self, t):
-        """(offset, name, type, size) for a record type; offsets are inferred from sizes."""
+    def record_members(self, t):
+        """(offset, name, type number, size) for a record type; offsets are inferred from sizes."""
         ty = self.type(t)
         if ty is None or ty[0] != 0x1E or not ty[4]:
             return []
@@ -183,12 +186,28 @@ class TDInfo:
             flags, name, mt = self.members[i]
             if not flags & 0x40:
                 msize = self.type_size(mt)
-                out.append((off, self.name(name), self.type_name(mt, 1), msize))
+                out.append((off, self.name(name), mt, msize))
                 off += msize
             if flags & 0x80:
                 break
             i += 1
         return out
+
+    def record_fields(self, t):
+        """(offset, name, type, size) for a record type; offsets are inferred from sizes."""
+        return [(off, name, self.type_name(mt, 1), size) for off, name, mt, size in self.record_members(t)]
+
+    def is_anonymous_record(self, t):
+        """True when t is a record without a name, or an array of them (`var P: record ... end`)."""
+        rec = element_record(self, t)
+        return rec is not None and not self.type(rec)[1]
+
+    def real_segment(self, segment, offset):
+        """True when segment:offset is inside the program. Imported procedures have segment
+        numbers past the program's segments, which have no address in Ghidra."""
+        if self.exe.kind == 'NE':
+            return 0 < segment <= len(self.exe.segments)
+        return segment * 16 + offset < self.exe.image_end - self.exe.hdr_paras * 16
 
     def module_of_symbol(self, index):
         """The unit of a data symbol: the unit of the nearest procedure before it in the symbol
@@ -214,7 +233,8 @@ class TDInfo:
             if bits & 7 == 0 and seg and self.type(t) and self.type(t)[0] == 0x23:
                 out.append(dict(index=i, name=self.name(name), segment=seg, offset=off,
                                 address=self.address(seg, off), module=self.module_of(seg, off),
-                                type=self.type_name(t), far=bool(bits & 0x10)))
+                                type=self.type_name(t), far=bool(bits & 0x10),
+                                imported=not self.real_segment(seg, off)))
         # Sizes: the distance to the next procedure or the end of the module's code range.
         by_seg = {}
         for p in out:
@@ -230,14 +250,19 @@ class TDInfo:
         return out
 
     def _attach_locals(self, procs):
-        """Parameters and locals: the scope whose symbols follow a procedure belong to it."""
+        """Parameters and locals: a scope belongs to the procedure at its start address. The
+        segment records say which segment each scope is in; when two procedures still share the
+        address, the owner is the last one before the scope's symbols."""
         by_index = {p['index']: p for p in procs}
-        for first, count, _, _, off, length in self.scopes:
-            owner = None
-            for p in procs:
-                if p['offset'] == off and length:
-                    owner = p
-                    break
+        scope_seg = {}
+        for _, seg, _, _, first_scope, n_scopes, *_ in self.segments:
+            for s in range(first_scope, first_scope + n_scopes):
+                scope_seg[s] = seg
+        for number, (first, count, _, _, off, length) in enumerate(self.scopes, 1):
+            seg = scope_seg.get(number)
+            here = [p for p in procs if p['offset'] == off and length and seg in (None, p['segment'])]
+            before = [p for p in here if p['index'] < first]
+            owner = max(before or here, key=lambda p: p['index'], default=None)
             if owner is None:
                 continue
             for i in range(first, first + count):
@@ -261,7 +286,7 @@ class TDInfo:
             if bits & 7 == 0 and seg and (seg, off) not in procs and self.type(t) \
                     and self.type(t)[0] not in (0x23, 0x24):
                 out.append(dict(name=self.name(name), address=self.address(seg, off), segment=seg,
-                                offset=off, size=self.type_size(t), type=self.type_name(t, 1),
+                                offset=off, size=self.type_size(t), type=self.type_name(t, 1), type_number=t,
                                 module=self.module_of_symbol(i)))
         return out
 
@@ -302,13 +327,17 @@ def element_record(td, t):
     return None
 
 
-def show_record(td, t, indent):
+def show_record(td, t, indent, base=0):
+    """Print a record's fields; the fields of an anonymous record inside it follow, indented,
+    at their offsets in the outer record (the first element's, for an array)."""
     rec = element_record(td, t)
     if rec is None:
         return
-    fields = td.record_fields(rec)
-    for off, name, ty, size in fields:
-        print(f'{indent}+{off:#06x}  {name}: {ty}  ({size})')
+    fields = td.record_members(rec)
+    for off, name, mt, size in fields:
+        print(f'{indent}+{base + off:#06x}  {name}: {td.type_name(mt, 1)}  ({size})')
+        if td.is_anonymous_record(mt) and len(indent) < 24:
+            show_record(td, mt, indent + '    ', base + off)
     total, size = sum(f[3] for f in fields), td.type_size(rec)
     if total != size:
         print(f'{indent}(fields add up to {total} bytes but the record is {size}: a variant part or '
@@ -338,12 +367,16 @@ def main(argv):
             print(f'    {td.name(m[0]):<12} {", ".join(files):<16} {" ".join(ranges)}')
     elif cmd == 'labels':
         # A name used in two units (unit-private procedures) gets its unit: drawlines_fonthand.
-        rows = [(p['address'], p['name'], p['module'], f'{p["size"]} bytes') for p in td.procedures()]
+        procs = td.procedures()
+        rows = [(p['address'], p['name'], p['module'], f'{p["size"]} bytes') for p in procs if not p['imported']]
         rows += [(g['address'], g['name'], g['module'], g['type']) for g in td.globals()]
         seen = {}
         for _, name, *_ in rows:
             seen[name.lower()] = seen.get(name.lower(), 0) + 1
         print('# address\tlabel\tevidence (from tdinfo.py: the original debug symbols)')
+        imported = sum(p['imported'] for p in procs)
+        if imported:
+            print(f'# {imported} imported procedures left out: their segment numbers are past the program\'s segments')
         printed = set()
         for addr, name, module, what in rows:
             label = f'{name}_{module}' if seen[name.lower()] > 1 and module else name
@@ -355,13 +388,15 @@ def main(argv):
         for p in td.procedures():
             if needle in p['name'].lower() or needle in p['module'].lower():
                 print(f'{p["address"]}  {p["size"]:6d} bytes  {p["module"]:<10} {p["name"]}'
-                      f'{"" if p["far"] else "  (near)"}')
+                      f'{"" if p["far"] else "  (near)"}{"  (imported: no address in the program)" if p["imported"] else ""}')
                 for v in p.get('vars', []):
                     print(f'        {v["kind"]:<9} [bp{v["bp"]:+d}] {v["name"]}: {v["type"]}')
     elif cmd == 'globals':
         for g in td.globals():
             if needle in g['name'].lower() or needle in g['module'].lower():
                 print(f'{g["address"]}  {g["size"]:6d}  {g["module"]:<10} {g["name"]}: {g["type"]}')
+                if td.is_anonymous_record(g['type_number']):
+                    show_record(td, g['type_number'], '        ')
     elif cmd == 'types':
         for t in td.named_types():
             if needle in t['name'].lower():
