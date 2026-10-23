@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["--prefix", "site", "run", "dev", "--", "--port", "5180"],
       "port": 5180
+    },
+    {
+      "name": "diagrams",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "5181", "--bind", "127.0.0.1"],
+      "port": 5181
     }
   ]
 }

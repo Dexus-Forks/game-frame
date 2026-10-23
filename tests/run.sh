@@ -1153,6 +1153,15 @@ printf '$ tests/run.sh\n  ok    a check <&>\n' | "$PYTHON" site/captures/term_sv
 rm -f "$svg"
 out="$("$PYTHON" site/diagrams/make.py --check 2>&1)" && ok "the guides' diagrams match their generator" \
   || bad "the guides' diagrams differ: run python3 site/diagrams/make.py" "$out"
+out="$(python3 site/diagrams/animcheck.py 2>&1)" && ok "the animated diagrams keep their loops in step and their animations valid ($(echo "$out" | tail -1))" \
+  || bad "site/diagrams/animcheck.py" "$out"
+expect "animcheck.py prints its usage" "site/diagrams/animcheck.py [FILE.svg" python3 site/diagrams/animcheck.py --help
+d="$(mktemp -d)"
+printf '<svg xmlns="http://www.w3.org/2000/svg"><rect><animate attributeName="x" values="0;9" dur="6s" repeatCount="indefinite"/></rect><rect><animate attributeName="x" values="0;9;0" keyTimes="0;1" dur="4s" repeatCount="indefinite"/></rect><rect><animate attributeName="opacity" values="0;1" begin="2s" dur="1s"/></rect></svg>' > "$d/t.svg"
+out="$(python3 site/diagrams/animcheck.py "$d/t.svg" 2>&1)"
+[[ $? == 1 && "$out" == *"does not divide"* && "$out" == *"3 values but 2 keyTimes"* && "$out" == *"visible until then"* ]] \
+  && ok "animcheck.py finds drift, dropped animations and elements shown before their turn" || bad "animcheck.py faults" "$out"
+rm -rf "$d"
 if [[ -d site/node_modules ]]; then
   out="$(npm --prefix site run build 2>&1)"
   [[ $? == 0 && -f site/.vitepress/dist/games/interaction.html && -f site/.vitepress/dist/skills/re-observe.html ]] \

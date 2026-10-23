@@ -327,7 +327,7 @@ def atari2600_beam():
     s.rect(x0 + hb, y0, w - hb, 34, BLUE, rx=3, extra=' fill-opacity="0.22"')
     s.text(x0 + hb + (w - hb) / 2, y0 + 21, 'visible: 160 pixels', 11, TEXT, 'middle')
     s.add(f'<rect x="{x0}" y="{y0 - 4}" width="3" height="42" fill="{AMBER}"><animate attributeName="x" '
-          f'values="{x0};{x0 + w - 3}" dur="1.2s" repeatCount="indefinite"/></rect>')
+          f'values="{x0};{x0 + w - 3}" dur="1s" repeatCount="indefinite"/></rect>')   # four lines per 4 s frame
     # The CPU's writes along the line.
     s.text(x0 + 4, y0 + 74, 'STA WSYNC waits for the next line.', 11, DIM)
     s.text(x0 + 4, y0 + 90, 'Writes to GRP0 must land before the beam reaches the sprite.', 11, DIM)
@@ -847,16 +847,19 @@ def raster_split():
     s.heading('Raster effects', 'An interrupt fires on a chosen line. The game writes a video register in the interrupt handler.')
     x0, y0, w, h, split = 40, 84, 360, 230, 170
     s.add(f'<clipPath id="pf"><rect x="{x0}" y="{y0}" width="{w}" height="{split}"/></clipPath>')
-    hills = ''.join(f'<rect x="{x0 + k * 40}" y="{y0 + 120 - (k * 37) % 70}" width="30" height="{50 + (k * 37) % 70}" '
+    # The hills repeat every four columns and the layer scrolls exactly four columns per loop, so
+    # the loop has no seam. The beam draws two frames per loop, in step with the scroll.
+    rise = (0, 37, 14, 51)
+    hills = ''.join(f'<rect x="{x0 + k * 40}" y="{y0 + 120 - rise[k % 4]}" width="30" height="{50 + rise[k % 4]}" '
                     f'fill="{GREEN}" fill-opacity="0.45"/>' for k in range(-2, 20))
     s.add(f'<g clip-path="url(#pf)"><rect x="{x0}" y="{y0}" width="{w}" height="{split}" fill="{BLUE}" fill-opacity="0.18"/>'
-          f'<g>{hills}<animateTransform attributeName="transform" type="translate" values="0 0;-80 0" dur="2s" '
+          f'<g>{hills}<animateTransform attributeName="transform" type="translate" values="0 0;-160 0" dur="4s" '
           'repeatCount="indefinite"/></g></g>')
     s.rect(x0, y0 + split, w, h - split, GREY, rx=0, extra=' fill-opacity="0.35"')
     s.text(x0 + 14, y0 + split + 26, 'SCORE 001200    LIVES 3', 13, TEXT, weight='600', mono=True)
     s.line(x0 - 6, y0 + split, x0 + w + 6, y0 + split, AMBER, 2, ' stroke-dasharray="5 3"')
     s.add(f'<rect x="{x0}" y="{y0}" width="{w}" height="2" fill="{TEXT}"><animate attributeName="y" values="{y0};{y0 + h - 2}" '
-          'dur="1.6s" repeatCount="indefinite"/></rect>')
+          'dur="2s" repeatCount="indefinite"/></rect>')
     tx = 440
     s.text(tx, 120, f'line {split}: the interrupt fires', 13, AMBER, weight='600')
     para(s, tx, 142, 'The handler sets the scroll back to 0, so the lines below are drawn without scrolling.', 420)

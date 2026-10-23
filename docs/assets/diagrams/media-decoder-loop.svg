@@ -2,20 +2,11 @@
 <title>A data decoder in the code. The file is read into a buffer. A tight loop then changes each byte with constants as keys. Stopping just after the loop gives the plain data</title>
 <rect x="0.5" y="0.5" width="899" height="299" rx="10" fill="#0d1b1e" stroke="#1f3d40"/>
 <defs><marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" fill="#8fa9a5"/></marker></defs>
-<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">LETTING THE GAME DECODE ITS DATA</text>
-<text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">Right after the file is read, a tight loop changes every byte. Stop the program after the loop and save the buffer.</text>
 <rect x="24.0" y="96.0" width="150.0" height="50.0" rx="4" fill="#64748b" stroke="none" fill-opacity="0.3"/>
-<text x="99.0" y="118.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#e2ece9" text-anchor="middle">ReadFile</text>
-<text x="99.0" y="134.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#8fa9a5" text-anchor="middle">the scrambled bytes</text>
 <path d="M176.0 121.0L206.0 121.0" stroke="#8fa9a5" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
 <rect x="210.0" y="90.0" width="250.0" height="62.0" rx="4" fill="#c084fc" stroke="none" fill-opacity="0.2"/>
-<text x="222.0" y="110.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">for each byte of the buffer:</text>
-<text x="222.0" y="128.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">  b = rotate(b ^ key, 3) + k</text>
-<text x="222.0" y="146.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="9.5" font-weight="400" fill="#8fa9a5" text-anchor="start">illustrative</text>
 <path d="M462.0 121.0L492.0 121.0" stroke="#8fa9a5" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
 <rect x="496.0" y="96.0" width="160.0" height="50.0" rx="4" fill="#f59e0b" stroke="none" fill-opacity="0.3"/>
-<text x="576.0" y="118.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#e2ece9" text-anchor="middle">stop here</text>
-<text x="576.0" y="134.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#8fa9a5" text-anchor="middle">save the buffer</text>
 <rect x="24.0" y="190.0" width="32.0" height="26.0" rx="2" fill="#f87171" stroke="none" fill-opacity="0.3"/>
 <rect x="24" y="190" width="32" height="26" rx="2" fill="#2dd4bf" opacity="0"><animate attributeName="opacity" values="0.7;0" keyTimes="0;0.9700" dur="5.0s" calcMode="discrete" repeatCount="indefinite"/></rect>
 <rect x="59.0" y="190.0" width="32.0" height="26.0" rx="2" fill="#f87171" stroke="none" fill-opacity="0.3"/>
@@ -64,6 +55,15 @@
 <rect x="794" y="190" width="32" height="26" rx="2" fill="#2dd4bf" opacity="0"><animate attributeName="opacity" values="0;0.7;0" keyTimes="0;0.7333;0.9700" dur="5.0s" calcMode="discrete" repeatCount="indefinite"/></rect>
 <rect x="829.0" y="190.0" width="32.0" height="26.0" rx="2" fill="#f87171" stroke="none" fill-opacity="0.3"/>
 <rect x="829" y="190" width="32" height="26" rx="2" fill="#2dd4bf" opacity="0"><animate attributeName="opacity" values="0;0.7;0" keyTimes="0;0.7667;0.9700" dur="5.0s" calcMode="discrete" repeatCount="indefinite"/></rect>
+<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">LETTING THE GAME DECODE ITS DATA</text>
+<text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">Right after the file is read, a tight loop changes every byte. Stop the program after the loop and save the buffer.</text>
+<text x="99.0" y="118.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#e2ece9" text-anchor="middle">ReadFile</text>
+<text x="99.0" y="134.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#8fa9a5" text-anchor="middle">the scrambled bytes</text>
+<text x="222.0" y="110.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">for each byte of the buffer:</text>
+<text x="222.0" y="128.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="400" fill="#e2ece9" text-anchor="start">  b = rotate(b ^ key, 3) + k</text>
+<text x="222.0" y="146.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="9.5" font-weight="400" fill="#8fa9a5" text-anchor="start">illustrative</text>
+<text x="576.0" y="118.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#e2ece9" text-anchor="middle">stop here</text>
+<text x="576.0" y="134.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#8fa9a5" text-anchor="middle">save the buffer</text>
 <text x="24.0" y="236.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#8fa9a5" text-anchor="start">the buffer, which turns from scrambled (red) to plain (teal) as the loop runs</text>
 <text x="24.0" y="278.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#e2ece9" text-anchor="start">Port the decoder like any function, with its constants and order of operations, and check it by emulation.</text>
 </svg>

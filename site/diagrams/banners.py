@@ -722,7 +722,7 @@ def hero():
         a.add(f'<rect x="400" y="{y}" width="190" height="52" rx="10" fill="{col}" fill-opacity="0.16" stroke="{col}" '
               f'stroke-width="2"/>')
         mono(a, 495, y + 33, name, 20, '#e2e8f0', 'middle')
-        a.add(f'<circle r="5" fill="{col}"><animateMotion dur="2s" begin="{k * 0.6:.1f}s" repeatCount="indefinite" '
+        a.add(f'<circle r="5" fill="{col}"><animateMotion dur="2s" begin="{k * 0.6 - 2:.1f}s" repeatCount="indefinite" '
               f'path="M360 {y + 26} H400 M590 {y + 26} H650"/></circle>')
         a.add(f'<path d="M360 {y + 26} H398 M592 {y + 26} H650" stroke="{col}" stroke-width="2" stroke-dasharray="4 6" '
               f'opacity="0.6"/>')

@@ -46,4 +46,13 @@ class Svg:
                 f'<rect x="0.5" y="0.5" width="{self.w - 1}" height="{self.h - 1}" rx="10" fill="{BG}" stroke="{EDGE}"/>\n'
                 '<defs><marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" '
                 f'orient="auto"><path d="M0 0L8 4L0 8z" fill="{DIM}"/></marker></defs>\n')
-        return head + '\n'.join(self.parts) + '\n</svg>\n'
+        return head + '\n'.join(self.layers()) + '\n</svg>\n'
+
+    def layers(self):
+        """The parts in drawing order. In an animated diagram the static labels go on top, so a
+        token, cursor or highlight that moves over a box never hides the box's text. Animated
+        texts and groups keep their place, as do the shapes. A static diagram is drawn as added."""
+        if not any('<animate' in p for p in self.parts):
+            return self.parts
+        label = lambda p: p.startswith('<text') and '<animate' not in p
+        return [p for p in self.parts if not label(p)] + [p for p in self.parts if label(p)]

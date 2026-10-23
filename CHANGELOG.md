@@ -76,6 +76,17 @@ Every release of GameFrame, newest first. The format follows
 
 ### Fixed
 
+- The animated diagrams: in every animated diagram the static labels are drawn last, so a
+  moving token or highlight passes under the text it crosses instead of hiding it. Tokens that
+  loop start with a negative `begin`, so none waits in the card's top-left corner before its
+  path starts. Each "original" label in the function-swap diagram hides while its new tile
+  shows. The raster-split and Atari 2600 beams now keep step with what they trigger, and the
+  raster scroll loops with no seam.
+- `site/diagrams/animcheck.py` (run by the tests) fails on loops that drift apart, animations a
+  browser would drop and elements shown before their turn. `site/diagrams/animrender.html`
+  plays every animated diagram in a browser and lists shapes over labels, tokens off the card
+  and boxes that light up when the playhead is elsewhere.
+
 - `readseg.py` stops with a clear message when an argument is not an address, such as a count
   written without `--count`. It printed the first value and then crashed.
 - The Claude Code commit and push gates check the command's own git verbs. Claude Code's
