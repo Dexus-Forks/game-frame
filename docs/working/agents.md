@@ -258,6 +258,11 @@ only the lander's role commits, and the session shows the user each `Decisions` 
 - Give every long run a timeout. A hung emulator or a game waiting for input must not block
   the session.
 - Stop servers, emulators and game processes you started before you finish.
+- A headless run of the whole original is slow. An emulated DOS game ran at about 21 frames a
+  second, so a few demos took a quarter of an hour. Before an agent runs the original again,
+  it looks in `derived/` for a capture that already holds what it needs. A capture script that
+  logs everything a later stage might want (calls, palettes, sounds, file reads, frame counts)
+  saves the next run.
 - Every agent keeps a progress log in `derived/progress/<agent>.log`, one line per step
   (`./gameframe progress <agent> --add "..."`). When the user asks how the work is going, read
   `./gameframe progress`. It shows each log's last lines, newest first. An agent's transcript is
