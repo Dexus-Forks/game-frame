@@ -64,6 +64,11 @@ Every release of GameFrame, newest first. The format follows
 - `dosinfo.py --pstrings` prints a Pascal string's length byte address, the address code
   uses, instead of the text's. It finds a string right after another one when the second's
   length byte is a printable character.
+- `tdinfo.py`: `types` and `globals` print the fields of anonymous records inside a type or
+  a variable's declaration. `labels` leaves out imported procedures, whose segment numbers
+  are past the program's (`procs` marks them). A scope's parameters and locals go to the
+  procedure in the scope's own segment, not the first procedure at the same offset in any
+  segment.
 
 ## [1.0.1] - 2026-10-23
 

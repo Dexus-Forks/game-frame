@@ -192,17 +192,29 @@ def tdinfo(syms, code_len):
     types.append(struct.pack('<BHHBH', 0x1E, rec_name, 8, 0, 1))                 # 8 record, member 1
     members = [struct.pack('<BHH', 0, name('seed'), 4), struct.pack('<BHH', 0, name('total'), 6),
                struct.pack('<BHH', 0x80, name('calls'), 6)]
+    # Anonymous records: 9 is `record x, y: Word end`, 10 is Player's own `record lives: Word;
+    # pos: <9> end`, 11 is the named type Spot = record kind: Word; at: <9> end.
+    types.append(struct.pack('<BHHBH', 0x1E, 0, 4, 0, 4))                       # 9, members 4-5
+    types.append(struct.pack('<BHHBH', 0x1E, 0, 6, 0, 6))                       # 10, members 6-7
+    spot_name = name('Spot')
+    types.append(struct.pack('<BHHBH', 0x1E, spot_name, 6, 0, 8))               # 11, members 8-9
+    members += [struct.pack('<BHH', 0, name('x'), 6), struct.pack('<BHH', 0x80, name('y'), 6),
+                struct.pack('<BHH', 0, name('lives'), 6), struct.pack('<BHH', 0x80, name('pos'), 9),
+                struct.pack('<BHH', 0, name('kind'), 6), struct.pack('<BHH', 0x80, name('at'), 9)]
     procs = [('rng_seed', 2), ('rng_next', 3), ('sum_draws', 3), ('checksum', 3),
              ('get_data_seg', 3), ('ask_host', 3), ('dos_version', 3), ('field_read', 3)]
-    symbols, scopes = [], []
+    # An imported procedure: Borland gives it a segment number past the program's segments, and
+    # here the same offset as rng_next, so a scope matched by offset alone would pick it.
+    symbols, scopes = [struct.pack('<HHHHB', name('host_call'), 3, syms['rng_next'], 0xC00F, 0x18)], []
     for proc, t in procs:
         symbols.append(struct.pack('<HHHHB', name(proc), t, syms[proc], 1, 0x18))
         if proc == 'rng_next':      # its parameter, at [bp+6]
             symbols.append(struct.pack('<HHHHB', name('range'), 6, 6, 0, 0x0A))
             scopes.append(struct.pack('<HHHHHH', len(symbols), 1, 0, 0xFFFF, syms[proc], syms['sum_draws'] - syms[proc]))
-    for var, off, t in (('RandSeed', 0, 4), ('Total', 4, 6), ('Calls', 6, 6)):
+    for var, off, t in (('RandSeed', 0, 4), ('Total', 4, 6), ('Calls', 6, 6), ('Player', 0x0A, 10)):
         symbols.append(struct.pack('<HHHHB', name(var), t, off, 2, 0))
     symbols.append(struct.pack('<HHHHB', rec_name, 8, 0, 0, 6))                  # type SampleState
+    symbols.append(struct.pack('<HHHHB', spot_name, 11, 0, 0, 6))                # type Spot
     module = struct.pack('<HBBHHHHHH', name('sample'), 2, 4, 1, 0, 1, 1, 1, 1)
     files = struct.pack('<HI', name('SAMPLE.S'), 0)
     lines = [(10 + i, syms[p]) for i, (p, _) in enumerate(procs)]

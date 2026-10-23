@@ -219,6 +219,12 @@ print([real48(b) for b in (bytes([129, 0, 0, 0, 0, 0]), bytes([130, 0, 0, 0, 0, 
 PY
 expect "tdinfo lists procedures with sizes and parameters" "param     [bp+6] range: Word" "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe procs rng_next
 expect "tdinfo lays out a record" "+0x0004  total: Word  (2)" "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe types
+expect "tdinfo types shows an anonymous record inside a record" "        +0x0004  y: Word  (2)" "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe types spot
+expect "tdinfo globals shows the fields of a variable declared as an anonymous record" "            +0x0004  y: Word  (2)" "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe globals player
+out="$("$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe labels)"
+[[ "$out" != *host_call* && "$out" == *"1 imported procedures left out"* ]] && ok "tdinfo labels leave out imported procedures (no address in the program)" || bad "tdinfo labels and imports" "$out"
+out="$("$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe procs)"
+[[ "$(echo "$out" | sed -n 2p)" != *range* && "$out" == *"rng_next"$'\n'"        param     [bp+6] range"* ]] && ok "tdinfo gives a scope to the procedure in its segment (not another at the same offset)" || bad "tdinfo scope owner" "$out"
 expect "tdinfo writes labels" "1008:0000	RandSeed" "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe labels
 expect "tdinfo maps code to source lines" "1000:0028	SAMPLE.S:11" "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe lines
 expect "tdinfo writes a Rust reader for a record" "seed: r.i32()?," "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe rust SampleState
@@ -716,6 +722,9 @@ expect "the project template's dictionary is valid" "0 rows, 0 errors" "$PYTHON"
 expect "decomp_query reads labels from --labels FILE" "2 functions, 2 decompiled, 1 labelled" "$PYTHON" tools/triage/decomp_query.py --export tests/fixtures/export-layout --labels tests/fixtures/export-layout/names.tsv stats
 expect "decomp_query layout merges a structure's fields" "0x18     4  int                          2      1  FUN_140001000, FUN_140001100" "$PYTHON" tools/triage/decomp_query.py --export tests/fixtures/export-layout layout FUN_140001000 FUN_140001100
 expect "decomp_query layout scales indexes of an int pointer" "    int                      f_1c;  /* also read as char */" "$PYTHON" tools/triage/decomp_query.py --export tests/fixtures/export-layout layout FUN_140001000 FUN_140001100
+P="$(mktemp -d)"; mkdir -p "$P/analysis/export" && cp -R tests/fixtures/export-layout/GAME.EXE "$P/analysis/export/"
+expect "gameframe run decomp_query reads the project's export by default (GAMEFRAME_PROJECT)" "GAME.EXE: 2 functions" env GAMEFRAME_PROJECT="$P" ./gameframe run decomp_query stats
+rm -rf "$P"
 expect "shaders finds a Direct3D 9 pixel shader and its constant" "FogColor" "$PYTHON" tools/formats/shaders.py "$W/shaders.bin"
 expect "shaders reads a DXBC container's stage and version" "DXBC pixel 4.0 [RDEF SHDR]" "$PYTHON" tools/formats/shaders.py "$W/shaders.bin"
 expect "shaders reads SPIR-V names" "names: main, Albedo" "$PYTHON" tools/formats/shaders.py "$W/shaders.bin"
@@ -723,9 +732,6 @@ expect "shaders finds GLSL source" "GLSL source" "$PYTHON" tools/formats/shaders
 expect "shaders finds all four" "4 shaders" "$PYTHON" tools/formats/shaders.py "$W/shaders.bin"
 expect "ramdiff finds the first frame that differs" "first difference at frame 6" "$PYTHON" tools/verify/ramdiff.py "$W/orig.ram" "$W/port.ram" --size 2048 --map "$W/ram.map" --ignore 0x9-0x9
 expect "ramdiff names the address from a RAM map" "player_y" "$PYTHON" tools/verify/ramdiff.py "$W/orig.ram" "$W/port.ram" --size 2048 --map "$W/ram.map" --ignore 0x9-0x9
-P="$(mktemp -d)"; mkdir -p "$P/analysis/export" && cp -R tests/fixtures/export-layout/GAME.EXE "$P/analysis/export/"
-expect "gameframe run decomp_query reads the project's export by default (GAMEFRAME_PROJECT)" "GAME.EXE: 2 functions" env GAMEFRAME_PROJECT="$P" ./gameframe run decomp_query stats
-rm -rf "$P"
 expect "ramdiff counts the frames that differ" "4 of 10 frames differ" "$PYTHON" tools/verify/ramdiff.py "$W/orig.ram" "$W/port.ram" --size 2048 --map "$W/ram.map" --ignore 0x9-0x9
 "$PYTHON" tools/verify/ramdiff.py "$W/orig.ram" "$W/orig.ram" --size 2048 >/dev/null && ok "ramdiff exits 0 for identical runs" || bad "ramdiff identical"
 rm -rf "$W"
@@ -749,6 +755,11 @@ assert run('commit', dict(c, agent_type='gameframe:re-tracer')) == 2, 're-tracer
 assert run('commit', dict(c, agent_type='re-lander')) == 0, 're-lander may commit'
 p = {'cwd': d, 'tool_input': {'command': 'git push'}}
 assert run('push', dict(p, agent_type='re-porter')) == 2 and run('push', p) == 0, 'push gate'
+# Claude Code's `if` also matches commands it cannot parse: only a real git verb is checked.
+for other in ('for f in a b; do echo "$f"; done', 'cat <<EOF > x\ngit\nEOF', 'echo $HOME && git status'):
+    assert run('commit', {'cwd': d, 'agent_type': 're-tracer', 'tool_input': {'command': other}}) == 0, other
+    assert run('push', {'cwd': d, 'agent_type': 're-tracer', 'tool_input': {'command': other}}) == 0, other
+assert run('commit', {'cwd': d, 'agent_type': 're-tracer', 'tool_input': {'command': 'git commit -F - <<EOF\nx\nEOF'}}) == 2, 'heredoc commit'
 pseudo = 'undefined8 uVar1;\nuVar1 = CONCAT44(a, b);\n'
 w = lambda path: {'cwd': d, 'tool_input': {'file_path': f'{d}/{path}', 'content': pseudo}}
 assert run('write', w('docs/f.md')) == 2 and run('write', w('analysis/f.c')) == 0, 'write gate'
@@ -759,11 +770,6 @@ cmd = 'GAMEFRAME_AGENT=re-tracer git commit -m x'
 lander = 'GAMEFRAME_AGENT=re-lander git -C . commit -m x'
 events = {
     'codex': lambda c: {'cwd': d, 'hook_event_name': 'PreToolUse', 'tool_name': 'Bash', 'tool_input': {'command': c}},
-# Claude Code's `if` also matches commands it cannot parse: only a real git verb is checked.
-for other in ('for f in a b; do echo "$f"; done', 'cat <<EOF > x\ngit\nEOF', 'echo $HOME && git status'):
-    assert run('commit', {'cwd': d, 'agent_type': 're-tracer', 'tool_input': {'command': other}}) == 0, other
-    assert run('push', {'cwd': d, 'agent_type': 're-tracer', 'tool_input': {'command': other}}) == 0, other
-assert run('commit', {'cwd': d, 'agent_type': 're-tracer', 'tool_input': {'command': 'git commit -F - <<EOF\nx\nEOF'}}) == 2, 'heredoc commit'
     'gemini': lambda c: {'cwd': d, 'hook_event_name': 'BeforeTool', 'tool_name': 'run_shell_command', 'tool_input': {'command': c}},
     'cursor': lambda c: {'hook_event_name': 'beforeShellExecution', 'command': c, 'cwd': d, 'workspace_roots': [d]},
     'copilot': lambda c: {'timestamp': 1704614400000, 'cwd': d, 'toolName': 'bash', 'toolArgs': json.dumps({'command': c})},
