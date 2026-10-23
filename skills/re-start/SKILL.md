@@ -77,6 +77,10 @@ A small task may use only two or three steps. Do not skip `land`.
 
 GameFrame also has one agent per stage, in `agents/` (a project has them in
 `.claude/agents/`; from the Claude Code plugin they are named `gameframe:re-tracer` and so on).
+Codex, Gemini CLI, GitHub Copilot and OpenCode read copies in their own formats
+([Agents in every client](../../docs/working/agents.md#agents-in-every-client)). If your agent
+can start subagents, send each agent as a subagent. If it cannot, take each role yourself in
+this session: read the agent's file, load its skills, do its stage and write its hand-off.
 Each one has its skills preloaded, does only its stage, and ends with a
 `## Hand-off` block that names the next agent and gives it a one-line brief. You, the main
 session, send the agents: read each hand-off, check its evidence, and send the next one.
