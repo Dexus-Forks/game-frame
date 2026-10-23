@@ -722,6 +722,9 @@ expect "shaders finds GLSL source" "GLSL source" "$PYTHON" tools/formats/shaders
 expect "shaders finds all four" "4 shaders" "$PYTHON" tools/formats/shaders.py "$W/shaders.bin"
 expect "ramdiff finds the first frame that differs" "first difference at frame 6" "$PYTHON" tools/verify/ramdiff.py "$W/orig.ram" "$W/port.ram" --size 2048 --map "$W/ram.map" --ignore 0x9-0x9
 expect "ramdiff names the address from a RAM map" "player_y" "$PYTHON" tools/verify/ramdiff.py "$W/orig.ram" "$W/port.ram" --size 2048 --map "$W/ram.map" --ignore 0x9-0x9
+P="$(mktemp -d)"; mkdir -p "$P/analysis/export" && cp -R tests/fixtures/export-layout/GAME.EXE "$P/analysis/export/"
+expect "gameframe run decomp_query reads the project's export by default (GAMEFRAME_PROJECT)" "GAME.EXE: 2 functions" env GAMEFRAME_PROJECT="$P" ./gameframe run decomp_query stats
+rm -rf "$P"
 expect "ramdiff counts the frames that differ" "4 of 10 frames differ" "$PYTHON" tools/verify/ramdiff.py "$W/orig.ram" "$W/port.ram" --size 2048 --map "$W/ram.map" --ignore 0x9-0x9
 "$PYTHON" tools/verify/ramdiff.py "$W/orig.ram" "$W/orig.ram" --size 2048 >/dev/null && ok "ramdiff exits 0 for identical runs" || bad "ramdiff identical"
 rm -rf "$W"

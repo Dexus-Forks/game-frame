@@ -58,6 +58,9 @@ Every release of GameFrame, newest first. The format follows
 - The Claude Code commit and push gates check the command's own git verbs. Claude Code's
   `if: Bash(git commit *)` also matches commands it cannot parse (a heredoc, a shell variable,
   a for loop), so the gates fired on commands that neither commit nor push.
+- `./gameframe run decomp_query` without `--export` reads the project's `analysis/export`
+  (the folder `GAMEFRAME_PROJECT` names), and its `labels/names.tsv` after the current
+  folder's. Before, it read GameFrame's own sample export.
 
 ## [1.0.1] - 2026-10-23
 

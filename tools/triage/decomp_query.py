@@ -23,14 +23,19 @@ evidence): add a row every time you identify a function, and every later answer 
 read. A file of labels for this binary alone, labels/<binary name>.tsv in the current folder, is
 read first (for overlays and DLLs whose addresses overlap). The labels are then read from each
 --labels FILE (the first file to name an address wins), else from labels/names.tsv in the current folder
-(the project you work in), else from GameFrame's own. `--binary` picks a binary when the export holds several (default: the only one, or the
-first .exe).
+(the project you work in), else from the project's, else from GameFrame's own. `--binary` picks a
+binary when the export holds several (default: the only one, or the first .exe).
+
+`--export` defaults to analysis/export in the project: the folder GAMEFRAME_PROJECT names (a
+project's `./gameframe` sets it), else GameFrame's own folder.
 """
 import os
 import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# The game's project, which a project's own `gameframe` launcher names; GameFrame itself otherwise.
+PROJECT = os.environ.get('GAMEFRAME_PROJECT') or ROOT
 HEADER = re.compile(r'^// ==== ([0-9a-fA-F:]+) (.*)$')
 FUN = re.compile(r'FUN_([0-9a-fA-F]+)(?:_([0-9a-fA-F]{4}))?')
 
@@ -169,7 +174,8 @@ def load_labels(paths=None):
     labels = {}
     if not paths:
         here = os.path.join(os.getcwd(), 'labels', 'names.tsv')
-        paths = [here if os.path.exists(here) else os.path.join(ROOT, 'labels', 'names.tsv')]
+        project = os.path.join(PROJECT, 'labels', 'names.tsv')
+        paths = [next((p for p in (here, project) if os.path.exists(p)), os.path.join(ROOT, 'labels', 'names.tsv'))]
     for path in paths:
         labels.update({a: n for a, n in load_one(path).items() if a not in labels})
     return labels
@@ -190,7 +196,7 @@ def load_one(path):
 
 
 def main(argv):
-    export_dir = os.path.join(ROOT, 'analysis', 'export')
+    export_dir = os.path.join(PROJECT, 'analysis', 'export')
     binary, labels_file = None, []
     while argv and argv[0].startswith('--'):
         if argv[0] == '--binary':
