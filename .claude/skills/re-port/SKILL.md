@@ -138,7 +138,7 @@ These are the details that make a reimplementation drift, in order of how often 
    then: a step that no caller took over is a behaviour the port silently lacks.
 13. **Uninitialised and stale state.** The original may read a field before writing it, or keep
    a value from the last frame. That is behaviour too.
-13. **Assembly ported at the register level.** Ports that replace routines inside a running
+14. **Assembly ported at the register level.** Ports that replace routines inside a running
     original (`docs/working/hybrid-port.md`) must
     leave every register as the original does, scratch registers too. They must also set the
     flags that callers test after the return. On the 386 a shift count is masked to 5 bits, so
