@@ -225,12 +225,15 @@ Copilot's `web` covers both web tools, so it stays allowed while either is allow
 
 | Client | Rules | Skills | Subagents | Hooks (the gates) | MCP servers |
 |---|---|---|---|---|---|
-| Claude Code | `CLAUDE.md`, which imports `AGENTS.md` | `.claude/skills/`, or the plugin | `.claude/agents/`, or the plugin | `.claude/settings.json`, or the plugin's `hooks/hooks.json` | `.mcp.json` |
-| Codex | `AGENTS.md` | `.agents/skills/` | `.codex/agents/*.toml` | see [Gates](gates.md) | `.codex/config.toml`, `[mcp_servers]`, in trusted projects only |
-| Gemini CLI | `GEMINI.md`, or `AGENTS.md` through `context.fileName` | `.gemini/skills/`, `.agents/skills/` | `.gemini/agents/*.md` (experimental) | `.gemini/settings.json`, `hooks` | `.gemini/settings.json`, `mcpServers` |
-| GitHub Copilot | `AGENTS.md` (in VS Code, `chat.useAgentsMdFile`), `.github/copilot-instructions.md` | `.github/skills/`, `.claude/skills/` | `.github/agents/*.agent.md`; VS Code also `.claude/agents/` | `.github/hooks/` | VS Code `.vscode/mcp.json`; on GitHub.com, the repository's settings |
-| Cursor | `AGENTS.md`, `.cursor/rules/` | `.cursor/skills/`, `.claude/skills/` | `.cursor/agents/`, `.claude/agents/`, `.codex/agents/` | `.cursor/hooks.json` | `.cursor/mcp.json` |
-| OpenCode | `AGENTS.md` | `.opencode/skills/`, `.claude/skills/`, `.agents/skills/` | `.opencode/agents/*.md` | plugins in `.opencode/plugins/` | `opencode.json`, `mcp` |
+| Claude Code | `CLAUDE.md`, which imports `AGENTS.md` | `.claude/skills/`, or the plugin | `.claude/agents/`, or the plugin | `.claude/settings.json`, or the plugin's `hooks/hooks.json`: commit, push, write, session | `.mcp.json` |
+| Codex | `AGENTS.md` | `.agents/skills/` | `.codex/agents/*.toml` | `.codex/hooks.json`: commit, push, write | `.codex/config.toml`, `[mcp_servers]`, in trusted projects only |
+| Gemini CLI | `GEMINI.md`, or `AGENTS.md` through `context.fileName` | `.gemini/skills/`, `.agents/skills/` | `.gemini/agents/*.md` (experimental) | `.gemini/settings.json`, from `hooks/gemini-settings.json`: commit, push, write | `.gemini/settings.json`, `mcpServers` |
+| GitHub Copilot | `AGENTS.md` (in VS Code, `chat.useAgentsMdFile`), `.github/copilot-instructions.md` | `.github/skills/`, `.claude/skills/` | `.github/agents/*.agent.md`; VS Code also `.claude/agents/` | `.github/hooks/gameframe.json`: commit, push | VS Code `.vscode/mcp.json`; on GitHub.com, the repository's settings |
+| Cursor | `AGENTS.md`, `.cursor/rules/` | `.cursor/skills/`, `.claude/skills/` | `.cursor/agents/`, `.claude/agents/`, `.codex/agents/` | `.cursor/hooks.json`: commit, push | `.cursor/mcp.json` |
+| OpenCode | `AGENTS.md` | `.opencode/skills/`, `.claude/skills/`, `.agents/skills/` | `.opencode/agents/*.md` | none; the git hook only | `opencode.json`, `mcp` |
+
+Every client also gets the git pre-commit hook (`scripts/hooks/git/pre-commit`; a project
+has it in `.githooks/pre-commit`). [Gates](gates.md) says what each check blocks.
 
 These formats change often. Codex's and Gemini CLI's agent files are new. Check a client's own
 documentation when a cell matters: [Codex subagents](https://developers.openai.com/codex/subagents),
