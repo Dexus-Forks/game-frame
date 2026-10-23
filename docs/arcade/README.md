@@ -101,9 +101,9 @@ which route to take.
 - [Tools for console work](../consoles/tools.md) and
   [matching decompilation](../consoles/matching-decomp.md).
 - [Sound](../hardware/sound.md) and [running the original](../observe/running-the-original.md).
-- The skills for each step: [re-inventory](../../.claude/skills/re-inventory/SKILL.md),
-  [re-observe](../../.claude/skills/re-observe/SKILL.md),
-  [re-ghidra](../../.claude/skills/re-ghidra/SKILL.md),
-  [re-emulate](../../.claude/skills/re-emulate/SKILL.md),
-  [re-port](../../.claude/skills/re-port/SKILL.md) and
-  [re-verify](../../.claude/skills/re-verify/SKILL.md).
+- The skills for each step: [re-inventory](../../skills/re-inventory/SKILL.md),
+  [re-observe](../../skills/re-observe/SKILL.md),
+  [re-ghidra](../../skills/re-ghidra/SKILL.md),
+  [re-emulate](../../skills/re-emulate/SKILL.md),
+  [re-port](../../skills/re-port/SKILL.md) and
+  [re-verify](../../skills/re-verify/SKILL.md).

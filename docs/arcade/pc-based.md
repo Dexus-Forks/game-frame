@@ -41,8 +41,8 @@ The Type X dongle schemes are not covered here.
   source. Some features need Patreon support
   ([Emulation General Wiki, TeknoParrot](https://emulation.gametechwiki.com/index.php/TeknoParrot)).
 - Ghidra and Unicorn cover x86 and x86-64. The
-  [re-ghidra](../../.claude/skills/re-ghidra/SKILL.md) and
-  [re-emulate](../../.claude/skills/re-emulate/SKILL.md) skills cover the PE path.
+  [re-ghidra](../../skills/re-ghidra/SKILL.md) and
+  [re-emulate](../../skills/re-emulate/SKILL.md) skills cover the PE path.
 
 ### Projects to learn from
 

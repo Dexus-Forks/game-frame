@@ -122,7 +122,7 @@ cannot handle the Amiga's free-form track format
 - Pick one TV standard. A takeover game times itself from the vertical blank, at 50 Hz or 60 Hz.
 - Reproduce the Copper list, the Blitter operations and the audio DMA at that frame rate.
 - Take ground truth for a function that touches only RAM from Unicorn's 68000
-  ([re-emulate](../../.claude/skills/re-emulate/SKILL.md)). Anything that reads chip registers
+  ([re-emulate](../../skills/re-emulate/SKILL.md)). Anything that reads chip registers
   needs a full trace from WinUAE or MAME.
 - Keep the IPF image as the record of what shipped. Read a Copylock game from memory after it
   decrypts itself.

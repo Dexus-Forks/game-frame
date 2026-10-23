@@ -92,7 +92,7 @@ missing when the source used a shift.
 Put the original's integer operations in a few small helper functions in the port. Write a
 division with the original's rounding and edge cases, a shift with its masking, and an add
 with its width. Test the helpers against the original under emulation on the edge cases
-([re-emulate](../../.claude/skills/re-emulate/SKILL.md)), then use them everywhere.
+([re-emulate](../../skills/re-emulate/SKILL.md)), then use them everywhere.
 
 ## What to record
 

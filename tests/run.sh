@@ -549,7 +549,7 @@ rm -rf "$L"
 echo "Project scaffold"
 tmp="$(mktemp -d)/re-test"
 scripts/new-project.sh "$tmp" "Test Game" $B >/dev/null 2>&1
-[[ -f "$tmp/AGENTS.md" && -f "$tmp/README.md" && -f "$tmp/LICENSE-APACHE" && -f "$tmp/LICENSE-CC0-1.0" && ! -e "$tmp/LICENSE-CC-BY-4.0" && ! -e "$tmp/LICENSE-MIT" && -f "$tmp/.cargo/config.toml" && -f "$tmp/.claude/settings.json" && -x "$tmp/gameframe" && -f "$tmp/target/game.exe" && -d "$tmp/.git" && ! -e "$tmp/tools" && ! -e "$tmp/scripts" && ! -e "$tmp/.claude/skills" && ! -e "$tmp/docs/DOS.md" ]] \
+[[ -f "$tmp/AGENTS.md" && -f "$tmp/README.md" && -f "$tmp/LICENSE-APACHE" && -f "$tmp/LICENSE-CC0-1.0" && ! -e "$tmp/LICENSE-CC-BY-4.0" && ! -e "$tmp/LICENSE-MIT" && -f "$tmp/.cargo/config.toml" && -f "$tmp/.claude/settings.json" && -x "$tmp/gameframe" && -f "$tmp/target/game.exe" && -d "$tmp/.git" && ! -e "$tmp/tools" && ! -e "$tmp/scripts" && ! -e "$tmp/.claude/skills" && ! -e "$tmp/skills" && ! -e "$tmp/.agents" && ! -e "$tmp/docs/DOS.md" ]] \
   && grep -q "Test Game" "$tmp/AGENTS.md" && grep -q '"gameframe@game-frame": true' "$tmp/.claude/settings.json" && ! grep -q "gate.py" "$tmp/.claude/settings.json" \
   && ! (cd "$tmp" && git ls-files | grep -q '^target/') \
   && ok "new-project makes a plugin project: settings enable the plugin, no copied toolkit, target/ out of git" || bad "new-project scaffold" "$(ls -la "$tmp" 2>&1)"
@@ -561,18 +561,26 @@ out="$("$PWD/scripts/update-project.sh" "$tmp" 2>&1)"
 
 tmp="$(mktemp -d)/re-copy"
 scripts/new-project.sh "$tmp" "Test Game" $B --copy >/dev/null 2>&1
-[[ -f "$tmp/docs/DOS.md" && -f "$tmp/docs/games/README.md" && -f "$tmp/.claude/skills/re-start/SKILL.md" && -f "$tmp/.claude/agents/re-tracer.md" && -f "$tmp/requirements-live.txt" && -f "$tmp/scripts/hooks/gate.py" && -f "$tmp/docs/assets/diagrams/fixed-step.svg" ]] \
+[[ -f "$tmp/docs/DOS.md" && -f "$tmp/docs/games/README.md" && -f "$tmp/skills/re-start/SKILL.md" && -L "$tmp/.claude/skills" && -f "$tmp/.claude/skills/re-start/SKILL.md" && -L "$tmp/.agents/skills" && -f "$tmp/.agents/skills/re-start/SKILL.md" && -f "$tmp/.claude/agents/re-tracer.md" && -f "$tmp/requirements-live.txt" && -f "$tmp/scripts/hooks/gate.py" && -f "$tmp/docs/assets/diagrams/fixed-step.svg" ]] \
   && ok "new-project --copy copies the toolkit, skills, agents, gates and guides" || bad "new-project --copy" "$(ls -la "$tmp" 2>&1)"
 expect "gameframe works in a copied project" "tools/pe/peinfo.py  (program)" "$tmp/gameframe" tool peinfo
 echo "# a local note" >> "$tmp/tools/triage/memscan.py"
-rm "$tmp/.claude/skills/re-trace/SKILL.md"
+rm "$tmp/skills/re-trace/SKILL.md"
 out="$(cd "$tmp" && "$OLDPWD/scripts/update-project.sh" . 2>&1)"
-[[ -f "$tmp/.claude/skills/re-trace/SKILL.md" && "$out" == *"1 files were added"* && "$out" == *"tools/triage/memscan.py"* ]] \
+[[ -f "$tmp/skills/re-trace/SKILL.md" && "$out" == *"1 files were added"* && "$out" == *"tools/triage/memscan.py"* ]] \
   && grep -q "a local note" "$tmp/tools/triage/memscan.py" \
   && ok "update-project restores a missing file and keeps a file the project changed" || bad "update-project" "$out"
+old="$(mktemp -d)/re-old"
+cp -R "$tmp" "$old"
+rm "$old/.claude/skills" "$old/.agents/skills" && mv "$old/skills" "$old/.claude/skills"
+mkdir -p "$old/.claude/skills/my-own" && echo "# mine" > "$old/.claude/skills/my-own/SKILL.md"
+out="$("$PWD/scripts/update-project.sh" "$old" 2>&1)"
+[[ -f "$old/skills/re-start/SKILL.md" && -f "$old/skills/my-own/SKILL.md" && -L "$old/.claude/skills" && -L "$old/.agents/skills" && -f "$old/.agents/skills/my-own/SKILL.md" && "$out" == *"0 files were added"* ]] \
+  && ok "update-project moves an older project's .claude/skills to skills/ and links both agent folders to it" || bad "update-project moves the skills" "$out $(ls -la "$old/.claude" 2>&1)"
+rm -rf "$old"
 (cd "$tmp" && git add -A && git commit -qm copy)
 out="$("$PWD/scripts/update-project.sh" "$tmp" --plugin 2>&1)"
-[[ ! -e "$tmp/.claude/skills/re-start" && ! -e "$tmp/scripts" && ! -e "$tmp/docs/DOS.md" && -f "$tmp/tools/triage/memscan.py" && ! -e "$tmp/tools/pe" && "$out" == *"tools/triage/memscan.py"* ]] \
+[[ ! -e "$tmp/skills" && ! -e "$tmp/.claude/skills" && ! -e "$tmp/.agents" && ! -e "$tmp/scripts" && ! -e "$tmp/docs/DOS.md" && -f "$tmp/tools/triage/memscan.py" && ! -e "$tmp/tools/pe" && "$out" == *"tools/triage/memscan.py"* ]] \
   && grep -q "GAMEFRAME_PROJECT" "$tmp/gameframe" && grep -q '"gameframe@game-frame": true' "$tmp/.claude/settings.json" && ! grep -q "gate.py" "$tmp/.claude/settings.json" \
   && ok "update-project --plugin removes the copies, keeps the project's changes, enables the plugin" || bad "update-project --plugin" "$out"
 
@@ -648,6 +656,28 @@ PY
 )"
 [[ $? == 0 ]] && ok "the gates block game material, decompiled code and non-lander commits ($out)" || bad "gates" "$out"
 
+echo "Agent Skills (agentskills.io): one copy in skills/, found by every agent"
+out="$("$PYTHON" - <<'PY' 2>&1
+import re, pathlib
+found = sorted(pathlib.Path('skills').glob('*/SKILL.md'))
+assert found, 'no skills in skills/'
+for f in found:
+    m = re.match(r'---\n(.*?)\n---\n', f.read_text(), re.S)
+    assert m, f'{f}: no front matter'
+    front = dict(l.split(':', 1) for l in m.group(1).splitlines() if re.match(r'^[a-z-]+:', l))
+    name, desc = front.get('name', '').strip(), front.get('description', '').strip()
+    assert re.fullmatch(r'[a-z0-9]+(-[a-z0-9]+)*', name) and len(name) <= 64, f'{f}: name {name!r} breaks the spec'
+    assert name == f.parent.name, f'{f}: name {name!r} does not match its folder'
+    assert 1 <= len(desc) <= 1024, f'{f}: description is {len(desc)} characters (1 to 1024)'
+    assert desc.startswith('"') or ': ' not in desc, f'{f}: an unquoted description with ": " is not valid YAML'
+for link in ('.claude/skills', '.agents/skills'):
+    p = pathlib.Path(link)
+    assert p.is_symlink() and p.resolve() == pathlib.Path('skills').resolve(), f'{link} does not link to skills/'
+print(len(found), 'skills')
+PY
+)"
+[[ $? == 0 ]] && ok "every skill meets the spec (name matches its folder, description 1-1024 characters); .claude/skills and .agents/skills link to skills/ ($out)" || bad "Agent Skills spec" "$out"
+
 echo "Claude Code plugin"
 out="$("$PYTHON" - <<'PY' 2>&1
 import json, re, pathlib
@@ -656,8 +686,8 @@ market = json.loads(pathlib.Path('.claude-plugin/marketplace.json').read_text())
 assert [p['name'] for p in market['plugins']] == [plugin['name']], 'the marketplace lists the plugin'
 assert pathlib.Path(plugin['skills'], 're-start', 'SKILL.md').is_file(), 'the plugin finds the skills'
 assert pathlib.Path('.claude/agents').resolve() == pathlib.Path('agents').resolve(), '.claude/agents links to agents/'
-skills = {p.parent.name for p in pathlib.Path('.claude/skills').glob('*/SKILL.md')}
-start = pathlib.Path('.claude/skills/re-start/SKILL.md').read_text()
+skills = {p.parent.name for p in pathlib.Path('skills').glob('*/SKILL.md')}
+start = pathlib.Path('skills/re-start/SKILL.md').read_text()
 agents = sorted(pathlib.Path('agents').glob('*.md'))
 assert agents, 'no agents'
 for a in agents:
@@ -687,7 +717,7 @@ table = subprocess.run(['./gameframe', 'agents', '--table'], capture_output=True
 guide = pathlib.Path('docs/working/agents.md').read_text()
 assert table in guide, 'docs/working/agents.md does not hold the current `gameframe agents --table`'
 # Every tool or script a skill, an agent or a guide names exists (case studies quote other projects).
-pages = list(pathlib.Path('agents').glob('*.md')) + list(pathlib.Path('.claude/skills').glob('*/SKILL.md'))
+pages = list(pathlib.Path('agents').glob('*.md')) + list(pathlib.Path('skills').glob('*/SKILL.md'))
 pages += [p for p in pathlib.Path('docs').rglob('*.md') if 'case-studies' not in p.parts] + [pathlib.Path('AGENTS.md'), pathlib.Path('README.md')]
 missing = sorted({(m, str(p)) for p in pages for m in re.findall(r'(?<![\w/.$-])((?:tools|scripts)/[\w./-]+\.(?:py|sh|java))', p.read_text(errors='replace')) if not pathlib.Path(m).exists()})
 assert not missing, f'named but missing: {missing[:5]}'
@@ -712,7 +742,7 @@ expect "scripts/env.sh sets GAMEFRAME_ROOT and puts gameframe on PATH" "$(pwd)/g
 G=./gameframe
 expect "gameframe prints its help with no command" "find WORD" $G
 expect "gameframe steps reads the loop from re-start" "re-emulate: What exactly does this original function return" $G steps
-expect "gameframe skills lists every skill" "$(ls -d .claude/skills/re-*/ | wc -l | tr -d ' ')" sh -c "$G skills --json | '$PYTHON' -c 'import json,sys; print(len(json.load(sys.stdin)))'"
+expect "gameframe skills lists every skill" "$(ls -d skills/re-*/ | wc -l | tr -d ' ')" sh -c "$G skills --json | '$PYTHON' -c 'import json,sys; print(len(json.load(sys.stdin)))'"
 expect "gameframe skill prints one section" "## Pitfalls" $G skill emulate --section pitfalls
 expect "gameframe skill names a missing section" "has no section matching" $G skill re-trace --section nothing-here
 expect "gameframe tools shows each tool's own first line" "\"summary\": \"$(sed -n 2p tools/verify/seqdiff.py | sed 's/^"""//')\"" $G tools --json

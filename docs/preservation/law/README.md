@@ -24,8 +24,8 @@ Most countries follow one of three patterns.
 
 Observing a program while it runs is the widest permission. It covers running the original,
 capturing frames and state, and recording calls. These are the playbook's observe and emulate
-steps ([re-observe](../../../.claude/skills/re-observe/SKILL.md),
-[re-emulate](../../../.claude/skills/re-emulate/SKILL.md)). Decompiling is the narrowest
+steps ([re-observe](../../../skills/re-observe/SKILL.md),
+[re-emulate](../../../skills/re-emulate/SKILL.md)). Decompiling is the narrowest
 permission. Many countries allow it only for interoperability, and about a third of the
 countries covered give it no express cover. Of the playbook's steps, decompiling has the
 least legal cover.

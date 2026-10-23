@@ -16,7 +16,7 @@ npm --prefix site run build    # site/.vitepress/dist
 | `/guide` and the menu's sections | `docs/README.md`: each `## ` section is a menu group, in order |
 | `/games/`, `/observe/`, `/case-studies/` and their pages | `docs/<folder>/README.md` and the files it links to, in the order it links them |
 | `/game-patterns`, `/dos`, `/abi`, `/setup`, `/legal` | `docs/*.md` (URLs in lower case) |
-| `/skills/<name>` | `.claude/skills/<name>/SKILL.md`, through the dynamic route `site/skills/[skill].md`, followed by the agents that preload it and the tools it names |
+| `/skills/<name>` | `skills/<name>/SKILL.md`, through the dynamic route `site/skills/[skill].md`, followed by the agents that preload it and the tools it names |
 | `/agents/<name>` | `agents/<name>.md`, through `site/agents/[agent].md` |
 | `/tools/<name>` | The tool's own help (its docstring or header comment, as `./gameframe tool NAME` prints it), through `site/tools/[tool].md` |
 | `/skills/`, `/agents/`, `/tools/` | Index pages made from the same files, through `site/[section]/index.md` |

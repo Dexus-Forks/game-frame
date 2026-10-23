@@ -9,7 +9,7 @@ tests/run.sh --ghidra        # proves every tool against the sample game (~1½ m
 
 `scripts/setup.sh` without options only checks and prints a table. The details (sizes,
 Linux and Windows, REA registration for each agent, common problems) are in the `re-setup`
-skill: [.claude/skills/re-setup/SKILL.md](../.claude/skills/re-setup/SKILL.md).
+skill: [skills/re-setup/SKILL.md](../skills/re-setup/SKILL.md).
 
 For Linux machines, containers and cloud agent workspaces, see
 [Linux, cloud and container environments](working/environments.md). In each new shell or agent

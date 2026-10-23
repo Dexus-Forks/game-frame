@@ -137,7 +137,7 @@ The same page lists other options for capturing ground truth.
 
 MAME's Lua memory taps and its `trace` and `wpset` debugger commands are not covered here.
 See [running the original](../observe/running-the-original.md) and the
-[re-observe](../../.claude/skills/re-observe/SKILL.md) skill for capture in general.
+[re-observe](../../skills/re-observe/SKILL.md) skill for capture in general.
 
 ## Refresh rates and frame drift
 
@@ -210,7 +210,7 @@ Z80, 6502, 6809, 8080, SH-2 or TMS34010
 ([unicorn.h](https://github.com/unicorn-engine/unicorn/blob/master/include/unicorn/unicorn.h)).
 For Z80, 6502 and 6809 games, take ground truth from MAME's debugger and Lua, or from a small
 purpose-built CPU core. The [CPU families](../computers/cpu-families.md)
-page lists such cores. The [re-emulate](../../.claude/skills/re-emulate/SKILL.md) skill covers
+page lists such cores. The [re-emulate](../../skills/re-emulate/SKILL.md) skill covers
 the Unicorn path for the CPUs it supports. FinalBurn Neo, Demul and JConfig are not covered
 here.
 

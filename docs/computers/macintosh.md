@@ -67,7 +67,7 @@ AppleSingle/AppleDouble or DiskCopy images (not confirmed)
 - Unicorn runs 68k code (not confirmed) ([Unicorn Engine](https://www.unicorn-engine.org/)). A
   function from a single CODE segment could run under Unicorn with the A5 world and the needed
   traps stubbed. That is how `tools/emu/dos_env` stubs DOS
-  ([re-emulate](../../.claude/skills/re-emulate/SKILL.md)).
+  ([re-emulate](../../skills/re-emulate/SKILL.md)).
 
 ### Projects to learn from
 

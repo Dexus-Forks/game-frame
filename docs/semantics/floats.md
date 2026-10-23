@@ -76,7 +76,7 @@ Each condition matters:
 ## How to check
 
 1. Run each float routine of the original under emulation on many inputs, including values
-   near zero, near overflow, negative zero and NaN ([re-emulate](../../.claude/skills/re-emulate/SKILL.md)).
+   near zero, near overflow, negative zero and NaN ([re-emulate](../../skills/re-emulate/SKILL.md)).
    Some C runtime routines handle NaN and infinity on a separate path. MSVC's `sqrtf` passes
    them to its maths error handler, which an emulator that has not started the runtime does
    not have, so the emulation stops there (*observed*). Read that path in the disassembly, or

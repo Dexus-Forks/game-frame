@@ -22,7 +22,7 @@ Set up GameFrame on this computer for me.
 
 1. Clone https://github.com/tanepiper/game-frame into ~/code/game-frame
    (or update it with git pull if it is already there).
-2. Read AGENTS.md and .claude/skills/re-setup/SKILL.md.
+2. Read AGENTS.md and skills/re-setup/SKILL.md.
 3. Run scripts/setup.sh and show me the table of what is present and what is missing.
 4. Before you install anything, tell me what scripts/setup.sh --install will install and how
    large each part is. Wait for my answer, then run it.
@@ -45,7 +45,7 @@ GameFrame is the whole framework. It has two parts.
 
 The **playbook** is the method and the rules an agent follows:
 
-- the skills in `.claude/skills/re-*/`, one per step of the method;
+- the skills in `skills/re-*/`, one per step of the method;
 - the stage agents in `agents/`, packaged with the skills as a Claude Code plugin
   (`.claude-plugin/`);
 - the rules in `AGENTS.md` and, for each game, in the project's own `AGENTS.md`
@@ -70,8 +70,12 @@ scripts/new-project.sh ~/re/mygame "My Game" "/path/to/My Game"   # a project fo
 ```
 
 Then open the new project with your agent and ask it to start with the **re-start** skill.
-Claude Code finds the skills in `.claude/skills/` automatically; other agents read `AGENTS.md`
-and the `SKILL.md` files.
+The skills follow the Agent Skills format (https://agentskills.io). There is one copy, in
+`skills/`. The links `.claude/skills` and `.agents/skills` point to it, so Claude Code,
+Codex, Gemini CLI, GitHub Copilot, Cursor and OpenCode find the skills without setup. Agents
+that do not read skill folders read `AGENTS.md` and the `SKILL.md` files. On Windows, git makes the links
+only with symbolic links turned on (`git clone -c core.symlinks=true`, with Developer Mode);
+without them, point the agent at `skills/`.
 
 ### As a Claude Code plugin
 
@@ -124,19 +128,19 @@ to produce, and the pitfalls that cost time.
 
 | Skill | Step |
 |---|---|
-| [re-start](.claude/skills/re-start/SKILL.md) | Rules, the loop, a first-session checklist, routing to the other skills |
-| [re-setup](.claude/skills/re-setup/SKILL.md) | Install and check the toolchain; register REA for your agent |
-| [re-inventory](.claude/skills/re-inventory/SKILL.md) | Which files hold the game's code; native, managed, scripted or packed; engine and middleware; data containers; what kind of game it is |
-| [re-browse](.claude/skills/re-browse/SKILL.md) | A resource viewer from day one: the catalogue of every file (`catalog.py`), then the project's own viewer on the port's readers, for people and agents to check decoded content |
-| [re-observe](.claude/skills/re-observe/SKILL.md) | Run the original where you can watch, drive and capture it; every input; every screen; an object model with entry points for tests and agents |
-| [re-rea](.claude/skills/re-rea/SKILL.md) | When to use REA's MCP tools, and how they fit with the text export |
-| [re-ghidra](.claude/skills/re-ghidra/SKILL.md) | Headless export, queries, one-off decompiles, vtables, constants, checking the disassembly |
-| [re-trace](.claude/skills/re-trace/SKILL.md) | From a string, import, export or class name to the function, its fields and constants |
-| [re-format](.claude/skills/re-format/SKILL.md) | Decode archives, resources and saves; prove decoders on every file |
-| [re-emulate](.claude/skills/re-emulate/SKILL.md) | Run original functions under Unicorn for ground truth; trace random draws |
-| [re-port](.claude/skills/re-port/SKILL.md) | Reimplement exactly: precision, order of operations, draw order, iteration order; an exact core with commands, digests and a headless runner; additions (multiplayer, mods) kept apart |
-| [re-verify](.claude/skills/re-verify/SKILL.md) | Bit-exact parity, draw order, determinism with digests and on every platform, recordings, saves, pictures, version against version, test tiers |
-| [re-land](.claude/skills/re-land/SKILL.md) | Document in evidence style, label, commit safely |
+| [re-start](skills/re-start/SKILL.md) | Rules, the loop, a first-session checklist, routing to the other skills |
+| [re-setup](skills/re-setup/SKILL.md) | Install and check the toolchain; register REA for your agent |
+| [re-inventory](skills/re-inventory/SKILL.md) | Which files hold the game's code; native, managed, scripted or packed; engine and middleware; data containers; what kind of game it is |
+| [re-browse](skills/re-browse/SKILL.md) | A resource viewer from day one: the catalogue of every file (`catalog.py`), then the project's own viewer on the port's readers, for people and agents to check decoded content |
+| [re-observe](skills/re-observe/SKILL.md) | Run the original where you can watch, drive and capture it; every input; every screen; an object model with entry points for tests and agents |
+| [re-rea](skills/re-rea/SKILL.md) | When to use REA's MCP tools, and how they fit with the text export |
+| [re-ghidra](skills/re-ghidra/SKILL.md) | Headless export, queries, one-off decompiles, vtables, constants, checking the disassembly |
+| [re-trace](skills/re-trace/SKILL.md) | From a string, import, export or class name to the function, its fields and constants |
+| [re-format](skills/re-format/SKILL.md) | Decode archives, resources and saves; prove decoders on every file |
+| [re-emulate](skills/re-emulate/SKILL.md) | Run original functions under Unicorn for ground truth; trace random draws |
+| [re-port](skills/re-port/SKILL.md) | Reimplement exactly: precision, order of operations, draw order, iteration order; an exact core with commands, digests and a headless runner; additions (multiplayer, mods) kept apart |
+| [re-verify](skills/re-verify/SKILL.md) | Bit-exact parity, draw order, determinism with digests and on every platform, recordings, saves, pictures, version against version, test tiers |
+| [re-land](skills/re-land/SKILL.md) | Document in evidence style, label, commit safely |
 
 ## Stage agents
 
@@ -316,7 +320,7 @@ GameFrame uses two licences, one for each kind of work.
 | What | Licence |
 |---|---|
 | **Code**: `tools/`, `scripts/`, `tests/`, `examples/`, `templates/`, `site/` (its configuration and code), `.claude-plugin/`, the Ghidra scripts | [Apache License 2.0](LICENSE-APACHE) |
-| **Content**: the documentation (`docs/`), the skills (`.claude/skills/`), the agents (`agents/`), the READMEs and `AGENTS.md`, and the website's text | [CC0 1.0](LICENSE-CC0-1.0), dedicated to the public domain |
+| **Content**: the documentation (`docs/`), the skills (`skills/`), the agents (`agents/`), the READMEs and `AGENTS.md`, and the website's text | [CC0 1.0](LICENSE-CC0-1.0), dedicated to the public domain |
 
 CC0 1.0 gives up all copyright in the content, as far as the law allows. Anyone may copy,
 adapt, translate and remix it for any purpose, commercial included, without asking and without

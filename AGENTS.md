@@ -2,11 +2,11 @@
 
 This file is for agents and people who change **GameFrame itself**. To reverse engineer a
 game *with* it, create a project (`scripts/new-project.sh`): the project gets its own `AGENTS.md`
-from `templates/project/`, and the skills in `.claude/skills/` (start with `re-start`).
+from `templates/project/`, and the skills in `skills/` (start with `re-start`).
 
 ## What this repository is
 
-GameFrame is an agentic framework for reverse engineering games. Its playbook of skills and agents runs inside your coding agent. Its toolkit of tested tools checks every result against the original. The playbook is the method, the skills in `.claude/skills/re-*`, the
+GameFrame is an agentic framework for reverse engineering games. Its playbook of skills and agents runs inside your coding agent. Its toolkit of tested tools checks every result against the original. The playbook is the method, the skills in `skills/re-*`, the
 agents in `agents/` and these rules. The toolkit is `tools/` and `scripts/`. Nothing here is
 specific to one game. Un-Banished (https://github.com/tanepiper/unbanished) is the worked case study and may
 be mentioned and linked, but examples and advice must stay general.
@@ -59,7 +59,7 @@ These rules are for changes to GameFrame itself, which is a public repository.
 
 | Path | What |
 |---|---|
-| `.claude/skills/re-*/SKILL.md` | One skill per step of the method |
+| `skills/re-*/SKILL.md` | One skill per step of the method, in the Agent Skills format. `.claude/skills` and `.agents/skills` link here, so every agent finds the one copy |
 | `agents/re-*.md` | One agent per stage and nine task agents, which hand off to each other (`.claude/agents` links here) |
 | `.claude/settings.json`, `scripts/hooks/gate.py`, `hooks/hooks.json` | Permissions and the gates (hooks) for Claude Code: [docs/working/gates.md](docs/working/gates.md) |
 | `.claude-plugin/` | The Claude Code plugin and its marketplace: the skills and the agents |

@@ -27,7 +27,7 @@ Examples:
   gameframe run peinfo target/game.exe --imports
   gameframe find vtable
 
-Inputs: the skills (.claude/skills/re-*/SKILL.md), the tools (tools/, scripts/) and their own
+Inputs: the skills (skills/re-*/SKILL.md), the tools (tools/, scripts/) and their own
 help, read from the files. The same command works in GameFrame and in a project made by
 scripts/new-project.sh. Standard library only; it needs no .venv itself.
 

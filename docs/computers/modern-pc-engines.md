@@ -19,7 +19,7 @@ recognise each one.
 
 ### Tools
 
-The REA tools inspect managed assemblies ([re-rea](../../.claude/skills/re-rea/SKILL.md)).
+The REA tools inspect managed assemblies ([re-rea](../../skills/re-rea/SKILL.md)).
 
 ### For an exact reimplementation
 
@@ -46,7 +46,7 @@ Il2CppDumper rebuilds names from the metadata (not confirmed)
 ### For an exact reimplementation
 
 - Rebuild the names first. Then trace the native code as for any PE program
-  ([re-trace](../../.claude/skills/re-trace/SKILL.md)).
+  ([re-trace](../../skills/re-trace/SKILL.md)).
 
 ## Unreal Engine 4 and 5
 
@@ -91,7 +91,7 @@ gdsdecomp recovers projects (not confirmed) ([gdsdecomp](https://github.com/bruv
 Kernel-level anti-cheat can block debuggers (not confirmed)
 ([Anti-cheat software](https://en.wikipedia.org/wiki/Anti-cheat_software)). Protected or
 virtualised code is hard to decompile. Unicorn emulation is most useful on the game's own logic
-([re-emulate](../../.claude/skills/re-emulate/SKILL.md)).
+([re-emulate](../../skills/re-emulate/SKILL.md)).
 
 ## Linux builds as a second binary
 

@@ -1,4 +1,4 @@
-// One page per skill, made from .claude/skills/<skill>/SKILL.md when the site builds.
+// One page per skill, made from skills/<skill>/SKILL.md when the site builds.
 // The front matter becomes a short lead with a prompt to copy; relative links are marked for
 // links.mts to resolve. The page ends with the agents that preload the skill and the tools it names.
 import fs from 'node:fs'
@@ -22,7 +22,7 @@ function prompt(name: string): string {
 }
 
 export default {
-  watch: ['../../.claude/skills/*/SKILL.md'],
+  watch: ['../../skills/*/SKILL.md'],
   paths() {
     return skills().map(({ name, description, file }) => {
       const dir = path.relative(ROOT, path.dirname(file))

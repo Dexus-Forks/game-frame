@@ -125,9 +125,9 @@ a diagram of each team's hand-offs and the failure path.
 ## First session on a new game
 
 0. Find the tools. The commands in the skills run from a project made by `new-project.sh`
-   (it copies the tools in) or from a clone of GameFrame. If the skills came from the Claude
-   Code plugin and neither exists yet, clone GameFrame first
-   (`git clone https://github.com/tanepiper/game-frame ~/code/game-frame`) and run the steps
+   (it copies the tools in) or from a clone of GameFrame. If the skills came from a plugin or a
+   skills folder alone (the Claude Code plugin, for example) and neither exists yet, clone
+   GameFrame first (`git clone https://github.com/tanepiper/game-frame ~/code/game-frame`) and run the steps
    below from there.
 1. `scripts/setup.sh` (and `--install` if anything is missing). See `re-setup`.
 2. If the project has no repository yet: `scripts/new-project.sh DIR "Game Name" PATH/TO/GAME`.

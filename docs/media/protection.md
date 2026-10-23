@@ -84,7 +84,7 @@ Some protection systems also change the code itself, so that it is hard to read.
 In games, this kind of code usually belongs to a protection system wrapped around the game,
 and the game's own code stays readable. Find where the protection ends and the game begins. Leave the protection alone. If a game's own rules sit inside virtualised code, the usual
 route is to measure the function from outside. Call it with chosen inputs and record the
-outputs ([re-emulate](../../.claude/skills/re-emulate/SKILL.md)).
+outputs ([re-emulate](../../skills/re-emulate/SKILL.md)).
 
 ## Checks against debuggers and emulators
 
@@ -118,7 +118,7 @@ can leave the check out.
 
 The port reimplements the game. Protection is not part of the game. Mark each check the
 port leaves out with a "not ported" note at the place it would have run, so the ledger lists
-it ([re-port](../../.claude/skills/re-port/SKILL.md)). Prefer a release that has no protection.
+it ([re-port](../../skills/re-port/SKILL.md)). Prefer a release that has no protection.
 Many digital re-releases ship without the disc checks. `compare_trees.py` and `similar.py`
 show whether such a release is otherwise the same program.
 

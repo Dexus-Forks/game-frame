@@ -1,4 +1,4 @@
-"""The skills in .claude/skills/re-*/SKILL.md, their sections, and the method's steps.
+"""The skills in skills/re-*/SKILL.md, their sections, and the method's steps.
 
     from skills import skills, find, section, steps
     for s in skills(): print(s.name, s.description)

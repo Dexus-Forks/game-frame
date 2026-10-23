@@ -8,7 +8,7 @@ runs.
 
 | Environment | For | What you can capture |
 |---|---|---|
-| GameFrame's emulators (`pe_emu.py`, `dos_emu`, `dos_env`) | One function or the whole program, headless, scripted, in tests | Registers, memory, calls, random draws, frames from video memory, every byte ([re-emulate](../../.claude/skills/re-emulate/SKILL.md)) |
+| GameFrame's emulators (`pe_emu.py`, `dos_emu`, `dos_env`) | One function or the whole program, headless, scripted, in tests | Registers, memory, calls, random draws, frames from video memory, every byte ([re-emulate](../../skills/re-emulate/SKILL.md)) |
 | DOSBox-X | DOS games with a window, a debugger and file logging | Breakpoints, memory dumps, file access logs, screenshots, audio and video recording ([DOS games](../DOS.md)) |
 | DOSBox Staging | DOS games, accurate and simple to configure | Screenshots, audio and video, raw OPL output |
 | 86Box, PCem | DOS and Windows 9x games that need exact period hardware | The full machine, slowly |

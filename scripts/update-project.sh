@@ -15,6 +15,8 @@
 #     replaced with the current one;
 #   - changed in the project (contents GameFrame never had): kept, and listed at the end, so a
 #     project's own edits are never lost.
+# The skills live in skills/, with the links .claude/skills and .agents/skills to it (a copy where
+# links cannot be made). An older project's skills in .claude/skills move to skills/ first.
 # --plugin moves such a project to the plugin: every copied file that is GameFrame's (current or
 # older) is removed, the project's changed copies are kept and listed, `gameframe` becomes the
 # launcher, and .claude/settings.json enables the plugin in place of the local gates. It then
@@ -24,7 +26,7 @@
 # every change; commit it like any other.
 set -euo pipefail
 . "$(dirname "$0")/lib.sh"
-[[ $# -ge 1 ]] || { sed -n '2,25p' "$0"; exit 2; }
+[[ $# -ge 1 ]] || { sed -n '2,26p' "$0"; exit 2; }
 dir="$1"; shift; dry=""; plugin=""
 for a in "$@"; do case "$a" in --dry-run) dry=--dry-run ;; --plugin) plugin=--plugin ;; *) echo "unknown option $a" >&2; exit 2 ;; esac; done
 [[ -d "$dir/.git" || -f "$dir/.git" ]] || { echo "$dir is not a git repository" >&2; exit 1; }
@@ -49,7 +51,7 @@ def tracked(sub):
 pairs = []
 for sub in ('tools', 'scripts'):
     pairs += [(f, f) for f in tracked(sub)]
-pairs += [(f, f) for f in tracked('.claude/skills') if f.split('/')[2].startswith('re-')]
+pairs += [(f, f) for f in tracked('skills') if f.split('/')[1].startswith('re-')]
 pairs += [(f, '.claude/' + f) for f in tracked('agents')]
 pairs += [(f, f) for f in ('gameframe', 'requirements.txt', 'requirements-live.txt', '.mcp.json')]
 for f in ('ABI', 'GAME-PATTERNS', 'DOS', 'LEGAL', 'OUTPUTS', 'SETUP', 'COMPILED-CODE', 'TYPES'):
@@ -57,6 +59,47 @@ for f in ('ABI', 'GAME-PATTERNS', 'DOS', 'LEGAL', 'OUTPUTS', 'SETUP', 'COMPILED-
 for d in ('games', 'observe', 'engines', 'hardware', 'consoles', 'handhelds', 'computers', 'arcade', 'media',
           'working', 'teams', 'case-studies', 'preservation', 'assets'):
     pairs += [(f, f) for f in tracked(f'docs/{d}')]
+
+SKILL_LINKS = ('.claude/skills', '.agents/skills')
+
+def move_skills():
+    """Move an older project's skills from .claude/skills (a folder) to skills/."""
+    old = os.path.join(dest, '.claude', 'skills')
+    if os.path.islink(old) or not os.path.isdir(old) or os.path.isdir(os.path.join(dest, 'skills')):
+        return
+    if not dry:
+        shutil.move(old, os.path.join(dest, 'skills'))
+
+def link_skills():
+    """.claude/skills and .agents/skills point to skills/; a copy where links cannot be made."""
+    target = os.path.join(dest, 'skills')
+    for link in SKILL_LINKS:
+        p = os.path.join(dest, link)
+        if dry or os.path.islink(p) or not os.path.isdir(target):
+            continue
+        if os.path.isdir(p):
+            if not set(os.listdir(p)) <= set(os.listdir(target)):
+                print(f'{link} holds skills that skills/ does not: move them to skills/, then run this again.')
+                continue
+            shutil.rmtree(p)
+        os.makedirs(os.path.dirname(p), exist_ok=True)
+        try:
+            os.symlink(os.path.join('..', 'skills'), p, target_is_directory=True)
+        except OSError:
+            shutil.copytree(target, p)
+
+def unlink_skills():
+    """Remove the links once skills/ is gone."""
+    if dry or os.path.isdir(os.path.join(dest, 'skills')):
+        return
+    for link in SKILL_LINKS:
+        p = os.path.join(dest, link)
+        if os.path.islink(p):
+            os.remove(p)
+        elif os.path.isdir(p):
+            shutil.rmtree(p)
+    if os.path.isdir(os.path.join(dest, '.agents')) and not os.listdir(os.path.join(dest, '.agents')):
+        os.rmdir(os.path.join(dest, '.agents'))
 
 def is_plugin_project():
     d = os.path.join(dest, 'gameframe')
@@ -112,6 +155,7 @@ if is_plugin_project() and not to_plugin:
     sys.exit(0)
 
 added, replaced, kept, same = [], [], [], 0
+move_skills()
 if to_plugin:
     removed = []
     for src, dst in pairs:
@@ -125,10 +169,11 @@ if to_plugin:
         else:
             kept.append(dst)
     if not dry:
-        for top in ('tools', 'scripts', '.claude/skills', '.claude/agents', 'docs'):
+        for top in ('tools', 'scripts', 'skills', '.claude/agents', 'docs'):
             for base, dirs, files in os.walk(os.path.join(dest, top), topdown=False):
                 if not os.listdir(base):
                     os.rmdir(base)
+    unlink_skills()
     put_launcher()
     plugin_settings()
     print(f'{len(removed)} copied GameFrame files {verb} removed; gameframe {verb} replaced by the launcher; '
@@ -178,6 +223,7 @@ for src, dst in pairs:
         os.makedirs(os.path.dirname(d) or '.', exist_ok=True)
         shutil.copy2(s, d)
 
+link_skills()
 settings = os.path.join(dest, '.claude', 'settings.json')
 if os.path.exists(settings):
     kept.append('.claude/settings.json (compare it with GameFrame\'s: the gates are in "hooks")')

@@ -33,7 +33,7 @@ None listed.
 - Ghidra's built-in 68000 module covers the MC68010. Unicorn's M68K backend runs it
   ([CPU families](../computers/cpu-families.md#the-68000)).
 - The 6502 sound CPU has a Ghidra module and no Unicorn backend.
-- The [re-emulate](../../.claude/skills/re-emulate/SKILL.md) skill covers Unicorn ground truth.
+- The [re-emulate](../../skills/re-emulate/SKILL.md) skill covers Unicorn ground truth.
 
 ### Projects to learn from
 

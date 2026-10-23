@@ -14,8 +14,9 @@
 #   target/, analysis/, derived/   for the game, Ghidra output and ground truth: ignored by git
 # The guides stay in GameFrame (`./gameframe root` prints where), and on its website.
 # --copy instead copies GameFrame's toolkit, skills, agents, gates and guides into the project,
-# for agents that cannot use the Claude Code plugin. scripts/update-project.sh refreshes such a
-# copy, or moves it to the plugin with --plugin.
+# for agents that cannot use the Claude Code plugin. The skills go in skills/, with the links
+# .claude/skills and .agents/skills to it, so every agent finds the one copy.
+# scripts/update-project.sh refreshes such a copy, or moves it to the plugin with --plugin.
 # With PATH/TO/GAME it copies the game's executables and DLLs into target/ (data files are
 # left where they are: point the tools at them) and prints a first look at each binary.
 set -euo pipefail
@@ -23,13 +24,20 @@ set -euo pipefail
 copy=0; args=()
 for a in "$@"; do [[ "$a" == --copy ]] && copy=1 || args+=("$a"); done
 set -- ${args[@]+"${args[@]}"}
-[[ $# -ge 2 ]] || { sed -n '2,22p' "$0"; exit 2; }
+[[ $# -ge 2 ]] || { sed -n '2,21p' "$0"; exit 2; }
 dir="$1"; name="$2"; game="${3:-}"
 [[ -e "$dir" && -n "$(ls -A "$dir" 2>/dev/null)" ]] && { echo "$dir exists and is not empty" >&2; exit 1; }
 mkdir -p "$dir"/{target,analysis,derived,docs,labels,.claude}
 if [[ $copy == 1 ]]; then
   cp -R "$ROOT/tools" "$ROOT/scripts" "$dir/"
-  cp -R "$ROOT/.claude/skills" "$dir/.claude/"
+  # One copy of the skills in skills/, and links for the agents that look elsewhere:
+  # .claude/skills (Claude Code, Copilot, Cursor) and .agents/skills (Codex, Gemini CLI, others).
+  cp -R "$ROOT/skills" "$dir/skills"
+  mkdir -p "$dir/.agents"
+  for l in .claude/skills .agents/skills; do
+    # Without symbolic links (Windows without developer mode) the link is a second copy.
+    ln -s ../skills "$dir/$l" 2>/dev/null && [[ -d "$dir/$l/re-start" ]] || { rm -rf "$dir/$l"; cp -R "$ROOT/skills" "$dir/$l"; }
+  done
   cp -R "$ROOT/agents" "$dir/.claude/agents"
   # The permissions and the gates (scripts/hooks/gate.py): docs/working/gates.md.
   cp "$ROOT/.claude/settings.json" "$dir/.claude/settings.json"

@@ -7,7 +7,7 @@ authors and ROM hackers have used these features for decades, and their methods 
 reimplementation well. This page covers using an emulator to measure the original, comparing
 the port with it frame by frame, and the community's records of games. [Running the
 original](running-the-original.md) lists the emulators. GameFrame's own emulators for single
-functions are in [re-emulate](../../.claude/skills/re-emulate/SKILL.md).
+functions are in [re-emulate](../../skills/re-emulate/SKILL.md).
 
 ## What a good emulator gives
 

@@ -28,13 +28,13 @@ GameFrame asks an agent for evidence at every step.
 - **The original is required.** Every project starts from the owner's own copy. The agent reads
   that program. It has no other source.
 - **Results are measured.** The agent runs functions of the original under emulation to get
-  exact answers ([re-emulate](../../.claude/skills/re-emulate/SKILL.md)).
+  exact answers ([re-emulate](../../skills/re-emulate/SKILL.md)).
 - **The port must match.** The new code must give the same answers to the last bit. A port that
-  does not match fails its tests ([re-verify](../../.claude/skills/re-verify/SKILL.md)).
+  does not match fails its tests ([re-verify](../../skills/re-verify/SKILL.md)).
 - **Every claim is cited.** Each finding names the place in the original it came from, and says
   whether it was read, measured or guessed ([Writing findings](../working/writing.md)).
 - **A person reviews the work.** The agent lands each piece of work as a small commit that a
-  person reads ([re-land](../../.claude/skills/re-land/SKILL.md)).
+  person reads ([re-land](../../skills/re-land/SKILL.md)).
 - **Nothing from the game is shared.** Decompiled code stays on the owner's computer. The
   published code is new ([Legal](../LEGAL.md)).
 
