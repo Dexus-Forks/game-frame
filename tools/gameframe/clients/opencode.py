@@ -7,7 +7,7 @@ own settings say.
 """
 import json
 
-from clients import allowed
+from clients import allowed, body
 
 DIR = '.opencode/agents'
 
@@ -21,4 +21,4 @@ def render(agent, generated):
     deny = [p for p in allowed([], 2, every=True) if p not in keep]
     perms = ''.join(f'\n  {p}: deny' for p in deny)
     return (f"---\ndescription: {json.dumps(agent['description'])}\nmode: subagent\n"
-            f"permission:{perms or ' {}'}\n---\n\n<!-- {generated} -->\n\n{agent['body']}")
+            f"permission:{perms or ' {}'}\n---\n\n<!-- {generated} -->\n\n{body(agent)}")

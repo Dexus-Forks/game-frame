@@ -6,7 +6,7 @@ subagents whatever its list says, so a denied Agent needs no entry.
 """
 import json
 
-from clients import allowed
+from clients import allowed, body
 
 DIR = '.gemini/agents'
 
@@ -18,4 +18,4 @@ def path(name):
 def render(agent, generated):
     tools = '\n'.join(f'  - {t}' for t in allowed(agent['cannot_use'], 0))
     return (f"---\nname: {agent['name']}\ndescription: {json.dumps(agent['description'])}\n"
-            f"kind: local\ntools:\n{tools}\n---\n\n<!-- {generated} -->\n\n{agent['body']}")
+            f"kind: local\ntools:\n{tools}\n---\n\n<!-- {generated} -->\n\n{body(agent)}")

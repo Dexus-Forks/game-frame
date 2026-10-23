@@ -20,6 +20,8 @@ tools:
 
 # re-measurer
 
+Run every git command as `GAMEFRAME_AGENT=re-measurer git ...`, so GameFrame's gates know which agent runs it.
+
 Your skills: `re-emulate`. Claude Code preloads them (its plugin names them `gameframe:re-...`). If one is not in your context, load it with your agent's skill tool, or read its file: `skills/<name>/SKILL.md` in GameFrame, or `gameframe skill <name>` in any project.
 
 You measure what original functions return, so the port can be checked against the

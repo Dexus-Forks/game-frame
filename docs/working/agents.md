@@ -189,6 +189,10 @@ Each agent's front matter has five keys. Clients that do not know a key ignore i
 | `color` | Its colour in the session list | `color` | left out | left out | left out | left out |
 | `disallowedTools` | The tools it may not use, by Claude Code's names | `disallowedTools` | said in the instructions | an allowlist, `tools` | an allowlist, `tools` | `permission: deny` |
 
+Every generated copy adds a line after its title: run each git command as
+`GAMEFRAME_AGENT=<name> git ...`. Only Claude Code tells a hook which agent is running, so the
+[gates](gates.md) read this variable in the other clients.
+
 The body becomes the agent's instructions in every client: `developer_instructions` for Codex,
 the Markdown body for the others. Codex runs an agent with the session's own tools, sandbox and
 MCP servers. Its file cannot remove web access or subagents, so the instructions name what the
@@ -222,9 +226,9 @@ Copilot's `web` covers both web tools, so it stays allowed while either is allow
 | Client | Rules | Skills | Subagents | Hooks (the gates) | MCP servers |
 |---|---|---|---|---|---|
 | Claude Code | `CLAUDE.md`, which imports `AGENTS.md` | `.claude/skills/`, or the plugin | `.claude/agents/`, or the plugin | `.claude/settings.json`, or the plugin's `hooks/hooks.json` | `.mcp.json` |
-| Codex | `AGENTS.md` | `.agents/skills/` | `.codex/agents/*.toml` | see [Gates](gates.md) | `.codex/config.toml`, `[mcp_servers]` |
+| Codex | `AGENTS.md` | `.agents/skills/` | `.codex/agents/*.toml` | see [Gates](gates.md) | `.codex/config.toml`, `[mcp_servers]`, in trusted projects only |
 | Gemini CLI | `GEMINI.md`, or `AGENTS.md` through `context.fileName` | `.gemini/skills/`, `.agents/skills/` | `.gemini/agents/*.md` (experimental) | `.gemini/settings.json`, `hooks` | `.gemini/settings.json`, `mcpServers` |
-| GitHub Copilot | `AGENTS.md`, `.github/copilot-instructions.md` | `.github/skills/`, `.claude/skills/` | `.github/agents/*.agent.md`; VS Code also `.claude/agents/` | `.github/hooks/` | VS Code `.vscode/mcp.json`; on GitHub.com, the repository's settings |
+| GitHub Copilot | `AGENTS.md` (in VS Code, `chat.useAgentsMdFile`), `.github/copilot-instructions.md` | `.github/skills/`, `.claude/skills/` | `.github/agents/*.agent.md`; VS Code also `.claude/agents/` | `.github/hooks/` | VS Code `.vscode/mcp.json`; on GitHub.com, the repository's settings |
 | Cursor | `AGENTS.md`, `.cursor/rules/` | `.cursor/skills/`, `.claude/skills/` | `.cursor/agents/`, `.claude/agents/`, `.codex/agents/` | `.cursor/hooks.json` | `.cursor/mcp.json` |
 | OpenCode | `AGENTS.md` | `.opencode/skills/`, `.claude/skills/`, `.agents/skills/` | `.opencode/agents/*.md` | plugins in `.opencode/plugins/` | `opencode.json`, `mcp` |
 

@@ -6,7 +6,7 @@ turns off the shell tool, the one tool a Codex agent file can remove.
 """
 import json
 
-from clients import limits
+from clients import body as full_body
 
 DIR = '.codex/agents'
 
@@ -16,11 +16,7 @@ def path(name):
 
 
 def render(agent, generated):
-    body = agent['body']
-    note = limits(agent['cannot_use'])
-    if note:
-        title, rest = body.split('\n', 1)
-        body = f'{title}\n\n{note}\n{rest}'
+    body = full_body(agent, with_limits=True)
     if "'''" in body:
         raise ValueError(f"{agent['name']}: the body holds ''' and cannot be a TOML literal string")
     lines = [f'# {generated}',

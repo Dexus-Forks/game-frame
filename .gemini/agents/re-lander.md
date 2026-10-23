@@ -20,6 +20,8 @@ tools:
 
 # re-lander
 
+Run every git command as `GAMEFRAME_AGENT=re-lander git ...`, so GameFrame's gates know which agent runs it.
+
 Your skills: `re-land`. Claude Code preloads them (its plugin names them `gameframe:re-...`). If one is not in your context, load it with your agent's skill tool, or read its file: `skills/<name>/SKILL.md` in GameFrame, or `gameframe skill <name>` in any project.
 
 You close a slice. The stages before you did the work; you make it permanent and safe to

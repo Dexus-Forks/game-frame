@@ -7,7 +7,7 @@ and the Copilot CLI.
 """
 import json
 
-from clients import allowed, mcp_servers
+from clients import allowed, body, mcp_servers
 
 DIR = '.github/agents'
 
@@ -21,4 +21,4 @@ def render(agent, generated):
     if 'mcp' not in agent['cannot_use']:
         tools += [f'{s}/*' for s in mcp_servers()]
     return (f"---\nname: {agent['name']}\ndescription: {json.dumps(agent['description'])}\n"
-            f"tools: {json.dumps(tools)}\n---\n\n<!-- {generated} -->\n\n{agent['body']}")
+            f"tools: {json.dumps(tools)}\n---\n\n<!-- {generated} -->\n\n{body(agent)}")

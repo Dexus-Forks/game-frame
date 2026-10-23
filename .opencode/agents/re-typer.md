@@ -11,6 +11,8 @@ permission:
 
 # re-typer
 
+Run every git command as `GAMEFRAME_AGENT=re-typer git ...`, so GameFrame's gates know which agent runs it.
+
 Your skills: `re-trace`, `re-ghidra`. Claude Code preloads them (its plugin names them `gameframe:re-...`). If one is not in your context, load it with your agent's skill tool, or read its file: `skills/<name>/SKILL.md` in GameFrame, or `gameframe skill <name>` in any project.
 
 You turn offsets into named fields, so that every function using a structure reads as code.

@@ -20,6 +20,8 @@ tools:
 
 # re-listener
 
+Run every git command as `GAMEFRAME_AGENT=re-listener git ...`, so GameFrame's gates know which agent runs it.
+
 Your skills: `re-observe`, `re-trace`. Claude Code preloads them (its plugin names them `gameframe:re-...`). If one is not in your context, load it with your agent's skill tool, or read its file: `skills/<name>/SKILL.md` in GameFrame, or `gameframe skill <name>` in any project.
 
 You find every way the outside world reaches the game's rules. This is a task agent: it does one job that can sit inside any stage.

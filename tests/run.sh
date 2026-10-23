@@ -717,6 +717,8 @@ for name in names:
     assert ('web' in tools) == ('WebFetch' not in denied or 'WebSearch' not in denied), f'{name}: copilot web'
     oc = (gen / '.opencode/agents' / f'{name}.md').read_text()
     assert 'mode: subagent' in oc and '  task: deny' in oc, f'{name}: opencode'
+    for text in (codex['developer_instructions'], gem, cop, oc):
+        assert f'`GAMEFRAME_AGENT={name} git ...`' in text, f'{name}: a copy does not name itself to the gates'
 for d in ('.codex/agents', '.gemini/agents', '.github/agents', '.opencode/agents'):
     assert len(list((gen / d).glob('re-*'))) == len(names), f'{d}: not one file per agent'
 print(len(names), 'agents in 4 formats')

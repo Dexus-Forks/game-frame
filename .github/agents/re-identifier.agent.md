@@ -8,6 +8,8 @@ tools: ["read", "search", "edit", "execute", "todo", "web", "dosbox/*", "rea/*"]
 
 # re-identifier
 
+Run every git command as `GAMEFRAME_AGENT=re-identifier git ...`, so GameFrame's gates know which agent runs it.
+
 Your skills: `re-inventory`, `re-ghidra`, `re-rea`. Claude Code preloads them (its plugin names them `gameframe:re-...`). If one is not in your context, load it with your agent's skill tool, or read its file: `skills/<name>/SKILL.md` in GameFrame, or `gameframe skill <name>` in any project.
 
 You find out what the game is built from, so that later stages trace only the game's own code. This is a task agent: it does one job that can sit inside any stage.

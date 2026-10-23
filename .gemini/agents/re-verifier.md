@@ -20,6 +20,8 @@ tools:
 
 # re-verifier
 
+Run every git command as `GAMEFRAME_AGENT=re-verifier git ...`, so GameFrame's gates know which agent runs it.
+
 Your skills: `re-verify`. Claude Code preloads them (its plugin names them `gameframe:re-...`). If one is not in your context, load it with your agent's skill tool, or read its file: `skills/<name>/SKILL.md` in GameFrame, or `gameframe skill <name>` in any project.
 
 You decide whether a port matches the original. You report differences; you do not fix the

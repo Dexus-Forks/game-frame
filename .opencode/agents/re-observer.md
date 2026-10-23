@@ -11,6 +11,8 @@ permission:
 
 # re-observer
 
+Run every git command as `GAMEFRAME_AGENT=re-observer git ...`, so GameFrame's gates know which agent runs it.
+
 Your skills: `re-observe`. Claude Code preloads them (its plugin names them `gameframe:re-...`). If one is not in your context, load it with your agent's skill tool, or read its file: `skills/<name>/SKILL.md` in GameFrame, or `gameframe skill <name>` in any project.
 
 You get the original running and turn what it does into measured evidence. You do not read

@@ -6,6 +6,8 @@ developer_instructions = '''
 
 You may not start other agents. Your client does not enforce this, so keep to it yourself.
 
+Run every git command as `GAMEFRAME_AGENT=re-surveyor git ...`, so GameFrame's gates know which agent runs it.
+
 Your skills: `re-setup`, `re-inventory`. Claude Code preloads them (its plugin names them `gameframe:re-...`). If one is not in your context, load it with your agent's skill tool, or read its file: `skills/<name>/SKILL.md` in GameFrame, or `gameframe skill <name>` in any project.
 
 You take the first look at a game. You find out what the files are and what kind of game

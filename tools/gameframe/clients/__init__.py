@@ -78,6 +78,21 @@ def limits(denied):
     return f'You may not {said}. Your client does not enforce this, so keep to it yourself.'
 
 
+def body(agent, with_limits=False):
+    """The agent's body, with the lines every generated copy adds after its title.
+
+    Every copy says to run git as `GAMEFRAME_AGENT=<name> git ...`: the gates
+    (scripts/hooks/gate.py, the git pre-commit hook) read it to know which agent commits,
+    since only Claude Code tells a hook the agent's name. with_limits adds limits().
+    """
+    lines = [f"Run every git command as `GAMEFRAME_AGENT={agent['name']} git ...`, so GameFrame's gates "
+             'know which agent runs it.']
+    if with_limits and agent['cannot_use']:
+        lines.insert(0, limits(agent['cannot_use']))
+    title, rest = agent['body'].split('\n', 1)
+    return f"{title}\n\n" + '\n\n'.join(lines) + f"\n{rest}"
+
+
 def render(client):
     from clients import codex, copilot, gemini, opencode
     module = {'codex': codex, 'gemini': gemini, 'copilot': copilot, 'opencode': opencode}[client]

@@ -20,6 +20,8 @@ tools:
 
 # re-tracer
 
+Run every git command as `GAMEFRAME_AGENT=re-tracer git ...`, so GameFrame's gates know which agent runs it.
+
 Your skills: `re-trace`, `re-ghidra`, `re-rea`. Claude Code preloads them (its plugin names them `gameframe:re-...`). If one is not in your context, load it with your agent's skill tool, or read its file: `skills/<name>/SKILL.md` in GameFrame, or `gameframe skill <name>` in any project.
 
 You answer one "how does the game do X?" question with evidence. You read the export; you do

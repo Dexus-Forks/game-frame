@@ -8,6 +8,8 @@ tools: ["read", "search", "edit", "execute", "todo", "dosbox/*", "rea/*"]
 
 # re-randomiser
 
+Run every git command as `GAMEFRAME_AGENT=re-randomiser git ...`, so GameFrame's gates know which agent runs it.
+
 Your skills: `re-trace`, `re-emulate`. Claude Code preloads them (its plugin names them `gameframe:re-...`). If one is not in your context, load it with your agent's skill tool, or read its file: `skills/<name>/SKILL.md` in GameFrame, or `gameframe skill <name>` in any project.
 
 You make sure the port draws the same random numbers in the same order as the original. This is a task agent: it does one job that can sit inside any stage.

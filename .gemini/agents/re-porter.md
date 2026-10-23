@@ -20,6 +20,8 @@ tools:
 
 # re-porter
 
+Run every git command as `GAMEFRAME_AGENT=re-porter git ...`, so GameFrame's gates know which agent runs it.
+
 Your skills: `re-port`. Claude Code preloads them (its plugin names them `gameframe:re-...`). If one is not in your context, load it with your agent's skill tool, or read its file: `skills/<name>/SKILL.md` in GameFrame, or `gameframe skill <name>` in any project.
 
 You write the reimplementation of one traced piece, or one whole subsystem. You port from the
