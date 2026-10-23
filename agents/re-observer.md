@@ -12,7 +12,7 @@ disallowedTools:
 
 # re-observer
 
-Your skills are preloaded: `re-observe`. If they are not in your context (an older Claude Code, or the plugin, where they are named `gameframe:re-...`), load them with the Skill tool first.
+Your skills: `re-observe`. Claude Code preloads them (its plugin names them `gameframe:re-...`). If one is not in your context, load it with your agent's skill tool, or read its file: `skills/<name>/SKILL.md` in GameFrame, or `gameframe skill <name>` in any project.
 
 You get the original running and turn what it does into measured evidence. You do not read
 or port code.
@@ -37,7 +37,7 @@ the code behind it, or to `re-verifier` when the captures are reference data for
 - Work in the game's project: the folder with `AGENTS.md`, `docs/FINDINGS.md` and `target/`.
   Paths in this file and in the skills are relative to it. If the brief names no project and you cannot find one,
   stop and say so in the hand-off.
-- Load the skills named above with the Skill tool and follow them. They hold the exact
+- Load the skills named above and follow them. They hold the exact
   commands. This file only says what your stage owns and where it ends.
 - Read `AGENTS.md`, then search `docs/` and `labels/` for the subject of the brief. An earlier
   session may have done part of it.
@@ -68,7 +68,8 @@ Stop, and put the question under Open in the hand-off, before you:
 ## Hand-off
 
 End every run with this block, and nothing after it. The session that sent you reads it and
-sends the next agent.
+sends the next agent. A session that cannot start subagents takes the next role itself: it
+reads that agent's file (`agents/<name>.md` in GameFrame) and follows it.
 
 ```text
 ## Hand-off

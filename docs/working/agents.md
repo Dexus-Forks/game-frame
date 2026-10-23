@@ -159,6 +159,89 @@ stops at the same points:
 `gameframe agents --table` prints this table from the agents' own files. The tests check that
 the two match.
 
+## Agents in every client
+
+The agents in `agents/re-*.md` are the one source. Claude Code reads them through the
+`.claude/agents` link. Other coding agents read their own formats, which
+`gameframe agents --emit all` writes from that source:
+
+| Client | Agent files | Written by |
+|---|---|---|
+| Claude Code | `.claude/agents/` (a link to `agents/`) | nothing: the source itself |
+| Codex | `.codex/agents/<name>.toml` | `gameframe agents --emit codex` |
+| Gemini CLI | `.gemini/agents/<name>.md` | `gameframe agents --emit gemini` |
+| GitHub Copilot | `.github/agents/<name>.agent.md` | `gameframe agents --emit copilot` |
+| OpenCode | `.opencode/agents/<name>.md` | `gameframe agents --emit opencode` |
+| Cursor | `.claude/agents/` and `.codex/agents/` | nothing more |
+
+Never edit a generated file. Edit the agent in `agents/`, then run `gameframe agents --emit all`.
+The tests generate the files again and fail when the copies in the repository differ.
+
+### The source's front matter
+
+Each agent's front matter has five keys. Clients that do not know a key ignore it.
+
+| Key | What it says | Claude Code | Codex | Gemini CLI | Copilot | OpenCode |
+|---|---|---|---|---|---|---|
+| `name` | The agent's name, the same as its file name | `name` | `name` | `name` | `name` | the file name |
+| `description` | When to send this agent | `description` | `description` | `description` | `description` | `description` |
+| `skills` | The skills it loads, from `skills/` | preloaded | named in the instructions | named in the instructions | named in the instructions | named in the instructions |
+| `color` | Its colour in the session list | `color` | left out | left out | left out | left out |
+| `disallowedTools` | The tools it may not use, by Claude Code's names | `disallowedTools` | said in the instructions | an allowlist, `tools` | an allowlist, `tools` | `permission: deny` |
+
+The body becomes the agent's instructions in every client: `developer_instructions` for Codex,
+the Markdown body for the others. Codex runs an agent with the session's own tools, sandbox and
+MCP servers. Its file cannot remove web access or subagents, so the instructions name what the
+agent may not do. A denied `Bash` also sets `[features] shell_tool = false`.
+
+### Tool names
+
+`disallowedTools` may only name the tools in this table. Gemini CLI and Copilot take only an
+allowlist, so their files list every name in their column that an allowed tool still maps to.
+Copilot's `web` covers both web tools, so it stays allowed while either is allowed.
+
+| Claude Code | Gemini CLI | Copilot | OpenCode |
+|---|---|---|---|
+| `Read` | `read_file`, `read_many_files`, `list_directory` | `read` | `read` |
+| `Grep` | `grep_search` | `search` | `grep` |
+| `Glob` | `glob` | `search` | `glob` |
+| `Edit` | `replace` | `edit` | `edit` |
+| `Write` | `write_file` | `edit` | `edit` |
+| `Bash` | `run_shell_command` | `execute` | `bash` |
+| `TodoWrite` | `write_todos` | `todo` | `todowrite` |
+| `Skill` | `activate_skill` | none | `skill` |
+| `WebFetch` | `web_fetch` | `web` | `webfetch` |
+| `WebSearch` | `google_web_search` | `web` | `websearch` |
+| `Agent` | none: subagents cannot start subagents | `agent` | `task` |
+| MCP tools | `mcp_*` | `<server>/*` for each server in `.mcp.json` | not limited |
+
+`tools/gameframe/clients/` holds this table in code (`TOOLS`). Change both together.
+
+### Where each client reads its configuration
+
+| Client | Rules | Skills | Subagents | Hooks (the gates) | MCP servers |
+|---|---|---|---|---|---|
+| Claude Code | `CLAUDE.md`, which imports `AGENTS.md` | `.claude/skills/`, or the plugin | `.claude/agents/`, or the plugin | `.claude/settings.json`, or the plugin's `hooks/hooks.json` | `.mcp.json` |
+| Codex | `AGENTS.md` | `.agents/skills/` | `.codex/agents/*.toml` | see [Gates](gates.md) | `.codex/config.toml`, `[mcp_servers]` |
+| Gemini CLI | `GEMINI.md`, or `AGENTS.md` through `context.fileName` | `.gemini/skills/`, `.agents/skills/` | `.gemini/agents/*.md` (experimental) | `.gemini/settings.json`, `hooks` | `.gemini/settings.json`, `mcpServers` |
+| GitHub Copilot | `AGENTS.md`, `.github/copilot-instructions.md` | `.github/skills/`, `.claude/skills/` | `.github/agents/*.agent.md`; VS Code also `.claude/agents/` | `.github/hooks/` | VS Code `.vscode/mcp.json`; on GitHub.com, the repository's settings |
+| Cursor | `AGENTS.md`, `.cursor/rules/` | `.cursor/skills/`, `.claude/skills/` | `.cursor/agents/`, `.claude/agents/`, `.codex/agents/` | `.cursor/hooks.json` | `.cursor/mcp.json` |
+| OpenCode | `AGENTS.md` | `.opencode/skills/`, `.claude/skills/`, `.agents/skills/` | `.opencode/agents/*.md` | plugins in `.opencode/plugins/` | `opencode.json`, `mcp` |
+
+These formats change often. Codex's and Gemini CLI's agent files are new. Check a client's own
+documentation when a cell matters: [Codex subagents](https://developers.openai.com/codex/subagents),
+[Gemini CLI subagents](https://geminicli.com/docs/core/subagents/),
+[Copilot custom agents](https://docs.github.com/en/copilot/reference/custom-agents-configuration),
+[Cursor subagents](https://cursor.com/docs/context/subagents),
+[OpenCode agents](https://opencode.ai/docs/agents/).
+
+### Without subagents
+
+Some clients cannot start subagents, or the user may prefer one session. Then the session
+takes each role itself. It reads the agent's file, follows it, writes the hand-off, and then
+reads the file of the agent that the hand-off's `Next` line names. The rules stay the same:
+only the lander's role commits, and the session shows the user each `Decisions` line.
+
 ## Run long work in the background
 
 - Ghidra exports, long fuzz runs, full test tiers and builds can take minutes. Start them in the background with a time limit. Do other work meanwhile.

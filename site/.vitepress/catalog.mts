@@ -110,7 +110,9 @@ export function agentPage(a: Agent, relink: (body: string, file: string) => stri
     `> **Agent \`${a.name}\`.** ${esc(a.description)}`, '',
     `Preloaded skills: ${a.skills.map(s => `[${s}](/skills/${s})`).join(', ') || 'none'}.`, '',
     'Claude Code runs it as a subagent from `.claude/agents/` in a project, or from the GameFrame'
-    + ' plugin as `gameframe:' + a.name + '`. [Agent teams](/teams/) shows how the agents hand work'
+    + ' plugin as `gameframe:' + a.name + '`. Codex, Gemini CLI and Copilot read the copies that'
+    + ' `gameframe agents --emit` writes ([Agents in every client](/working/agents#agents-in-every-client)).'
+    + ' [Agent teams](/teams/) shows how the agents hand work'
     + ` to each other. [Source on GitHub](${githubUrl(path.relative(ROOT, a.file))}).`, '',
   ].join('\n')
   const body = relink(a.body, a.file)

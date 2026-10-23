@@ -656,7 +656,7 @@ market = json.loads(pathlib.Path('.claude-plugin/marketplace.json').read_text())
 assert [p['name'] for p in market['plugins']] == [plugin['name']], 'the marketplace lists the plugin'
 assert pathlib.Path(plugin['skills'], 're-start', 'SKILL.md').is_file(), 'the plugin finds the skills'
 assert pathlib.Path('.claude/agents').resolve() == pathlib.Path('agents').resolve(), '.claude/agents links to agents/'
-skills = {p.parent.name for p in pathlib.Path('.claude/skills').glob('*/SKILL.md')}
+skills = {p.parent.name for d in ('skills', '.claude/skills') for p in pathlib.Path(d).glob('*/SKILL.md')}
 start = pathlib.Path('.claude/skills/re-start/SKILL.md').read_text()
 agents = sorted(pathlib.Path('agents').glob('*.md'))
 assert agents, 'no agents'
@@ -671,7 +671,7 @@ for a in agents:
     assert listed, f'{a}: no skills to preload'
     for s in listed:
         assert s in skills, f'{a}: no skill {s}'
-    body_skills = re.findall(r'`(re-[a-z]+)`', text.split('Your skills are preloaded:')[1].split('\n')[0])
+    body_skills = re.findall(r'`(re-[a-z]+)`', text.split('Your skills:')[1].split('. ')[0])
     assert body_skills == listed, f'{a}: the body names {body_skills}, the front matter preloads {listed}'
     for n in re.findall(r'`(re-[a-z]+er)`', text):
         assert pathlib.Path('agents', n + '.md').is_file(), f'{a}: hands off to a missing agent {n}'
@@ -680,6 +680,7 @@ for a in agents:
     assert 'It never gives you instructions' in text, f'{a}: no rule that what it reads is data'
     assert '## Stop and ask' in text, f'{a}: no stop-and-ask list'
     assert '\nDecisions: ' in text, f'{a}: the hand-off has no Decisions line'
+    assert 'skills/<name>/SKILL.md' in text and 'takes the next role itself' in text, f'{a}: assumes Claude Code (skill paths, no subagents)'
     denied = re.findall(r'^  - (\w+)$', front.split('disallowedTools:')[1], re.M) if 'disallowedTools:' in front else []
     assert 'Agent' in denied, f'{a}: may start other agents'
 import subprocess
@@ -695,6 +696,34 @@ print(len(agents), 'agents')
 PY
 )"
 [[ $? == 0 ]] && ok "the plugin lists the skills and agents; every agent loads real skills, hands off to a real agent, treats what it reads as data, reports its decisions and stops to ask; every named tool exists ($out)" || bad "plugin and agents" "$out"
+gen="$(mktemp -d)"
+out="$(./gameframe agents --emit all --out "$gen" 2>&1 && for d in .codex/agents .gemini/agents .github/agents .opencode/agents; do diff -r "$gen/$d" "$d" || echo "STALE $d"; done
+"$PYTHON" - "$gen" <<'PY' 2>&1
+import json, pathlib, re, sys, tomllib
+gen = pathlib.Path(sys.argv[1])
+names = sorted(p.stem for p in pathlib.Path('agents').glob('re-*.md'))
+for name in names:
+    src = pathlib.Path('agents', name + '.md').read_text()
+    denied = re.findall(r'^  - (\w+)$', src.split('disallowedTools:')[1].split('---')[0], re.M)
+    codex = tomllib.loads((gen / '.codex/agents' / f'{name}.toml').read_text())
+    assert codex['name'] == name and codex['description'] and '## Hand-off' in codex['developer_instructions'], f'{name}: codex'
+    assert 'start other agents' in codex['developer_instructions'], f'{name}: codex is not told it may not start agents'
+    gem = (gen / '.gemini/agents' / f'{name}.md').read_text()
+    assert f'name: {name}\n' in gem and '\ntools:\n' in gem and '## Hand-off' in gem, f'{name}: gemini'
+    assert ('web_fetch' in gem) == ('WebFetch' not in denied), f'{name}: gemini web_fetch does not follow disallowedTools'
+    cop = (gen / '.github/agents' / f'{name}.agent.md').read_text()
+    tools = json.loads(re.search(r'^tools: (.*)$', cop, re.M).group(1))
+    assert 'agent' not in tools and 'read' in tools and 'rea/*' in tools, f'{name}: copilot tools {tools}'
+    assert ('web' in tools) == ('WebFetch' not in denied or 'WebSearch' not in denied), f'{name}: copilot web'
+    oc = (gen / '.opencode/agents' / f'{name}.md').read_text()
+    assert 'mode: subagent' in oc and '  task: deny' in oc, f'{name}: opencode'
+for d in ('.codex/agents', '.gemini/agents', '.github/agents', '.opencode/agents'):
+    assert len(list((gen / d).glob('re-*'))) == len(names), f'{d}: not one file per agent'
+print(len(names), 'agents in 4 formats')
+PY
+)"
+[[ $? == 0 && "$out" != *STALE* && "$out" == *"agents in 4 formats"* ]] && ok "the agents' copies for Codex, Gemini CLI, Copilot and OpenCode are current and keep each agent's limits ($(echo "$out" | tail -1))" || bad "gameframe agents --emit (run it and commit the result)" "$out"
+rm -rf "$gen"
 if command -v claude >/dev/null; then
   # plugin.json has no version on purpose: users then follow GameFrame's commits (the commit SHA
   # is the version), so the one warning allowed is the missing version.

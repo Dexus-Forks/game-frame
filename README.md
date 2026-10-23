@@ -157,6 +157,12 @@ classes), `re-matcher` (a crate or
 library against the game), `re-editor` (documents to the writing rules) and `re-checker`
 (claims and sources). `re-start` ("Task agents") has their table.
 
+Claude Code, Cursor and VS Code read the agents in `agents/` (through `.claude/agents`). Codex,
+Gemini CLI, GitHub Copilot and OpenCode read copies in their own formats, which
+`gameframe agents --emit all` writes. A client without subagents takes each role in one
+session. [Agents in every client](docs/working/agents.md#agents-in-every-client) has the support
+matrix.
+
 [Agent teams](docs/teams/README.md) shows how the agents work together: seven teams for
 common pieces of work (start-up, an exact system, a data format, the main loop, the interface,
 sound and hardware, documentation), each with a diagram of its hand-offs, the data passed
@@ -316,7 +322,7 @@ GameFrame uses two licences, one for each kind of work.
 | What | Licence |
 |---|---|
 | **Code**: `tools/`, `scripts/`, `tests/`, `examples/`, `templates/`, `site/` (its configuration and code), `.claude-plugin/`, the Ghidra scripts | [Apache License 2.0](LICENSE-APACHE) |
-| **Content**: the documentation (`docs/`), the skills (`.claude/skills/`), the agents (`agents/`), the READMEs and `AGENTS.md`, and the website's text | [CC0 1.0](LICENSE-CC0-1.0), dedicated to the public domain |
+| **Content**: the documentation (`docs/`), the skills (`.claude/skills/`), the agents (`agents/`, and their generated copies in `.codex/`, `.gemini/`, `.github/agents/` and `.opencode/`), the READMEs and `AGENTS.md`, and the website's text | [CC0 1.0](LICENSE-CC0-1.0), dedicated to the public domain |
 
 CC0 1.0 gives up all copyright in the content, as far as the law allows. Anyone may copy,
 adapt, translate and remix it for any purpose, commercial included, without asking and without

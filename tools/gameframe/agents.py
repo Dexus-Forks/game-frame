@@ -1,13 +1,16 @@
 """The agents, read from their own files: what each one loads, cannot use, and hands off to.
 
-The table in docs/working/agents.md is this module's output (`gameframe agents --table`), so
-the guide always describes the agents as they are configured.
+The source is agents/re-*.md (in a project made with `new-project.sh --copy`, its copy in
+.claude/agents/). The table in docs/working/agents.md is this module's output
+(`gameframe agents --table`), so the guide always describes the agents as they are configured.
+clients/ turns the same files into each coding agent's own format (`gameframe agents --emit`).
 """
+import json
 import re
 
 from paths import ROOT
 
-AGENTS = ROOT / '.claude' / 'agents'
+AGENTS = ROOT / 'agents' if (ROOT / 'agents').is_dir() else ROOT / '.claude' / 'agents'
 
 
 def _list(front, key):
@@ -15,19 +18,31 @@ def _list(front, key):
     return [line[4:].strip() for line in m.group(1).splitlines()] if m else []
 
 
+def _scalar(front, key):
+    m = re.search(rf'^{key}: (.*)$', front, re.M)
+    if not m:
+        return ''
+    value = m.group(1).strip()
+    return json.loads(value) if value.startswith('"') else value
+
+
 def agents():
     out = []
     for p in sorted(AGENTS.glob('*.md')):
         text = p.read_text(encoding='utf-8')
-        front = re.match(r'---\n(.*?)\n---\n', text, re.S).group(1)
-        desc = re.search(r'^description: "?(.*?)"?$', front, re.M).group(1)
+        m = re.match(r'---\n(.*?)\n---\n', text, re.S)
+        front, body = m.group(1), text[m.end():]
+        desc = _scalar(front, 'description')
         ends = text.split('## Where it ends', 1)[1].split('\n## ', 1)[0] if '## Where it ends' in text else ''
         out.append({
             'name': p.stem,
             'summary': desc.split('. ')[0].rstrip('.') + '.',
+            'description': desc,
+            'color': _scalar(front, 'color'),
             'skills': _list(front, 'skills'),
             'cannot_use': _list(front, 'disallowedTools'),
             'hands_off_to': sorted(set(re.findall(r'`(re-[a-z]+er)`', ends)) - {p.stem}),
+            'body': body.lstrip('\n'),
         })
     return out
 

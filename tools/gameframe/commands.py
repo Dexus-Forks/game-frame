@@ -8,11 +8,13 @@ import shutil
 import subprocess
 import sys
 import textwrap
+from pathlib import Path
 
 import agents
 import catalog
+import clients
 import skills
-from paths import NAME, SCRIPTS, python, rel
+from paths import NAME, ROOT, SCRIPTS, python, rel
 from search import search
 
 GROUPS = {'disc': 'Discs and disk images', 'pe': 'Windows PE', 'dos': '16-bit DOS', 'emu': 'Emulators', 'triage': 'Triage',
@@ -89,12 +91,28 @@ def list_agents(args):
     if args.table:
         print(agents.table())
         return 0
+    if args.emit:
+        return emit_agents(args.emit, args.out)
     found = agents.agents()
     if args.json:
-        return _dump(found)
+        return _dump([{k: v for k, v in a.items() if k != 'body'} for a in found])
     pad = max(len(a['name']) for a in found) + 2
     for a in found:
         print(_row(a['name'], a['summary'], pad))
+    return 0
+
+
+def emit_agents(client, out):
+    """Write each client's agent files, and remove generated files whose agent is gone."""
+    out = Path(out) if out else ROOT
+    for c in clients.CLIENTS if client == 'all' else (client,):
+        files = clients.render(c)
+        for old in {(out / f).parent for f in files}:
+            for p in old.glob('re-*') if old.is_dir() else ():
+                if str(p.relative_to(out)) not in files:
+                    p.unlink()
+        clients.write(files, out)
+        print(f'{c}: {len(files)} agents in {rel(out / next(iter(files))).rsplit("/", 1)[0]}/')
     return 0
 
 

@@ -16,6 +16,8 @@ Commands:
       --max N           lines shown per skill or tool (default 3)
   agents                every agent: its skills, the tools it cannot use, its hand-offs
       --table           the Markdown table that docs/working/agents.md holds
+      --emit CLIENT     write the agents in a client's format: codex, gemini, copilot, opencode or all
+      --out DIR         where --emit writes (default: the repository root)
   doctor [ARGS]         check the toolchain (scripts/setup.sh; ARGS such as --install pass on)
 
 steps, skills, agents, tools, tool and find take --json, for agents and scripts.
@@ -31,8 +33,11 @@ Inputs: the skills (.claude/skills/re-*/SKILL.md), the tools (tools/, scripts/) 
 help, read from the files. The same command works in GameFrame and in a project made by
 scripts/new-project.sh. Standard library only; it needs no .venv itself.
 
-It does not change any file, install anything, or keep its own copy of the skills or the help:
-`run` and `doctor` start the tool or script, which does its own work.
+It does not install anything or keep its own copy of the skills or the help: `run` and
+`doctor` start the tool or script, which does its own work. The one command that writes files
+is `agents --emit`. It writes .codex/agents/*.toml, .gemini/agents/*.md,
+.github/agents/*.agent.md and .opencode/agents/*.md from agents/re-*.md
+(docs/working/agents.md, "Agents in every client").
 """
 import argparse
 import sys
@@ -61,6 +66,8 @@ def parser():
     s = sub.add_parser('agents', help='every agent and how it is configured')
     s.add_argument('--json', action='store_true')
     s.add_argument('--table', action='store_true')
+    s.add_argument('--emit', choices=('codex', 'gemini', 'copilot', 'opencode', 'all'), help='write the agents in a client\'s format')
+    s.add_argument('--out', metavar='DIR', help='where --emit writes (default: the repository root)')
     s = sub.add_parser('tools', help='every tool and script')
     s.add_argument('--json', action='store_true')
     s = sub.add_parser('tool', help='one tool\'s own help')

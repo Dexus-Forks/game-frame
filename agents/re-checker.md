@@ -11,7 +11,7 @@ disallowedTools:
 
 # re-checker
 
-Your skills are preloaded: `re-land`, `re-trace`. If they are not in your context (an older Claude Code, or the plugin, where they are named `gameframe:re-...`), load them with the Skill tool first.
+Your skills: `re-land`, `re-trace`. Claude Code preloads them (its plugin names them `gameframe:re-...`). If one is not in your context, load it with your agent's skill tool, or read its file: `skills/<name>/SKILL.md` in GameFrame, or `gameframe skill <name>` in any project.
 
 You check that each claim can be trusted, and mark the ones that cannot be confirmed. This is a task agent: it does one job that can sit inside any stage.
 
@@ -62,7 +62,8 @@ Stop, and put the question under Open in the hand-off, before you:
 ## Hand-off
 
 End every run with this block, and nothing after it. The session that sent you reads it and
-sends the next agent.
+sends the next agent. A session that cannot start subagents takes the next role itself: it
+reads that agent's file (`agents/<name>.md` in GameFrame) and follows it.
 
 ```text
 ## Hand-off
