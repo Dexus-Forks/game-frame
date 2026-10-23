@@ -1,6 +1,6 @@
 ---
 name: re-emulate
-description: Run individual functions from a game's Windows x64 binaries (tools/emu/pe_emu.py) or 16-bit DOS/NE programs (tools/emu/dos_emu/) under the Unicorn emulator to capture exact ground truth for chosen inputs, and record the calls they make (random draws) with call_trace.py. Use for anything a reimplementation must match bit for bit - random number generators, maths, procedural generation, simulation steps, pathfinding, parsers - instead of trusting the pseudocode.
+description: Run individual functions from a game's Windows x64 binaries (tools/emu/pe_emu.py), 32-bit x86 Windows binaries (tools/emu/pe32_emu.py) or 16-bit DOS/NE programs (tools/emu/dos_emu/) under the Unicorn emulator to capture exact ground truth for chosen inputs, and record the calls they make (random draws) with call_trace.py. Use for anything a reimplementation must match bit for bit - random number generators, maths, procedural generation, simulation steps, pathfinding, parsers - instead of trusting the pseudocode.
 ---
 
 # Emulate original code for ground truth
@@ -84,8 +84,12 @@ emu = Emu('target/Game.exe', ['target/Engine.dll'])  # loads, relocates, links i
   than porting blind; dump intermediate state with hooks to compare in stages.
 - **DllMain is not run**: if a function depends on globals a DLL sets up at load, initialise
   them yourself, or call the module's initialiser explicitly.
-- **32-bit games** (x86) need a variant of the harness: `UC_MODE_32`, arguments on the stack,
-  `this` in ecx, a TEB at FS. `docs/ABI.md` lists the conventions. Linux ELF and macOS Mach-O
+- **32-bit games** (x86) run under `tools/emu/pe32_emu.py`: `Emu32('GAME.EXE')`, then
+  `call(addr, args=[...])` for cdecl and stdcall, or `call(addr, esi=..., edi=...)` for
+  hand-written routines that take registers. MMX and x87 work. Every import stops the run with
+  its name until you give it a handler (`stubs=`). It has no TEB at FS and does not set `this`
+  in ecx for you: pass `ecx=` for thiscall. `docs/ABI.md` lists the conventions, and
+  `docs/hardware/simd.md` shows it on MMX code. Linux ELF and macOS Mach-O
   binaries need a different loader; the calling convention is System V (rdi, rsi, rdx, rcx, r8,
   r9; floats in xmm0-7).
 - **Floating point state**: the emulator starts with the default MXCSR (round to nearest). If the

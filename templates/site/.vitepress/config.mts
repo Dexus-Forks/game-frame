@@ -1,7 +1,8 @@
 // SITE_TITLE: a log of the work and what it found. Made by GameFrame's scripts/new-site.sh; the
 // re-site skill says what goes on each page. The project's documents are shown with
-// <!--@include: ...-->, so each has one copy, in docs/. The site holds no game material: only
-// prose, addresses, offsets, constants and pictures made by the project's own code.
+// <!--@include: ...-->, so each has one copy, in docs/. The site holds none of the game's files:
+// prose, addresses, offsets, constants, and captioned pictures (screenshots of the original and
+// of the project's viewer, frames from the port).
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { defineConfig } from 'vitepress'

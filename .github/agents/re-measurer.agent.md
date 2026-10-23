@@ -1,6 +1,6 @@
 ---
 name: re-measurer
-description: "Runs chosen functions of the original under the Unicorn emulator (Windows x64 or 16-bit DOS/NE) to capture exact ground truth for chosen inputs, and records the calls they make, such as random draws. Use for anything a reimplementation must match bit for bit."
+description: "Runs chosen functions of the original under the Unicorn emulator (Windows x64, 32-bit x86 Windows, or 16-bit DOS/NE) to capture exact ground truth for chosen inputs, and records the calls they make, such as random draws. Use for anything a reimplementation must match bit for bit."
 tools: ["read", "search", "edit", "execute", "todo", "dosbox/*", "rea/*"]
 ---
 

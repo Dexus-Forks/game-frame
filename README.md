@@ -228,6 +228,7 @@ between agents, the outcome, and the failure path.
 | `tools/triage/deviations.py` | Every `Deviation:` and `not ported` comment in the reimplementation, as one ledger; `--check` for tests |
 | `tools/triage/coverage.py` | How much of the original (by count and by size) the reimplementation cites, and the largest functions nobody cites yet |
 | `tools/emu/pe_emu.py` | Call any function of a Windows x64 EXE or DLL with chosen inputs and read the result |
+| `tools/emu/pe32_emu.py` | Call a routine of a 32-bit (x86) Windows EXE or DLL, with arguments on the stack or inputs in registers, MMX and x87 included; each import stops the run with its name |
 | `tools/emu/call_trace.py` | The calls an emulated function makes (random draws), in order, with call sites |
 | `tools/formats/reader.py`, `validate.py` | Prototype a format decoder; prove it consumes every byte of every file |
 | `tools/formats/xorscan.py` | The key of a simply obfuscated file: XOR, add, stepping and chained keys |
@@ -317,9 +318,9 @@ The documentation is in [docs/](docs/README.md). It is also built as a website
 
 Native Windows x64 games and 16-bit DOS games (MZ real mode, NE protected mode, Borland
 Pascal and C) are covered end to end; 32-bit LE/LX DOS-extender games are recognised and run
-in DOSBox-X, but have no loader or emulator here yet. 32-bit, Linux and macOS binaries work with
-Ghidra and the PE tools where they apply; the emulator needs a variant for them (`re-emulate`
-lists what changes). Managed (.NET, Unity), scripted and packed games are routed to the right
+in DOSBox-X, but have no loader or emulator here yet. 32-bit Windows games run under
+`tools/emu/pe32_emu.py`, routine by routine. Linux and macOS binaries work with Ghidra and the
+tools where they apply; the emulator needs a variant for them (`re-emulate` lists what changes). Managed (.NET, Unity), scripted and packed games are routed to the right
 tools by `re-inventory`.
 
 Use it on games you own, keep the game's files and anything derived from them out of
