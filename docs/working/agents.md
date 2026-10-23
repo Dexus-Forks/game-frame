@@ -258,6 +258,10 @@ only the lander's role commits, and the session shows the user each `Decisions` 
 - Give every long run a timeout. A hung emulator or a game waiting for input must not block
   the session.
 - Stop servers, emulators and game processes you started before you finish.
+- Every agent keeps a progress log in `derived/progress/<agent>.log`, one line per step
+  (`./gameframe progress <agent> --add "..."`). When the user asks how the work is going, read
+  `./gameframe progress`. It shows each log's last lines, newest first. An agent's transcript is
+  too long to read, and its hand-off only comes at the end.
 
 ## When you are stuck
 

@@ -75,6 +75,19 @@ Stop, and put the question under Open in the hand-off, before you:
 - choose between versions or releases of the game;
 - do anything the brief does not cover that cannot be undone.
 
+## Progress
+
+Keep a progress log, so the session that sent you can see how far you are without reading your
+transcript. Write one line when you start, with the brief in a few words. Write one line after
+each step that changes a file or takes more than a few minutes. Write one line when you hand off.
+
+```bash
+./gameframe progress re-lander --add "<what is done, what failed, or what is running>"
+```
+
+Each line goes to `derived/progress/re-lander.log` in the project, which git ignores. Write what
+has happened. A plan is not progress.
+
 ## Hand-off
 
 End every run with this block, and nothing after it. The session that sent you reads it and

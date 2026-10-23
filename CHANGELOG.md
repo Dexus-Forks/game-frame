@@ -9,6 +9,11 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `gameframe progress`: every agent keeps a progress log, one line per step, in
+  `derived/progress/<agent>.log` (`gameframe progress <agent> --add TEXT`). `gameframe progress`
+  shows each log's last lines, newest first, so the main session can answer "how is it going?"
+  without reading an agent's transcript. Each agent's file has a Progress section that says
+  when to write.
 - Know-how: a taxonomy of failure modes and context, one Markdown entry per failure, each with
   its symptoms, cause, evidence, status (solved, workaround, dead end, open) and what was tried
   ([the design](docs/working/knowhow.md), [the entries](docs/knowhow/README.md)).

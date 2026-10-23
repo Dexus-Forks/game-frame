@@ -960,6 +960,11 @@ expect "gameframe tool suggests a close name" "Did you mean: peinfo" $G tool pei
 expect "gameframe run gives the same output as the tool" "$("$PYTHON" tools/pe/peinfo.py $B/game.exe | head -1)" $G run peinfo $B/game.exe
 expect "gameframe run passes the tool's exit code" "rc 1" sh -c "$G run bitcompare f32 $B/truth/seed-1.f32 $B/naive/seed-1.f32 >/dev/null; echo rc \$?"
 expect "gameframe run refuses a library and says why" "a library to import" $G run pe_emu
+pt=$(mktemp -d)
+GAMEFRAME_PROJECT=$pt $G progress re-tester --add "first step done" >/dev/null
+expect "gameframe progress shows an agent's latest line" "first step done" env GAMEFRAME_PROJECT=$pt $G progress
+expect "gameframe progress writes the log under derived/progress" "re-tester.log" ls $pt/derived/progress
+rm -rf "$pt"
 expect "gameframe find names the skills and tools for a word" "tool vtable" $G find vtable
 expect "gameframe mcp: every agent's MCP file is current with .mcp.json" "rc 0" sh -c "$G mcp --emit all --check; echo rc \$?"
 
