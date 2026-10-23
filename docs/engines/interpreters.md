@@ -38,7 +38,7 @@ receives the loaded data and keeps a pointer into it is the interpreter or its c
 
 The table of handlers is the list of opcodes. Label each entry with its number before reading
 any handler. Then decode one script by hand with that list, and write a disassembler for the
-format ([re-format](../../.claude/skills/re-format/SKILL.md)). A disassembler that reads every
+format ([re-format](../../skills/re-format/SKILL.md)). A disassembler that reads every
 byte of every script file proves that the list of opcodes and their operand sizes is complete.
 
 ## Stack machines and register machines

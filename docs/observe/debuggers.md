@@ -50,7 +50,7 @@ register can be followed back to the instruction that set it.
 Ghidra can also run code without the game, with its P-Code emulator (`EmulatorHelper` in a
 script, or the Emulator in the debugger). It runs any processor Ghidra can decompile:
 68000, MIPS, SH-2, Z80, 6502, ARM and others. For those processors it can take the place of
-Unicorn in [re-emulate](../../.claude/skills/re-emulate/SKILL.md). Set the registers and memory,
+Unicorn in [re-emulate](../../skills/re-emulate/SKILL.md). Set the registers and memory,
 run one function, and read the result. It is slower than Unicorn and needs the same care with
 the hardware the function reads.
 

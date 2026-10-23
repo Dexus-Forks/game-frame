@@ -1,6 +1,6 @@
 # Getting more from Ghidra
 
-The [re-ghidra](../../.claude/skills/re-ghidra/SKILL.md) skill covers the daily work: export a
+The [re-ghidra](../../skills/re-ghidra/SKILL.md) skill covers the daily work: export a
 binary once, query the text, decompile single addresses, apply labels. This page covers the
 techniques for larger questions. Some cover a whole program at once. Others carry work from one
 build to the next, or handle code that is not an ordinary executable.

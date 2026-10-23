@@ -3,7 +3,7 @@
 GameFrame is an agentic framework for reverse engineering games. Its playbook of skills and agents runs inside your coding agent. Its toolkit of tested tools checks every result against the original.
 
 These pages cover reverse engineering games, apart from the
-step-by-step skills (in `.claude/skills/`, listed in the [README](../README.md#skills)). Start with the kind
+step-by-step skills (in `skills/`, listed in the [README](../README.md#skills)). Start with the kind
 of game you have, then how to observe it, then the reference pages as you need them.
 
 The website is built from these files where they are (see [site/README.md](../site/README.md)):

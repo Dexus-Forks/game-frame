@@ -13,7 +13,7 @@ the playbook's loop.
 
 ## REA or the text export?
 
-| Use REA (`mcp__rea__*`) when | Use GameFrame's Ghidra export (`re-ghidra`) when |
+| Use REA's tools (`mcp__rea__*` in Claude Code) when | Use GameFrame's Ghidra export (`re-ghidra`) when |
 |---|---|
 | The target is not a plain native binary: an APK/IPA, a .NET assembly, an Electron app or ASAR, a browser page, firmware, an archive | You need to search the whole program as text, many times (grep is instant) |
 | You want a quick, cited answer about one function: `open_binary` then `analyze_function`, `procedure_callers`, `xrefs` | You trace a system across hundreds of functions over several sessions |
@@ -52,6 +52,6 @@ targeted questions and evidence, the export for broad search.
 
 ## When REA is not connected
 
-No `mcp__rea__*` tools in the session means the MCP server is not registered or did not start.
+No REA tools in the session (no `mcp__rea__*` in Claude Code) means the MCP server is not registered or did not start.
 Follow `re-setup` section 3. Meanwhile, continue with GameFrame's own tools: Ghidra export,
 `decomp_query.py`, `ghidra-run.sh` and the emulator cover native binaries completely.

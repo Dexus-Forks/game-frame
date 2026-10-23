@@ -87,7 +87,7 @@ Sources: [libretro: Neko Project II Kai](https://docs.libretro.com/library/neko_
 - GameFrame's DOS tools help with the CPU and DOS layer ([DOS games](../DOS.md)). The
   hardware layer needs its own notes.
 - Ghidra has x86 real mode built in. Unicorn runs x86 16-bit code
-  ([re-emulate](../../.claude/skills/re-emulate/SKILL.md)).
+  ([re-emulate](../../skills/re-emulate/SKILL.md)).
 
 ### Projects to learn from
 

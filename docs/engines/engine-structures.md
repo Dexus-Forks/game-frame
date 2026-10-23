@@ -33,7 +33,7 @@ games share. [Recognising an engine](recognising.md) covers telling engines apar
 2. **Find the factory table.** It pairs names (or hashes) with functions. Each function
    creates one class, and its vtable leads to all that class's methods.
 3. **Find the stream loader.** It calls the factory for each object in a file. Its field reads,
-   class by class, are the file format ([re-format](../../.claude/skills/re-format/SKILL.md)).
+   class by class, are the file format ([re-format](../../skills/re-format/SKILL.md)).
 4. **Find the update order.** The main loop calls the scene graph's update and then the
    controllers, or the other way round. Write the order down. It decides what each frame
    shows.

@@ -16,5 +16,5 @@
     "preservation",
     "decompilation"
   ],
-  "skills": "./.claude/skills/"
+  "skills": "./skills/"
 }

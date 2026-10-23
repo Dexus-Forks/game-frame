@@ -15,7 +15,7 @@ which are in [CPUs and floating point](../hardware/cpus.md).
 
 Every 8-bit family here is little-endian except the 6809. Every 16-bit console CPU except x86
 is big-endian. A data-file decoder must follow the byte order of the machine that wrote the
-file ([re-format](../../.claude/skills/re-format/SKILL.md)). A file copied between a 68000
+file ([re-format](../../skills/re-format/SKILL.md)). A file copied between a 68000
 machine and an ARM or x86 machine may have been converted to the other byte order.
 
 ## The 8080, Z80 and SM83
@@ -200,7 +200,7 @@ Ghidra's processor list holds 39 folders
 
 Loaders for platforms and console loaders are on [tools for console work](../consoles/tools.md).
 The commands for a headless export are in the
-[re-ghidra](../../.claude/skills/re-ghidra/SKILL.md) skill.
+[re-ghidra](../../skills/re-ghidra/SKILL.md) skill.
 
 ### Unicorn
 
@@ -222,7 +222,7 @@ It covers only the 32-bit and 64-bit families (68000, ARM, MIPS, PowerPC, x86). 
 - Unicorn emulates CPUs only. Any function that touches custom chips needs stubs.
 
 GameFrame's Unicorn tools and how to use them are in the
-[re-emulate](../../.claude/skills/re-emulate/SKILL.md) skill.
+[re-emulate](../../skills/re-emulate/SKILL.md) skill.
 
 ### Capstone and other disassemblers
 

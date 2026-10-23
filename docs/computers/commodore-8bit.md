@@ -122,7 +122,7 @@ The formats below are (not confirmed)
 - **VICE** has a monitor with breakpoints and a remote monitor protocol
   ([vice-emu.sourceforge.io](https://vice-emu.sourceforge.io/)). An agent can drive captures
   through the remote monitor with a script
-  ([re-observe](../../.claude/skills/re-observe/SKILL.md)).
+  ([re-observe](../../skills/re-observe/SKILL.md)).
 - **CCS64** runs on Windows.
 - Ghidra has the 6502 built in. Its `ADC` p-code is not exact
   ([arithmetic traps](cpu-families.md#ghidra-s-6502-adc-is-not-exact)). Unicorn has no 6502.

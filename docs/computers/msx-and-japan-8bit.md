@@ -41,7 +41,7 @@ Images are ROM dumps with a mapper type, DSK disks and CAS tapes (not confirmed)
 
 - **openMSX** has a Tcl console and a separate debugger ([openmsx.org](https://openmsx.org/)).
   An agent can drive captures through the Tcl console with a script
-  ([re-observe](../../.claude/skills/re-observe/SKILL.md)).
+  ([re-observe](../../skills/re-observe/SKILL.md)).
 - Ghidra has the Z80 built in. Unicorn has no Z80. For ground truth use a small core such as
   iz80 ([CPU families](cpu-families.md#tools-per-family)).
 

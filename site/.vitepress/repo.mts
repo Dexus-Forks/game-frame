@@ -11,7 +11,7 @@
 //   examples/<name>/README.md         -> /examples/<name>
 //   crates/<name>/README.md           -> /crates/<name>
 //   site/index.md                     -> /            (the home page, the one page written for the site)
-//   site/skills/[skill].md            -> /skills/<skill>, one per .claude/skills/<skill>/SKILL.md
+//   site/skills/[skill].md            -> /skills/<skill>, one per skills/<skill>/SKILL.md
 //   site/agents/[agent].md            -> /agents/<agent>, one per agents/<agent>.md
 //   site/tools/[tool].md              -> /tools/<tool>, one per tool or script (its own help)
 //   site/[section]/index.md           -> /skills/, /agents/, /tools/ (catalog.mts has all four)
@@ -26,7 +26,7 @@ export const GITHUB = 'https://github.com/tanepiper/game-frame'
 /** Repository paths (relative to ROOT) that are not pages, for VitePress's srcExclude. */
 export const EXCLUDE = [
   '.git/**', '.venv/**', '**/node_modules/**', 'analysis/**', 'derived/**', 'target/**',
-  'templates/**', 'tools/**', 'tests/**', 'scripts/**', 'labels/**',
+  'templates/**', 'skills/**', 'tools/**', 'tests/**', 'scripts/**', 'labels/**',
   'AGENTS.md', 'CLAUDE.md', 'GAPS.md', 'agents/**', 'site/README.md', 'site/.vitepress/**',
   'examples/*/build/**', 'crates/target/**', 'crates/*/THIRD_PARTY.md',
 ]
@@ -51,7 +51,7 @@ export function rewrite(id: string): string {
 
 /** The site URL for a repository path, or null when it is not a page. */
 export function pageUrl(repoPath: string): string | null {
-  const skill = repoPath.match(/^\.claude\/skills\/([^/]+)(\/SKILL\.md)?\/?$/)
+  const skill = repoPath.match(/^skills\/([^/]+)(\/SKILL\.md)?\/?$/)
   if (skill) return `/skills/${skill[1]}`
   const agent = repoPath.match(/^agents\/([\w-]+)\.md$/)
   if (agent && fs.existsSync(path.join(ROOT, repoPath))) return `/agents/${agent[1]}`
@@ -80,7 +80,7 @@ export function githubUrl(repoPath: string): string {
 
 /** The skills, in the order of the README's skills table. */
 export function skills(): { name: string, description: string, file: string }[] {
-  const dir = path.join(ROOT, '.claude/skills')
+  const dir = path.join(ROOT, 'skills')
   const readme = fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8')
   const order = [...readme.matchAll(/\.claude\/skills\/([\w-]+)\/SKILL\.md/g)].map(m => m[1])
   const names = fs.readdirSync(dir).filter(n => fs.existsSync(path.join(dir, n, 'SKILL.md')))

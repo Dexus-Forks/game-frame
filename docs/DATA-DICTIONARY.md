@@ -72,7 +72,7 @@ In the file, every row has them.
 
 1. **Start from `labels/fields.tsv`.** Every named field is a candidate row. Add the globals the
    rules use, and the fields of the data files and saves you have decoded
-   ([re-format](../.claude/skills/re-format/SKILL.md)).
+   ([re-format](../skills/re-format/SKILL.md)).
 2. **Find the unit from the arithmetic.** A field added to a position every tick is a velocity in
    position units per tick. A field compared with 360, 256 or 65536 is probably an angle. A field
    that counts up once per tick is a time. Mark a unit found this way *inferred* until a

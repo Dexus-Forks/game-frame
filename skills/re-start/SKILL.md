@@ -77,6 +77,10 @@ A small task may use only two or three steps. Do not skip `land`.
 
 GameFrame also has one agent per stage, in `agents/` (a project has them in
 `.claude/agents/`; from the Claude Code plugin they are named `gameframe:re-tracer` and so on).
+Codex, Gemini CLI, GitHub Copilot and OpenCode read copies in their own formats
+([Agents in every client](../../docs/working/agents.md#agents-in-every-client)). If your agent
+can start subagents, send each agent as a subagent. If it cannot, take each role yourself in
+this session: read the agent's file, load its skills, do its stage and write its hand-off.
 Each one has its skills preloaded, does only its stage, and ends with a
 `## Hand-off` block that names the next agent and gives it a one-line brief. You, the main
 session, send the agents: read each hand-off, check its evidence, and send the next one.
@@ -125,9 +129,9 @@ a diagram of each team's hand-offs and the failure path.
 ## First session on a new game
 
 0. Find the tools. The commands in the skills run from a project made by `new-project.sh`
-   (it copies the tools in) or from a clone of GameFrame. If the skills came from the Claude
-   Code plugin and neither exists yet, clone GameFrame first
-   (`git clone https://github.com/tanepiper/game-frame ~/code/game-frame`) and run the steps
+   (it copies the tools in) or from a clone of GameFrame. If the skills came from a plugin or a
+   skills folder alone (the Claude Code plugin, for example) and neither exists yet, clone
+   GameFrame first (`git clone https://github.com/tanepiper/game-frame ~/code/game-frame`) and run the steps
    below from there.
 1. `scripts/setup.sh` (and `--install` if anything is missing). See `re-setup`.
 2. If the project has no repository yet: `scripts/new-project.sh DIR "Game Name" PATH/TO/GAME`.

@@ -6,7 +6,7 @@ machine and the operating system: a window, drawing, sound, input, time, files. 
 match the original bit for bit. The platform layer must behave the same as the original where
 the player can see it, and can otherwise be built in any good modern way. This page covers that
 split, each part of the platform layer, browser builds, and the player's data.
-[re-port](../../.claude/skills/re-port/SKILL.md) covers porting the core, and [What a project
+[re-port](../../skills/re-port/SKILL.md) covers porting the core, and [What a project
 can ship](../OUTPUTS.md) the releases.
 
 ## The split
@@ -22,7 +22,7 @@ can ship](../OUTPUTS.md) the releases.
 - **The platform layer is replaceable.** A desktop build, a browser build and a headless test
   harness are three platform layers around one core.
 - **Additions sit outside the core.** New features talk to the core through a few documented
-  entry points, so the core stays a faithful copy ([re-port](../../.claude/skills/re-port/SKILL.md)).
+  entry points, so the core stays a faithful copy ([re-port](../../skills/re-port/SKILL.md)).
 
 ## The parts of the platform layer
 

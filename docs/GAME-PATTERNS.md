@@ -219,7 +219,7 @@ with a table as the player types.
 - **Port the encoder and the decoder.** The port must accept every password the original
   accepts, and give the same password for the same state. Port both directions with their bit
   layout and their checksum, and test them against passwords from the original.
-- **Measure, then generate.** Run the checker in an emulator ([re-emulate](../.claude/skills/re-emulate/SKILL.md))
+- **Measure, then generate.** Run the checker in an emulator ([re-emulate](../skills/re-emulate/SKILL.md))
   with chosen codes to confirm the layout. A checker with a small key space can be run over
   every code. A checker that is a set of equations can be solved with a solver such as Z3 or
   angr, which find the inputs that pass. The original's accepted codes become the port's test

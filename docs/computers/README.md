@@ -127,13 +127,13 @@ The CPC has wait states that round every access to 4 cycles.
 - [DOS games](../DOS.md): 16-bit programs, Borland debug symbols, the DOS emulators.
 - [Console games](../consoles/README.md) and [tools for console work](../consoles/tools.md).
 - [Software engines and middleware](../engines/README.md).
-- The skills for each step: [re-inventory](../../.claude/skills/re-inventory/SKILL.md),
-  [re-observe](../../.claude/skills/re-observe/SKILL.md),
-  [re-ghidra](../../.claude/skills/re-ghidra/SKILL.md),
-  [re-emulate](../../.claude/skills/re-emulate/SKILL.md),
-  [re-format](../../.claude/skills/re-format/SKILL.md),
-  [re-port](../../.claude/skills/re-port/SKILL.md) and
-  [re-verify](../../.claude/skills/re-verify/SKILL.md).
+- The skills for each step: [re-inventory](../../skills/re-inventory/SKILL.md),
+  [re-observe](../../skills/re-observe/SKILL.md),
+  [re-ghidra](../../skills/re-ghidra/SKILL.md),
+  [re-emulate](../../skills/re-emulate/SKILL.md),
+  [re-format](../../skills/re-format/SKILL.md),
+  [re-port](../../skills/re-port/SKILL.md) and
+  [re-verify](../../skills/re-verify/SKILL.md).
 
 ## Not covered yet
 

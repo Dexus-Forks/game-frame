@@ -6,8 +6,9 @@ engineering games. Its playbook of skills and agents runs inside your coding age
 stage agents, the gates and the MCP servers come from GameFrame's Claude Code plugin, enabled
 in `.claude/settings.json`, so they stay current. Each agent does one step and hands off to the
 next (`re-start`, "Stage agents"). `./gameframe` runs the toolkit on this project.
-Agents without plugin support read the skills in GameFrame's `.claude/skills/*/SKILL.md`
-(`./gameframe root` prints where GameFrame is).
+Agents without plugin support read the skills in GameFrame's `skills/*/SKILL.md`
+(`./gameframe root` prints where GameFrame is). A project made with `--copy` has them in
+`skills/`, with the links `.claude/skills` and `.agents/skills` that agents look in.
 
 ## The goal
 

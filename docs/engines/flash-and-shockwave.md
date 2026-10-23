@@ -55,7 +55,7 @@ Things to look for in the code:
   slower.
 - **Randomness.** `Math.random()` takes no seed, so a run cannot be repeated. A port that must
   match a recording has to record the draws, or replace the generator with a seeded one
-  ([re-verify](../../.claude/skills/re-verify/SKILL.md)).
+  ([re-verify](../../skills/re-verify/SKILL.md)).
 - **Numbers.** ActionScript `Number` is an IEEE double. AS3 also has 32-bit `int` and `uint`.
   Integer overflow, string to number conversion and `Math` functions follow the player's rules.
   Port those rules exactly where the game depends on them.

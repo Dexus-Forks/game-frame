@@ -25,7 +25,7 @@ function gitTime(...paths: string[]): number | undefined {
 }
 
 // Every path the site builds pages from, for the home page's date.
-const SITE_SOURCES = ['README.md', 'docs', '.claude/skills', 'examples/*/README.md', 'site/index.md']
+const SITE_SOURCES = ['README.md', 'docs', 'skills', 'examples/*/README.md', 'site/index.md']
 
 // The workflow sets SITE_BASE to the Pages path (/game-frame/); locally it is /.
 const base = process.env.SITE_BASE || '/'
@@ -44,7 +44,7 @@ export default withMermaid(defineConfig({
   // takes the date of the newest change to any page.
   transformPageData(pageData) {
     const skill = pageData.params?.skill
-    if (skill) pageData.lastUpdated = gitTime(`.claude/skills/${skill}/SKILL.md`) ?? pageData.lastUpdated
+    if (skill) pageData.lastUpdated = gitTime(`skills/${skill}/SKILL.md`) ?? pageData.lastUpdated
     else if (pageData.frontmatter.layout === 'home') {
       pageData.lastUpdated = gitTime(...SITE_SOURCES)
       home.frontmatter = pageData.frontmatter
@@ -111,7 +111,7 @@ export default withMermaid(defineConfig({
       // Runs in the browser, so it cannot use GITHUB from repo.mts. Pages made by a dynamic
       // route (skills, agents, tools, the indexes) carry their source file in params.source.
       pattern: ({ filePath, params }) => 'https://github.com/tanepiper/game-frame/edit/main/'
-        + (params?.source ?? (params?.skill ? `.claude/skills/${params.skill}/SKILL.md` : filePath)),
+        + (params?.source ?? (params?.skill ? `skills/${params.skill}/SKILL.md` : filePath)),
       text: 'Edit this page on GitHub',
     },
     footer: {

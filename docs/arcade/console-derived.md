@@ -234,7 +234,7 @@ None listed yet.
 
 - Do not use MAME as ground truth for any Chihiro game.
 - The media board holds an .xbe loader. Ghidra and Unicorn cover the x86 code once the files
-  are decrypted ([re-ghidra](../../.claude/skills/re-ghidra/SKILL.md)).
+  are decrypted ([re-ghidra](../../skills/re-ghidra/SKILL.md)).
 
 ## Namco System 246, 256 and Super 256
 

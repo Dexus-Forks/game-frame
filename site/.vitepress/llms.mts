@@ -7,7 +7,7 @@
 //
 // Each copy is the page's own Markdown file: front matter removed, relative links turned into
 // links to the site's .md copies (or to GitHub for tools and scripts). Skill pages come from
-// .claude/skills/<name>/SKILL.md, with the same short lead as the HTML page. The home page is
+// skills/<name>/SKILL.md, with the same short lead as the HTML page. The home page is
 // mostly front matter, so its copy is written from the hero and the features.
 import fs from 'node:fs'
 import path from 'node:path'

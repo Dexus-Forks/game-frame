@@ -45,8 +45,8 @@ be different.
 - Record the versions of the tools that matter (Ghidra, the emulator, DOSBox-X). Tools change
   how they name and analyse things between versions.
 - For measured evidence, record the inputs: the function, the arguments, the seed, the save
-  file, the frame. [re-emulate](../../.claude/skills/re-emulate/SKILL.md) and
-  [re-observe](../../.claude/skills/re-observe/SKILL.md) describe how.
+  file, the frame. [re-emulate](../../skills/re-emulate/SKILL.md) and
+  [re-observe](../../skills/re-observe/SKILL.md) describe how.
 - Label each claim as observed, measured, inferred or assumed ([Writing](writing.md)).
 
 ## Look before you run

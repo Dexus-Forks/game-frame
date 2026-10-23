@@ -59,7 +59,7 @@ Its author never documented STX. Hatari 1.8.0 (2014) added the first open-source
 - command scripts that run at startup and on breakpoints.
 
 The scripts let an agent drive captures
-([re-observe](../../.claude/skills/re-observe/SKILL.md)). No Ghidra loader for ST PRG files is
+([re-observe](../../skills/re-observe/SKILL.md)). No Ghidra loader for ST PRG files is
 known. Steem SSE's debugger is not documented here. Unicorn runs 68000 code but none of the
 ST's chips.
 
@@ -85,7 +85,7 @@ ST's chips.
 - Keep the STX image as the record of a protected disk. A plain ST image loses the protection.
 - Read a self-decrypting game from emulator memory after it decrypts itself.
 - Take ground truth for a function that touches only RAM from Unicorn's 68000
-  ([re-emulate](../../.claude/skills/re-emulate/SKILL.md)). Anything that reads chip registers
+  ([re-emulate](../../skills/re-emulate/SKILL.md)). Anything that reads chip registers
   needs a full trace from Hatari.
 
 ## Atari STE, Mega STE, TT030 and Falcon030

@@ -4,7 +4,7 @@ A game folder holds executables, archives, pictures, sounds, levels, scripts and
 use formats the developer invented. This page describes how to say what a file is, and what it
 holds, before you find the code that reads it. The tools are `tools/triage/filetypes.py`,
 `tools/triage/similar.py`, `tools/formats/xorscan.py` and `tools/formats/timestamps.py`. Each
-result here is a lead. Confirm it in the code that reads the file ([re-format](../../.claude/skills/re-format/SKILL.md)).
+result here is a lead. Confirm it in the code that reads the file ([re-format](../../skills/re-format/SKILL.md)).
 
 ## Kind, from the first bytes
 

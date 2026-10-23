@@ -2,7 +2,7 @@
 //
 // Each comes from its own file, read when the site builds, and nothing is copied:
 //
-//   .claude/skills/<name>/SKILL.md   -> /skills/<name>   (the skill, then its agents and tools)
+//   skills/<name>/SKILL.md   -> /skills/<name>   (the skill, then its agents and tools)
 //   agents/<name>.md                 -> /agents/<name>   (the agent's brief, with its skills)
 //   tools/..., scripts/...           -> /tools/<name>    (the tool's own help: its docstring or
 //                                                         header comment, read by ./gameframe)
@@ -33,7 +33,7 @@ let agentCache: Agent[] | undefined
 export function agents(): Agent[] {
   if (agentCache) return agentCache
   const dir = path.join(ROOT, 'agents')
-  const start = fs.readFileSync(path.join(ROOT, '.claude/skills/re-start/SKILL.md'), 'utf8')
+  const start = fs.readFileSync(path.join(ROOT, 'skills/re-start/SKILL.md'), 'utf8')
   const order = [...start.matchAll(/^\| `(re-[\w-]+)` \|/gm)].map(m => m[1])
   const rank = (n: string) => (order.indexOf(n) + 1 || order.length + 1)
   agentCache = fs.readdirSync(dir).filter(f => f.endsWith('.md')).map(f => {

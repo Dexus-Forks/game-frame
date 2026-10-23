@@ -104,7 +104,7 @@ by size); 170 of 170 resource types; around 45 documented deviations.
 | In Un-Banished | Corresponds to here |
 |---|---|
 | `AGENTS.md` | `templates/project/AGENTS.md` |
-| `.claude/skills/banished-*` | `.claude/skills/re-*` |
+| `.claude/skills/banished-*` | `skills/re-*` |
 | `tools/ghidra/`, `tools/emu/pe_emu.py` | `tools/ghidra/`, `tools/emu/pe_emu.py` (generalised) |
 | `tools/triage/` (`decomp.py`, `fnindex.py`, `rngdiff.py`, `deviations.py`, `coverage.py`) | `tools/triage/decomp_query.py`, `tools/verify/seqdiff.py`, `tools/triage/deviations.py`, `tools/triage/coverage.py` |
 | `tools/compat/`, `tools/test/run.py` | `re-verify` sections 3, 6 and 7 |

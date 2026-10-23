@@ -35,7 +35,7 @@ techniques as the programmers of the time used them.
 ## How to measure
 
 1. **Run the drawing routine alone.** Call the original's polygon, line or span function
-   under emulation ([re-emulate](../../.claude/skills/re-emulate/SKILL.md)) with coordinates
+   under emulation ([re-emulate](../../skills/re-emulate/SKILL.md)) with coordinates
    you choose, into an empty buffer. Save the buffer. Then do the same with the port's
    function, and compare the two buffers byte for byte (`tools/verify/bitcompare.py`).
 2. **Choose hard cases.** Use edges that fall exactly on pixel centres, slopes of 1 and of

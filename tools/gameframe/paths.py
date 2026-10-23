@@ -9,7 +9,7 @@ from pathlib import Path
 
 NAME = 'gameframe'          # the command's name: change it here and in the launcher's file name
 ROOT = Path(__file__).resolve().parents[2]
-SKILLS = ROOT / '.claude' / 'skills'
+SKILLS = ROOT / 'skills'
 TOOLS = ROOT / 'tools'
 SCRIPTS = ROOT / 'scripts'
 

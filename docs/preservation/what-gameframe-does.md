@@ -15,11 +15,11 @@ emulates. The MAME team says that playing a game mainly shows that the documenta
 - The findings are written down as documents, with the address in the original that each claim
   comes from ([Writing findings](../working/writing.md)).
 - Functions of the original run under emulation to give exact answers for chosen inputs
-  ([re-emulate](../../.claude/skills/re-emulate/SKILL.md)).
+  ([re-emulate](../../skills/re-emulate/SKILL.md)).
 - The new code must give the same answers to the last bit. A port that does not match fails its
-  tests ([re-verify](../../.claude/skills/re-verify/SKILL.md)).
+  tests ([re-verify](../../skills/re-verify/SKILL.md)).
 - File formats are decoded and proved against every file of their type
-  ([re-format](../../.claude/skills/re-format/SKILL.md)).
+  ([re-format](../../skills/re-format/SKILL.md)).
 
 A later project can use the documents without the port's code.
 
