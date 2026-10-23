@@ -27,11 +27,17 @@ Direct3D 9 and 11 shaders, and a data-driven interface. Every step of the loop w
   resource of its type to the last byte.
 - **Decompile:** one headless Ghidra export of both binaries (about 20 minutes), searched as
   text by every later session.
-- **Trace, emulate, port, verify:** 32 emulator scripts produced ground truth for the random
-  generator, noise, terrain generation, path finding, tree growth, names, storage, animation and
-  more; 22 test files compare the Rust code against them bit for bit. One example: the town name
-  generator was checked on 3,000 names in sequence, which also proves that random draws happen
-  in the same order.
+- **Trace, emulate, port, verify:** 47 emulator scripts produced ground truth for the random
+  generator, noise, terrain generation, path finding, tree growth, names, storage, animation, a
+  citizen's health and happiness, and more; 36 test files compare the Rust code against them
+  bit for bit. One example: the town name generator was checked on 3,000 names in sequence,
+  which also proves that random draws happen in the same order.
+- **Reading is not enough for floats:** functions that matched the decompile when read still
+  differed for NaN inputs once they were emulated with NaN among the cases. A `comiss` followed
+  by `ja` or `jbe` sends NaN the other way from the C that Ghidra shows. A multiply by −1 keeps
+  a NaN in the original, while the Rust compiler turned the port's into a negation that flipped
+  the NaN's sign. See [The same floats on every platform](../semantics/floats.md) and
+  [Compiled code](../COMPILED-CODE.md), "The flags".
 - **Whole-system checks:** saves from the original load and continue; two runs with the same
   seed give identical frames; screenshots of the original (streamed from a Windows PC) are
   compared with an image-difference tool; every optimisation must leave saves and frames
@@ -41,7 +47,7 @@ Direct3D 9 and 11 shaders, and a data-driven interface. Every step of the loop w
   network) and additions built around it: multiplayer with a server, recordings, a test probe,
   mod sites and rule hooks for mods (WebAssembly plugins with no floats and a fixed budget).
   Each addition is a build option; a test builds the game without any of them and checks that
-  it plays exactly as the full build; `--pure` turns them all off for one run. Doing this earlier
+  it plays exactly as the full build; `--vanilla` turns them all off for one run. Doing this earlier
   would have been cheaper: see `re-port`, "Build it so it can be checked".
 - **Releases:** each version is tagged by one workflow, which also builds the game on Windows,
   macOS and Linux runners and attaches a zip for each (`docs/OUTPUTS.md`), and rebuilds the

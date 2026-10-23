@@ -36,7 +36,8 @@ Each condition matters:
 | Maths functions (`sin`, `pow`, `exp`) | Every C runtime, every language and every GPU has its own versions, which differ in the last bit | Port the original's routine, or the routine of its C runtime, and test it against the original |
 | Estimate instructions (`rcpss`, `rsqrtss`) | Intel and AMD CPUs give different results; only a maximum error is specified | Measure them on the CPU the reference captures came from, and use a table or a formula that gives those bits |
 | Fused multiply-add | A compiler may fuse `a * b + c` into one rounding | Fuse only where the original's instruction did; turn contraction off elsewhere |
-| NaN bits | x86 makes a negative quiet NaN (`0xFFC00000` for a float); ARM makes a positive one (`0x7FC00000`); WebAssembly allows either | Matters only if the game stores, hashes or compares NaN bits; then set them explicitly |
+| NaN bits | A NaN made from numbers (`0 / 0`, infinity minus infinity) is negative on x86 (`0xFFC00000` for a float) and positive on ARM (`0x7FC00000`); WebAssembly allows either. A NaN that comes in as an operand goes out unchanged, apart from being made quiet, on x86 SSE and on ARM in its default mode. An x86 `mulss` and a Rust build on ARM both return a `0x7FC00000` input as `0x7FC00000` (*measured*) | Matters only if the game stores, hashes or compares NaN bits; then keep the original's operations, so that a NaN input passes through the same way |
+| Multiplying by −1 | The original's `x * -1.0` returns a NaN unchanged. A compiler may turn the port's `x * -1.0` into a negation, which flips the NaN's sign bit: LLVM does this in a release build (*observed*). Writing `c - x` instead loses the `-0` that the multiply gives at `x = c` | Negate only a number, and pass a NaN through: `if x.is_nan() { x } else { -x }` |
 | Denormals | 32-bit ARM NEON always flushes them to zero; games may set flush-to-zero on x86 | Copy the original's setting, and test with very small values |
 | Text to number | `atof` and `strtod` were not always correctly rounded in old runtimes, and they read the decimal separator from the locale | Parse with the original's routine, or check every number the game reads from text |
 
@@ -57,7 +58,12 @@ Each condition matters:
 
 - **Rust.** `f32` and `f64` operations are IEEE operations, and the compiler does not reorder
   them. `f32::sin` and similar call the platform's maths library, so they differ between
-  platforms. Write the original's versions instead.
+  platforms. Write the original's versions instead. The compiler may still rewrite an
+  operation into another one with the same result for every number, such as `x * -1.0` into
+  `-x`. Such a rewrite can change the bits of a NaN (see the table above). `f32::min`,
+  `f32::max` and `f32::clamp` also treat NaN in their own way: `min` and `max` return the
+  other value, and `clamp` returns the NaN. Port the original's comparisons instead of these
+  functions where a NaN can reach them.
 - **JavaScript.** Every number is a 64-bit double. `Math.fround` rounds to 32 bits, so a `float`
   operation is `Math.fround(Math.fround(a) * Math.fround(b))`. `Math.sin` and the other
   functions are implementation-defined and differ between browsers.
@@ -71,6 +77,10 @@ Each condition matters:
 
 1. Run each float routine of the original under emulation on many inputs, including values
    near zero, near overflow, negative zero and NaN ([re-emulate](../../.claude/skills/re-emulate/SKILL.md)).
+   Some C runtime routines handle NaN and infinity on a separate path. MSVC's `sqrtf` passes
+   them to its maths error handler, which an emulator that has not started the runtime does
+   not have, so the emulation stops there (*observed*). Read that path in the disassembly, or
+   start the runtime first.
 2. Compare the port's bits exactly with `tools/verify/bitcompare.py`, with no tolerance.
 3. Run the same comparison on every platform the port ships on, including the browser.
 4. When a value differs, find the first operation that differs. It is usually an order of
