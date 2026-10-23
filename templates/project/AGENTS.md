@@ -6,9 +6,11 @@ engineering games. Its playbook of skills and agents runs inside your coding age
 stage agents, the gates and the MCP servers come from GameFrame's Claude Code plugin, enabled
 in `.claude/settings.json`, so they stay current. Each agent does one step and hands off to the
 next (`re-start`, "Stage agents"). `./gameframe` runs the toolkit on this project.
-Agents without plugin support read the skills in GameFrame's `skills/*/SKILL.md`
-(`./gameframe root` prints where GameFrame is). A project made with `--copy` has them in
-`skills/`, with the links `.claude/skills` and `.agents/skills` that agents look in.
+The other coding agents (Codex, Gemini CLI, Copilot, Cursor, OpenCode) read a copy of the
+skills in `skills/` through the `.agents/skills` link, and their own agents, hooks and MCP
+servers, for each agent named with `new-project.sh --agent`. A project made with `--copy` also
+has the link `.claude/skills`.
+GameFrame's `scripts/update-project.sh` keeps these files current (`./gameframe root` prints where GameFrame is).
 
 ## The goal
 
@@ -73,6 +75,8 @@ user may change any of them.
 | `labels/dictionary.tsv` | The data dictionary: the meaning, unit, range and evidence of each value the rules use |
 | `./gameframe` | Runs GameFrame's toolkit here: `run NAME ARGS`, `python FILE`, `doctor`, and help on the method: `steps`, `skills`, `agents`, `tools`, `tool NAME`, `find WORD`. `root` prints where GameFrame is |
 | `.claude/settings.json` | Enables GameFrame's plugin: the skills, the agents, the gates, and the MCP servers (REA, and `dosbox` for DOS games) |
+| `skills/`, `.agents/skills` | The skills, for the coding agents other than Claude Code |
+| `.codex/`, `.gemini/`, `.github/agents/`, `.github/hooks/`, `.cursor/`, `.vscode/mcp.json`, `.opencode/`, `opencode.json` | Each other agent's agents, gate hooks (through `./gameframe gate`) and MCP servers, for the agents the project was set up for |
 | GameFrame's `docs/` | The reference documents and guides the skills name (`docs/DOS.md`, `docs/ABI.md`, `docs/games/` and the rest), in GameFrame's folder and on https://tanepiper.github.io/game-frame/ |
 
 ## The loop

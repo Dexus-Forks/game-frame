@@ -549,17 +549,41 @@ rm -rf "$L"
 echo "Project scaffold"
 tmp="$(mktemp -d)/re-test"
 scripts/new-project.sh "$tmp" "Test Game" $B >/dev/null 2>&1
-[[ -f "$tmp/AGENTS.md" && -f "$tmp/README.md" && -f "$tmp/LICENSE-APACHE" && -f "$tmp/LICENSE-CC0-1.0" && ! -e "$tmp/LICENSE-CC-BY-4.0" && ! -e "$tmp/LICENSE-MIT" && -f "$tmp/.cargo/config.toml" && -f "$tmp/.claude/settings.json" && -x "$tmp/gameframe" && -f "$tmp/target/game.exe" && -d "$tmp/.git" && ! -e "$tmp/tools" && ! -e "$tmp/scripts" && ! -e "$tmp/.claude/skills" && ! -e "$tmp/skills" && ! -e "$tmp/.agents" && ! -e "$tmp/docs/DOS.md" ]] \
+[[ -f "$tmp/AGENTS.md" && -f "$tmp/README.md" && -f "$tmp/LICENSE-APACHE" && -f "$tmp/LICENSE-CC0-1.0" && ! -e "$tmp/LICENSE-CC-BY-4.0" && ! -e "$tmp/LICENSE-MIT" && -f "$tmp/.cargo/config.toml" && -f "$tmp/.claude/settings.json" && -x "$tmp/gameframe" && -f "$tmp/target/game.exe" && -d "$tmp/.git" && ! -e "$tmp/tools" && ! -e "$tmp/scripts" && ! -e "$tmp/.claude/skills" && -f "$tmp/skills/re-start/SKILL.md" && -L "$tmp/.agents/skills" && ! -e "$tmp/docs/DOS.md" ]] \
   && grep -q "Test Game" "$tmp/AGENTS.md" && grep -q '"gameframe@game-frame": true' "$tmp/.claude/settings.json" && ! grep -q "gate.py" "$tmp/.claude/settings.json" \
+  && grep -q 'gameframe gate cursor' "$tmp/.cursor/hooks.json" && grep -q 'gameframe\\" gate codex' "$tmp/.codex/hooks.json" && grep -q '"AGENTS.md"' "$tmp/.gemini/settings.json" \
   && ! (cd "$tmp" && git ls-files | grep -q '^target/') \
-  && ok "new-project makes a plugin project: settings enable the plugin, no copied toolkit, target/ out of git" || bad "new-project scaffold" "$(ls -la "$tmp" 2>&1)"
+  && ok "new-project makes a plugin project: settings enable the plugin, no copied toolkit, the other agents' skills, agents and hooks through ./gameframe gate, target/ out of git" || bad "new-project scaffold" "$(ls -la "$tmp" 2>&1)"
 expect "the launcher finds GameFrame and runs its tools on the project" "EXE, x64 (64-bit)" sh -c "cd '$tmp' && GAMEFRAME_ROOT='$(pwd)' ./gameframe run peinfo target/game.exe"
 expect "the launcher runs a project script with the toolkit on its path" "pe_emu ok" sh -c "cd '$tmp' && printf 'import pe_emu\\nprint(\"pe_emu ok\")\\n' > probe.py && GAMEFRAME_ROOT='$(pwd)' ./gameframe python probe.py"
 out="$(cd "$tmp" && git config core.hooksPath && git add -f target/game.exe && GAMEFRAME_ROOT="$OLDPWD" git commit -qm game 2>&1; git reset -q)"
 [[ "$out" == *".githooks"*"stages game material"* ]] && ok "a plugin project's git pre-commit hook finds GameFrame and blocks game material" || bad "plugin project pre-commit hook" "$out"
 expect "the session hook says where GameFrame's guides are" "read docs/NAME.md as" sh -c "echo '{\"cwd\": \"$tmp\"}' | python3 scripts/hooks/gate.py session"
 out="$("$PWD/scripts/update-project.sh" "$tmp" 2>&1)"
-[[ "$out" == *"Plugin project: the gameframe launcher is current"* ]] && ok "update-project leaves a plugin project's launcher and settings current" || bad "update-project on a plugin project" "$out"
+[[ "$out" == *"Plugin project: the gameframe launcher is current"* && "$out" == *"0 were added, 0 were replaced"* ]] && ok "update-project leaves a plugin project's launcher, settings and agent files current" || bad "update-project on a plugin project" "$out"
+expect "scripts/clients.py prints its usage" "scripts/clients.py write DEST" python3 scripts/clients.py --help
+one="$(mktemp -d)/re-claude"
+scripts/new-project.sh "$one" "Test Game" --agent claude >/dev/null 2>&1
+[[ -f "$one/.claude/settings.json" && -f "$one/CLAUDE.md" && ! -e "$one/skills" && ! -e "$one/.agents" && ! -e "$one/.codex" && ! -e "$one/.gemini" && ! -e "$one/.cursor" && ! -e "$one/opencode.json" ]] \
+  && ok "new-project --agent claude writes only Claude Code's files" || bad "new-project --agent claude" "$(ls -A "$one" 2>&1)"
+two="$(mktemp -d)/re-two"
+scripts/new-project.sh "$two" "Test Game" --agent codex,cursor >/dev/null 2>&1
+[[ ! -e "$two/.claude" && ! -e "$two/CLAUDE.md" && -f "$two/.codex/agents/re-tracer.toml" && -f "$two/.cursor/agents/re-tracer.md" && ! -e "$two/.gemini" && "$(python3 scripts/clients.py detect "$two")" == "codex,cursor" ]] \
+  && ok "new-project --agent codex,cursor writes their files and no Claude Code settings" || bad "new-project --agent codex,cursor" "$(ls -A "$two" 2>&1)"
+out="$(GAMEFRAME_ROOT="$PWD" python3 - "$two" <<'PY'
+import json, subprocess, sys
+event = lambda c: json.dumps({'cwd': sys.argv[1], 'hook_event_name': 'PreToolUse', 'tool_name': 'Bash', 'tool_input': {'command': c}})
+run = lambda c: subprocess.run(['./gameframe', 'gate', 'codex'], cwd=sys.argv[1], input=event(c), text=True, capture_output=True).returncode
+print(run('GAMEFRAME_AGENT=re-' + 'tracer git ' + 'commit -m x'), run('ls'))
+PY
+)"
+[[ "$out" == "2 0" ]] && ok "a plugin project's Codex hook runs the gates through ./gameframe gate" || bad "./gameframe gate" "$out"
+out="$("$PWD/scripts/update-project.sh" "$two" --agent gemini 2>&1)"
+grep -q 'gameframe\\" gate gemini' "$two/.gemini/settings.json" && grep -q '"AGENTS.md"' "$two/.gemini/settings.json" && [[ -f "$two/.gemini/agents/re-tracer.md" ]] \
+  && ok "update-project --agent gemini adds Gemini CLI's agents, hooks and settings to a project" || bad "update-project --agent gemini" "$out"
+out="$(scripts/new-project.sh "$(dirname "$two")/re-bad" "Test Game" --agent bogus 2>&1)"
+[[ $? != 0 && "$out" == *"unknown agent bogus"* && ! -e "$(dirname "$two")/re-bad" ]] && ok "new-project refuses an unknown agent before writing anything" || bad "new-project --agent bogus" "$out"
+rm -rf "$(dirname "$one")" "$(dirname "$two")"
 
 tmp="$(mktemp -d)/re-copy"
 scripts/new-project.sh "$tmp" "Test Game" $B --copy >/dev/null 2>&1
@@ -583,8 +607,8 @@ out="$("$PWD/scripts/update-project.sh" "$old" 2>&1)"
   && ok "update-project moves an older project's .claude/skills to skills/ and links both agent folders to it" || bad "update-project moves the skills" "$out $(ls -la "$old/.claude" 2>&1)"
 rm -rf "$old"
 (cd "$tmp" && git add -A && git commit -qm copy)
-out="$("$PWD/scripts/update-project.sh" "$tmp" --plugin 2>&1)"
-[[ ! -e "$tmp/skills" && ! -e "$tmp/.claude/skills" && ! -e "$tmp/.agents" && ! -e "$tmp/scripts" && ! -e "$tmp/docs/DOS.md" && -f "$tmp/tools/triage/memscan.py" && ! -e "$tmp/tools/pe" && "$out" == *"tools/triage/memscan.py"* ]] \
+out="$("$PWD/scripts/update-project.sh" "$tmp" --plugin --agent claude 2>&1)"
+[[ ! -e "$tmp/skills" && ! -e "$tmp/.claude/skills" && ! -e "$tmp/.agents" && ! -e "$tmp/scripts" && ! -e "$tmp/.codex" && ! -e "$tmp/.cursor" && ! -e "$tmp/.gemini" && ! -e "$tmp/opencode.json" && ! -e "$tmp/docs/DOS.md" && -f "$tmp/tools/triage/memscan.py" && ! -e "$tmp/tools/pe" && "$out" == *"tools/triage/memscan.py"* ]] \
   && grep -q "GAMEFRAME_PROJECT" "$tmp/gameframe" && grep -q '"gameframe@game-frame": true' "$tmp/.claude/settings.json" && ! grep -q "gate.py" "$tmp/.claude/settings.json" \
   && ok "update-project --plugin removes the copies, keeps the project's changes, enables the plugin" || bad "update-project --plugin" "$out"
 
@@ -731,6 +755,8 @@ plugin = json.loads(pathlib.Path('.claude-plugin/plugin.json').read_text())
 market = json.loads(pathlib.Path('.claude-plugin/marketplace.json').read_text())
 assert [p['name'] for p in market['plugins']] == [plugin['name']], 'the marketplace lists the plugin'
 assert re.fullmatch(r'\d+\.\d+\.\d+', plugin.get('version', '')), 'plugin.json has a release version (MAJOR.MINOR.PATCH)'
+released = re.findall(r'^## \[(\d+\.\d+\.\d+)\]', pathlib.Path('CHANGELOG.md').read_text(), re.M)
+assert released and released[0] == plugin['version'], f'CHANGELOG.md\'s newest release {released[:1]} is plugin.json\'s version {plugin["version"]}'
 assert pathlib.Path(plugin['skills'], 're-start', 'SKILL.md').is_file(), 'the plugin finds the skills'
 assert pathlib.Path('.claude/agents').resolve() == pathlib.Path('agents').resolve(), '.claude/agents links to agents/'
 skills = {p.parent.name for p in pathlib.Path('skills').glob('*/SKILL.md')}

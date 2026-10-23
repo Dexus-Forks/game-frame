@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Bring a project made with GameFrame up to GameFrame's current version.
 #
-#   scripts/update-project.sh DIR [--plugin] [--dry-run]
+#   scripts/update-project.sh DIR [--plugin] [--agent LIST] [--dry-run]
 #
 # A project normally gets GameFrame's skills, agents, gates and MCP servers from its Claude Code
 # plugin, and runs the toolkit through its own small `gameframe` launcher (new-project.sh makes
@@ -21,19 +21,36 @@
 # older) is removed, the project's changed copies are kept and listed, `gameframe` becomes the
 # launcher, and .claude/settings.json enables the plugin in place of the local gates. It then
 # lists the project's own files that still name a removed tool path.
+# --agent LIST names the coding agents the project is set up for, as in new-project.sh (claude,
+# codex, gemini, copilot, cursor, opencode, or all). Without it, the agents whose files the
+# project already has. Each agent's skill link, agents, gate hooks and MCP servers are added or
+# refreshed by scripts/clients.py; an agent left out keeps its files. With --plugin, only the
+# chosen agents' files are written again, since the old ones call the removed scripts/.
 # The project's own files (AGENTS.md, README.md, docs/FINDINGS.md, docs/CHECKLIST.md, labels/,
 # its code) are never touched. With --dry-run nothing is written. The project's git history shows
 # every change; commit it like any other.
 set -euo pipefail
 . "$(dirname "$0")/lib.sh"
-[[ $# -ge 1 ]] || { sed -n '2,26p' "$0"; exit 2; }
-dir="$1"; shift; dry=""; plugin=""
-for a in "$@"; do case "$a" in --dry-run) dry=--dry-run ;; --plugin) plugin=--plugin ;; *) echo "unknown option $a" >&2; exit 2 ;; esac; done
+[[ $# -ge 1 ]] || { sed -n '2,31p' "$0"; exit 2; }
+dir="$1"; shift; dry=""; plugin=""; agent=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --dry-run) dry=--dry-run ;;
+    --plugin) plugin=--plugin ;;
+    --agent) [[ $# -ge 2 ]] || { echo "--agent needs a list" >&2; exit 2; }; agent="$2"; shift ;;
+    --agent=*) agent="${1#--agent=}" ;;
+    *) echo "unknown option $1" >&2; exit 2 ;;
+  esac
+  shift
+done
 [[ -d "$dir/.git" || -f "$dir/.git" ]] || { echo "$dir is not a git repository" >&2; exit 1; }
-"${PYTHON:-python3}" - "$ROOT" "$dir" "$dry" "$plugin" <<'PY'
+"${PYTHON:-python3}" - "$ROOT" "$dir" "$dry" "$plugin" "$agent" <<'PY'
 import json, os, re, shutil, subprocess, sys
 root, dest = os.path.abspath(sys.argv[1]), os.path.abspath(sys.argv[2])
 dry, to_plugin = sys.argv[3] == '--dry-run', sys.argv[4] == '--plugin'
+sys.path.insert(0, os.path.join(root, 'scripts'))
+import clients
+chosen = clients.parse(sys.argv[5]) if sys.argv[5] else (clients.detect(dest) or ['claude'])
 launcher = os.path.join(root, 'templates', 'project', 'gameframe')
 verb = 'would be' if dry else 'were'
 
@@ -53,8 +70,11 @@ for sub in ('tools', 'scripts'):
     pairs += [(f, f) for f in tracked(sub)]
 pairs += [(f, f) for f in tracked('skills') if f.split('/')[1].startswith('re-')]
 pairs += [(f, '.claude/' + f) for f in tracked('agents')]
-for sub in ('.codex/agents', '.gemini/agents', '.github/agents', '.opencode/agents'):
-    pairs += [(f, f) for f in tracked(sub) if f.split('/')[-1].startswith('re-')]
+# Each agent's own files (its agents' copies, hooks and MCP servers) come from clients.py. Moving
+# to the plugin removes every agent's GameFrame files first, since their hooks call scripts/;
+# clients.py then adds back the chosen agents' files, with hooks that call ./gameframe gate.
+agent_pairs = [(f, f) for sub in clients.AGENT_DIRS.values() for f in tracked(sub) if f.split('/')[-1].startswith('re-')]
+agent_pairs += [(f, f) for files in clients.CONFIGS.values() for f in files]
 pairs += [(f, f) for f in ('gameframe', 'requirements.txt', 'requirements-live.txt', '.mcp.json')]
 for f in ('ABI', 'GAME-PATTERNS', 'DOS', 'LEGAL', 'OUTPUTS', 'SETUP', 'COMPILED-CODE', 'TYPES'):
     pairs.append((f'docs/{f}.md', f'docs/{f}.md'))
@@ -63,6 +83,15 @@ for d in ('games', 'observe', 'engines', 'hardware', 'consoles', 'handhelds', 'c
     pairs += [(f, f) for f in tracked(f'docs/{d}')]
 
 SKILL_LINKS = ('.claude/skills', '.agents/skills')
+
+
+def client_files(plugin):
+    """Add or refresh the chosen agents' files; print what changed."""
+    w = clients.write(dest, chosen, plugin=plugin, dry=dry)
+    print(f'Agent files for {", ".join(chosen)}: {len(w.added)} {verb} added, {len(w.replaced)} {verb} replaced, '
+          f'{w.same} were already current.')
+    for f in w.kept:
+        print(f'  kept {f}')
 
 def move_skills():
     """Move an older project's skills from .claude/skills (a folder) to skills/."""
@@ -75,7 +104,8 @@ def move_skills():
 def link_skills():
     """.claude/skills and .agents/skills point to skills/; a copy where links cannot be made."""
     target = os.path.join(dest, 'skills')
-    for link in SKILL_LINKS:
+    wanted = [l for l, on in zip(SKILL_LINKS, ('claude' in chosen, any(c != 'claude' for c in chosen))) if on]
+    for link in wanted:
         p = os.path.join(dest, link)
         if dry or os.path.islink(p) or not os.path.isdir(target):
             continue
@@ -152,15 +182,17 @@ def put_launcher():
 
 if is_plugin_project() and not to_plugin:
     state = put_launcher()
-    plugin_settings()
+    if 'claude' in chosen:
+        plugin_settings()
     print(f'Plugin project: the gameframe launcher is {state}; .claude/settings.json enables the plugin.')
+    client_files(plugin=True)
     sys.exit(0)
 
 added, replaced, kept, same = [], [], [], 0
 move_skills()
 if to_plugin:
     removed = []
-    for src, dst in pairs:
+    for src, dst in pairs + agent_pairs:
         s, d = os.path.join(root, src), os.path.join(dest, dst)
         if not os.path.isfile(d):
             continue
@@ -170,14 +202,23 @@ if to_plugin:
                 os.remove(d)
         else:
             kept.append(dst)
+    # A copied project's .gemini/settings.json is written, not copied: remove it when unchanged.
+    gemini = os.path.join(dest, '.gemini', 'settings.json')
+    if os.path.isfile(gemini) and open(gemini).read() == clients.gemini_settings(plugin=False):
+        removed.append('.gemini/settings.json')
+        if not dry:
+            os.remove(gemini)
     if not dry:
-        for top in ('tools', 'scripts', 'skills', '.claude/agents', 'docs', '.codex', '.gemini', '.github', '.opencode'):
+        for top in ('tools', 'scripts', 'skills', '.claude/agents', 'docs', '.codex', '.gemini', '.github', '.cursor', '.vscode', '.opencode'):
             for base, dirs, files in os.walk(os.path.join(dest, top), topdown=False):
                 if not os.listdir(base):
                     os.rmdir(base)
     unlink_skills()
     put_launcher()
-    plugin_settings()
+    if 'claude' in chosen:
+        plugin_settings()
+    if not dry:
+        client_files(plugin=True)
     print(f'{len(removed)} copied GameFrame files {verb} removed; gameframe {verb} replaced by the launcher; '
           '.claude/settings.json enables the plugin.')
     if kept:
@@ -226,8 +267,11 @@ for src, dst in pairs:
         shutil.copy2(s, d)
 
 link_skills()
+client_files(plugin=False)
 settings = os.path.join(dest, '.claude', 'settings.json')
-if os.path.exists(settings):
+if 'claude' not in chosen:
+    pass
+elif os.path.exists(settings):
     kept.append('.claude/settings.json (compare it with GameFrame\'s: the gates are in "hooks")')
 else:
     added.append('.claude/settings.json')

@@ -87,6 +87,11 @@ below follow each agent's documentation as of October 2026.
 | Cursor | `.cursor/hooks.json` | `beforeShellExecution` | Commit, push |
 | GitHub Copilot | `.github/hooks/gameframe.json` | `preToolUse` (`bash`) | Commit, push |
 
+A project gets these files for the agents it names with `--agent` (`scripts/clients.py`). In a
+project made with `--copy` they call the project's own `scripts/hooks/gate.py`. A plugin project
+has no `scripts/`, so its hooks call `./gameframe gate KIND` instead, and the launcher runs
+GameFrame's `gate.py`.
+
 ### Claude Code
 
 The plugin brings the hooks in `hooks/hooks.json`. GameFrame itself, and projects made with

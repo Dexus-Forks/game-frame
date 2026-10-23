@@ -65,7 +65,7 @@ These rules are for changes to GameFrame itself, which is a public repository.
 | `.claude/settings.json`, `scripts/hooks/gate.py`, `scripts/hooks/gates/`, `scripts/hooks/git/pre-commit`, `hooks/hooks.json`, `.codex/hooks.json`, `.cursor/hooks.json`, `.github/hooks/gameframe.json`, `hooks/gemini-settings.json` | Permissions and the gates: the git pre-commit hook, and hooks for Claude Code, Codex, Gemini CLI, Cursor and Copilot: [docs/working/gates.md](docs/working/gates.md) |
 | `.claude-plugin/` | The Claude Code plugin and its marketplace: the skills and the agents |
 | `gameframe`, `tools/gameframe/` | The help and discovery command. It reads the skills and each tool's own help, so a new tool needs no entry there |
-| `scripts/` | setup, new-project, ghidra-export, ghidra-run, and `lib.sh` (paths and `.env`) |
+| `scripts/` | setup, new-project, update-project, ghidra-export, ghidra-run, `clients.py` (the files each coding agent needs in a project), and `lib.sh` (paths and `.env`) |
 | `tools/disc`, `tools/pe`, `tools/dos`, `tools/triage`, `tools/emu`, `tools/formats`, `tools/verify`, `tools/ghidra` | The tools |
 | `templates/project/` | What `new-project.sh` writes into a game's repository |
 | `examples/sample-game/` | The test target: C sources, build script, ground truth, a port, a decoder |
@@ -73,6 +73,7 @@ These rules are for changes to GameFrame itself, which is a public repository.
 | `tests/run.sh` | The checks |
 | `docs/` | The taxonomy of games (`games/`), engines (Flash and Shockwave too), hardware, consoles, observing the original (`observe/`), media and files (`media/`), working as an agent (`working/`), case studies, ABI, DOS, game patterns, compiled code, legal notes, setup |
 | `crates/` | A Cargo workspace of clean implementations taken from the case studies (OPL2, WMA, MSVC CRT, Turbo Pascal); rules in `docs/crates/README.md`. `cargo test --release` in `crates/` |
+| `CHANGELOG.md` | Every release, newest first. Add each change under Unreleased. A release moves them under its version, sets the same version in `.claude-plugin/plugin.json` (the tests check the two match) and tags the commit `vX.Y.Z` |
 | `GAPS.md` | Topics missing from the guides and tools, and where each is now covered. Tick an item when it is merged; add new gaps to it |
 | `site/` | The documentation website (VitePress). It builds from `docs/`, the skills and the examples where they are; it holds no copies of their content |
 | `.mcp.json` | The MCP servers (REA, DOSBox-X) for Claude Code. `gameframe mcp --emit all` writes them into `.codex/config.toml`, `.gemini/settings.json`, `.cursor/mcp.json`, `.vscode/mcp.json` and `opencode.json` |
