@@ -89,8 +89,9 @@ The skills and the stage agents are also a Claude Code plugin. In Claude Code:
 The plugin brings the skills, the agents, the gates and the MCP servers in `.mcp.json`. A
 project made with `scripts/new-project.sh` enables it in its `.claude/settings.json`, with
 auto-update on, and runs the toolkit through its own `./gameframe` launcher, which finds
-GameFrame in a clone or in the plugin's install. `plugin.json` has no version on purpose: Claude
-Code then uses the commit, so every project follows GameFrame's latest commit. A project's own
+GameFrame in a clone or in the plugin's install. `plugin.json` carries the release's version.
+Claude Code updates the plugin when that version changes, so projects move from one release to
+the next. Each release raises the version and tags the commit with it. A project's own
 tools and scripts sit beside the launcher, and GameFrame never touches them.
 
 ## Find your way with `gameframe`

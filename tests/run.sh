@@ -730,6 +730,7 @@ import json, re, pathlib
 plugin = json.loads(pathlib.Path('.claude-plugin/plugin.json').read_text())
 market = json.loads(pathlib.Path('.claude-plugin/marketplace.json').read_text())
 assert [p['name'] for p in market['plugins']] == [plugin['name']], 'the marketplace lists the plugin'
+assert re.fullmatch(r'\d+\.\d+\.\d+', plugin.get('version', '')), 'plugin.json has a release version (MAJOR.MINOR.PATCH)'
 assert pathlib.Path(plugin['skills'], 're-start', 'SKILL.md').is_file(), 'the plugin finds the skills'
 assert pathlib.Path('.claude/agents').resolve() == pathlib.Path('agents').resolve(), '.claude/agents links to agents/'
 skills = {p.parent.name for p in pathlib.Path('skills').glob('*/SKILL.md')}
@@ -803,12 +804,11 @@ PY
 [[ $? == 0 && "$out" != *STALE* && "$out" == *"agents in 4 formats"* ]] && ok "the agents' copies for Codex, Gemini CLI, Copilot and OpenCode are current and keep each agent's limits ($(echo "$out" | tail -1))" || bad "gameframe agents --emit (run it and commit the result)" "$out"
 rm -rf "$gen"
 if command -v claude >/dev/null; then
-  # plugin.json has no version on purpose: users then follow GameFrame's commits (the commit SHA
-  # is the version), so the one warning allowed is the missing version.
+  # plugin.json carries the release's version: Claude Code updates the plugin when it changes.
   out="$(claude plugin validate . 2>&1)"
   warnings="$(echo "$out" | grep -c '❯' || true)"
-  [[ "$out" == *"Validation passed"* && "$warnings" -le 1 && ( "$warnings" == 0 || "$out" == *"No version specified"* ) ]] \
-    && ok "claude plugin validate passes; the only warning is the version left out so projects follow every commit" || bad "claude plugin validate" "$out"
+  [[ "$out" == *"Validation passed"* && "$warnings" == 0 ]] \
+    && ok "claude plugin validate passes with no warnings" || bad "claude plugin validate" "$out"
 else
   echo "  skip  claude plugin validate (no claude command)"
 fi
