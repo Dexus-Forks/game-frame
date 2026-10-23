@@ -10,7 +10,8 @@ contains the game's own files: every output reads the player's own copy (see
 - **Documents** in `docs/`, in the evidence style of `re-land`: formats, rules, constants, with
   addresses and labels. They are useful on their own to modders and to other projects.
 - **A website** made from those documents (VitePress, MkDocs or similar), built by CI on every
-  push. Pictures and short videos made by the reimplementation itself, never screenshots of the
+  push. The `re-site` skill makes one in `sites/<name>/`: a diary entry per milestone, and the
+  documents shown with `@include`. Pictures and short videos made by the reimplementation itself, never screenshots of the
   original's assets.
 - **Readers for the formats** as a small library with no other dependencies, so modding tools
   can use them.

@@ -7,6 +7,22 @@ Every release of GameFrame, newest first. The format follows
 
 ## [Unreleased]
 
+### Skills and agents
+
+- A new skill, `re-site`, builds and keeps a project's website: a VitePress site in
+  `sites/<name>/`, or one `site/`. It holds a diary with one entry per milestone and the
+  project's documents shown through `@include`, so each has one copy. Entries are written for
+  readers, as findings with their evidence, never as commit lists or tool output.
+- A new task agent, `re-publisher`, writes the diary entry for each milestone, adds pages for
+  new documents and checks the site before `re-lander` commits it.
+- `scripts/new-site.sh` starts a site from `templates/site/`, with a GitHub Pages workflow that
+  builds every site in the project.
+- `tools/site/check.py` checks a site for game files, decompiled code, missing includes, diary
+  entries without a title or summary, and entries that read like a commit log.
+- New projects get milestones in their `AGENTS.md` and checklist. A viewer of every asset comes
+  before the game, since each format then becomes a reader, a document and a viewer panel that
+  the rest of the project reuses. `re-start` gives the same goals.
+
 ### Projects
 
 - `new-project.sh --agent LIST` sets a project up for the coding agents it names: `claude`,

@@ -46,6 +46,8 @@ dir="$1"; name="$2"; game="${3:-}"
 mkdir -p "$dir"/{target,analysis,derived,docs,labels,.claude}
 if [[ $copy == 1 ]]; then
   cp -R "$ROOT/tools" "$ROOT/scripts" "$dir/"
+  # The site template that scripts/new-site.sh reads (re-site).
+  mkdir -p "$dir/templates" && cp -R "$ROOT/templates/site" "$dir/templates/site"
   # One copy of the skills in skills/, and links for the agents that look elsewhere:
   # .claude/skills (Claude Code, Copilot, Cursor) and .agents/skills (Codex, Gemini CLI, others).
   # The links and each agent's own files come from scripts/clients.py, below.

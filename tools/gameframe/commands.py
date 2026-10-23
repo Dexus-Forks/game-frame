@@ -19,7 +19,7 @@ from search import search
 
 GROUPS = {'disc': 'Discs and disk images', 'pe': 'Windows PE', 'dos': '16-bit DOS', 'emu': 'Emulators', 'triage': 'Triage',
           'formats': 'Formats', 'verify': 'Verify', 'ghidra': 'Ghidra scripts',
-          'scripts': 'Scripts'}
+          'site': 'Sites', 'scripts': 'Scripts'}
 
 
 def _width():

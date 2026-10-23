@@ -66,7 +66,7 @@ def tracked(sub):
 
 # (path in GameFrame, path in the project)
 pairs = []
-for sub in ('tools', 'scripts'):
+for sub in ('tools', 'scripts', 'templates/site'):
     pairs += [(f, f) for f in tracked(sub)]
 pairs += [(f, f) for f in tracked('skills') if f.split('/')[1].startswith('re-')]
 pairs += [(f, '.claude/' + f) for f in tracked('agents')]
@@ -209,7 +209,7 @@ if to_plugin:
         if not dry:
             os.remove(gemini)
     if not dry:
-        for top in ('tools', 'scripts', 'skills', '.claude/agents', 'docs', '.codex', '.gemini', '.github', '.cursor', '.vscode', '.opencode'):
+        for top in ('tools', 'scripts', 'templates', 'skills', '.claude/agents', 'docs', '.codex', '.gemini', '.github', '.cursor', '.vscode', '.opencode'):
             for base, dirs, files in os.walk(os.path.join(dest, top), topdown=False):
                 if not os.listdir(base):
                     os.rmdir(base)

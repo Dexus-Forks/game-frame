@@ -12,7 +12,20 @@ ground truth). Keep it short; details belong in the topic documents.
 - [ ] Ghidra export of the game's own binaries (`./gameframe run ghidra-export`)
 - [ ] Data containers identified and listed
 
-## Foundations (usually first: everything else depends on them)
+## Viewer (before the game: every format becomes a reader, a document and a panel)
+
+- [ ] Catalogue of every file (`./gameframe run catalog target/ derived/catalog`)
+- [ ] The project's viewer app, on the port's own readers
+- [ ] Pictures and palettes
+- [ ] Sounds and music
+- [ ] Models and levels
+- [ ] Text, fonts and saves
+
+## Site
+
+- [ ] The site and its first diary entry (`re-site`)
+
+## Foundations (everything in the game depends on them)
 
 - [ ] Random number generator: traced / measured / reimplemented / verified
 - [ ] Maths helpers the simulation uses (vectors, angles, fixed point)

@@ -18,6 +18,21 @@ GOAL: write one paragraph here. For example: "a 1:1 reimplementation of GAME_NAM
 LANGUAGE, reading the player's own data files", or "document the save format", or "a mod
 loader". Say what "done" means and how exact it must be.
 
+### Milestones
+
+The usual order for a new project. Change it to suit the goal; the user decides. Each milestone
+gets an entry in the project's diary (`re-site`).
+
+1. **Inventory.** Every file known: binaries, engine, containers, the kind of game (`re-inventory`).
+2. **A viewer of every asset.** Pictures, palettes, sounds, music, models, levels, text and
+   saves, all opened by the project's own readers (`re-browse`, `re-format`). Build it before
+   the game. Each format becomes a reader crate or module with tests on every file, a document
+   in `docs/`, and a panel in the viewer. The port, mod tools and the site reuse all three.
+3. **A site.** The diary and the format documents, for the people who will use them (`re-site`).
+4. **The foundations.** The random generator, the maths, the game clock and the main loop,
+   measured and verified (`re-trace`, `re-emulate`, `re-verify`).
+5. **The game.** One system at a time, each verified before the next (`re-port`, `re-verify`).
+
 ## The user decides
 
 The agent is not the judge of the user's intentions, of which law applies to them, or of what

@@ -149,6 +149,7 @@ stops at the same points:
 | `re-measurer` | re-emulate | Agent, WebFetch, WebSearch | re-porter, re-verifier |
 | `re-observer` | re-observe | Agent, WebFetch, WebSearch | re-tracer, re-verifier |
 | `re-porter` | re-port | Agent, WebFetch, WebSearch | re-verifier |
+| `re-publisher` | re-site, re-land | Agent, WebFetch, WebSearch | re-lander |
 | `re-randomiser` | re-trace, re-emulate | Agent, WebFetch, WebSearch | re-porter, re-verifier |
 | `re-surveyor` | re-setup, re-inventory | Agent | re-decompiler, re-observer |
 | `re-tracer` | re-trace, re-ghidra, re-rea | Agent, WebFetch, WebSearch | re-decoder, re-measurer, re-porter |

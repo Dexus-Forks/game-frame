@@ -70,6 +70,7 @@ inventory -> observe -> decompile -> trace -> format -> emulate -> reimplement -
 | Reimplement | Write new code that behaves the same | `re-port` |
 | Verify | Is the new code bit-exact, deterministic, compatible with real saves? | `re-verify` |
 | Land | Document, label, commit | `re-land` |
+| Publish | What would a reader want to know about the work so far? A diary entry per milestone, the documents as pages | `re-site` |
 
 A small task may use only two or three steps. Do not skip `land`.
 
@@ -120,6 +121,7 @@ the same hand-off. Send them when a job is large enough to fill this session's c
 | `re-matcher` | A crate, library or released source compared with the game's version | `re-porter`, `re-tracer` |
 | `re-editor` | Documents edited to the writing rules, wording only | `re-checker`, `re-lander` |
 | `re-checker` | Every claim's evidence and sources checked, doubtful ones marked | `re-editor`, `re-lander` |
+| `re-publisher` | The project's site: a diary entry for a milestone, a page for each new document | `re-editor`, `re-checker`, `re-lander` |
 
 
 
@@ -151,8 +153,27 @@ a diagram of each team's hand-offs and the failure path.
    decoders come (`docs/working/viewer.md`).
 7. `re-observe`: get the original running where you can watch, drive and capture it.
 8. `re-ghidra`: export the game's own binaries (`scripts/ghidra-export.sh`).
-9. Pick the foundations first: the random number generator, the maths helpers, the game clock
+9. When the work on the game starts, pick the foundations first: the random number generator, the maths helpers, the game clock
    and the data container. Everything else depends on them. They are small enough to emulate and verify in one session.
+
+## Goals for a new project
+
+Give the work goals a reader would notice, in this order unless the user's goal says otherwise
+(the project's `AGENTS.md`, "Milestones"):
+
+1. **Inventory**: every file known (`re-inventory`).
+2. **A viewer of every asset, before the game**: pictures, palettes, sounds, music, models,
+   levels, text and saves, opened by the project's own readers (`re-browse`, `re-format`). This
+   is the best first goal. Each format becomes three things that the rest of the project
+   reuses: a reader crate or module, proved on every file; a document in `docs/`; and a panel
+   in the viewer. The port starts with its data layer done and tested, mod tools come for free,
+   and the person directing the work can check every decoder by looking.
+3. **A site**: the diary and the format documents, for the people who use them (`re-site`).
+4. **The foundations**: random generator, maths, clock and main loop, measured and verified.
+5. **The game**, one system at a time.
+
+At each goal, write a diary entry and update `docs/CHECKLIST.md`. When a goal turns up something
+generic, a reader or a pitfall another game will meet, fix it in GameFrame or its `crates/`.
 
 ## Spend effort where it pays
 

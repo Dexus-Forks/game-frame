@@ -612,6 +612,47 @@ out="$("$PWD/scripts/update-project.sh" "$tmp" --plugin --agent claude 2>&1)"
   && grep -q "GAMEFRAME_PROJECT" "$tmp/gameframe" && grep -q '"gameframe@game-frame": true' "$tmp/.claude/settings.json" && ! grep -q "gate.py" "$tmp/.claude/settings.json" \
   && ok "update-project --plugin removes the copies, keeps the project's changes, enables the plugin" || bad "update-project --plugin" "$out"
 
+echo "Project sites (re-site)"
+expect "new-site prints its usage" "scripts/new-site.sh NAME" bash scripts/new-site.sh
+expect "tools/site/check.py prints its usage" "tools/site/check.py SITE_DIR" python3 tools/site/check.py --help
+sp="$(mktemp -d)/re-site"
+scripts/new-project.sh "$sp" "Test Game" --agent claude >/dev/null 2>&1
+out="$(cd "$sp" && GAMEFRAME_ROOT="$OLDPWD" ./gameframe run new-site test "Test: \"Game\"" --repo https://github.com/example/test 2>&1)"
+S="$sp/sites/test"
+[[ -f "$S/.vitepress/config.mts" && -f "$S/diary/posts.data.mts" && -f "$sp/.github/workflows/sites.yml" ]] \
+  && grep -q '<!--@include: ../../docs/FINDINGS.md-->' "$S/findings.md" && grep -q 'title: "Test: \\"Game\\""' "$S/.vitepress/config.mts" \
+  && ok "new-site writes sites/NAME with the diary, the included documents and the Pages workflow, and quotes the title" || bad "new-site" "$out $(ls -A "$S" 2>&1)"
+out="$(cd "$sp" && GAMEFRAME_ROOT="$OLDPWD" ./gameframe run new-site test "Again" 2>&1)"
+[[ $? != 0 && "$out" == *"exists"* ]] && ok "new-site never writes over a site" || bad "new-site twice" "$out"
+out="$(python3 tools/site/check.py "$S" 2>&1)"
+[[ $? == 1 && "$out" == *"TODO(site)"* ]] && ok "check.py fails a site with the template's TODO(site) lines" || bad "check.py TODO" "$out"
+sed -i.bak 's/TODO(site) //' "$S/index.md" && rm "$S/index.md.bak"
+words="The reader checks the record count against the file size before it reads anything, and every record decodes."
+{ printf -- '---\ntitle: "The first format"\nsummary: The data file is a table of fixed records.\n---\n\n# The first format\n\n'
+  for i in 1 2 3 4 5 6 7 8; do echo "$words"; done; } > "$S/diary/2026-10-23-first-format.md"
+out="$(python3 tools/site/check.py "$S" 2>&1)"
+[[ $? == 0 && "$out" == *"0 errors, 0 warnings"* ]] && ok "check.py passes a site with a real diary entry" || bad "check.py clean site" "$out"
+{ printf -- '---\ntitle: Work\nsummary: Commits.\n---\n\n'
+  for h in 1a2b3c4 5d6e7f8 9a0b1c2 3d4e5f6; do echo "- Add $h the next thing"; done; } > "$S/diary/2026-10-24-work.md"
+printf -- '---\ntitle: No summary\n---\n\nShort.\n' > "$S/diary/2026-10-25-x.md"
+printf 'MZ' > "$S/public.exe"
+printf '<!--@include: ../../docs/MISSING.md-->\n' > "$S/missing.md"
+printf 'The loop reads %s.\n' "$(printf 'undef%s local_8' ined4)" >> "$sp/docs/FINDINGS.md"
+out="$(python3 tools/site/check.py "$S" 2>&1)"
+[[ $? == 1 && "$out" == *"commit log"* && "$out" == *"no summary"* && "$out" == *"game file (.exe)"* && "$out" == *"MISSING.md, which does not exist"* && "$out" == *"decompiled code (in "*"FINDINGS.md)"* ]] \
+  && ok "check.py finds commit logs, missing summaries, game files, missing includes and decompiled code in an included document" || bad "check.py problems" "$out"
+rm "$S/diary/2026-10-24-work.md" "$S/diary/2026-10-25-x.md" "$S/public.exe" "$S/missing.md"
+git -C "$sp" checkout -q docs/FINDINGS.md
+if [[ -x site/node_modules/.bin/vitepress ]]; then
+  ln -s "$PWD/site/node_modules" "$S/node_modules"
+  out="$(cd "$S" && ./node_modules/.bin/vitepress build 2>&1)"
+  [[ $? == 0 ]] && grep -q "The first format</a>" "$S/.vitepress/dist/diary/index.html" && grep -q "2026-10-23 · The first format" "$S/.vitepress/dist/index.html" \
+    && ok "the new site builds with VitePress, and the diary lists its entry" || bad "new site build" "$out"
+else
+  echo "  skip  the new site's VitePress build (run npm install in site/)"
+fi
+rm -rf "$(dirname "$sp")"
+
 echo "Engine run-time: hashed names, skeletons, structures, shaders, memory per frame"
 W="$(mktemp -d)"
 "$PYTHON" tests/make_engine.py "$W"

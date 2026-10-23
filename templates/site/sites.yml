@@ -1,0 +1,62 @@
+# Build the project's sites and publish them on GitHub Pages. Made by GameFrame's
+# scripts/new-site.sh. A site is site/ or a folder in sites/ with a package.json. One site is
+# served at /<repository>/; several are served at /<repository>/<name>/, with a short index page
+# at /<repository>/ that links each one. Turn on Pages in the repository's settings, with
+# "GitHub Actions" as the source.
+name: Sites
+
+on:
+  push:
+    branches: [main]
+    paths: ['site/**', 'sites/**', 'docs/**', '.github/workflows/sites.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # lastUpdated reads the git history
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build every site
+        run: |
+          repo="${GITHUB_REPOSITORY#*/}"
+          sites=()
+          [[ -f site/package.json ]] && sites+=(site)
+          for d in sites/*/; do [[ -f "$d/package.json" ]] && sites+=("${d%/}"); done
+          mkdir -p public
+          for s in "${sites[@]}"; do
+            name="$(basename "$s")"
+            if [[ ${#sites[@]} == 1 ]]; then base="/$repo/"; out=public; else base="/$repo/$name/"; out="public/$name"; fi
+            (cd "$s" && { [[ -f package-lock.json ]] && npm ci || npm install; } && SITE_BASE="$base" npm run build)
+            mkdir -p "$out" && cp -R "$s/.vitepress/dist/." "$out/"
+          done
+          if [[ ${#sites[@]} -gt 1 ]]; then
+            { echo '<!doctype html><meta charset="utf-8"><title>Sites</title><ul>'
+              for s in "${sites[@]}"; do n="$(basename "$s")"; echo "<li><a href=\"$n/\">$n</a></li>"; done
+              echo '</ul>'; } > public/index.html
+          fi
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

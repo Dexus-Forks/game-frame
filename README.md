@@ -142,6 +142,7 @@ to produce, and the pitfalls that cost time.
 | [re-port](skills/re-port/SKILL.md) | Reimplement exactly: precision, order of operations, draw order, iteration order; an exact core with commands, digests and a headless runner; additions (multiplayer, mods) kept apart |
 | [re-verify](skills/re-verify/SKILL.md) | Bit-exact parity, draw order, determinism with digests and on every platform, recordings, saves, pictures, version against version, test tiers |
 | [re-land](skills/re-land/SKILL.md) | Document in evidence style, label, commit safely |
+| [re-site](skills/re-site/SKILL.md) | The project's website in `sites/`: a diary entry per milestone, the documents shown as pages with `@include`, no commit dumps and no game material |
 
 ## Stage agents
 
@@ -155,12 +156,12 @@ that block game material, decompiled code and commits by other agents.
 `re-porter` → `re-verifier` → `re-lander`, and back to the tracer or the porter when a check
 fails.
 
-Nine task agents do one job each, in any stage: `re-identifier` (engine and libraries),
+Ten task agents do one job each, in any stage: `re-identifier` (engine and libraries),
 `re-randomiser` (random generators and draw order), `re-listener` (every input),
 `re-cataloguer` (every screen), `re-mapper` (hardware and memory), `re-typer` (structures and
 classes), `re-matcher` (a crate or
-library against the game), `re-editor` (documents to the writing rules) and `re-checker`
-(claims and sources). `re-start` ("Task agents") has their table.
+library against the game), `re-editor` (documents to the writing rules), `re-checker`
+(claims and sources) and `re-publisher` (the project's site and diary). `re-start` ("Task agents") has their table.
 
 Claude Code, Cursor and VS Code read the agents in `agents/` (through `.claude/agents`). Codex,
 Gemini CLI, GitHub Copilot and OpenCode read copies in their own formats, which
@@ -181,6 +182,7 @@ between agents, the outcome, and the failure path.
 | `source scripts/env.sh` | Sets `GAMEFRAME_ROOT`, loads `.env`, puts `gameframe` and the `.venv` Python on `PATH`, for each shell or agent session |
 | `scripts/new-project.sh DIR "Name" [GAME] [--copy] [--agent LIST]` | Creates a project for one game: rules, the plugin enabled, the `./gameframe` launcher, ignored folders for the game and its derivatives. `--copy` copies the toolkit, skills and guides instead. `--agent` names the coding agents to set it up for (`claude,codex,gemini,copilot,cursor,opencode`, or `all`, the default): each gets its skill link, agents, gate hooks and MCP servers |
 | `scripts/update-project.sh DIR [--plugin] [--agent LIST] [--dry-run]` | Keeps a project current. For a plugin project, refreshes the launcher, settings and each agent's files. For a copied project, adds what is missing, replaces older copies and keeps the project's own edits; `--plugin` moves it to the plugin and removes only GameFrame's own files. `--agent` adds agents; without it, the agents the project already has are refreshed |
+| `scripts/new-site.sh NAME "Title" ["Description"] [--single] [--repo URL]` | Starts a project's website in `sites/NAME/` (or `site/`): the front page, the diary, the findings and status pages through `@include`, and a GitHub Pages workflow (`re-site`) |
 | `scripts/ghidra-export.sh [--labels FILE] BINARY...` | Headless Ghidra analysis and a text export: pseudocode, functions, strings, imports, exports; names applied from a labels file |
 | `scripts/ghidra-run.sh BINARY decompile\|named\|refs\|vtable\|labels\|callargs\|blocks OUT ARGS` | One-off jobs in the analysed project, without re-analysis: also every call with its arguments, and raw memory pieces |
 | `scripts/extract-installer.sh [--detect] INSTALLER OUT` | Unpacks an installer or package without running it: Inno Setup (GOG), NSIS, InstallShield, MSI, archives, `.dmg`, `.pkg`, GOG's `.sh`, CD images |
@@ -239,6 +241,7 @@ between agents, the outcome, and the failure path.
 | `tools/verify/bitcompare.py` | Ground truth against reimplementation, bit for bit, with ULP distance |
 | `tools/verify/ramdiff.py` | Memory frame by frame from the original and the port: the first frame and address that differ, named from a RAM map |
 | `tools/verify/seqdiff.py` | The first random draw (or any event) where two traces differ |
+| `tools/site/check.py SITE_DIR` | Checks a project's site before it is published: no game files or decompiled code, includes that resolve, diary entries with a title and summary that do not read like a commit log |
 | `tools/ghidra/*.java` | The Ghidra scripts the shell scripts run (`ApplyLabels.java` names functions and creates missed ones) |
 | `tools/dos/dosinfo.py` | What is this DOS binary: MZ, NE or LE; segments with Ghidra's selectors; imports; compiler, extender, packer fingerprints; debug symbols; Pascal strings |
 | `tools/dos/tdinfo.py` | Borland Turbo Debugger symbols: original procedure, global and type names, parameters, record layouts, source lines, labels for Ghidra, Rust readers for records |
