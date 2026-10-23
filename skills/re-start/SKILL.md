@@ -208,6 +208,12 @@ choose how deep to go for each piece:
 
 ## How to work
 
+When a command fails, run `./gameframe advise "<error text>"` before you debug it. When the work
+turns to a new era, platform, runtime or kind of hardware, run `./gameframe advise TOPIC`
+(`./gameframe advise windows-9x directdraw`, `./gameframe advise wine`). It names known failures
+with their fixes, dead ends with what was tried, and the context for that era. A hook does the
+same after each shell command in Claude Code. Read `docs/working/knowhow.md` for how it works.
+
 Read `docs/working/agents.md` once per project. It covers writing everything down in the
 repository, measuring before porting, splitting work between sessions, and what to do when stuck. Write every document by
 `docs/working/writing.md`.

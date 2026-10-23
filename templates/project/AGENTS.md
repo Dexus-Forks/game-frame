@@ -99,7 +99,10 @@ user may change any of them.
 inventory → observe → decompile → trace → (format) → emulate → reimplement → verify → land. Start each
 session by reading `docs/CHECKLIST.md` and searching `docs/` and `labels/` for the addresses
 and names you are about to work on. `./gameframe find WORD` shows which skills and
-tools cover a subject, and `./gameframe tool NAME` prints a tool's usage.
+tools cover a subject, and `./gameframe tool NAME` prints a tool's usage. When a command
+fails, or the work turns to a new era, runtime or kind of hardware, run
+`./gameframe advise "<error text or topic>"`. It names known failures with their fixes, and dead
+ends with what was tried. Record this game's own in `docs/knowhow/` (`re-land`, "Know-how").
 
 Keep a resource viewer from the first day (`re-browse`): the catalogue
 (`./gameframe run catalog target/game derived/catalog --decoder GLOB=DECODER.py`) until the

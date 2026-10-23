@@ -9,6 +9,7 @@ its function count, the export count, and *engine fingerprints*: names in the im
 strings that point to a known engine, middleware or protection (Unity, Unreal, FMOD, Steam,
 Denuvo...). Run it on every binary in the game folder before anything else; it tells you which
 binaries hold the game's own code and which tools apply (see the re-inventory skill).
+A section whose VirtualSize is 0 (Watcom's linker writes these) shows its raw size, marked.
 """
 import re
 import sys
@@ -69,7 +70,9 @@ def main(path, *flags):
         name = s.Name.rstrip(b'\0').decode(errors='replace')
         flags = ''.join(c for c, bit in (('r', 0x40000000), ('w', 0x80000000), ('x', 0x20000000))
                         if s.Characteristics & bit)
-        print(f'    {name:<9} {base + s.VirtualAddress:#x}  size {s.Misc_VirtualSize:#9x}  {flags}  entropy {s.get_entropy():.2f}')
+        size = s.Misc_VirtualSize or s.SizeOfRawData   # Watcom's linker can leave VirtualSize at 0
+        raw = '' if s.Misc_VirtualSize else '  (raw size: VirtualSize 0)'
+        print(f'    {name:<9} {base + s.VirtualAddress:#x}  size {size:#9x}  {flags}  entropy {s.get_entropy():.2f}{raw}')
     imports = getattr(pe, 'DIRECTORY_ENTRY_IMPORT', [])
     print(f'  imports: {len(imports)} DLLs')
     for d in imports:

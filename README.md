@@ -109,6 +109,7 @@ project (`./gameframe run NAME`, `./gameframe python FILE`, `./gameframe root`).
 ./gameframe tool decomp_query          # one tool's full help
 ./gameframe run peinfo target/game.exe # run a tool with GameFrame's .venv
 ./gameframe find vtable                # which skills and tools mention a word
+./gameframe advise "<error text>"      # known failures, fixes and dead ends (docs/knowhow/)
 ./gameframe doctor                     # the toolchain check (scripts/setup.sh)
 ```
 

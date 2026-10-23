@@ -52,6 +52,9 @@ original's behaviour, not the port.
   commands. This file only says what your stage owns and where it ends.
 - Read `AGENTS.md`, then search `docs/` and `labels/` for the subject of the brief. An earlier
   session may have done part of it.
+- When a command fails, or the work turns to a new era, runtime or kind of hardware, run
+  `./gameframe advise "<error text or topic>"`. It names known failures with their fixes, and
+  dead ends with what was tried (`docs/working/knowhow.md`).
 
 ## Rules
 

@@ -58,6 +58,22 @@
           { "type": "command", "command": "python3", "args": ["${CLAUDE_PROJECT_DIR}/scripts/hooks/gate.py", "write"], "timeout": 10 }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "python3", "args": ["${CLAUDE_PROJECT_DIR}/scripts/hooks/advise.py", "post"], "timeout": 10 }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "python3", "args": ["${CLAUDE_PROJECT_DIR}/scripts/hooks/advise.py", "post"], "timeout": 10 }
+        ]
+      }
     ]
   }
 }

@@ -14,6 +14,13 @@ Commands:
   run NAME [ARGS]       run a tool or script: Python tools with GameFrame's .venv
   find WORD             which skills and tools mention WORD, line by line
       --max N           lines shown per skill or tool (default 3)
+  advise TEXT           known failure modes and context for an error message, a log or a topic
+      -                 read the text from stdin (pipe a log into it)
+      --signatures      only entries whose error signature matches the text
+      --entry ID        print one entry in full
+      --list            every entry with its status
+      --check           check every entry's fields, facets, links and sections
+      --why             say why each entry matched; --max N entries (default 5)
   agents                every agent: its skills, the tools it cannot use, its hand-offs
       --table           the Markdown table that docs/working/agents.md holds
       --emit CLIENT     write the agents in a client's format: codex, gemini, copilot, opencode or all
@@ -22,7 +29,7 @@ Commands:
   mcp --emit CLIENT     write .mcp.json's servers for codex, gemini, cursor, vscode, opencode or all
       --check           only report which files are not current (exit 1)
 
-steps, skills, agents, tools, tool and find take --json, for agents and scripts.
+steps, skills, agents, tools, tool, find and advise take --json, for agents and scripts.
 
 Examples:
   gameframe steps
@@ -30,9 +37,12 @@ Examples:
   gameframe tool peinfo
   gameframe run peinfo target/game.exe --imports
   gameframe find vtable
+  gameframe advise "A privileged instruction was executed at 004a88cd"
+  wine game.exe 2>&1 | tail -50 | gameframe advise -
+  gameframe advise directdraw wine
 
 Inputs: the skills (skills/re-*/SKILL.md), the tools (tools/, scripts/) and their own
-help, read from the files. The same command works in GameFrame and in a project made by
+help, and the know-how entries (docs/knowhow/, GameFrame's and the project's), read from the files. The same command works in GameFrame and in a project made by
 scripts/new-project.sh. Standard library only; it needs no .venv itself.
 
 It does not install anything or keep its own copy of the skills or the help: `run` and
@@ -80,6 +90,15 @@ def parser():
     s.add_argument('word', help='plain text, any case')
     s.add_argument('--max', type=int, default=3, metavar='N', help='lines shown per skill or tool (default 3)')
     s.add_argument('--json', action='store_true')
+    s = sub.add_parser('advise', help='known failure modes and context for some text (docs/working/knowhow.md)')
+    s.add_argument('text', nargs='*', help='an error message, a topic, or - to read stdin')
+    s.add_argument('--signatures', action='store_true', help='only entries whose error signature matches')
+    s.add_argument('--entry', metavar='ID', help='print one entry in full')
+    s.add_argument('--list', action='store_true', help='every entry with its status')
+    s.add_argument('--check', action='store_true', help='check every entry; exit 1 on a problem')
+    s.add_argument('--why', action='store_true', help='say why each entry matched')
+    s.add_argument('--max', type=int, default=5, metavar='N', help='entries shown (default 5)')
+    s.add_argument('--json', action='store_true')
     s = sub.add_parser('mcp', help='write the MCP servers in each agent\'s format (see tools/gameframe/mcp.py)')
     s.add_argument('--emit', required=True, choices=(*mcp.CLIENTS, 'all'), metavar='CLIENT',
                    help=f'{", ".join(mcp.CLIENTS)} or all')
@@ -110,7 +129,7 @@ def main(argv):
             print(__doc__.rstrip())
         return 0
     return {'steps': commands.steps, 'skills': commands.list_skills, 'skill': commands.skill,
-            'agents': commands.list_agents, 'tools': commands.list_tools, 'tool': commands.tool, 'find': commands.find,
+            'agents': commands.list_agents, 'tools': commands.list_tools, 'tool': commands.tool, 'find': commands.find, 'advise': commands.advise,
             'mcp': mcp.emit,
             }[args.command](args)
 

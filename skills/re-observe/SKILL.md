@@ -29,6 +29,13 @@ model, how exact the interface must be. They decide what to capture.
 Prefer headless, scripted runs for evidence. Use windowed runs to see what happens and where to
 look. `docs/observe/running-the-original.md` has the full table.
 
+Before the first run, ask what is known about the game's era and the system you run it on:
+`./gameframe advise windows-9x directdraw wine` or `./gameframe advise dos dosbox`. Old games
+assumed hardware that modern systems refuse (port I/O, 16-bit desktops, short mode lists, a CD
+in the drive). The context entries list the checks to make first, such as
+`./gameframe run insns GAME.EXE '^(in|out|cli|sti)'` for privileged instructions. When a run
+fails, pass the error text or the log's tail to `./gameframe advise -`.
+
 In an emulator, start every run from a save state, record the inputs as a movie, and have a
 script dump the game's memory after each frame. Those dumps are ground truth for
 `tools/verify/ramdiff.py`. Search Data Crystal, The Cutting Room Floor and TASVideos for RAM

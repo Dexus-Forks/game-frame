@@ -31,5 +31,7 @@ def context(root, gameframe):
                  ' runs a project script with the toolkit on its path).')
     if todo:
         text += ' Next open items in docs/CHECKLIST.md: ' + ' | '.join(todo) + '.'
+    text += (' When a command fails, or the work turns to a new era, runtime or hardware, run'
+             ' ./gameframe advise "<error text or topic>" for known failures, fixes and dead ends.')
     return json.dumps({'hookSpecificOutput': {'hookEventName': 'SessionStart',
                                               'additionalContext': text}})

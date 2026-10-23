@@ -101,6 +101,21 @@ proposed again.
 - [x] `new-project.sh --copy` and `update-project.sh` copy the agents for clients other than Claude Code
 - [x] `tools/emu/pe32_emu.py`: 32-bit (x86) PE routines under Unicorn, with register inputs, MMX, and named import stubs
 
+## Know-how ([docs/knowhow/](docs/knowhow/README.md), [the design](docs/working/knowhow.md))
+
+- [x] A taxonomy of failure modes by era, platform, runtime, hardware, API, compiler, genre and symptom
+- [x] The entry format, `gameframe advise` and its `--check`
+- [x] A hook that names matching entries after a shell command in Claude Code
+- [x] Seed entries from running a 1997 Windows game under Wine on Apple silicon, and the
+  context for Windows 95 DirectDraw games, Wine on macOS and Watcom programs
+- [x] PE tools fall back to `SizeOfRawData` when a section's VirtualSize is 0 (`peinfo`, `vtable`)
+- [ ] The same hook for Codex, Gemini CLI, Cursor and Copilot (their post-tool events)
+- [ ] An MCP tool for `advise`, for clients without shell hooks
+- [ ] A Wine-side input tool: a small Windows program that sends keys as scancodes and clicks
+  with `SendInput`, built from our own source
+- [ ] Context entries for DOS with DOSBox-X, 3D-card builds and 16-bit Windows
+- [ ] Queries that `advise` missed, to decide on embeddings (none recorded yet)
+
 ## Out of scope
 
 These were considered and left out, with the reason:

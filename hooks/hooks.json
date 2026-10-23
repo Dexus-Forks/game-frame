@@ -1,5 +1,5 @@
 {
-  "description": "GameFrame's gates: no game material or decompiled code in commits or tracked files, only re-lander commits and pushes, and a short status at the start of a session. See docs/working/gates.md.",
+  "description": "GameFrame's gates: no game material or decompiled code in commits or tracked files, only re-lander commits and pushes, a short status at the start of a session, and known failure modes after a shell command (docs/working/knowhow.md). See docs/working/gates.md.",
   "hooks": {
     "SessionStart": [
       {
@@ -20,6 +20,22 @@
         "matcher": "Write|Edit",
         "hooks": [
           { "type": "command", "command": "python3", "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/hooks/gate.py", "write"], "timeout": 10 }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "python3", "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/hooks/advise.py", "post"], "timeout": 10 }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "python3", "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/hooks/advise.py", "post"], "timeout": 10 }
         ]
       }
     ]

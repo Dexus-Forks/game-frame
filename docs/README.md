@@ -65,6 +65,12 @@ the order of this page and of each folder's `README.md` is the order of the site
 - [Working on a project](working/README.md): how agents work well on this, and how to write
   findings.
 
+## Known failures and context
+
+- [Know-how](knowhow/README.md): failure modes seen before, with their fixes, dead ends and
+  what was tried, and what to know for an era, runtime or kind of hardware.
+  `./gameframe advise` searches them.
+
 ## Reference
 
 - [Game patterns](GAME-PATTERNS.md): the parts most games are built from, as they appear in

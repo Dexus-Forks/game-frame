@@ -31,6 +31,10 @@ table=$("$PYTHON" -c "import pefile;p=pefile.PE('$B/game.exe');print(hex(p.OPTIO
 expect "readdata reads a float table" "0.05000000074505806, 0.125, 0.3333333134651184, 1.0" "$PYTHON" tools/pe/readdata.py $B/game.exe f32 "$table" --count 4
 vt=$("$PYTHON" -c "import pefile;p=pefile.PE('$B/game.exe');print(hex(p.OPTIONAL_HEADER.ImageBase+[e.address for e in p.DIRECTORY_ENTRY_EXPORT.symbols if e.name==b'tree_vtbl'][0]))")
 expect "vtable lists two slots" "+0x008" "$PYTHON" tools/pe/vtable.py $B/game.exe "$vt"
+vz="$(mktemp -d)"; "$PYTHON" -c "import pefile,sys;p=pefile.PE(sys.argv[1]);[setattr(s,'Misc_VirtualSize',0) for s in p.sections];p.write(sys.argv[2])" $B/game.exe "$vz/game.exe"
+expect "vtable reads a PE whose sections have a VirtualSize of 0, as Watcom writes" "+0x008" "$PYTHON" tools/pe/vtable.py "$vz/game.exe" "$vt"
+expect "peinfo shows the raw size of a section with a VirtualSize of 0" "(raw size: VirtualSize 0)" "$PYTHON" tools/pe/peinfo.py "$vz/game.exe"
+rm -rf "$vz"
 expect "peinfo counts the base relocations" "base relocations: " "$PYTHON" tools/pe/peinfo.py $B/game.exe
 expect "dates finds a FILETIME and a DOS date" "0x00000b  filetime   2026-10-22 14:30:00" "$PYTHON" - <<'PY'
 import struct, datetime as dt, subprocess, sys, tempfile
@@ -925,6 +929,78 @@ expect "gameframe run passes the tool's exit code" "rc 1" sh -c "$G run bitcompa
 expect "gameframe run refuses a library and says why" "a library to import" $G run pe_emu
 expect "gameframe find names the skills and tools for a word" "tool vtable" $G find vtable
 expect "gameframe mcp: every agent's MCP file is current with .mcp.json" "rc 0" sh -c "$G mcp --emit all --check; echo rc \$?"
+
+echo "Know-how (gameframe advise, scripts/hooks/advise.py)"
+K="GAMEFRAME_KNOWHOW=tests/fixtures/knowhow"
+expect "advise finds an entry by its error signature" "[Solved] fixture-solved" env $K $G advise "error: widget overflow at 0xbeef"
+expect "advise reads a log on stdin" "[Open] fixture-open" sh -c "echo 'gadget fault in fixturemod+0x104' | env $K $G advise - --signatures"
+expect "advise finds entries by a topic's alias" "names hang, testvm" env $K $G advise "tvm frozen" --why
+expect "advise lists what an open entry tried" "Tried 2 things: A bigger stack: no change; Fewer threads" env $K $G advise "gadget fault in fixturemod+0x10a"
+expect "advise --signatures leaves out entries found only by words" "rc 1" sh -c "env $K $G advise 'tvm frozen' --signatures >/dev/null; echo rc \$?"
+expect "advise says how to record what it does not know" "re-land --section know-how" env $K $G advise "nothing like this at all"
+expect "advise --entry prints the whole entry" "Count the widgets first." env $K $G advise --entry fixture-solved
+expect "advise --check passes GameFrame's own entries" "0 problems" $G advise --check
+out="$("$PYTHON" - <<'PY' 2>&1
+import os, shutil, subprocess, tempfile
+d = tempfile.mkdtemp(); os.makedirs(f'{d}/docs/knowhow')
+shutil.copy('tests/fixtures/knowhow/README.md', f'{d}/docs/knowhow/README.md')
+bad = open('tests/fixtures/knowhow/fixture-open.md').read().replace('status: open', 'status: fixed').replace('[testvm]', '[nowhere]').replace("'gadget", "'(gadget")
+open(f'{d}/docs/knowhow/fixture-bad.md', 'w').write(bad)
+r = subprocess.run(['./gameframe', 'advise', '--check'], env={**os.environ, 'GAMEFRAME_KNOWHOW': f'{d}/docs/knowhow'}, capture_output=True, text=True)
+for want in ("status 'fixed'", "runtime 'nowhere' is not in the taxonomy", 'missing ), unterminated subpattern', 'differs from the file name'):
+    assert want in r.stdout, (want, r.stdout)
+assert r.returncode == 1
+# A project's own entries are found from its folder, next to GameFrame's.
+shutil.copy('tests/fixtures/knowhow/fixture-solved.md', f'{d}/docs/knowhow/project-only.md')
+txt = open(f'{d}/docs/knowhow/project-only.md').read().replace('id: fixture-solved', 'id: project-only')
+open(f'{d}/docs/knowhow/project-only.md', 'w').write(txt)
+env = {k: v for k, v in os.environ.items() if k not in ('GAMEFRAME_KNOWHOW', 'GAMEFRAME_PROJECT')}
+r = subprocess.run([os.path.abspath('gameframe'), 'advise', 'widget overflow at 0x10'], cwd=d, env=env, capture_output=True, text=True)
+assert 'project-only' in r.stdout and '(this project)' in r.stdout, r.stdout
+print('bad entries fail the check; a project\'s own entries are found')
+PY
+)"
+[[ $? == 0 ]] && ok "advise --check reports bad entries, and advise reads a project's entries ($out)" || bad "advise --check and project entries" "$out"
+for q in "A privileged instruction was executed at 004a88cd:wine-privileged-instruction" \
+         "0024:err:seh:virtual_setup_exception nested exception on signal stack:wine-wow64-rosetta-fault" \
+         "fixme:d3d:surface_cpu_blt Failed to blit:directdraw-16bit-back-surface" \
+         "dyld[123]: Library not loaded: @rpath/libinotify.0.dylib:macos-dyld-stripped" \
+         "directdraw windowed fullscreen 16-bit desktop:directdraw-windowed-16bit-desktop"; do
+  expect "advise puts ${q##*:} first for its error text or topic" "] ${q##*:}:" sh -c "$G advise '${q%:*}' --max 1"
+done
+out="$("$PYTHON" - <<'PY' 2>&1
+import json, os, subprocess, uuid
+H = os.path.abspath('scripts/hooks/advise.py')
+env = {**os.environ, 'GAMEFRAME_KNOWHOW': os.path.abspath('tests/fixtures/knowhow')}
+sid = uuid.uuid4().hex
+def hook(event):
+    r = subprocess.run(['python3', H, 'post'], input=json.dumps({'session_id': sid, 'cwd': os.getcwd(), **event}),
+                       capture_output=True, text=True, env=env)
+    assert r.returncode == 0, r.stderr
+    return json.loads(r.stdout)['hookSpecificOutput'] if r.stdout.strip() else None
+fail = {'hook_event_name': 'PostToolUseFailure', 'tool_name': 'Bash', 'tool_input': {'command': 'tool x'},
+        'error': 'Exit code 1\nwidget overflow at 0x1f'}
+out = hook(fail)
+assert out and out['hookEventName'] == 'PostToolUseFailure' and 'fixture-solved' in out['additionalContext'], out
+assert 'advise --entry fixture-solved' in out['additionalContext']
+assert hook(fail) is None, 'an entry is named once per session'
+ok = {'hook_event_name': 'PostToolUse', 'tool_name': 'Bash', 'tool_input': {'command': 'ls'},
+      'tool_response': {'stdout': 'gadget fault in fixturemod+0x10c', 'stderr': ''}}
+out = hook(ok)
+assert out and 'fixture-open' in out['additionalContext'] and 'Tried 2 things' in out['additionalContext'], out
+assert hook({**ok, 'tool_response': {'stdout': 'all fine', 'stderr': ''}}) is None, 'ordinary output says nothing'
+sid = uuid.uuid4().hex
+out = hook({**ok, 'tool_input': {'command': 'fixture-run --fast'}, 'tool_response': {'stdout': ''}})
+assert out and 'fixture-open' in out['additionalContext'], 'a context pattern matches the command'
+r = subprocess.run(['python3', H, 'post'], input='not json', capture_output=True, text=True)
+assert r.returncode == 0 and not r.stdout, 'bad input is ignored'
+print('signatures after a failed and a passing command, once per session, command patterns, bad input')
+PY
+)"
+[[ $? == 0 ]] && ok "the know-how hook names matching entries after a shell command ($out)" || bad "know-how hook" "$out"
+for f in hooks/hooks.json .claude/settings.json; do
+  grep -q '"PostToolUseFailure"' "$f" && grep -q 'advise.py' "$f" || bad "$f runs the know-how hook after Bash"
+done
 out="$("$PYTHON" - <<'PY' 2>&1
 import json, re, subprocess, tomllib
 src = json.load(open('.mcp.json'))['mcpServers']

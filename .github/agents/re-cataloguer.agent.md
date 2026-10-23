@@ -35,6 +35,9 @@ When every screen found three ways is in the inventory with its captures. Hand o
   you cannot find one, stop and say so in the hand-off.
 - Read `AGENTS.md`, then search `docs/` and `labels/` for the subject of the brief. An earlier
   session may have done part of it.
+- When a command fails, or the work turns to a new era, runtime or kind of hardware, run
+  `./gameframe advise "<error text or topic>"`. It names known failures with their fixes, and
+  dead ends with what was tried (`docs/working/knowhow.md`).
 - Follow the skills named above. They hold the exact commands. This file only says what your
   task owns and where it ends.
 

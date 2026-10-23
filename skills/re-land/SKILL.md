@@ -36,6 +36,29 @@ work.
   with the change. `tools/triage/coverage.py SOURCE_DIR` gives the progress figures for the
   checklist.
 
+### Know-how
+
+Ask whether this slice hit a failure, a dead end or a fact about the era, runtime or hardware
+that the next game would hit too. Examples are a tool that crashed, a game that would not
+start, a fix that took an hour and an idea that did not work. If it did, record it as a
+know-how entry (`docs/working/knowhow.md`). Then `./gameframe advise` and the hook find it
+next time.
+
+1. Run `./gameframe advise "<the exact error text>"`. If an entry exists, add to it: a new line
+   under `## Tried`, a new signature, or the fix that turns `open` into `solved`.
+2. Otherwise copy GameFrame's `docs/knowhow/_template.md` into the project's `docs/knowhow/`,
+   named by the entry's id. Fill in the facets from GameFrame's `docs/knowhow/README.md`. When
+   the failure prints anything, add at least one signature (a regular expression for the exact
+   message). Add the sections its status needs: `Symptoms`, `Cause` and `What to do` when
+   solved; `Symptoms` and `Tried` when open or a dead end.
+3. Run `./gameframe advise --check`, then the error text again. The entry should come first.
+4. An entry that holds for other games belongs in GameFrame too. Say so in the report. The
+   user decides whether to move it.
+
+Record an open problem too, with every attempt under `## Tried`. That list saves the next
+session the most time. Never put game material in an entry. Only addresses and short message
+texts belong there.
+
 ## 2. Check what you are about to commit
 
 ```bash

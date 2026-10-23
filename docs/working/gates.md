@@ -81,7 +81,7 @@ below follow each agent's documentation as of October 2026.
 
 | Agent | Config file | Event | What is checked |
 |---|---|---|---|
-| Claude Code | `hooks/hooks.json` (the plugin), `.claude/settings.json` | `PreToolUse` on `Bash`, `Write`, `Edit`; `SessionStart` | Commit, push, write; a session note |
+| Claude Code | `hooks/hooks.json` (the plugin), `.claude/settings.json` | `PreToolUse` on `Bash`, `Write`, `Edit`; `SessionStart`; `PostToolUse` and `PostToolUseFailure` on `Bash` | Commit, push, write; a session note; known failures after a command |
 | Codex | `.codex/hooks.json` | `PreToolUse` on `Bash` and `apply_patch` | Commit, push; write (the added lines of each file in a patch) |
 | Gemini CLI | `hooks/gemini-settings.json`, merged into `.gemini/settings.json` | `BeforeTool` on `run_shell_command`, `write_file`, `replace` | Commit, push, write |
 | Cursor | `.cursor/hooks.json` | `beforeShellExecution` | Commit, push |
@@ -99,6 +99,11 @@ The plugin brings the hooks in `hooks/hooks.json`. GameFrame itself, and project
 `push`, `write` or `session`. The hook's `if` field picks out `git commit` and `git push`. The
 `session` gate adds a short note to the start of a session: whether `.env`, `.venv` and the
 Ghidra export exist, and the next three open items in `docs/CHECKLIST.md`.
+
+One more hook is not a gate. After each shell command, `scripts/hooks/advise.py post` looks
+for know-how entries whose error signature matches the output, or whose command pattern matches
+the command, and adds them to the agent's context. It never blocks anything
+([Know-how](knowhow.md#being-told-the-hook)).
 
 ### Codex
 

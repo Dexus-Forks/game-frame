@@ -9,6 +9,25 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- Know-how: a taxonomy of failure modes and context, one Markdown entry per failure, each with
+  its symptoms, cause, evidence, status (solved, workaround, dead end, open) and what was tried
+  ([the design](docs/working/knowhow.md), [the entries](docs/knowhow/README.md)).
+  `gameframe advise "<error text or topic>"` finds entries by error signature, facet, alias and
+  word, reads a log on stdin, and checks every entry with `--check`. It reads a project's own
+  `docs/knowhow/` too.
+- A Claude Code hook, `scripts/hooks/advise.py`, that names the matching entries after a shell
+  command (`PostToolUse` and `PostToolUseFailure`), once per session, and the context entry for
+  Wine when a command starts it.
+- Eighteen seed entries from the POD: Planet of Death project: privileged port probes under
+  Wine, DirectDraw mode tables, windowed mode on a 16-bit desktop, 16-bit back surfaces, "insert
+  the CD", ini paths, VirtualSize 0, `SuspendThread`, DirectInput focus, input inside Wine,
+  `DYLD_*` on macOS, `wineserver -w`, leftover processes, winedbg, and the open `wow64cpu` fault
+  under Rosetta with every attempt; and context for Windows 95 DirectDraw games, Wine on macOS
+  and Watcom programs.
+- The skills (`re-start`, `re-observe`, `re-land`'s new "Know-how" step), every agent and the
+  project template suggest `gameframe advise` when a command fails or the work turns to a new
+  era, runtime or hardware.
+
 - Two hardware guides from the POD: Planet of Death (1997) project:
   [MMX and other SIMD code](docs/hardware/simd.md) (finding hand-written MMX routines,
   matching each to its plain twin through its callers, measuring both, porting exactly) and
@@ -26,6 +45,9 @@ Every release of GameFrame, newest first. The format follows
 - `tools/triage/insns.py` lists the pattern for MMX code among its groups.
 
 ### Changed
+
+- `peinfo` and `vtable` use a section's raw size when its VirtualSize is 0, as Watcom's linker
+  writes it; `peinfo` marks such a section.
 
 - `re-site`, `re-publisher`, `re-land` and `docs/OUTPUTS.md` now allow screenshots of the
   original game and of the project's viewer in documents and on the site, a few at a time,

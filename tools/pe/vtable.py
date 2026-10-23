@@ -4,7 +4,8 @@
 Usage: vtable.py BINARY TABLE_ADDRESS [SLOTS] [--names functions.tsv]
 
 Reads pointers from TABLE_ADDRESS until one does not point into an executable section (or
-SLOTS are read), and prints each slot's offset, target and name. Names come from a Ghidra
+SLOTS are read), and prints each slot's offset, target and name. A section with a VirtualSize
+of 0 counts with its raw size, as Windows maps it. Names come from a Ghidra
 functions.tsv (scripts/ghidra-export.sh writes one) and from labels/names.tsv when present.
 A class's vtable is found in its constructor: the last store to the object's first word,
 `*this = &vtable` (a base constructor stores its own vtable there first; a class with a second
@@ -47,7 +48,8 @@ def main(argv):
     names = load_names(names_path)
     root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     names.update(load_names(os.path.join(root, 'labels', 'names.tsv')))
-    execs = [(base + s.VirtualAddress, base + s.VirtualAddress + s.Misc_VirtualSize)
+    # Watcom's linker can leave VirtualSize at 0; Windows then maps SizeOfRawData bytes.
+    execs = [(base + s.VirtualAddress, base + s.VirtualAddress + (s.Misc_VirtualSize or s.SizeOfRawData))
              for s in pe.sections if s.Characteristics & 0x20000000]
     va = int(table.split('_')[-1], 16)
     for i in range(slots):

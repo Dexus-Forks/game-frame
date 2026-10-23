@@ -3,6 +3,7 @@
 Output is plain text for people, or JSON (--json) for agents and scripts. The text comes from
 the skills and the tools themselves (catalog.py, skills.py); nothing here copies it.
 """
+import difflib
 import json
 import shutil
 import subprocess
@@ -10,8 +11,10 @@ import sys
 import textwrap
 from pathlib import Path
 
+import advise as know
 import agents
 import catalog
+import knowhow
 import clients
 import skills
 from paths import NAME, ROOT, SCRIPTS, python, rel
@@ -186,3 +189,57 @@ def find(args):
 
 def doctor(rest):
     return subprocess.call(['bash', str(SCRIPTS / 'setup.sh'), *rest])
+
+
+def advise(args):
+    """Known failure modes and context for some text, an entry in full, the list, or a check."""
+    if args.check:
+        problems = knowhow.check()
+        for p in problems:
+            print(p)
+        print(f'{len(knowhow.entries())} entries, {len(problems)} problems')
+        return 1 if problems else 0
+    if args.entry:
+        e = next((e for e in knowhow.entries() if e.id == args.entry), None)
+        if not e:
+            close = difflib.get_close_matches(args.entry, [e.id for e in knowhow.entries()], n=3, cutoff=0.4)
+            return _no_entry(args.entry, close)
+        if args.json:
+            return _dump({**e.as_dict(), 'body': e.body})
+        print(e.path.read_text(encoding='utf-8').rstrip())
+        return 0
+    if args.list:
+        every = knowhow.entries()
+        if args.json:
+            return _dump([e.as_dict() for e in every])
+        pad = max(len(e.id) for e in every) + 2
+        for e in every:
+            print(_row(e.id, f'[{know.LABEL[e.status]}] {e.title}', pad))
+        return 0
+    text = ' '.join(args.text)
+    if text in ('', '-'):
+        text = sys.stdin.read()
+    if not text.strip():
+        print(f'{NAME} advise: give an error message, a log on stdin (-) or a topic. '
+              f'See `{NAME} help advise`.', file=sys.stderr)
+        return 2
+    hits = know.signature_hits(text) if args.signatures else know.search(text)
+    hits = hits[:args.max]
+    if args.json:
+        return _dump([{**h.entry.as_dict(), 'score': h.score, 'why': h.why} for h in hits])
+    if not hits:
+        print(f'No know-how matches. If you solve it, or give it up, record it: '
+              f'`{NAME} skill re-land --section know-how`.')
+        return 1
+    for h in hits:
+        print(know.brief(h.entry, NAME))
+        if args.why:
+            print('  Why: ' + '; '.join(h.why))
+        print()
+    return 0
+
+
+def _no_entry(name, close):
+    hint = f' Did you mean: {", ".join(close)}?' if close else ''
+    print(f'{NAME}: no know-how entry {name!r}.{hint} See `{NAME} advise --list`.', file=sys.stderr)
+    return 2
