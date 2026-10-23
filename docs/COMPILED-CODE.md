@@ -156,6 +156,12 @@ each.
   callers of `GetProcAddress` and their string arguments (`ghidra-run.sh BINARY callargs OUT
   GetProcAddress`). Games did this for optional parts such as DirectX versions, force feedback
   and voice chat.
+- **Constructors and vtables.** A C++ constructor calls its base's constructor, which stores the
+  base's vtable at the object's start, then stores its own vtable over it. A class with two bases
+  also stores a second vtable further into the object (`*(this + 0x28) = &vtable2`), for its
+  second base. The vtable a class's callers use is the last one stored at offset 0. A tool that
+  takes the last vtable store in the constructor reads the second base's table instead, and
+  reports the wrong slots for every class with two bases.
 - **Shared code.** The linker can merge identical functions. One body may then serve two names. Its callers may expect different meanings.
 - **Checks the compiler added.** Pascal compilers can check each array index and each
   arithmetic result (Turbo Pascal's `{$R+}` and `{$Q+}`). The check is a compare and a call to

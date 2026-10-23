@@ -6,8 +6,10 @@ Usage: vtable.py BINARY TABLE_ADDRESS [SLOTS] [--names functions.tsv]
 Reads pointers from TABLE_ADDRESS until one does not point into an executable section (or
 SLOTS are read), and prints each slot's offset, target and name. Names come from a Ghidra
 functions.tsv (scripts/ghidra-export.sh writes one) and from labels/names.tsv when present.
-A class's vtable is found in its constructor: the first store into a new object is usually
-`*this = &vtable`. Slot offsets are what call sites use: `(*(code **)(*obj + 0x18))(obj)` calls
+A class's vtable is found in its constructor: the last store to the object's first word,
+`*this = &vtable` (a base constructor stores its own vtable there first; a class with a second
+base also stores a second vtable further in, `*(this + 0x28) = &vtable2`, which is not the one
+whose slots the class's callers use). Slot offsets are what call sites use: `(*(code **)(*obj + 0x18))(obj)` calls
 slot +0x18.
 """
 import os
