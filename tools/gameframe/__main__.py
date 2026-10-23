@@ -17,6 +17,8 @@ Commands:
   agents                every agent: its skills, the tools it cannot use, its hand-offs
       --table           the Markdown table that docs/working/agents.md holds
   doctor [ARGS]         check the toolchain (scripts/setup.sh; ARGS such as --install pass on)
+  mcp --emit CLIENT     write .mcp.json's servers for codex, gemini, cursor, vscode, opencode or all
+      --check           only report which files are not current (exit 1)
 
 steps, skills, agents, tools, tool and find take --json, for agents and scripts.
 
@@ -41,6 +43,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import commands  # noqa: E402
+import mcp  # noqa: E402
 from paths import NAME  # noqa: E402
 
 PASS_ON = {'run', 'doctor'}      # commands whose arguments belong to the tool they start
@@ -70,6 +73,11 @@ def parser():
     s.add_argument('word', help='plain text, any case')
     s.add_argument('--max', type=int, default=3, metavar='N', help='lines shown per skill or tool (default 3)')
     s.add_argument('--json', action='store_true')
+    s = sub.add_parser('mcp', help='write the MCP servers in each agent\'s format (see tools/gameframe/mcp.py)')
+    s.add_argument('--emit', required=True, choices=(*mcp.CLIENTS, 'all'), metavar='CLIENT',
+                   help=f'{", ".join(mcp.CLIENTS)} or all')
+    s.add_argument('--check', action='store_true', help='write nothing; exit 1 when a file is not current')
+    s.add_argument('--stdout', action='store_true', help='print the files instead of writing them')
     return p, sub
 
 
@@ -96,6 +104,7 @@ def main(argv):
         return 0
     return {'steps': commands.steps, 'skills': commands.list_skills, 'skill': commands.skill,
             'agents': commands.list_agents, 'tools': commands.list_tools, 'tool': commands.tool, 'find': commands.find,
+            'mcp': mcp.emit,
             }[args.command](args)
 
 

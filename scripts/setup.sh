@@ -5,6 +5,8 @@
 #   scripts/setup.sh --install  install what is missing (Homebrew on macOS, apt on Debian/Ubuntu)
 #                               and create .venv with the Python tools
 #   scripts/setup.sh --rea      also show REA's own registration plan for your agent (dry run)
+#   scripts/setup.sh --rea --client codex   the plan for another agent: claude_code (default),
+#                               codex, gemini_cli, cursor, vscode or opencode (REA's own names)
 #
 # What gets installed, and roughly how big it is:
 #   Ghidra (decompiler, ~500 MB) and JDK 21 (~300 MB)   static analysis
@@ -19,14 +21,16 @@
 # download page instead of fetching a large archive itself.
 set -uo pipefail
 . "$(dirname "$0")/lib.sh"
-install=0; rea=0
-for a in "$@"; do
-  case "$a" in
+install=0; rea=0; client="${REA_CLIENT:-claude_code}"
+while [[ $# -gt 0 ]]; do
+  case "$1" in
     --install) install=1 ;;
     --rea) rea=1 ;;
-    -h|--help) sed -n '2,19p' "$0"; exit 0 ;;
-    *) echo "unknown option $a" >&2; exit 2 ;;
+    --client) client="${2:?--client needs a name}"; shift ;;
+    -h|--help) sed -n '2,21p' "$0"; exit 0 ;;
+    *) echo "unknown option $1" >&2; exit 2 ;;
   esac
+  shift
 done
 os="$(uname -s)"
 missing=0
@@ -93,7 +97,7 @@ fi
 if [[ $rea == 1 ]]; then
   echo
   echo "REA registration plan (dry run; nothing is changed):"
-  npx -y rea-agents@6.4.0 setup --client "${REA_CLIENT:-claude_code}" --dry-run || \
+  npx -y rea-agents@6.4.0 setup --client "$client" --dry-run || \
     echo "  could not run REA's setup; see docs/SETUP.md"
 fi
 

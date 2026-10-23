@@ -17,7 +17,7 @@ scripts/setup.sh --install    # installs what is missing (Homebrew on macOS, apt
 --install`). `./gameframe run NAME ARGS` then runs any Python tool with the `.venv`.
 
 The script writes `.env` with `GHIDRA_INSTALL_DIR` and `JAVA_HOME` once both are found. Every
-script and `.mcp.json` read these, so set them there if your installs are elsewhere.
+script and the MCP files read these, so set them there if your installs are elsewhere.
 
 Sizes (tell the user before installing on their machine if they have not approved it): Ghidra
 about 500 MB, JDK 21 about 300 MB, the Python packages about 40 MB, Zig about 200 MB (only for
@@ -50,11 +50,27 @@ See `re-rea` for when to use it.
 - **Claude Code:** this repository has a project `.mcp.json` that starts REA with
   `npx -y rea-agents@6.4.0 mcp`, passing `GHIDRA_INSTALL_DIR` and `JAVA_HOME`. Claude Code asks
   once to approve project MCP servers; after that the `mcp__rea__*` tools appear.
-- **Other agents** (Codex, Cursor, Gemini CLI, Windsurf...): use REA's own setup, which writes
-  the client's MCP configuration and installs REA's skill:
+- **Other agents:** the same servers (`rea` and `dosbox`) are in each agent's own file,
+  written from `.mcp.json` by `./gameframe mcp --emit all`. Run it again after changing
+  `.mcp.json`; `tests/run.sh` fails while a file is out of date.
+
+  | Agent | File | Reads AGENTS.md |
+  |---|---|---|
+  | Claude Code | `.mcp.json` (the source) | through `CLAUDE.md` |
+  | Codex | `.codex/config.toml`, in trusted projects only | yes |
+  | Gemini CLI | `.gemini/settings.json` | through `context.fileName` in the same file |
+  | Cursor | `.cursor/mcp.json` | yes |
+  | GitHub Copilot in VS Code | `.vscode/mcp.json` | yes (`chat.useAgentsMdFile`, on by default) |
+  | OpenCode | `opencode.json` | yes |
+
+  Only Claude Code and Gemini CLI expand `${VAR:-default}`. The other files name the variable
+  without its default, so start those agents from a shell where `source scripts/env.sh` has
+  set `GHIDRA_INSTALL_DIR` and `JAVA_HOME`. Put `dosbox-x-mcp-server` on `PATH` for them.
+- **REA's own setup** writes REA into the agent's user configuration and installs REA's skill.
+  Its client names are `claude_code`, `codex`, `gemini_cli`, `cursor`, `vscode` and `opencode`:
   ```bash
   scripts/setup.sh --rea                          # dry run: shows the plan for Claude Code
-  REA_CLIENT=codex scripts/setup.sh --rea         # the plan for another client
+  scripts/setup.sh --rea --client codex           # the plan for another client
   npx -y rea-agents@6.4.0 setup --client codex --yes   # apply, after the user agrees
   ```
 - REA's own skill (`reverse-engineer-anything`) explains every tool. Install it with REA's setup,
