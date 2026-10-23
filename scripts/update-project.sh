@@ -51,6 +51,8 @@ for sub in ('tools', 'scripts'):
     pairs += [(f, f) for f in tracked(sub)]
 pairs += [(f, f) for f in tracked('.claude/skills') if f.split('/')[2].startswith('re-')]
 pairs += [(f, '.claude/' + f) for f in tracked('agents')]
+for sub in ('.codex/agents', '.gemini/agents', '.github/agents', '.opencode/agents'):
+    pairs += [(f, f) for f in tracked(sub) if f.split('/')[-1].startswith('re-')]
 pairs += [(f, f) for f in ('gameframe', 'requirements.txt', 'requirements-live.txt', '.mcp.json')]
 for f in ('ABI', 'GAME-PATTERNS', 'DOS', 'LEGAL', 'OUTPUTS', 'SETUP', 'COMPILED-CODE', 'TYPES'):
     pairs.append((f'docs/{f}.md', f'docs/{f}.md'))
@@ -125,7 +127,7 @@ if to_plugin:
         else:
             kept.append(dst)
     if not dry:
-        for top in ('tools', 'scripts', '.claude/skills', '.claude/agents', 'docs'):
+        for top in ('tools', 'scripts', '.claude/skills', '.claude/agents', 'docs', '.codex', '.gemini', '.github', '.opencode'):
             for base, dirs, files in os.walk(os.path.join(dest, top), topdown=False):
                 if not os.listdir(base):
                     os.rmdir(base)

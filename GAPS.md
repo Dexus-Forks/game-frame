@@ -95,7 +95,7 @@ proposed again.
 - [x] `ExportDisasm.java` (`ghidra-run.sh disasm`): straight-line disassembly of code Ghidra did not make a function
 - [x] Ports that run inside the original, with instruction counts and declines ([the guide](docs/working/hybrid-port.md))
 - [x] `gameframe agents --emit`: the agents for Codex, Gemini CLI, Copilot and OpenCode ([the matrix](docs/working/agents.md#agents-in-every-client))
-- [ ] `new-project.sh --copy` and `update-project.sh` copy the agents for clients other than Claude Code
+- [x] `new-project.sh --copy` and `update-project.sh` copy the agents for clients other than Claude Code
 
 ## Out of scope
 

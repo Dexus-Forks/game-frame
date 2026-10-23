@@ -564,6 +564,8 @@ scripts/new-project.sh "$tmp" "Test Game" $B --copy >/dev/null 2>&1
 [[ -f "$tmp/docs/DOS.md" && -f "$tmp/docs/games/README.md" && -f "$tmp/.claude/skills/re-start/SKILL.md" && -f "$tmp/.claude/agents/re-tracer.md" && -f "$tmp/requirements-live.txt" && -f "$tmp/scripts/hooks/gate.py" && -f "$tmp/docs/assets/diagrams/fixed-step.svg" ]] \
   && ok "new-project --copy copies the toolkit, skills, agents, gates and guides" || bad "new-project --copy" "$(ls -la "$tmp" 2>&1)"
 expect "gameframe works in a copied project" "tools/pe/peinfo.py  (program)" "$tmp/gameframe" tool peinfo
+[[ -f "$tmp/.codex/agents/re-tracer.toml" && -f "$tmp/.gemini/agents/re-tracer.md" && -f "$tmp/.github/agents/re-tracer.agent.md" && -f "$tmp/.opencode/agents/re-tracer.md" ]] \
+  && ok "new-project --copy copies the agents for Codex, Gemini CLI, Copilot and OpenCode" || bad "new-project --copy agents for other clients" "$(ls -a "$tmp" 2>&1)"
 echo "# a local note" >> "$tmp/tools/triage/memscan.py"
 rm "$tmp/.claude/skills/re-trace/SKILL.md"
 out="$(cd "$tmp" && "$OLDPWD/scripts/update-project.sh" . 2>&1)"

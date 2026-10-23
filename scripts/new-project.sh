@@ -31,6 +31,8 @@ if [[ $copy == 1 ]]; then
   cp -R "$ROOT/tools" "$ROOT/scripts" "$dir/"
   cp -R "$ROOT/.claude/skills" "$dir/.claude/"
   cp -R "$ROOT/agents" "$dir/.claude/agents"
+  # The agents' copies for Codex, Gemini CLI, Copilot and OpenCode (gameframe agents --emit).
+  for d in .codex/agents .gemini/agents .github/agents .opencode/agents; do mkdir -p "$dir/$d" && cp "$ROOT/$d"/re-* "$dir/$d/"; done
   # The permissions and the gates (scripts/hooks/gate.py): docs/working/gates.md.
   cp "$ROOT/.claude/settings.json" "$dir/.claude/settings.json"
   cp "$ROOT/requirements.txt" "$ROOT/requirements-live.txt" "$ROOT/.mcp.json" "$ROOT/gameframe" "$dir/"
