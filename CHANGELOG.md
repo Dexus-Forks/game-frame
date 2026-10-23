@@ -70,6 +70,8 @@ Every release of GameFrame, newest first. The format follows
   code still stay out of git.
 ### Fixed
 
+- `readseg.py` stops with a clear message when an argument is not an address, such as a count
+  written without `--count`. It printed the first value and then crashed.
 - The Claude Code commit and push gates check the command's own git verbs. Claude Code's
   `if: Bash(git commit *)` also matches commands it cannot parse (a heredoc, a shell variable,
   a for loop), so the gates fired on commands that neither commit nor push.

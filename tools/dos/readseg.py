@@ -59,7 +59,12 @@ def main(argv):
     path, kind, *addrs = argv
     exe = load(path)
     for a in addrs:
-        seg, off = parse_address(a)
+        try:
+            seg, off = parse_address(a)
+        except ValueError:
+            hint = ' (a count goes after --count)' if a.isdigit() else ''
+            print(f'{a}: not an address{hint}', file=sys.stderr)
+            sys.exit(2)
         at = exe.file_offset(seg, off)
         if at is None:
             print(f'{seg:04x}:{off:04x}  not initialised in the file (a variable set at run time, or an '

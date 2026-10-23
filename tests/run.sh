@@ -228,6 +228,7 @@ expect "dosinfo finds a Pascal string right after another, with a printable leng
 expect "dosinfo reads a real-mode MZ" "3 relocations" "$PYTHON" tools/dos/dosinfo.py $D/sample-mz.exe
 expect "dosinfo finds Turbo Debugger symbols" "debug symbols: Turbo Debugger" "$PYTHON" tools/dos/dosinfo.py $D/sample-td.exe
 expect "readseg reads a typed constant" "1008:0000  4660" "$PYTHON" tools/dos/readseg.py $D/sample.exe u32 DAT_1008_0000
+expect "readseg says where a count goes" "a count goes after --count" bash -c "\"$PYTHON\" tools/dos/readseg.py $D/sample.exe hex 1008:0000 2 2>&1; true"
 expect "readseg reads a Pascal string" "'DOS SAMPLE 1'" "$PYTHON" tools/dos/readseg.py $D/sample.exe pstr 1008:0010
 expect "readseg decodes a Turbo Pascal Real" "[1.0, -2.5, 0.0]" "$PYTHON" - <<'PY'
 import sys; sys.path.insert(0, 'tools/dos')
