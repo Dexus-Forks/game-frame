@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "BeforeTool": [
+      {
+        "matcher": "run_shell_command|write_file|replace",
+        "hooks": [
+          {
+            "name": "gameframe-gates",
+            "type": "command",
+            "command": "python3 \"$GEMINI_PROJECT_DIR/scripts/hooks/gate.py\" gemini",
+            "timeout": 30000,
+            "description": "GameFrame's gates: no game material or decompiled code, only re-lander commits"
+          }
+        ]
+      }
+    ]
+  }
+}

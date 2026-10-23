@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# GameFrame's git pre-commit hook: the commit gate for every person and every agent.
+#
+#   git config core.hooksPath scripts/hooks/git    in GameFrame (GameFrame's scripts/setup.sh does this)
+#   git config core.hooksPath .githooks            in a project (GameFrame's scripts/new-project.sh does this)
+#
+# Runs `gate.py staged` on the commit's index. It blocks game material (target/, analysis/,
+# derived/, game-data/, save-game/, game binaries and data files) and added lines that look like
+# decompiled code. With GAMEFRAME_AGENT set to a GameFrame agent other than re-lander, it blocks
+# the commit too. It finds gate.py next to itself (GameFrame, or a project made with --copy),
+# then in $GAMEFRAME_ROOT, then through the project's ./gameframe root. When it finds none it
+# warns and lets the commit through. git commit --no-verify skips it. It does not check pushes.
+here="$(cd "$(dirname "$0")" && pwd)"
+top="$(git rev-parse --show-toplevel)"
+for g in "$here/../gate.py" "$top/scripts/hooks/gate.py" "${GAMEFRAME_ROOT:+$GAMEFRAME_ROOT/scripts/hooks/gate.py}"; do
+  [[ -n "$g" && -f "$g" ]] && { gate="$g"; break; }
+done
+if [[ -z "${gate:-}" && -x "$top/gameframe" ]]; then
+  root="$("$top/gameframe" root 2>/dev/null)" && [[ -f "$root/scripts/hooks/gate.py" ]] && gate="$root/scripts/hooks/gate.py"
+fi
+if [[ -z "${gate:-}" ]]; then
+  echo "GameFrame's pre-commit hook could not find gate.py: the commit is not checked." >&2
+  exit 0
+fi
+cd "$top" && exec python3 "$gate" staged

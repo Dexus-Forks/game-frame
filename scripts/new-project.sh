@@ -72,7 +72,10 @@ if [[ -n "$game" ]]; then
   find "$game" -maxdepth 2 -type f \( -iname '*.exe' -o -iname '*.dll' -o -iname '*.ovl' \) -exec cp {} "$dir/target/" \;
   echo "Copied $(ls "$dir/target" | wc -l | tr -d ' ') binaries into $dir/target/"
 fi
+# The git pre-commit hook: the commit gate for people and every agent (docs/working/gates.md).
+mkdir -p "$dir/.githooks" && cp "$ROOT/scripts/hooks/git/pre-commit" "$dir/.githooks/pre-commit"
 (cd "$dir" && git init -q && git add -A && git commit -qm "Start reverse engineering $name" && echo "Created $dir (git repository, first commit made)")
+git -C "$dir" config core.hooksPath .githooks
 if [[ -n "$game" && -x "$PYTHON" ]]; then
   for b in "$dir"/target/*; do
     if "$PYTHON" "$ROOT/tools/pe/peinfo.py" "$b" >/dev/null 2>&1; then "$PYTHON" "$ROOT/tools/pe/peinfo.py" "$b" | head -4

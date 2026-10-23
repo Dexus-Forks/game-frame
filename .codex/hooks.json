@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^(Bash|apply_patch)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/scripts/hooks/gate.py\" codex",
+            "timeout": 30,
+            "statusMessage": "GameFrame gates"
+          }
+        ]
+      }
+    ]
+  }
+}

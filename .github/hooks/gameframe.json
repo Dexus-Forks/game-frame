@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "bash": "python3 scripts/hooks/gate.py copilot",
+        "powershell": "python scripts/hooks/gate.py copilot",
+        "timeoutSec": 30
+      }
+    ]
+  }
+}

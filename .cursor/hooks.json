@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      { "command": "python3 scripts/hooks/gate.py cursor", "matcher": "git", "timeout": 30 }
+    ]
+  }
+}
