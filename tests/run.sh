@@ -149,10 +149,25 @@ cleared="$(cd "$T2/inst" && find . | sort | tr '\n' ' ')"
 echo own > "$T2/mod/Data/OWN.BIN"
 expect "modfolder refuses to replace the game's own file" "the game's own" "$PYTHON" tools/live/modfolder.py install "$T2/mod" "$T2/inst"
 echo "ssh-ed25519 AAAAtest me@example" > "$T2/k.pub"; touch "$T2/img.qcow2" "$T2/disc.iso"
-"$PYTHON" tools/live/emupc.py init "$T2/vm" --image "$T2/img.qcow2" --key "$T2/k.pub" --disc "$T2/disc.iso" >/dev/null
+free_port="$("$PYTHON" -c 'import socket; s = socket.socket(); s.bind(("127.0.0.1", 0)); print(s.getsockname()[1])')"
+"$PYTHON" tools/live/emupc.py init "$T2/vm" --image "$T2/img.qcow2" --key "$T2/k.pub" --disc "$T2/disc.iso" --ssh-port "$free_port" >/dev/null
 bash -n "$T2/vm/start.sh" && grep -q "IdentitiesOnly yes" "$T2/vm/ssh_config" && grep -q "disc.iso,media=cdrom" "$T2/vm/start.sh" \
   && grep -q "wine32:i386" "$T2/vm/cloud-init/user-data" && grep -q "openbox" "$T2/vm/cloud-init/user-data" && grep -q "ssh-ed25519 AAAAtest" "$T2/vm/cloud-init/user-data" \
   && ok "emupc writes cloud-init, an SSH config with IdentitiesOnly, and a QEMU start script with the disc as a CD-ROM" || bad "emupc init" "$(ls -R "$T2/vm")"
+out="$(GAMEFRAME_PROJECT=/x/My_Game "$PYTHON" - "$T2" <<'PY'
+import socket, subprocess, sys
+t = sys.argv[1]
+s = socket.socket(); s.bind(('127.0.0.1', 0)); s.listen(1); port = s.getsockname()[1]
+r = subprocess.run([sys.executable, 'tools/live/emupc.py', 'init', t + '/vm2', '--image', t + '/img.qcow2',
+                    '--key', t + '/k.pub', '--ssh-port', str(port)], capture_output=True, text=True)
+print('refused' if r.returncode and 'in use' in r.stderr else 'accepted', r.stderr.strip())
+s.close()
+r = subprocess.run([sys.executable, 'tools/live/emupc.py', 'init', t + '/vm3', '--image', t + '/img.qcow2',
+                    '--key', t + '/k.pub', '--ssh-port', str(port)], capture_output=True, text=True)
+print('name', open(t + '/vm3/cloud-init/meta-data').read().split()[1])
+PY
+)"
+[[ "$out" == refused*"name gf-vm-my-game"* ]] && ok "emupc refuses another VM's port and names the VM after the project" || bad "emupc port and name" "$out"
 rm -rf "$T2"
 
 T3="$(mktemp -d)"

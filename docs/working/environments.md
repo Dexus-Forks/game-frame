@@ -99,6 +99,15 @@ different, and its own tools, crates, scripts and viewers belong in its own repo
 GameFrame's. Pass back up only what would help any game: a tool fix, a format family, a
 pitfall, a know-how entry, each with a test against GameFrame's own samples.
 
+## One emulated PC per game
+
+When a game runs in an emulated PC (`tools/live/emupc.py`), give each game its own: its own
+folder (`derived/vm` in the project, which git ignores), disk overlay, SSH key, port and name.
+The Debian cloud image underneath can be shared, because the VMs never write to it. `emupc.py
+init` names the VM after the project and refuses a port that another VM listens on. Never run
+one game in another game's VM: it ties the game to that project's machine, load and changes,
+and puts one game's files inside the other's.
+
 ## No display
 
 The tests and the tools need no display. `dosbox-run.sh` uses SDL's dummy video and audio
