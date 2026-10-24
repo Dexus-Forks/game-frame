@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
-"""Find which unexplained fields next to geometry are computed from it: bounds, centres,
-normals, plane distances. Before an editor moves vertices, these must be written again.
+"""Find which unexplained fields next to geometry are computed from it, such as bounds, centres,
+normals and plane distances. An editor that moves vertices must write these fields again.
 
 Usage: derived.py RECORDS.jsonl [--field-scale S] [--vertex-scale S] [--tol T] [--json]
 
   RECORDS.jsonl  one record a line, written by your decoder:
                    {"vertices": [[x, y, z], ...], "fields": [f0, f1, ...]}
-                 a record is one object with its vertices (a sector, a mesh: try bounds) or
-                 one face with its corners in order (try normals and planes); fields are the
-                 record's unexplained numbers, in stored order
+                 a record is one object with its vertices (a sector, a mesh: try bounds), or
+                 one face with its corners in order (try normals and planes). The fields are
+                 the record's unexplained numbers, in stored order
   --field-scale  divide every field by S first: 65536 for 16.16 fixed point (default 1)
   --vertex-scale divide every coordinate by S first (default 1)
   --tol T        a field matches a candidate within T (default 0.001 after scaling)
 
-For every field it tries every candidate on every record, and the negated candidate too (a
-normal stored pointing the other way), and prints the candidate that matches the most records,
-with its share. A field that nothing explains is shown as such.
+For every field it tries every candidate on every record. It also tries each negated candidate
+(a normal stored pointing the other way). It prints the candidate that matches the most records,
+with its share. For a field that no candidate explains, it prints "nothing explains it".
 
 Candidates, from each record's vertices:
 
@@ -25,14 +25,14 @@ Candidates, from each record's vertices:
   cross_x cross_y cross_z               the unit normal of the first two edges
   plane_newell plane_cross              the plane's distance: -(n . v0)
 
-Why: level files often store data computed from the vertices. Moving vertices without
-writing them again gives culling, lighting or physics from the old shape. In one 1997 game the
-six words after each sector were its bounds on every record, and Newell's normals matched
-97.9 to 99.6 % of faces where the cross product of the first edges matched 74 % (the rest were
-quads that are not flat) (docs/knowhow/context-geometry-derived-data.md).
+Why: level files often store data computed from the vertices. When an editor moves vertices
+and does not write this data again, culling, lighting or physics use the old shape. In one
+1997 game the six words after each sector were its bounds on every record. Newell's normals
+matched 97.9 to 99.6 % of faces. The cross product of the first edges matched 74 % (the faces
+it missed were quads that are not flat) (docs/knowhow/context-geometry-derived-data.md).
 
-It does not decode files: write the records from your decoder. Candidates are in the same
-units as the vertices; a field stored in another unit shows only after the right scale.
+It does not decode files. Write the records from your decoder. Candidates are in the same
+units as the vertices. A field stored in another unit matches only after the right scale.
 Standard library only.
 """
 import json

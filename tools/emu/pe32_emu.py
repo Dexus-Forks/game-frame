@@ -25,9 +25,9 @@ What it does:
   the callee popping `pop_bytes` of arguments, as stdcall does);
 - gives the code a stack and a bump allocator (`alloc`); `reset()` puts the image's data back
   and clears the allocator, so each trial starts from the same state;
-- lays out the game's structures by hand: `array(count, stride)` gives each record's address,
-  `put(addr, '<iI', value, pointer)` writes fields, `get(addr, '<i')` reads them, so a linked
-  list, a graph or a table of records with pointers takes a few lines;
+- lays out the game's structures by hand. `array(count, stride)` gives each record's address.
+  `put(addr, '<iI', value, pointer)` writes fields. `get(addr, '<i')` reads them. A linked
+  list, a graph or a table of records with pointers then takes a few lines;
 - `call(addr, args=[...], **registers)` pushes `args` right to left (cdecl and stdcall), then a
   return address that stops the run, sets the named registers and runs until the routine
   returns. It returns every general register afterwards.
@@ -174,7 +174,7 @@ class Emu32:
         return addr
 
     def get(self, addr, fmt):
-        """Read a struct format at `addr`: a tuple, or the value alone for one field."""
+        """Read a struct format at `addr`. Return a tuple, or the value alone for one field."""
         fmt = fmt if fmt[0] in '<>=!@' else '<' + fmt
         out = struct.unpack(fmt, self.read(addr, struct.calcsize(fmt)))
         return out[0] if len(out) == 1 else out
