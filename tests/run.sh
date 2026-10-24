@@ -1668,8 +1668,9 @@ if "$PYTHON" -c "import anthropic" 2>/dev/null; then
   expect "name_functions prepare picks the unnamed functions above --min-size and sends nothing" "2 functions" llm tools/llm/name_functions.py prepare
   expect "name_functions puts a function's callers and strings in its request" 'Called by: FUN_00401000' grep -o 'Called by: FUN_00401000' "$L/analysis/llm/names/demo.exe/requests.jsonl"
   expect "name_functions puts the strings a function uses in its request" 'SAVE0001.DAT' grep -oF 'Strings: [\"SAVE0001.DAT' "$L/analysis/llm/names/demo.exe/requests.jsonl"
-  expect "name_functions submits one batch" "2 requests" llm tools/llm/name_functions.py submit
-  expect "name_functions reports the batch" "2 succeeded" llm tools/llm/name_functions.py status
+  expect "name_functions submits the requests as small batches" "2 batches, 2 requests" llm tools/llm/name_functions.py submit --size 1
+  expect "name_functions reports every batch and the total" "all 2 batches: ended; 2 ended; 0 processing, 2 succeeded" llm tools/llm/name_functions.py status
+  expect "name_functions cancels only batches that have not ended" "ended" llm tools/llm/name_functions.py cancel
   llm tools/llm/name_functions.py fetch >/dev/null
   expect "name_functions writes the suggestions to analysis/, never labels/" "401040	fake_name	low" cat "$L/analysis/llm/names/demo.exe/suggested.tsv"
   expect "ask sends the matching know-how entries" "entries sent: wine-privileged-instruction" llm tools/llm/ask.py privileged instruction under wine
