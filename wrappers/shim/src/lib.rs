@@ -1,4 +1,4 @@
-//! What every wrapper DLL shares (`glide`, `ati3dcif`, `s3dtkw`, `ddraw`, `sgl`).
+//! What every wrapper DLL shares (`glide`, `ati3dcif`, `s3dtkw`, `ddraw`, `sgl`, `maxi94`).
 //!
 //! - `config`: the settings they share (the game's window class, the marker colour, the
 //!   patch file), and their parsers. Plain Rust, tested on the host.
@@ -6,9 +6,13 @@
 //!   NT stop, emulated by an exception handler; each DLL installs it from its `DllMain`.
 //! - `patch`: the game's own code patched in memory at load, from the file `WRAPPER_PATCHES`
 //!   names, so the EXE on disk stays unchanged.
+//! - `iat`: one of the EXE's imports replaced by the wrapper's own function, to see the calls
+//!   the game makes to another library.
 //! - `log`: a log to the file a DLL names by an environment variable, or to standard error.
 
 pub mod config;
+#[cfg(windows)]
+pub mod iat;
 #[cfg(windows)]
 pub mod log;
 #[cfg(windows)]

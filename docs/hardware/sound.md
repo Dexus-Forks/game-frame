@@ -82,6 +82,8 @@ play this song, set this volume ([Middleware](../engines/middleware.md)).
 
 A3D and EAX effects need hardware that no longer exists. Software reimplementations exist
 (OpenAL Soft supports EAX effects). Decide whether the port reproduces them and record it.
+[The sound card makers' APIs](sound-card-apis.md) covers these and the other card libraries
+of the time, and the stand-ins in `wrappers/`.
 
 ## Checklist
 

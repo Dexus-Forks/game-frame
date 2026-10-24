@@ -14,6 +14,7 @@ library is in [replacement libraries](../docs/hardware/replacement-libraries.md)
 | `ati3dcif.dll` | ATI 3D Rage (ATI3DCIF) | The faces the game gives the chip, in software, into its DirectDraw surface | [ati3dcif](ati3dcif/README.md) |
 | `s3dtkw.dll` | S3 ViRGE (S3D Toolkit, `S3DTKW.dll`) | The same | [s3dtkw](s3dtkw/README.md) |
 | `sgl.dll` | PowerVR SGL, the scene-graph half | The game's scene graph, kept and drawn with OpenGL at any size; the 2D picture over it through `ddraw.dll` | [sgl](sgl/README.md) |
+| `94DLL32.dll` (`maxi94`) | Guillemot Maxi Sound 64 (Dream SAM9407) | No picture: the card's wave streams are Wine's wave outputs, so the game's sound plays | [maxi94](maxi94/README.md) |
 
 The shared crates:
 
@@ -28,7 +29,9 @@ The libraries come from the [POD: Planet of Death](https://github.com/tanepiper/
 project ([case study](../docs/case-studies/pod.md)). They run its unchanged 3dfx, ATI, S3 and
 PowerVR builds. Each library implements the calls POD makes, and its README lists what it does
 not handle. A game that makes other calls gets a log line for each unknown call. Add those
-calls here, with a test against our own samples (`AGENTS.md`, rule 8).
+calls here, with a test against our own samples (`AGENTS.md`, rule 8). The sound cards of
+the time, and which of their libraries can be stood in for, are in
+[sound-card APIs](../docs/hardware/sound-card-apis.md).
 
 ## Build
 
@@ -44,7 +47,7 @@ each DLL's exports from its crate's `.def` file (`glide/glide2x.def`, `sgl/sgl.d
 land in `target/i686-pc-windows-gnu/release/`. The host tests:
 
 ```bash
-cd wrappers && cargo test --release --target "$(rustc -vV | sed -n 's/^host: //p')" -p raster -p scalers -p pixels -p shim -p sgl
+cd wrappers && cargo test --release --target "$(rustc -vV | sed -n 's/^host: //p')" -p raster -p scalers -p pixels -p shim -p sgl -p maxi94
 ```
 
 `tests/run.sh` runs both, and checks each DLL's export table against its `.def` file.
@@ -73,7 +76,7 @@ cd wrappers && cargo test --release --target "$(rustc -vV | sed -n 's/^host: //p
    | `WRAPPER_PATCHES` | A file of patches to the game's code, applied in memory at load ([shim](shim/README.md)) | none |
 
    Each library's own variables are in its README: `GLIDE_*`, `DDRAW_*`, `SGL_*`, and the log
-   files `GLIDE_LOG`, `DDRAW_LOG`, `ATI3DCIF_LOG`, `S3DTK_LOG` and `SGL_LOG`.
+   files `GLIDE_LOG`, `DDRAW_LOG`, `ATI3DCIF_LOG`, `S3DTK_LOG`, `SGL_LOG` and `MAXI94_LOG`.
 5. **Read the logs.** Each DLL logs every call it does not handle, once. The first run shows
    which calls a new game needs.
 
