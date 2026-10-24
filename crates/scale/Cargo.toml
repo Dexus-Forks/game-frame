@@ -1,0 +1,12 @@
+[package]
+name = "gameframe-scale"
+description = "Whole-multiple scaling of a finished low-resolution frame: nearest, Scale2x (EPX) and a CRT-style look"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["scaling", "scale2x", "epx", "pixel-art", "retro"]
+categories = ["graphics", "multimedia::images"]
+
+[dependencies]

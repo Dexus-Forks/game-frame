@@ -11,6 +11,7 @@ Here they are generic and tested without any game's files. They are free to use 
 | [gameframe-msvc-crt](../../crates/msvc-crt/README.md) | The Microsoft C runtime's `sinf`, `cosf`, `acosf`, `atan2f`, `qsort` order and `rand`, bit for bit | Un-Banished, matching the game's runtime on 200,000 calls per function |
 | [gameframe-mmx](../../crates/mmx/README.md) | The Intel MMX instructions bit for bit: wrapping and saturating packed arithmetic, `pmulhw`, `pmaddwd`, packs, unpacks and shifts | POD: Planet of Death (1997), where a model of the game's MMX mixer built on it matched the original on 500 random channels |
 | [gameframe-gpu-1997](../../crates/gpu-1997/README.md) | The texture formats and API constants of 3dfx Glide 2.x (with NCC), ATI3DCIF and the S3D Toolkit, one texel decoder, and what each card accepts | POD: Planet of Death (1997), whose 3dfx, ATI and S3 builds were traced with it |
+| [gameframe-scale](../../crates/scale/README.md) | Whole-multiple scaling of a finished frame: nearest, Scale2x (EPX) and a CRT-style look, for any pixel type | POD: Planet of Death (1997), whose replacement Glide and DirectDraw libraries show the game's frame scaled this way |
 | [gameframe-turbo-pascal](../../crates/turbo-pascal/README.md) | Turbo Pascal's 6-byte `Real` with its exact arithmetic, `Random`, and Pascal data layouts | Tyrian 2026, matching the original runtime on 40,000 operands per routine |
 
 ## Ask your agent

@@ -8,7 +8,7 @@ platform: [windows-9x]
 hardware: [cd-rom]
 genre: [racing-sports]
 tags: [versions, editions, gold, patch, reference, labels, re-record]
-tools: [versiondiff, match_functions, compare_trees, discinfo, ghidra-export]
+tools: [buildid, versiondiff, match_functions, compare_trees, discinfo, ghidra-export]
 skills: [re-inventory, re-ghidra, re-verify]
 docs: [docs/working/versions.md]
 seen: ['POD: Planet of Death (1997), first edition and POD Gold 2.8, 2026-10-24']
@@ -25,10 +25,17 @@ has started, move the project to it in order: record both editions, compare thei
 ground truth again, verify the port again, and keep the old edition as documented differences
 (`docs/working/versions.md`, "Moving to a newer version mid-project").
 
+The cheap way to avoid the move is a check on day one: read the copy's identity with
+`tools/triage/buildid.py`, then search MobyGames, PCGamingWiki, the publisher's old site on
+archive.org and the store pages for later official releases, before deep work
+(`re-inventory`, "Every edition, and the reference").
+
 The POD case (*observed*, 2026-10-24): a month of work used the March 1997 first edition, a
 European disc in four languages with 16 tracks and 8 cars. Then POD Gold 2.8 turned up, with
 executables linked in October 1997, English as well, 32 tracks, 16 cars, Direct3D and PowerVR
-builds, and official updates, fan files and era tools beside it. Gold has 423 data files
+builds, and official updates, fan files and era tools beside it. Gold's readme says "Version 2.8
+(September 29th, 1997)" and its executables were linked from 1997-10-25 to 10-29; the first
+edition's executables were linked on 1997-03-07, and its disc was mastered on 1997-01-13. Gold has 423 data files
 against 289, 136 of them new, and a track list whose format needs a variant reader.
 
 What it changes:

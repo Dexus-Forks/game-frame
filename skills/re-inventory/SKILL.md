@@ -169,19 +169,35 @@ Before deep work, find every edition of the game and record them in `docs/versio
 project template; copy `templates/project/docs/versions.md` from GameFrame if the project is
 older):
 
-1. **List the editions**: the first release, regional releases with other languages, "Gold"
+1. **Read this copy's identity** first:
+   `.venv/bin/python tools/triage/buildid.py target/GAME --name "First edition" --write docs/versions.md`.
+   It reads the disc's mastering date, each executable's link date and VERSIONINFO, version
+   strings in the code, and the version lines of the readme and setup files.
+2. **Is it the latest official version?** Search for later official releases: the
+   publisher's or developer's own editions, patches and updates, regional and language
+   releases, "Gold" or "GOTY" re-releases, and digital re-releases (GOG, Steam). Check
+   MobyGames (the title's releases and patches), PCGamingWiki ("Essential improvements",
+   "Patches", "Availability"), the publisher's and developer's old sites and FTP patch pages
+   through the Wayback Machine, archive.org items for the title, the GOG and Steam pages, and
+   magazine cover-disc listings. Fan patches, cracks and mods are context, recorded apart, and
+   never the reference. Compare what you find with the build identity, and answer in
+   `docs/versions.md`: is this the latest official build, and if not, which is and where it is
+   documented. Record each source with its URL and the date you checked it. Ask the user
+   before downloading anything. If a later official version exists, suggest moving the
+   reference to it.
+3. **List the editions**: the first release, regional releases with other languages, "Gold"
    and budget re-releases, official patches and updates, store builds, ports and demos, with
    the date of each. Look in the readme and manual, the publisher's old pages, archive sites,
    magazine cover discs and fan sites. Note the extras that came with each (tools, extra
    levels, fan files).
-2. **Record each one**: its source, the checksums of its files or image, its languages, content
+4. **Record each one**: its source, the checksums of its files or image, its languages, content
    and builds.
-3. **Measure the data delta** between each pair:
+5. **Measure the data delta** between each pair:
    `.venv/bin/python tools/triage/versiondiff.py target/first/GAME.CUE target/latest/GAME.CUE`.
    It reads folders or disc images in place and prints the files added, removed and changed by
    folder, the PE link dates of the executables, and the languages. Paste it into the
    data-delta section.
-4. **Pick the reference**: by default the last version released, which has the most fixes and
+6. **Pick the reference**: by default the last version released, which has the most fixes and
    improvements. Write down the reason when you pick another.
 
 The code delta comes after the Ghidra export of each edition: `match_functions.py` matches

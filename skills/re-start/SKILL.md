@@ -146,7 +146,10 @@ a diagram of each team's hand-offs and the failure path.
 3. Read `AGENTS.md`, `docs/CHECKLIST.md` and `docs/FINDINGS.md` if they exist. Search `docs/` and
    `labels/` for anything you are about to touch: earlier sessions may have traced it.
 4. Find every edition of the game (first release, regional releases, re-releases, patches,
-   demos) and its date, and record them in `docs/versions.md`. The reference is by default the
+   demos) and its date, and record them in `docs/versions.md`. First check whether the
+   project's copy is the latest official build: read its identity with
+   `tools/triage/buildid.py`, then search MobyGames, PCGamingWiki, the publisher's old site on
+   archive.org and the GOG and Steam pages for later official releases. The reference is by default the
    last version released (`re-inventory`, "Every edition, and the reference";
    `docs/working/versions.md`). Do this before deep work: a newer edition found late costs
    the work again.

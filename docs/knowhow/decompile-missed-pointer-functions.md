@@ -56,9 +56,10 @@ often open with a row of register pushes (`push ebx; push ecx; push edx; push es
 
 `./gameframe run exportcov GAME.EXE analysis/export/GAME.EXE/functions.tsv --starts
 starts.txt` measures the coverage after an export and lists the likely starts in the gaps.
-Pass them to `scripts/ghidra-run.sh GAME.EXE decompile OUT.txt $(cat starts.txt)`: it makes the
-functions, skips an address that nothing refers to unless it follows a `ret` or padding, and
-reports a bad address without stopping the batch.
+`./gameframe run ghidra-run GAME.EXE fill-gaps OUT.txt starts.txt` makes the functions, skips
+an address that nothing refers to unless it follows a `ret` or padding, reports a bad address
+without stopping the batch, and exports the binary again, so `decomp.c` and `functions.tsv`
+hold the new functions. Run `exportcov` again after it and repeat until no starts are left.
 
 `./gameframe run refs GAME.EXE ADDRESS --functions analysis/export/GAME.EXE/functions.tsv`
 lists every instruction that refers to an address from the raw bytes, and marks those that lie

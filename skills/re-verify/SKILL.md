@@ -178,6 +178,21 @@ on one target only, or from a different iteration order of a hash map.
 recording and check every digest. A recording made today is a regression test for every later change. It is also how a lockstep multiplayer game is checked: two players are two replays of
 the same commands.
 
+**Recordings read from outside.** A recording of the original made by reading its memory
+(`tools/live/memrec.py`) sees only some frames, and one sample can mix two or three of them.
+Make the port write a trace of every state it passes through, with the game's clock, as JSON
+Lines with the recording's names. Then:
+
+```bash
+./gameframe run replay derived/race.jsonl build/port-trace.jsonl --clock race_clock --block lap,place
+```
+
+A value passes when any port state in the sample's window holds it: from the sample's clock to
+the next sample's clock, and one frame more. `--block` compares values the recorder read
+together as one. `--require NAME=RATE` accepts less than every sample, only for a value the
+port cannot reproduce from the recorded input. A wrong value in the port fails in every window
+it reaches ([the straddle](../../docs/knowhow/replay-sample-straddles-frames.md)).
+
 ## 4. Real saves
 
 Load saves made by the original game (several sizes and ages) and check every value you decode;

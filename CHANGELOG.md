@@ -17,6 +17,24 @@ Every release of GameFrame, newest first. The format follows
   and `re-editor` over the documents; `ask.py` answers a question from the know-how entries.
   `fake_api.py` stands in for the API in `tests/run.sh`. The SDK is optional, in
   `requirements-llm.txt`.
+- `ghidra-run.sh ... callargs regs=watcom`: the constant each register gets before every call,
+  in Watcom's order (EAX, EDX, EBX, ECX) or any list, where the decompiler shows no arguments.
+- `ghidra-run.sh ... fill-gaps`: makes a function at each start `exportcov` finds, goes on past
+  a bad one, and exports the binary again. The sample DLL gains a routine Ghidra misses.
+- `tools/verify/replay.py`: checks a port's trace against a recording read from outside, where
+  one sample can mix frames; a value passes when any state in its window holds it.
+- `tools/triage/axes.py`: the up axis, its sign and the handedness of a 3D game, from a recorded
+  path over the level's vertices.
+- `tools/pe/probegen.py`: a probe library for a DLL a 32-bit game imports, exporting the same
+  names (decorated `__stdcall` ones too) and logging every call with its arguments.
+- The `gameframe-scale` crate: nearest, Scale2x (EPX) and a CRT look, for a finished frame.
+- `re-browse` section 5: growing the viewer into an editor.
+- `tools/triage/buildid.py`: everything a copy says about its own version (the disc's mastering
+  date, link dates, VERSIONINFO, version strings, readme and setup lines), written into the
+  project's `docs/versions.md`. `re-inventory`, `re-start` and the versions guide check on day one
+  whether the copy is the latest official build, and where to search for later official
+  releases; the template has a "Build identity" and an "Is this the latest official version?"
+  section.
 - Versions and their deltas: [the versions guide](docs/working/versions.md) now starts with
   finding every edition, takes the last version released as the default reference, and has the
   steps for moving to a newer edition mid-project. A project template, `docs/versions.md`,

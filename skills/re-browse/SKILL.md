@@ -115,7 +115,30 @@ jq '.coverage' derived/viewer/manifest.json
 - Add each new view to the export in the same change that adds it to the window, with a test
   that runs the export on files built in the test.
 
-## 5. Test it
+## 5. Grow it into an editor
+
+When modding is a goal, the viewer becomes the editor, after its readers are proved and before
+the game itself. Build it in this order ([Writers, editors and mods](../../docs/working/mods.md)):
+
+1. **Readers that record offsets.** Each reader keeps, for every field a person may change,
+   the offset it read it from. A writer then patches those bytes. It never re-serialises the
+   decoded view.
+2. **One edit type.** Every change is one value of one `Edit` enum: move this vertex, set this
+   texture, change this price. The window and a command-line mode both make those values, so an
+   agent, a test or a script can do anything a person can
+   ([one edit type](../../docs/knowhow/context-editor-one-edit-type.md)).
+3. **Exact undo.** Each applied edit keeps the bytes it replaced. Undo writes them back. After
+   each edit, decode again from the bytes, so the view shows what will be saved.
+4. **Derived data written again.** Bounds, normals and planes stored next to geometry follow
+   the vertices. Find them first with `tools/formats/derived.py`.
+5. **Behind a build option**, when the project keeps its exact core apart from its additions.
+
+The tests that make it trustworthy: a save with no edits equals the original file on every
+file of the kind (`validate.py --write`); each edit kind saves, reads back and finds exactly its
+change; an edit and its undo give the original bytes; one edit of each kind loads in the
+original game and shows there.
+
+## 6. Test it
 
 - The readers' tests run over every file of the player's copy and skip when it is missing.
 - The viewer builds natively and for the browser in CI or before each commit.
@@ -124,7 +147,7 @@ jq '.coverage' derived/viewer/manifest.json
 - When the viewer plays sound you cannot hear, test the sound path headlessly: run the player
   for a few seconds and check that the samples are not silent.
 
-## 6. Land it
+## 7. Land it
 
 Write each format into the project's `docs/FORMATS.md` (or one document per format) with its
 evidence, add a README section on running the viewer, and update `docs/CHECKLIST.md` with the

@@ -20,6 +20,27 @@ own folder under `target/` (`target/first`, `target/gold`).
 *Measured* DATE: checksums against the source's; dates from the PE headers
 (`tools/triage/versiondiff.py`); the rest from the readme.
 
+## Build identity
+
+What each copy says about its own version, written by
+`tools/triage/buildid.py target/EDITION --name EDITION --write docs/versions.md`: the disc's
+mastering date, each executable's link date and VERSIONINFO, version strings in the code, and
+version lines in the readme and setup files.
+
+## Is this the latest official version?
+
+Official releases found, with the source of each. Only the publisher's or developer's own
+releases count: editions, regional and language releases, re-releases ("Gold", "GOTY"),
+patches and updates, and digital re-releases (GOG, Steam). Fan patches, cracks and mods go in
+the extras table, as context, never as the reference.
+
+| Release | Date | Version | Source (URL) | Checked |
+|---|---|---|---|---|
+| | | | MobyGames, PCGamingWiki, the publisher's site on archive.org, GOG, Steam | DATE |
+
+Answer: this project's copy is / is not the latest official build. If not, the latest is ...,
+documented at ... .
+
 ## Updates, patches and extras
 
 | File | What it is | Used |

@@ -187,7 +187,7 @@ between agents, the outcome, and the failure path.
 | `scripts/update-project.sh DIR [--plugin] [--agent LIST] [--dry-run]` | Keeps a project current. For a plugin project, refreshes the launcher, settings and each agent's files. For a copied project, adds what is missing, replaces older copies and keeps the project's own edits; `--plugin` moves it to the plugin and removes only GameFrame's own files. `--agent` adds agents; without it, the agents the project already has are refreshed |
 | `scripts/new-site.sh NAME "Title" ["Description"] [--single] [--repo URL]` | Starts a project's website in `sites/NAME/` (or `site/`): the front page, the diary, the findings and status pages through `@include`, and a GitHub Pages workflow (`re-site`) |
 | `scripts/ghidra-export.sh [--labels FILE] BINARY...` | Headless Ghidra analysis and a text export: pseudocode, functions, strings, imports, exports; names applied from a labels file |
-| `scripts/ghidra-run.sh BINARY decompile\|named\|refs\|vtable\|labels\|callargs\|blocks OUT ARGS` | One-off jobs in the analysed project, without re-analysis: also every call with its arguments, and raw memory pieces |
+| `scripts/ghidra-run.sh BINARY decompile\|named\|refs\|vtable\|labels\|callargs\|blocks\|disasm\|fill-gaps OUT ARGS` | One-off jobs in the analysed project, without re-analysis: also every call with its arguments (`regs=watcom` for register arguments), raw memory pieces, and `fill-gaps` to make the functions `exportcov` finds and export again |
 | `scripts/extract-installer.sh [--detect] INSTALLER OUT` | Unpacks an installer or package without running it: Inno Setup (GOG), NSIS, InstallShield, MSI, archives, `.dmg`, `.pkg`, GOG's `.sh`, CD images |
 | `scripts/zcc.sh` | rustc's linker for 32-bit Windows DLLs through `zig cc`, with no MinGW, exporting exactly the names in a `.def` file: replacement libraries a 1990s game imports by name |
 | `scripts/dosbox-run.sh [--fileio] [--break] [--mcp PORT] DIR PROGRAM` | Runs a DOS program in DOSBox-X without a window: exit code, file I/O log, debugger control |
@@ -205,6 +205,7 @@ between agents, the outcome, and the failure path.
 | `tools/triage/tables.py` | Sine and cosine lookup tables, with their steps, scale, type and rounding |
 | `tools/triage/sigscan.py` | Byte signatures with wildcards: make them from named functions, find them in another build or a game |
 | `tools/triage/insns.py` | Every instruction of a kind: port access, interrupts, timers, divisions |
+| `tools/triage/buildid.py` | Which build a copy is: the disc's mastering date, each executable's link date and VERSIONINFO, version strings, readme and setup version lines; written into `docs/versions.md` |
 | `tools/triage/versiondiff.py` | Two editions compared, as folders or disc images read in place: files added, removed and changed by folder, the executables' link dates, the languages; Markdown for `docs/versions.md` |
 | `tools/triage/exportcov.py` | How much code a Ghidra export covers, its largest gaps, and the likely starts of the functions it missed, for a batch decompile |
 | `tools/triage/refs.py` | Every instruction that refers to an address, found in the raw code bytes (32-bit and RIP-relative), read, write or value, with hits in no function marked |
@@ -216,8 +217,10 @@ between agents, the outcome, and the failure path.
 | `tools/triage/hashnames.py` | Which hash function names things, and the name behind each hash constant |
 | `tools/triage/match_functions.py` | The same functions in two builds, from two Ghidra exports; your labels carried to the new addresses |
 | `tools/triage/memscan.py` | Where a running game keeps a value, from memory dumps taken as it changes; pointers to it |
+| `tools/triage/axes.py` | Which axis is up in a 3D game, its sign, and the handedness, from a recorded path over the level's vertices |
 | `tools/triage/compare_trees.py` | Two copies or releases compared file by file (SHA-256, case-insensitive paths); hashes to publish |
 | `tools/pe/peinfo.py` | What is this binary: architecture, compiler, PDB path, imports, exports, RTTI, engine and packer fingerprints |
+| `tools/pe/probegen.py` | A probe library for a DLL a 32-bit game imports: the same export names, and a log of every call with its arguments |
 | `tools/pe/peres.py` | Version information, string tables, dialogs, bitmaps and data inside a Windows executable |
 | `tools/pe/stackstrings.py` | Text the code builds on the stack, which no string list shows |
 | `tools/pe/readdata.py` | The real value of a `DAT_` constant or table |
@@ -260,6 +263,7 @@ between agents, the outcome, and the failure path.
 | `tools/verify/bitcompare.py` | Ground truth against reimplementation, bit for bit, with ULP distance |
 | `tools/verify/ramdiff.py` | Memory frame by frame from the original and the port: the first frame and address that differ, named from a RAM map |
 | `tools/verify/seqdiff.py` | The first random draw (or any event) where two traces differ |
+| `tools/verify/replay.py` | A port's trace against a recording read from outside: a value passes when any state in its sample's window holds it |
 | `tools/site/check.py SITE_DIR` | Checks a project's site before it is published: no game files or decompiled code, includes that resolve, diary entries with a title and summary that do not read like a commit log |
 | `tools/ghidra/*.java` | The Ghidra scripts the shell scripts run (`ApplyLabels.java` names functions and creates missed ones) |
 | `tools/dos/dosinfo.py` | What is this DOS binary: MZ, NE or LE; segments with Ghidra's selectors; imports; compiler, extender, packer fingerprints; debug symbols; Pascal strings |

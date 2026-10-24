@@ -63,3 +63,34 @@ __declspec(dllexport) int __cdecl heaviest_path(const struct link *l) {
     }
     return s;
 }
+
+/* A routine that takes its arguments in registers in Watcom's order (EAX, EDX, EBX, ECX), and
+ * a caller that loads them with constants: for ExportCallArgs' --regs watcom, which reads the
+ * values a register call passes, where the decompiler sees none. */
+__declspec(dllexport) int __cdecl reg_sum(void) {
+    int a, d, b, c;
+    __asm__ volatile ("" : "=a"(a), "=d"(d), "=b"(b), "=c"(c));
+    return a + d * 2 + b * 3 + c * 4;
+}
+
+__declspec(dllexport) int __cdecl reg_call(void) {
+    int r;
+    __asm__ volatile ("movl $1234, %%eax\n\tmovl $7, %%edx\n\tmovl $0x55, %%ebx\n\tmovl $3, %%ecx\n\tcall %P1"
+                      : "=a"(r) : "i"(reg_sum) : "ebx", "ecx", "edx", "memory");
+    return r;
+}
+
+/* A routine Ghidra's analysis misses, for exportcov and ghidra-run fill-gaps: hand-written, with
+ * no prologue to match, after padding, and reached only through a pointer that the code XORs
+ * with a key at run time, so no reference leads to it. 1990s games hid code the same way. */
+__asm__ (".text\n\t.balign 16\n\t.byte 0xcc,0xcc,0xcc,0xcc\n\t.balign 16\n"
+         "_hidden_triple:\n\tmovl 4(%esp), %eax\n\tleal (%eax,%eax,2), %eax\n\tretl\n");
+extern int __cdecl hidden_triple(int);
+#define HIDE_KEY 0x5a5a5a5au
+static volatile unsigned hidden_slot;
+
+__declspec(dllexport) int __cdecl call_hidden(int x) {
+    if (!hidden_slot) hidden_slot = (unsigned)(unsigned long)&hidden_triple ^ HIDE_KEY;
+    int (__cdecl *f)(int) = (int (__cdecl *)(int))(unsigned long)(hidden_slot ^ HIDE_KEY);
+    return f(x);
+}

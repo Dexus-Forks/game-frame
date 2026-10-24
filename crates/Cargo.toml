@@ -2,7 +2,7 @@
 # the case-study reimplementations and made generic. Each crate has its own README.
 [workspace]
 resolver = "2"
-members = ["opl2", "wma", "msvc-crt", "turbo-pascal", "mmx", "gpu-1997"]
+members = ["opl2", "wma", "msvc-crt", "turbo-pascal", "mmx", "gpu-1997", "scale"]
 
 [workspace.package]
 version = "0.1.0"

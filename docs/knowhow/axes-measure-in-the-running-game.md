@@ -12,7 +12,7 @@ genre: []
 symptom: [wrong-picture]
 tags: [axes, coordinates, handedness, viewer, editor, height, mirror]
 signatures: []
-tools: [memrec]
+tools: [memrec, axes]
 skills: [re-browse, re-observe]
 docs: [docs/observe/memory.md, docs/working/viewer.md]
 seen: ['POD: Planet of Death (1997), 2026-10-24']
@@ -47,3 +47,15 @@ object's position from memory over geometry you know (a car on a road, a player 
 find the face under it. Check handedness with a turn: the direction a Left input turns as seen
 from +up. Store the convention per model kind (POD: tracks up, car models down) and test it (a
 point with larger height projects higher on screen).
+
+`tools/triage/axes.py` does the measuring. Give it a `memrec` recording of something that
+drives or walks on the level, the level's vertices from the project's reader, and a time span
+in which it turns left:
+
+```bash
+./gameframe run axes derived/lap.jsonl derived/track.pts --pos car_x,car_y,car_z --index 0 \
+    --scale 1/65536 --left-turn 12:15
+```
+
+It names the up axis and its sign (the object rides a steady height above the surface on that
+axis only) and the handedness.
