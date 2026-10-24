@@ -19,9 +19,10 @@ A key that is not scoped to a workspace needs ANTHROPIC_WORKSPACE_ID, the worksp
 both clients send it as the anthropic-workspace-id header. A key scoped to a workspace needs
 nothing more, and that workspace's spend limit then applies.
 
-ANTHROPIC_API_KEY, ANTHROPIC_WORKSPACE_ID and GAMEFRAME_MODEL are read from the environment, else from the .env of the
-current folder, the project or GameFrame (the first that exists). GAMEFRAME_NO_DOTENV=1 skips
-.env (the tests set it).
+ANTHROPIC_API_KEY, ANTHROPIC_WORKSPACE_ID and GAMEFRAME_MODEL are read from the environment, else from the .env files of
+the current folder, the project and GameFrame, in that order: each value comes from the first
+file that has it, so a project's .env without a key still lets GameFrame's key through.
+GAMEFRAME_NO_DOTENV=1 skips .env (the tests set it).
 
 Run directly, it checks the setup: the SDK, the key and the claude command.
 
@@ -43,18 +44,21 @@ KEYS = ('ANTHROPIC_API_KEY', 'ANTHROPIC_WORKSPACE_ID', 'GAMEFRAME_MODEL')
 
 
 def load_env():
-    """Take ANTHROPIC_API_KEY and GAMEFRAME_MODEL from the project's .env, when the environment
-    has none (./gameframe run does not export .env)."""
+    """Take ANTHROPIC_API_KEY, ANTHROPIC_WORKSPACE_ID and GAMEFRAME_MODEL from the .env files of
+    the current folder, the project and GameFrame, when the environment has none (./gameframe
+    run does not export .env). Each value comes from the first file that has it."""
     if os.environ.get('GAMEFRAME_NO_DOTENV'):
         return
+    seen = set()
     for folder in (os.getcwd(), PROJECT, ROOT):
         path = os.path.join(folder, '.env')
-        if os.path.exists(path):
-            for line in open(path, encoding='utf-8'):
-                key, eq, value = line.strip().partition('=')
-                if eq and key in KEYS and key not in os.environ:
-                    os.environ[key] = value.strip().strip('"\'')
-            return
+        if os.path.realpath(path) in seen or not os.path.exists(path):
+            continue
+        seen.add(os.path.realpath(path))
+        for line in open(path, encoding='utf-8'):
+            key, eq, value = line.strip().partition('=')
+            if eq and key in KEYS and key not in os.environ:
+                os.environ[key] = value.strip().strip('"\'')
 
 
 load_env()
