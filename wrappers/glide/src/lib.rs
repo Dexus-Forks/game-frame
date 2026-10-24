@@ -4,26 +4,44 @@
 //! (`glide2x.def`, written with `stubs` from `api.tsv`); how the game uses each is in POD's
 //! `docs/hardware/3d-cards.md`.
 //!
+//! - `vertex`, `layout`, `fog`, `tdf`: vertices (culling, fans, clipping), where mip levels
+//!   lie in texture memory, the fog tables and 3DF files; plain Rust, tested on the host.
 //! - `api`: the exported calls. They record commands (`cmd`) and answer queries.
 //! - `render`: the thread that owns the OpenGL context and replays the commands.
 //! - `window`: the game's window, made the drawing surface.
 //! - `shim` (a crate shared with the other replacement DLLs): settings, a CPU check's port
 //!   I/O, which Windows 95 allowed, emulated; patches from a file; the log.
 
-#![cfg(windows)]
-#![allow(clippy::missing_safety_doc)]
+#![allow(clippy::missing_safety_doc, clippy::too_many_arguments)]
 
+// Plain Rust, tested on the host.
+pub mod fog;
+pub mod layout;
+pub mod tdf;
+pub mod vertex;
+
+#[cfg(windows)]
 mod api;
+#[cfg(windows)]
 mod cmd;
+#[cfg(windows)]
 mod config;
+#[cfg(windows)]
 mod consts;
+#[cfg(windows)]
 mod gl;
+#[cfg(windows)]
 mod log;
+#[cfg(windows)]
 mod render;
+#[cfg(windows)]
 mod win32;
+#[cfg(windows)]
 mod window;
+#[cfg(windows)]
 mod stubs;
 
+#[cfg(windows)]
 /// Called by the C runtime's DLL entry point: the port I/O handler goes in before the game's
 /// own code runs.
 #[unsafe(no_mangle)]

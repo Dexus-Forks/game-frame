@@ -52,7 +52,7 @@ game met, with a count. The log of a new game's first run then lists what to wri
 
 | DLL | Stands in for | What it draws | State | Known gaps |
 |---|---|---|---|---|
-| [`glide2x.dll`](../../wrappers/glide/README.md) | 3dfx Glide 2.x (`glide.dll`, `glide2x.dll`) | The whole scene with OpenGL, at any size. The Voodoo's colour combiners, chroma key and table fog are one fragment shader. The W buffer is OpenGL's depth test | 55 of 156 calls (Glide 2.43 and 2.1.1). POD's 3dfx builds (first edition and Gold) race at 1280 × 960 | Only TMU 0 draws. No NCC textures or mipmaps. `GR_BLEND_PREFOG_COLOR` is taken as zero |
+| [`glide2x.dll`](../../wrappers/glide/README.md) | 3dfx Glide 2.x (`glide.dll`, `glide2x.dll`) | The whole scene with OpenGL, at any size. The Voodoo's colour combiners, alpha test, chroma key and table fog are one fragment shader. The W buffer is OpenGL's depth test. Mipmaps, NCC and multibase textures, the `gu` texture manager and 3DF files | 131 of 156 calls (Glide 2.43 and 2.1.1). POD's 3dfx builds (first edition and Gold) race at 1280 × 960 | Only TMU 0 draws, so no detail textures. No antialiased edges or dither. `GR_BLEND_PREFOG_COLOR` is taken as zero |
 | [`sgl.dll`](../../wrappers/sgl/README.md) | PowerVR PCX1 and PCX2, SGL's scene graph and its immediate mode | It keeps the scene graph the game builds, or takes the faces it sends each frame (`sgltri_*`), and draws them with OpenGL. The 2D picture goes on top through `ddraw.dll` or SGL's own 2D callback | 61 of 134 calls (60 of SGL's 133, and one for `ddraw.dll`). POD Gold's PowerVR build races at 1280 × 960. The immediate mode is tested only with our own program | Shadow volumes, and convex objects other than light volumes, are skipped |
 | [`ati3dcif.dll`](../../wrappers/ati3dcif/README.md) | ATI 3D Rage (ATI3DCIF) | Solid, flat and Gouraud triangles and quads, blended by source alpha, in software into the game's DirectDraw surface | 6 of 17 calls. POD's ATI build races with the frame scaled | No textures, lines, rectangles, points, Z buffer or fog. Whether the Rage rounded edges the same way is *unknown* |
 | [`s3dtkw.dll`](../../wrappers/s3dtkw/README.md) | S3 ViRGE (S3D Toolkit) | Gouraud lists, strips and fans, blended by source alpha, in software into a 15-bit or 8-bit surface | All 6 calls, and 3 slots of the function table. POD's S3 build races with the frame scaled | Textured faces are drawn Gouraud. Fog is logged and not drawn |
@@ -210,9 +210,9 @@ Every library writes the same three kinds of line:
 
 ```text
 glide: release build, GameFrame wrappers 0.1.0
-glide: not implemented: grTexDetailControl(0x0, 0x4, 0x2, 0x3f800000) (later calls are counted)
-glide: not handled: grTexMipMapMode: mode 2: mipmaps are not handled (later calls are counted)
-glide: not implemented or not handled, by count: grTexDetailControl ×812, grTexMipMapMode ×3
+glide: not implemented: guMPInit() (later calls are counted)
+glide: not handled: grTexDetailControl: detail textures need a second TMU; ignored (later calls are counted)
+glide: not implemented or not handled, by count: grTexDetailControl ×812, guMPInit ×1
 ```
 
 - `not implemented` is a call to a stub, with its arguments as 32-bit words.
@@ -272,13 +272,13 @@ GameFrame keeps no game material. A test for a new call uses our own code, such 
 
 `tests/run.sh` builds the release and debug DLLs, runs the host tests, checks each export table
 against its `.def` file, checks that the `.def` files and stubs match the API tables, and builds
-`sgltest.exe` and `sgltritest.exe` when zig is installed. A stub's argument bytes are checked when the DLL links. The
+`sgltest.exe`, `sgltritest.exe` and `glidetest.exe` when zig is installed. A stub's argument bytes are checked when the DLL links. The
 `.def` file names each stdcall export by its decorated name, such as `grAADrawLine@8`. Rust
 gives a function that name only when it takes exactly 8 bytes of arguments. To run the host
 tests alone:
 
 ```bash
-cd wrappers && cargo test --release --target "$(rustc -vV | sed -n 's/^host: //p')" -p raster -p scalers -p pixels -p shim -p sgl
+cd wrappers && cargo test --release --target "$(rustc -vV | sed -n 's/^host: //p')" -p raster -p scalers -p pixels -p shim -p sgl -p glide
 ```
 
 ![sgltest.exe drawn by sgl.dll at 1280 × 960: a lit, textured cube under a 2D bar](../assets/case-studies/sgltest-scene.webp)
@@ -298,6 +298,16 @@ WRAPPER_WINDOW_CLASS=SglTest SGL_SHOT_DIR='C:\shots' SGL_SHOT_EVERY=30 SGL_SCALE
 (`sgltri_*`). It draws a fogged floor, a Gouraud triangle, a turning textured quad, a
 highlighted triangle and a translucent one. A 2D bar goes on top. Pass `ddraw` after the
 frame count to use `sgl_use_ddraw_mode`'s 2D callback in place of the address callback.
+
+[`wrappers/glide/test/glidetest.c`](../../wrappers/glide/test/glidetest.c) draws a known scene
+through `glide2x.dll` and checks it. It reads pixels back with `grLfbReadRegion` and prints one
+line per check: culling, clipping, `gu` and NCC textures, the alpha test, fog, points, an LFB
+write, saved state, a 3DF file and the queries. Its exit code is the number of failed checks:
+
+```bash
+zig cc -target x86-windows-gnu -O2 wrappers/glide/test/glidetest.c -o glidetest.exe -luser32
+WINEDLLOVERRIDES=glide2x=n GLIDE_SCALE=2 wine glidetest.exe 120
+```
 
 The other libraries have no such test program yet. They were checked against POD's own runs.
 

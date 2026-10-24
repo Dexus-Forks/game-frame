@@ -9,6 +9,17 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `glide2x.dll` implements 131 of the 156 Glide calls, up from 55, so it runs more Glide 2
+  games than POD. It now draws points, polygons, and the antialiased and clipping draws. It
+  handles culling, the alpha test, colour and depth masks, depth bias, drawing to the front
+  buffer, the lower left origin and the colour formats. It saves and restores state
+  (`grGlideGetState`, `grGlideSetState`). Textures gain mipmaps, LOD bias, NCC tables,
+  multibase, partial downloads, the `gu` texture manager and 3DF files. The frame buffer gains
+  region reads and colour formats. The queries, statistics and `gu` fog tables are in. The
+  fog tables match the original byte for byte. `wrappers/glide/test/glidetest.c` draws and
+  checks a known scene through the DLL, and `tests/run.sh` builds it. The host tests cover
+  clipping, culling, mip level layout, fog tables, 3DF files and NCC tables.
+
 - `sgl.dll` now has SGL's immediate mode, which Hardwar's PowerVR mode uses. It has the
   `sgltri_*` calls for triangles, quads and rendering. It has SGL's DirectDraw mode with its 2D
   callback. It also has the end-of-render callback, the error, version and texture-memory
