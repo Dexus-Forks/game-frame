@@ -91,6 +91,15 @@ A failure must name at least one symptom. `tests/run.sh` runs the check.
 The facts in an entry follow [the evidence rules](evidence.md). An entry says which game it was
 seen in (`seen`). It holds nothing from that game beyond addresses and short message texts.
 
+### High-level topics
+
+Give each major topic a starting entry, even before there is a specific failure to record. A
+topic entry uses `kind: context` and a short id people can guess, such as `sound-card`. It names
+the first checks, links the main guide, and points to narrower entries. Keep failure entries for
+the individual symptoms and fixes. When a query reveals that a topic has only narrow entries,
+add its overview so `advise --entry TOPIC` works before an agent knows the specific failure. Do
+not make a separate entry for every alias; the taxonomy already handles those names.
+
 ## Asking: `gameframe advise`
 
 ```

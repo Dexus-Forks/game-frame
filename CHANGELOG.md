@@ -9,6 +9,10 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- Know-how now has broad starting entries for sound cards, CPU behavior, display output,
+  CD-ROMs, input, networking, game files, and timing. The entries link to detailed guides, with
+  case notes where available. Know-how guidance now calls for an overview when a major topic has
+  only narrow entries.
 - `sgl.dll` draws the immediate mode's shadow and light volumes (`sgltri_shadow`), which it
   only counted before. Each call's faces become the planes of one convex volume, oriented as
   PowerVR's driver orients them, and every pixel is tested against them: a shadow multiplies
