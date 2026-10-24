@@ -86,10 +86,19 @@ Each is marked `Deviation:` in the code.
   planes) are skipped.
 - A translucent map's clear pixels are cut out. Only a material's opacity blends.
 - Faces are lit from both sides. SGL's default material is assumed (white, opaque).
+- Point lights are placed from the camera: SGL positions a light with `sgl_position_light`,
+  which POD never calls, and POD's car lamps are a spot at (0, 0, 0) along +z (*inferred*).
+- A light volume goes into its list where its first plane is added (POD asks for it before the
+  transform that places it).
+- A texture that no lighting term affects shows unlit (POD's sky); over a texture only the
+  specular highlight is added of the terms it does not affect.
 - A frame shows under at most three of the game's pictures.
 - A 2D pixel of exactly the marker colour counts as not drawn by the game.
 
 ## Known problems
+
+- The render thread keeps only the latest frame and picture: in software OpenGL a race runs
+  at about 3 pictures a second, and every queued picture used to stay in memory.
 
 - Under Wine on Apple silicon POD faults in `wow64cpu` in the menus, with this library or
   without it: know-how entry `wine-wow64-rosetta-fault`. An emulated x86 PC runs it.
