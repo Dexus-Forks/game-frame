@@ -34,6 +34,8 @@ the order of this page and of each folder's `README.md` is the order of the site
 
 - [Hardware of the era](hardware/README.md): CPUs and floating point, 2D graphics, 3D
   accelerators, sound, memory, storage, input and networks.
+- [Replacement 3D-card libraries](hardware/wrappers.md): stand-in DLLs that run a 1990s game's
+  build for one 3D card on a modern machine, unchanged and at a larger size.
 - [Software engines and middleware](engines/README.md): recognising an engine, the id and
   Build engines, Unreal, other licensed engines, studio engines, middleware.
 - [Numbers, text and libraries](semantics/README.md): integer and floating-point behaviour on

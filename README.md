@@ -308,8 +308,9 @@ under Apache 2.0. See [docs/crates](docs/crates/README.md).
 ## Replacement libraries
 
 `wrappers/` is a Cargo workspace of DLLs that stand in for the 3D card libraries of 1997 and
-for DirectDraw. A game that imports one of them runs unchanged and draws at any size. See
-[wrappers](wrappers/README.md) and [replacement libraries](docs/hardware/replacement-libraries.md).
+for DirectDraw. A game that imports one of them runs unchanged and draws at any size. The guide
+[Replacement 3D-card libraries](docs/hardware/wrappers.md) says how to build and use them. See
+also [wrappers](wrappers/README.md) and [replacement libraries](docs/hardware/replacement-libraries.md).
 
 | DLL | Stands in for |
 |---|---|
