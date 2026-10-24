@@ -64,6 +64,17 @@ proposed again.
 - [x] PowerVR SGL's immediate-mode half (`sgltri_*`), which Hardwar's PowerVR mode uses. The 13 calls it lacked, and `sgltri_rerender`, are in `wrappers/sgl` ([sgl](wrappers/sgl/README.md), `test/sgltritest.c`). Shadow volumes given as triangles are still not drawn. No run of Hardwar has checked it
 - [ ] Rendition RRedline and Matrox MSI in the same detail
 
+## Sound ([sound.md](docs/hardware/sound.md), [audio coverage](docs/hardware/audio-coverage.md))
+
+- [x] Map common PC audio device families by era, separate chip emulation from card behavior,
+  compatibility libraries and host output, and record current GameFrame coverage
+- [ ] YMF262 OPL3 synthesis and register behavior, with a proof against a named reference
+- [ ] PC speaker, Tandy PSG, CMS/SAA1099 and LPT DAC components
+- [ ] Sound Blaster DSP generations, DMA, mixer and IRQ timing, layered over OPL2/OPL3
+- [ ] Gravis UltraSound GF1 and InterWave voice, memory and interrupt behavior
+- [ ] MPU-401 event timing and adapters for MT-32 and General MIDI synthesizers
+- [ ] AWE SoundFont Manager and selected Windows card APIs, when a game's call sites require them
+
 ## Engines ([animation.md](docs/engines/animation.md))
 
 - [x] Pose changes after blending: inverse kinematics, look-at, hand placement

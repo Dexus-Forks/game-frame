@@ -32,7 +32,9 @@ The libraries come from the [POD: Planet of Death](https://github.com/tanepiper/
 project ([case study](../docs/case-studies/pod.md)). They run its unchanged 3dfx, ATI, S3 and
 PowerVR builds. Each library implements the calls POD makes, and its README lists what it does
 not handle. The sound cards of the time, and which of their libraries can be stood in for,
-are in [sound-card APIs](../docs/hardware/sound-card-apis.md).
+are in [sound-card APIs](../docs/hardware/sound-card-apis.md). The wider device and API roadmap,
+including the OPL, Sound Blaster, Gravis, MIDI and 3D audio layers, is in
+[PC audio coverage](../docs/hardware/audio-coverage.md).
 
 ## Every call of the original
 

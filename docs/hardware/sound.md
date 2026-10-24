@@ -8,13 +8,19 @@ the sound exactly, you need to know which device the game wrote for and how it d
 | Device | Year | How games use it | Notes |
 |---|---|---|---|
 | PC speaker | 1981 | Tones from timer channel 2 (port `42h`), switched on through port `61h` | Some games played samples by switching the speaker very fast |
+| PCjr and Tandy 1000 | 1984 | SN76496/SN76489 tone and noise registers; later models add an 8-bit DAC | Common in early DOS games and ports |
+| Covox Speech Thing and Disney Sound Source | 1987 | 8-bit samples written through an LPT port | The Disney device adds a FIFO; both can be driven by software timing |
+| Creative Music System / Game Blaster | 1987 | Two Philips SAA1099 chips | Square-wave voices, noise and stereo |
 | AdLib | 1987 | The Yamaha YM3812 (OPL2) FM chip at ports `388h` and `389h` | 9 voices of FM synthesis; music is a stream of register writes |
 | Roland MT-32 | 1987 | MIDI through an MPU-401 interface (port `330h`) | Its own synthesis and sounds; many Sierra games were written for it |
 | Sound Blaster | 1989 | An OPL2 for music, and an 8-bit digital channel (the DSP) with DMA | Settings in the `BLASTER` environment variable: port, IRQ, DMA |
-| Sound Blaster Pro | 1991 | Stereo; later models have the YMF262 (OPL3) | |
-| Sound Blaster 16 | 1992 | 16-bit digital sound with 16-bit DMA | |
+| Sound Blaster Pro | 1991 | SB Pro 1 uses two OPL2 chips; SB Pro 2 uses the YMF262 OPL3 | Both provide stereo PCM |
+| Sound Blaster 16 and AdLib Gold | 1992 | SB16 adds 16-bit DMA; AdLib Gold adds stereo and a digital section | OPL3 implementations vary across card revisions |
+| Pro AudioSpectrum, Windows Sound System and ESS AudioDrive | 1991 onward | 16-bit PCM through a codec; models vary in OPL3, Sound Blaster compatibility and mixer support | Identify the exact card and codec |
 | Gravis Ultrasound | 1992 | 32 hardware voices playing samples from the card's own memory | Popular with tracker music and the demo scene |
 | General MIDI modules (Roland SC-55) | 1991 | MIDI through an MPU-401 | General MIDI fixed the instrument numbers |
+| AWE32/AWE64 | 1994 | Sound Blaster PCM plus EMU8000 wavetable voices and uploaded banks | Games may use the SoundFont Manager as well as `midiOut` |
+| Aureal A3D and Creative EAX | 1997–1998 | DirectSound 3D extensions for positional audio and environmental effects | APIs differ: A3D exposes COM interfaces; EAX uses DirectSound property sets |
 
 ## FM synthesis (OPL2 and OPL3)
 
@@ -84,6 +90,8 @@ A3D and EAX effects need hardware that no longer exists. Software reimplementati
 (OpenAL Soft supports EAX effects). Decide whether the port reproduces them and record it.
 [The sound card makers' APIs](sound-card-apis.md) covers these and the other card libraries
 of the time, and the stand-ins in `wrappers/`.
+[PC audio coverage](audio-coverage.md) tracks which devices and APIs GameFrame can reuse today
+and which reusable pieces remain to build.
 
 ## Checklist
 

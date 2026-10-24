@@ -48,8 +48,10 @@ In my GameFrame project, find every place the game touches hardware.
   and use them, and how to add a game.
 - [MMX and other SIMD code](simd.md): finding hand-written MMX routines, matching them to the
   plain build, measuring both, and porting them exactly.
-- [Sound](sound.md): the PC speaker, AdLib and OPL FM synthesis, Sound Blaster, Gravis
-  Ultrasound, MIDI devices, DirectSound, A3D and EAX.
+- [Sound](sound.md): the PC speaker, Tandy, Covox, Game Blaster, AdLib and OPL FM synthesis,
+  Sound Blaster, Gravis Ultrasound, MIDI devices, DirectSound, A3D and EAX.
+- [PC audio coverage](audio-coverage.md): the reusable chip, card, library and backend layers;
+  GameFrame coverage today and priorities for the next hardware models and replacements.
 - [The sound card makers' APIs](sound-card-apis.md): the Maxi Sound 64, A3D, EAX, the AWE's
   SoundFont Manager, Sensaura and QSound: how a game finds each, what Wine offers, and which
   can be stood in for.
