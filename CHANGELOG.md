@@ -16,7 +16,8 @@ Every release of GameFrame, newest first. The format follows
   `headless.py` runs an agent unattended under a budget, and `docs-check` runs `re-checker`
   and `re-editor` over the documents; `ask.py` answers a question from the know-how entries.
   `fake_api.py` stands in for the API in `tests/run.sh`. The SDK is optional, in
-  `requirements-llm.txt`.
+  `requirements-llm.txt`. Know-how: `api-credits-refused`, the messages a refused run gives
+  and the fix for each.
 - `ghidra-run.sh ... callargs regs=watcom`: the constant each register gets before every call,
   in Watcom's order (EAX, EDX, EBX, ECX) or any list, where the decompiler shows no arguments.
 - `ghidra-run.sh ... fill-gaps`: makes a function at each start `exportcov` finds, goes on past
