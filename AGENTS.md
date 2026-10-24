@@ -76,6 +76,7 @@ These rules are for changes to GameFrame itself, which is a public repository.
 | `tests/run.sh` | The checks |
 | `docs/` | The taxonomy of games (`games/`), engines (Flash and Shockwave too), hardware, consoles, observing the original (`observe/`), media and files (`media/`), working as an agent (`working/`), case studies, ABI, DOS, game patterns, compiled code, legal notes, setup |
 | `crates/` | A Cargo workspace of clean implementations taken from the case studies (OPL2, WMA, MSVC CRT, Turbo Pascal); rules in `docs/crates/README.md`. `cargo test --release` in `crates/` |
+| `wrappers/` | A Cargo workspace of replacement DLLs for 1997 3D cards and DirectDraw (Glide 2, ATI3DCIF, S3D Toolkit, SGL's scene graph, DirectDraw), taken from the POD case study. Built for 32-bit Windows through `scripts/zcc.sh`; host tests in `tests/run.sh` |
 | `CHANGELOG.md` | Every release, newest first. Add each change under Unreleased. A release moves them under its version, sets the same version in `.claude-plugin/plugin.json` (the tests check the two match) and tags the commit `vX.Y.Z` |
 | `GAPS.md` | Topics missing from the guides and tools, and where each is now covered. Tick an item when it is merged; add new gaps to it |
 | `site/` | The documentation website (VitePress). It builds from `docs/`, the skills and the examples where they are; it holds no copies of their content |

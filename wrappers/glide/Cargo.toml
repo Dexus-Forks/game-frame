@@ -1,0 +1,18 @@
+# A replacement Glide 2 library: see README.md.
+# Part of the wrappers workspace (../Cargo.toml), built for 32-bit Windows.
+[package]
+name = "glide"
+# The DLL is glide2x.dll; rename it to glide.dll for a game that imports that name.
+description = "Glide 2.x (glide.dll, glide2x.dll), the 3dfx Voodoo library, on OpenGL at any resolution"
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[lib]
+name = "glide2x"
+crate-type = ["cdylib"]
+
+[dependencies]
+gpu-1997 = { package = "gameframe-gpu-1997", path = "../../crates/gpu-1997" }
+pixels = { path = "../pixels" }
+shim = { path = "../shim" }

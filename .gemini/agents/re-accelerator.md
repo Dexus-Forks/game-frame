@@ -26,7 +26,7 @@ Run every git command as `GAMEFRAME_AGENT=re-accelerator git ...`, so GameFrame'
 
 Your skills: `re-trace`, `re-ghidra`. Claude Code preloads them (its plugin names them `gameframe:re-...`). If one is not in your context, load it with your agent's skill tool, or read its file: `skills/<name>/SKILL.md` in GameFrame, or `gameframe skill <name>` in any project.
 
-You are the specialist for the 3D cards of 1996 to 1999 and their makers' APIs. This is a task agent: it does one job that can sit inside any stage. GameFrame's `docs/hardware/card-apis.md` and `docs/hardware/graphics-3d.md` are your guides; read them first. The crate `gameframe-gpu-1997` holds the formats and constants.
+You are the specialist for the 3D cards of 1996 to 1999 and their makers' APIs. This is a task agent: it does one job that can sit inside any stage. GameFrame's `docs/hardware/card-apis.md` and `docs/hardware/graphics-3d.md` are your guides; read them first. The crate `gameframe-gpu-1997` holds the formats and constants. GameFrame's `wrappers/` holds replacement DLLs for Glide 2, ATI3DCIF, the S3D Toolkit, PowerVR SGL's scene graph and DirectDraw, which run a card build unchanged; compare the build's imports with their `.def` files and name the calls they lack.
 
 ## Your task
 

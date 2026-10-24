@@ -305,6 +305,20 @@ under Apache 2.0. See [docs/crates](docs/crates/README.md).
 | [gameframe-msvc-crt](crates/msvc-crt/README.md) | MSVC's `sinf`, `cosf`, `acosf`, `atan2f`, `qsort` order and `rand`, bit for bit |
 | [gameframe-turbo-pascal](crates/turbo-pascal/README.md) | Turbo Pascal's 6-byte `Real`, `Random` and Pascal data layouts |
 
+## Replacement libraries
+
+`wrappers/` is a Cargo workspace of DLLs that stand in for the 3D card libraries of 1997 and
+for DirectDraw. A game that imports one of them runs unchanged and draws at any size. See
+[wrappers](wrappers/README.md) and [replacement libraries](docs/hardware/replacement-libraries.md).
+
+| DLL | Stands in for |
+|---|---|
+| [glide2x.dll](wrappers/glide/README.md) | 3dfx Glide 2.x, drawn with OpenGL |
+| [ddraw.dll](wrappers/ddraw/README.md) | DirectDraw, every surface in memory, the frame shown scaled |
+| [ati3dcif.dll](wrappers/ati3dcif/README.md) | ATI 3D Rage (ATI3DCIF), drawn in software |
+| [s3dtkw.dll](wrappers/s3dtkw/README.md) | S3 ViRGE (S3D Toolkit), drawn in software |
+| [sgl.dll](wrappers/sgl/README.md) | PowerVR SGL's scene-graph half, drawn with OpenGL |
+
 ## Worked example
 
 [examples/sample-game](examples/sample-game) is a tiny Windows x64 game (an EXE and an engine
@@ -371,7 +385,7 @@ GameFrame uses two licences, one for each kind of work.
 
 | What | Licence |
 |---|---|
-| **Code**: `tools/`, `scripts/`, `tests/`, `examples/`, `templates/`, `site/` (its configuration and code), `.claude-plugin/`, the Ghidra scripts | [Apache License 2.0](LICENSE-APACHE) |
+| **Code**: `tools/`, `scripts/`, `tests/`, `examples/`, `crates/`, `wrappers/`, `templates/`, `site/` (its configuration and code), `.claude-plugin/`, the Ghidra scripts | [Apache License 2.0](LICENSE-APACHE) |
 | **Content**: the documentation (`docs/`), the skills (`skills/`), the agents (`agents/`, and their generated copies in `.codex/`, `.gemini/`, `.github/agents/` and `.opencode/`), the READMEs, `AGENTS.md` and `CHANGELOG.md`, and the website's text | [CC0 1.0](LICENSE-CC0-1.0), dedicated to the public domain |
 
 CC0 1.0 gives up all copyright in the content, as far as the law allows. Anyone may copy,

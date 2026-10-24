@@ -1,0 +1,13 @@
+[package]
+name = "ddraw"
+description = "DirectDraw (ddraw.dll) in memory for 1990s games: any mode granted, the frame shown scaled in a window"
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+scalers = { path = "../scalers" }
+shim = { path = "../shim" }

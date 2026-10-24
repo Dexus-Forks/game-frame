@@ -26,7 +26,7 @@ PowerVR's first chips (PCX1, PCX2) were driven through VideoLogic's SGL. Unlike 
 is a retained scene graph: the game builds display lists of transforms, materials, meshes,
 lights and cameras, edits a few transforms each frame and calls `sgl_render`. A stand-in keeps
 the graph and draws it with any API at any size. POD's PowerVR build runs through
-`wrapper/sgl` (Rust, 32-bit Windows, OpenGL). What mattered, each *observed* or *measured*
+GameFrame's `wrappers/sgl` (Rust, 32-bit Windows, OpenGL). What mattered, each *observed* or *measured*
 there:
 
 - **Look for the SDK on the game's disc.** Games shipped the PowerVR driver package, with
@@ -48,7 +48,7 @@ there:
 - **Names.** Calls with `generate_name` false return 0 (`sgl_no_err`), not a name.
 - **A test without the game.** A small Windows program that makes the same calls on a known
   scene (a textured cube under a 2D bar) checks the projection, lighting, textures and the
-  overlay where the game itself cannot run (`wrapper/sgl/test/sgltest.c`).
+  overlay where the game itself cannot run (`wrappers/sgl/test/sgltest.c`).
 
 ## Still guesses
 

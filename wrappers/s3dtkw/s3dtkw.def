@@ -1,0 +1,6 @@
+LIBRARY S3DTKW.dll
+EXPORTS
+S3DTK_InitLib
+S3DTK_CreateRenderer
+S3DTK_DestroyRenderer
+S3DTK_LinearToPhysical
