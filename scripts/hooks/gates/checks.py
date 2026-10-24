@@ -20,10 +20,17 @@ GAME_EXTS = {
 }
 # .md is a Mega Drive ROM extension too; Markdown is far more common in a repository.
 GAME_EXTS.discard('.md')
-# Lines that Ghidra's decompiler writes and people do not.
+# Lines that Ghidra's decompiler writes and people do not. The English word "undefined" and
+# FUN_/DAT_ names cited in a sentence pass; Ghidra's types, declarations and statements do not.
+GHIDRA_NAME = r'(?:FUN|DAT)_[0-9a-fA-F]{4,}(?:_[0-9a-fA-F]{4})?'
 PSEUDOCODE = re.compile(
-    r'\bundefined[1248]?\b|\bCONCAT\d\d\(|\bSUB\d\d\(|\bZEXT\d\d\(|\(\*\*\(code \*\*\)|'
-    r'/\* WARNING: |\bunaff_\w+|\bin_stack_\w+|\bextraout_\w+'
+    r'\bundefined[1248]\b|\bundefined\s*\*|'                         # sized types, pointers
+    r'\bundefined\s+\**(?:[a-z]{0,3}Var\d+|local_\w+|param_\d+|[a-z]{0,3}Stack_\w+)|'  # variables
+    r'\bCONCAT\d\d\(|\bSUB\d\d\(|\bZEXT\d\d\(|\(\*\*\(code \*\*\)|'
+    r'/\* WARNING: |\bunaff_\w+|\bin_stack_\w+|\bextraout_\w+|'
+    r'\b' + GHIDRA_NAME + r'\s*\([^()]*\)\s*;|'                        # a call statement
+    r'\b' + GHIDRA_NAME + r'\s*=[^=]|=\s*(?:\([\w\s*]+\)\s*)?' + GHIDRA_NAME + r'\s*;|'  # assignments
+    r'\b(?:void|int|uint|char|short|long|bool|float|double|code)\s+\**' + GHIDRA_NAME + r'\s*\('  # declarations
 )
 # Paths where decompiled code may live (all ignored by git).
 PRIVATE_DIRS = ('analysis/', 'derived/', 'target/')

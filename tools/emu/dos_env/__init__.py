@@ -22,7 +22,7 @@ What it provides:
   - DPMI16 KERNEL imports (Borland Pascal 7, Windows 3.x): GlobalAlloc / GlobalLock (64 KB
     selectors in a row, 8 apart, for blocks over 64 KB), GlobalFree, GetFreeSpace, InitTask.
   - Ports: VGA status (0x3DA) alternates so retrace waits end; the DAC (0x3C8/0x3C9) is kept
-    in `env.dac` (256 x RGB, 6-bit); PIT, PIC, keyboard, joystick, Sound Blaster and AdLib
+    in `env.dac` (256 x RGB, 6-bit); PIT, PIC, joystick, Sound Blaster and AdLib
     ports answer with safe constant values. Every port write is counted in `env.ports`.
   - BIOS: INT 10h (video modes, recorded in `env.video_mode`), INT 16h (no key waiting),
     INT 33h (no mouse), INT 1Ah and the tick count at 0040:006C (`env.ticks`, one tick per
@@ -32,8 +32,13 @@ What it provides:
   - The timer: IRQ 0 goes to INT 8's handler (the program's, or the BIOS's, which counts the
     tick) at the rate the program sets on the PIT, counted in instructions: `ips` per second
     (default 25 million, a fast 486). `env.irq0_count` counts deliveries.
+  - The keyboard (keyboard.py): scan codes on port 0x60, raised as IRQ 1 through INT 9's
+    handler (the program's own, which fills its key table, or the BIOS's, which feeds INT 16h)
+    and acknowledged through port 0x20. env.press(0x39, at=10, hold=3) presses Space at tick
+    10 for 3 ticks; env.key_script('10:39:3') does the same from text; set env.key_clock to
+    count in frames. `env.irq1_count` counts deliveries.
 Anything else stops the run with its name (the emulator's own message), so you know what to
-add. It does not emulate sound output, a real keyboard (use env.keys), or DPMI services
+add. It does not emulate sound output, key repeat or shift states, or DPMI services
 beyond what is listed.
 """
 from unicorn import UC_HOOK_CODE, UC_HOOK_INSN, UC_HOOK_MEM_READ
@@ -44,9 +49,10 @@ from dos_emu import FarPtr
 from .bios import BiosServices
 from .dos import DosServices
 from .dpmi import DpmiServices
+from .keyboard import Keyboard
 from .pc import PcHardware
 
-class DosEnv(DosServices, DpmiServices, BiosServices, PcHardware):
+class DosEnv(DosServices, DpmiServices, BiosServices, PcHardware, Keyboard):
     def __init__(self, emu, root, overlay=None, clock=(1999, 8, 31, 12, 0, 0, 0), args='', ips=25_000_000,
                  program='C:\\GAME.EXE', environment=('PATH=C:\\', 'COMSPEC=C:\\COMMAND.COM')):
         self.emu, self.root = emu, root
@@ -86,11 +92,14 @@ class DosEnv(DosServices, DpmiServices, BiosServices, PcHardware):
         emu.write(FarPtr(self.bios, 0), b'\xCF' * 0x400)
         at = emu.linear(self.bios, 8 * 4)
         emu.uc.hook_add(UC_HOOK_CODE, self.bios_int8, begin=at, end=at)
+        at = emu.linear(self.bios, 9 * 4)
+        emu.uc.hook_add(UC_HOOK_CODE, self.bios_int9, begin=at, end=at)
         # The timer: IRQ 0 every (instructions per second / tick rate) instructions.
         self.ips = ips
         self.divisor = 0x10000
         self.pit_write_high = False
         self.irq0_count = 0
+        self.init_keyboard()
         emu.on_slice = self.on_slice
         self.set_timer_slice()
         emu.uc.hook_add(UC_HOOK_MEM_READ, self.bios_tick_read, begin=0x46C, end=0x46F)

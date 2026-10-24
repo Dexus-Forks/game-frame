@@ -30,11 +30,14 @@ show the reason. In every other case the gate exits 0 and changes nothing.
 
 Ghidra's decompiler writes names and forms that people do not write by hand.
 The gates look for these: `undefined4`, `CONCAT44(`, `SUB41(`, `ZEXT14(`, `(**(code **)`, `/* WARNING: `, and variables such as `unaff_EBX`, `in_stack_00000008` and `extraout_EAX`.
+They also look for pointers and variables declared with those types, and for statements with
+Ghidra's names: a call to a `FUN_` function ending in a semicolon, an assignment to or from a
+`DAT_` name, and a function declared with a `FUN_` name.
 One such line can appear in prose that explains a type. Two or more lines in one write or one
 commit are blocked.
 
 Function addresses such as `FUN_1400be770`, offsets such as `+0x44` and constants pass. They are
-how findings cite the original.
+how findings cite the original. Plain English that uses the word in its usual sense passes too.
 
 ### Which agents may commit
 

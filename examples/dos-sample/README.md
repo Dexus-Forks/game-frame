@@ -8,6 +8,9 @@ involved.
   numbers, a checksum over a far pointer, a selector fixup, an imported call (`KERNEL.3`) and
   a DOS call (`INT 21h`), and `main_loop`: eight frames of a tiny main loop for
   `tools/emu/fragments.py` (DPMI blocks, the VGA display, a file read each frame).
+- `wait_keys`: installs a keyboard handler on INT 9 that reads port `0x60` into a key table
+  and a log and acknowledges the PIC, as a game's handler does, then waits for scan codes
+  (dos_env's keyboard test).
 - `make_exe.py OUT`: assembles it with `zig cc` (LLVM, `.code16`) and links it with Python into
   `sample.exe` (NE, 16-bit protected mode), `sample-td.exe` (the same with Turbo Debugger
   symbols appended) and `sample-mz.exe` (real-mode MZ). The data segment holds Pascal strings,
