@@ -253,3 +253,51 @@ event_end:
 	jb frame_top
 	movw $0x4c00, %ax
 	int $0x21
+
+# function wait_keys(count: word): word    installs key_handler on INT 9 (DOS AH=25h), waits
+# until it has seen `count` scan codes, returns how many it has seen. key_handler does what a
+# game's keyboard handler does: reads the scan code from port 0x60, marks the key down or up in
+# KeyDown (0x0100 + scan), logs it in KeyLog, and acknowledges the PIC (EOI to port 0x20).
+# Tests dos_env's keyboard (IRQ 1).
+	.set KeyCount, 0x00AC   # word: scan codes seen
+	.set KeyLog, 0x00B0     # 16 bytes: the scan codes, in order (wraps)
+	.set KeyDown, 0x0100    # 128 bytes: 1 while the key is held
+wait_keys:
+	pushw %bp
+	movw %sp, %bp
+	pushw %ds
+	pushw %cs
+	popw %ds
+	movw $0x2509, %ax
+	movw $(key_handler - entry), %dx
+	int $0x21
+	popw %ds
+	sti
+	movw 6(%bp), %cx
+1:	cmpw %cx, KeyCount
+	jb 1b
+	movw KeyCount, %ax
+	popw %bp
+	lretw $2
+key_handler:
+	pushw %ds
+	pushw %ax
+	pushw %bx
+	movw %cs:(fix_tick_ds - entry), %ax   # the data segment (tick_handler's relocated word)
+	movw %ax, %ds
+	inb $0x60, %al
+	movw KeyCount, %bx
+	andw $15, %bx
+	movb %al, KeyLog(%bx)
+	incw KeyCount
+	movb %al, %bl
+	andw $0x7f, %bx
+	notb %al
+	shrb $7, %al            # 1 for a make code, 0 for a break code
+	movb %al, KeyDown(%bx)
+	movb $0x20, %al
+	outb %al, $0x20
+	popw %bx
+	popw %ax
+	popw %ds
+	iret

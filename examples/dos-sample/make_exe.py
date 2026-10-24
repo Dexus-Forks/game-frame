@@ -29,7 +29,7 @@ import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 EXPORTS = ['rng_seed', 'rng_next', 'sum_draws', 'checksum', 'get_data_seg', 'ask_host', 'dos_version', 'field_read',
-           'read_file', 'wait_ticks', 'get_key', 'write_file']
+           'read_file', 'wait_ticks', 'get_key', 'write_file', 'wait_keys']
 # Labels inside main_loop, written to symbols.tsv for the fragments.py test
 LABELS = ['main_loop', 'frame_top', 'draw', 'draw_even_end', 'draw_odd_end', 'event', 'event_end']
 DESCRIPTION = b'DOS sample for GameFrame'
@@ -76,7 +76,8 @@ def data_segment():
     d += MESSAGE + b'\0' + DESCRIPTION + b'\0' + ADJACENT + b'\0'
     d += bytes(0x80 - len(d))
     d += b'sample.txt\0'                     # FileName at 0x80 (read_file)
-    d += bytes(0xB0 - len(d))                # FileBuf at 0x90; main_loop's words at 0xA0
+    d += bytes(0x180 - len(d))               # FileBuf at 0x90; main_loop's words at 0xA0;
+                                             # KeyLog at 0xB0, KeyDown at 0x100 (wait_keys)
     return bytes(d)
 
 

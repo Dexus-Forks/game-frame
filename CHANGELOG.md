@@ -9,6 +9,10 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `dos_env` has a keyboard: `env.press(scan, at, hold)` and `env.key_script('10:39:3')` put
+  make and break codes on port 0x60 and raise IRQ 1 through the game's INT 9 handler, which
+  acknowledges through port 0x20. The BIOS's INT 9 feeds the INT 16h queue, and INT 16h waits
+  for a key still to come. The DOS sample gains `wait_keys` and a keyboard handler.
 - `tools/triage/exportcov.py`: how much code a Ghidra export covers, its largest gaps, and the
   likely starts of the functions it missed (call targets, starts after a return or padding),
   written for the batch decompile.

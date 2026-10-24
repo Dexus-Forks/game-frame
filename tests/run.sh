@@ -487,6 +487,15 @@ import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu; from do
 e = DosEmu('$D/sample.exe'); env = DosEnv(e, root='$D'); env.keys = [0x1C0D]; k = e.call('GET_KEY')
 try: e.call('GET_KEY')
 except RuntimeError as x: print(hex(k), x)"
+expect "dos_env delivers scripted scan codes as IRQ 1 to the program's INT 9 handler (key table, EOI)" "1 2 0 5 39b9 2" "$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu; from dos_env import DosEnv
+e = DosEmu('$D/sample.exe'); env = DosEnv(e, root='$D'); env.key_script('2:39:3')
+e.call('WAIT_KEYS', 1); held = e.read((0x1008, 0x139), 1)[0]; at = env.irq0_count
+e.call('WAIT_KEYS', 2); print(held, at, e.read((0x1008, 0x139), 1)[0], env.irq0_count, e.read((0x1008, 0xB0), 2).hex(), env.irq1_count)"
+expect "dos_env's BIOS INT 9 feeds INT 16h from scan codes (extended keys too)" "0x1c0d 0x4800" "$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu; from dos_env import DosEnv
+e = DosEmu('$D/sample.exe'); env = DosEnv(e, root='$D'); env.press(0x1C, at=1); env.press(0xE048, at=1)
+print(hex(e.call('GET_KEY')), hex(e.call('GET_KEY')))"
 expect "dos_env's DPMI gives selectors at a base, and the constant selectors point at VGA" "a0000 b8123" "$PYTHON" -c "
 import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu; from dos_env import DosEnv
 e = DosEmu('$D/sample.exe'); env = DosEnv(e, root='$D'); s = e.new_selector(base=0xB8123)

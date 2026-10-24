@@ -231,7 +231,15 @@ emu.run_to('1000:ca59')                          # the next frame: carry on as i
   the program asked for, in order: compare it with DOSBox-X's file log.
 - The timer: IRQ 0 reaches the program's INT 8 handler at the rate it programs on the PIT,
   counted in instructions (`ips`, default 25 million per second), so frame-paced loops run.
-- Keys: `env.keys` (scan << 8 | ascii). A read with none queued stops the run and says so.
+- Keys for the BIOS: `env.keys` (scan << 8 | ascii). A read with none queued stops the run and
+  says so.
+- Keys for a game's own keyboard handler: `env.press(0x39, at=10, hold=3)` presses Space at tick
+  10 and releases it 3 ticks later. The make code, then the break code (`scan | 0x80`), sits on
+  port `0x60`, and IRQ 1 goes through the INT 9 vector the game installed. The next byte waits
+  for the handler's EOI to port `0x20`, as on real hardware. `env.key_script('10:39:3 12:e048')`
+  takes the same as text (an extended key such as Up gets its `E0` prefix). Time counts IRQ 0
+  deliveries; set `env.key_clock = lambda: frame` to count your script's frames instead. With no
+  handler installed, the BIOS's INT 9 puts the keys in `env.keys`, and INT 16h waits for them.
 - Each stop names what is missing (an interrupt, a DPMI call, an import): add it to dos_env,
   with a test against the sample. Things it needed for a real game: the NE header's own stack
   segment, a PSP with an environment, the BIOS data area (CRT port, mode, columns), a BIOS
