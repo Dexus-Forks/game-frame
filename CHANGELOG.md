@@ -9,6 +9,13 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `tools/triage/buildid.py`: everything a copy says about its own version (the disc's mastering
+  date, link dates, VERSIONINFO, version strings, readme and setup lines), written into the
+  project's `docs/versions.md`. `re-inventory`, `re-start` and the versions guide check on day one
+  whether the copy is the latest official build, and where to search for later official
+  releases; the template has a "Build identity" and an "Is this the latest official version?"
+  section.
+
 - Versions and their deltas: [the versions guide](docs/working/versions.md) now starts with
   finding every edition, takes the last version released as the default reference, and has the
   steps for moving to a newer edition mid-project. A project template, `docs/versions.md`,

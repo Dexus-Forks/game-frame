@@ -15,6 +15,23 @@ the game's own readme and manual, the publisher's old web pages, archive sites, 
 discs, store pages and fan sites, and note each edition's date. A month of work on one edition
 can be checked again on a newer one, but a newer edition found late costs that month again.
 
+Start with this copy's own identity, then look for anything later:
+
+```bash
+.venv/bin/python tools/triage/buildid.py target/GAME --name "This copy" --write docs/versions.md
+```
+
+`buildid.py` reads the disc's mastering date, each executable's link date and VERSIONINFO,
+version strings in the code, and the version lines of the readme and setup files. Compare that
+with the official releases you find: the publisher's or developer's own editions, patches and
+updates, regional and language releases, re-releases, and digital re-releases. Good sources are
+MobyGames' release and patch lists, PCGamingWiki's "Essential improvements", "Patches" and
+"Availability" sections, the publisher's and developer's old sites and FTP patch pages through
+the Wayback Machine, archive.org items, the GOG and Steam pages, and magazine cover-disc
+listings. Fan patches, cracks and mods are context, recorded apart, and never the reference.
+Record each source with its URL and the date you checked it, and ask the user before
+downloading anything.
+
 Record what you find in `docs/versions.md` (the project template has the table): each edition
 with its source and checksums, its languages, content and builds, the data and code deltas
 between editions, the extras, and which edition is the reference.

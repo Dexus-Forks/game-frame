@@ -694,6 +694,7 @@ expect "extract-installer hands a CUE sheet to discinfo" "CD image -> discinfo" 
   && ok "discinfo copies the files and writes the audio track as WAV" || bad "discinfo --extract --audio"
 "$PYTHON" tools/disc/discinfo.py "$W/test.cue" --iso "$W/cut.iso" >/dev/null
 expect "versiondiff reads a disc image in place and finds no change against its own extracted files" "0 removed, 0 changed" "$PYTHON" tools/triage/versiondiff.py "$W/test.cue" "$W/x"
+expect "buildid reads a disc image's volume label and mastering date" "Disc: volume TESTDISC; created 1995-11-03 14:30:00 UTC+01:00" "$PYTHON" tools/triage/buildid.py "$W/test.cue"
 expect "discinfo --iso cuts the data track of a BIN/CUE into an ISO that reads the same" "Secret Data.dat" "$PYTHON" tools/disc/discinfo.py "$W/cut.iso" --files
 [[ $(( $(wc -c < "$W/cut.iso") % 2048 )) == 0 ]] && ok "the cut ISO holds whole 2048-byte sectors" || bad "discinfo --iso sector size"
 expect "filetypes names a PE executable" "executable (PE, Windows)" "$PYTHON" tools/triage/filetypes.py $B/game.exe
@@ -780,6 +781,19 @@ if zig cc -target x86_64-windows-gnu "$W/m.c" tests/fixtures/resources.rc -o "$W
   expect "peres reads the version information" "OriginalFilename         SAMPLE.EXE" "$PYTHON" tools/pe/peres.py "$W/res.exe"
   expect "peres reads a string table" "17  'Insert disc 2'" "$PYTHON" tools/pe/peres.py "$W/res.exe" --strings
 else bad "peres: zig could not compile tests/fixtures/resources.rc"; fi
+mkdir -p "$W/copy"; printf 'const char *banner = "Sample Game Version 2.8";\nint main(void){return banner[0] == 0;}\n' > "$W/bm.c"
+if zig cc -target x86-windows-gnu "$W/bm.c" tests/fixtures/resources.rc -o "$W/copy/GAME.EXE" >/dev/null 2>&1; then
+  printf 'Sample Game\r\n\r\nVersion 2.8 (September 29th, 1997)\r\nThanks for playing.\r\n' > "$W/copy/README.TXT"
+  out="$("$PYTHON" tools/triage/buildid.py "$W/copy" --name Gold)"
+  [[ "$out" == *"ProductVersion 2.8; FileVersion (fixed) 1.2.3.4; CompanyName GameFrame Samples"* && "$out" == *'"Sample Game Version 2.8"'* \
+     && "$out" == *'`README.TXT`: "Version 2.8 (September 29th, 1997)"'* && "$out" == *"Executables linked 20"* && "$out" != *"Thanks for playing"* ]] \
+    && ok "buildid reads VERSIONINFO, the link date, version strings and the readme's version line" || bad "buildid" "$out"
+  printf '# Versions\n\n## Build identity\n\n## The reference\n\nFirst edition.\n' > "$W/versions.md"
+  "$PYTHON" tools/triage/buildid.py "$W/copy" --name Gold --write "$W/versions.md" >/dev/null
+  "$PYTHON" tools/triage/buildid.py "$W/copy" --name Gold --write "$W/versions.md" >/dev/null
+  [[ $(grep -c '^<!-- buildid Gold -->' "$W/versions.md") == 1 && "$(sed -n '/## Build identity/,/## The reference/p' "$W/versions.md")" == *"### Gold"* ]] \
+    && ok "buildid writes its block under Build identity in docs/versions.md, and replaces it on a second run" || bad "buildid --write" "$(cat "$W/versions.md")"
+else bad "buildid: zig could not compile the sample"; fi
 if zig cc -target x86-windows-gnu -O1 -fno-sanitize=undefined tests/fixtures/stackstring.c -o "$W/ss.exe" >/dev/null 2>&1; then
   expect "stackstrings finds text built on the stack" "'SAVE'" "$PYTHON" tools/pe/stackstrings.py "$W/ss.exe"
 else bad "stackstrings: zig could not compile tests/fixtures/stackstring.c"; fi
