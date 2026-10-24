@@ -365,6 +365,26 @@ impl Walk<'_> {
     }
 }
 
+/// A spot light's factor at the cosine `c` of the angle off its axis, as PowerVR's driver
+/// works it (SGLMID4.dll: `FUN_10035360` stores `k = log2(concentration)`, the light loop of
+/// `FUN_1001c170` takes `(1 - min((1 - c) k, 1))^2`; concentration 1 gives `c`, 0 no spot).
+/// POD's lamps have concentration 32: `k` = 5, so the light reaches 37 degrees off the axis
+/// (*observed*).
+fn spot(concentration: i32, c: f32) -> f32 {
+    match concentration {
+        i32::MIN..=0 => 1.0,
+        1 => c.max(0.0),
+        n => {
+            if c <= 0.0 {
+                return 0.0;
+            }
+            let k = (n as f32).log2();
+            let f = 1.0 - ((1.0 - c.min(1.0)) * k).min(1.0);
+            f * f
+        }
+    }
+}
+
 /// The colour at a vertex: what the texture multiplies and what is added after it.
 fn light(mat: &Material, textured: bool, ambient: Colour, lights: &[PlacedLight], p: V3, n: V3) -> (Colour, Colour) {
     let mut diffuse = [0.0f32; 3];
@@ -375,7 +395,7 @@ fn light(mat: &Material, textured: bool, ambient: Colour, lights: &[PlacedLight]
         // Deviation: faces are lit from both sides (SGL meshes are not culled by default, and
         // which side a face's normal points to is the game's choice).
         let c = dot(n, to).abs();
-        let spot = if concentration > 0 { dot(l.dir, [-to[0], -to[1], -to[2]]).max(0.0).powi(concentration) } else { 1.0 };
+        let spot = spot(concentration, dot(l.dir, [-to[0], -to[1], -to[2]]));
         for k in 0..3 {
             diffuse[k] += l.colour[k] * c * spot;
         }
@@ -458,6 +478,15 @@ mod tests {
         s.add_face(&[0, 1, 2, 3]);
         let b = &view(&s, cam as u32).unwrap().batches[0];
         assert!(b.verts[0].modulate[0] > 0.8, "lit: {:?}", b.verts[0].modulate);
+    }
+
+    #[test]
+    fn spot_as_the_driver() {
+        assert_eq!(spot(0, -1.0), 1.0, "no spot");
+        assert_eq!(spot(32, 1.0), 1.0, "on the axis");
+        let c = 30f32.to_radians().cos();
+        assert!((spot(32, c) - (1.0 - (1.0 - c) * 5.0).powi(2)).abs() < 1e-6);
+        assert_eq!(spot(32, 36f32.to_radians().cos() - 0.05), 0.0, "past 37 degrees");
     }
 
     #[test]
