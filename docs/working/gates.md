@@ -1,9 +1,9 @@
 # Permissions and gates
 
 GameFrame and every project made with `scripts/new-project.sh` come with gates. A gate is a
-small check that runs before a commit, a push or a file write. It stops the few mistakes that
-cost the most: game material in git, decompiled code in tracked files, and commits by agents
-that should hand off instead. The gates run in git itself, so they protect people and every
+small check that runs before a commit, a push, a file write or a shell command. It stops the
+few mistakes that cost the most: game material in git, decompiled code in tracked files,
+commits by agents that should hand off instead, and deleting the user's copy of the game. The gates run in git itself, so they protect people and every
 agent. Each agent's own hooks add earlier checks, and permissions decide what runs without a
 prompt.
 
@@ -25,6 +25,23 @@ show the reason. In every other case the gate exits 0 and changes nothing.
 | Commit | Staged files in `target/`, `analysis/`, `derived/`, `game-data/` or `save-game/`. Staged game binaries and data files (`.exe`, `.dll`, `.ovl`, `.pkg`, `.sav`, `.wad`, `.pak`, ROM images and others). Added lines that look like Ghidra's decompiled code. A commit made by a GameFrame agent other than `re-lander`. |
 | Push | A push made by a GameFrame agent other than `re-lander`. |
 | Write | Writing two or more lines of decompiled code into a file outside `analysis/`, `derived/` and `target/`. |
+| Delete | A shell command that would delete or move a project's game folder, `target/`: `rm`, `trash`, `mv` of it or into the Trash, `find -delete`, `git clean -x`, `cargo clean` into `target/`, build-folder cleaners (`kondo`, `cargo sweep`, `npkill`) and scripts that call `rmtree` or `send2trash` on it. A command that starts with `GAMEFRAME_DELETE_GAME=1` passes. |
+
+### The game folder
+
+A project's `target/` holds the user's own copy of the game: disc images, the installed files
+and saves. Git ignores it, so no commit keeps a copy. Cargo's build output has the same default
+name, and a project with a Rust port has a `Cargo.toml` beside it, so cleaners and agents take
+it for build output. The project's `.cargo/config.toml` sends Cargo to `build/` instead.
+
+`scripts/hooks/gates/game_folder.py` decides which folders are game folders. A folder named
+`target` is one when it holds `GAME-FILES-NOT-BUILD-OUTPUT.txt`, when the folder above sets
+another `target-dir` in `.cargo/config.toml`, or when the folder above names GameFrame in its
+`AGENTS.md`. The delete gate (`scripts/hooks/gates/deletes.py`) blocks a command that would
+remove one, or a folder that holds one. Renaming a project folder passes. When the user wants
+the game folder gone, the command starts with `GAMEFRAME_DELETE_GAME=1`, or the user runs it
+themselves. `./gameframe doctor` reports a missing or empty game folder. See
+[the know-how entry](../knowhow/game-folder-deleted-as-build-output.md) for what happened.
 
 ### What counts as decompiled code
 

@@ -1,7 +1,8 @@
 """Turn one agent's pre-tool hook event into Check records for checks.reason().
 
 Each adapter takes the event (the JSON the agent writes on the hook's stdin) and returns a list
-of Check records, empty when the tool call is none of a commit, a push or a file write. The
+of Check records, empty when the tool call is none of a commit, a push, a file write or a shell
+command that may delete files (the delete gate, deletes.py). The
 field names follow each agent's own documentation, as of October 2026:
 
 - Claude Code (PreToolUse): tool_input.command for Bash, checked for the gate's git verb because
@@ -24,6 +25,7 @@ import json
 import os
 
 from checks import Check, agent_name, command_agent, env_agent, git_verbs
+from deletes import MAY_DELETE
 
 AGENTS = ('claude', 'codex', 'gemini', 'cursor', 'copilot')
 
@@ -34,14 +36,20 @@ def _cwd(event):
 
 
 def shell(command, cwd, agent=None):
-    """Commit and push checks for one shell command."""
+    """Commit, push and delete checks for one shell command."""
     who = agent or env_agent() or command_agent(command)
-    return [Check(v, cwd, who, command=command) for v in git_verbs(command)]
+    found = [Check(v, cwd, who, command=command) for v in git_verbs(command)]
+    if MAY_DELETE.search(command or ''):
+        found.append(Check('delete', cwd, who, command=command))
+    return found
 
 
 def claude(event, mode):
-    """mode is the gate the hook was wired to: commit, push or write."""
+    """mode is the gate the hook was wired to: commit, push, write or delete."""
     tool, cwd = event.get('tool_input') or {}, _cwd(event)
+    if mode == 'delete':
+        command = tool.get('command', '')
+        return [Check('delete', cwd, command=command)] if MAY_DELETE.search(command) else []
     if mode == 'write':
         return [Check('write', cwd, path=tool.get('file_path', ''),
                       text=tool.get('content') or tool.get('new_string') or '')]

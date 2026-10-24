@@ -4,7 +4,7 @@
     "beforeShellExecution": [
       {
         "command": "python3 scripts/hooks/gate.py cursor",
-        "matcher": "git",
+        "matcher": "git|rm|mv|find|cargo|trash|unlink|kondo|npkill|clean|rmtree|Trash",
         "timeout": 30
       }
     ],
