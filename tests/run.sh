@@ -397,7 +397,7 @@ site = [i.address for i in capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32
 print(e.call(r, args=[21, 4], until=site)['stack'][2:4])
 PY
 out="$("$PYTHON" - <<'PY' 2>&1
-import capstone, pefile, subprocess, sys, tempfile
+import capstone, os, pefile, subprocess, sys, tempfile
 D = 'examples/sample-game/build/mixer32.dll'
 p = pefile.PE(D); base = p.OPTIONAL_HEADER.ImageBase
 md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
@@ -424,9 +424,21 @@ starts = open(t.name + '.starts').read().split()
 print(r.stdout)
 assert hex(missing) in starts, (hex(missing), starts)
 print('the function left out of functions.tsv is found as a gap and a likely start')
+# bodies.tsv beside functions.tsv: a function's second piece is counted where it lies.
+miss = [r_ for r_ in rows if r_[2] == 'reset_order'][0]
+d = tempfile.mkdtemp()
+fn, bd = os.path.join(d, 'functions.tsv'), os.path.join(d, 'bodies.tsv')
+open(fn, 'w').write(''.join(f'{s:x}\t{n}\t{name}\t\n' for s, n, name in keep))
+open(bd, 'w').write(''.join(f'{s:08x}\t{s + n:08x}\t{s:08x}\n' for s, n, name in keep)
+                    + f'{miss[0]:08x}\t{miss[0] + miss[1]:08x}\t{keep[0][0]:08x}\n')
+r = subprocess.run([sys.executable, 'tools/triage/exportcov.py', D, fn, '--min', '0', '--starts', fn + '.starts'],
+                   capture_output=True, text=True)
+assert 'bodies.tsv' in r.stdout, r.stdout
+assert hex(miss[0]) not in open(fn + '.starts').read().split(), r.stdout
+print('a piece listed in bodies.tsv is covered, not a gap')
 PY
 )"
-[[ $? == 0 ]] && ok "exportcov measures an export's coverage and finds a function left out of it" || bad "exportcov" "$out"
+[[ $? == 0 ]] && ok "exportcov measures an export's coverage, finds a function left out of it, and reads bodies.tsv" || bad "exportcov" "$out"
 
 echo "Ground truth and the port"
 "$PYTHON" $S/ground_truth.py $B/truth >/dev/null && "$PYTHON" $S/port.py $B/port >/dev/null \

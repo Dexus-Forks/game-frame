@@ -1,6 +1,8 @@
 // Export everything an agent needs to read a binary as text, after Ghidra's auto-analysis:
 //   OUT/<program>/decomp.c      every function's pseudocode, each headed "// ==== <addr> <name>"
 //   OUT/<program>/functions.tsv address, size in bytes, name, "thunk" for thunks
+//   OUT/<program>/bodies.tsv    each piece of each function: start, end (exclusive), entry point;
+//                               a function's body can be several pieces apart
 //   OUT/<program>/strings.txt   address and value of every defined string
 //   OUT/<program>/imports.txt   library!function for every import
 //   OUT/<program>/exports.txt   address and name of every exported entry point
@@ -29,10 +31,14 @@ public class ExportAll extends GhidraScript {
       while (it.hasNext()) { Data x = it.next(); if (x.hasStringValue()) w.println(x.getAddress() + "\t" + String.valueOf(x.getValue()).replace("\n","\\n")); }
     }
     DecompInterface di = new DecompInterface(); di.openProgram(currentProgram);
-    try (PrintWriter f = new PrintWriter(new File(d, "functions.tsv")); PrintWriter c = new PrintWriter(new File(d, "decomp.c"))) {
+    try (PrintWriter f = new PrintWriter(new File(d, "functions.tsv")); PrintWriter c = new PrintWriter(new File(d, "decomp.c"));
+         PrintWriter b = new PrintWriter(new File(d, "bodies.tsv"))) {
       for (Function fn : currentProgram.getFunctionManager().getFunctions(true)) {
         if (monitor.isCancelled()) break;
         f.println(fn.getEntryPoint() + "\t" + fn.getBody().getNumAddresses() + "\t" + fn.getName(true) + "\t" + (fn.isThunk()?"thunk":""));
+        if (!fn.isExternal())
+          for (ghidra.program.model.address.AddressRange ar : fn.getBody())
+            b.println(ar.getMinAddress() + "\t" + ar.getMaxAddress().add(1) + "\t" + fn.getEntryPoint());
         if (fn.isThunk() || fn.isExternal()) continue;
         DecompileResults r = di.decompileFunction(fn, 60, monitor);
         c.println("// ==== " + fn.getEntryPoint() + " " + fn.getName(true));
