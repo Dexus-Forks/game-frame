@@ -1,0 +1,6 @@
+[package]
+name = "shim"
+description = "What every replacement DLL shares: settings, Windows 95 port I/O emulated, in-memory patches from a file, and a log"
+edition.workspace = true
+license.workspace = true
+version.workspace = true

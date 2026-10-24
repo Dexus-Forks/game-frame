@@ -32,8 +32,9 @@ a modern machine. GameFrame's [know-how](../knowhow/README.md) began here.
   ([the open fault](../knowhow/wine-wow64-rosetta-fault.md)). The project then moved to an
   emulated x86-64 PC with QEMU, Debian and Wine 10, which runs every build
   ([the emulated-PC route](../knowhow/context-emulated-pc.md)).
-- **The card builds:** replacement libraries for Glide 2, ATI3DCIF, the S3D Toolkit and
-  DirectDraw let the unchanged 3dfx, ATI and S3 builds run in the emulated PC. The Glide build
+- **The card builds:** replacement libraries for Glide 2, ATI3DCIF, the S3D Toolkit, PowerVR
+  SGL and DirectDraw let the unchanged 3dfx, ATI, S3 and PowerVR builds run in the emulated PC.
+  They now live in GameFrame's [wrappers/](../../wrappers/README.md). The Glide build
   draws at any resolution. The ATI and S3 builds turned out to give their chips only part of
   the frame ([3D-card builds](../knowhow/context-3d-card-builds.md)).
 - **Mods:** the game opens each data file under its install folder before the CD, so a changed
@@ -66,6 +67,9 @@ a modern machine. GameFrame's [know-how](../knowhow/README.md) began here.
   [writers, editors and mods](../working/mods.md), and more tools: `exportcov`, `memlog`,
   `emulock`, `loopcut`, `derived`, `zcc.sh`, `validate.py --write`, and `pe32_emu`'s control
   word, layout helpers and stop at a call.
+- The replacement libraries themselves, in [wrappers/](../../wrappers/README.md): Glide 2,
+  DirectDraw, ATI3DCIF, the S3D Toolkit and SGL's scene graph, made game-agnostic (POD's
+  window class, marker colour and code patches became settings).
 - Two crates, `gameframe-mmx` and `gameframe-gpu-1997`, and the guides on
   [MMX code](../hardware/simd.md) and [the card makers' 3D APIs](../hardware/card-apis.md).
 - Fixes: PE sections with a VirtualSize of 0, and `peinfo --imports`.

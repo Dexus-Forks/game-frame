@@ -1,0 +1,20 @@
+# Replacement libraries for the PC 3D cards of 1997 and for DirectDraw: one DLL per library a
+# game imports, and the pieces they share. Built for 32-bit Windows (.cargo/config.toml);
+# `raster`, `scalers`, `pixels`, `shim`'s settings and `sgl`'s scene graph are tested on the
+# host. See README.md.
+[workspace]
+resolver = "3"
+members = ["glide", "shim", "ati3dcif", "s3dtkw", "ddraw", "raster", "scalers", "sgl", "pixels"]
+
+[workspace.package]
+edition = "2024"
+license = "Apache-2.0"
+version = "0.1.0"
+repository = "https://github.com/tanepiper/game-frame"
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+opt-level = 3

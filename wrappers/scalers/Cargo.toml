@@ -1,0 +1,6 @@
+[package]
+name = "scalers"
+description = "Pixel-art scalers for a finished low-resolution frame: integer nearest, Scale2x (EPX) and a CRT-style look"
+edition.workspace = true
+license.workspace = true
+version.workspace = true

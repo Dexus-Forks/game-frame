@@ -1,0 +1,11 @@
+# 32-bit Windows, linked by zig through GameFrame's scripts/zcc.sh: no MinGW toolchain needed.
+# zcc finds each DLL's .def file (glide/glide2x.def, sgl/sgl.def) under ZCC_DEF_DIR, so each
+# DLL exports exactly the names a game imports.
+[build]
+target = "i686-pc-windows-gnu"
+
+[target.i686-pc-windows-gnu]
+linker = "../scripts/zcc.sh"
+
+[env]
+ZCC_DEF_DIR = { value = ".", relative = true }

@@ -13,3 +13,5 @@ __pycache__/
 /site/.vitepress/cache/
 # The crates workspace build output
 /crates/target/
+/wrappers/target/
+/wrappers/Cargo.lock

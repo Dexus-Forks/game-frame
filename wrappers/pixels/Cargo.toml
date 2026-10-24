@@ -1,0 +1,6 @@
+[package]
+name = "pixels"
+description = "Pixel formats of 1990s PC games: RGB555, RGB565, 8-bit palettes, BGRA, Windows DIB"
+edition.workspace = true
+license.workspace = true
+version.workspace = true

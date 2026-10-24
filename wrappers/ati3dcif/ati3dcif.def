@@ -1,0 +1,8 @@
+LIBRARY ati3dcif.dll
+EXPORTS
+_ATI3DCIF_Init@0=ATI3DCIF_Init@0
+_ATI3DCIF_ContextCreate@0=ATI3DCIF_ContextCreate@0
+_ATI3DCIF_ContextSetState@12=ATI3DCIF_ContextSetState@12
+_ATI3DCIF_RenderBegin@4=ATI3DCIF_RenderBegin@4
+_ATI3DCIF_RenderEnd@0=ATI3DCIF_RenderEnd@0
+_ATI3DCIF_RenderPrimList@8=ATI3DCIF_RenderPrimList@8

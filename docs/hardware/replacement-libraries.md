@@ -5,8 +5,44 @@ card's own API (Glide, ATI3DCIF, the S3D Toolkit), an old DirectDraw that grants
 mode, or a CPU that allows port I/O. A replacement library with the original's file name and
 exports runs the unchanged game. It can also draw at a higher resolution, log every call, or
 serve as the first piece of a port. This page covers how to write one. The method comes from the
-POD: Planet of Death project. Its unchanged 3dfx, ATI and S3 builds run through replacements
-written this way ([case study](../case-studies/pod.md)).
+POD: Planet of Death project. Its unchanged 3dfx, ATI, S3 and PowerVR builds run through
+replacements written this way ([case study](../case-studies/pod.md)).
+
+## Use the shared libraries first
+
+GameFrame's [wrappers/](../../wrappers/README.md) workspace holds the libraries POD's builds
+run through. Try them before you write your own.
+
+| DLL | Stands in for |
+|---|---|
+| `glide2x.dll` | 3dfx Glide 2.x. It draws with OpenGL at any resolution. Copy it as `glide.dll` for an early Glide 2 game |
+| `ddraw.dll` | DirectDraw. It keeps every surface in memory, grants any mode and shows the frame scaled |
+| `ati3dcif.dll` | ATI 3D Rage (ATI3DCIF). It draws the chip's faces in software into the game's surface |
+| `s3dtkw.dll` | S3 ViRGE (S3D Toolkit). The same |
+| `sgl.dll` | PowerVR SGL's scene-graph half. It keeps the scene graph and draws it with OpenGL |
+
+1. Build them: `cd wrappers && cargo build --release`. This needs the Rust target
+   `i686-pc-windows-gnu` and zig. The DLLs land in `wrappers/target/i686-pc-windows-gnu/release/`.
+2. Compare the game's imports with the DLL's exports. `./gameframe run peinfo GAME.EXE
+   --imports` lists the game's. Each DLL's `.def` file lists its own. A game that loads its
+   card library at run time names it only in its strings.
+3. Copy the DLL next to the game's EXE, under the file name the game asks for.
+4. Under Wine, tell Wine to load the copy: `WINEDLLOVERRIDES="ddraw=n,b;sgl=n;glide=n"`.
+5. Set the game's window class in `WRAPPER_WINDOW_CLASS`, so that `glide` and `sgl` draw into
+   the game's own window. The class name is in the game's `RegisterClassA` call. Without the
+   variable they take the first visible window of the process.
+6. Set the other variables as each library's README says: the output size (`GLIDE_SCALE`,
+   `SGL_SCALE`, `DDRAW_SCALE`), the marker colour (`WRAPPER_MARKER`, when the game draws
+   RGB565 `0x0821` itself) and the log files.
+7. If the game must be patched in memory (a CPU check that quits on today's CPUs), write the
+   patches into a file in your project and name it in `WRAPPER_PATCHES`
+   ([shim](../../wrappers/shim/README.md)). The EXE on disk stays unchanged.
+8. Read the logs. Each DLL logs every call it does not handle, once. Add the missing calls to
+   `wrappers/` with a test, so the next game finds them there.
+
+The libraries cover the calls POD makes. SGL's immediate-mode half (`sgltri_*`) is still open
+([GAPS.md](../../GAPS.md)). The rest of this page covers how to write a library that is not
+there yet.
 
 ## Start with a probe
 
@@ -62,8 +98,11 @@ _grSstOpen@24=grSstOpen@24
 ```
 
 ```bash
-ZCC_DEF_DIR=wrapper/glide cargo build --release --target i686-pc-windows-gnu
+ZCC_DEF_DIR=mywrapper/glide cargo build --release --target i686-pc-windows-gnu
 ```
+
+In a workspace with one `.def` in each crate, set `ZCC_DEF_DIR` to the workspace. zcc then
+finds `ZCC_DEF_DIR/*/NAME.def`, as `wrappers/.cargo/config.toml` does.
 
 Use `panic = "abort"` in the profiles. Check the export table of the result (`peinfo --exports`)
 against the game's imports. Then call a simple export under `pe32_emu` before the first run in

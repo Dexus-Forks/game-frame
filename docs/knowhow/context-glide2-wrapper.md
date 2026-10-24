@@ -23,7 +23,7 @@ seen: ['POD: Planet of Death (1997), 2026-10-23']
 
 A game that draws everything through Glide can be drawn at any resolution by replacing the
 library: the game passes screen coordinates, colours and texture memory, and nothing else
-depends on the Voodoo's 640 × 480. POD's 3dfx build runs unchanged through `wrapper/glide`
+depends on the Voodoo's 640 × 480. POD's 3dfx build runs unchanged through GameFrame's `wrappers/glide`
 (Rust, built for 32-bit Windows, OpenGL). What mattered, each *observed* or *measured* there:
 
 - **The file and the names.** Early Glide 2 games import `glide.dll`, not `glide2x.dll`, by

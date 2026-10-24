@@ -9,6 +9,14 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `wrappers/`, a Cargo workspace of replacement libraries for the 3D cards of 1997, moved from
+  the POD project: `glide2x.dll` (Glide 2.x on OpenGL), `ddraw.dll` (DirectDraw in memory,
+  scaled), `ati3dcif.dll` and `s3dtkw.dll` (the chips' faces drawn in software), and `sgl.dll`
+  (PowerVR SGL's scene-graph half on OpenGL). The shared crates are `shim`, `raster`,
+  `scalers` and `pixels`. The game-specific parts became settings: `WRAPPER_WINDOW_CLASS`,
+  `WRAPPER_MARKER` and a patch file named by `WRAPPER_PATCHES`. `tests/run.sh` runs the host
+  tests, builds the DLLs, checks their export tables against the `.def` files and builds
+  `sgltest.c`.
 - Thirty-seven know-how entries: thirteen from POD (POD Gold, the PowerVR build, the emulated
   PC, ptrace under Wine, the FPU control word in the game's own thread and more) and
   twenty-four from Hardwar, among them running the original on a whole-process snapshot,
@@ -17,6 +25,9 @@ Every release of GameFrame, newest first. The format follows
 
 ### Changed
 
+- `scripts/zcc.sh` also finds a DLL's `.def` file one folder down, in `ZCC_DEF_DIR/*/NAME.def`,
+  for a workspace with one `.def` in each crate.
+- The replacement-libraries guide points at `wrappers/` and says how a game uses them.
 - Three know-how entries take POD's newer findings: the game races with the x87 word 0x027f,
   and CD audio and PulseAudio in the emulated PC.
 - `re-randomiser` lists chance taken from the frame clock; the recording guide records the

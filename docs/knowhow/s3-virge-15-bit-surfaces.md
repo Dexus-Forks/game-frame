@@ -39,5 +39,5 @@ A probe `S3DTKW.dll` dumping the `S3DTK_SURFACE` set as `S3DTK_DRAWSURFACE`:
 
 Draw the chip's pixels in the format the game names (`sfFormat`), and make the DirectDraw
 surfaces report the same masks (`0x7c00`, `0x3e0`, `0x1f`). POD's software renderer reads the
-surface's pixel format and follows it, so both halves agree (`wrapper/ddraw`:
+surface's pixel format and follows it, so both halves agree (`wrappers/ddraw`:
 `DDRAW_PIXELS=555`).
