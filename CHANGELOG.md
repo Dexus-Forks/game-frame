@@ -12,8 +12,8 @@ Every release of GameFrame, newest first. The format follows
 GameFrame 1.1.0 brings the lessons of POD, Hardwar and Tyrian into the framework: a know-how
 layer of failure modes and context with a hook for every agent, tools for 32-bit and 1990s games
 (a 32-bit emulator, Watcom register arguments, export gaps, card-library probes, recordings and
-replays), guides for MMX, 3D cards, versions and the story, a website for each project, and one
-GameFrame checkout per machine.
+replays), tools that spend a plan's monthly API credits, guides for MMX, 3D cards, versions and
+the story, a website for each project, and one GameFrame checkout per machine.
 
 ### Added
 
