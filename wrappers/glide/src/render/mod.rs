@@ -104,6 +104,10 @@ impl Renderer {
             let mut ids = [0u32; 2];
             (gl.GenBuffers)(1, &mut ids[0]);
             (gl.GenTextures)(1, &mut ids[1]);
+            // A core context draws nothing without a vertex array object bound.
+            if crate::window::CORE.load(std::sync::atomic::Ordering::Relaxed) {
+                crate::gl::bind_vertex_array();
+            }
             (gl.Enable)(DEPTH_CLAMP);
             (gl.Disable)(CULL_FACE);
             self.gpu = Some(Gpu { gl, programs, dc, hwnd, frame, vbo: ids[0], lfb_tex: ids[1], lfb_size: (0, 0) });
@@ -131,7 +135,8 @@ impl Renderer {
                 (gl.VertexAttribPointer)(i as u32, size, FLOAT, 0, stride, (off * 4) as *const _);
             }
             let scale = (g.frame.ow as f32 / g.frame.w as f32).max(1.0);
-            if self.prim == LINES {
+            // A core context takes no width above 1.
+            if self.prim == LINES && !crate::window::CORE.load(std::sync::atomic::Ordering::Relaxed) {
                 (gl.LineWidth)(scale);
             }
             if self.prim == POINTS {

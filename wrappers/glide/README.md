@@ -30,6 +30,9 @@ libgl1-mesa-dri:i386`).
 | `WRAPPER_WINDOW_CLASS` | The game's window class (`../README.md`). POD's is `Fenetre Pod` | the first visible window |
 | `WRAPPER_MARKER` | The marker colour of the 2D frame buffer (below) | `0x0821` |
 
+On macOS, Wine gives OpenGL 2.1, so the library asks for a 3.2 core context there and
+compiles its shaders as GLSL 1.50. Lines are then one output pixel wide.
+
 Speed in an emulated PC (*measured* in POD, the library logs frames per second): POD's menus
 ran at about 5 frames a second at 1×, 2 at 2× and 0.4 at 4×, with Mesa's llvmpipe on an
 emulated CPU. `LP_NATIVE_VECTOR_WIDTH=128` made llvmpipe faster under QEMU.
