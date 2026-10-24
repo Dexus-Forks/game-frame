@@ -46,9 +46,18 @@ there:
   mesh's faces; made elsewhere they are entries of the current list. Lists made with
   `preserve_state` give the transform, material and lights back when they end.
 - **Names.** Calls with `generate_name` false return 0 (`sgl_no_err`), not a name.
+- **The immediate mode.** SGL's other half (`sgltri_*`) takes faces already projected to the
+  screen, in Direct3D's `D3DTLVERTEX` layout (`SGLVERTEX`), under an `SGLCONTEXT` of 0x90
+  bytes. Hardwar (1998) uses it. Draw the faces through the same pipeline. A vertex at screen
+  `(x, y)` with `1/w` becomes the camera-space point `(x w, -y w, w)` under a camera that maps
+  it straight back, with the nearest `w` as the near plane. PowerVR's own SGLMID4.dll answers
+  what the header leaves open. A face clockwise on the screen faces the camera. Faces of less
+  than 1/32 pixel are dropped. Flat shading takes the first vertex's colour. The fog density
+  (0 to 31) is a power-of-two register.
 - **A test without the game.** A small Windows program that makes the same calls on a known
   scene (a textured cube under a 2D bar) checks the projection, lighting, textures and the
-  overlay where the game itself cannot run (`wrappers/sgl/test/sgltest.c`).
+  overlay where the game itself cannot run (`wrappers/sgl/test/sgltest.c`, and `sgltritest.c` for
+  the immediate mode).
 
 ## Still guesses
 

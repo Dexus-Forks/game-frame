@@ -6,6 +6,7 @@
 //!
 //! - `graph`: the objects and the editing state (`Scene`), one method per SGL call.
 //! - `walk`: the traversal, from the root list to triangles in camera space.
+//! - `tri`: immediate mode (`sgltri_*`), faces already on the screen, as batches like `walk`'s.
 //! - `convex`: a convex object's solid from its planes (light volumes).
 //! - `math`: affine matrices.
 //! - `dump`: the graph as text, for debugging.
@@ -14,6 +15,7 @@ pub mod convex;
 pub mod dump;
 pub mod graph;
 pub mod math;
+pub mod tri;
 pub mod walk;
 
 pub use graph::Scene;

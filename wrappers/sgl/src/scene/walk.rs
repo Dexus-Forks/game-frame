@@ -78,6 +78,8 @@ pub struct Batch {
     pub pass: u32,
     pub translucent: bool,
     pub fog: bool,
+    /// Drawn without the depth test (immediate mode's `SGLTT_DISABLEZBUFFER`).
+    pub no_depth: bool,
     pub verts: Vec<Vert>,
 }
 
@@ -292,7 +294,7 @@ impl Walk<'_> {
         let pass = if translucent { self.pass + 1 } else { 0 };
         let key = (tex, pass, translucent, fog);
         *self.index.entry(key).or_insert_with(|| {
-            self.batches.push(Batch { texture: tex, pass, translucent, fog, verts: Vec::new() });
+            self.batches.push(Batch { texture: tex, pass, translucent, fog, no_depth: false, verts: Vec::new() });
             self.batches.len() - 1
         })
     }

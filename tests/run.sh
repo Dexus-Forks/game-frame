@@ -1611,7 +1611,7 @@ if command -v cargo >/dev/null; then
     && ok "stubgen: each wrapper's .def and stubs match its API table, every call with the original's convention ($(echo "$out" | grep -o '[0-9]* of [0-9]*' | paste -sd, - | sed 's/,/, /g'))" \
     || bad "stubgen --check" "$out"
   out="$(cd wrappers && cargo test --release --target "$host" --target-dir "$WT" -p raster -p scalers -p pixels -p shim -p sgl -p maxi94 2>&1)"
-  [[ $? == 0 ]] && ok "the wrappers' host tests pass: rasteriser, scalers, pixels, settings, SGL scene graph, Maxi Sound 64 streams and mixer ($(echo "$out" | grep -o '[0-9]* passed' | awk '{s+=$1} END {print s}') tests)" \
+  [[ $? == 0 ]] && ok "the wrappers' host tests pass: rasteriser, scalers, pixels, settings, SGL scene graph and immediate mode, Maxi Sound 64 streams and mixer ($(echo "$out" | grep -o '[0-9]* passed' | awk '{s+=$1} END {print s}') tests)" \
     || bad "wrappers host tests" "$(echo "$out" | grep -E 'FAILED|panicked|error' | head -8)"
   if rustup target list --installed 2>/dev/null | grep -q i686-pc-windows-gnu && command -v zig >/dev/null; then
     out="$(cd wrappers && cargo build -q --release --target-dir "$WT" 2>&1)"
@@ -1637,6 +1637,8 @@ print(', '.join(out))"
       || bad "wrappers debug build" "$(echo "$out" | grep -E 'error' | head -8)"
     zig cc -target x86-windows-gnu -O2 wrappers/sgl/test/sgltest.c -o "$WT/sgltest.exe" -luser32 >/dev/null 2>&1 \
       && ok "sgltest.c, the SGL stand-in's test program, builds" || bad "sgltest.c does not build"
+    zig cc -target x86-windows-gnu -O2 wrappers/sgl/test/sgltritest.c -o "$WT/sgltritest.exe" -luser32 >/dev/null 2>&1 \
+      && ok "sgltritest.c, the test program for SGL's immediate mode, builds" || bad "sgltritest.c does not build"
   else
     echo "  skip  the wrapper DLLs (needs rustup target i686-pc-windows-gnu and zig)"
   fi

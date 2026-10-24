@@ -15,7 +15,7 @@ library, with pictures of POD's runs.
 | `ddraw.dll` | DirectDraw 1 to 3 | Every surface in memory, any mode granted, the frame shown scaled in a window | [ddraw](ddraw/README.md) |
 | `ati3dcif.dll` | ATI 3D Rage (ATI3DCIF) | The faces the game gives the chip, in software, into its DirectDraw surface | [ati3dcif](ati3dcif/README.md) |
 | `s3dtkw.dll` | S3 ViRGE (S3D Toolkit, `S3DTKW.dll`) | The same | [s3dtkw](s3dtkw/README.md) |
-| `sgl.dll` | PowerVR SGL, the scene-graph half | The game's scene graph, kept and drawn with OpenGL at any size; the 2D picture over it through `ddraw.dll` | [sgl](sgl/README.md) |
+| `sgl.dll` | PowerVR SGL, the scene graph and the immediate mode | The game's scene graph or its screen-space faces, drawn with OpenGL at any size; the 2D picture over it through `ddraw.dll` or SGL's own 2D callback | [sgl](sgl/README.md) |
 | `94DLL32.dll` (`maxi94`) | Guillemot Maxi Sound 64 (Dream SAM9407) | No picture: the card's wave streams are Wine's wave outputs, so the game's sound plays | [maxi94](maxi94/README.md) |
 
 The shared crates:
@@ -43,7 +43,7 @@ each library, one call at a time.
 | DLL | The original | Implemented | Exported |
 |---|---|---|---|
 | `glide2x.dll` | Glide 2.43 (`glide2x.dll`) and Glide 2.1.1 (`glide.dll`) | 55 | 156 |
-| `sgl.dll` | PowerVR driver 3.1.0's `sgl.dll`, `sgl_delete_all_textures` from a later SGL, and `sgl_wrapper_present` | 47 | 134 |
+| `sgl.dll` | PowerVR driver 3.1.0's `sgl.dll`, `sgl_delete_all_textures` from a later SGL, and `sgl_wrapper_present` | 61 | 134 |
 | `ati3dcif.dll` | ATI 3D Rage Pro SDK 4.1's `ATI3DCIF.LIB` | 6 | 17 |
 | `s3dtkw.dll` | S3's 1996 ViRGE driver's `S3DTKW.DLL` | 6 | 6 |
 | `ddraw.dll` | DirectX 5's `DDRAW.DLL`, the public calls, and DirectX 7's `DirectDrawCreateEx` and `DirectDrawEnumerateEx` | 2 | 9 |

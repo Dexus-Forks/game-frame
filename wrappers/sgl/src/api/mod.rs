@@ -1,6 +1,8 @@
-//! The 46 calls POD's `WPODPVR.EXE` imports from `sgl.dll`, under their own names (`__cdecl`, as
-//! sgl.h declares them; `sgl.def`). The rest of SGL's calls are stubs (`crate::stubs`). Each reads the game's pointers and edits the scene graph
-//! (`scene::Scene`); `sgl_render` hands a frame to `frame`.
+//! SGL's calls, under their own names (`__cdecl`, as sgl.h declares them; `sgl.def`): the 46
+//! that POD's `WPODPVR.EXE` imports, for the scene graph, and the immediate mode Hardwar
+//! uses. The rest of SGL's calls are stubs (`crate::stubs`). Each reads the game's pointers
+//! and edits the scene graph (`scene::Scene`) or the immediate-mode frame (`scene::tri`);
+//! `sgl_render` hands a frame to `frame`, `sgltri_render` to `immediate`.
 //!
 //! - `device`: devices, viewports, the address callback, `sgl_render`.
 //! - `list`: display lists and transforms.
@@ -8,17 +10,22 @@
 //! - `material`: the material calls, translucency and fog switches.
 //! - `light`: lights and cameras, fog and background.
 //! - `texture`: texture maps.
+//! - `tri`: the immediate mode (`sgltri_*`).
+//! - `info`: errors, versions, texture memory, the DirectDraw mode and the end-of-render callback.
 //!
 //! `SGL_TRACE=N` logs the first N calls of each function with their arguments (default 0).
 
 mod device;
+mod info;
 mod light;
 mod list;
 mod material;
 mod object;
 mod texture;
+mod tri;
 
 pub use device::{Viewport, install_ini};
+pub use info::record as error;
 
 use crate::scene::Scene;
 use crate::scene::math::V3;
@@ -34,13 +41,26 @@ pub struct Sgl {
     /// Maps `sgl_preprocess_texture` made, by the pixel pointer it wrote into the game's
     /// `sgl_intermediate_map`, until `sgl_create_texture` takes them.
     pub preprocessed: HashMap<usize, Box<[u8]>>,
+    /// The immediate-mode frame being built, the last one rendered, and how many were.
+    pub tri: crate::scene::tri::Frame,
+    pub last_tri: Option<crate::scene::walk::View>,
+    pub frames: u32,
 }
 
 static SGL: OnceLock<Mutex<Sgl>> = OnceLock::new();
 
 pub fn sgl() -> MutexGuard<'static, Sgl> {
     SGL.get_or_init(|| {
-        Mutex::new(Sgl { scene: Scene::new(), viewports: HashMap::new(), device: None, next_handle: 1, preprocessed: HashMap::new() })
+        Mutex::new(Sgl {
+            scene: Scene::new(),
+            viewports: HashMap::new(),
+            device: None,
+            next_handle: 1,
+            preprocessed: HashMap::new(),
+            tri: Default::default(),
+            last_tri: None,
+            frames: 0,
+        })
     })
     .lock()
     .unwrap_or_else(|e| e.into_inner())
