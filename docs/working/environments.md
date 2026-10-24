@@ -142,3 +142,16 @@ licence and the provider's terms allow it.
   `scripts/setup.sh --install` and registers REA again.
 - Report changes you had to make to GameFrame's own files upstream, so the next environment
   does not need them.
+
+## Back up a Codex Cloud environment
+
+The persistent Codex Cloud environment for this repository has a local backup. Its settings
+are listed in docs/working/codex-cloud-environment-settings.md, its install script is in
+scripts/codex-cloud-environment-install.sh, and its start instructions are in
+docs/working/codex-cloud-start-skill.txt. The files were copied from the published game-frame
+environment on 2026-10-25.
+
+Codex Cloud does not read these files automatically. When you change the environment's
+Install script or Start skill in Codex Settings, update the matching local file too. To restore
+the environment, paste the contents of each file into the corresponding setting. This backup
+is separate from generated files under .codex/.
