@@ -46,7 +46,12 @@ before each call. The pseudocode is a guide to the shape of the function only.
 ./gameframe run ghidra-run GAME.EXE disasm analysis/notes/lights.asm 0x44b9c8        # the whole function
 ./gameframe run ghidra-run GAME.EXE disasm analysis/notes/span.asm 0x44b9c8-0x44ba40 # a range, in order
 ./gameframe run refs GAME.EXE 0x535f43 --functions analysis/export/GAME.EXE/functions.tsv   # users of a string
+./gameframe run ghidra-run GAME.EXE callargs analysis/notes/srand.tsv regs=watcom srand  # every call's EAX, EDX, EBX, ECX
 ```
+
+`callargs regs=watcom` reads, for every call to a function, the constant each register gets
+before the call in the same block. It finds the seeds, ids and sizes a Watcom program passes
+in registers, which the pseudocode leaves out.
 
 Set the calling convention of the functions you trace to `__watcall` in Ghidra, or give them
 custom storage, and decompile again (`docs/working/ghidra.md`). Record the real arguments in

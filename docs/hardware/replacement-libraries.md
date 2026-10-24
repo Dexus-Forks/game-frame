@@ -27,6 +27,19 @@ surface layouts of two APIs this way.
 3. **Read each call's success value at its call site.** SDKs of the time are not consistent
    with themselves. The S3D Toolkit's `InitLib` returns 0 on success. Its `CreateRenderer` and
    every table function return 1 ([S3D Toolkit](../knowhow/s3dtk-error-setstate.md)).
+4. **Generate the first probe.** `tools/pe/probegen.py` writes one from the import table:
+
+   ```bash
+   ./gameframe run probegen target/GAME.EXE glide.dll derived/probe          # NAME.c, NAME.def, build.sh
+   ./gameframe run probegen target/GAME.EXE S3DTKW.DLL derived/probe --stdcall S3DTK_InitLib=0
+   sh derived/probe/build.sh                                               # zig cc: glide.dll
+   ```
+
+   It exports exactly the imported names, decorated ones included. Each call appends its name
+   and argument words to `probe-NAME.log` in the game's folder. A decorated name gives the
+   argument size. An undecorated `__stdcall` import needs `--stdcall NAME=BYTES`, or the
+   game's stack goes wrong after the call. Then add record dumps to the stubs that take
+   vertices or surfaces.
 
 ## Build it
 

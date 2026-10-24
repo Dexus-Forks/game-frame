@@ -111,25 +111,27 @@ proposed again.
 Proposed by the POD project (its `docs/gameframe-lessons.md`) and not yet in GameFrame. Each
 needs the test named there before it moves:
 
-- [ ] `ExportCallArgs` that knows Watcom's register order (EAX, EDX, EBX, ECX), so a constant
-  passed in a register is reported
-- [ ] `ghidra-run fill-gaps`: make and decompile the functions `exportcov` finds, into a
-  `decomp-extra.c` that `decomp_query` also reads
-- [ ] A replay harness for `re-verify`: drive a port from a recording made at a lower rate than
-  the game steps, and accept a sample when any state in its window matches
-- [ ] A reader for `memrec` recordings: load, summarise, export as CSV, and print values the
-  game's way
-- [ ] `memscan.py`: find every copy of a value, and report which one changes when a mod is
-  installed (a value the game replaces at run time)
-- [ ] A writer for block containers: re-lay the entries after one grows, and recompute raw
-  offsets and checksums
-- [ ] An editor stage in `re-browse`: offsets the reader records, one edit type, patches with
-  byte undo, and a command line that makes the same edits
-- [ ] An axes check in `re-observe`: from an object's position in memory and the level faces
-  under it, name the height axis, its sign and the handedness
-- [ ] `winput`: `click:X,Y wait:1 lmb` as the default click, for games that draw their own cursor
-- [ ] From POD's replacement libraries, as tools with tests: frame scalers (nearest, Scale2x,
-  CRT), a probe-library generator from an import list, and a render timing log
+- [x] `ExportCallArgs` that knows Watcom's register order (EAX, EDX, EBX, ECX), so a constant
+  passed in a register is reported: `ghidra-run.sh BIN callargs OUT regs=watcom FUNC`
+- [x] `ghidra-run fill-gaps`: make the functions `exportcov` finds, then export again, so
+  `decomp.c` and `functions.tsv` hold them (no separate `decomp-extra.c` is needed)
+- [x] A replay harness for `re-verify`: accept a sample when any port state in its window
+  matches (`tools/verify/replay.py`); the port drives itself from the recorded input
+- [x] A reader for `memrec` recordings: `tools/live/memlog.py` (summary, CSV, one sample);
+  printing values the game's way stays in the project
+- [x] `memscan.py`: every copy of a value, before and after a mod is installed, is two
+  `DUMP:=VALUE` rules ([the entry](docs/knowhow/context-mod-value-replaced-at-run-time.md))
+- [x] A writer for block containers: re-laying entries and checksums is in
+  [Writers, editors and mods](docs/working/mods.md); the writer itself belongs to each format
+- [x] An editor stage in `re-browse` (section 5): offsets the reader records, one edit type,
+  patches with byte undo, and a command line that makes the same edits
+- [x] An axes check: `tools/triage/axes.py` names the up axis, its sign and the handedness
+  from a recorded path over the level's vertices
+- [x] `winput`: `point X Y wait 1000 button` clicks in games that draw their own cursor
+- [x] From POD's replacement libraries: frame scalers (the `gameframe-scale` crate: nearest,
+  Scale2x, CRT) and a probe-library generator (`tools/pe/probegen.py`)
+- [ ] A render timing log for replacement libraries (frames per second, time per kind of
+  command): small and specific to each renderer, so left to the library for now
 
 ## Reading the story ([lore.md](docs/working/lore.md))
 

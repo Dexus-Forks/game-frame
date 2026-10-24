@@ -77,8 +77,16 @@ games a quarter to a third of the code was missing, the main loop among it:
 ./gameframe run exportcov GAME.EXE analysis/export/GAME.EXE/functions.tsv --starts analysis/notes/starts.txt   # share in functions, gaps, likely starts
 ```
 
-Pass the starts to `ghidra-run.sh GAME.EXE decompile` (section 3) in batches of about 50, then
-export again. Recover the gaps before tracing anything that might live in them.
+Then make functions at those starts and export again, in one step:
+
+```bash
+./gameframe run ghidra-run GAME.EXE fill-gaps analysis/notes/fill.txt analysis/notes/starts.txt   # report in fill.txt
+./gameframe run exportcov GAME.EXE analysis/export/GAME.EXE/functions.tsv                       # what is left
+```
+
+A start that fails (data that looked like code) is reported in the report and the rest go on.
+Repeat until `exportcov` finds no more starts. Recover the gaps before tracing anything that
+might live in them.
 
 Plain `grep` and `awk` on `decomp.c` work too: `awk '/^\/\/ ==== 1400be770 /{p=1;print;next}
 /^\/\/ ==== /{p=0} p' analysis/export/Game.exe/decomp.c` prints one function.
@@ -112,7 +120,10 @@ scripts/ghidra-run.sh boot.bin blocks    analysis/notes/blocks.txt derived/loadm
 
 - `callargs` lists every call to the named functions with the constant, string and global
   arguments at each call, from P-Code, for any processor: every sound and its id, every file
-  name, every random range in one pass.
+  name, every random range in one pass. Add `regs=watcom` (EAX, EDX, EBX, ECX) or
+  `regs=EAX,ECX` for arguments passed in registers, which the decompiler drops under a stack
+  convention: each call then also shows the constant loaded into each register before it, in
+  the same block (`EAX=0x4d2 (1234)`), or `?`.
 - `blocks` adds raw pieces of memory from a load map (a booter, a memory dump, ROM banks) and
   analyses them.
 

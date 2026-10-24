@@ -9,6 +9,18 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `ghidra-run.sh ... callargs regs=watcom`: the constant each register gets before every call,
+  in Watcom's order (EAX, EDX, EBX, ECX) or any list, where the decompiler shows no arguments.
+- `ghidra-run.sh ... fill-gaps`: makes a function at each start `exportcov` finds, goes on past
+  a bad one, and exports the binary again. The sample DLL gains a routine Ghidra misses.
+- `tools/verify/replay.py`: checks a port's trace against a recording read from outside, where
+  one sample can mix frames; a value passes when any state in its window holds it.
+- `tools/triage/axes.py`: the up axis, its sign and the handedness of a 3D game, from a recorded
+  path over the level's vertices.
+- `tools/pe/probegen.py`: a probe library for a DLL a 32-bit game imports, exporting the same
+  names (decorated `__stdcall` ones too) and logging every call with its arguments.
+- The `gameframe-scale` crate: nearest, Scale2x (EPX) and a CRT look, for a finished frame.
+- `re-browse` section 5: growing the viewer into an editor.
 - `ExportAll.java` writes `bodies.tsv`, every piece of every function (start, end, entry), and
   `exportcov.py` reads it beside `functions.tsv` (or with `--bodies`). Before, a function whose
   body lies in several pieces counted as one run from its entry: Hardwar's export measured

@@ -31,7 +31,9 @@ look. `docs/observe/running-the-original.md` has the full table.
 
 To record a whole run as the reference for a port, read `docs/observe/recording.md`:
 `tools/live/memrec.py` records named values from the game's memory, `memlog.py` reads them
-back, and the replay checks every sample with a window.
+back, and the replay checks every sample with a window (`tools/verify/replay.py`, `re-verify`).
+In a 3D game, `tools/triage/axes.py` reads such a recording over the level's vertices and names
+the up axis, its sign and the handedness, before any viewer or editor relies on them.
 
 Before the first run, ask what is known about the game's era and the system you run it on:
 `./gameframe advise windows-9x directdraw wine` or `./gameframe advise dos dosbox`. Old games

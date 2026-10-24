@@ -335,6 +335,38 @@ print(f'bss zero {got == bytes(len(got))}, header bytes {got[:2] == b"MZ"}; cw {
 shutil.rmtree(d)
 PY
 expect "pe32_emu prints its usage with no arguments" "registers in" "$PYTHON" tools/emu/pe32_emu.py
+if command -v zig >/dev/null; then
+  P="$(mktemp -d)"
+  # A program that imports a card library as 1990s games do: a decorated stdcall name, a plain
+  # one, and an undecorated stdcall one (as S3D's). Its import library comes from a .def.
+  printf 'LIBRARY card.dll\nEXPORTS\n  _cardDraw@12\n  cardInit\n  S3DTK_Flip\n' > "$P/imp.def"
+  cat > "$P/game.c" <<'EOF'
+extern unsigned card_draw(unsigned, unsigned, unsigned) __asm__("__cardDraw@12");
+extern unsigned card_init(void) __asm__("_cardInit");
+extern unsigned card_flip(unsigned) __asm__("_S3DTK_Flip");
+int main(void) { card_init(); card_flip(9); return (int)card_draw(1, 2, 3); }
+EOF
+  (cd "$P" && zig dlltool -m i386 -d imp.def -l cardimp.lib && zig cc -target x86-windows-gnu -O1 game.c cardimp.lib -o game.exe) >/dev/null 2>&1
+  "$PYTHON" tools/pe/probegen.py "$P/game.exe" card.dll "$P/out" --stdcall S3DTK_Flip=4 >/dev/null 2>&1 && sh "$P/out/build.sh" >/dev/null 2>&1
+  expect "probegen writes a probe that exports the imported names, logs each call's arguments and keeps the stack" \
+    "['S3DTK_Flip', '_cardDraw@12', 'cardInit'] one stack | _cardDraw@12 0x00000001 0x00000002 0x00000003 | cardInit 0x00000000 0x00000000 0x00000000 0x00000000 | S3DTK_Flip 0x00001234" \
+    "$PYTHON" - "$P/out/card.dll" <<'PY'
+import sys, pefile; sys.path.insert(0, 'tools/emu')
+from pe32_emu import Emu32
+pe = pefile.PE(sys.argv[1])
+ex = {e.name.decode(): pe.OPTIONAL_HEADER.ImageBase + e.address for e in pe.DIRECTORY_ENTRY_EXPORT.symbols}
+log = []
+def write(e):
+    log.append(e.read(e.arg(1), e.arg(2)).decode().strip()); return 1
+emu = Emu32(sys.argv[1], stubs={'CreateFileA': (lambda e: 0x77, 28), 'WriteFile': (write, 20)})
+sps = {emu.call(ex[n], args=a)['esp'] for n, a in (('_cardDraw@12', [1, 2, 3]), ('cardInit', []), ('S3DTK_Flip', [0x1234]))}
+print(sorted(ex), 'one stack' if len(sps) == 1 else f'stacks {sps}', '|', ' | '.join(log))
+PY
+  rm -rf "$P"
+else
+  echo "  skip  probegen (needs zig)"
+fi
+expect "probegen prints its usage" "probegen.py GAME.EXE DLL OUT_DIR" "$PYTHON" tools/pe/probegen.py
 expect "pe32_emu loads an FPU control word: a magic-number add rounds to nearest, or truncates" "nearest 4, chop 3; 103 of 200 cases differ; whole multiples none" "$PYTHON" - <<'PY'
 import sys; sys.path.insert(0, 'tools/emu')
 import pefile
@@ -428,6 +460,25 @@ done
 [[ $draws == 20 ]] && ok "the port draws random numbers in the original's order (20 seeds)" || bad "draw order matches on $draws of 20 seeds"
 [[ $drift == 20 ]] && ok "bitcompare catches the naive double-precision port (20 seeds)" || bad "naive port caught on only $drift of 20 seeds"
 expect "call traces name the call site" "game.exe+0x" head -1 $B/truth/seed-1.trace
+R="$(mktemp -d)"
+"$PYTHON" - "$R" <<'PY'
+import json, sys
+d = sys.argv[1]
+# A toy game: x moves 3 a step, (a, b) follow the clock. The recorder samples every 8 steps and
+# reads the clock at one step, x one step later and the pair (a, b) two steps later.
+def state(k): return {'clock': k, 'x': 3 * k, 'a': k % 7, 'b': (k * 5) % 11}
+states = [state(k) for k in range(200)]
+rec = [{'t': n / 10, 'n': n, 'clock': k, 'x': states[k + 1]['x'], 'a': states[k + 2]['a'], 'b': states[k + 2]['b']}
+       for n, k in enumerate(range(0, 190, 8))]
+bad = [dict(s, x=s['x'] + (1 if s['clock'] >= 100 else 0)) for s in states]
+for name, rows in (('rec', rec), ('port', states), ('bad', bad)):
+    open(f'{d}/{name}.jsonl', 'w').write(''.join(json.dumps(r) + '\n' for r in rows))
+PY
+out="$("$PYTHON" tools/verify/replay.py $R/rec.jsonl $R/port.jsonl --clock clock --block a,b; echo "rc $?"; "$PYTHON" tools/verify/replay.py $R/rec.jsonl $R/bad.jsonl --clock clock --block a,b; echo "rc $?")"
+[[ "$out" == *"ok   a b: 24 of 24"*"ok   x: 24 of 24"*"rc 0"*"FAIL x: 13 of 24"*"recorded {'x': 315}"*"rc 1"* ]] \
+  && ok "replay accepts a port on samples that straddle steps, and catches a one-unit change" || bad "replay" "$out"
+expect "replay prints its usage" "replay.py RECORDING PORT_TRACE" "$PYTHON" tools/verify/replay.py
+rm -rf "$R"
 
 echo "Formats"
 expect "the sample decoder consumes every byte" "1 of 1 files decode completely" "$PYTHON" tools/formats/validate.py $S/decode_sample.py "$B/*.dat"
@@ -693,6 +744,28 @@ for i, gold in enumerate((500, 480, 480, 612)):
 PY
 expect "memscan narrows dumps to the one address that holds the value" "0x00021235  u16  500 -> 480 -> 480 -> 612" "$PYTHON" tools/triage/memscan.py "$W/m0.bin:=500" "$W/m1.bin:=480" "$W/m2.bin:same" "$W/m3.bin:up" --base 0x20000
 expect "memscan finds a pointer to the value" "0x00024000" "$PYTHON" tools/triage/memscan.py "$W/m3.bin" --pointers 0x21235 --base 0x20000
+"$PYTHON" - "$W" <<'PY'
+import json, math, sys
+d = sys.argv[1]
+# A level whose up is -y, in right-handed coordinates; a car 0.5 above it turns left (anticlockwise
+# seen from above). The mirrored copy (x negated) is the same level drawn left-handed.
+h = lambda x, z: 4 * math.sin(x / 9) + 3 * math.cos(z / 7)
+pts = [(x, -h(x, z), z) for x in range(0, 101, 2) for z in range(0, 101, 2)]
+rec = []
+for n in range(240):
+    a = n / 240 * 2 * math.pi
+    x, z = 50 + 30 * math.cos(a), 50 + 30 * math.sin(a)
+    rec.append({'t': n / 10, 'px': round(x * 65536), 'py': round(-(h(x, z) + 0.5) * 65536), 'pz': round(z * 65536)})
+for name, p, r in (('level', pts, rec), ('mirror', [(-x, y, z) for x, y, z in pts], [dict(s, px=-s['px']) for s in rec])):
+    open(f'{d}/{name}.pts', 'w').write(''.join(f'{x} {y} {z}\n' for x, y, z in p))
+    open(f'{d}/{name}.jsonl', 'w').write(''.join(json.dumps(s) + '\n' for s in r))
+PY
+expect "axes finds the up axis and its sign from a path on the level" "up is -y: the object rides 0.500 above the surface" \
+  "$PYTHON" tools/triage/axes.py "$W/level.jsonl" "$W/level.pts" --pos px,py,pz --scale 1/65536
+expect "axes tells right-handed coordinates from a left turn" "right-handed coordinates" \
+  "$PYTHON" tools/triage/axes.py "$W/level.jsonl" "$W/level.pts" --pos px,py,pz --scale 1/65536 --left-turn 0:6
+expect "axes reports a mirrored copy as left-handed" "left-handed coordinates" \
+  "$PYTHON" tools/triage/axes.py "$W/mirror.jsonl" "$W/mirror.pts" --pos px,py,pz --scale 1/65536 --left-turn 0:6
 expect "xorscan finds a repeating XOR key" "xor-key:1f2e3d4c " "$PYTHON" tools/formats/xorscan.py "$W/hidden.txt" --top 1
 expect "timestamps reads a FAT date" "dos       1995-11-03 14:30:10" "$PYTHON" tools/formats/timestamps.py 0x1F6373C5
 expect "reader reads LEB128 and big-endian numbers" "624485 -123456 4660" "$PYTHON" -c "
@@ -1495,6 +1568,20 @@ if [[ "${1:-}" == --ghidra ]]; then
   scripts/ghidra-run.sh game.exe callargs analysis/notes/callargs.tsv rng_seed printf >/dev/null 2>&1
   expect "ghidra-run callargs resolves a constant argument" "0x4d2 (1234)" cat analysis/notes/callargs.tsv
   expect "ghidra-run callargs resolves a string argument" '"after 10 s: %f' cat analysis/notes/callargs.tsv
+  scripts/ghidra-export.sh $B/mixer32.dll >/dev/null 2>&1
+  scripts/ghidra-run.sh mixer32.dll callargs analysis/notes/regargs.tsv regs=watcom reg_sum >/dev/null 2>&1
+  expect "ghidra-run callargs regs=watcom reads arguments passed in EAX, EDX, EBX and ECX, in Watcom's order" \
+    "reg_call	EAX=0x4d2 (1234)	EDX=0x7 (7)	EBX=0x55 (85)	ECX=0x3 (3)" cat analysis/notes/regargs.tsv
+  # mixer32.dll's hidden_triple: no prologue, reached only through an XORed pointer. Ghidra misses
+  # it, exportcov finds it, fill-gaps makes it (a bad start does not stop the batch) and exports again.
+  "$PYTHON" tools/triage/exportcov.py $B/mixer32.dll analysis/export/mixer32.dll/functions.tsv --min 0 --starts analysis/notes/gaps.starts >/dev/null 2>&1
+  echo 0xdeadbeef >> analysis/notes/gaps.starts
+  out="$(scripts/ghidra-run.sh mixer32.dll fill-gaps analysis/notes/fill.txt analysis/notes/gaps.starts 2>&1)"
+  left="$("$PYTHON" tools/triage/exportcov.py $B/mixer32.dll analysis/export/mixer32.dll/functions.tsv --min 0 2>&1 | grep 'likely function starts')"
+  [[ "$(head -1 analysis/notes/gaps.starts)" == 0x10001010 && "$out" == *"1 of 2 starts decompiled, 1 failed"* ]] \
+    && grep -q "^10001010	" analysis/export/mixer32.dll/functions.tsv && grep -A6 "^// ==== 10001010 " analysis/export/mixer32.dll/decomp.c | grep -q "param_1 \* 3" \
+    && [[ "$left" == "0 likely"* ]] \
+    && ok "exportcov finds a routine Ghidra missed; ghidra-run fill-gaps makes it, goes on past a bad start and exports again" || bad "fill-gaps" "$out $left"
   scripts/ghidra-run.sh game.exe disasm analysis/notes/sim.asm 0x140001090 0x140001090-0x1400010a0 >/dev/null 2>&1
   expect "ghidra-run disasm lists a function by name" "140001090 simulate" cat analysis/notes/sim.asm
   expect "ghidra-run disasm decodes a range in order" "// ==== 140001090-1400010a0" cat analysis/notes/sim.asm

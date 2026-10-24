@@ -19,6 +19,10 @@ name = "gameframe-opl2"
 version = "0.1.0"
 
 [[package]]
+name = "gameframe-scale"
+version = "0.1.0"
+
+[[package]]
 name = "gameframe-turbo-pascal"
 version = "0.1.0"
 
