@@ -176,6 +176,43 @@ expect "emulock refuses a second holder and names the first" 'held by a since' "
   && ok "emulock lets only the holder free a lock, then the next one take it" || bad "emulock free and take"
 rm -rf "$T3"
 
+T4="$(mktemp -d)"
+"$PYTHON" - "$T4/rec.jsonl" <<'PY'
+import json, random, sys
+sys.path.insert(0, 'tools/formats')
+from derived import newell
+r = random.Random(7); out = open(sys.argv[1], 'w')
+for k in range(200):
+    x, y, z = r.uniform(-2000, 2000), r.uniform(-2000, 2000), r.uniform(0, 80)
+    q = [[x, y, z], [x + 40, y, z + r.uniform(-1, 1) * (k % 4 == 0)], [x + 40, y + 30, z + 5], [x, y + 30, z + 5]]
+    q = [[round(c * 65536) / 65536 for c in v] for v in q]
+    vs = [[round(c * 65536) for c in v] for v in q]
+    n = newell(q)
+    fields = [min(v[i] for v in vs) for i in range(3)] + [max(v[i] for v in vs) for i in range(3)]
+    fields += [round(c * 65536) for c in n] + [r.randrange(1 << 30)]
+    out.write(json.dumps({'vertices': vs, 'fields': fields}) + '\n')
+PY
+out="$("$PYTHON" tools/formats/derived.py "$T4/rec.jsonl" --field-scale 65536 --vertex-scale 65536)"
+[[ "$out" == *"field 0   min_x           100.0 %"* && "$out" == *"field 5   max_z           100.0 %"* && "$out" == *"field 8   newell_z        100.0 %"* && "$out" == *"field 9   nothing explains it"* ]] \
+  && ok "derived finds stored bounds and Newell normals, and nothing for noise" || bad "derived" "$out"
+if command -v cargo >/dev/null && rustup target list --installed 2>/dev/null | grep -q i686-pc-windows-gnu && command -v zig >/dev/null; then
+  mkdir -p "$T4/crate/src"
+  printf '[package]\nname = "probe"\nversion = "0.1.0"\nedition = "2021"\n\n[lib]\ncrate-type = ["cdylib"]\n\n[profile.release]\npanic = "abort"\n' > "$T4/crate/Cargo.toml"
+  printf '#[no_mangle]\npub extern "stdcall" fn answer() -> u32 { 42 }\n\n#[no_mangle]\npub extern "C" fn plain(x: u32) -> u32 { x + 1 }\n' > "$T4/crate/src/lib.rs"
+  printf 'LIBRARY probe.dll\nEXPORTS\n_answer@0=answer@0\nplain\n' > "$T4/crate/probe.def"
+  (cd "$T4/crate" && CARGO_TARGET_I686_PC_WINDOWS_GNU_LINKER="$ROOT/scripts/zcc.sh" ZCC_DEF_DIR="$T4/crate" cargo build -q --release --target i686-pc-windows-gnu --target-dir "$T4/build" >/dev/null 2>&1)
+  expect "zcc links a 32-bit Rust DLL with zig that exports the .def's names, and its stdcall export runs" "['_answer@0', 'plain'] 42" "$PYTHON" -c "
+import sys, pefile; sys.path.insert(0, 'tools/emu')
+from pe32_emu import Emu32
+d = '$T4/build/i686-pc-windows-gnu/release/probe.dll'; p = pefile.PE(d)
+ex = {e.name.decode(): p.OPTIONAL_HEADER.ImageBase + e.address for e in p.DIRECTORY_ENTRY_EXPORT.symbols}
+print(sorted(ex), Emu32(d).call(ex['_answer@0'])['eax'])"
+else
+  echo "  skip  zcc (needs cargo, rustup target i686-pc-windows-gnu and zig)"
+fi
+expect "zcc prints its usage" "rustc's linker for 32-bit Windows DLLs" scripts/zcc.sh --help
+rm -rf "$T4"
+
 echo "Live tracing"
 if "$PYTHON" -c "import frida" 2>/dev/null && command -v cc >/dev/null; then
   T="$(mktemp -d)"
@@ -290,6 +327,20 @@ a, b = e.call(f, args=[v, 1], fpu_cw=NEAREST)['eax'], e.call(f, args=[v, 1], fpu
 d = e.fpu_modes(f, [[k * 1000 + 7, 13] for k in range(200)])
 none = e.fpu_modes(f, [[65536 * k, 3] for k in range(1, 50)])
 print(f'nearest {a}, chop {b}; {len(d)} of 200 cases differ; whole multiples {"none" if not none else len(none)}')
+PY
+expect "pe32_emu lays out a linked list and a graph of records for a function to walk" "42 111" "$PYTHON" - <<'PY'
+import sys; sys.path.insert(0, 'tools/emu')
+import pefile
+from pe32_emu import Emu32
+D = 'examples/sample-game/build/mixer32.dll'
+p = pefile.PE(D); ex = {e.name.decode(): p.OPTIONAL_HEADER.ImageBase + e.address for e in p.DIRECTORY_ENTRY_EXPORT.symbols}
+e = Emu32(D)
+n = e.array(3, 8)
+for i, (v, nx) in enumerate([(5, n[1]), (7, n[2]), (30, 0)]):
+    e.put(n[i], 'iI', v, nx)
+g = e.array(4, 12)
+e.put(g[0], 'iII', 1, g[1], g[2]); e.put(g[1], 'iII', 10, g[3], 0); e.put(g[2], 'iII', 4, 0, 0); e.put(g[3], 'iII', 100, 0, 0)
+print(e.call(ex['sum_list'], args=[n[0]])['eax'], e.call(ex['heaviest_path'], args=[g[0]])['eax'])
 PY
 expect "pe32_emu stops at a call to a library routine and reads its arguments" "[42, 5]" "$PYTHON" - <<'PY'
 import sys; sys.path.insert(0, 'tools/emu')

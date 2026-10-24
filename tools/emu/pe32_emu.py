@@ -25,6 +25,9 @@ What it does:
   the callee popping `pop_bytes` of arguments, as stdcall does);
 - gives the code a stack and a bump allocator (`alloc`); `reset()` puts the image's data back
   and clears the allocator, so each trial starts from the same state;
+- lays out the game's structures by hand: `array(count, stride)` gives each record's address,
+  `put(addr, '<iI', value, pointer)` writes fields, `get(addr, '<i')` reads them, so a linked
+  list, a graph or a table of records with pointers takes a few lines;
 - `call(addr, args=[...], **registers)` pushes `args` right to left (cdecl and stdcall), then a
   return address that stops the run, sets the named registers and runs until the routine
   returns. It returns every general register afterwards.
@@ -156,6 +159,25 @@ class Emu32:
 
     def u32(self, addr):
         return struct.unpack('<I', self.read(addr, 4))[0]
+
+    # The game's structures, laid out by hand: records of a stride with pointer fields, as the
+    # game's loader leaves them (docs/knowhow/emulate-function-on-game-structures.md).
+
+    def array(self, count, stride, fill=0):
+        """Allocate `count` records of `stride` bytes; return each record's address."""
+        base = self.alloc(count * stride, fill)
+        return [base + i * stride for i in range(count)]
+
+    def put(self, addr, fmt, *values):
+        """Write `values` at `addr` with a struct format (little-endian), such as '<iI'."""
+        self.write(addr, struct.pack(fmt if fmt[0] in '<>=!@' else '<' + fmt, *values))
+        return addr
+
+    def get(self, addr, fmt):
+        """Read a struct format at `addr`: a tuple, or the value alone for one field."""
+        fmt = fmt if fmt[0] in '<>=!@' else '<' + fmt
+        out = struct.unpack(fmt, self.read(addr, struct.calcsize(fmt)))
+        return out[0] if len(out) == 1 else out
 
     # ------------------------------------------------------------------ calls
 

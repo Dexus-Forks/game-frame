@@ -57,6 +57,11 @@ a modern machine. GameFrame's [know-how](../knowhow/README.md) began here.
   bytes), `discinfo --iso` (a BIN/CUE's data track as an ISO), `emupc` (the emulated PC's
   files), `shot` (captures that are never overwritten) and `modfolder` (mods in an install
   folder).
+- Guides on [recording the original and replaying it](../observe/recording.md),
+  [replacement libraries](../hardware/replacement-libraries.md) and
+  [writers, editors and mods](../working/mods.md), and more tools: `exportcov`, `memlog`,
+  `emulock`, `loopcut`, `derived`, `zcc.sh`, `validate.py --write`, and `pe32_emu`'s control
+  word, layout helpers and stop at a call.
 - Two crates, `gameframe-mmx` and `gameframe-gpu-1997`, and the guides on
   [MMX code](../hardware/simd.md) and [the card makers' 3D APIs](../hardware/card-apis.md).
 - Fixes: PE sections with a VirtualSize of 0, and `peinfo --imports`.

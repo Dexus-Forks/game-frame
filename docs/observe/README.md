@@ -39,5 +39,8 @@ does, so each claim about the port can cite a measurement. Read them after you h
   `fields.py`, and checking a rebuilt server or client.
 - [Finding values in memory](memory.md): scanning memory dumps for a value you can see,
   confirming the address, and finding the structure around it.
+- [Recording the original, and replaying it](recording.md): recording a whole run from the
+  game's memory with `memrec.py`, reading it with `memlog.py`, what an outside reader cannot
+  see, and replaying the recording into the port with a window for each sample.
 - [A model to query](object-model.md): an object model of the game, like a web page's, with
   entry points for queries, input, time and capture, in both the original and the port.
