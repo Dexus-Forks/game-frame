@@ -64,3 +64,18 @@ Agents can also read this site as plain text. [llms.txt](/llms.txt) lists every
 page with a short description, and [llms-full.txt](/llms-full.txt) holds all
 of them in one file. Each page has a Markdown copy at the same address with `.md` at the end,
 such as [/games/interaction.md](/games/interaction.md).
+
+## The 3D-card builds, on today's machines
+
+Many Windows games of the late 1990s shipped one build for each 3D card: 3dfx, PowerVR, ATI
+Rage, S3 ViRGE. No modern system has those cards or their driver libraries. Those builds no
+longer start. GameFrame has stand-in DLLs for Glide 2, PowerVR SGL, ATI3DCIF, the S3D Toolkit
+and DirectDraw. Copy them beside the game. Its EXE then runs unchanged. The Glide and PowerVR
+builds are drawn again with OpenGL at any size. The ATI and S3 builds show their frame scaled.
+
+![POD Gold's PowerVR build in a race at 1280 × 960, drawn by GameFrame's sgl.dll](../docs/assets/case-studies/pod-sgl-race.webp)
+
+They are tested with one game so far, POD: Planet of Death, under Wine. Each library handles
+the calls POD makes. It logs the modes and states it does not draw. The first run of a new game
+shows much of what is missing. [Replacement 3D-card libraries](../docs/hardware/wrappers.md) says what each one does,
+how to build it and how to use it.

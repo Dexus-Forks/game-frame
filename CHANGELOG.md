@@ -23,6 +23,11 @@ Every release of GameFrame, newest first. The format follows
   registers left by callees, fake worlds and Ghidra function recovery. The taxonomy gains the
   API `sgl` (PowerVR).
 
+- A guide to the replacement libraries, [docs/hardware/wrappers.md](docs/hardware/wrappers.md):
+  why games had a build per card, what each DLL draws and lacks, how to build and use them,
+  patch files, logs, adding a game or a call, tests, and POD as the worked example with
+  screenshots of its runs. The home page has a section on them.
+
 ### Changed
 
 - `scripts/zcc.sh` also finds a DLL's `.def` file one folder down, in `ZCC_DEF_DIR/*/NAME.def`,
