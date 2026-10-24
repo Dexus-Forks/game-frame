@@ -45,6 +45,7 @@ An entry has one of five statuses.
 | [Clicks and keys do not reach a Wine window](wine-input-without-accessibility.md) | workaround |
 | [macOS drops `DYLD_*` through `/bin/sh`](macos-dyld-stripped.md) | solved |
 | [`wineserver -w` never returns](wineserver-wait-hangs.md) | solved |
+| [A `pgrep -f` wait loop never ends](pgrep-wait-matches-itself.md) | solved |
 | [A leftover game process holds the single-instance mutex](single-instance-leftover.md) | solved |
 | [Attaching winedbg kills the game](winedbg-attach-kills.md) | dead-end |
 | [A system call faults in `wow64cpu` under Rosetta](wine-wow64-rosetta-fault.md) | open |

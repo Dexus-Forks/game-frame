@@ -9,6 +9,8 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- Know-how: `pgrep-wait-matches-itself`. A wait loop with `pgrep -f` never ends, because the
+  pattern matches the waiting shell's own command line.
 - `re-observe`: a capture script prints its usage for `--help` and runs nothing, and never
   overwrites an earlier capture. Seen when checking a script's usage started a 15-minute run
   over the saved data.
