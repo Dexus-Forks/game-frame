@@ -131,6 +131,11 @@ the game's own differences come from tracing its builds. Record which profile is
 reference for exact comparisons ([3D accelerators](graphics-3d.md), "How to approach a game
 with several renderers").
 
+## Replacing the libraries
+
+To run a card build without its card, or to draw it at a higher resolution, write a library
+with the same name and exports: [Replacement libraries for a 1990s game](replacement-libraries.md).
+
 ## Sources
 
 - 3dfx, Glide 2.x SDK and `glide.h`.

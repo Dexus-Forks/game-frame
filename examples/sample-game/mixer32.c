@@ -42,3 +42,24 @@ __declspec(dllexport) int __cdecl report(int a, int b) {
     char buf[32];
     return wsprintfA(buf, "%d %d", a * 2, b + 1);
 }
+
+/* A linked list and records with pointers, for pe32_emu's array/put/get layout helpers. */
+struct node { int value; const struct node *next; };
+
+__declspec(dllexport) int __cdecl sum_list(const struct node *n) {
+    int s = 0;
+    for (; n; n = n->next) s += n->value;
+    return s;
+}
+
+struct link { int weight; const struct link *to[2]; };
+
+__declspec(dllexport) int __cdecl heaviest_path(const struct link *l) {
+    int s = 0;
+    while (l) {
+        s += l->weight;
+        const struct link *a = l->to[0], *b = l->to[1];
+        l = !a ? b : !b ? a : (a->weight >= b->weight ? a : b);
+    }
+    return s;
+}

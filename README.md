@@ -189,6 +189,7 @@ between agents, the outcome, and the failure path.
 | `scripts/ghidra-export.sh [--labels FILE] BINARY...` | Headless Ghidra analysis and a text export: pseudocode, functions, strings, imports, exports; names applied from a labels file |
 | `scripts/ghidra-run.sh BINARY decompile\|named\|refs\|vtable\|labels\|callargs\|blocks OUT ARGS` | One-off jobs in the analysed project, without re-analysis: also every call with its arguments, and raw memory pieces |
 | `scripts/extract-installer.sh [--detect] INSTALLER OUT` | Unpacks an installer or package without running it: Inno Setup (GOG), NSIS, InstallShield, MSI, archives, `.dmg`, `.pkg`, GOG's `.sh`, CD images |
+| `scripts/zcc.sh` | rustc's linker for 32-bit Windows DLLs through `zig cc`, with no MinGW, exporting exactly the names in a `.def` file: replacement libraries a 1990s game imports by name |
 | `scripts/dosbox-run.sh [--fileio] [--break] [--mcp PORT] DIR PROGRAM` | Runs a DOS program in DOSBox-X without a window: exit code, file I/O log, debugger control |
 | `./gameframe COMMAND` | Help and discovery: the steps, the skills, every tool's own help; runs a tool with the `.venv` |
 | `tests/run.sh [--ghidra]` | 183 checks of every tool against the two sample games, and more with `--ghidra` |
@@ -241,7 +242,8 @@ between agents, the outcome, and the failure path.
 | `tools/emu/pe_emu.py` | Call any function of a Windows x64 EXE or DLL with chosen inputs and read the result |
 | `tools/emu/pe32_emu.py` | Call a routine of a 32-bit (x86) Windows EXE or DLL, with arguments on the stack or inputs in registers, MMX and x87 included; each import stops the run with its name |
 | `tools/emu/call_trace.py` | The calls an emulated function makes (random draws), in order, with call sites |
-| `tools/formats/reader.py`, `validate.py` | Prototype a format decoder; prove it consumes every byte of every file |
+| `tools/formats/reader.py`, `validate.py` | Prototype a format decoder; prove it consumes every byte of every file, and with `--write` that every file writes back identical |
+| `tools/formats/derived.py` | Which unexplained fields next to geometry are computed from it: bounds, centres, Newell and cross-product normals, plane distances |
 | `tools/formats/xorscan.py` | The key of a simply obfuscated file: XOR, add, stepping and chained keys |
 | `tools/formats/rawimage.py` | Raw pixels to PNG: VGA 13h, Mode X, EGA planes, CGA, packed and 16-bit, with palettes |
 | `tools/formats/markers.py` | Unique values planted in a file's fields, then found in memory dumps |

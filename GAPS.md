@@ -148,20 +148,26 @@ Proposed by POD and not built yet, each with the reason:
 
 - [ ] Watcom register order (EAX, EDX, EBX, ECX) in `ExportCallArgs`: needs a Watcom-built
   sample. GameFrame has no Watcom compiler in its toolchain
-- [ ] A helper that lays out linked structures in scratch memory for `pe32_emu`: wait for a
-  second project, to see which layouts recur
+- [x] Layout helpers in `pe32_emu` (`array`, `put`, `get`), tested on a linked list and a graph
 - [ ] A replay harness for `re-verify` (frames rebuilt at recorded clocks, a window for samples
   that straddle frames): a crate-sized piece. It is best moved from POD's `crates/pod-race` tests
 - [ ] Printing recorded values the game's way (a game's own time format): game-specific; it
   belongs beside the port
 - [ ] A multi-entry block-container writer: needs a sample container format with checksums in
   GameFrame's samples
-- [ ] An editor stage in `re-browse`, an axes check, and a derived-data finder for geometry: each
-  needs a sample format with fixed-point positions, bounds and normals
-- [ ] `zcc`, a `zig cc` linker script for 32-bit Windows DLLs from Rust, and the wrapper pieces
-  (port-I/O shim, DirectDraw in memory, Glide 2 on OpenGL, scalers, rasteriser, probe-library
-  generator, render-thread timing): large. Each needs a Windows test program run under Wine.
-  GameFrame's tests cannot run those programs yet
+- [x] A derived-data finder for geometry (`tools/formats/derived.py`), tested on generated
+  records with stored bounds and normals
+- [x] Guides: [Recording the original](docs/observe/recording.md),
+  [Replacement libraries](docs/hardware/replacement-libraries.md),
+  [Writers, editors and mods](docs/working/mods.md), and an emulated-PC section in
+  [Running the original](docs/observe/running-the-original.md)
+- [ ] An editor stage in `re-browse` and an axes check: each needs a sample format with
+  fixed-point positions in GameFrame's samples; the mods guide has the method
+- [x] `scripts/zcc.sh`, the `zig cc` linker for 32-bit Windows DLLs from Rust, tested with a
+  two-export crate whose stdcall export runs under `pe32_emu`
+- [ ] The wrapper pieces (port-I/O shim, DirectDraw in memory, Glide 2 on OpenGL, scalers,
+  rasteriser, probe-library generator, render-thread timing): large. Each needs a Windows test
+  program run under Wine. GameFrame's tests cannot run those programs yet
 - [ ] A Wine runner for `tests/run.sh` (Wine on Linux CI), so the Windows-side tools above and
   `winput` can be tested for real
 

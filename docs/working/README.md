@@ -28,6 +28,8 @@ work that spans several steps and several sessions.
   format identification, and recording what was done.
 - [Handling the game as evidence](evidence.md): identifying the copy, keeping it unchanged,
   tying each finding to it, and making each result repeatable.
+- [Writers, editors and mods](mods.md): a writer that gives every file back, an editor that
+  changes only what was edited, and loading a changed file into the unchanged original.
 - [Know-how: failure modes and context](knowhow.md): the taxonomy of known failures and
   dead ends, the entry format, `gameframe advise`, the hook that names entries after a command,
   and how to add an entry at the end of a slice.

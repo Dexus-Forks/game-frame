@@ -40,6 +40,9 @@ In my GameFrame project, find every place the game touches hardware.
   NVIDIA, Direct3D and OpenGL, and software renderers.
 - [The card makers' 3D APIs](card-apis.md): Glide 2.x, ATI3DCIF and the S3D Toolkit in detail:
   reading their calls, how textures reach each card, and games with one build per card.
+- [Replacement libraries for a 1990s game](replacement-libraries.md): probes, exact exports with
+  `zcc.sh`, what the game assumes (a window, threads, the frame buffer, port I/O, any display
+  mode), and measuring what the card is given.
 - [MMX and other SIMD code](simd.md): finding hand-written MMX routines, matching them to the
   plain build, measuring both, and porting them exactly.
 - [Sound](sound.md): the PC speaker, AdLib and OPL FM synthesis, Sound Blaster, Gravis

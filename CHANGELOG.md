@@ -9,6 +9,18 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- Three guides from the POD: Planet of Death project:
+  [Recording the original, and replaying it](docs/observe/recording.md),
+  [Replacement libraries for a 1990s game](docs/hardware/replacement-libraries.md) and
+  [Writers, editors and mods](docs/working/mods.md); and a section on the emulated-PC route in
+  [Running the original](docs/observe/running-the-original.md).
+- `scripts/zcc.sh`: rustc's linker for 32-bit Windows DLLs through `zig cc`, exporting exactly
+  the names in a `.def` file.
+- `pe32_emu`: `array`, `put` and `get` lay out the game's structures; the sample DLL gains
+  `sum_list` and `heaviest_path` to test them.
+- `tools/formats/derived.py`: which fields next to geometry are bounds, centres, normals or
+  plane distances.
+
 - Know-how entries for GameFrame's own tools: unmapped memory under the emulators, an import
   with no handler, a tool run without the `.venv`, and Ghidra refusing a path in a dot folder.
 
