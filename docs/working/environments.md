@@ -67,6 +67,24 @@ It sets `GAMEFRAME_ROOT`, loads `.env`, exports `GHIDRA_INSTALL_DIR` and `JAVA_H
 `gameframe` and the `.venv` Python first on `PATH`. The scripts load `.env` themselves, so
 this matters for commands typed by hand and for agents.
 
+## One clone per game
+
+Keep one clone of GameFrame as the source you change and push to GitHub. Give each game
+project its own clone, made from GitHub, and update it with `git pull`. A project made by
+`scripts/new-project.sh` records the clone that made it in its `.env`:
+
+```bash
+GAMEFRAME_ROOT=~/code/GAME/game-frame
+```
+
+The project's `./gameframe` reads that line, from the project and from its main checkout, so
+the project's git worktrees use the same clone. Without it, `./gameframe` looks for
+`../game-frame` next to the project. Two projects in one folder then share whatever is there,
+and a git worktree, which has no `../game-frame`, falls through to the next clone it finds
+under `~/code`, which may be the source clone. The Hardwar project hit both: two projects
+shared a symlinked clone, and its worktrees found the source clone, which lacked a tool the
+project needed.
+
 ## No display
 
 The tests and the tools need no display. `dosbox-run.sh` uses SDL's dummy video and audio
