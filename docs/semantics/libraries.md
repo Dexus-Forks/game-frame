@@ -12,7 +12,9 @@ This page lists the functions whose differences reach the player, and what to do
 The rule for all of them is the same. Find which runtime the game was linked with
 ([Recognising an engine](../engines/recognising.md#libraries-that-are-not-the-engine)), then port
 that runtime's version of each function the rules use. GameFrame's
-[crates](../crates/README.md) include some of them, such as the MSVC maths functions.
+[crates](../crates/README.md) include some of them. `gameframe-msvc-crt` has measured MSVC math,
+sorting and random-number routines. It also has source-derived byte, string and integer text
+functions that still need runtime comparison.
 
 ## Random numbers
 
@@ -34,8 +36,8 @@ generator, keep its state where the original keeps it, and draw in the same orde
 `qsort` is not stable, and each runtime sorts in its own way. Elements that compare equal come
 out in an order that depends on the algorithm.
 
-- **Microsoft C.** A quicksort with a median-of-three pivot, and an insertion sort for parts of
-  8 elements or fewer.
+- **Microsoft C.** A quicksort with a median-of-three pivot, and a selection sort for partitions
+  of 8 elements or fewer.
 - **glibc.** For many years a merge sort when it could allocate memory, which kept equal
   elements in order, and a quicksort otherwise. Later versions changed this.
 - **C++ `std::sort`.** An introsort in every major library, with its own thresholds. Equal
@@ -57,6 +59,9 @@ different order.
 - **The locale.** A C program runs in the "C" locale until it calls `setlocale`. After
   `setlocale(LC_ALL, "")` on a German or French system, `printf` writes `3,5` and `atof` stops
   reading at the comma. See [Text and encodings](text.md#the-locale).
+- **Integer conversion.** The MSVC crate provides source-derived `strtol`, `strtoul`, `strtoll`,
+  `strtoull` and integer-to-text routines. It uses C-locale whitespace and ASCII digits. Compare
+  it with the game's CRT before relying on overflow or locale edge cases.
 
 ## Time
 
