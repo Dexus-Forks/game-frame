@@ -1,0 +1,2 @@
+# Optional: the tools that call Claude with an API key (scripts/setup.sh --install puts this into .venv)
+anthropic>=2.0    # the Claude API SDK: tools/llm (docs/working/api-credits.md)

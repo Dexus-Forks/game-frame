@@ -9,6 +9,14 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `tools/llm/`, tools that spend a Max or Team plan's monthly API credits
+  ([API credits](docs/working/api-credits.md)): `name_functions.py` suggests names for every
+  unnamed function in one Message Batch; `skillcheck.py` gives an agent one skill and a task
+  on the sample game and checks the answer against ground truth (`tests/skill-tasks.json`);
+  `headless.py` runs an agent unattended under a budget, and `docs-check` runs `re-checker`
+  and `re-editor` over the documents; `ask.py` answers a question from the know-how entries.
+  `fake_api.py` stands in for the API in `tests/run.sh`. The SDK is optional, in
+  `requirements-llm.txt`.
 - Versions and their deltas: [the versions guide](docs/working/versions.md) now starts with
   finding every edition, takes the last version released as the default reference, and has the
   steps for moving to a newer edition mid-project. A project template, `docs/versions.md`,

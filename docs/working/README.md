@@ -36,6 +36,9 @@ work that spans several steps and several sessions.
 - [Know-how: failure modes and context](knowhow.md): the taxonomy of known failures and
   dead ends, the entry format, `gameframe advise`, the hook that names entries after a command,
   and how to add an entry at the end of a slice.
+- [API credits](api-credits.md): what a Max or Team plan's monthly API credits pay for, and
+  the tools that use them: naming functions in a batch, checking each skill on its own,
+  unattended agent runs, a monthly check of the documents, and questions to the know-how.
 - [Permissions and gates](gates.md): the commands an agent may run without asking, the ones
   that ask first, and the hooks that stop game material, decompiled code and stray commits.
 - [Writing findings and documents](writing.md): plain English, the patterns to avoid, evidence

@@ -272,6 +272,17 @@ between agents, the outcome, and the failure path.
 | `tools/dos/fileio_trace.py` | From a DOSBox-X file log: every file's reads in order, with record patterns |
 | `tools/dos/dbx_control.py` | Drive DOSBox-X's debugger from a script: breakpoints, registers, memory |
 
+The tools in `tools/llm/` call Claude with an API key, so they spend Claude Platform credits,
+such as a Max or Team plan's monthly credits ([API credits](docs/working/api-credits.md)).
+
+| Tool | What it does |
+|---|---|
+| `tools/llm/name_functions.py` | A suggested name, signature and summary for every unnamed function in a Ghidra export, in one Message Batch, written to `analysis/` for you to confirm |
+| `tools/llm/skillcheck.py` | Gives an agent one skill and a task on the sample game, and checks its answer against the ground truth: is each skill enough on its own? |
+| `tools/llm/headless.py` | Runs one of GameFrame's agents unattended under a budget and saves its report; `docs-check` runs `re-checker` and `re-editor` over the documents |
+| `tools/llm/ask.py` | A question answered from the know-how entries `gameframe advise` finds, naming each entry it uses |
+| `tools/llm/client.py` | The shared client; run it to check the SDK, the key and the `claude` command |
+
 ## Crates
 
 Clean Rust implementations of chips and runtimes that many old games need, each checked against
