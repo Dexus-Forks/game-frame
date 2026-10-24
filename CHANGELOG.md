@@ -9,6 +9,15 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `glide2x.dll` now implements all 156 Glide 2 calls. The last 25 are in. The PCI library
+  (`pci*`) shows one Voodoo Graphics. `guMPDrawTriangle` draws two textures in two passes, as
+  Glide 2.43 does. The `guMovie*` calls record each frame shown as a TGA file. That is a
+  Deviation, as Glide 2.43 cannot record. `guEncodeRLE16` gives the same bytes as the
+  original on 2009 test images, faults included. `ConvertAndDownloadRle` downloads zeros, as
+  the original does, since its line decoder is empty. `grSstConfigPipeline` and
+  `grSstVidMode` do nothing, as the window is the library's. `glidetest.c` checks the PCI
+  library, the encoder, the two passes and a recorded frame.
+
 - A project's `target/`, the user's own copy of the game, is now hard to delete by mistake. A
   disk cleanup took it for Cargo build output and lost three projects' game copies and an
   original save (`docs/knowhow/game-folder-deleted-as-build-output.md`).

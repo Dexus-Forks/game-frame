@@ -6,9 +6,7 @@ OpenGL, at any output size (2×, 4×, or a size you name). It was made for POD's
 (`WPOD3DFX.EXE`, first edition and Gold), and then grew to the rest of Glide 2 that games
 use. It exports all 156 functions of Glide 2.43 and Glide 2.1.1, under the decorated
 `__stdcall` names the games link to (`_grGlideInit@0` and so on, in `glide2x.def`). It
-implements 131 of them. The other 25 are stubs that log their calls (`api.tsv`,
-[wrappers](../README.md)): the PCI helpers (`pci*`), the multi-pass calls (`guMP*`), the
-movie recorder (`guMovie*`), the RLE helpers, `grSstConfigPipeline` and `grSstVidMode`.
+implements all 156 (`api.tsv`, [wrappers](../README.md)).
 
 Early Glide 2 games import the file `glide.dll`. Later ones import `glide2x.dll`. Copy the DLL
 under the name your game's import table gives (`./gameframe run peinfo GAME.EXE --imports`).
@@ -40,8 +38,8 @@ emulated CPU. `LP_NATIVE_VECTOR_WIDTH=128` made llvmpipe faster under QEMU.
 
 | Module | Does |
 |---|---|
-| `api/` | The exported calls (`sst`, `state`, `tex`, `gutex`, `draw`, `lfb`, `lfbread`, `query`). They answer queries and record everything else as commands. `shadow` keeps the state as the game set it, for `grGlideGetState` and for what acts before a triangle is recorded: the origin, culling, the delta-0 colour and the STW hint |
-| `vertex.rs`, `layout.rs`, `fog.rs`, `tdf.rs` | Plain Rust, tested on the host: culling, polygon fans and clipping; where mip levels lie in texture memory (each level takes at least 2 × 2 texels, as on the Voodoo); the `gu` fog tables; 3DF texture files |
+| `api/` | The exported calls (`sst`, `state`, `tex`, `gutex`, `draw`, `lfb`, `lfbread`, `query`, `mp`, `movie`, `rle`, `pci`). They answer queries and record everything else as commands. `shadow` keeps the state as the game set it, for `grGlideGetState` and for what acts before a triangle is recorded: the origin, culling, the delta-0 colour and the STW hint |
+| `vertex.rs`, `layout.rs`, `fog.rs`, `tdf.rs`, `rle.rs` | Plain Rust, tested on the host: culling, polygon fans and clipping; where mip levels lie in texture memory (each level takes at least 2 × 2 texels, as on the Voodoo); the `gu` fog tables; 3DF texture files; the run-length code of `guEncodeRLE16` |
 | `cmd.rs` | The commands and the queue. A frame's commands go to the render thread at `grBufferSwap`. A game may call Glide from more than one thread, and an OpenGL context belongs to one |
 | `render/` | The render thread: the frame buffer (`frame.rs`, two colour buffers and one depth buffer, like Glide's), the state (`state.rs`), the texture memory (`textures.rs`, decoded with `gameframe-gpu-1997`), the shaders (`shaders.rs`) |
 | `window.rs` | The early Glide 2 `grSstOpen` takes no window. So the library finds the game's own window (`WRAPPER_WINDOW_CLASS`, which may still be hidden; without it the first visible window of the process), makes it borderless at the output size, and draws into it. Without a game window it makes one. The later `grSstWinOpen` names the window |
@@ -77,13 +75,22 @@ Each is marked `Deviation:` in the code.
   floating point *w*.
 - `GR_COMBINE_LOCAL_DEPTH` in the alpha combiner is taken as the iterated alpha.
 - `grSstVRetraceOn` always answers yes, and `grSstPerfStats` counts no pixels.
+- The PCI library (`pci*`) shows one Voodoo Graphics at device number 0. Its configuration
+  space is made up from the card's usual values. Every map call returns the same zeroed
+  16 MB block, and writes there draw nothing. The MTRR calls succeed and do nothing.
+- `guMPDrawTriangle` draws the detail and trilinear functions as one pass of texture 0.
+  After the passes it puts back the game's texture combine function.
+- In Glide 2.43 the `guMovie*` calls only report that the Voodoo cannot record. Here they
+  write each frame shown as a 24-bit TGA file (`NAME0000.tga` and on).
+- `guEncodeRLE16` stops where the original would read past the image.
 
 ## Test
 
 `test/glidetest.c` draws a known scene through the DLL and checks it. It opens 640 × 480 on
 its own window, draws, reads pixels back with `grLfbReadRegion` and prints one line per check:
 culling, clipping, `gu` and NCC textures, the alpha test, fog, points, an LFB write, saved
-state, statistics, a 3DF file and the queries. Then it animates a mipmapped checker in
+state, statistics, a 3DF file, the queries, the PCI library, `guEncodeRLE16`, two textures
+blended by `guMPDrawTriangle`, and a frame recorded by `guMovieStart`. Then it animates a mipmapped checker in
 perspective. The exit code is the number of failed checks. `tests/run.sh` builds it. Running
 it needs Wine or Windows.
 
@@ -97,6 +104,12 @@ WINEDLLOVERRIDES=glide2x=n GLIDE_SCALE=2 wine glidetest.exe 120
 
 The host tests (`cargo test --release --target <host> -p glide` in `wrappers/`) check the
 plain-Rust modules. The fog tables match Glide 2.43's own output byte for byte (*measured*,
-the original run under `tools/emu/pe32_emu.py`).
+the original run under `tools/emu/pe32_emu.py`). So does `guEncodeRLE16`'s code, on 2009
+images.
+
+Glide 2.43's own `guEncodeRLE16` has faults, and the port keeps them. Each run takes one
+pixel too many from the count, so the code covers fewer pixels than the image has. Pixels of
+0x8000 and above never form runs. Its `ConvertAndDownloadRle` calls an empty line decoder,
+so it downloads zeros. The port downloads zeros too.
 
 Build: `../README.md`. Licence: Apache-2.0 (code), CC0-1.0 (this text).
