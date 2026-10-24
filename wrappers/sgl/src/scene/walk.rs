@@ -346,7 +346,11 @@ impl Walk<'_> {
     /// planes) is skipped; POD makes only the one light volume (`FUN_0049b770`).
     fn convex(&mut self, id: u32, st: &State) {
         let Some(Obj::Convex(c)) = self.scene.objs.get(&id) else { return };
-        if !c.light_volume || c.planes.len() < 4 {
+        if !c.light_volume {
+            shim::gap!("sgl convex object", "a convex object that is not a light volume is not drawn");
+            return;
+        }
+        if c.planes.len() < 4 {
             return;
         }
         let planes: Vec<HalfSpace> = c.planes.iter().map(HalfSpace::from_plane).collect();

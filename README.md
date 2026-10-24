@@ -221,6 +221,7 @@ between agents, the outcome, and the failure path.
 | `tools/triage/compare_trees.py` | Two copies or releases compared file by file (SHA-256, case-insensitive paths); hashes to publish |
 | `tools/pe/peinfo.py` | What is this binary: architecture, compiler, PDB path, imports, exports, RTTI, engine and packer fingerprints |
 | `tools/pe/probegen.py` | A probe library for a DLL a 32-bit game imports: the same export names, and a log of every call with its arguments |
+| `tools/pe/apitable.py` | The API table of a 32-bit DLL or import library: every export with its calling convention and argument bytes, read from its code, and its parameters from a header |
 | `tools/pe/peres.py` | Version information, string tables, dialogs, bitmaps and data inside a Windows executable |
 | `tools/pe/stackstrings.py` | Text the code builds on the stack, which no string list shows |
 | `tools/pe/readdata.py` | The real value of a `DAT_` constant or table |

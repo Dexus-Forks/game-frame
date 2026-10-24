@@ -1,0 +1,26 @@
+# The API table of ati3dcif.dll: every export of ATI's ATI3DCIF for the 3D Rage, from the import library ATI3DCIF.LIB and the header
+# ATI3DCIF.H of ATI's 3D Rage Pro SDK 4.1 for Windows 95 (archive.org: 3drageprow-95-sdk-4.1zip).
+# Written by tools/pe/apitable.py from the original's own code; the stub column was added by
+# hand. wrappers/stubgen.py writes ati3dcif.def and src/stubs.rs from this file: each export this
+# library does not implement yet becomes a stub that logs its call and returns `stub`.
+# Columns: export name, Rust name, stdcall or cdecl, argument bytes (stdcall), parameter
+# count (- unknown), return kind (int, void, float, - unknown), the stub's return value.
+# A stub returns 6, C3D_EC_NOTIMPYET (ATI3DCIF.H).
+export	symbol	convention	bytes	params	returns	stub
+_ATI3DCIF_ContextCreate@0	ATI3DCIF_ContextCreate	stdcall	0	0	int	6
+_ATI3DCIF_ContextDestroy@4	ATI3DCIF_ContextDestroy	stdcall	4	1	int	6
+_ATI3DCIF_ContextSetState@12	ATI3DCIF_ContextSetState	stdcall	12	3	int	6
+_ATI3DCIF_GetInfo@4	ATI3DCIF_GetInfo	stdcall	4	1	int	6
+_ATI3DCIF_Init@0	ATI3DCIF_Init	stdcall	0	0	int	6
+_ATI3DCIF_RenderBegin@4	ATI3DCIF_RenderBegin	stdcall	4	1	int	6
+_ATI3DCIF_RenderEnd@0	ATI3DCIF_RenderEnd	stdcall	0	0	int	6
+_ATI3DCIF_RenderPrimList@8	ATI3DCIF_RenderPrimList	stdcall	8	2	int	6
+_ATI3DCIF_RenderPrimMesh@12	ATI3DCIF_RenderPrimMesh	stdcall	12	3	int	6
+_ATI3DCIF_RenderPrimStrip@8	ATI3DCIF_RenderPrimStrip	stdcall	8	2	int	6
+_ATI3DCIF_RenderSwitch@4	ATI3DCIF_RenderSwitch	stdcall	4	1	int	6
+_ATI3DCIF_Term@0	ATI3DCIF_Term	stdcall	0	0	int	6
+_ATI3DCIF_TexturePaletteAnimate@16	ATI3DCIF_TexturePaletteAnimate	stdcall	16	4	int	6
+_ATI3DCIF_TexturePaletteCreate@12	ATI3DCIF_TexturePaletteCreate	stdcall	12	3	int	6
+_ATI3DCIF_TexturePaletteDestroy@4	ATI3DCIF_TexturePaletteDestroy	stdcall	4	1	int	6
+_ATI3DCIF_TextureReg@8	ATI3DCIF_TextureReg	stdcall	8	2	int	6
+_ATI3DCIF_TextureUnreg@4	ATI3DCIF_TextureUnreg	stdcall	4	1	int	6

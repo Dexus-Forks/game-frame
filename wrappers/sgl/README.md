@@ -10,13 +10,16 @@ meshes, lights and cameras, built once; each frame the game moves transforms, sw
 on and off and calls `sgl_render`. The immediate-mode half (`sgltri_*`) takes lists of
 triangles and quads every frame. This library implements the scene-graph half: the 46 calls
 POD imports, under their own names (`sgl.def`, `__cdecl`, undecorated), and one more,
-`sgl_wrapper_present`, for `ddraw.dll`. How POD uses each call, with evidence, is in POD's
+`sgl_wrapper_present`, for `ddraw.dll`. It exports all 132 calls of PowerVR driver 3.1.0's
+`sgl.dll`. It also exports `sgl_delete_all_textures`, which Hardwar imports from a later SGL.
+The 87 calls it does not implement are stubs that log their calls (`api.tsv`,
+[wrappers](../README.md)). How POD uses each call, with evidence, is in POD's
 `docs/hardware/3d-cards.md` ("The PowerVR build").
 
 ## Not yet here: the immediate-mode half
 
 Hardwar (1998) loads `sgl.dll` at run time for its PowerVR mode and uses the immediate-mode
-half. It shares 7 names with POD. These 13 are missing here: `sgl_delete_all_textures`,
+half. It shares 7 names with POD. These 13 are stubs here: `sgl_delete_all_textures`,
 `sgl_get_errors`, `sgl_get_free_texture_mem`, `sgl_get_versions`, `sgl_get_win_versions`,
 `sgl_use_ddraw_mode`, `sgl_use_eor_callback`, `sgltri_isrendercomplete`, `sgltri_quads`,
 `sgltri_render`, `sgltri_shadow`, `sgltri_startofframe` and `sgltri_triangles`

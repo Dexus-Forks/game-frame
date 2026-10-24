@@ -8,12 +8,13 @@
 //!   names, so the EXE on disk stays unchanged.
 //! - `iat`: one of the EXE's imports replaced by the wrapper's own function, to see the calls
 //!   the game makes to another library.
-//! - `log`: a log to the file a DLL names by an environment variable, or to standard error.
+//! - `log`: a log to the file a DLL names by an environment variable, or to standard error,
+//!   and the counted log of what is not implemented yet (`stub!`, `gap!`). Plain Rust, so
+//!   the scene code tested on the host can use it.
 
 pub mod config;
 #[cfg(windows)]
 pub mod iat;
-#[cfg(windows)]
 pub mod log;
 #[cfg(windows)]
 pub mod patch;

@@ -1,0 +1,16 @@
+# The API table of S3DTKW.dll: every export of S3's S3D Toolkit for the ViRGE, from the Win95 S3DTKW.DLL of S3's 1996 ViRGE 325
+# driver (archive.org: s-3-virge-325-driver-disk-2).
+# Written by tools/pe/apitable.py from the original's own code; the stub column was added by
+# hand. wrappers/stubgen.py writes s3dtkw.def and src/stubs.rs from this file: each export this
+# library does not implement yet becomes a stub that logs its call and returns `stub`.
+# Columns: export name, Rust name, stdcall or cdecl, argument bytes (stdcall), parameter
+# count (- unknown), return kind (int, void, float, - unknown), the stub's return value.
+# No header: each parameter count is the highest [ebp+N] the original's code reads, and each
+# returns int in eax. A stub returns -1, which POD's S3 build treats as a failure.
+export	symbol	convention	bytes	params	returns	stub
+S3DTK_InitLib	S3DTK_InitLib	cdecl	0	1	int	-1
+S3DTK_ExitLib	S3DTK_ExitLib	cdecl	0	0	int	-1
+S3DTK_CreateRenderer	S3DTK_CreateRenderer	cdecl	0	2	int	-1
+S3DTK_DestroyRenderer	S3DTK_DestroyRenderer	cdecl	0	1	int	-1
+S3DTK_PhysicalToLinear	S3DTK_PhysicalToLinear	cdecl	0	2	int	-1
+S3DTK_LinearToPhysical	S3DTK_LinearToPhysical	cdecl	0	1	int	-1

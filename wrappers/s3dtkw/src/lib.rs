@@ -10,6 +10,7 @@ use std::ffi::c_void;
 mod api;
 mod draw;
 mod table;
+mod stubs;
 
 #[unsafe(no_mangle)]
 pub extern "system" fn DllMain(_module: *mut c_void, reason: u32, _reserved: *mut c_void) -> i32 {
@@ -17,6 +18,9 @@ pub extern "system" fn DllMain(_module: *mut c_void, reason: u32, _reserved: *mu
         shim::log::init("s3dtk", "S3DTK_LOG");
         shim::ports::install();
         shim::patch::apply();
+    }
+    if reason == 0 {
+        shim::log::summary();
     }
     1
 }

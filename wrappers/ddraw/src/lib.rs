@@ -20,6 +20,7 @@ mod desc;
 mod palette;
 mod present;
 mod surface;
+mod stubs;
 
 use shim::log;
 use std::ffi::c_void;
@@ -30,6 +31,9 @@ pub extern "system" fn DllMain(_module: *mut c_void, reason: u32, _reserved: *mu
         shim::log::init("ddraw", "DDRAW_LOG");
         shim::ports::install();
         shim::patch::apply();
+    }
+    if reason == 0 {
+        shim::log::summary();
     }
     1
 }

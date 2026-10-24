@@ -19,10 +19,6 @@ pub struct DirectDraw {
 /// `docs/running.md`).
 const MODES: [(u32, u32); 7] = [(320, 200), (320, 240), (512, 384), (640, 400), (640, 480), (800, 600), (1024, 768)];
 
-/// Argument counts of `IDirectDraw`'s 23 methods; `IDirectDraw2` has 5 for SetDisplayMode
-/// (21) and adds GetAvailableVidMem (23).
-const ARGS1: [usize; 23] = [2, 0, 0, 0, 3, 4, 3, 2, 4, 4, 0, 2, 1, 2, 1, 1, 1, 1, 1, 0, 2, 3, 2];
-
 static V1: OnceLock<Vec<usize>> = OnceLock::new();
 static V2: OnceLock<Vec<usize>> = OnceLock::new();
 
@@ -53,17 +49,16 @@ pub fn new(version: u32) -> *mut DirectDraw {
         V1.get_or_init(|| {
             let mut m = common();
             m.push((21, set_display_mode1 as Slot));
-            finish(table(&ARGS1, &m))
+            let mut stubs = direct_draw::stubs();
+            stubs.truncate(23);
+            finish(table(stubs, &m))
         })
     } else {
         V2.get_or_init(|| {
-            let mut args = ARGS1.to_vec();
-            args[21] = 5;
-            args.push(3);
             let mut m = common();
             m.push((21, set_display_mode2 as Slot));
             m.push((23, get_available_vid_mem as Slot));
-            finish(table(&args, &m))
+            finish(table(direct_draw::stubs(), &m))
         })
     };
     Box::into_raw(Box::new(DirectDraw { vtbl: vtbl.as_ptr() as *const Slot, refs: 1 }))

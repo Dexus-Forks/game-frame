@@ -3,8 +3,10 @@
 `glide2x.dll` replaces 3dfx's Glide 2.x library. The game runs unchanged. It loads this
 library in place of 3dfx's, and the library draws everything the Voodoo would have drawn with
 OpenGL, at any output size (2×, 4×, or a size you name). It was made for POD's 3dfx builds
-(`WPOD3DFX.EXE`, first edition and Gold). It exports the 55 functions they call, under the
-decorated `__stdcall` names the games link to (`_grGlideInit@0` and so on, in `glide2x.def`).
+(`WPOD3DFX.EXE`, first edition and Gold). It implements the 55 functions they call. It
+exports all 156 functions of Glide 2.43 and Glide 2.1.1, under the decorated `__stdcall` names
+the games link to (`_grGlideInit@0` and so on, in `glide2x.def`). The other 101 are stubs that
+log their calls (`api.tsv`, [wrappers](../README.md)).
 
 Early Glide 2 games import the file `glide.dll`. Later ones import `glide2x.dll`. Copy the DLL
 under the name your game's import table gives (`./gameframe run peinfo GAME.EXE --imports`).

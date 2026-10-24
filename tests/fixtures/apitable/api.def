@@ -1,0 +1,8 @@
+LIBRARY api.dll
+EXPORTS
+_decorated@8=decorated@8
+plain_std=plain_std@12
+plain_c
+ratio
+nothing
+table_data DATA

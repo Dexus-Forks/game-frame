@@ -22,7 +22,7 @@ The shared crates:
 
 | Crate | Does | Tested on the host |
 |---|---|---|
-| [shim](shim/README.md) | The shared settings (`WRAPPER_*`), Windows 95 port I/O emulated, in-memory patches from a file, the log | the settings' parsers |
+| [shim](shim/README.md) | The shared settings (`WRAPPER_*`), Windows 95 port I/O emulated, in-memory patches from a file, the log of what is not implemented | the settings' parsers and the log's counts |
 | [raster](raster/README.md) | A small software triangle rasteriser into 8-, 15- and 16-bit frame buffers | yes |
 | [scalers](scalers/README.md) | Whole-multiple, Scale2x and CRT-style scalers for a finished frame | yes |
 | [pixels](pixels/README.md) | RGB555 and RGB565 to 8-bit colour | yes |
@@ -30,10 +30,38 @@ The shared crates:
 The libraries come from the [POD: Planet of Death](https://github.com/tanepiper/pod-planet-of-death)
 project ([case study](../docs/case-studies/pod.md)). They run its unchanged 3dfx, ATI, S3 and
 PowerVR builds. Each library implements the calls POD makes, and its README lists what it does
-not handle. A game that makes other calls gets a log line for each unknown call. Add those
-calls here, with a test against our own samples (`AGENTS.md`, rule 8). The sound cards of
-the time, and which of their libraries can be stood in for, are in
-[sound-card APIs](../docs/hardware/sound-card-apis.md).
+not handle. The sound cards of the time, and which of their libraries can be stood in for,
+are in [sound-card APIs](../docs/hardware/sound-card-apis.md).
+
+## Every call of the original
+
+Each DLL exports every call the original library exports, so a game that imports any of them
+loads. The calls a library does not implement yet are stubs. A stub logs its call with its
+arguments and returns a failure value the game can test. The aim is a full replacement for
+each library, one call at a time.
+
+| DLL | The original | Implemented | Exported |
+|---|---|---|---|
+| `glide2x.dll` | Glide 2.43 (`glide2x.dll`) and Glide 2.1.1 (`glide.dll`) | 55 | 156 |
+| `sgl.dll` | PowerVR driver 3.1.0's `sgl.dll`, `sgl_delete_all_textures` from a later SGL, and `sgl_wrapper_present` | 47 | 134 |
+| `ati3dcif.dll` | ATI 3D Rage Pro SDK 4.1's `ATI3DCIF.LIB` | 6 | 17 |
+| `s3dtkw.dll` | S3's 1996 ViRGE driver's `S3DTKW.DLL` | 6 | 6 |
+| `ddraw.dll` | DirectX 5's `DDRAW.DLL`, the public calls, and DirectX 7's `DirectDrawCreateEx` and `DirectDrawEnumerateEx` | 2 | 9 |
+
+Each library's `api.tsv` is its original's API table: every export, its calling convention,
+its argument bytes, its parameters and what a stub returns. `tools/pe/apitable.py` reads the
+table from the original DLL's own code (the `ret N` of each function) or from its SDK's import
+library, with the SDK header for the parameters. `wrappers/stubgen.py` writes each crate's
+`.def` and `src/stubs.rs` from the table. It stubs every call the crate does not define. It
+fails when a call is defined with the wrong convention. Inside `ddraw.dll`, every COM method
+that is not implemented is a stub named by its interface (`IDirectDrawSurface::GetDC`).
+
+The original libraries are not in this repository. Keep your copies outside it, as you do the
+game's files. Only the tables, which hold names and sizes, are here.
+
+To implement a call, write it in its module with `#[unsafe(no_mangle)]` and the original's
+convention (`extern "system"` for stdcall, `extern "C"` for cdecl). Then run
+`python3 wrappers/stubgen.py`. Test it against our own samples (`AGENTS.md`, rule 8).
 
 ## Build
 
@@ -41,18 +69,30 @@ Rust with the 32-bit Windows target, and zig 0.17 as the linker. No MinGW is nee
 
 ```bash
 rustup target add i686-pc-windows-gnu
-cd wrappers && cargo build --release
+cd wrappers && cargo build --release     # release: for playing
+cd wrappers && cargo build               # debug: for working on a library
 ```
 
+| | Release (`target/i686-pc-windows-gnu/release/`) | Debug (`target/i686-pc-windows-gnu/debug/`) |
+|---|---|---|
+| Optimisation | Full, with link-time optimisation | Light (level 1, the dependencies level 2), so a game still runs |
+| Symbols | Stripped | Kept, for a debugger |
+| Stubs and gaps | The first call of each logged, the rest counted | The first 50 of each logged, the rest counted |
+| OpenGL | Not checked | Errors logged after each frame (`glide2x.dll`, `sgl.dll`) |
+| Size | About 0.4 to 1.2 MB a DLL | About 6 to 10 MB a DLL |
+
+The first log line of each DLL names its build.
+
 `.cargo/config.toml` sets the target and links through GameFrame's `scripts/zcc.sh`. zcc takes
-each DLL's exports from its crate's `.def` file (`glide/glide2x.def`, `sgl/sgl.def`). The DLLs
-land in `target/i686-pc-windows-gnu/release/`. The host tests:
+each DLL's exports from its crate's `.def` file (`glide/glide2x.def`, `sgl/sgl.def`). The host
+tests:
 
 ```bash
 cd wrappers && cargo test --release --target "$(rustc -vV | sed -n 's/^host: //p')" -p raster -p scalers -p pixels -p shim -p sgl -p maxi94
 ```
 
-`tests/run.sh` runs both, and checks each DLL's export table against its `.def` file.
+`tests/run.sh` runs them, builds both kinds of DLL, checks each export table against its `.def`
+file, and runs `python3 wrappers/stubgen.py --check`.
 
 ## Use them with a game
 
@@ -79,8 +119,9 @@ cd wrappers && cargo test --release --target "$(rustc -vV | sed -n 's/^host: //p
 
    Each library's own variables are in its README: `GLIDE_*`, `DDRAW_*`, `SGL_*`, and the log
    files `GLIDE_LOG`, `DDRAW_LOG`, `ATI3DCIF_LOG`, `S3DTK_LOG`, `SGL_LOG` and `MAXI94_LOG`.
-5. **Read the logs.** Each DLL logs most of the modes, states and methods it does not handle.
-   The first run shows much of what a new game needs. What each one logs is in
-   [the guide](../docs/hardware/wrappers.md#reading-the-logs).
+5. **Read the logs.** Each DLL logs `not implemented: NAME(arguments)` the first time the game
+   calls a stub, and `not handled: WHAT: detail` the first time an implemented call meets a mode
+   it does not draw. When the game exits, each DLL logs every one of them with its count. That
+   list is what the game still needs. Use the debug build to see more calls of each.
 
 Licence: Apache-2.0 (code), CC0-1.0 (the READMEs).

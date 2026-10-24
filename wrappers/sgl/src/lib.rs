@@ -22,6 +22,7 @@ mod api;
 mod frame;
 #[cfg(windows)]
 mod render;
+mod stubs;
 
 #[cfg(windows)]
 #[unsafe(no_mangle)]
@@ -31,6 +32,9 @@ pub extern "system" fn DllMain(_module: *mut std::ffi::c_void, reason: u32, _res
         shim::ports::install();
         shim::patch::apply();
         api::install_ini();
+    }
+    if reason == 0 {
+        shim::log::summary();
     }
     1
 }

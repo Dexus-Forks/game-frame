@@ -1,0 +1,21 @@
+# The API table of ddraw.dll: every export of DirectDraw, from the DDRAW.DLL of DirectX 5 (on POD Gold's disc, DIRECTX/)
+# and MinGW's ddraw.h.
+# Written by tools/pe/apitable.py from the original's own code; the stub column was added by
+# hand. wrappers/stubgen.py writes ddraw.def and src/stubs.rs from this file: each export this
+# library does not implement yet becomes a stub that logs its call and returns `stub`.
+# Columns: export name, Rust name, stdcall or cdecl, argument bytes (stdcall), parameter
+# count (- unknown), return kind (int, void, float, - unknown), the stub's return value.
+# Only the public calls: the DirectX 5 DDRAW.DLL's other exports (DDHAL32_*, VidMem*, the
+# thunks) are its own internals. DirectDrawCreateEx and DirectDrawEnumerateEx (DirectX 7) come
+# from ddraw.h (MinGW). Stubs return DDERR_UNSUPPORTED (0x80004001); DllCanUnloadNow S_FALSE
+# (1); DllGetClassObject CLASS_E_CLASSNOTAVAILABLE (0x80040111).
+export	symbol	convention	bytes	params	returns	stub
+DirectDrawCreate	DirectDrawCreate	stdcall	12	3	int	0x80004001
+DirectDrawCreateClipper	DirectDrawCreateClipper	stdcall	12	3	int	0x80004001
+DirectDrawEnumerateA	DirectDrawEnumerateA	stdcall	8	2	int	0x80004001
+DirectDrawEnumerateW	DirectDrawEnumerateW	stdcall	8	2	int	0x80004001
+DllCanUnloadNow	DllCanUnloadNow	stdcall	0	0	int	1
+DllGetClassObject	DllGetClassObject	stdcall	12	3	int	0x80040111
+DirectDrawCreateEx	DirectDrawCreateEx	stdcall	16	4	int	0x80004001
+DirectDrawEnumerateExA	DirectDrawEnumerateExA	stdcall	12	3	int	0x80004001
+DirectDrawEnumerateExW	DirectDrawEnumerateExW	stdcall	12	3	int	0x80004001

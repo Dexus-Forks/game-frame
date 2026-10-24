@@ -1,4 +1,5 @@
-//! The four exported calls (cdecl: the caller removes the arguments).
+//! The six exported calls (cdecl: the caller removes the arguments; each original function
+//! ends in a plain `ret`, wrappers/s3dtkw/api.tsv).
 
 use shim::log;
 
@@ -40,4 +41,17 @@ pub extern "C" fn S3DTK_DestroyRenderer(_table: *mut *mut crate::table::Table) -
 #[unsafe(no_mangle)]
 pub extern "C" fn S3DTK_LinearToPhysical(linear: u32) -> u32 {
     linear
+}
+
+/// The original returns 1 (its code sets the result to 1 before it frees its mappings).
+#[unsafe(no_mangle)]
+pub extern "C" fn S3DTK_ExitLib() -> i32 {
+    1
+}
+
+/// The linear address of a physical one, for `size` bytes. The original maps it through DPMI
+/// (function 0x800); here physical addresses are linear ones, as in `S3DTK_LinearToPhysical`.
+#[unsafe(no_mangle)]
+pub extern "C" fn S3DTK_PhysicalToLinear(physical: u32, _size: u32) -> u32 {
+    physical
 }
