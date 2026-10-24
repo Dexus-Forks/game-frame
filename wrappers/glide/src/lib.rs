@@ -1,11 +1,12 @@
 //! `glide.dll`: the Glide 2.x library, drawn with OpenGL at any output size. It was made for
-//! POD's 3dfx builds (`WPOD3DFX.EXE`). It implements the 55 functions they call and
-//! exports all 156 of Glide 2.43 and 2.1.1, under their decorated `__stdcall` names
+//! POD's 3dfx builds (`WPOD3DFX.EXE`). It implements and exports all 156 functions of
+//! Glide 2.43 and 2.1.1, under their decorated `__stdcall` names
 //! (`glide2x.def`, written with `stubs` from `api.tsv`); how the game uses each is in POD's
 //! `docs/hardware/3d-cards.md`.
 //!
-//! - `vertex`, `layout`, `fog`, `tdf`: vertices (culling, fans, clipping), where mip levels
-//!   lie in texture memory, the fog tables and 3DF files; plain Rust, tested on the host.
+//! - `vertex`, `layout`, `fog`, `tdf`, `rle`: vertices (culling, fans, clipping), where mip
+//!   levels lie in texture memory, the fog tables, 3DF files and `guEncodeRLE16`'s code;
+//!   plain Rust, tested on the host.
 //! - `api`: the exported calls. They record commands (`cmd`) and answer queries.
 //! - `render`: the thread that owns the OpenGL context and replays the commands.
 //! - `window`: the game's window, made the drawing surface.
@@ -17,6 +18,7 @@
 // Plain Rust, tested on the host.
 pub mod fog;
 pub mod layout;
+pub mod rle;
 pub mod tdf;
 pub mod vertex;
 
