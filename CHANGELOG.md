@@ -20,7 +20,32 @@ Every release of GameFrame, newest first. The format follows
   `sum_list` and `heaviest_path` to test them.
 - `tools/formats/derived.py`: which fields next to geometry are bounds, centres, normals or
   plane distances.
-
+- Reading the story, from the Hardwar project: the guide
+  [Reading the story for design decisions](docs/working/lore.md), which makes the case that a
+  game's manual and its own text say what each system is for and which must be exact, with
+  Hardwar as the worked example. `re-inventory` has a new step, "Read the story", and
+  `re-start`, `re-surveyor` and the games taxonomy point to it. New projects get a
+  `docs/lore.md` template with the table "in the story → in the code → evidence".
+- A case study of Hardwar (1998), and Hardwar in the vehicle simulations' reference games.
+- `tools/triage/sentences.py`: the sentences in a program or a Ghidra `strings.txt`, ASCII and
+  UTF-16, with addresses, for reading the story.
+- `tools/formats/shadetable.py`: a palette game's shade, fog or light table, with the levels
+  that are black, unchanged and white, the colour it fades toward, the shift that reaches
+  normal light, and a picture.
+- `xorscan.py --records` and `--key-in`: a key XORed into one field of every directory record,
+  read from the names' zero padding and completed from the executable.
+- `rawimage.py` and `catalog.py --dac shift`: 6-bit palettes shifted left by 2 (63 is 252).
+  The catalogue fills a palette of fewer than 256 colours with magenta.
+- `constants.py` reports Park-Miller's 16807 without `--all` when its modulus 0x7fffffff, or
+  Schrage's 127773 or 2836, is beside it.
+- `new-site.sh --manual`: a Pages workflow that runs only when started by hand. New sites get a
+  theme to colour from the game and a `public/` folder; `re-site` asks for figures and diagrams
+  in every diary entry from the first. `re-browse` describes the viewer's `--export` mode for
+  agents.
+- Know-how from Hardwar: Watcom pseudocode that drops register arguments, the x87 control word
+  `0x0c7f`, a variable frame step in replays, 6-bit palettes shifted by 2, light tables with an
+  unchanged level, worktrees without the ignored folders and Ghidra's project lock, and
+  reading the story. The entries on missed functions and on Watcom name `exportcov` and Hardwar.
 - Know-how entries for GameFrame's own tools: unmapped memory under the emulators, an import
   with no handler, a tool run without the `.venv`, and Ghidra refusing a path in a dot folder.
 - `dos_env` has a keyboard: `env.press(scan, at, hold)` and `env.key_script('10:39:3')` put
@@ -126,6 +151,12 @@ Every release of GameFrame, newest first. The format follows
 
 ### Changed
 
+- One GameFrame checkout per machine. A project made by `new-project.sh` pins it with
+  `GAMEFRAME_ROOT` in its `.env`, and `./gameframe` reads that from the project and from its main
+  checkout, so worktrees use the same one. The launcher no longer looks in `../game-frame` next
+  to a project, where projects side by side shared a stale symlinked clone. A game's session
+  changes GameFrame in a worktree of that checkout, never in a second clone
+  ([environments](docs/working/environments.md)).
 - `ExportAddressBatch` (`ghidra-run.sh decompile`) reports a bad address and goes on, and makes
   no function at an address that nothing refers to unless it follows a `ret` or padding, so a
   call site no longer splits the function around it.

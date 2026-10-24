@@ -30,18 +30,21 @@ An entry has one of five statuses.
 | [16-bit Windows (Windows 3.x) programs: what to know before the first run](context-windows-3x.md) | context |
 | [A changed value in a data file loads but changes nothing in the game](context-mod-value-replaced-at-run-time.md) | context |
 | [A data editor agents and tests can drive: one edit type for the window and the command line](context-editor-one-edit-type.md) | context |
+| [A game that loads its own x87 control word, such as 0x0c7f (single precision, truncation)](context-x87-control-word.md) | context |
 | [Before modding a format: a writer that gives every file back byte for byte](writer-round-trip-every-file.md) | context |
 | [Before moving geometry: find the bounds and normals stored with it](context-geometry-derived-data.md) | context |
 | [CD-era games often look in their install folder before the CD: a mod can be a file, with no patch](context-mods-install-folder-first.md) | context |
 | [DOS games in DOSBox-X: what to know before the first run](context-dos-dosbox.md) | context |
 | [Games with a build per 3D card: Glide, ATI3DCIF and the S3D Toolkit](context-3d-card-builds.md) | context |
 | [Keep a capture of every error dialog and crash, as it happens](context-keep-every-dialog.md) | context |
+| [Lighting in a 256-colour renderer is a lookup in a shade table, with one level that changes nothing](context-palette-light-tables.md) | context |
 | [Measure a function that walks the game's data structures under the emulator](emulate-function-on-game-structures.md) | context |
 | [Port a game's rules before its physics, driven by a recorded run](context-port-rules-before-physics.md) | context |
 | [Record a whole run of the original from its memory as the reference for a port](record-a-run-from-memory.md) | context |
 | [Running the original in an emulated PC when Wine on the host fails](context-emulated-pc.md) | context |
 | [Start a recorder when the next race begins instead of driving the menus](wait-for-the-next-race.md) | context |
 | [The game's clock runs at a slightly different rate from real time](game-clock-not-real-time.md) | context |
+| [The manual and the program's own text say what a system is for before the code does](context-read-the-story.md) | context |
 | [Watcom C/C++ programs: calling convention, runtime and linker quirks](context-watcom.md) | context |
 | [Windows 95 and DirectDraw games: what to know before the first run](context-windows-9x-directdraw.md) | context |
 | [Wine on macOS with Apple silicon: what to know before running a game there](context-wine-macos.md) | context |
@@ -70,14 +73,17 @@ An entry has one of five statuses.
 | [A ported fixed-point function differs from the original in a few cases out of thousands](x87-magic-add-rounding.md) | solved |
 | [A privileged instruction under Wine, from a Windows 95 port probe](wine-privileged-instruction.md) | solved |
 | [A reference recording was made with modded files loaded](mods-loaded-in-a-reference-recording.md) | solved |
+| [A replay drifts from the original because the game steps by the measured frame time](variable-frame-step-replay.md) | solved |
 | [A replay matches the recording at the end but not at some samples, one sample early or late](replay-sample-straddles-frames.md) | solved |
 | [A run in a shared test VM dies: "X connection to :2 broken"](shared-vm-pkill-display.md) | solved |
 | [A run script hangs on `wineserver -w`](wineserver-wait-hangs.md) | solved |
+| [A session in a git worktree finds no game, no Ghidra export and no Python environment](worktree-ignored-folders-missing.md) | solved |
 | [A wait loop with `pgrep -f` never ends after the process has finished](pgrep-wait-matches-itself.md) | solved |
 | [An editor's save changes bytes nobody edited (fixed point through floats)](editor-float-view-changes-bytes.md) | solved |
 | [An emulated function calls a Windows import that has no handler](emu-import-no-handler.md) | solved |
 | [An emulated function stops with an unmapped memory read, write or fetch](emu-unmapped-memory.md) | solved |
 | [Every new run exits at once, because a leftover game process holds its mutex](single-instance-leftover.md) | solved |
+| [Ghidra's pseudocode of a Watcom function leaves out arguments and stores that the disassembly shows](watcom-pseudocode-drops-register-arguments.md) | solved |
 | [Ghidra headless refuses a project path inside a folder whose name starts with a dot](ghidra-dot-folder-path.md) | solved |
 | [Keys reach a game under Wine on Xvfb only with a window manager running](xvfb-needs-window-manager.md) | solved |
 | [macOS drops DYLD_ variables through /bin/sh, so a Wine build cannot load its libraries](macos-dyld-stripped.md) | solved |
@@ -87,6 +93,7 @@ An entry has one of five statuses.
 | [The game asks for its CD under Wine on Linux, though the disc's folder is mapped with the right label](wine-linux-cd-drive.md) | solved |
 | [The game asks for its CD while the disc is there, because some file failed to open](insert-cd-file-open-failed.md) | solved |
 | [The player's car drives itself after a scripted driver was stopped](input-driver-keys-held-after-kill.md) | solved |
+| [The port's colours are a little brighter than the original's, because 6-bit palette values were scaled to 255](palette-6bit-shift.md) | solved |
 | [Times printed by the game differ by a hundredth from the same values printed by a tool](x87-truncating-time-format.md) | solved |
 
 A project keeps the entries for its own game in its own `docs/knowhow/`, in the same format.

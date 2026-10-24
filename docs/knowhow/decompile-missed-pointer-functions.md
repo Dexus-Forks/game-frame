@@ -8,13 +8,13 @@ platform: [windows-9x]
 compiler: [watcom]
 genre: []
 symptom: [tool-error]
-tags: [ghidra, function-pointer, coverage, decompile, export, callback, dispatch-table]
+tags: [ghidra, function-pointer, coverage, decompile, export, callback, dispatch-table, prologue, winmain, main-loop]
 signatures:
   - 'Cannot invoke "ghidra\.program\.model\.address\.Address\.isExternalAddress\(\)" because "addr" is null'
 tools: [exportcov, ghidra-export, ghidra-run, decomp_query, refs]
 skills: [re-ghidra, re-trace]
 docs: [docs/working/ghidra.md]
-seen: ['POD: Planet of Death (1997), 2026-10-23']
+seen: ['POD: Planet of Death (1997), 2026-10-23', 'Hardwar (1998), 2026-10-24']
 ---
 
 # A function has no callers, or no function exists, because Ghidra missed code reached through pointers
@@ -38,7 +38,11 @@ through pointers is not found: per-object function pointers (each POD car has a 
 its physics step and one to its driver), handlers registered by name in a table, and
 callbacks. Code between those functions is lost with them. *Measured* in POD's
 `WINPOD.EXE`: 263 KB of 857 KB of `BEGTEXT` lay outside every function after the first
-export.
+export. In Hardwar's `HARDWARW.EXE`, also Watcom, about 774 KB of the 1.14 MB code section was
+in functions: WinMain, the run loop, the 12.9 KB vehicle control function, two rasteriser
+blocks and the Direct3D and DirectPlay code lay in the gaps (*observed*). Watcom functions
+often open with a row of register pushes (`push ebx; push ecx; push edx; push esi`) instead of
+`push ebp; mov ebp, esp`, which the analysis does not take as a start.
 
 ## Evidence
 

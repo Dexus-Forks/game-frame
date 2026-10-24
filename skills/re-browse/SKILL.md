@@ -98,9 +98,22 @@ different synthesiser) with `Deviation:` comments.
 - In the browser, read files from a file picker, or from a local development server that
   serves the ignored data folder on `127.0.0.1` only (the port's dev-server script with an
   `--app viewer` choice). Never bundle or upload the files.
-- For agents, add a command-line mode that writes views to files: one PNG per picture, a frame
-  of a model, a JSON manifest of every file's decode status. An agent compares those with
-  captures of the original (`re-verify`, `tools/verify/`).
+- For agents, add an export mode from the start: `viewer --export DIR` opens no window and
+  writes every view to files. Write one PNG per picture, palette and font (`NAME.png`), one
+  frame of each model or level from a fixed camera (`NAME.3d.png`), and a `manifest.json` with
+  every file's kind, its reader, whether every byte was consumed and the coverage line. Print
+  the coverage line too. An agent reads the manifest and looks at the pictures to check a
+  decoder, compares them with captures of the original (`re-verify`, `tools/verify/`), and
+  takes the diary's figures from them (`re-site`). The export holds the game's material:
+  write it into `derived/` only.
+
+```bash
+cargo run --release -p GAME-viewer -- --export derived/viewer        # no window
+jq '.coverage' derived/viewer/manifest.json
+```
+
+- Add each new view to the export in the same change that adds it to the window, with a test
+  that runs the export on files built in the test.
 
 ## 5. Test it
 

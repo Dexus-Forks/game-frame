@@ -678,6 +678,46 @@ rm -rf "$W"
 echo "Constants, resources, stack strings, Flash, function matching"
 W="$(mktemp -d)"
 expect "constants finds the MSVC-style random generator in the engine" "MSVC rand() multiplier 214013" "$PYTHON" tools/triage/constants.py $B/engine.dll
+"$PYTHON" - "$W" <<'PY'
+import random, struct, sys
+d = sys.argv[1]; r = random.Random(3); junk = lambda n: bytes(r.randrange(256) for _ in range(n))
+# Park-Miller: 16807 beside its modulus in one function; a lone 16807 elsewhere is not reported.
+open(f'{d}/pm.bin', 'wb').write(b'\x90' * 100 + b'\x69\xc0' + struct.pack('<I', 16807) + b'\x25'
+                                + struct.pack('<I', 0x7fffffff) + b'\xc3' + b'\x90' * 300 + struct.pack('<I', 16807) + b'\x90' * 300)
+# Sentences among binary noise, one of them UTF-16, one a template with a format code.
+open(f'{d}/text.bin', 'wb').write(junk(300) + b'The pilot is low on power and looks for a lightwell.\0' + junk(50)
+     + b'OPEN_FILE_TABLE_ENTRY_NAMES\0' + 'Water goes into power cells, sold by the two factions.'.encode('utf-16-le')
+     + b'\0\0' + junk(30) + b'%s pays %d credits for the cargo.\0' + junk(20))
+open(f'{d}/strings.txt', 'w').write('00401000\tshort\n00402000\tThe crater lights rise and fall with the clock.\\nA second sentence on the next line.\n')
+# A pack directory whose names are XORed with a key the executable keeps.
+key = b'GAMEFRAMESAMPLE!'
+words = ['HANGAR', 'CRATER', 'MOTH', 'LOGO', 'FONT', 'HUD', 'RADAR', 'TUNNEL', 'PILOT', 'WATER', 'SKY', 'DOCK']
+recs = b''
+for i in range(40):
+    name = f'{r.choice(words)}{r.randrange(10)}.{r.choice(["WAV", "SPR", "PAL", "SHP"])}'.encode().ljust(16, b'\0')
+    recs += struct.pack('<I', 2) + bytes(a ^ b for a, b in zip(name, key)) + struct.pack('<II', i * 10, 10)
+open(f'{d}/pack.dat', 'wb').write(b'\x11' * 500 + recs + struct.pack('<I', 500))
+open(f'{d}/keyed.exe', 'wb').write(b'\x90' * 64 + key + b'\0' * 32)
+# A 64-level light table on a grey palette (6-bit, after a 4-byte header): 0 black, 32 unchanged, 63 white.
+open(f'{d}/grey.pal', 'wb').write(b'\0\0\xf8\0' + bytes(v for c in range(256) for v in (c * 63 // 255,) * 3))
+t = bytes((c * L // 32 if L <= 32 else c + (255 - c) * (L - 32) // 31) for L in range(64) for c in range(256))
+open(f'{d}/light.rmp', 'wb').write(b'HDR!' + t)
+open(f'{d}/light-by-colour.rmp', 'wb').write(bytes(t[L * 256 + c] for c in range(256) for L in range(64)))
+PY
+expect "constants reports Park-Miller's 16807 when its modulus is beside it" "16807, with modulus 0x7fffffff nearby  [paired]" "$PYTHON" tools/triage/constants.py "$W/pm.bin"
+[[ $("$PYTHON" tools/triage/constants.py "$W/pm.bin" | grep -c 16807) == 1 ]] && ok "constants leaves out a lone 16807 without --all" || bad "constants lone 16807"
+expect "sentences lists the long strings of a binary, UTF-16 too" "Water goes into power cells, sold by the two factions. [utf-16]" "$PYTHON" tools/triage/sentences.py "$W/text.bin"
+expect "sentences keeps format codes and drops identifiers" "# 3 sentences" "$PYTHON" tools/triage/sentences.py "$W/text.bin"
+expect "sentences reads a Ghidra strings.txt and splits its lines" "0x00402000    7  A second sentence on the next line." "$PYTHON" tools/triage/sentences.py "$W/strings.txt"
+expect "xorscan --records shows the key bytes the names' zero padding gives away" '?? 45 53 41 4d 50 4c 45 21  "????????ESAMPLE!"' "$PYTHON" tools/formats/xorscan.py "$W/pack.dat" --records 500:28:4:16
+expect "xorscan --key-in finds the whole key in the executable" '"GAMEFRAMESAMPLE!" stored in '"$W"'/keyed.exe at file offset 0x40' "$PYTHON" tools/formats/xorscan.py "$W/pack.dat" --records 500:28:4:16 --key-in "$W/keyed.exe"
+expect "shadetable finds the level of normal light and the shift that reaches it" "normal light: level 32; a 2.14 intensity of 0x4000 >> 9 lands there" "$PYTHON" tools/formats/shadetable.py "$W/light.rmp" --offset 4 --palette "$W/grey.pal" --palette-offset 4 --png "$W/light.png"
+expect "shadetable names the black and white ends" "level 63       mostly colour 255 (252, 252, 252)" "$PYTHON" tools/formats/shadetable.py "$W/light.rmp" --offset 4 --palette "$W/grey.pal" --palette-offset 4 --dac shift
+expect "shadetable tells a table stored colour by colour" "layout colour" "$PYTHON" tools/formats/shadetable.py "$W/light-by-colour.rmp" --palette "$W/grey.pal" --palette-offset 4
+expect "rawimage and catalog shift 6-bit palettes when asked, and fill a short palette with magenta" "(252, 252, 252) (255, 255, 255) (255, 0, 255)" "$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/formats'); import rawimage, catalog
+print(rawimage.load_palette('$W/grey.pal', 4, 'shift')[255], rawimage.load_palette('$W/grey.pal', 4)[255], catalog.load_palette('$W/grey.pal', 4 + 6, 'shift')[255])"
+printf '10001000\t%d\tFUN_10001000\t\n' $((0x20000)) > "$W/half.tsv"
 printf 'int main(void){return 0;}\n' > "$W/m.c"
 if zig cc -target x86_64-windows-gnu "$W/m.c" tests/fixtures/resources.rc -o "$W/res.exe" >/dev/null 2>&1; then
   expect "peres reads the version information" "OriginalFilename         SAMPLE.EXE" "$PYTHON" tools/pe/peres.py "$W/res.exe"
@@ -817,10 +857,10 @@ echo "Project scaffold"
 tmp="$(mktemp -d)/re-test"
 scripts/new-project.sh "$tmp" "Test Game" $B >/dev/null 2>&1
 [[ -f "$tmp/AGENTS.md" && -f "$tmp/README.md" && -f "$tmp/LICENSE-APACHE" && -f "$tmp/LICENSE-CC0-1.0" && ! -e "$tmp/LICENSE-CC-BY-4.0" && ! -e "$tmp/LICENSE-MIT" && -f "$tmp/.cargo/config.toml" && -f "$tmp/.claude/settings.json" && -x "$tmp/gameframe" && -f "$tmp/target/game.exe" && -d "$tmp/.git" && ! -e "$tmp/tools" && ! -e "$tmp/scripts" && ! -e "$tmp/.claude/skills" && -f "$tmp/skills/re-start/SKILL.md" && -L "$tmp/.agents/skills" && ! -e "$tmp/docs/DOS.md" ]] \
-  && grep -q "Test Game" "$tmp/AGENTS.md" && grep -q '"gameframe@game-frame": true' "$tmp/.claude/settings.json" && ! grep -q "gate.py" "$tmp/.claude/settings.json" \
+  && grep -q "Test Game" "$tmp/AGENTS.md" && grep -q "In the story | In the code | Evidence" "$tmp/docs/lore.md" && grep -q '"gameframe@game-frame": true' "$tmp/.claude/settings.json" && ! grep -q "gate.py" "$tmp/.claude/settings.json" \
   && grep -q 'gameframe gate cursor' "$tmp/.cursor/hooks.json" && grep -q 'gameframe\\" gate codex' "$tmp/.codex/hooks.json" && grep -q '"AGENTS.md"' "$tmp/.gemini/settings.json" \
   && ! (cd "$tmp" && git ls-files | grep -q '^target/') \
-  && ok "new-project makes a plugin project: settings enable the plugin, no copied toolkit, the other agents' skills, agents and hooks through ./gameframe gate, target/ out of git" || bad "new-project scaffold" "$(ls -la "$tmp" 2>&1)"
+  && ok "new-project makes a plugin project: docs/lore.md from its template, settings enable the plugin, no copied toolkit, the other agents' skills, agents and hooks through ./gameframe gate, target/ out of git" || bad "new-project scaffold" "$(ls -la "$tmp" 2>&1)"
 expect "the launcher finds GameFrame and runs its tools on the project" "EXE, x64 (64-bit)" sh -c "cd '$tmp' && GAMEFRAME_ROOT='$(pwd)' ./gameframe run peinfo target/game.exe"
 expect "the launcher runs a project script with the toolkit on its path" "pe_emu ok" sh -c "cd '$tmp' && printf 'import pe_emu\\nprint(\"pe_emu ok\")\\n' > probe.py && GAMEFRAME_ROOT='$(pwd)' ./gameframe python probe.py"
 out="$(cd "$tmp" && git config core.hooksPath && git add -f target/game.exe && GAMEFRAME_ROOT="$OLDPWD" git commit -qm game 2>&1; git reset -q)"
@@ -891,6 +931,13 @@ S="$sp/sites/test"
   && ok "new-site writes sites/NAME with the diary, the included documents and the Pages workflow, and quotes the title" || bad "new-site" "$out $(ls -A "$S" 2>&1)"
 out="$(cd "$sp" && GAMEFRAME_ROOT="$OLDPWD" ./gameframe run new-site test "Again" 2>&1)"
 [[ $? != 0 && "$out" == *"exists"* ]] && ok "new-site never writes over a site" || bad "new-site twice" "$out"
+grep -q 'paths:' "$sp/.github/workflows/sites.yml" && [[ -f "$S/.vitepress/theme/custom.css" && -d "$S/public" ]] \
+  && ok "new-site writes a theme to colour from the game and a public/ folder for the diary's figures" || bad "new-site theme"
+sm="$(mktemp -d)/re-manual"
+scripts/new-project.sh "$sm" "Test Game" --agent claude >/dev/null 2>&1
+(cd "$sm" && GAMEFRAME_ROOT="$OLDPWD" ./gameframe run new-site test "Manual" --manual >/dev/null 2>&1)
+grep -q 'workflow_dispatch:' "$sm/.github/workflows/sites.yml" && ! grep -q 'push:' "$sm/.github/workflows/sites.yml" \
+  && ok "new-site --manual writes a Pages workflow that runs only when started by hand" || bad "new-site --manual" "$(cat "$sm/.github/workflows/sites.yml" 2>&1 | head -20)"
 out="$(python3 tools/site/check.py "$S" 2>&1)"
 [[ $? == 1 && "$out" == *"TODO(site)"* ]] && ok "check.py fails a site with the template's TODO(site) lines" || bad "check.py TODO" "$out"
 sed -i.bak 's/TODO(site) //' "$S/index.md" && rm "$S/index.md.bak"

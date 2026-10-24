@@ -69,6 +69,17 @@ $P $T layout 140010a0 140011f0   # one structure's fields from several functions
 $P $T biggest 40                 # the largest unlabelled functions (where the work is)
 ```
 
+Then measure how much of the code is in functions. Ghidra's analysis misses code reached only
+through pointers, and Watcom code that opens with a row of register pushes. In two Watcom
+games a quarter to a third of the code was missing, the main loop among it:
+
+```bash
+./gameframe run exportcov GAME.EXE analysis/export/GAME.EXE/functions.tsv --starts analysis/notes/starts.txt   # share in functions, gaps, likely starts
+```
+
+Pass the starts to `ghidra-run.sh GAME.EXE decompile` (section 3) in batches of about 50, then
+export again. Recover the gaps before tracing anything that might live in them.
+
 Plain `grep` and `awk` on `decomp.c` work too: `awk '/^\/\/ ==== 1400be770 /{p=1;print;next}
 /^\/\/ ==== /{p=0} p' analysis/export/Game.exe/decomp.c` prints one function.
 
@@ -155,6 +166,15 @@ games, which compute in 80-bit precision until stored; `imul`/`idiv` (signed) ag
   disassembly at the call site settle it.
 - **32-bit games** pass arguments on the stack (cdecl, stdcall) and `this` in ecx (thiscall);
   see `docs/ABI.md`.
+- **Watcom register calls.** Watcom C passes the first four arguments in EAX, EDX, EBX and ECX.
+  With Ghidra's default convention the pseudocode drops them, and the stores that fill them
+  look dead. For any Watcom function the port depends on, read the disassembly
+  (`ghidra-run.sh GAME.EXE disasm OUT ADDR`) and check every register set before each call
+  (`./gameframe advise --entry watcom-pseudocode-drops-register-arguments`).
+- **One Ghidra job per project.** Ghidra locks the project while a headless job runs, so a
+  second session's `ghidra-run.sh` fails with `Unable to lock project`. Take turns, or give each
+  session a copy with `--project DIR`. Git worktrees do not hold `analysis/`: use the main
+  checkout's (`./gameframe advise --entry worktree-ignored-folders-missing`).
 - **Paths with a dot folder.** Ghidra refuses a project path with a folder that starts with
   "." (for example a git worktree in `.claude/worktrees/`). The scripts handle it with a link
   in `$TMPDIR` (`ghidra_project_dir` in `scripts/lib.sh`); call `analyzeHeadless` yourself the same way.

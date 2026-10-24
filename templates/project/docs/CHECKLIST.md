@@ -11,6 +11,7 @@ ground truth). Keep it short; details belong in the topic documents.
 - [ ] Every binary identified (`./gameframe run peinfo`)
 - [ ] Ghidra export of the game's own binaries (`./gameframe run ghidra-export`)
 - [ ] Data containers identified and listed
+- [ ] The story read: the manual and the program's long strings, `docs/lore.md` written (`re-inventory`, "Read the story")
 
 ## Viewer (before the game: every format becomes a reader, a document and a panel)
 

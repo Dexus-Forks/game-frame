@@ -1,0 +1,41 @@
+/*
+ * The site's colours and figure style. Replace the four colours with ones from the game's
+ * palette or interface (read them in the project's viewer), so the site looks like its game.
+ * System fonts only.
+ */
+:root {
+  --site-accent: #3a6ea5;      /* links and buttons: the game's main interface colour */
+  --site-accent-dark: #2c5684;
+  --site-second: #b8860b;      /* a second colour from the game, for tips and highlights */
+  --site-paper: #f6f4ef;       /* the page in light mode */
+
+  --vp-c-brand-1: var(--site-accent);
+  --vp-c-brand-2: var(--site-accent-dark);
+  --vp-c-brand-3: var(--site-accent);
+  --vp-c-brand-soft: color-mix(in srgb, var(--site-accent) 14%, transparent);
+  --vp-c-tip-1: var(--site-second);
+  --vp-c-bg: var(--site-paper);
+}
+
+.dark {
+  --site-paper: #16181c;       /* the page in dark mode: a dark colour from the game */
+  --vp-c-bg: var(--site-paper);
+}
+
+/* Figures: a picture followed by its caption in italics, as the diary entries write them:
+ * ![What it shows](/name.webp)
+ * *Our viewer, FILE.EXT: what the picture shows.*
+ */
+.vp-doc p > img {
+  display: block;
+  margin: 1.5rem auto 0.25rem;
+  max-width: 100%;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 4px;
+}
+.vp-doc p:has(> img) + p > em:only-child {
+  display: block;
+  text-align: center;
+  font-size: 0.9em;
+  color: var(--vp-c-text-2);
+}

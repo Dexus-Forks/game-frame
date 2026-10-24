@@ -3,7 +3,7 @@
 make of it, as a static HTML page for people and a JSON manifest for agents.
 
 Usage: catalog.py GAME_DIR OUT_DIR [--decoder GLOB=DECODER.py ...] [--palette FILE]
-                  [--palette-offset N] [--hex N]
+                  [--palette-offset N] [--dac shift|scale] [--hex N]
 
   GAME_DIR              the game's files (walked recursively)
   OUT_DIR               where index.html, catalog.json and the pictures go. It holds game
@@ -14,6 +14,9 @@ Usage: catalog.py GAME_DIR OUT_DIR [--decoder GLOB=DECODER.py ...] [--palette FI
   --palette FILE        256 RGB entries for palette-indexed pictures (6-bit VGA values are
                         scaled up when none is above 63); --palette-offset N reads it from
                         inside a bigger file. Without it, the default VGA palette
+  --dac shift|scale     how 6-bit values become 8 bits: scale (default, 63 -> 255) or shift
+                        (<< 2, 63 -> 252, as many games' palette loaders do). A palette with
+                        fewer than 256 colours is filled with magenta
   --hex N               bytes of each file shown in hex (default 256)
 
 A decoder may also define `images(result)`, returning a list of pictures to show:
@@ -40,7 +43,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(HERE, '..', 'triage'))
-from rawimage import default_vga, png  # noqa: E402
+from rawimage import dac8, default_vga, png  # noqa: E402
 from reader import FormatError, Reader  # noqa: E402
 import filetypes  # noqa: E402
 
@@ -55,12 +58,15 @@ def load_decoder(path):
     return mod
 
 
-def load_palette(path, offset):
+def load_palette(path, offset, dac='scale'):
+    """256 colours. A palette that sets fewer (248 after a 4-byte header) is filled with magenta,
+    so colours the file does not set stand out."""
     data = open(path, 'rb').read()[offset:offset + 768]
-    if len(data) < 768:
-        sys.exit(f'{path}: fewer than 768 palette bytes at {offset}')
-    scale = 255 / 63 if max(data) <= 63 else 1
-    return [tuple(int(v * scale) for v in data[i * 3:i * 3 + 3]) for i in range(256)]
+    if len(data) < 48:
+        sys.exit(f'{path}: fewer than 16 palette colours at {offset}')
+    six_bit = max(data) <= 63
+    pal = [tuple(dac8(v, dac) if six_bit else v for v in data[i * 3:i * 3 + 3]) for i in range(len(data) // 3)]
+    return pal + [(255, 0, 255)] * (256 - len(pal))
 
 
 def hexdump(data):
@@ -138,7 +144,7 @@ def main(argv):
         if a == '--decoder':
             opts['--decoder'].append(argv[i + 1])
             i += 2
-        elif a in ('--palette', '--palette-offset', '--hex'):
+        elif a in ('--palette', '--palette-offset', '--hex', '--dac'):
             opts[a] = argv[i + 1]
             i += 2
         else:
@@ -150,7 +156,7 @@ def main(argv):
     for spec in opts['--decoder']:
         glob, _, path = spec.partition('=')
         decoders.append((glob.lower(), path, load_decoder(path)))
-    palette = (load_palette(opts['--palette'], int(opts.get('--palette-offset', '0'), 0))
+    palette = (load_palette(opts['--palette'], int(opts.get('--palette-offset', '0'), 0), opts.get('--dac', 'scale'))
                if '--palette' in opts else default_vga())
     hex_bytes = int(opts.get('--hex', '256'))
 
