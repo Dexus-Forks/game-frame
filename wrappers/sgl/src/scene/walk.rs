@@ -124,12 +124,80 @@ struct Walk<'a> {
     index: HashMap<(u32, u32, bool, bool), usize>,
     /// Light volumes: their planes, their placement and their light.
     volumes: Vec<(Vec<HalfSpace>, Mat, Colour)>,
+    /// Where the camera is: point lights are placed from it.
+    eye: Mat,
+}
+
+/// The camera's placement: the transforms down to it, as the traversal would apply them.
+fn find_camera(scene: &Scene, id: u32, m: Mat, camera: u32, depth: u32) -> Option<Mat> {
+    let l = scene.list(id)?;
+    if depth > 64 {
+        return None;
+    }
+    let mut m = m;
+    for n in &l.nodes {
+        match *n {
+            Node::List(c) => {
+                let Some(child) = scene.list(c) else { continue };
+                if child.ignore {
+                    continue;
+                }
+                if child.preserve {
+                    if let Some(found) = find_camera(scene, c, m, camera, depth + 1) {
+                        return Some(found);
+                    }
+                } else {
+                    // A list that keeps no state passes its transforms on: walk it as part of this one.
+                    if let Some(found) = find_camera(scene, c, m, camera, depth + 1) {
+                        return Some(found);
+                    }
+                    m = end_transform(scene, c, m, depth + 1);
+                }
+            }
+            Node::Transform(t) => {
+                if let Some(Obj::Transform(x)) = scene.objs.get(&t) {
+                    m = m.mul(x);
+                }
+            }
+            Node::Camera(c) if c == camera => return Some(m),
+            _ => {}
+        }
+    }
+    None
+}
+
+/// The transform after a list that does not keep its state.
+fn end_transform(scene: &Scene, id: u32, m: Mat, depth: u32) -> Mat {
+    let Some(l) = scene.list(id) else { return m };
+    if depth > 64 {
+        return m;
+    }
+    let mut m = m;
+    for n in &l.nodes {
+        match *n {
+            Node::Transform(t) => {
+                if let Some(Obj::Transform(x)) = scene.objs.get(&t) {
+                    m = m.mul(x);
+                }
+            }
+            Node::List(c) => {
+                if let Some(child) = scene.list(c) {
+                    if !child.ignore && !child.preserve {
+                        m = end_transform(scene, c, m, depth + 1);
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+    m
 }
 
 /// The scene as `camera` sees it; `None` if the camera is not in the graph (or is in an
 /// ignored list).
 pub fn view(scene: &Scene, camera: u32) -> Option<View> {
-    let mut w = Walk { scene, camera, found: None, pass: 0, batches: Vec::new(), index: HashMap::new(), volumes: Vec::new() };
+    let eye = find_camera(scene, scene.root, Mat::IDENTITY, camera, 0)?;
+    let mut w = Walk { scene, camera, found: None, pass: 0, batches: Vec::new(), index: HashMap::new(), volumes: Vec::new(), eye };
     let mut st = State { m: Mat::IDENTITY, mat: Material::default(), lights: Vec::new(), fog: true };
     w.list(scene.root, &mut st, 0);
     let (cam, place) = w.found?;
@@ -190,8 +258,13 @@ impl Walk<'_> {
                 Node::Light(i) => {
                     if let Some(Obj::Light(l)) = self.scene.objs.get(&i) {
                         if l.on {
+                            // A point light is placed from the camera, not by the transforms
+                            // above it in the list (*inferred*: SGL has a separate
+                            // `sgl_position_light`, which POD never calls, and POD's car lights
+                            // are a narrow spot at (0, 0, 0) pointing along +z, the viewer's own
+                            // lamp, FUN_0049ba60 and FUN_004888e0).
                             let (pos, dir) = match l.kind {
-                                LightKind::Point { direction, position, .. } => (st.m.point(position), normalize(st.m.vector(direction))),
+                                LightKind::Point { direction, position, .. } => (self.eye.point(position), normalize(self.eye.vector(direction))),
                                 LightKind::Ambient { .. } => ([0.0; 3], [0.0; 3]),
                             };
                             st.lights.push(PlacedLight { colour: l.colour, kind: l.kind, pos, dir });
@@ -379,6 +452,29 @@ mod tests {
         assert_eq!(b.verts.len(), 6);
         assert_eq!(b.verts[0].p, [0.0, 0.0, 5.0], "the camera 5 forward sees the quad 5 ahead");
         assert_eq!(b.verts[0].modulate, [0.5, 0.5, 0.5, 1.0]);
+    }
+
+    #[test]
+    fn point_lights_shine_from_the_camera() {
+        // A camera 10 back, a spot light at (0, 0, 0) pointing along +z created after a far
+        // transform: it lights a quad in front of the camera, as POD's car lamps do.
+        let mut s = Scene::new();
+        s.create_list(false, true);
+        s.transform(Mat::translate([0.0, 0.0, 0.0]));
+        let cam = s.create_camera(1.0, 1.0, 0.0);
+        s.to_parent();
+        s.create_list(false, true);
+        s.transform(Mat::translate([500.0, 0.0, 0.0]));
+        s.create_light(false, Light { colour: [1.0; 3], kind: LightKind::Point { direction: [0.0, 0.0, 1.0], position: [0.0; 3], concentration: 32 }, on: true, shadows: false, smooth: false });
+        s.to_parent();
+        s.create_light(false, Light { colour: [1.0; 3], kind: LightKind::Point { direction: [0.0, 0.0, 1.0], position: [0.0; 3], concentration: 32 }, on: true, shadows: false, smooth: false });
+        s.create_mesh(false);
+        s.material(MatOp::Ambient([0.0; 3]));
+        let v = |x, y| Vertex { p: [x, y, 10.0], n: Some([0.0, 0.0, -1.0]), uv: None };
+        s.add_vertices([v(-0.1, -0.1), v(0.1, -0.1), v(0.1, 0.1), v(-0.1, 0.1)].into_iter());
+        s.add_face(&[0, 1, 2, 3]);
+        let b = &view(&s, cam as u32).unwrap().batches[0];
+        assert!(b.verts[0].modulate[0] > 0.8, "lit: {:?}", b.verts[0].modulate);
     }
 
     #[test]
