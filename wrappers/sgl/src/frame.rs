@@ -154,16 +154,47 @@ pub fn render(viewport: i32, camera: i32, swap: bool) {
         pending.need_address = true;
         pending.frames += 1;
         let first = pending.frames == 1;
+        let frames = pending.frames;
         drop(pending);
         if first {
             shim::log!("first frame: {} view(s), {} batches", views.len(), views.iter().map(|v| v.view.batches.len()).sum::<usize>());
         }
+        dump(frames, &views);
         render::send(Cmd::Frame(views));
         if !HOOKED.load(Ordering::Relaxed) {
             render::send(Cmd::Present(Present { hwnd: 0, w: 0, h: 0, rgba: None }));
         }
     }
 }
+
+/// `SGL_DUMP` (a Windows path): write the scene graph and a frame's batches there, at frame
+/// `SGL_DUMP_FRAME`, or at the next frame after a file of the same name plus `.now` appears
+/// (it is then removed), so a running game can be dumped at the moment wanted.
+fn dump(frame: u32, views: &[ViewDraw]) {
+    let Ok(path) = std::env::var("SGL_DUMP") else { return };
+    let at = std::env::var("SGL_DUMP_FRAME").ok().and_then(|v| v.parse().ok()).unwrap_or(0u32);
+    let now = format!("{path}.now");
+    let asked = frame % 16 == 0 && std::fs::remove_file(&now).is_ok();
+    if frame != at && !asked {
+        return;
+    }
+    let mut out = crate::scene::dump::dump(&sgl().scene);
+    for (i, v) in views.iter().enumerate() {
+        out += &format!("view {i}: camera {:?}\n", v.view.camera);
+        for b in &v.view.batches {
+            let first = b.verts.first();
+            out += &format!("  batch texture {} pass {} translucent {} fog {}: {} triangles, first {:?}\n", b.texture, b.pass, b.translucent, b.fog, b.verts.len() / 3, first);
+        }
+        for vol in &v.view.volumes {
+            out += &format!("  volume {} planes colour {:?}\n", vol.planes.len(), vol.colour);
+        }
+    }
+    match std::fs::write(&path, out) {
+        Ok(()) => shim::log!("scene of frame {frame} written to {path}"),
+        Err(e) => shim::log!("cannot write {path}: {e}"),
+    }
+}
+
 
 /// Called by `wrappers/ddraw` each time the game shows its picture: the window and the
 /// primary surface's pixels. Returns 1 when this library showed it (16-bit pictures), 0 to

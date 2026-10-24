@@ -8,8 +8,10 @@
 //! - `walk`: the traversal, from the root list to triangles in camera space.
 //! - `convex`: a convex object's solid from its planes (light volumes).
 //! - `math`: affine matrices.
+//! - `dump`: the graph as text, for debugging.
 
 pub mod convex;
+pub mod dump;
 pub mod graph;
 pub mod math;
 pub mod walk;

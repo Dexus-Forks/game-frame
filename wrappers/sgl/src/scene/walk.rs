@@ -7,7 +7,7 @@
 //! ambient material × the ambient lights, diffuse material × each point light × the cosine at
 //! the vertex (a spot light: × the cosine to its axis to the power `concentration`), specular
 //! with its shininess, and glow. `sgl_set_texture_effect` picks which terms the texture
-//! colours; the others are added on top.
+//! colours (see `light` for the rest).
 
 use super::Colour;
 use super::convex::HalfSpace;
@@ -321,10 +321,32 @@ fn light(mat: &Material, textured: bool, ambient: Colour, lights: &[PlacedLight]
     ];
     let mut modulate = [0.0f32; 3];
     let mut add = [0.0f32; 3];
-    for (t, on) in terms.iter().zip(mat.effect) {
-        let into = if on || !textured { &mut modulate } else { &mut add };
-        for k in 0..3 {
-            into[k] += t[k];
+    if !textured {
+        for t in &terms {
+            for k in 0..3 {
+                modulate[k] += t[k];
+            }
+        }
+    } else if mat.effect == [false; 4] {
+        // A texture that no lighting term affects shows as it is: POD's sky sets glow 1, all
+        // four effects off and fog off (FUN_0049a560), and is meant to show its picture
+        // (*inferred*; sgl.h does not say).
+        modulate = [1.0; 3];
+    } else {
+        // The terms the texture affects are multiplied by it. Of the others only the
+        // specular highlight is added on top (*inferred*: the PCX chips shaded a texture by
+        // one intensity and added a highlight).
+        for (i, (t, on)) in terms.iter().zip(mat.effect).enumerate() {
+            let into = if on {
+                &mut modulate
+            } else if i == 2 {
+                &mut add
+            } else {
+                continue;
+            };
+            for k in 0..3 {
+                into[k] += t[k];
+            }
         }
     }
     (modulate.map(|v| v.min(1.0)), add.map(|v| v.min(1.0)))
