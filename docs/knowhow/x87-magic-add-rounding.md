@@ -47,6 +47,9 @@ start-up `fninit` leaves) the sequential model matched all 20,000 cases; under 0
 
 ## What to do
 
+`pe32_emu`'s `emu.fpu_modes(FUNC, cases)` runs a routine under both control words and lists the
+cases whose result differs; `call(..., fpu_cw=...)` runs it under one.
+
 Model the conversion exactly in integers: keep the magic constant, add each product in the
 order the code does, round to the extended format's step after each `fadd`, then to the
 double's step, and subtract the constant (`crates/pod-race/src/gate.rs`, `dot`). Then

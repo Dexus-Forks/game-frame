@@ -8,7 +8,7 @@ platform: [windows-9x, linux]
 runtime: [wine, virtual-machine]
 genre: []
 tags: [ground-truth, recording, proc-mem, memory, reference, port, verify]
-tools: [memrec, memscan]
+tools: [memrec, memlog, memscan]
 skills: [re-observe, re-verify, re-port]
 docs: [docs/observe/memory.md]
 seen: ['POD: Planet of Death (1997), 2026-10-23']
@@ -24,7 +24,8 @@ game runs under Wine on Linux (natively or in a VM), the simplest recorder reads
 process's memory from outside through `/proc/PID/mem` as root. The game is not changed or
 slowed, and nothing is injected.
 
-GameFrame's `tools/live/memrec.py` is that recorder: `snap` copies the writable memory for
+`memlog.py summary REC.jsonl` and `memlog.py csv` read a recording back. GameFrame's
+`tools/live/memrec.py` is that recorder: `snap` copies the writable memory for
 `memscan.py` diffs, and `record SPEC` writes named values as JSON Lines. What worked for POD,
 whose recorder it came from:
 

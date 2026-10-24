@@ -18,9 +18,6 @@ Every release of GameFrame, newest first. The format follows
 - A case study of Hardwar (1998), and Hardwar in the vehicle simulations' reference games.
 - `tools/triage/sentences.py`: the sentences in a program or a Ghidra `strings.txt`, ASCII and
   UTF-16, with addresses, for reading the story.
-- `tools/triage/gaps.py`: the share of code Ghidra left outside functions, and the likely
-  function starts in each gap (call targets, and starts after a `ret` with a frame or a row of
-  register pushes, as Watcom code opens), ready for `ghidra-run.sh decompile`.
 - `tools/formats/shadetable.py`: a palette game's shade, fog or light table, with the levels
   that are black, unchanged and white, the colour it fades toward, the shift that reaches
   normal light, and a picture.
@@ -37,7 +34,25 @@ Every release of GameFrame, newest first. The format follows
 - Know-how from Hardwar: Watcom pseudocode that drops register arguments, the x87 control word
   `0x0c7f`, a variable frame step in replays, 6-bit palettes shifted by 2, light tables with an
   unchanged level, worktrees without the ignored folders and Ghidra's project lock, and
-  reading the story. The entries on missed functions and on Watcom name `gaps` and Hardwar.
+  reading the story. The entries on missed functions and on Watcom name `exportcov` and Hardwar.
+- Know-how entries for GameFrame's own tools: unmapped memory under the emulators, an import
+  with no handler, a tool run without the `.venv`, and Ghidra refusing a path in a dot folder.
+- `dos_env` has a keyboard: `env.press(scan, at, hold)` and `env.key_script('10:39:3')` put
+  make and break codes on port 0x60 and raise IRQ 1 through the game's INT 9 handler, which
+  acknowledges through port 0x20. The BIOS's INT 9 feeds the INT 16h queue, and INT 16h waits
+  for a key still to come. The DOS sample gains `wait_keys` and a keyboard handler.
+- `tools/triage/exportcov.py`: how much code a Ghidra export covers, its largest gaps, and the
+  likely starts of the functions it missed (call targets, starts after a return or padding),
+  written for the batch decompile.
+- `pe32_emu`: `fpu_cw=` loads an x87 control word before a call, `fpu_modes()` lists the cases
+  whose result depends on the rounding mode, and `until=` stops at an address and returns the
+  stack there, as for a call to `sprintf`. The sample's 32-bit DLL gains `fix_mul` (a magic-number
+  `fadd`) and `report` (a call to `wsprintfA`).
+- `validate.py --write`: decode, encode and compare every file, naming the first differing byte.
+  The sample decoder has an `encode`.
+- `tools/live/memlog.py` (read a recording back: summary, CSV), `tools/live/emulock.py` (who
+  uses a shared emulator) and `tools/live/loopcut.py` (a recorded path cut into one loop).
+
 - Thirty-five know-how entries promoted from the POD: Planet of Death project. They cover
   replacement card libraries under Wine (Glide 2, the S3D Toolkit, ViRGE surfaces, missing
   card libraries), mods (the install folder first, values replaced at run time, mods in a
@@ -125,6 +140,10 @@ Every release of GameFrame, newest first. The format follows
 
 ### Changed
 
+- `ExportAddressBatch` (`ghidra-run.sh decompile`) reports a bad address and goes on, and makes
+  no function at an address that nothing refers to unless it follows a `ret` or padding, so a
+  call site no longer splits the function around it.
+
 - The know-how hook reads only `stdout`, `stderr` and the error of a Claude Code command. The
   desktop app adds notes on changed files to the result. Those notes had matched the text of
   the entries themselves.
@@ -143,6 +162,10 @@ Every release of GameFrame, newest first. The format follows
 
 ### Fixed
 
+- `tools/site/check.py` and the gates no longer take the English word "undefined" in prose for
+  decompiled code. The pattern now matches Ghidra's sized types, pointers and variables of
+  those types, and statements with `FUN_` and `DAT_` names (calls, assignments and
+  declarations). Names cited in a sentence pass, as before.
 - The animated diagrams: in every animated diagram the static labels are drawn last, so a
   moving token or highlight passes under the text it crosses instead of hiding it. Tokens that
   loop start with a negative `begin`, so none waits in the card's top-left corner before its

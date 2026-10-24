@@ -64,6 +64,7 @@ An entry has one of five statuses.
 | [A DirectDraw game runs in a window only on a 16-bit desktop, else goes fullscreen](directdraw-windowed-16bit-desktop.md) | solved |
 | [A driver run with sudo sends no keys: "Can't open display"](sudo-drops-display.md) | solved |
 | [A function has no callers, or no function exists, because Ghidra missed code reached through pointers](decompile-missed-pointer-functions.md) | solved |
+| [A GameFrame tool fails with "No module named unicorn", pefile or capstone](tool-without-venv.md) | solved |
 | [A helper script named like a standard module breaks imports, as dis.py broke capstone](python-script-shadows-stdlib.md) | solved |
 | [A line-following driver stalls or wedges at the same place every lap](racing-line-must-be-a-closed-lap.md) | solved |
 | [A path from an installer's ini file lacks its last backslash, so files are not found](installer-ini-path-separator.md) | solved |
@@ -79,8 +80,11 @@ An entry has one of five statuses.
 | [A session in a git worktree finds no game, no Ghidra export and no Python environment](worktree-ignored-folders-missing.md) | solved |
 | [A wait loop with `pgrep -f` never ends after the process has finished](pgrep-wait-matches-itself.md) | solved |
 | [An editor's save changes bytes nobody edited (fixed point through floats)](editor-float-view-changes-bytes.md) | solved |
+| [An emulated function calls a Windows import that has no handler](emu-import-no-handler.md) | solved |
+| [An emulated function stops with an unmapped memory read, write or fetch](emu-unmapped-memory.md) | solved |
 | [Every new run exits at once, because a leftover game process holds its mutex](single-instance-leftover.md) | solved |
 | [Ghidra's pseudocode of a Watcom function leaves out arguments and stores that the disassembly shows](watcom-pseudocode-drops-register-arguments.md) | solved |
+| [Ghidra headless refuses a project path inside a folder whose name starts with a dot](ghidra-dot-folder-path.md) | solved |
 | [Keys reach a game under Wine on Xvfb only with a window manager running](xvfb-needs-window-manager.md) | solved |
 | [macOS drops DYLD_ variables through /bin/sh, so a Wine build cannot load its libraries](macos-dyld-stripped.md) | solved |
 | [Porting more of the original made a replay agree less with the recording](replay-stand-in-for-unported-logic.md) | solved |

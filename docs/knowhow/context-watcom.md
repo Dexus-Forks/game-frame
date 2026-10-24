@@ -7,7 +7,7 @@ era: [early-1990s, late-1990s]
 platform: [dos, windows-9x]
 compiler: [watcom]
 tags: [watcall, dos4gw, register-calling-convention, linker]
-tools: [peinfo, insns, gaps]
+tools: [peinfo, insns, exportcov]
 skills: [re-inventory, re-ghidra, re-trace]
 docs: [docs/ABI.md, docs/COMPILED-CODE.md, docs/DOS.md]
 seen: ['POD: Planet of Death (1997), 2026-10-23', 'Hardwar (1998), 2026-10-24']
@@ -35,7 +35,7 @@ before you read the pseudocode. Otherwise every function shows the wrong argumen
   ([register arguments dropped](watcom-pseudocode-drops-register-arguments.md)).
 - **Function starts.** Watcom code often opens with a row of register pushes, which the
   analysis misses. In POD and Hardwar a quarter to a third of the code lay in no function
-  ([missed functions](decompile-missed-pointer-functions.md), `gaps`).
+  ([missed functions](decompile-missed-pointer-functions.md), `exportcov`).
 - **Section names.** `BEGTEXT`, `DGROUP` and `.bss` together are the Watcom linker's names
   (*observed* in Hardwar).
 - **The FPU.** Look for the control word the game loads; Hardwar loads `0x0c7f`

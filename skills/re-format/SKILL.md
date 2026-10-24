@@ -112,6 +112,11 @@ Every file must report complete. A failure says where it stopped and shows the n
 missed field, a wrong type or a version branch. `examples/sample-game/decode_sample.py` is a
 complete small example.
 
+Before writing or modding a file, add `encode(result)` to the decoder and run the same command
+with `--write`: every file must come back identical, byte for byte. A failure names the first
+offset that differs. Keep the stored form beside the friendly view (raw palettes, pools as
+stored, unused tails) until it passes (docs/knowhow/writer-round-trip-every-file.md).
+
 Then look at what the decoder found (`re-browse`). Add `images(result)` to the decoder when the
 format holds pictures, and run the catalogue with it:
 

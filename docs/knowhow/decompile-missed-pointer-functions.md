@@ -11,7 +11,7 @@ symptom: [tool-error]
 tags: [ghidra, function-pointer, coverage, decompile, export, callback, dispatch-table, prologue, winmain, main-loop]
 signatures:
   - 'Cannot invoke "ghidra\.program\.model\.address\.Address\.isExternalAddress\(\)" because "addr" is null'
-tools: [ghidra-export, ghidra-run, decomp_query, refs, gaps]
+tools: [exportcov, ghidra-export, ghidra-run, decomp_query, refs]
 skills: [re-ghidra, re-trace]
 docs: [docs/working/ghidra.md]
 seen: ['POD: Planet of Death (1997), 2026-10-23', 'Hardwar (1998), 2026-10-24']
@@ -54,11 +54,11 @@ often open with a row of register pushes (`push ebx; push ecx; push edx; push es
 
 ## What to do
 
-`./gameframe run gaps GAME.EXE analysis/export/GAME.EXE/functions.tsv` measures the share of
-the code that lies in no function and lists the likely starts in each gap: call targets, and
-starts after a `ret` that open with `push ebp; mov ebp, esp`, `sub esp` or a row of register
-pushes. `--addresses` prints them one per line, for `ghidra-run.sh GAME.EXE decompile` in small
-batches.
+`./gameframe run exportcov GAME.EXE analysis/export/GAME.EXE/functions.tsv --starts
+starts.txt` measures the coverage after an export and lists the likely starts in the gaps.
+Pass them to `scripts/ghidra-run.sh GAME.EXE decompile OUT.txt $(cat starts.txt)`: it makes the
+functions, skips an address that nothing refers to unless it follows a `ret` or padding, and
+reports a bad address without stopping the batch.
 
 `./gameframe run refs GAME.EXE ADDRESS --functions analysis/export/GAME.EXE/functions.tsv`
 lists every instruction that refers to an address from the raw bytes, and marks those that lie

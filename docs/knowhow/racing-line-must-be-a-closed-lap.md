@@ -12,7 +12,7 @@ genre: [racing-sports]
 symptom: [tool-error]
 tags: [racing-line, line-follower, recording, lap, automation]
 signatures: []
-tools: [memrec]
+tools: [memrec, loopcut]
 skills: [re-observe]
 docs: [docs/games/racing-sports.md]
 seen: ['POD: Planet of Death (1997), 2026-10-24']
@@ -34,5 +34,6 @@ takes about 70 s).
 ## What to do
 
 Record more than a lap from a computer car and cut it where the car comes back within a few
-units of its first point, so the line is a closed loop. Check the gap between the last and first
+units of its first point, so the line is a closed loop:
+`./gameframe run loopcut REC.jsonl --x car_x --y car_y --index 1 --out LINE.jsonl`. Check the gap between the last and first
 points before using a line.

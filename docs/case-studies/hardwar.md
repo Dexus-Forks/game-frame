@@ -62,7 +62,7 @@ viewer; the 7 left are force-feedback effects.
   is a trace of the simulation.
 - **Code outside functions.** About a third of the code was in no function after Ghidra's
   analysis: WinMain, the run loop, the vehicle control function, two rasteriser blocks
-  ([missed functions](../knowhow/decompile-missed-pointer-functions.md), `gaps`).
+  ([missed functions](../knowhow/decompile-missed-pointer-functions.md), `exportcov`).
 
 ## What the story explained
 
@@ -97,7 +97,7 @@ The whole account is [Reading the story for design decisions](../working/lore.md
 - The lore step in the method: `re-inventory` "Read the story", the `docs/lore.md` template
   and the guide [Reading the story for design decisions](../working/lore.md).
 - Tools: `sentences` (a program's long strings, for reading the story), `shadetable` (shade,
-  fog and light tables of palette games), `gaps` (code Ghidra did not turn into functions,
+  fog and light tables of palette games), `exportcov` (code Ghidra did not turn into functions,
   with likely starts), `xorscan --records` (a key XORed into one field of every directory
   record, found from the padding and then in the executable), `rawimage` and `catalog
   --dac shift`, and Park–Miller reported by `constants` when its modulus is beside it.

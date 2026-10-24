@@ -100,7 +100,6 @@ proposed again.
 - [x] `gameframe agents --emit`: the agents for Codex, Gemini CLI, Copilot and OpenCode ([the matrix](docs/working/agents.md#agents-in-every-client))
 - [x] `new-project.sh --copy` and `update-project.sh` copy the agents for clients other than Claude Code
 - [x] `tools/emu/pe32_emu.py`: 32-bit (x86) PE routines under Unicorn, with register inputs, MMX, and named import stubs
-- [x] `tools/triage/gaps.py`: the share of code Ghidra left outside functions, with likely starts (call targets, Watcom push prologues)
 - [x] `tools/formats/shadetable.py`: shade, fog and light tables of palette games
 - [x] `xorscan.py --records`, `--key-in`: a key XORed into one field of every directory record, found from zero padding and in the executable
 - [x] `rawimage.py` and `catalog.py --dac shift`: 6-bit palettes shifted left by 2, as many loaders do; short palettes filled with magenta
@@ -143,29 +142,35 @@ proposed again.
   had matched entries' own text)
 - [ ] Queries that `advise` missed, to decide on embeddings (none recorded yet)
 
+Proposed by POD, now built:
+
+- [x] Export coverage and the likely starts in its gaps (`tools/triage/exportcov.py`), for the
+  batch decompile
+- [x] Per-address errors in `ExportAddressBatch`, and no new function at an address that
+  nothing refers to unless it follows a `ret` or padding
+- [x] An x87 control word in `pe32_emu` (`fpu_cw=`), and `fpu_modes`, which lists the cases
+  whose result depends on it; the sample's `fix_mul` uses the 1.5 × 2^68 `fadd`
+- [x] Stop at a call and read its arguments in `pe32_emu` (`until=`); the sample's `report`
+  calls `wsprintfA`
+- [x] A reader for `memrec` recordings (`tools/live/memlog.py`: summary, CSV, 16.16 as decimals)
+- [x] A lock for a shared emulator (`tools/live/emulock.py`)
+- [x] A round-trip check (`validate.py --write`, with `encode` in the decoder)
+- [x] A closed-loop cut for recorded paths (`tools/live/loopcut.py`)
+
 Proposed by POD and not built yet, each with the reason:
 
-- [ ] Export coverage after `ghidra-export` and a `ghidra-run fill-gaps` pass that makes
-  functions at call targets and after `ret` in gaps: needs a sample with a function reached
-  only through a pointer table, and a Ghidra change. `refs.py --functions` finds such code now
-- [ ] Per-address errors in `ExportAddressBatch`, and a search back for a function's start:
-  a Ghidra script change with its own test
 - [ ] Watcom register order (EAX, EDX, EBX, ECX) in `ExportCallArgs`: needs a Watcom-built
   sample. GameFrame has no Watcom compiler in its toolchain
-- [ ] A control word in `pe32_emu` (`fpu_cw=`) and an `fpu-modes` probe: needs a sample routine
-  with the 1.5 × 2^68 `fadd` trick
-- [ ] Stop at a call and read its arguments in `pe32_emu`, and a helper that lays out linked
-  structures in scratch memory: small. Each needs a sample function
+- [ ] A helper that lays out linked structures in scratch memory for `pe32_emu`: wait for a
+  second project, to see which layouts recur
 - [ ] A replay harness for `re-verify` (frames rebuilt at recorded clocks, a window for samples
   that straddle frames): a crate-sized piece. It is best moved from POD's `crates/pod-race` tests
-- [ ] A reader for `memrec` recordings (summary, CSV, values printed the game's way): wait for a
-  second project's needs
-- [ ] A lock for a shared emulator: start with a convention, written in `context-emulated-pc`
-- [ ] A round-trip harness (`validate.py --write`) and a multi-entry block-container writer:
-  need writer samples in GameFrame's own formats
+- [ ] Printing recorded values the game's way (a game's own time format): game-specific; it
+  belongs beside the port
+- [ ] A multi-entry block-container writer: needs a sample container format with checksums in
+  GameFrame's samples
 - [ ] An editor stage in `re-browse`, an axes check, and a derived-data finder for geometry: each
   needs a sample format with fixed-point positions, bounds and normals
-- [ ] A closed-lap check for recorded racing lines: racing only. The know-how entry covers it
 - [ ] `zcc`, a `zig cc` linker script for 32-bit Windows DLLs from Rust, and the wrapper pieces
   (port-I/O shim, DirectDraw in memory, Glide 2 on OpenGL, scalers, rasteriser, probe-library
   generator, render-thread timing): large. Each needs a Windows test program run under Wine.

@@ -52,6 +52,7 @@ changed copy reads back changed. Four changed files then loaded in the original 
 
 ## What to do
 
-For each format: add the round-trip test over every file first, then fix the reader until it
+For each format: add the round-trip test over every file first (`validate.py DECODER.py GLOB
+--write`, with an `encode(result)` beside `decode`), then fix the reader until it
 keeps every byte, then add the one edit the mod needs and a test that reads it back. Run the
 tests in release builds: a nearest-colour search over every picture is slow in debug.

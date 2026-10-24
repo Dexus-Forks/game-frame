@@ -103,6 +103,10 @@ These apply to many games:
 - **Two keyboard paths.** Besides the key table the frame reads, a game may ask the BIOS
   "is a key waiting?" to skip a screen or end a demo. That is a second input, read at a
   different point.
+- **Drive the key table through the game's handler.** Writing key bytes into the game's
+  table skips its INT 9 handler, which may also count presses, queue them or set a "key
+  pressed" flag. Under `dos_env`, `env.press(scan, at=frame, hold=n)` delivers the scan codes
+  as IRQ 1, so the handler runs as it does on a PC ([DOS](../DOS.md)).
 - **Devices that are not there.** With no joystick or mouse installed, the polling code may
   write nothing, or only clear a flag. Find out what an absent device leaves in memory, and
   model that state too.

@@ -89,7 +89,11 @@ emu = Emu('target/Game.exe', ['target/Engine.dll'])  # loads, relocates, links i
   hand-written routines that take registers. MMX and x87 work. Every import stops the run with
   its name until you give it a handler (`stubs=`). It has no TEB at FS and does not set `this`
   in ecx for you: pass `ecx=` for thiscall. `docs/ABI.md` lists the conventions, and
-  `docs/hardware/simd.md` shows it on MMX code. Linux ELF and macOS Mach-O
+  `docs/hardware/simd.md` shows it on MMX code. `call(..., fpu_cw=0x037f)` loads an x87
+  control word first (`NEAREST` 0x037f, `CHOP` 0x0f7f), and `emu.fpu_modes(addr, cases)` lists
+  the cases whose result depends on the rounding mode. `call(..., until=ADDR)` stops at an
+  address, such as a call to `sprintf` that needs the C runtime, and returns `stack`, the
+  call's arguments (docs/knowhow/x87-magic-add-rounding.md). Linux ELF and macOS Mach-O
   binaries need a different loader; the calling convention is System V (rdi, rsi, rdx, rcx, r8,
   r9; floats in xmm0-7).
 - **Floating point state**: the emulator starts with the default MXCSR (round to nearest). If the

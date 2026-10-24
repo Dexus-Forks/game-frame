@@ -36,9 +36,10 @@ Beltane's whole path graph, 20,000 cases each, and the port matched every one.
   order update, which returns at once when the car stands first.
 - **Stop before library calls** that need the C runtime's thread data: POD's `format_time`
   calls Watcom's `sprintf`, which faults under Unicorn (`UC_ERR_WRITE_UNMAPPED`). Stopping
-  at the call and reading its arguments from the stack measures the function's own work.
+  at the call and reading its arguments from the stack measures the function's own work:
+  `emu.call(addr, args, until=CALL_SITE)['stack']`.
 - **Load a control word** before the call when the code uses the FPU
-  ([x87-magic-add-rounding](x87-magic-add-rounding.md)).
+  (`emu.call(..., fpu_cw=0x037f)`; [x87-magic-add-rounding](x87-magic-add-rounding.md)).
 - **Bias the random cases** towards the branches: points near a gate's plane, trackers at a
   link's last point, cars on the same lap.
 
