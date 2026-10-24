@@ -9,6 +9,9 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- Know-how entries for GameFrame's own tools: unmapped memory under the emulators, an import
+  with no handler, a tool run without the `.venv`, and Ghidra refusing a path in a dot folder.
+
 - `tools/triage/exportcov.py`: how much code a Ghidra export covers, its largest gaps, and the
   likely starts of the functions it missed (call targets, starts after a return or padding),
   written for the batch decompile.

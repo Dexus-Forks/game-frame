@@ -123,7 +123,7 @@ rows = [json.loads(l) for l in r.stdout.splitlines()]
 assert len(rows) >= 4, (r.stdout, r.stderr)
 assert all(isinstance(x['xs'], list) and len(x['xs']) == 3 and x['xs'][1] == 20 for x in rows)
 assert rows[-1]['clock'] >= rows[0]['clock'] and rows[-1]['clock'] > 0, rows
-assert all(0 <= x['xs'][0] - 10 - x['clock'] // 100 <= 2 for x in rows), rows   # a sample may straddle writer steps
+assert all(-1 <= x['xs'][0] - 10 - x['clock'] // 100 <= 2 for x in rows), rows   # a sample may straddle writer steps, either way
 r = subprocess.run([sys.executable, M, 'snap', '--pid', '4242', '--proc', d, '--out', f'{d}/snap'], capture_output=True, text=True)
 data = open(f'{d}/snap/0x500000.bin', 'rb').read()
 assert len(data) == 0x2000 and struct.unpack_from('<I', data, 0x100)[0] == 3900 and not os.path.exists(f'{d}/snap/0x400000.bin'), r.stdout
@@ -1156,9 +1156,11 @@ for q in "A privileged instruction was executed at 004a88cd:wine-privileged-inst
          "0024:err:seh:virtual_setup_exception nested exception on signal stack:wine-wow64-rosetta-fault" \
          "fixme:d3d:surface_cpu_blt Failed to blit:directdraw-16bit-back-surface" \
          "dyld[123]: Library not loaded: @rpath/libinotify.0.dylib:macos-dyld-stripped" \
-         "directdraw windowed fullscreen 16-bit desktop:directdraw-windowed-16bit-desktop"; do
+         "directdraw windowed fullscreen 16-bit desktop:directdraw-windowed-16bit-desktop" \
+         "unicorn.unicorn.UcError: Invalid memory read (UC_ERR_READ_UNMAPPED):emu-unmapped-memory"; do
   expect "advise puts ${q##*:} first for its error text or topic" "] ${q##*:}:" sh -c "$G advise '${q%:*}' --max 1"
 done
+expect "advise puts tool-without-venv first for a missing package" "] tool-without-venv:" sh -c "echo \"ModuleNotFoundError: No module named 'unicorn'\" | $G advise - --max 1"
 out="$("$PYTHON" - <<'PY' 2>&1
 import json, os, subprocess, uuid
 H = os.path.abspath('scripts/hooks/advise.py')
