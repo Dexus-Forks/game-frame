@@ -1,7 +1,7 @@
 # Case studies
 
-Four projects built with GameFrame, of four different kinds of game, on four different
-platforms. Each took a different route. All four aim for the same results as the original
+Five projects built with GameFrame, of five different kinds of game, on four different
+platforms. Each took a different route. All five aim for the same results as the original
 for the same inputs.
 
 | Project | Game | Family | Platform | Route |
@@ -10,6 +10,7 @@ for the same inputs.
 | [Tyrian 2026](tyrian.md) | Tyrian 2000 (1999) | [Arcade action](../games/arcade-action.md) | DOS, 16-bit Borland Pascal | Names from debug symbols; the main loop ported in fragments, each checked from captured states |
 | [Frontier](frontier.md) | Frontier: Elite II (1993) | [Space simulation](../games/vehicle-sims.md) | DOS, assembly and C, overlays | Run the original inside the port, replace it routine by routine |
 | [POD](pod.md) | POD: Planet of Death (1997) | [Racing](../games/racing-sports.md) | Windows 95, Watcom C, DirectDraw, five builds for CPUs and 3D cards | Formats with writers first; the original under Wine, then in an emulated PC; races recorded from memory; the rules ported before the physics |
+| [Hardwar](hardwar.md) | Hardwar (1998) | [Vehicle simulation](../games/vehicle-sims.md) over an [economy](../games/management.md) | Windows 95, Watcom C, four renderers, one resource pack | The story read first for what each system is for; a viewer and reader crates for every format before the game; the foundations traced by parallel sessions |
 
 ## The tooling they built to capture a game
 
@@ -39,5 +40,8 @@ part of each.
   record what it does.
 - **Build an entry point into the game.** A probe, a state image or a runtime hook: one narrow way in
   that tests, scripts and agents all use ([A model to query](../observe/object-model.md)).
+- **Read the story for what each system is for.** The manual and the program's own text name
+  the systems the designers cared about, and so which must be exact
+  ([Reading the story](../working/lore.md), from Hardwar).
 - **Check in small pieces, then as a whole.** Functions, then fragments or routines, then whole
   runs, demos and saves.

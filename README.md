@@ -132,7 +132,7 @@ to produce, and the pitfalls that cost time.
 |---|---|
 | [re-start](skills/re-start/SKILL.md) | Rules, the loop, a first-session checklist, routing to the other skills |
 | [re-setup](skills/re-setup/SKILL.md) | Install and check the toolchain; register REA for your agent |
-| [re-inventory](skills/re-inventory/SKILL.md) | Which files hold the game's code; native, managed, scripted or packed; engine and middleware; data containers; what kind of game it is |
+| [re-inventory](skills/re-inventory/SKILL.md) | Which files hold the game's code; native, managed, scripted or packed; engine and middleware; data containers; what kind of game it is; the story from the manual and the program's text, in `docs/lore.md` |
 | [re-browse](skills/re-browse/SKILL.md) | A resource viewer from day one: the catalogue of every file (`catalog.py`), then the project's own viewer on the port's readers, for people and agents to check decoded content |
 | [re-observe](skills/re-observe/SKILL.md) | Run the original where you can watch, drive and capture it; every input; every screen; an object model with entry points for tests and agents |
 | [re-rea](skills/re-rea/SKILL.md) | When to use REA's MCP tools, and how they fit with the text export |
@@ -211,7 +211,8 @@ between agents, the outcome, and the failure path.
 | `tools/triage/pointerpaths.py` | A chain of pointers from a global to a value that moves between runs |
 | `tools/triage/coverdiff.py` | The code that ran only with an action: two coverage logs (drcov or address lists) compared, by function |
 | `tools/triage/fixity.py` | A BagIt bag of a game copy with checksums; manifests in place; verification over time |
-| `tools/triage/constants.py` | Random generators, checksums, hashes, ciphers and decompressors named by their constants, with addresses |
+| `tools/triage/constants.py` | Random generators, checksums, hashes, ciphers and decompressors named by their constants, with addresses; Park–Miller when its modulus is beside its multiplier |
+| `tools/triage/sentences.py` | The sentences in a program or a Ghidra `strings.txt`: messages, descriptions and notes, for reading the game's story (`docs/working/lore.md`) |
 | `tools/triage/hashnames.py` | Which hash function names things, and the name behind each hash constant |
 | `tools/triage/match_functions.py` | The same functions in two builds, from two Ghidra exports; your labels carried to the new addresses |
 | `tools/triage/memscan.py` | Where a running game keeps a value, from memory dumps taken as it changes; pointers to it |
@@ -245,8 +246,9 @@ between agents, the outcome, and the failure path.
 | `tools/emu/call_trace.py` | The calls an emulated function makes (random draws), in order, with call sites |
 | `tools/formats/reader.py`, `validate.py` | Prototype a format decoder; prove it consumes every byte of every file, and with `--write` that every file writes back identical |
 | `tools/formats/derived.py` | Which unexplained fields next to geometry are computed from it: bounds, centres, Newell and cross-product normals, plane distances |
-| `tools/formats/xorscan.py` | The key of a simply obfuscated file: XOR, add, stepping and chained keys |
-| `tools/formats/rawimage.py` | Raw pixels to PNG: VGA 13h, Mode X, EGA planes, CGA, packed and 16-bit, with palettes |
+| `tools/formats/xorscan.py` | The key of a simply obfuscated file: XOR, add, stepping and chained keys; a key XORed into one field of every directory record, from the names' zero padding, found again in the executable |
+| `tools/formats/rawimage.py` | Raw pixels to PNG: VGA 13h, Mode X, EGA planes, CGA, packed and 16-bit, with palettes (6-bit values scaled or shifted, `--dac`) |
+| `tools/formats/shadetable.py` | A palette game's shade, fog or light table: the black, unchanged and white levels, the colour it fades toward, a picture |
 | `tools/formats/markers.py` | Unique values planted in a file's fields, then found in memory dumps |
 | `tools/dos/omf.py` | OMF object files and libraries (.OBJ, .LIB): publics, and signatures of the runtime for `sigscan.py` |
 | `tools/formats/pcap.py` | A network capture (pcap, pcapng) split into flows and messages, or joined into TCP streams |

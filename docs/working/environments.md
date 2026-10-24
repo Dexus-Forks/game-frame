@@ -67,6 +67,38 @@ It sets `GAMEFRAME_ROOT`, loads `.env`, exports `GHIDRA_INSTALL_DIR` and `JAVA_H
 `gameframe` and the `.venv` Python first on `PATH`. The scripts load `.env` themselves, so
 this matters for commands typed by hand and for agents.
 
+## One GameFrame checkout
+
+Keep one checkout of GameFrame on a machine: the clone of https://github.com/tanepiper/game-frame
+that you change, test and push. Every game project uses it. A project made by
+`scripts/new-project.sh` names it in its `.env` (git-ignored):
+
+```bash
+GAMEFRAME_ROOT=~/code/game-frame
+```
+
+The project's `./gameframe` reads that line, from the project and from its main checkout, so the
+project's git worktrees use the same checkout. Without the line it tries `~/code/game-frame`,
+then `~/code/reverse-engineer-games`, then the plugin's newest install. It never looks next to
+the project. It used to: projects side by side then shared whatever sat in `../game-frame`, and
+one project ran a symlinked second clone that had fallen a day behind.
+
+To change GameFrame from a game's session, work in a git worktree of that one checkout, test
+there, and merge into its `main`:
+
+```bash
+git -C "$(./gameframe root)" worktree add ../game-frame-NAME -b NAME
+```
+
+Do not make a second clone for a game. Its work and the main checkout drift apart, a project
+pinned to it runs old tools, and its lessons reach GitHub only when someone remembers to push
+them. `./gameframe root` prints the checkout a project uses.
+
+This rule is about where GameFrame lives. It does not limit what a game builds. Each game is
+different, and its own tools, crates, scripts and viewers belong in its own repository, next to
+GameFrame's. Pass back up only what would help any game: a tool fix, a format family, a
+pitfall, a know-how entry, each with a test against GameFrame's own samples.
+
 ## No display
 
 The tests and the tools need no display. `dosbox-run.sh` uses SDL's dummy video and audio

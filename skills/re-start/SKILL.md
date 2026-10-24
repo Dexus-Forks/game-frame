@@ -157,6 +157,10 @@ a diagram of each team's hand-offs and the failure path.
 6. Classify the game: read `docs/games/README.md` and its family page, and write the kind of
    game, its time model and how exact the interface must be into `docs/FINDINGS.md`. Copy the
    family's rule set into the project's `AGENTS.md`.
+   Then read the story: the manual and the program's long strings (`./gameframe run
+   sentences`), into `docs/lore.md` with the table "in the story → in the code → evidence"
+   (`re-inventory`, "Read the story"). The lore says what each system is for and which must
+   be exact. Read it again whenever a system's purpose is unclear.
 7. `re-browse`: run the catalogue (`tools/formats/catalog.py target/game derived/catalog`)
    so the person and you can see every file, and grow it into the project's viewer as the
    decoders come (`docs/working/viewer.md`).

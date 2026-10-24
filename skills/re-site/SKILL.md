@@ -37,6 +37,7 @@ sentence at the top of the front page.
 ```bash
 ./gameframe run new-site NAME "Title" "One sentence: what it is and for whom"     # sites/NAME/
 ./gameframe run new-site NAME "Title" "..." --single                              # site/
+./gameframe run new-site NAME "Title" "..." --manual                              # publish by hand only
 cd sites/NAME && npm install && npm run dev                                       # http://localhost:5173
 ```
 
@@ -50,10 +51,24 @@ The script writes:
 | `findings.md`, `status.md` | `docs/FINDINGS.md` and `docs/CHECKLIST.md` through `@include` |
 | `diary/index.md`, `diary/posts.data.mts` | The list of entries, newest first, with each summary |
 | `.vitepress/config.mts` | Title, navigation, the diary in the sidebar, local search, the footer |
+| `.vitepress/theme/` | The default theme with four colours to set from the game (`custom.css`), and the style of figures and their captions |
+| `public/` | The diary's pictures (WebP) and diagrams (SVG) |
 | `.github/workflows/sites.yml` | Builds every site and publishes it on GitHub Pages (once per project) |
 
 Commit `package-lock.json` after the first `npm install`. The `.gitignore` in the site keeps
 `node_modules/` and the build out of git.
+
+- **Publishing by hand.** Without `--manual` the workflow builds and publishes on every push
+  to `main` that changes the site or `docs/`. A project that pushes often spends many Actions
+  minutes that way. With `--manual` it runs only when started from the Actions tab or with
+  `gh workflow run sites.yml`. Ask the user which they want. To change an existing workflow,
+  delete its `push:` block and keep `workflow_dispatch:`.
+- **A theme in the game's style.** Set the colours in `.vitepress/theme/custom.css` from the
+  game: its palette or its interface, read in the project's viewer. Keep VitePress's dark and
+  light modes, and choose a dark mode default in `config.mts` (`appearance: 'dark'`) when the
+  game is dark. Use system fonts. Never load the game's fonts, pictures or logo files from the
+  game's data; a logo drawn by the project's viewer, as a small WebP, is a capture like any
+  other.
 
 ## 3. What goes on it
 
@@ -126,11 +141,17 @@ The rules for an entry:
   link the compare range on the repository's host, once.
 - **No tool dumps.** Describe output in a sentence with the numbers that matter. A short table
   of measured values is fine when it is the point.
-- **Pictures that show the finding.** Screenshots of the original game, screenshots of the
-  project's viewer with a decoded file, frames rendered by the port, diagrams, charts of
-  measured values. Choose a few for each entry and caption each with what it shows and where it
-  comes from (`The original, track 3`, `Our viewer, CAR1.BIN`). Put them in `public/` (WebP,
-  under 1 MB) and link them as `/name.webp`. The game's files themselves stay out: no
+- **Pictures that show the finding, from the first entry.** Give every entry two to five
+  figures. Use screenshots of the original game, screenshots of the project's viewer with a
+  decoded file (its `--export` mode writes them, `re-browse`), frames rendered by the port and
+  charts of measured values. Draw a diagram for each format and system an entry explains: a
+  file's layout with its offsets, a record's fields, a key applied to a name, a table's
+  levels, the order of a calculation. Write the diagrams as SVG by hand or with a small script
+  from the numbers they show, in the theme's colours. Caption each figure in italics on the
+  line after it with what it shows and where it comes from (`*Our viewer, CAR1.BIN: ...*`,
+  `*Diagram: the layout of the pack, from FUN_00512198.*`). Put them in `public/` (WebP under
+  1 MB, SVG) and link them as `/name.webp`. Adding figures to old entries later costs more
+  than drawing them as each entry is written. The game's files themselves stay out: no
   extracted textures, sounds or text in bulk, no archives, no downloads of its data.
 - **Length.** Usually 300 to 1,500 words. Shorter is a note: fold it into the next entry.
   Longer usually means reference material that belongs in `docs/`.
@@ -161,12 +182,13 @@ about entries that read like a commit log, entries that are too short or too lon
 pictures. Fix every error. Read every warning and fix it, or say in the hand-off why it stays.
 
 6. Land it with `re-land`: stage the site's files by name. The workflow publishes on the next
-   push to `main`.
+   push to `main`, or when the user starts it, if it is manual.
 
 ## Publishing
 
 `.github/workflows/sites.yml` builds `site/` and every `sites/*/` that has a `package.json`.
-One site is served at `https://OWNER.github.io/REPO/`. Several are served at `.../REPO/NAME/`,
+A workflow made with `--manual` runs only when started by hand. One site is served at
+`https://OWNER.github.io/REPO/`. Several are served at `.../REPO/NAME/`,
 with a short index page at `.../REPO/` that links each one. The user turns on Pages in the
 repository's settings, with "GitHub Actions" as the source. Publishing makes the site public,
 so the user decides when. A private repository can still build the site and keep it private.

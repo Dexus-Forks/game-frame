@@ -16,6 +16,9 @@ Use it at the start of a project, together with the `re-inventory` skill:
 3. Read its family page (or pages, for a mixed game) and copy the rule set into the project's
    `AGENTS.md`.
 4. Follow the connections to the systems your game shares with other families.
+5. Read the game's story: the manual and the program's long strings. They say what each
+   system is for and which the family's rules make exact for this game
+   ([Reading the story](../working/lore.md)).
 
 ## Ask your agent
 
@@ -32,6 +35,8 @@ In my GameFrame project, classify the game.
    docs/FINDINGS.md, with the evidence for each.
 5. Copy the family's rule set into the project's AGENTS.md and adjust it to this game.
 6. Ask me how exact the interface must be, and record my answer.
+7. Read the manual and the program's long strings (./gameframe run sentences). Write
+   docs/lore.md: what the story says each system is for, and which must be exact.
 ```
 
 ## Axes

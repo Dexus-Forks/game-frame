@@ -91,4 +91,4 @@ the order of this page and of each folder's `README.md` is the order of the site
 
 ## Case studies
 
-- [Case studies](case-studies/README.md): four projects and the tooling they built.
+- [Case studies](case-studies/README.md): five projects and the tooling they built.

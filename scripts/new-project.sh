@@ -10,7 +10,7 @@
 #                             the gates and the MCP servers come from it and stay current
 #   gameframe                 runs GameFrame's toolkit on this project (./gameframe help); it finds
 #                             GameFrame in a clone or in the plugin's install
-#   docs/FINDINGS.md, docs/CHECKLIST.md, docs/versions.md, labels/names.tsv, labels/fields.tsv
+#   docs/FINDINGS.md, docs/CHECKLIST.md, docs/lore.md, docs/versions.md, labels/names.tsv, labels/fields.tsv
 #   target/, analysis/, derived/   for the game, Ghidra output and ground truth: ignored by git
 # The guides stay in GameFrame (`./gameframe root` prints where), and on its website.
 # --copy instead copies GameFrame's toolkit, skills, agents, gates and guides into the project,
@@ -74,7 +74,7 @@ python3 "$ROOT/scripts/clients.py" write "$dir" --agent "$agents" $([[ $copy == 
 cp "$ROOT/templates/project/licences/LICENSE-APACHE" "$ROOT/templates/project/licences/LICENSE-CC0-1.0" "$dir/"
 cp "$ROOT/templates/project/gitignore" "$dir/.gitignore"
 cp "$ROOT/templates/project/labels/"*.tsv "$dir/labels/"
-for f in AGENTS.md README.md docs/FINDINGS.md docs/CHECKLIST.md docs/versions.md; do
+for f in AGENTS.md README.md docs/FINDINGS.md docs/CHECKLIST.md docs/lore.md docs/versions.md; do
   sed -e "s/GAME_NAME/$name/g" -e "s/DATE/$(date +%Y-%m-%d)/" "$ROOT/templates/project/$f" > "$dir/$f"
 done
 [[ $claude == 1 ]] && printf 'The instructions for this repository are in AGENTS.md:\n\n@AGENTS.md\n' > "$dir/CLAUDE.md"
@@ -82,6 +82,10 @@ done
 mkdir -p "$dir/.cargo"
 printf '[build]\n# target/ holds your copy of the game: never let Cargo build (or clean) there.\ntarget-dir = "build"\n' > "$dir/.cargo/config.toml"
 [[ -f "$ROOT/.env" ]] && cp "$ROOT/.env" "$dir/.env"
+# Pin a plugin project to the one GameFrame checkout that made it (docs/working/environments.md):
+# ./gameframe reads GAMEFRAME_ROOT from .env, also from the project's git worktrees. A copied
+# project carries its own tools and needs no pin.
+[[ $copy == 1 ]] || printf '\n# The GameFrame checkout this project uses (./gameframe reads it)\nGAMEFRAME_ROOT=%s\n' "$ROOT" >> "$dir/.env"
 [[ -d "$dir/tools" ]] && { find "$dir/tools" -name '__pycache__' -prune -exec rm -r {} + 2>/dev/null || true; }
 if [[ -n "$game" ]]; then
   find "$game" -maxdepth 2 -type f \( -iname '*.exe' -o -iname '*.dll' -o -iname '*.ovl' \) -exec cp {} "$dir/target/" \;

@@ -3,7 +3,7 @@
 block of a data file that may hold a picture.
 
 Usage: rawimage.py INPUT OUT.png --mode MODE [--width W] [--height H] [--offset N]
-                   [--palette FILE] [--palette-offset N] [--start N] [--scale S]
+                   [--palette FILE] [--palette-offset N] [--dac shift|scale] [--start N] [--scale S]
 
   MODE        how the bytes hold pixels:
                 linear8   one byte per pixel, a palette index (VGA mode 13h, most 256-colour data)
@@ -24,6 +24,9 @@ Usage: rawimage.py INPUT OUT.png --mode MODE [--width W] [--height H] [--offset 
                        read it from inside a bigger file. Without it: the default VGA palette
                        for linear8 and modex, the EGA palette for 16 colours, CGA palette 1
   --scale S            make each pixel S x S (for looking, not for comparing)
+  --dac shift|scale    how 6-bit palette values become 8 bits: scale (the default, 63 -> 255)
+                       or shift (value << 2, 63 -> 252). Many games shift; read the palette
+                       loader and use its rule when comparing pixels with the original
 
 Two uses. Run a picture you captured from the original (a DOSBox-X memory dump of A000:0000,
 an emulator's video RAM) into a PNG, to compare with the port's frame (re-verify). Or try a
@@ -81,7 +84,12 @@ def ega_palette():
 CGA1 = [(0, 0, 0), (85, 255, 255), (255, 85, 255), (255, 255, 255)]
 
 
-def load_palette(path, offset):
+def dac8(c, dac):
+    """A 6-bit VGA DAC value as 8 bits: 'scale' (63 -> 255) or 'shift', as many games do (63 -> 252)."""
+    return c << 2 if dac == 'shift' else c * 255 // 63
+
+
+def load_palette(path, offset, dac='scale'):
     with open(path, 'rb') as f:
         data = f.read()
     if data.startswith(b'JASC-PAL'):
@@ -91,7 +99,7 @@ def load_palette(path, offset):
         return [tuple(vals[i:i + 3]) for i in range(0, len(vals), 3)]
     data = data[offset:offset + 768]
     six_bit = max(data) <= 63
-    return [tuple((c * 255 // 63 if six_bit else c) for c in data[i:i + 3]) for i in range(0, len(data) - 2, 3)]
+    return [tuple((dac8(c, dac) if six_bit else c) for c in data[i:i + 3]) for i in range(0, len(data) - 2, 3)]
 
 
 def indices(data, mode, width, height, start):
@@ -167,7 +175,7 @@ def main(argv):
             rows.append(bytes(row))
     else:
         if opt('--palette'):
-            pal = load_palette(opt('--palette'), int(opt('--palette-offset', '0'), 0))
+            pal = load_palette(opt('--palette'), int(opt('--palette-offset', '0'), 0), opt('--dac', 'scale'))
         elif mode in ('linear8', 'modex'):
             pal = default_vga()
         elif mode in ('planar4', 'packed4'):
