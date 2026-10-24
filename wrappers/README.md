@@ -5,7 +5,9 @@ ATI3DCIF, S3's S3D Toolkit or PowerVR's SGL. It also expects a DirectDraw that g
 full-screen 640 × 480 mode. No modern system has these libraries. Each DLL here has the
 original's file name and exports, so the unchanged game loads it. The DLL then draws the
 game's picture on today's machine at the size you choose. The method for writing such a
-library is in [replacement libraries](../docs/hardware/replacement-libraries.md).
+library is in [replacement libraries](../docs/hardware/replacement-libraries.md). The guide
+[Replacement 3D-card libraries](../docs/hardware/wrappers.md) says how to build and use each
+library, with pictures of POD's runs.
 
 | DLL | Stands in for | Draws | README |
 |---|---|---|---|
@@ -74,7 +76,8 @@ cd wrappers && cargo test --release --target "$(rustc -vV | sed -n 's/^host: //p
 
    Each library's own variables are in its README: `GLIDE_*`, `DDRAW_*`, `SGL_*`, and the log
    files `GLIDE_LOG`, `DDRAW_LOG`, `ATI3DCIF_LOG`, `S3DTK_LOG` and `SGL_LOG`.
-5. **Read the logs.** Each DLL logs every call it does not handle, once. The first run shows
-   which calls a new game needs.
+5. **Read the logs.** Each DLL logs most of the modes, states and methods it does not handle.
+   The first run shows much of what a new game needs. What each one logs is in
+   [the guide](../docs/hardware/wrappers.md#reading-the-logs).
 
 Licence: Apache-2.0 (code), CC0-1.0 (the READMEs).

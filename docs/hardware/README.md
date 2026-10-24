@@ -43,6 +43,9 @@ In my GameFrame project, find every place the game touches hardware.
 - [Replacement libraries for a 1990s game](replacement-libraries.md): probes, exact exports with
   `zcc.sh`, what the game assumes (a window, threads, the frame buffer, port I/O, any display
   mode), and measuring what the card is given.
+- [Replacement 3D-card libraries](wrappers.md): GameFrame's stand-in DLLs for Glide 2, PowerVR
+  SGL, ATI3DCIF, the S3D Toolkit and DirectDraw. The page says what each draws, how to build
+  and use them, and how to add a game.
 - [MMX and other SIMD code](simd.md): finding hand-written MMX routines, matching them to the
   plain build, measuring both, and porting them exactly.
 - [Sound](sound.md): the PC speaker, AdLib and OPL FM synthesis, Sound Blaster, Gravis
