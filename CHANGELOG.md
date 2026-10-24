@@ -9,6 +9,13 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `ExportAll.java` writes `bodies.tsv`, every piece of every function (start, end, entry), and
+  `exportcov.py` reads it beside `functions.tsv` (or with `--bodies`). Before, a function whose
+  body lies in several pieces counted as one run from its entry: Hardwar's export measured
+  93.7% where 98.0% of its code is in functions.
+- Know-how: a project whose `./gameframe` runs another project's GameFrame or the source clone
+  (one clone per game, named in `.env`), and scripted edits that stop matching after a
+  formatter reflows the code.
 - Reading the story, from the Hardwar project: the guide
   [Reading the story for design decisions](docs/working/lore.md), which makes the case that a
   game's manual and its own text say what each system is for and which must be exact, with

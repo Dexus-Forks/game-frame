@@ -72,11 +72,13 @@ An entry has one of five statuses.
 | [A port diverges because a trace said "only this function writes that table" and was wrong](trace-claims-need-an-address-scan.md) | solved |
 | [A ported fixed-point function differs from the original in a few cases out of thousands](x87-magic-add-rounding.md) | solved |
 | [A privileged instruction under Wine, from a Windows 95 port probe](wine-privileged-instruction.md) | solved |
+| [A project's ./gameframe runs another project's GameFrame, or the source clone, and a tool is missing](project-uses-another-projects-gameframe.md) | solved |
 | [A reference recording was made with modded files loaded](mods-loaded-in-a-reference-recording.md) | solved |
 | [A replay drifts from the original because the game steps by the measured frame time](variable-frame-step-replay.md) | solved |
 | [A replay matches the recording at the end but not at some samples, one sample early or late](replay-sample-straddles-frames.md) | solved |
 | [A run in a shared test VM dies: "X connection to :2 broken"](shared-vm-pkill-display.md) | solved |
 | [A run script hangs on `wineserver -w`](wineserver-wait-hangs.md) | solved |
+| [A scripted edit to source code fails to match after a formatter has run](scripted-edits-after-formatter.md) | solved |
 | [A session in a git worktree finds no game, no Ghidra export and no Python environment](worktree-ignored-folders-missing.md) | solved |
 | [A wait loop with `pgrep -f` never ends after the process has finished](pgrep-wait-matches-itself.md) | solved |
 | [An editor's save changes bytes nobody edited (fixed point through floats)](editor-float-view-changes-bytes.md) | solved |
