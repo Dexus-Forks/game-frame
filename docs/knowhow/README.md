@@ -9,6 +9,9 @@ design is in [Know-how: failure modes and context](../working/knowhow.md).
 ./gameframe advise "A privileged instruction was executed at 004a88cd"
 wine GAME.EXE 2>&1 | tail -100 | ./gameframe advise -
 ./gameframe advise directdraw wine
+./gameframe advise sound-card
+./gameframe advise x86-cpu
+./gameframe advise cd-rom
 ./gameframe advise --list
 ./gameframe advise --entry wine-privileged-instruction
 ```
@@ -91,13 +94,18 @@ An entry has one of five statuses.
 | [Before modding a format: a writer that gives every file back byte for byte](writer-round-trip-every-file.md) | context |
 | [Before moving geometry: find the bounds and normals stored with it](context-geometry-derived-data.md) | context |
 | [CD-era games often look in their install folder before the CD: a mod can be a file, with no patch](context-mods-install-folder-first.md) | context |
+| [CD-ROM data, disc checks and audio](cd-rom.md) | context |
 | [Clicks and keys from the agent do not reach a Wine window on macOS](wine-input-without-accessibility.md) | workaround |
 | [DirectInput ignores keys, because a window that is not foreground cannot acquire the device](directinput-not-foreground.md) | workaround |
+| [Display modes, surfaces and palettes](display.md) | context |
 | [DOS games in DOSBox-X: what to know before the first run](context-dos-dosbox.md) | context |
 | [Emulating a range of code inside a big message handler](emulating-inside-a-handler.md) | context |
 | [Emulating a whole system routine: stubs, whole records, and stale registers](emulating-a-system.md) | context |
 | [Emulating game rules on a world built by hand](fake-worlds.md) | context |
 | [Every new run exits at once, because a leftover game process holds its mutex](single-instance-leftover.md) | solved |
+| [Game clocks, ticks and frame timing](timing.md) | context |
+| [Game files and data formats](file-formats.md) | context |
+| [Game input devices and event timing](input.md) | context |
 | [Games with a build per 3D card: Glide, ATI3DCIF and the S3D Toolkit](context-3d-card-builds.md) | context |
 | [Ghidra headless refuses a project path inside a folder whose name starts with a dot](ghidra-dot-folder-path.md) | solved |
 | [Ghidra's pseudocode of a Watcom function leaves out arguments and stores that the disassembly shows](watcom-pseudocode-drops-register-arguments.md) | solved |
@@ -114,6 +122,7 @@ An entry has one of five statuses.
 | [Measuring a function that calls the whole game: intercept its callees](isolate-callees.md) | context |
 | [Measuring ported systems when an unported one draws first](unported-share-search.md) | context |
 | [Moving a project's labels and references to a newer version of the game](context-move-to-a-newer-version.md) | context |
+| [Networking and multiplayer messages](networking.md) | context |
 | [Port a game's rules before its physics, driven by a recorded run](context-port-rules-before-physics.md) | context |
 | [Porting more of the original made a replay agree less with the recording](replay-stand-in-for-unported-logic.md) | solved |
 | [Porting routines that build records in their stack frame: keep the frame as an array](frames-as-arrays.md) | context |
@@ -129,6 +138,7 @@ An entry has one of five statuses.
 | [Scripted menu clicks land one time in three in a game with its own cursor](directinput-cursor-click-timing.md) | workaround |
 | [Set the game's x87 control word before each emulated run](x87-control-word-per-run.md) | context |
 | [SSH to a VM fails with "Too many authentication failures"](ssh-too-many-auth-failures.md) | solved |
+| [Sound cards and audio paths in games](sound-card.md) | context |
 | [Start a recorder when the next race begins instead of driving the menus](wait-for-the-next-race.md) | context |
 | [The front end and the docked screens run at 640 x 400](docked-screens-640x400.md) | context |
 | [The game asks for its CD under Wine on Linux, though the disc's folder is mapped with the right label](wine-linux-cd-drive.md) | solved |
@@ -152,6 +162,7 @@ An entry has one of five statuses.
 | [Wine shows each palette index in a colour of its own](wine-palette-colours.md) | context |
 | [Writing a Glide 2 replacement for an early Glide game](context-glide2-wrapper.md) | context |
 | [Writing a PowerVR SGL replacement for a PCX1/PCX2 game](context-powervr-sgl-wrapper.md) | context |
+| [x86 CPUs, instructions and arithmetic](x86-cpu.md) | context |
 
 A project keeps the entries for its own game in its own `docs/knowhow/`, in the same format.
 `./gameframe advise` reads both. An entry that holds for other games too moves here, with a
