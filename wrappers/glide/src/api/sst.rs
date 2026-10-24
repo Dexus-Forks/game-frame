@@ -8,6 +8,24 @@ use std::sync::atomic::{AtomicU32, Ordering};
 
 static WIDTH: AtomicU32 = AtomicU32::new(640);
 static HEIGHT: AtomicU32 = AtomicU32::new(480);
+/// `GrColorFormat_t` from the open: how the game packs every `GrColor_t`.
+static FORMAT: AtomicU32 = AtomicU32::new(consts::COLORFORMAT_ARGB);
+
+/// A colour the game packed, as 0xAARRGGBB.
+pub fn argb(c: u32) -> u32 {
+    consts::argb(c, FORMAT.load(Ordering::Relaxed))
+}
+
+/// What every open does: the size, the colour format, the state reset to Glide's defaults and
+/// the origin.
+fn opened(w: u32, h: u32, format: u32, origin: u32) {
+    WIDTH.store(w, Ordering::Relaxed);
+    HEIGHT.store(h, Ordering::Relaxed);
+    FORMAT.store(format & 3, Ordering::Relaxed);
+    super::shadow::reset(w, h);
+    super::shadow::origin(origin & 1);
+    super::lfb::opened(format & 3, origin & 1);
+}
 
 pub fn screen() -> (u32, u32) {
     (WIDTH.load(Ordering::Relaxed), HEIGHT.load(Ordering::Relaxed))
@@ -49,14 +67,10 @@ pub extern "system" fn grSstSelect(_board: u32) {}
 pub extern "system" fn grSstOpen(res: u32, refresh: u32, format: u32, origin: u32, smoothing: u32, buffers: u32) -> i32 {
     let (w, h) = consts::resolution(res).unwrap_or((640, 480));
     log!("grSstOpen {w}x{h} (res {res}, refresh {refresh}, format {format}, origin {origin}, smoothing {smoothing}, {buffers} buffers)");
-    if format != 0 || origin != 0 {
-        shim::gap!("grSstOpen format", "only GR_COLORFORMAT_ARGB and GR_ORIGIN_UPPER_LEFT are handled");
-    }
-    WIDTH.store(w, Ordering::Relaxed);
-    HEIGHT.store(h, Ordering::Relaxed);
     let (ow, oh) = crate::config::get().output(w, h);
     let hwnd = crate::window::prepare(ow, oh) as usize;
     push(Cmd::Open { width: w, height: h, out: (ow, oh), hwnd });
+    opened(w, h, format, origin);
     flush();
     1
 }
@@ -66,11 +80,10 @@ pub extern "system" fn grSstOpen(res: u32, refresh: u32, format: u32, origin: u3
 pub extern "system" fn grSstWinOpen(hwnd: usize, res: u32, refresh: u32, format: u32, origin: u32, colour: u32, aux: u32) -> u32 {
     let (w, h) = consts::resolution(res).unwrap_or((640, 480));
     log!("grSstWinOpen {w}x{h} (window {hwnd:#x}, res {res}, refresh {refresh}, format {format}, origin {origin}, {colour} colour and {aux} aux buffers)");
-    WIDTH.store(w, Ordering::Relaxed);
-    HEIGHT.store(h, Ordering::Relaxed);
     let (ow, oh) = crate::config::get().output(w, h);
     let hwnd = if hwnd == 0 { crate::window::prepare(ow, oh) as usize } else { crate::window::size(hwnd as _, ow, oh) as usize };
     push(Cmd::Open { width: w, height: h, out: (ow, oh), hwnd });
+    opened(w, h, format, origin);
     flush();
     1 // a context handle the game only passes back
 }
@@ -89,24 +102,9 @@ pub extern "system" fn grSstControl(code: u32) -> u32 {
     1
 }
 
-/// Idle, with the memory FIFO (bits 12–27) and the PCI FIFO (bits 0–5) empty: POD waits for
-/// bits 12–27 to read 0xffff before a large write.
 #[unsafe(no_mangle)]
-pub extern "system" fn grSstStatus() -> u32 {
-    0x0fff_f03f
-}
-
-#[unsafe(no_mangle)]
-pub extern "system" fn grSstIdle() {}
-
-#[unsafe(no_mangle)]
-pub extern "system" fn grSstScreenWidth() -> u32 {
-    screen().0
-}
-
-#[unsafe(no_mangle)]
-pub extern "system" fn grSstScreenHeight() -> u32 {
-    screen().1
+pub extern "system" fn grSstOrigin(origin: u32) {
+    super::shadow::origin(origin & 1);
 }
 
 /// The Voodoo hands the monitor to the 2D card when this is 1 (the videos, dialogs). Here the
@@ -125,12 +123,12 @@ pub extern "system" fn grBufferSwap(_interval: u32) {
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grBufferClear(color: u32, alpha: u32, depth: u32) {
-    push(Cmd::Clear { color, alpha: alpha & 0xff, depth: depth & 0xffff });
+    push(Cmd::Clear { color: argb(color), alpha: alpha & 0xff, depth: depth & 0xffff });
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grClipWindow(minx: u32, miny: u32, maxx: u32, maxy: u32) {
-    push(Cmd::Clip([minx, miny, maxx, maxy]));
+    super::shadow::clip([minx, miny, maxx, maxy]);
 }
 
 #[unsafe(no_mangle)]

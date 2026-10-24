@@ -91,8 +91,37 @@ pub const LFB_1555: u32 = 0x2;
 pub const LFB_888: u32 = 0x4;
 pub const LFB_8888: u32 = 0x5;
 
+// GrOriginLocation_t
+pub const ORIGIN_UPPER_LEFT: u32 = 0;
+pub const ORIGIN_LOWER_LEFT: u32 = 1;
+
+// GrColorFormat_t
+pub const COLORFORMAT_ARGB: u32 = 0;
+pub const COLORFORMAT_ABGR: u32 = 1;
+pub const COLORFORMAT_RGBA: u32 = 2;
+pub const COLORFORMAT_BGRA: u32 = 3;
+
+// GrMipMapMode_t
+pub const MIPMAP_DISABLE: u32 = 0;
+
+// GrHint_t: GR_HINT_STWHINT, and its flag for a TMU 0 with its own w
+pub const HINT_STWHINT: u32 = 0;
+pub const STWHINT_W_DIFF_TMU0: u32 = 0x2;
+
 // GrLfbBypassMode_t
 pub const LFBBYPASS_ENABLE: u32 = 1;
+
+/// A `GrColor_t` packed in `format` (`grSstOpen`'s colour format) as 0xAARRGGBB.
+pub fn argb(c: u32, format: u32) -> u32 {
+    let [b0, b1, b2, b3] = c.to_le_bytes(); // b3 is the top byte
+    let (a, r, g, b) = match format {
+        COLORFORMAT_ABGR => (b3, b0, b1, b2),
+        COLORFORMAT_RGBA => (b0, b3, b2, b1),
+        COLORFORMAT_BGRA => (b0, b1, b2, b3),
+        _ => (b3, b2, b1, b0),
+    };
+    u32::from_le_bytes([b, g, r, a])
+}
 
 /// `GrScreenResolution_t` to pixels; `None` for values this library does not know.
 pub fn resolution(res: u32) -> Option<(u32, u32)> {

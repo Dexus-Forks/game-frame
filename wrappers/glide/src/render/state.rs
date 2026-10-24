@@ -1,7 +1,7 @@
 //! The Glide render state as the render thread keeps it, and its translation to OpenGL state
 //! and the scene shader's uniforms.
 
-use crate::cmd::TexInfo;
+use crate::cmd::Source;
 use crate::consts::*;
 use crate::gl::*;
 use crate::render::shaders::Program;
@@ -25,7 +25,14 @@ pub struct State {
     pub tex_fn: u32,
     pub filter: (u32, u32),
     pub clamp: (u32, u32),
-    pub source: Option<(u32, TexInfo)>,
+    pub source: Option<Source>,
+    /// `GrCmpFnc_t` and the reference value.
+    pub alpha_test: [u32; 2],
+    pub color_mask: (bool, bool),
+    pub depth_bias: i32,
+    /// `grTexMipMapMode`: the mode and whether to blend between levels.
+    pub mipmap: (u32, bool),
+    pub lod_bias: f32,
 }
 
 impl State {
@@ -50,6 +57,11 @@ impl State {
             filter: (FILTER_BILINEAR, FILTER_BILINEAR),
             clamp: (0, 0),
             source: None,
+            alpha_test: [7, 0],
+            color_mask: (true, true),
+            depth_bias: 0,
+            mipmap: (MIPMAP_DISABLE, false),
+            lod_bias: 0.0,
         }
     }
 
@@ -125,6 +137,10 @@ pub unsafe fn apply(gl: &Gl, p: &Program, s: &State, tex: &mut Textures, w: u32,
         (gl.UseProgram)(p.id);
         (gl.Uniform2f)(p.loc("uScreen"), w as f32, h as f32);
         (gl.Uniform1i)(p.loc("uDepthMode"), s.depth_mode as i32);
+        (gl.Uniform1f)(p.loc("uDepthBias"), s.depth_bias as f32);
+        (gl.Uniform2i)(p.loc("uAlphaTest"), s.alpha_test[0] as i32, s.alpha_test[1] as i32);
+        let (m, a) = (s.color_mask.0 as u8, s.color_mask.1 as u8);
+        (gl.ColorMask)(m, m, m, a);
         (gl.Uniform4i)(p.loc("uCC"), s.cc[0] as i32, s.cc[1] as i32, s.cc[2] as i32, s.cc[3] as i32);
         (gl.Uniform1i)(p.loc("uCCInvert"), (s.cc[4] != 0) as i32);
         (gl.Uniform4i)(p.loc("uAC"), s.ac[0] as i32, s.ac[1] as i32, s.ac[2] as i32, s.ac[3] as i32);
@@ -149,7 +165,7 @@ pub unsafe fn apply(gl: &Gl, p: &Program, s: &State, tex: &mut Textures, w: u32,
         (gl.Uniform1i)(p.loc("uTex"), 0);
         let mut tex_fn = s.tex_fn;
         let bound = match s.source {
-            Some((start, info)) if s.uses_texture() => tex.bind(gl, start, info),
+            Some(src) if s.uses_texture() => tex.bind(gl, src),
             _ => None,
         };
         match bound {
@@ -158,7 +174,14 @@ pub unsafe fn apply(gl: &Gl, p: &Program, s: &State, tex: &mut Textures, w: u32,
                 (gl.Uniform2f)(p.loc("uSTScale"), long / (256.0 * tw as f32), long / (256.0 * th as f32));
                 let f = |m: u32| if m == FILTER_BILINEAR { LINEAR } else { NEAREST };
                 let c = |m: u32| if m == CLAMP_CLAMP { CLAMP_TO_EDGE } else { REPEAT };
-                (gl.TexParameteri)(TEXTURE_2D, TEXTURE_MIN_FILTER, f(s.filter.0));
+                // With mipmaps: GL_{NEAREST,LINEAR}_MIPMAP_{NEAREST,LINEAR}, 0x2700 to 0x2703.
+                // Deviation: GR_MIPMAP_NEAREST_DITHER is drawn without the dither.
+                let min = match s.mipmap {
+                    (MIPMAP_DISABLE, _) => f(s.filter.0),
+                    (_, blend) => NEAREST_MIPMAP_NEAREST + (f(s.filter.0) - NEAREST) + 2 * blend as i32,
+                };
+                (gl.TexParameteri)(TEXTURE_2D, TEXTURE_MIN_FILTER, min);
+                (gl.TexParameterf)(TEXTURE_2D, TEXTURE_LOD_BIAS, s.lod_bias);
                 (gl.TexParameteri)(TEXTURE_2D, TEXTURE_MAG_FILTER, f(s.filter.1));
                 (gl.TexParameteri)(TEXTURE_2D, TEXTURE_WRAP_S, c(s.clamp.0));
                 (gl.TexParameteri)(TEXTURE_2D, TEXTURE_WRAP_T, c(s.clamp.1));

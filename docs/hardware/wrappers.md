@@ -52,7 +52,7 @@ game met, with a count. The log of a new game's first run then lists what to wri
 
 | DLL | Stands in for | What it draws | State | Known gaps |
 |---|---|---|---|---|
-| [`glide2x.dll`](../../wrappers/glide/README.md) | 3dfx Glide 2.x (`glide.dll`, `glide2x.dll`) | The whole scene with OpenGL, at any size. The Voodoo's colour combiners, chroma key and table fog are one fragment shader. The W buffer is OpenGL's depth test | 55 of 156 calls (Glide 2.43 and 2.1.1). POD's 3dfx builds (first edition and Gold) race at 1280 × 960 | Only TMU 0 draws. No NCC textures or mipmaps. `GR_BLEND_PREFOG_COLOR` is taken as zero |
+| [`glide2x.dll`](../../wrappers/glide/README.md) | 3dfx Glide 2.x (`glide.dll`, `glide2x.dll`) | The whole scene with OpenGL, at any size. The Voodoo's colour combiners, alpha test, chroma key and table fog are one fragment shader. The W buffer is OpenGL's depth test. Mipmaps, NCC and multibase textures, the `gu` texture manager and 3DF files | 131 of 156 calls (Glide 2.43 and 2.1.1). POD's 3dfx builds (first edition and Gold) race at 1280 × 960 | Only TMU 0 draws, so no detail textures. No antialiased edges or dither. `GR_BLEND_PREFOG_COLOR` is taken as zero |
 | [`sgl.dll`](../../wrappers/sgl/README.md) | PowerVR PCX1 and PCX2, SGL's scene-graph half | It keeps the scene graph the game builds and draws it with OpenGL, with the 2D picture laid on top through `ddraw.dll` | 47 of 134 calls (46 of SGL's 133, and one for `ddraw.dll`). POD Gold's PowerVR build races at 1280 × 960 | The immediate-mode half (`sgltri_*`) is stubs. Shadow volumes and other convex objects except light volumes are skipped |
 | [`ati3dcif.dll`](../../wrappers/ati3dcif/README.md) | ATI 3D Rage (ATI3DCIF) | Solid, flat and Gouraud triangles and quads, blended by source alpha, in software into the game's DirectDraw surface | 6 of 17 calls. POD's ATI build races with the frame scaled | No textures, lines, rectangles, points, Z buffer or fog. Whether the Rage rounded edges the same way is *unknown* |
 | [`s3dtkw.dll`](../../wrappers/s3dtkw/README.md) | S3 ViRGE (S3D Toolkit) | Gouraud lists, strips and fans, blended by source alpha, in software into a 15-bit or 8-bit surface | All 6 calls, and 3 slots of the function table. POD's S3 build races with the frame scaled | Textured faces are drawn Gouraud. Fog is logged and not drawn |
@@ -210,9 +210,9 @@ Every library writes the same three kinds of line:
 
 ```text
 glide: release build, GameFrame wrappers 0.1.0
-glide: not implemented: grTexDetailControl(0x0, 0x4, 0x2, 0x3f800000) (later calls are counted)
-glide: not handled: grTexMipMapMode: mode 2: mipmaps are not handled (later calls are counted)
-glide: not implemented or not handled, by count: grTexDetailControl ×812, grTexMipMapMode ×3
+glide: not implemented: guMPInit() (later calls are counted)
+glide: not handled: grTexDetailControl: detail textures need a second TMU; ignored (later calls are counted)
+glide: not implemented or not handled, by count: grTexDetailControl ×812, guMPInit ×1
 ```
 
 - `not implemented` is a call to a stub, with its arguments as 32-bit words.

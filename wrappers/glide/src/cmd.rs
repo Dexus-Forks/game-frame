@@ -7,21 +7,7 @@
 use std::sync::mpsc::{Receiver, SyncSender, sync_channel};
 use std::sync::{Mutex, OnceLock};
 
-/// A Glide `GrVertex` (Glide 2.x with two TMUs): 15 floats, 60 bytes.
-#[repr(C)]
-#[derive(Clone, Copy, Debug, Default)]
-pub struct Vertex {
-    pub x: f32,
-    pub y: f32,
-    pub z: f32,
-    pub r: f32,
-    pub g: f32,
-    pub b: f32,
-    pub ooz: f32,
-    pub a: f32,
-    pub oow: f32,
-    pub tmu: [[f32; 3]; 2],
-}
+pub use crate::vertex::Vertex;
 
 /// A `GrTexInfo` without its data pointer: what selects or describes a texture.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -30,6 +16,16 @@ pub struct TexInfo {
     pub large_lod: u32,
     pub aspect: u32,
     pub format: u32,
+}
+
+/// The texture to draw with: where it starts, its `GrTexInfo`, the four multibase addresses
+/// when multibase is on, and which NCC table its NCC formats read (0 or 1).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct Source {
+    pub start: u32,
+    pub info: TexInfo,
+    pub bases: Option<[u32; 4]>,
+    pub ncc: u8,
 }
 
 /// Pixels the game wrote to the frame buffer, as RGBA with alpha 0 where it wrote nothing.
@@ -70,11 +66,25 @@ pub enum Cmd {
     TexCombine(u32),
     TexFilter(u32, u32),
     TexClamp(u32, u32),
-    TexSource { start: u32, info: TexInfo },
+    TexSource(Source),
     Download { start: u32, data: Vec<u8> },
-    Palette(Box<[u32; 256]>),
+    /// Palette entries from `first` on.
+    Palette { first: usize, words: Vec<u32> },
+    /// NCC table 0 or 1, as the 112 bytes of a `GuNccTable`.
+    Ncc(u8, Box<[u8; 112]>),
+    /// `grTexMipMapMode`: the mode and whether to blend between levels.
+    MipMap(u32, bool),
+    LodBias(f32),
+    /// `grAlphaTestFunction`, `grAlphaTestReferenceValue`.
+    AlphaTest([u32; 2]),
+    /// Writes of colour and of alpha.
+    ColorMask(bool, bool),
+    DepthBias(i32),
+    /// `GR_BUFFER_FRONTBUFFER` or `GR_BUFFER_BACKBUFFER`.
+    RenderBuffer(u32),
     Triangle([Vertex; 3]),
     Line([Vertex; 2]),
+    Point(Vertex),
     Clear { color: u32, alpha: u32, depth: u32 },
     Lfb(LfbImage),
     Swap,

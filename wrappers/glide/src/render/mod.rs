@@ -63,7 +63,7 @@ pub fn run(commands: Receiver<Vec<Cmd>>) {
         let t = std::time::Instant::now();
         for c in batch {
             let kind = match c {
-                Cmd::Triangle(_) | Cmd::Line(_) => 0,
+                Cmd::Triangle(_) | Cmd::Line(_) | Cmd::Point(_) => 0,
                 Cmd::Lfb(_) => 1,
                 Cmd::Clear { .. } => 2,
                 Cmd::Swap => 3,
@@ -130,8 +130,12 @@ impl Renderer {
                 (gl.EnableVertexAttribArray)(i as u32);
                 (gl.VertexAttribPointer)(i as u32, size, FLOAT, 0, stride, (off * 4) as *const _);
             }
+            let scale = (g.frame.ow as f32 / g.frame.w as f32).max(1.0);
             if self.prim == LINES {
-                (gl.LineWidth)((g.frame.ow as f32 / g.frame.w as f32).max(1.0));
+                (gl.LineWidth)(scale);
+            }
+            if self.prim == POINTS {
+                (gl.PointSize)(scale);
             }
             (gl.DrawArrays)(self.prim, 0, n as i32);
         }
@@ -204,7 +208,24 @@ impl Renderer {
             (gl.Disable)(SCISSOR_TEST);
             (gl.Disable)(DEPTH_TEST);
             (gl.DepthMask)(0);
+            (gl.ColorMask)(1, 1, 1, 1);
             (gl.DrawArrays)(0x0005, 0, 4);
+        }
+        self.dirty = true;
+    }
+
+    /// Draw into the front buffer or the back one. Going back to the back buffer shows what
+    /// was drawn into the front one, as the Voodoo showed it while it was drawn.
+    unsafe fn render_buffer(&mut self, front: bool) {
+        let Some(g) = &mut self.gpu else { return };
+        unsafe {
+            if g.frame.front && !front {
+                let (cw, ch) = crate::window::client(g.hwnd);
+                let (cw, ch) = if cw > 0 && ch > 0 { (cw, ch) } else { (g.frame.ow as i32, g.frame.oh as i32) };
+                g.frame.show(&g.gl, &g.programs.present, self.state.gamma, cw, ch, g.dc, g.frame.back ^ 1);
+            }
+            g.frame.front = front;
+            g.frame.bind_back(&g.gl);
         }
         self.dirty = true;
     }
@@ -218,6 +239,8 @@ impl Renderer {
             (gl.ClearColor)(c(16), c(8), c(0), alpha as f32 / 255.0);
             (gl.ClearDepth)(depth as f64 / 65535.0);
             (gl.DepthMask)(s.depth_mask as u8);
+            let (rgb, a) = (s.color_mask.0 as u8, s.color_mask.1 as u8);
+            (gl.ColorMask)(rgb, rgb, rgb, a);
             (gl.Clear)(COLOR_BUFFER_BIT | if s.depth_mask { DEPTH_BUFFER_BIT } else { 0 });
         }
         self.dirty = true;
@@ -225,7 +248,7 @@ impl Renderer {
 
     unsafe fn exec(&mut self, c: Cmd) {
         use Cmd::*;
-        if !matches!(c, Triangle(_) | Line(_)) {
+        if !matches!(c, Triangle(_) | Line(_) | Point(_)) {
             unsafe { self.change() };
         }
         let s2 = &mut self.state;
@@ -257,11 +280,19 @@ impl Renderer {
             TexCombine(v) => s2.tex_fn = v,
             TexFilter(a, b) => s2.filter = (a, b),
             TexClamp(a, b) => s2.clamp = (a, b),
-            TexSource { start, info } => s2.source = Some((start, info)),
+            TexSource(src) => s2.source = Some(src),
             Download { start, data } => self.textures.download(start, &data),
-            Palette(p) => self.textures.palette(&p),
+            Palette { first, words } => self.textures.palette(first, &words),
+            Ncc(which, table) => self.textures.ncc(which, &*table),
+            MipMap(mode, blend) => s2.mipmap = (mode, blend),
+            LodBias(v) => s2.lod_bias = v,
+            AlphaTest(v) => s2.alpha_test = v,
+            ColorMask(rgb, a) => s2.color_mask = (rgb, a),
+            DepthBias(v) => s2.depth_bias = v,
+            RenderBuffer(b) => unsafe { self.render_buffer(b == crate::consts::BUFFER_FRONT) },
             Triangle(v) => unsafe { self.vertices(TRIANGLES, &v) },
             Line(v) => unsafe { self.vertices(LINES, &v) },
+            Point(v) => unsafe { self.vertices(POINTS, &[v]) },
             Clear { color, alpha, depth } => unsafe { self.clear(color, alpha, depth) },
             Lfb(img) => unsafe { self.lfb(&img) },
             Swap => {

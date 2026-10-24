@@ -1610,8 +1610,8 @@ if command -v cargo >/dev/null; then
   [[ $? == 0 && "$out" == *"s3dtkw: 6 of 6 calls implemented"* ]] \
     && ok "stubgen: each wrapper's .def and stubs match its API table, every call with the original's convention ($(echo "$out" | grep -o '[0-9]* of [0-9]*' | paste -sd, - | sed 's/,/, /g'))" \
     || bad "stubgen --check" "$out"
-  out="$(cd wrappers && cargo test --release --target "$host" --target-dir "$WT" -p raster -p scalers -p pixels -p shim -p sgl -p maxi94 2>&1)"
-  [[ $? == 0 ]] && ok "the wrappers' host tests pass: rasteriser, scalers, pixels, settings, SGL scene graph, Maxi Sound 64 streams and mixer ($(echo "$out" | grep -o '[0-9]* passed' | awk '{s+=$1} END {print s}') tests)" \
+  out="$(cd wrappers && cargo test --release --target "$host" --target-dir "$WT" -p raster -p scalers -p pixels -p shim -p sgl -p maxi94 -p glide 2>&1)"
+  [[ $? == 0 ]] && ok "the wrappers' host tests pass: rasteriser, scalers, pixels, settings, SGL scene graph, Maxi Sound 64 streams and mixer, Glide clipping, mip layout, fog tables and 3DF files ($(echo "$out" | grep -o '[0-9]* passed' | awk '{s+=$1} END {print s}') tests)" \
     || bad "wrappers host tests" "$(echo "$out" | grep -E 'FAILED|panicked|error' | head -8)"
   if rustup target list --installed 2>/dev/null | grep -q i686-pc-windows-gnu && command -v zig >/dev/null; then
     out="$(cd wrappers && cargo build -q --release --target-dir "$WT" 2>&1)"
@@ -1637,6 +1637,12 @@ print(', '.join(out))"
       || bad "wrappers debug build" "$(echo "$out" | grep -E 'error' | head -8)"
     zig cc -target x86-windows-gnu -O2 wrappers/sgl/test/sgltest.c -o "$WT/sgltest.exe" -luser32 >/dev/null 2>&1 \
       && ok "sgltest.c, the SGL stand-in's test program, builds" || bad "sgltest.c does not build"
+    out="$(zig cc -target x86-windows-gnu -O2 wrappers/glide/test/glidetest.c -o "$WT/glidetest.exe" -luser32 2>&1)"
+    [[ $? == 0 ]] && expect "glidetest.c, the Glide library's test program, builds and finds every call it uses in glide2x.dll" "50 calls found" "$PYTHON" -c "
+import re, pefile
+names = set(re.findall(rb'_(?:gr|gu)\w+@\d+', open('$WT/glidetest.exe', 'rb').read()))
+dll = {e.name for e in pefile.PE('$WT/i686-pc-windows-gnu/release/glide2x.dll').DIRECTORY_ENTRY_EXPORT.symbols}
+print(f'{len(names)} calls found' if names <= dll else f'missing: {sorted(names - dll)}')" || bad "glidetest.c does not build" "$out"
   else
     echo "  skip  the wrapper DLLs (needs rustup target i686-pc-windows-gnu and zig)"
   fi
