@@ -2,10 +2,14 @@
 """How much of a program's code a Ghidra export covers, where the gaps are, and where the
 functions it missed probably start.
 
-Usage: exportcov.py BINARY functions.tsv [--gaps N] [--starts FILE] [--min PERCENT]
+Usage: exportcov.py BINARY functions.tsv [--bodies FILE] [--gaps N] [--starts FILE] [--min PERCENT]
 
   BINARY         the Windows PE that was exported (32-bit or 64-bit)
   functions.tsv  the export's function list (address, size, name), from scripts/ghidra-export.sh
+  --bodies FILE  each piece of each function (start, end, entry; bodies.tsv from the same
+                 export, read by default when it sits beside functions.tsv). Without it, each
+                 function counts as one run of its size from its entry, which undercounts a
+                 function whose body is in several pieces
   --gaps N       list the N largest gaps (default 10)
   --starts FILE  write the likely function starts in the gaps, one address a line, ready for
                  `scripts/ghidra-run.sh BINARY decompile OUT.txt $(cat FILE)`
@@ -56,6 +60,20 @@ def load_functions(path):
         parts = line.rstrip('\n').split('\t')
         if len(parts) >= 2 and parts[1].isdigit():
             rows.append((int(parts[0], 16), int(parts[1])))
+    return sorted(rows)
+
+
+def load_bodies(path):
+    """(start, size) of every piece in bodies.tsv: start, end (exclusive), entry, in hex."""
+    rows = []
+    for line in open(path, encoding='utf-8', errors='replace'):
+        parts = line.rstrip('\n').split('\t')
+        try:
+            s, e = int(parts[0], 16), int(parts[1], 16)
+        except (IndexError, ValueError):
+            continue
+        if e > s:
+            rows.append((s, e - s))
     return sorted(rows)
 
 
@@ -140,10 +158,14 @@ def main(argv):
     opt = lambda k, d=None: argv[argv.index(k) + 1] if k in argv else d
     img = Image(argv[0], 0)
     funcs = load_functions(argv[1])
+    bodies = opt('--bodies', os.path.join(os.path.dirname(os.path.abspath(argv[1])), 'bodies.tsv'))
+    pieces = load_bodies(bodies) if os.path.exists(bodies) else funcs
+    if pieces is not funcs:
+        print(f'function bodies from {bodies} ({len(pieces)} pieces)')
     total = done = 0
     gaps = []
     for data, base, _ in img.regions:
-        ranges = covered_ranges(funcs, base, base + len(data))
+        ranges = covered_ranges(pieces, base, base + len(data))
         total += len(data)
         done += sum(e - s for s, e in ranges)
         gaps += gaps_of(data, base, ranges)

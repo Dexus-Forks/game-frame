@@ -9,6 +9,13 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `ExportAll.java` writes `bodies.tsv`, every piece of every function (start, end, entry), and
+  `exportcov.py` reads it beside `functions.tsv` (or with `--bodies`). Before, a function whose
+  body lies in several pieces counted as one run from its entry: Hardwar's export measured
+  93.7% where 98.0% of its code is in functions.
+- Know-how: a project whose `./gameframe` runs a second clone or another project's copy of
+  GameFrame (pin the machine's one checkout in `.env`), and scripted edits that stop matching
+  after a formatter reflows the code.
 - Three guides from the POD: Planet of Death project:
   [Recording the original, and replaying it](docs/observe/recording.md),
   [Replacement libraries for a 1990s game](docs/hardware/replacement-libraries.md) and
