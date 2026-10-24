@@ -185,13 +185,14 @@ int main(int argc, char **argv) {
         float xa[3] = {1, 0, 0};
         sgl_create_list(1, 1, 0);
         int light = sgl_create_point_light(1, white, d, o, 0, 0, 0);
-        sgl_create_light_volume(0, 1, light);
-        sgl_set_diffuse(warm);
-        sgl_set_glow(warm);
-        sgl_set_opacity(0.35f);
+        /* The transform first: a light volume sits in the list where it is made. */
         sgl_create_transform(1);
         sgl_translate(-3.0f, 3.0f, 3.0f);
         sgl_rotate(xa, 0.9f);
+        sgl_set_diffuse(warm);
+        sgl_set_glow(warm);
+        sgl_set_opacity(0.35f);
+        sgl_create_light_volume(0, 1, light);
         sgl_create_mesh(0);
         float a = 0, p1[3], p3[3], n1[3], n3[3];
         for (int k = 0; k < 40; k++) {

@@ -151,8 +151,6 @@ pub struct Scene {
     edit: Edit,
     /// The last convex object made, for planes added after another object became current.
     last_convex: Option<u32>,
-    /// A light volume asked for and not yet placed: its name, and its object.
-    pending_convex: Option<(u32, Convex)>,
 }
 
 impl Default for Scene {
@@ -165,7 +163,7 @@ impl Scene {
     pub fn new() -> Scene {
         let mut objs = HashMap::new();
         objs.insert(1, Obj::List(List { preserve: true, parent: 1, ..Default::default() }));
-        Scene { objs, textures: HashMap::new(), next: 2, root: 1, current: 1, edit: Edit::None, last_convex: None, pending_convex: None }
+        Scene { objs, textures: HashMap::new(), next: 2, root: 1, current: 1, edit: Edit::None, last_convex: None }
     }
 
     fn name(&mut self) -> u32 {
@@ -388,30 +386,20 @@ impl Scene {
 
     // Convex objects and light volumes.
 
-    /// The object goes into the list where its first plane is added, not here (*inferred*:
-    /// POD asks for its light volume, then makes the transform that places it, then adds the
-    /// planes, `FUN_0049b770`; placed here, the volume would never follow its transform).
+    /// The object goes into the current list now, as PowerVR's driver does (SGLMID4.dll
+    /// `FUN_10025270`, *observed*); planes added later go to it even after another object was
+    /// made (POD makes a transform and an empty mesh between, `FUN_0049b770`).
     pub fn create_light_volume(&mut self, generate: bool, light_volume: bool, light: i32) -> i32 {
-        let id = self.name();
-        self.pending_convex = Some((id, Convex { light_volume, light, ..Default::default() }));
-        self.edit = Edit::None;
+        let id = self.add(Obj::Convex(Convex { light_volume, light, ..Default::default() }), Node::Convex);
+        self.edit = Edit::Convex(id);
+        self.last_convex = Some(id);
         Self::named(id, generate)
     }
 
     pub fn add_plane(&mut self, plane: Plane) -> i32 {
-        let id = match (self.edit, self.pending_convex.take()) {
-            (Edit::Convex(id), pending) => {
-                self.pending_convex = pending;
-                id
-            }
-            (_, Some((id, c))) => {
-                self.objs.insert(id, Obj::Convex(c));
-                self.push(Node::Convex(id));
-                self.edit = Edit::Convex(id);
-                self.last_convex = Some(id);
-                id
-            }
-            (_, None) => match self.last_convex {
+        let id = match self.edit {
+            Edit::Convex(id) => id,
+            _ => match self.last_convex {
                 Some(id) => id,
                 None => return super::ERR_BAD_PARAMETER,
             },
@@ -508,7 +496,7 @@ mod tests {
     }
 
     #[test]
-    fn light_volume_placed_at_its_first_plane() {
+    fn light_volume_placed_where_it_is_made() {
         let mut s = Scene::new();
         s.create_light_volume(false, true, 0);
         s.create_transform(false);
@@ -516,9 +504,9 @@ mod tests {
         s.add_plane(Plane { p: [0.0; 3], n: [0.0, 0.0, 1.0], invisible: false });
         s.add_plane(Plane { p: [0.0; 3], n: [1.0, 0.0, 0.0], invisible: false });
         let root = s.list(s.root).unwrap();
-        assert!(matches!(root.nodes[..], [Node::Transform(_), Node::Mesh(_), Node::Convex(_)]));
+        assert!(matches!(root.nodes[..], [Node::Convex(_), Node::Transform(_), Node::Mesh(_)]));
         let Some(Obj::Convex(c)) = s.objs.values().find(|o| matches!(o, Obj::Convex(_))) else { panic!() };
-        assert_eq!(c.planes.len(), 2);
+        assert_eq!(c.planes.len(), 2, "planes after the mesh still go to the volume");
     }
 
     #[test]
