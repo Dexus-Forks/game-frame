@@ -55,6 +55,7 @@ logs](#reading-the-logs)).
 | [`ati3dcif.dll`](../../wrappers/ati3dcif/README.md) | ATI 3D Rage (ATI3DCIF) | Solid, flat and Gouraud triangles and quads, blended by source alpha, in software into the game's DirectDraw surface | 6 exports. POD's ATI build races with the frame scaled | No textures, lines, rectangles, points, Z buffer or fog. Whether the Rage rounded edges the same way is *unknown* |
 | [`s3dtkw.dll`](../../wrappers/s3dtkw/README.md) | S3 ViRGE (S3D Toolkit) | Gouraud lists, strips and fans, blended by source alpha, in software into a 15-bit or 8-bit surface | 4 exports and the function table. POD's S3 build races with the frame scaled | Textured faces are drawn Gouraud. Fog is logged and not drawn |
 | [`ddraw.dll`](../../wrappers/ddraw/README.md) | DirectDraw 1 to 3 | Every surface in memory and every mode granted. Each flip shows the frame in a window, scaled | Used by POD's ATI, S3 and PowerVR builds. Made for its software and MMX builds too (not confirmed with them) | No Direct3D. `DDRAW_SYSTEM=1` hands DirectDraw to the system's own library for a game that needs it. Methods POD does not call return `DDERR_UNSUPPORTED` |
+| [`94DLL32.dll`](../../wrappers/maxi94/README.md) (`maxi94`) | Guillemot Maxi Sound 64 (Dream SAM9407), the sound card library | No picture. The card's wave streams are Wine's wave outputs, and the mixer's wave and CD lines are answered for, so the game's sound plays | 6 exports by ordinal. POD Gold's `PODMAX64` finds both streams and writes them at full volume (menus only, on macOS) | Front and rear mixed into two speakers. Sample banks, the chip's voices and its effects are not exported. [Sound-card APIs](sound-card-apis.md) has the other cards |
 
 The libraries share four crates:
 
@@ -150,7 +151,7 @@ Each library also reads its own variables.
 | `DDRAW_PIXELS` | ddraw | `555` for 5-5-5 surfaces. The S3 build needs it, since a ViRGE draws only 15-bit | 565 |
 | `DDRAW_SYSTEM` | ddraw | `1` hands DirectDraw to the system's own `ddraw.dll`, for a game that needs Direct3D. The patches still apply | 0 |
 
-The log files are `GLIDE_LOG`, `SGL_LOG`, `DDRAW_LOG`, `ATI3DCIF_LOG` and `S3DTK_LOG`. Each
+The log files are `GLIDE_LOG`, `SGL_LOG`, `DDRAW_LOG`, `ATI3DCIF_LOG`, `S3DTK_LOG` and `MAXI94_LOG`. Each
 names a file, such as `C:\glide.log`. Without it, the library logs to standard error.
 
 ![One button of POD's ATI menu through the four filters of ddraw.dll](../assets/case-studies/pod-ddraw-filters.webp)
