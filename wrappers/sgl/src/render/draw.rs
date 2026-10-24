@@ -330,6 +330,12 @@ impl Renderer {
                         (gl.Disable)(BLEND);
                         (gl.DepthMask)(1);
                     }
+                    if b.no_depth {
+                        (gl.Disable)(DEPTH_TEST);
+                        (gl.DepthMask)(0);
+                    } else {
+                        (gl.Enable)(DEPTH_TEST);
+                    }
                     (gl.BindTexture)(TEXTURE_2D, tex);
                     (gl.Uniform1i)(p.loc("uTextured"), (tex != 0) as i32);
                     (gl.Uniform1i)(p.loc("uFogOn"), (b.fog && cam.fog.is_some()) as i32);

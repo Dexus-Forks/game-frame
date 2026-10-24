@@ -40,6 +40,11 @@ struct Pending {
 
 static PENDING: Mutex<Pending> = Mutex::new(Pending { need_address: true, views: Vec::new(), frames: 0 });
 
+/// Whether `wrappers/ddraw` hands the game's pictures over.
+pub(crate) fn hooked() -> bool {
+    HOOKED.load(Ordering::Relaxed)
+}
+
 pub fn set_callback(f: usize) {
     CALLBACK.store(f, Ordering::Relaxed);
 }
@@ -51,14 +56,14 @@ pub fn status() -> *const u32 {
 /// `CALLBACK_ADDRESS_PARAMS` (sglwin32.h, packed): the memory, its stride, bits per pixel.
 #[repr(C, packed)]
 #[derive(Default)]
-struct AddressParams {
-    mem: usize,
-    stride: u16,
-    bpp: u8,
+pub(crate) struct AddressParams {
+    pub mem: usize,
+    pub stride: u16,
+    pub bpp: u8,
 }
 
 /// Ask the game where to draw.
-fn address() -> Option<AddressParams> {
+pub(crate) fn address() -> Option<AddressParams> {
     let f = CALLBACK.load(Ordering::Relaxed);
     if f == 0 {
         return None;
@@ -106,7 +111,7 @@ fn visible(vp: &Viewport, all: &std::collections::HashMap<i32, Viewport>, dev: (
     out
 }
 
-fn fill_marker(p: &AddressParams, rects: &[[i32; 4]]) {
+pub(crate) fn fill_marker(p: &AddressParams, rects: &[[i32; 4]]) {
     if p.bpp != 16 {
         shim::log_once!("{} bits per pixel: no marker drawn", { p.bpp });
         return;
@@ -207,6 +212,13 @@ pub unsafe extern "C" fn sgl_wrapper_present(hwnd: usize, pixels: *const u8, w: 
     if !HOOKED.swap(true, Ordering::Relaxed) {
         shim::log!("presenting through wrappers/ddraw: {w}x{h}");
     }
+    let rgba = unsafe { picture(pixels, w, h, pitch) };
+    render::send(Cmd::Present(Present { hwnd, w, h, rgba: Some(rgba) }));
+    1
+}
+
+/// A 16-bit RGB565 picture as RGBA, alpha 0 where it holds the marker.
+pub(crate) unsafe fn picture(pixels: *const u8, w: u32, h: u32, pitch: u32) -> Vec<u8> {
     let mark = marker();
     let mut rgba = vec![0u8; (w * h * 4) as usize];
     for y in 0..h as usize {
@@ -224,6 +236,5 @@ pub unsafe extern "C" fn sgl_wrapper_present(hwnd: usize, pixels: *const u8, w: 
             rgba[o + 3] = 255;
         }
     }
-    render::send(Cmd::Present(Present { hwnd, w, h, rgba: Some(rgba) }));
-    1
+    rgba
 }

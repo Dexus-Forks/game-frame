@@ -61,7 +61,7 @@ proposed again.
 - [x] The card makers' 3D APIs in detail: Glide 2.x, ATI3DCIF, S3D Toolkit; one build per card ([card-apis.md](docs/hardware/card-apis.md), `gameframe-gpu-1997`, `re-accelerator`)
 - [x] Hand-written MMX code: finding it, matching it to the plain build, measuring, porting ([simd.md](docs/hardware/simd.md), `gameframe-mmx`, `re-vectoriser`)
 - [x] PowerVR SGL's scene-graph half: the 46 calls of POD's PowerVR build, a stand-in `sgl.dll` on OpenGL ([wrappers/sgl](wrappers/sgl/README.md))
-- [ ] PowerVR SGL's immediate-mode half (`sgltri_*`), which Hardwar's PowerVR mode uses. `wrappers/sgl` now exports them all as stubs (its `api.tsv`), so the game loads. These 13 still need writing: `sgl_delete_all_textures`, `sgl_get_errors`, `sgl_get_free_texture_mem`, `sgl_get_versions`, `sgl_get_win_versions`, `sgl_use_ddraw_mode`, `sgl_use_eor_callback`, `sgltri_isrendercomplete`, `sgltri_quads`, `sgltri_render`, `sgltri_shadow`, `sgltri_startofframe`, `sgltri_triangles`
+- [x] PowerVR SGL's immediate-mode half (`sgltri_*`), which Hardwar's PowerVR mode uses. The 13 calls it lacked, and `sgltri_rerender`, are in `wrappers/sgl` ([sgl](wrappers/sgl/README.md), `test/sgltritest.c`). Shadow volumes given as triangles are still not drawn. No run of Hardwar has checked it
 - [ ] Rendition RRedline and Matrox MSI in the same detail
 
 ## Engines ([animation.md](docs/engines/animation.md))

@@ -20,6 +20,15 @@ Every release of GameFrame, newest first. The format follows
   checks a known scene through the DLL, and `tests/run.sh` builds it. The host tests cover
   clipping, culling, mip level layout, fog tables, 3DF files and NCC tables.
 
+- `sgl.dll` now has SGL's immediate mode, which Hardwar's PowerVR mode uses. It has the
+  `sgltri_*` calls for triangles, quads and rendering. It has SGL's DirectDraw mode with its 2D
+  callback. It also has the end-of-render callback, the error, version and texture-memory
+  calls and `sgl_delete_all_textures`. That is 14 more calls, so SGL has 61 of 134. The faces
+  go through the scene graph's renderer. The header leaves facing, flat shading, translucency
+  levels and the fog register open. They were read from PowerVR's own SGLMID4.dll.
+  `wrappers/sgl/test/sgltritest.c` draws a known scene with them. The plain-Rust part has
+  host tests.
+
 - Every wrapper DLL now exports every call of the original library, so any game that uses one
   loads. Calls implemented of calls exported: Glide 55 of 156 (Glide 2.43 and 2.1.1), SGL 47
   of 134, ATI3DCIF 6 of 17, S3D Toolkit 6 of 6, DirectDraw 2 of 9. Each crate's `api.tsv`
