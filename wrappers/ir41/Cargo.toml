@@ -1,0 +1,14 @@
+[package]
+name = "ir41"
+description = "ir41_32.dll, a Video for Windows codec for Intel Indeo Video Interactive 4.1 (IV41): GameFrame's clean-room decoder, picture for picture as Intel's own codec"
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[lib]
+name = "ir41_32"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+indeo = { package = "gameframe-indeo", path = "../../crates/indeo" }
+shim = { path = "../shim" }
