@@ -74,6 +74,8 @@ pub unsafe extern "C" fn sgl_create_texture(
     let (w, h) = (tex.w, tex.h);
     // The graph keeps what the traversal needs; the pixels go to the render thread.
     let name = s.scene.create_texture(Texture { rgba: Vec::new(), ..tex.clone() });
+    // The driver charges by map type and size index, not by the picture's size.
+    s.texmem.take(name as u32, map_type, map_size);
     drop(s);
     crate::render::send(crate::render::Cmd::Texture(name as u32, tex));
     trace!("sgl_create_texture", "{map_type} {map_size} {generate_mipmap} {dither} {w}x{h} -> {name}");
@@ -83,7 +85,12 @@ pub unsafe extern "C" fn sgl_create_texture(
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_delete_texture(texture_name: i32) {
     trace!("sgl_delete_texture", "{texture_name}");
-    if sgl().scene.delete_texture(texture_name) {
+    let deleted = {
+        let mut s = sgl();
+        s.texmem.give_back(texture_name as u32);
+        s.scene.delete_texture(texture_name)
+    };
+    if deleted {
         crate::render::send(crate::render::Cmd::DeleteTexture(texture_name as u32));
     }
 }

@@ -50,7 +50,8 @@ Every release of GameFrame, newest first. The format follows
   callback. It also has the end-of-render callback, the error, version and texture-memory
   calls and `sgl_delete_all_textures`. That is 14 more calls, so SGL has 61 of 134. The faces
   go through the scene graph's renderer. The header leaves facing, flat shading, translucency
-  levels and the fog register open. They were read from PowerVR's own SGLMID4.dll.
+  levels, the order of translucent passes and the fog register open. They were read from
+  PowerVR's own SGLMID4.dll, partly by unattended `re-tracer` runs.
   `wrappers/sgl/test/sgltritest.c` draws a known scene with them. The plain-Rust part has
   host tests.
 

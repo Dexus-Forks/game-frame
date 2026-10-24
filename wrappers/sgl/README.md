@@ -33,9 +33,11 @@ The frame reaches the window in one of SGL's two output modes, in the driver's o
 
 - **Address mode** (`sgl_use_address_mode`). This works as for the scene graph (below).
 - **DirectDraw mode** (`sgl_use_ddraw_mode`). SGL owns the screen. At each `sgltri_render` it
-  calls the game's 2D callback with the finished frame's surface, then shows the frame. Here
-  the surface is a 16-bit picture of the device's size in this library's memory. What the game
-  draws into it goes over the frame, except where it still holds the marker.
+  calls the game's 2D callback with the back buffer of the frame just drawn, before the flip.
+  The surface is not locked during the call. Then it flips and starts the new frame. The
+  library keeps that order. Here the surface is a 16-bit picture of the device's size in this
+  library's memory. What the game draws into it goes over the frame, except where it still
+  holds the marker.
 
 After each render the end-of-render callback runs, if the game set one. If it returns a value
 other than 0, the next `sgltri_render` reports that value as its error. `sgltri_isrendercomplete`
@@ -91,7 +93,7 @@ when zig is there.
 
 | Module | Does |
 |---|---|
-| `scene/` | `tri.rs`: the immediate mode, from the game's contexts and vertices to batches. The graph (`graph.rs`: lists, transforms, meshes, materials, lights, cameras, textures, one method per call) and the traversal (`walk.rs`: from the root list to lit triangles in the camera's space; `convex.rs`: light volumes). Plain Rust, tested on the host |
+| `scene/` | `tri.rs`: the immediate mode, from the game's contexts and vertices to batches. The graph (`graph.rs`: lists, transforms, meshes, materials, lights, cameras, textures, one method per call) and the traversal (`walk.rs`: from the root list to lit triangles in the camera's space; `convex.rs`: light volumes; `texmem.rs`: free texture memory). Plain Rust, tested on the host |
 | `api/` | The exported calls: they read the game's pointers and edit the graph |
 | `frame.rs` | `sgl_render`: the address callback, the marker, the frame to the render thread; `sgl_wrapper_present` |
 | `immediate.rs` | `sgltri_render`: the frame through the address callback or the DirectDraw mode's 2D callback, then the end-of-render callback |
@@ -126,17 +128,31 @@ Each is marked `Deviation:` in the code.
 
 In the immediate mode:
 
-- Translucent faces are drawn after the opaque ones, in the order sent. The PCX2 sorted them
-  itself.
+- Translucent passes are sorted once for the whole screen. The driver sorts them in each
+  32 × 32 region, with that region's own depths. Each call gives one pass for its faces kept
+  as sent and one for the faces turned round. The passes are drawn farthest first, and the
+  faces in a pass in the order sent, as the driver does.
+- Translucency level 15 is drawn fully clear (*inferred*). The driver does not say how clear
+  the chip makes it.
 - The library counts the shadow and light volumes sent with `sgltri_shadow`. It does not
-  draw them.
-- The fog's rate per unit of `w` is read from SGL's fog register (0 to 31) as SGL writes it
-  for the scene graph (*inferred*). `SGL_FOG` scales it.
+  draw them. It checks the arguments in the driver's order.
+- Fog keeps `2^(-c × 2^(R - 22) × w / 0.01)` of a colour, with R the fog register (0 to 31)
+  (*inferred* from how SGL sets the register for the scene graph). The chip's constant `c`
+  lies between 0.5 and 1, and 0.75 is taken. `SGL_FOG` scales it.
+- `SGLTT_VERTEXFOG` and the specular alpha are ignored, as the driver ignores them. A face
+  fogs by its `w` whenever `bFogOn` is set.
 - The DirectDraw mode's 2D callback gets null for both DirectDraw objects. Only the memory is
-  real.
-- Mipmaps, bilinear filtering switches and mipmap offsets are ignored. Every texture is
-  filtered.
-- `sgl_get_free_texture_mem` reports 4 MB less 2 bytes for each texel of each texture.
+  real. The surface has the device's size; the driver snaps it to 320 × 240, 640 × 400 or
+  480, or 800 × 600.
+- Every texture is filtered bilinearly. In the driver, bilinear filtering is one global
+  setting (`BilinearFilteringMode` in sglhw.ini); `SGLTT_BILINEAR` is never read per call.
+  There is no per-call mipmap flag: mipmapped map types make mipmapped textures. The
+  mipmap offset (`SGLTT_MIPMAPOFFSET`) only changes mipmapped textures. The library ignores
+  mipmaps and the offset.
+- `sgl_get_free_texture_mem` counts as the driver does: 4 MB less 4 bytes at the start, less
+  a fixed charge for each texture by its map type and size (`scene/texmem.rs`). The driver
+  also takes two buffers of `TSPParamSize` KB at the start; that setting's default is not
+  known, so they are not taken out. A texture is never refused for lack of memory.
 - Only the immediate-mode calls and the information calls record errors for
   `sgl_get_errors`.
 - `sgl_get_versions` reports driver 3.1.0's strings. `sgl_delete_all_textures` takes no

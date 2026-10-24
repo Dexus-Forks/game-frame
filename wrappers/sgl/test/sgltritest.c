@@ -172,7 +172,7 @@ int main(int argc, char **argv) {
     memset(&c, 0, sizeof c);
     c.cBackgroundColour[0] = 0.1f; c.cBackgroundColour[1] = 0.15f; c.cBackgroundColour[2] = 0.3f;
     c.fFogR = 0.5f; c.fFogG = 0.5f; c.fFogB = 0.6f;
-    c.u32FogDensity = 12; /* about 95% of the colour kept at z = 2, 17% at z = 66 (scene/tri.rs `rate`) */
+    c.u32FogDensity = 10; /* about 97% of the colour kept at z = 2, 43% at z = 66 (scene/tri.rs `rate`) */
     c.bCullBackfacing = 1;
     c.u32GlobalTrans = 255;
 
