@@ -1,0 +1,12 @@
+[package]
+name = "maxi94"
+description = "94DLL32.dll, the Guillemot Maxi Sound 64 (Dream SAM9407) library: a silent stand-in, so games built for that card start without it"
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+shim = { path = "../shim" }

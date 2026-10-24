@@ -1,0 +1,8 @@
+LIBRARY 94DLL32.dll
+EXPORTS
+mpuMessage=mpuMessage@12 @2
+mpuMessageAc=mpuMessageAc@16 @3
+UpLoad=UpLoad@16 @8
+GetMemMapAddress=GetMemMapAddress@0 @9
+waveSetAuxVolume=waveSetAuxVolume@12 @13
+waveSetMainVolume=waveSetMainVolume@12 @14
