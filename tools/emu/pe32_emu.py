@@ -18,7 +18,12 @@ ESI. This module runs such routines exactly as they are, MMX and x87 included.
 What it does:
 
 - maps the image at its preferred base, as the loader would; Watcom images whose section
-  headers give a virtual size of 0 are mapped from their raw sizes (pefile does this);
+  headers give a virtual size of 0 are mapped from their raw sizes (pefile does this). A section
+  with a file pointer of 0 has no file data (Watcom's .bss): it is zeroed, as Windows does,
+  instead of holding the file's first bytes (docs/knowhow/pe-bss-file-pointer-zero.md);
+- starts the x87 as Windows starts a program, with the control word 0x037f (round to nearest,
+  64-bit precision). Unicorn alone starts at 0, which rounds every result to 24 bits
+  (docs/knowhow/unicorn-fpu-starts-single-precision.md);
 - points every import at a stub that stops the run with the import's name, so a routine that
   calls Windows fails loudly instead of running off into nowhere (`stubs=` gives a Python
   handler for an import: it receives the emulator and returns EAX; the stub then returns with
@@ -95,7 +100,12 @@ class Emu32:
             if pe.FILE_HEADER.Machine != 0x14c:
                 raise ValueError(f'{path}: not a 32-bit x86 image (machine {pe.FILE_HEADER.Machine:#x})')
             self.base = pe.OPTIONAL_HEADER.ImageBase
-            image = pe.get_memory_mapped_image()
+            image = bytearray(pe.get_memory_mapped_image())
+            # A section whose file pointer is 0 has no data in the file: the loader zeroes it.
+            for s in pe.sections:
+                if s.PointerToRawData == 0 and s.SizeOfRawData:
+                    start, n = s.VirtualAddress, max(s.Misc_VirtualSize, s.SizeOfRawData)
+                    image[start:start + n] = bytes(min(n, max(0, len(image) - start)))
             self.size = align(max(pe.OPTIONAL_HEADER.SizeOfImage, len(image)))
             image = image[:self.size]
         else:
@@ -112,6 +122,7 @@ class Emu32:
         self.heap_top = HEAP_BASE
         self.uc.hook_add(UC_HOOK_CODE, self._on_stub, begin=STUB_BASE, end=STUB_BASE + STUB_SIZE - 1)
         self.uc.hook_add(UC_HOOK_MEM_INVALID, self._on_bad_mem)
+        self.uc.reg_write(UC_X86_REG_FPCW, NEAREST)   # Windows starts a program here, not at 0
         self._stopped_in = None
 
     @classmethod
@@ -142,6 +153,7 @@ class Emu32:
         self.uc.mem_write(self.base, self.image)
         self.uc.mem_write(HEAP_BASE, bytes(self.heap_top - HEAP_BASE))
         self.heap_top = HEAP_BASE
+        self.uc.reg_write(UC_X86_REG_FPCW, NEAREST)
 
     def alloc(self, n, fill=0):
         a = self.heap_top

@@ -315,6 +315,25 @@ except EmuError as e:
     msg = str(e).split('called ')[1]
 print(got, ticks, msg)
 PY
+expect "pe32_emu zeroes a section with no file data and starts the x87 at 0x037f, as Windows does" "bss zero True, header bytes False; cw 0x37f 0x37f" "$PYTHON" - <<'PY'
+import os, shutil, struct, sys, tempfile, pefile; sys.path.insert(0, 'tools/emu')
+from pe32_emu import Emu32
+# A copy of the sample DLL whose .tls section claims file pointer 0, as Watcom's .bss does.
+d = tempfile.mkdtemp(); path = os.path.join(d, 'bss.dll')
+shutil.copy('examples/sample-game/build/mixer32.dll', path)
+pe = pefile.PE(path)
+s = [x for x in pe.sections if x.Name.rstrip(b'\0') == b'.tls'][0]
+s.PointerToRawData, s.Misc_VirtualSize = 0, 0
+pe.write(path); pe.close()
+emu = Emu32(path)
+at = emu.base + s.VirtualAddress; got = emu.read(at, s.SizeOfRawData)
+# fstcw [esp-4]; mov ax, [esp-4]; ret: the control word the code sees at start, and after reset().
+raw = Emu32.raw(bytes.fromhex('d97c24fc668b4424fcc3'))
+first = raw.call(0x401000)['eax'] & 0xffff
+raw.reset(); again = raw.call(0x401000)['eax'] & 0xffff
+print(f'bss zero {got == bytes(len(got))}, header bytes {got[:2] == b"MZ"}; cw {first:#x} {again:#x}')
+shutil.rmtree(d)
+PY
 expect "pe32_emu prints its usage with no arguments" "registers in" "$PYTHON" tools/emu/pe32_emu.py
 expect "pe32_emu loads an FPU control word: a magic-number add rounds to nearest, or truncates" "nearest 4, chop 3; 103 of 200 cases differ; whole multiples none" "$PYTHON" - <<'PY'
 import sys; sys.path.insert(0, 'tools/emu')

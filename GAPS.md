@@ -105,6 +105,31 @@ proposed again.
 - [x] `rawimage.py` and `catalog.py --dac shift`: 6-bit palettes shifted left by 2, as many loaders do; short palettes filled with magenta
 - [x] `constants.py`: Park-Miller's 16807 reported when its modulus or Schrage's constants are beside it
 - [x] `new-site.sh --manual` and a theme to colour from the game
+- [x] `pe32_emu`: a section with a file pointer of 0 (Watcom's `.bss`) is zeroed, and the x87
+  starts at 0x037f, as Windows does (Hardwar, POD; [the entry](docs/knowhow/pe-bss-file-pointer-zero.md))
+
+Proposed by the POD project (its `docs/gameframe-lessons.md`) and not yet in GameFrame. Each
+needs the test named there before it moves:
+
+- [ ] `ExportCallArgs` that knows Watcom's register order (EAX, EDX, EBX, ECX), so a constant
+  passed in a register is reported
+- [ ] `ghidra-run fill-gaps`: make and decompile the functions `exportcov` finds, into a
+  `decomp-extra.c` that `decomp_query` also reads
+- [ ] A replay harness for `re-verify`: drive a port from a recording made at a lower rate than
+  the game steps, and accept a sample when any state in its window matches
+- [ ] A reader for `memrec` recordings: load, summarise, export as CSV, and print values the
+  game's way
+- [ ] `memscan.py`: find every copy of a value, and report which one changes when a mod is
+  installed (a value the game replaces at run time)
+- [ ] A writer for block containers: re-lay the entries after one grows, and recompute raw
+  offsets and checksums
+- [ ] An editor stage in `re-browse`: offsets the reader records, one edit type, patches with
+  byte undo, and a command line that makes the same edits
+- [ ] An axes check in `re-observe`: from an object's position in memory and the level faces
+  under it, name the height axis, its sign and the handedness
+- [ ] `winput`: `click:X,Y wait:1 lmb` as the default click, for games that draw their own cursor
+- [ ] From POD's replacement libraries, as tools with tests: frame scalers (nearest, Scale2x,
+  CRT), a probe-library generator from an import list, and a render timing log
 
 ## Reading the story ([lore.md](docs/working/lore.md))
 

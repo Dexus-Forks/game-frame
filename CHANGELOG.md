@@ -179,6 +179,16 @@ Every release of GameFrame, newest first. The format follows
 
 ### Fixed
 
+- `pe32_emu` zeroes a section whose file pointer is 0, as Windows does. Watcom marks `.bss` this
+  way, and the emulator had filled it with the file's first bytes, so flags read as code
+  (from Hardwar). It also starts the x87 at the control word 0x037f, as Windows starts a program;
+  Unicorn alone starts at 0, which rounds every result to 24 bits (from POD).
+- Thirteen know-how entries from POD and Hardwar: the AI's chance from the frame clock, a missed
+  key tap, a 3D card that draws part of the frame, measuring library calls that lock mutexes, a
+  screen that closes while a key is held, decompiled switches that drop cases, painter's order
+  with big faces, a pointer the game draws, recording sound in a VM with no sound card, a
+  replay that plays too fast, the emulator's x87 start state, one multiply for two channels,
+  and the `.bss` file pointer. The taxonomy gains the symptom `wrong-result`.
 - `tools/site/check.py` and the gates no longer take the English word "undefined" in prose for
   decompiled code. The pattern now matches Ghidra's sized types, pointers and variables of
   those types, and statements with `FUN_` and `DAT_` names (calls, assignments and
