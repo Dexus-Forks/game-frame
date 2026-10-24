@@ -15,7 +15,7 @@ signatures:
 tools: []
 skills: [re-observe]
 docs: [docs/knowhow/context-wine-macos.md, docs/knowhow/wine-macos-suspendthread.md]
-seen: ['POD: Planet of Death (1997), Wine 11.0 and 11.18, 2026-10-23', 'POD Gold PowerVR and ATI builds with stand-in card libraries, Wine 11.0, 2026-10-24']
+seen: ['POD: Planet of Death (1997), Wine 11.0 and 11.18, 2026-10-23', 'POD Gold PowerVR and ATI builds with stand-in card libraries, Wine 11.0, 2026-10-24', 'POD Gold Maxi Sound 64 build with maxi94 and ddraw stand-ins, Wine 11.0, 2026-10-24']
 ---
 
 # A 32-bit game's system call faults in wow64cpu under Wine on Apple silicon
@@ -60,3 +60,7 @@ threads would show the fault without the game. Write that program before any rep
 
 Not tried yet: a Linux x86-64 host, a virtual machine with a real Windows 95 or 98. The small
 test program ran cleanly (above), so the fault needs something only the game does.
+- POD Gold's Maxi Sound 64 build (`PODMAX64.EXE`) with the `maxi94` and `ddraw` stand-ins:
+  the same read of `0x4ECD` at `0x7BF21139`, 16 to 20 seconds in, in about half of a dozen runs.
+  The other runs reached their time limit (45 to 100 seconds) in the menus. Sound was playing
+  in both kinds of run.

@@ -79,7 +79,10 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         params = json.loads(self.rfile.read(int(self.headers['Content-Length'])) or b'{}')
-        if self.path.startswith('/v1/messages/batches'):
+        if self.path.startswith('/v1/messages/batches') and self.path.endswith('/cancel'):
+            bid = self.path.strip('/').split('/')[3]
+            self.send(batch(bid, self.headers['Host']) if bid in BATCHES else {})
+        elif self.path.startswith('/v1/messages/batches'):
             bid = 'msgbatch_' + uuid.uuid4().hex[:12]
             BATCHES[bid] = params['requests']
             self.send(batch(bid, self.headers['Host']))

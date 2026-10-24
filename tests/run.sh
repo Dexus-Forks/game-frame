@@ -1610,24 +1610,28 @@ if command -v cargo >/dev/null; then
   [[ $? == 0 && "$out" == *"s3dtkw: 6 of 6 calls implemented"* ]] \
     && ok "stubgen: each wrapper's .def and stubs match its API table, every call with the original's convention ($(echo "$out" | grep -o '[0-9]* of [0-9]*' | paste -sd, - | sed 's/,/, /g'))" \
     || bad "stubgen --check" "$out"
-  out="$(cd wrappers && cargo test --release --target "$host" --target-dir "$WT" -p raster -p scalers -p pixels -p shim -p sgl 2>&1)"
-  [[ $? == 0 ]] && ok "the wrappers' host tests pass: rasteriser, scalers, pixels, settings, SGL scene graph ($(echo "$out" | grep -o '[0-9]* passed' | awk '{s+=$1} END {print s}') tests)" \
+  out="$(cd wrappers && cargo test --release --target "$host" --target-dir "$WT" -p raster -p scalers -p pixels -p shim -p sgl -p maxi94 2>&1)"
+  [[ $? == 0 ]] && ok "the wrappers' host tests pass: rasteriser, scalers, pixels, settings, SGL scene graph, Maxi Sound 64 streams and mixer ($(echo "$out" | grep -o '[0-9]* passed' | awk '{s+=$1} END {print s}') tests)" \
     || bad "wrappers host tests" "$(echo "$out" | grep -E 'FAILED|panicked|error' | head -8)"
   if rustup target list --installed 2>/dev/null | grep -q i686-pc-windows-gnu && command -v zig >/dev/null; then
     out="$(cd wrappers && cargo build -q --release --target-dir "$WT" 2>&1)"
     [[ $? == 0 ]] || bad "wrappers build for 32-bit Windows" "$(echo "$out" | grep -E 'error' | head -8)"
-    expect "each wrapper DLL exports exactly its .def's names: every call of the original library" "94DLL32 6 ok, ati3dcif 17 ok, ddraw 9 ok, glide2x 156 ok, S3DTKW 6 ok, sgl 134 ok" "$PYTHON" -c "
+    expect "each wrapper DLL exports exactly its .def's names and ordinals: every call of the original library" "ati3dcif 17 ok, ddraw 9 ok, glide2x 156 ok, maxi94 6 ok, s3dtkw 6 ok, sgl 134 ok" "$PYTHON" -c "
 import glob, os, pefile
 out = []
 for d in sorted(glob.glob('wrappers/*/*.def')):
     name = os.path.basename(d)[:-4]
-    lines = [l.split() for l in open(d).read().split('EXPORTS', 1)[1].splitlines() if l.strip()]
-    want = sorted(l[0].split('=')[0] for l in lines)
+    want = []
+    for line in open(d).read().split('EXPORTS', 1)[1].splitlines():
+        f = line.split()
+        if f:
+            ordinal = next((int(x[1:]) for x in f[1:] if x.startswith('@')), None)
+            want.append((f[0].split('=')[0], ordinal))
     p = pefile.PE('$WT/i686-pc-windows-gnu/release/' + name + '.dll')
-    got = sorted(e.name.decode() for e in p.DIRECTORY_ENTRY_EXPORT.symbols)
-    lib = open(d).readline().split()[1].rsplit('.', 1)[0]
-    out.append(f'{lib} {len(got)} ' + ('ok' if got == want else f'differs: {sorted(set(got) ^ set(want))[:5]}'))
-print(', '.join(sorted(out, key=str.lower)))"
+    syms = {e.name.decode(): e.ordinal for e in p.DIRECTORY_ENTRY_EXPORT.symbols}
+    bad = sorted(set(syms) ^ {n for n, _ in want}) + [n for n, o in want if o is not None and syms.get(n) != o]
+    out.append(f'{name} {len(syms)} ' + ('ok' if not bad else f'differs: {bad[:5]}'))
+print(', '.join(out))"
     out="$(cd wrappers && cargo build -q --target-dir "$WT" 2>&1)"
     [[ $? == 0 && -f "$WT/i686-pc-windows-gnu/debug/glide2x.dll" ]] && ok "the wrappers' debug build builds too" \
       || bad "wrappers debug build" "$(echo "$out" | grep -E 'error' | head -8)"
@@ -1686,8 +1690,9 @@ if "$PYTHON" -c "import anthropic" 2>/dev/null; then
   expect "name_functions prepare picks the unnamed functions above --min-size and sends nothing" "2 functions" llm tools/llm/name_functions.py prepare
   expect "name_functions puts a function's callers and strings in its request" 'Called by: FUN_00401000' grep -o 'Called by: FUN_00401000' "$L/analysis/llm/names/demo.exe/requests.jsonl"
   expect "name_functions puts the strings a function uses in its request" 'SAVE0001.DAT' grep -oF 'Strings: [\"SAVE0001.DAT' "$L/analysis/llm/names/demo.exe/requests.jsonl"
-  expect "name_functions submits one batch" "2 requests" llm tools/llm/name_functions.py submit
-  expect "name_functions reports the batch" "2 succeeded" llm tools/llm/name_functions.py status
+  expect "name_functions submits the requests as small batches" "2 batches, 2 requests" llm tools/llm/name_functions.py submit --size 1
+  expect "name_functions reports every batch and the total" "all 2 batches: ended; 2 ended; 0 processing, 2 succeeded" llm tools/llm/name_functions.py status
+  expect "name_functions cancels only batches that have not ended" "ended" llm tools/llm/name_functions.py cancel
   llm tools/llm/name_functions.py fetch >/dev/null
   expect "name_functions writes the suggestions to analysis/, never labels/" "401040	fake_name	low" cat "$L/analysis/llm/names/demo.exe/suggested.tsv"
   expect "ask sends the matching know-how entries" "entries sent: wine-privileged-instruction" llm tools/llm/ask.py privileged instruction under wine

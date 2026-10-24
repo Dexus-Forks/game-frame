@@ -27,6 +27,8 @@ An entry has one of five statuses.
 
 | Entry | Status |
 |---|---|
+| [A game's sound effects play at volume 0 under Wine, because it reads its volume from the mixer](wine-mixer-wave-volume-zero.md) | solved |
+| [A stand-in sound-card library starts the game, but the game turns its own sound off](sound-card-library-empty-answer-silences.md) | solved |
 | ["S3DTK Error : SetState" from a stand-in S3D Toolkit](s3dtk-error-setstate.md) | solved |
 | [16-bit Windows (Windows 3.x) programs: what to know before the first run](context-windows-3x.md) | context |
 | [8-bit textures with no palette in the file: infer it from the 16-bit copy of the same pictures](context-palette-from-16bit-twin.md) | context |
@@ -197,7 +199,7 @@ a log names the value. `advise` matches an alias as a whole word or phrase.
 - `cd-rom`: the CD-ROM drive, CD checks and CD audio. Also: cd, cdrom, cd audio, redbook.
 - `ports`: hardware I/O ports. Also: port i/o, io port.
 - `3d-card`: 1990s 3D cards: 3dfx, ATI Rage, S3 ViRGE. Also: 3dfx, voodoo, rage, virge.
-- `sound-card`: Sound Blaster and other sound hardware. Also: sound blaster, adlib, opl2, opl3.
+- `sound-card`: Sound Blaster and other sound hardware. Also: sound blaster, adlib, opl2, opl3, maxi sound, sam9407, awe32, awe64, aureal.
 
 ### api
 
@@ -212,6 +214,8 @@ a log names the value. `advise` matches an alias as a whole word or phrase.
 - `sgl`: PowerVR's SGL (Simple Graphics Library), the API of NEC's PowerVR PCX cards. Also: sgl.dll, powervr, pcx2.
 - `dos-ints`: DOS and BIOS interrupts. Also: int 21h, int 10h, int 33h.
 - `mci`: the Media Control Interface: CD audio and video. Also: mcicda, mciavi.
+- `winmm`: WinMM's wave output, MIDI output and mixer. Also: waveout, midiout, mixer, winmm.dll.
+- `card-sound-api`: a sound card maker's own library: the Maxi Sound 64's, A3D, EAX, the SoundFont Manager. Also: 94dll32, a3d.dll, eax, sfman32, qmixer.
 
 ### compiler
 
@@ -245,4 +249,5 @@ The values are the guides in [docs/games/](../games/README.md).
 - `no-input`: keys, clicks or the joystick do not reach the program. Also: input ignored, keys ignored.
 - `file-not-found`: the program cannot find or open a file. Also: missing file, insert cd.
 - `tool-error`: a GameFrame tool or another tool fails on the program's files.
+- `no-sound`: the program runs, but silent or with sounds missing. Also: silent, no audio, muted, volume 0.
 - `wrong-result`: a number, a table, a timing or a picture's order comes out different from the original, with no error. Also: wrong value, wrong table, too fast, out of order.

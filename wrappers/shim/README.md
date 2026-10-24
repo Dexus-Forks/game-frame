@@ -12,6 +12,9 @@
   is what a machine without the device answers (*inferred*: no device decodes those ports).
 - `patch`: patches to the game's code, applied in memory at load, so the EXE on disk stays
   unchanged.
+- `iat`: one of the game's imports replaced by the wrapper's own function, which calls on to
+  the original. `maxi94` hooks POD's `waveOutOpen` and `waveOutClose` this way, to know which
+  wave streams are open when the game asks the card.
 - `log`: one log per DLL, to the file its variable names, or to standard error. Its first
   line names the build (debug or release). `stub!` makes a stub for a call of the original
   library (`wrappers/stubgen.py` writes them). `gap!` marks a mode that a call does not

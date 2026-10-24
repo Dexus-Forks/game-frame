@@ -51,11 +51,16 @@ The answer is a name, a signature, a summary, a confidence and the evidence.
 ./gameframe run tools/llm/name_functions.py submit --binary GAME.EXE
 ./gameframe run tools/llm/name_functions.py status --binary GAME.EXE
 ./gameframe run tools/llm/name_functions.py fetch --binary GAME.EXE
+./gameframe run tools/llm/name_functions.py cancel --binary GAME.EXE
 ```
 
 `prepare` sends nothing. It prints the number of functions and their size in tokens, so you
-can decide before you submit. The Batch API costs half the normal price. Most batches end
-within an hour.
+can decide before you submit. The Batch API costs half the normal price.
+
+`submit` sends the requests as batches of 200 (`--size N`). One batch of thousands can sit
+for most of the 24 hours the API allows, and none of its answers can be fetched until it
+ends. Small batches end sooner, mostly within an hour. `fetch` reads every batch that has
+ended, so run it again as more end. `cancel` stops the ones still running.
 
 The results go to `analysis/llm/names/<binary>/suggested.tsv`, sorted by confidence. They are
 guesses from pseudocode. Confirm each one as `re-trace` does before you add it to

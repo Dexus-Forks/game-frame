@@ -50,6 +50,9 @@ In my GameFrame project, find every place the game touches hardware.
   plain build, measuring both, and porting them exactly.
 - [Sound](sound.md): the PC speaker, AdLib and OPL FM synthesis, Sound Blaster, Gravis
   Ultrasound, MIDI devices, DirectSound, A3D and EAX.
+- [The sound card makers' APIs](sound-card-apis.md): the Maxi Sound 64, A3D, EAX, the AWE's
+  SoundFont Manager, Sensaura and QSound: how a game finds each, what Wine offers, and which
+  can be stood in for.
 - [Shaders](shaders.md): finding compiled and source shaders with `shaders.py`, reading them,
   capturing frames, and porting them exactly.
 - [Pixel-exact software rendering](software-rendering.md): fill rules, edge stepping, lines,
