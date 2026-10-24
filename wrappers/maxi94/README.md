@@ -76,7 +76,7 @@ and the Gold disc. In a 414-second run of `PODMAX64.EXE` through a race, the gam
 - wrote non-silent buffers on both streams (loudest first sample 12,879).
 
 The recording of the game's output (22,050 Hz) is silent in the menus. It peaks at 22,867 to
-25,451 in the race's start and runs at 10,000 to 14,000 through the race. The CD music plays
+25,451 from about 90 to 180 seconds in, and runs at 10,000 to 14,000 through the race. The CD music plays
 beside it. On macOS, Wine's WOW64 fault (know-how `wine-wow64-rosetta-fault`) stops the game in
 its menus about half the time, so test there only as far as the streams.
 
