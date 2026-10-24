@@ -13,6 +13,7 @@ Here they are generic and tested without any game's files. They are free to use 
 | [gameframe-gpu-1997](../../crates/gpu-1997/README.md) | The texture formats and API constants of 3dfx Glide 2.x (with NCC), ATI3DCIF and the S3D Toolkit, one texel decoder, and what each card accepts | POD: Planet of Death (1997), whose 3dfx, ATI and S3 builds were traced with it |
 | [gameframe-scale](../../crates/scale/README.md) | Whole-multiple scaling of a finished frame: nearest, Scale2x (EPX) and a CRT-style look, for any pixel type | POD: Planet of Death (1997), whose replacement Glide and DirectDraw libraries show the game's frame scaled this way |
 | [gameframe-turbo-pascal](../../crates/turbo-pascal/README.md) | Turbo Pascal's 6-byte `Real` with its exact arithmetic, `Random`, and Pascal data layouts | Tyrian 2026, matching the original runtime on 40,000 operands per routine |
+| [gameframe-indeo](../../crates/indeo/README.md) | An Intel Indeo Video Interactive 4.1 (`IV41`) decoder, clean room, with Intel's tables read from the player's own `IR41_32.DLL` | POD: Planet of Death (1997), whose 13,663 video pictures it decodes byte for byte as Intel's codec does under the emulator |
 
 ## Ask your agent
 

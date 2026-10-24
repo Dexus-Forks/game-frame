@@ -17,6 +17,7 @@ library, with pictures of POD's runs.
 | `s3dtkw.dll` | S3 ViRGE (S3D Toolkit, `S3DTKW.dll`) | The same | [s3dtkw](s3dtkw/README.md) |
 | `sgl.dll` | PowerVR SGL, the scene graph and the immediate mode | The game's scene graph or its screen-space faces, drawn with OpenGL at any size; the 2D picture over it through `ddraw.dll` or SGL's own 2D callback | [sgl](sgl/README.md) |
 | `94DLL32.dll` (`maxi94`) | Guillemot Maxi Sound 64 (Dream SAM9407) | No picture: the card's wave streams are Wine's wave outputs, so the game's sound plays | [maxi94](maxi94/README.md) |
+| `ir41_32.dll` (`ir41`) | Intel's Indeo Video Interactive 4.1 codec (Video for Windows, `IV41`) | The game's videos, decoded by GameFrame's clean-room decoder, picture for picture as Intel's | [ir41](ir41/README.md) |
 
 The shared crates:
 
