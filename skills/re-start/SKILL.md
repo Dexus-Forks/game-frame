@@ -145,23 +145,31 @@ a diagram of each team's hand-offs and the failure path.
    tools and where a subject is covered. `./gameframe tool NAME` prints a tool's usage.
 3. Read `AGENTS.md`, `docs/CHECKLIST.md` and `docs/FINDINGS.md` if they exist. Search `docs/` and
    `labels/` for anything you are about to touch: earlier sessions may have traced it.
-4. `re-inventory`: run `tools/pe/peinfo.py` (Windows) or `tools/dos/dosinfo.py` (DOS) on every binary; decide which hold the game's own
+4. Find every edition of the game (first release, regional releases, re-releases, patches,
+   demos) and its date, and record them in `docs/versions.md`. First check whether the
+   project's copy is the latest official build: read its identity with
+   `tools/triage/buildid.py`, then search MobyGames, PCGamingWiki, the publisher's old site on
+   archive.org and the GOG and Steam pages for later official releases. The reference is by default the
+   last version released (`re-inventory`, "Every edition, and the reference";
+   `docs/working/versions.md`). Do this before deep work: a newer edition found late costs
+   the work again.
+5. `re-inventory`: run `tools/pe/peinfo.py` (Windows) or `tools/dos/dosinfo.py` (DOS) on every binary; decide which hold the game's own
    code, and whether the game is native C/C++ (GameFrame), managed (.NET, IL2CPP, Mono),
    scripted (Lua, Python, GameMaker), packed (unpack first), or 16-bit DOS (docs/DOS.md; check
    for debug symbols with `tools/dos/tdinfo.py`).
-5. Classify the game: read `docs/games/README.md` and its family page, and write the kind of
+6. Classify the game: read `docs/games/README.md` and its family page, and write the kind of
    game, its time model and how exact the interface must be into `docs/FINDINGS.md`. Copy the
    family's rule set into the project's `AGENTS.md`.
    Then read the story: the manual and the program's long strings (`./gameframe run
    sentences`), into `docs/lore.md` with the table "in the story → in the code → evidence"
    (`re-inventory`, "Read the story"). The lore says what each system is for and which must
    be exact. Read it again whenever a system's purpose is unclear.
-6. `re-browse`: run the catalogue (`tools/formats/catalog.py target/game derived/catalog`)
+7. `re-browse`: run the catalogue (`tools/formats/catalog.py target/game derived/catalog`)
    so the person and you can see every file, and grow it into the project's viewer as the
    decoders come (`docs/working/viewer.md`).
-7. `re-observe`: get the original running where you can watch, drive and capture it.
-8. `re-ghidra`: export the game's own binaries (`scripts/ghidra-export.sh`).
-9. When the work on the game starts, pick the foundations first: the random number generator, the maths helpers, the game clock
+8. `re-observe`: get the original running where you can watch, drive and capture it.
+9. `re-ghidra`: export the game's own binaries (`scripts/ghidra-export.sh`).
+10. When the work on the game starts, pick the foundations first: the random number generator, the maths helpers, the game clock
    and the data container. Everything else depends on them. They are small enough to emulate and verify in one session.
 
 ## Goals for a new project

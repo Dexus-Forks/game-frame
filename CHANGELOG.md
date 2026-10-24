@@ -21,6 +21,20 @@ Every release of GameFrame, newest first. The format follows
   names (decorated `__stdcall` ones too) and logging every call with its arguments.
 - The `gameframe-scale` crate: nearest, Scale2x (EPX) and a CRT look, for a finished frame.
 - `re-browse` section 5: growing the viewer into an editor.
+- `tools/triage/buildid.py`: everything a copy says about its own version (the disc's mastering
+  date, link dates, VERSIONINFO, version strings, readme and setup lines), written into the
+  project's `docs/versions.md`. `re-inventory`, `re-start` and the versions guide check on day one
+  whether the copy is the latest official build, and where to search for later official
+  releases; the template has a "Build identity" and an "Is this the latest official version?"
+  section.
+- Versions and their deltas: [the versions guide](docs/working/versions.md) now starts with
+  finding every edition, takes the last version released as the default reference, and has the
+  steps for moving to a newer edition mid-project. A project template, `docs/versions.md`,
+  records each edition, its checksums, languages, content and builds, the data and code
+  deltas, the extras and the reference. `re-inventory` and `re-start` have the step.
+- `tools/triage/versiondiff.py`: two editions compared as folders or disc images: files added,
+  removed and changed by folder, PE link dates and languages, as Markdown.
+- Know-how: `context-newer-edition-mid-project`, from POD's first edition and POD Gold.
 - `ExportAll.java` writes `bodies.tsv`, every piece of every function (start, end, entry), and
   `exportcov.py` reads it beside `functions.tsv` (or with `--bodies`). Before, a function whose
   body lies in several pieces counted as one run from its entry: Hardwar's export measured

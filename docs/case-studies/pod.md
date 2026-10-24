@@ -17,6 +17,10 @@ a modern machine. GameFrame's [know-how](../knowhow/README.md) began here.
 
 ## What the project did, step by step
 
+- **Editions:** a month of work on the March 1997 first edition, then POD Gold 2.8 turned up:
+  October 1997 executables, English, 32 tracks, 16 cars, Direct3D and PowerVR builds. Gold
+  became the reference, as the last version released, and the work moved to it
+  ([a newer edition mid-project](../knowhow/context-newer-edition-mid-project.md)).
 - **The disc:** the BIN/CUE read in place, 781 files byte-identical to an extracted copy, with
   a disc reader for the viewer, native and in the browser.
 - **Formats with writers:** the block container, text tables, menu images, video stills,
