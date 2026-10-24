@@ -844,10 +844,11 @@ out="$(python3 tools/site/check.py "$S" 2>&1)"
 [[ $? == 1 && "$out" == *"TODO(site)"* ]] && ok "check.py fails a site with the template's TODO(site) lines" || bad "check.py TODO" "$out"
 sed -i.bak 's/TODO(site) //' "$S/index.md" && rm "$S/index.md.bak"
 words="The reader checks the record count against the file size before it reads anything, and every record decodes."
+undef="The value is undefined when the count is zero; \`FUN_004436c8\` and \`DAT_005920a4\` are cited by name."
 { printf -- '---\ntitle: "The first format"\nsummary: The data file is a table of fixed records.\n---\n\n# The first format\n\n'
-  for i in 1 2 3 4 5 6 7 8; do echo "$words"; done; } > "$S/diary/2026-10-23-first-format.md"
+  for i in 1 2 3 4 5 6 7 8; do echo "$words"; done; echo "$undef"; } > "$S/diary/2026-10-23-first-format.md"
 out="$(python3 tools/site/check.py "$S" 2>&1)"
-[[ $? == 0 && "$out" == *"0 errors, 0 warnings"* ]] && ok "check.py passes a site with a real diary entry" || bad "check.py clean site" "$out"
+[[ $? == 0 && "$out" == *"0 errors, 0 warnings"* ]] && ok "check.py passes a site with a real diary entry (the word undefined and cited FUN_/DAT_ names too)" || bad "check.py clean site" "$out"
 { printf -- '---\ntitle: Work\nsummary: Commits.\n---\n\n'
   for h in 1a2b3c4 5d6e7f8 9a0b1c2 3d4e5f6; do echo "- Add $h the next thing"; done; } > "$S/diary/2026-10-24-work.md"
 printf -- '---\ntitle: No summary\n---\n\nShort.\n' > "$S/diary/2026-10-25-x.md"
@@ -917,7 +918,7 @@ rm -rf "$W"
 
 echo "Gates (scripts/hooks/gate.py)"
 out="$("$PYTHON" - <<'PY' 2>&1
-import json, os, shutil, subprocess, tempfile
+import json, os, shutil, subprocess, sys, tempfile
 G = os.path.abspath('scripts/hooks/gate.py')
 def run(mode, event):
     return subprocess.run(['python3', G, mode], input=json.dumps(event), capture_output=True, text=True).returncode
@@ -940,6 +941,15 @@ for other in ('for f in a b; do echo "$f"; done', 'cat <<EOF > x\ngit\nEOF', 'ec
     assert run('push', {'cwd': d, 'agent_type': 're-tracer', 'tool_input': {'command': other}}) == 0, other
 assert run('commit', {'cwd': d, 'agent_type': 're-tracer', 'tool_input': {'command': 'git commit -F - <<EOF\nx\nEOF'}}) == 2, 'heredoc commit'
 pseudo = 'undefined8 uVar1;\nuVar1 = CONCAT44(a, b);\n'
+sys.path.insert(0, 'scripts/hooks'); from gates.checks import pseudocode_lines
+# Built from placeholders (@ undefined, % FUN_, ~ DAT_), so this file passes the commit gate.
+g = lambda lines: [l.replace('@', 'undefined').replace('%', 'FUN_').replace('~', 'DAT_') for l in lines]
+flag = g(['@4 uVar1;', '@ *puVar2;', '@ auStack_10 [8];', '%00401000(param_1);', 'iVar1 = ~00539280;',
+          '~005920a4 = 2;', 'void %004ae894(int param_1)'])
+prose = g(['The result is @ when the count is zero.', 'Overflow is @ behaviour, so it may be dropped.',
+           'The race phase `~005920a4` is 2 during the countdown, set by `%004436c8`.'])
+assert len(pseudocode_lines('\n'.join(flag))) == len(flag), pseudocode_lines('\n'.join(flag))
+assert pseudocode_lines('\n'.join(prose)) == [], pseudocode_lines('\n'.join(prose))
 w = lambda path: {'cwd': d, 'tool_input': {'file_path': f'{d}/{path}', 'content': pseudo}}
 assert run('write', w('docs/f.md')) == 2 and run('write', w('analysis/f.c')) == 0, 'write gate'
 s = subprocess.run(['python3', G, 'session'], input=json.dumps({'cwd': d}), capture_output=True, text=True)

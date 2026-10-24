@@ -134,6 +134,10 @@ Every release of GameFrame, newest first. The format follows
 
 ### Fixed
 
+- `tools/site/check.py` and the gates no longer take the English word "undefined" in prose for
+  decompiled code. The pattern now matches Ghidra's sized types, pointers and variables of
+  those types, and statements with `FUN_` and `DAT_` names (calls, assignments and
+  declarations). Names cited in a sentence pass, as before.
 - The animated diagrams: in every animated diagram the static labels are drawn last, so a
   moving token or highlight passes under the text it crosses instead of hiding it. Tokens that
   loop start with a negative `begin`, so none waits in the card's top-left corner before its
