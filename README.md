@@ -204,6 +204,7 @@ between agents, the outcome, and the failure path.
 | `tools/triage/tables.py` | Sine and cosine lookup tables, with their steps, scale, type and rounding |
 | `tools/triage/sigscan.py` | Byte signatures with wildcards: make them from named functions, find them in another build or a game |
 | `tools/triage/insns.py` | Every instruction of a kind: port access, interrupts, timers, divisions |
+| `tools/triage/exportcov.py` | How much code a Ghidra export covers, its largest gaps, and the likely starts of the functions it missed, for a batch decompile |
 | `tools/triage/refs.py` | Every instruction that refers to an address, found in the raw code bytes (32-bit and RIP-relative), read, write or value, with hits in no function marked |
 | `tools/triage/pointerpaths.py` | A chain of pointers from a global to a value that moves between runs |
 | `tools/triage/coverdiff.py` | The code that ran only with an action: two coverage logs (drcov or address lists) compared, by function |
@@ -225,6 +226,9 @@ between agents, the outcome, and the failure path.
 | `tools/live/shot.py` | A capture of the screen, a window or a file kept under a name of its own in `derived/captures/DATE/`, with its text, never overwritten |
 | `tools/live/modfolder.py` | Installs a folder of changed files into a game's install folder, lists it and takes it out again, with no stale files |
 | `tools/live/emupc.py` | Writes an emulated PC for the original: QEMU, a Debian cloud image, cloud-init with Wine and 32-bit Mesa, Xvfb and openbox, SSH, the disc as a CD-ROM |
+| `tools/live/memlog.py` | Reads a `memrec` recording back: a summary of ranges and changes, CSV with arrays split and 16.16 values as decimals, or the sample nearest a time |
+| `tools/live/emulock.py` | A note of who uses a shared emulator or VM, since when and for what; a second session is refused and told who holds it |
+| `tools/live/loopcut.py` | Cuts a recorded path at its first return to the start, so a racing line or patrol is one closed loop; refuses a path shorter than a loop |
 | `tools/live/winput.py` | Keys, mouse moves and clicks sent to a game from inside Wine with `SendInput`, for macOS, where synthetic input needs a permission and Wine windows belong to no app. Builds `winput.c` with zig |
 | `tools/live/frida_trace.py` | Calls to chosen functions, and accesses to chosen memory, in a running game, with Frida. Calls use the same format as the emulator's call traces |
 | `tools/emu/mem_trace.py` | Which instructions read and write chosen memory while an emulated function runs. It is the first step of taint analysis |

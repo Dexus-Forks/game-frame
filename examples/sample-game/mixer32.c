@@ -26,3 +26,19 @@ __declspec(dllexport) void __stdcall swap_order(int a, int b) {
 __declspec(dllexport) void reset_order(void) {
     for (int i = 0; i < 8; i++) order_table[i] = i;
 }
+
+/* (a * b) / 65536 by the "magic number" add of 1.5 x 2^68, as 1990s games converted 16.16
+ * products: the result's rounding is the FPU's current mode (pe32_emu's fpu_cw). */
+__declspec(dllexport) int __cdecl fix_mul(int a, int b) {
+    static const double magic = 442721857769029238784.0;   /* 1.5 * 2^68 */
+    union { double d; int i[2]; } u;
+    __asm__ volatile ("fildl %1\n\tfimull %2\n\tfaddl %3\n\tfstpl %0"
+                      : "=m"(u.d) : "m"(a), "m"(b), "m"(magic));
+    return u.i[0];
+}
+
+/* Formats through a library routine, for pe32_emu's until=: stop at the call, read the arguments. */
+__declspec(dllexport) int __cdecl report(int a, int b) {
+    char buf[32];
+    return wsprintfA(buf, "%d %d", a * 2, b + 1);
+}

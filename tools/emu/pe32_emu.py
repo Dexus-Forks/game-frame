@@ -28,6 +28,17 @@ What it does:
 - `call(addr, args=[...], **registers)` pushes `args` right to left (cdecl and stdcall), then a
   return address that stops the run, sets the named registers and runs until the routine
   returns. It returns every general register afterwards.
+- `call(..., fpu_cw=0x0f7f)` loads an x87 control word first. The FPU's rounding mode changes
+  the result of any float-to-integer conversion that does not set its own mode, such as the
+  "magic number" `fadd` of 1.5 x 2^68. `NEAREST` (0x037f) is what `fninit` leaves, and what most
+  C start-up code runs with; `CHOP` (0x0f7f) truncates.
+- `call(..., until=ADDR)` stops when the code reaches ADDR, before that instruction runs, and
+  adds `stack` (the eight words at ESP) and `stopped_at` to the result. Stop at a `call` to a
+  library routine that needs the C runtime (`sprintf`, `printf`), and its arguments are
+  `stack[0]`, `stack[1]` and so on.
+- `fpu_modes(addr, cases, cws=(NEAREST, CHOP))` runs the routine on each case (a list of args)
+  under each control word, and returns the cases whose EAX differs: the inputs where the game's
+  FPU mode matters (docs/knowhow/x87-magic-add-rounding.md).
 
 What it does not do: run DllMain or the C runtime start-up, create threads, or emulate
 Windows. Routines that need the game's globals set up need them written first (`write`), from
@@ -36,6 +47,7 @@ the original's own initialisation or from a captured memory dump.
 Usage as a program (prints the registers after the call):
 
     pe32_emu.py BINARY ADDRESS [REG=VALUE ...] [--args V,V,...] [--dump ADDRESS:LENGTH]
+                [--fpu-cw WORD] [--until ADDRESS]
 
 Needs `unicorn` and `pefile` (scripts/setup.sh puts them in .venv).
 """
@@ -47,6 +59,7 @@ from unicorn import UC_ARCH_X86, UC_HOOK_CODE, UC_HOOK_MEM_INVALID, UC_MODE_32, 
 from unicorn.x86_const import (
     UC_X86_REG_EAX, UC_X86_REG_EBP, UC_X86_REG_EBX, UC_X86_REG_ECX, UC_X86_REG_EDI,
     UC_X86_REG_EDX, UC_X86_REG_EFLAGS, UC_X86_REG_EIP, UC_X86_REG_ESI, UC_X86_REG_ESP,
+    UC_X86_REG_FPCW,
 )
 
 REGS = {'eax': UC_X86_REG_EAX, 'ebx': UC_X86_REG_EBX, 'ecx': UC_X86_REG_ECX,
@@ -57,6 +70,7 @@ HEAP_BASE, HEAP_SIZE = 0x60000000, 0x04000000
 STACK_TOP, STACK_SIZE = 0x6f000000, 0x00100000
 STUB_BASE, STUB_SIZE = 0x7f000000, 0x00010000
 RETURN_TRAP = STUB_BASE + STUB_SIZE - 0x10
+NEAREST, CHOP = 0x037f, 0x0f7f      # x87 control words: what fninit leaves, and truncation
 
 
 def align(v, a=PAGE):
@@ -145,8 +159,8 @@ class Emu32:
 
     # ------------------------------------------------------------------ calls
 
-    def call(self, addr, args=(), count=50_000_000, **regs):
-        """Run the routine at `addr` until it returns; return the registers afterwards."""
+    def call(self, addr, args=(), count=50_000_000, fpu_cw=None, until=None, **regs):
+        """Run the routine at `addr` until it returns (or reaches `until`); return the registers."""
         sp = STACK_TOP - 0x100 - 4 * len(args)
         self.write(sp + 4, struct.pack(f'<{len(args)}I', *[a & 0xffffffff for a in args]))
         self.write(sp, struct.pack('<I', RETURN_TRAP))
@@ -155,11 +169,13 @@ class Emu32:
             if k not in REGS:
                 raise ValueError(f'unknown register {k}')
             self.uc.reg_write(REGS[k], v & 0xffffffff)
+        if fpu_cw is not None:
+            self.uc.reg_write(UC_X86_REG_FPCW, fpu_cw & 0xffff)
         self._stopped_in = None
-        start = addr
+        start, end = addr, until if until is not None else RETURN_TRAP
         while True:
             try:
-                self.uc.emu_start(start, RETURN_TRAP, count=count)
+                self.uc.emu_start(start, end, count=count)
             except UcError as e:
                 eip = self.uc.reg_read(UC_X86_REG_EIP)
                 raise EmuError(f'{e} at {eip:#x}') from None
@@ -176,7 +192,26 @@ class Emu32:
             start = ret
             if ret == RETURN_TRAP:
                 break
-        return {k: self.uc.reg_read(r) for k, r in REGS.items()}
+        out = {k: self.uc.reg_read(r) for k, r in REGS.items()}
+        if until is not None:
+            eip = self.uc.reg_read(UC_X86_REG_EIP)
+            if eip != until:
+                raise EmuError(f'the routine returned before it reached {until:#x}')
+            out['stopped_at'] = eip
+            out['stack'] = [self.u32(out['esp'] + 4 * i) for i in range(8)]
+        return out
+
+    def fpu_modes(self, addr, cases, cws=(NEAREST, CHOP), **kw):
+        """[(case, {cw: eax})] for the cases whose EAX differs between the control words."""
+        differ = []
+        for case in cases:
+            got = {}
+            for cw in cws:
+                self.reset()
+                got[cw] = self.call(addr, args=case, fpu_cw=cw, **kw)['eax']
+            if len(set(got.values())) > 1:
+                differ.append((case, got))
+        return differ
 
     def arg(self, i):
         """Inside a stub handler: the i-th stack argument of the import being called."""
@@ -199,12 +234,16 @@ def main(argv):
         return 0 if argv[:1] in (['-h'], ['--help']) else 1
     emu = Emu32(argv[0])
     addr = int(argv[1], 16)
-    regs, args, dumps = {}, [], []
+    regs, args, dumps, kw = {}, [], [], {}
     rest = argv[2:]
     while rest:
         a = rest.pop(0)
         if a == '--args':
             args = [int(v, 0) for v in rest.pop(0).split(',')]
+        elif a == '--fpu-cw':
+            kw['fpu_cw'] = int(rest.pop(0), 0)
+        elif a == '--until':
+            kw['until'] = int(rest.pop(0), 16)
         elif a == '--dump':
             where, n = rest.pop(0).split(':')
             dumps.append((int(where, 16), int(n, 0)))
@@ -213,8 +252,11 @@ def main(argv):
             regs[k.lower()] = int(v, 0)
         else:
             raise SystemExit(f'pe32_emu: unexpected argument {a}')
-    out = emu.call(addr, args=args, **regs)
+    out = emu.call(addr, args=args, **kw, **regs)
+    stack = out.pop('stack', None)
     print(' '.join(f'{k}={v:#010x}' for k, v in out.items()))
+    if stack:
+        print('stack: ' + ' '.join(f'{v:#010x}' for v in stack))
     for where, n in dumps:
         print(f'{where:#x}: {emu.read(where, n).hex()}')
     return 0

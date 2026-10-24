@@ -27,6 +27,21 @@ scripts/ghidra-export.sh --labels analysis/td-labels.tsv target/GAME.EXE
 scripts/ghidra-run.sh GAME.EXE labels analysis/notes/labels.txt labels/names.tsv  # an existing project
 ```
 
+After every export, measure how much code it covers. Ghidra misses functions reached only
+through pointers (handler tables, per-object step functions, callbacks), and the code between
+them:
+
+```bash
+.venv/bin/python tools/triage/exportcov.py target/GAME.EXE analysis/export/GAME.EXE/functions.tsv \
+  --starts analysis/notes/starts.txt
+scripts/ghidra-run.sh GAME.EXE decompile analysis/notes/missed.txt $(cat analysis/notes/starts.txt)
+```
+
+Below about 90% the export is missing whole systems. The batch decompile makes a function at
+each likely start, skips an address that nothing refers to unless it follows a `ret` or
+padding, and reports a bad address without stopping
+(docs/knowhow/decompile-missed-pointer-functions.md).
+
 It writes, per binary, into `analysis/export/<binary>/` (ignored by git):
 
 | File | Contents |

@@ -9,6 +9,18 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `tools/triage/exportcov.py`: how much code a Ghidra export covers, its largest gaps, and the
+  likely starts of the functions it missed (call targets, starts after a return or padding),
+  written for the batch decompile.
+- `pe32_emu`: `fpu_cw=` loads an x87 control word before a call, `fpu_modes()` lists the cases
+  whose result depends on the rounding mode, and `until=` stops at an address and returns the
+  stack there, as for a call to `sprintf`. The sample's 32-bit DLL gains `fix_mul` (a magic-number
+  `fadd`) and `report` (a call to `wsprintfA`).
+- `validate.py --write`: decode, encode and compare every file, naming the first differing byte.
+  The sample decoder has an `encode`.
+- `tools/live/memlog.py` (read a recording back: summary, CSV), `tools/live/emulock.py` (who
+  uses a shared emulator) and `tools/live/loopcut.py` (a recorded path cut into one loop).
+
 - Thirty-five know-how entries promoted from the POD: Planet of Death project. They cover
   replacement card libraries under Wine (Glide 2, the S3D Toolkit, ViRGE surfaces, missing
   card libraries), mods (the install folder first, values replaced at run time, mods in a
@@ -95,6 +107,10 @@ Every release of GameFrame, newest first. The format follows
 - `tools/triage/insns.py` lists the pattern for MMX code among its groups.
 
 ### Changed
+
+- `ExportAddressBatch` (`ghidra-run.sh decompile`) reports a bad address and goes on, and makes
+  no function at an address that nothing refers to unless it follows a `ret` or padding, so a
+  call site no longer splits the function around it.
 
 - The know-how hook reads only `stdout`, `stderr` and the error of a Claude Code command. The
   desktop app adds notes on changed files to the result. Those notes had matched the text of

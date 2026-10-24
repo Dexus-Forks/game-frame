@@ -11,7 +11,7 @@ symptom: [tool-error]
 tags: [ghidra, function-pointer, coverage, decompile, export, callback, dispatch-table]
 signatures:
   - 'Cannot invoke "ghidra\.program\.model\.address\.Address\.isExternalAddress\(\)" because "addr" is null'
-tools: [ghidra-export, ghidra-run, decomp_query, refs]
+tools: [exportcov, ghidra-export, ghidra-run, decomp_query, refs]
 skills: [re-ghidra, re-trace]
 docs: [docs/working/ghidra.md]
 seen: ['POD: Planet of Death (1997), 2026-10-23']
@@ -49,6 +49,12 @@ export.
   function start.
 
 ## What to do
+
+`./gameframe run exportcov GAME.EXE analysis/export/GAME.EXE/functions.tsv --starts
+starts.txt` measures the coverage after an export and lists the likely starts in the gaps.
+Pass them to `scripts/ghidra-run.sh GAME.EXE decompile OUT.txt $(cat starts.txt)`: it makes the
+functions, skips an address that nothing refers to unless it follows a `ret` or padding, and
+reports a bad address without stopping the batch.
 
 `./gameframe run refs GAME.EXE ADDRESS --functions analysis/export/GAME.EXE/functions.tsv`
 lists every instruction that refers to an address from the raw bytes, and marks those that lie

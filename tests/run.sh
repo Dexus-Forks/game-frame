@@ -155,6 +155,27 @@ bash -n "$T2/vm/start.sh" && grep -q "IdentitiesOnly yes" "$T2/vm/ssh_config" &&
   && ok "emupc writes cloud-init, an SSH config with IdentitiesOnly, and a QEMU start script with the disc as a CD-ROM" || bad "emupc init" "$(ls -R "$T2/vm")"
 rm -rf "$T2"
 
+T3="$(mktemp -d)"
+"$PYTHON" -c "
+import json, math, sys
+with open(sys.argv[1], 'w') as f:
+    for n in range(150):
+        a = 2 * math.pi * n / 100
+        f.write(json.dumps({'t': n / 10, 'n': n, 'x': [int(1000 * math.cos(a)), 5], 'y': int(1000 * math.sin(a)), 'clock': n * 6553}) + '\n')
+" "$T3/rec.jsonl"
+expect "loopcut cuts a recording of one and a half laps at its first return to the start" "kept 100 of 150 samples" "$PYTHON" tools/live/loopcut.py "$T3/rec.jsonl" --x x --y y
+head -60 "$T3/rec.jsonl" > "$T3/short.jsonl"
+expect "loopcut refuses a recording shorter than a lap" "record more than a loop" "$PYTHON" tools/live/loopcut.py "$T3/short.jsonl" --x x --y y
+expect "memlog summarises a recording: rate, ranges and changes" "x[1]                 int    5 .. 5   0 changes" "$PYTHON" tools/live/memlog.py summary "$T3/rec.jsonl"
+expect "memlog writes CSV with arrays split and 16.16 values as decimals" $'t,n,x[0],x[1],clock\n0.0,0,1000,5,0.000000\n0.1,1,998,5,0.099991' "$PYTHON" tools/live/memlog.py csv "$T3/rec.jsonl" --fields x,clock --fixed clock
+"$PYTHON" tools/live/emulock.py take gf-vm --who a --why "recording a race" --dir "$T3/L" >/dev/null
+expect "emulock refuses a second holder and names the first" 'held by a since' "$PYTHON" tools/live/emulock.py take gf-vm --who b --why mods --dir "$T3/L"
+"$PYTHON" tools/live/emulock.py free gf-vm --who b --dir "$T3/L" >/dev/null 2>&1; rc=$?
+"$PYTHON" tools/live/emulock.py free gf-vm --who a --dir "$T3/L" >/dev/null
+[[ $rc == 1 ]] && "$PYTHON" tools/live/emulock.py take gf-vm --who b --why mods --dir "$T3/L" >/dev/null \
+  && ok "emulock lets only the holder free a lock, then the next one take it" || bad "emulock free and take"
+rm -rf "$T3"
+
 echo "Live tracing"
 if "$PYTHON" -c "import frida" 2>/dev/null && command -v cc >/dev/null; then
   T="$(mktemp -d)"
@@ -258,6 +279,59 @@ except EmuError as e:
 print(got, ticks, msg)
 PY
 expect "pe32_emu prints its usage with no arguments" "registers in" "$PYTHON" tools/emu/pe32_emu.py
+expect "pe32_emu loads an FPU control word: a magic-number add rounds to nearest, or truncates" "nearest 4, chop 3; 103 of 200 cases differ; whole multiples none" "$PYTHON" - <<'PY'
+import sys; sys.path.insert(0, 'tools/emu')
+import pefile
+from pe32_emu import Emu32, NEAREST, CHOP
+D = 'examples/sample-game/build/mixer32.dll'
+p = pefile.PE(D); ex = {e.name.decode(): p.OPTIONAL_HEADER.ImageBase + e.address for e in p.DIRECTORY_ENTRY_EXPORT.symbols}
+e = Emu32(D); f = ex['fix_mul']; v = 3 * 65536 + 40000
+a, b = e.call(f, args=[v, 1], fpu_cw=NEAREST)['eax'], e.call(f, args=[v, 1], fpu_cw=CHOP)['eax']
+d = e.fpu_modes(f, [[k * 1000 + 7, 13] for k in range(200)])
+none = e.fpu_modes(f, [[65536 * k, 3] for k in range(1, 50)])
+print(f'nearest {a}, chop {b}; {len(d)} of 200 cases differ; whole multiples {"none" if not none else len(none)}')
+PY
+expect "pe32_emu stops at a call to a library routine and reads its arguments" "[42, 5]" "$PYTHON" - <<'PY'
+import sys; sys.path.insert(0, 'tools/emu')
+import capstone, pefile
+from pe32_emu import Emu32
+D = 'examples/sample-game/build/mixer32.dll'
+p = pefile.PE(D); r = p.OPTIONAL_HEADER.ImageBase + [e.address for e in p.DIRECTORY_ENTRY_EXPORT.symbols if e.name == b'report'][0]
+e = Emu32(D)
+site = [i.address for i in capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32).disasm(e.read(r, 80), r) if i.mnemonic == 'call'][0]
+print(e.call(r, args=[21, 4], until=site)['stack'][2:4])
+PY
+out="$("$PYTHON" - <<'PY' 2>&1
+import capstone, pefile, subprocess, sys, tempfile
+D = 'examples/sample-game/build/mixer32.dll'
+p = pefile.PE(D); base = p.OPTIONAL_HEADER.ImageBase
+md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
+rows = []
+for e in p.DIRECTORY_ENTRY_EXPORT.symbols:
+    name = e.name.decode()
+    if name == 'order_table':
+        continue
+    start = base + e.address
+    code = p.get_data(e.address, 0x400)
+    end = start
+    for i in md.disasm(code, start):
+        end = i.address + i.size
+        if i.mnemonic == 'ret':
+            break
+    rows.append((start, end - start, name))
+keep = [r for r in rows if r[2] != 'reset_order']
+t = tempfile.NamedTemporaryFile('w', suffix='.tsv', delete=False)
+t.write(''.join(f'{s:x}\t{n}\t{name}\t\n' for s, n, name in keep)); t.close()
+r = subprocess.run([sys.executable, 'tools/triage/exportcov.py', D, t.name, '--min', '0', '--starts', t.name + '.starts'],
+                   capture_output=True, text=True)
+missing = [r_ for r_ in rows if r_[2] == 'reset_order'][0][0]
+starts = open(t.name + '.starts').read().split()
+print(r.stdout)
+assert hex(missing) in starts, (hex(missing), starts)
+print('the function left out of functions.tsv is found as a gap and a likely start')
+PY
+)"
+[[ $? == 0 ]] && ok "exportcov measures an export's coverage and finds a function left out of it" || bad "exportcov" "$out"
 
 echo "Ground truth and the port"
 "$PYTHON" $S/ground_truth.py $B/truth >/dev/null && "$PYTHON" $S/port.py $B/port >/dev/null \
@@ -277,6 +351,10 @@ echo "Formats"
 expect "the sample decoder consumes every byte" "1 of 1 files decode completely" "$PYTHON" tools/formats/validate.py $S/decode_sample.py "$B/*.dat"
 printf 'SMPL\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x3f\x03oakEXTRA' > $B/broken.dat
 expect "validate fails a file with unread bytes" "5 bytes left unread" "$PYTHON" tools/formats/validate.py $S/decode_sample.py $B/broken.dat
+expect "validate --write checks that every file writes back identical" "1 of 1 files decode completely and write back identical" "$PYTHON" tools/formats/validate.py $S/decode_sample.py "$B/sample.dat" --write
+VW="$(mktemp -d)"; sed 's/len(name)) + name/len(name)) + name.upper()/' $S/decode_sample.py > "$VW/lossy.py"
+expect "validate --write names the first byte a writer changes" "differs at offset 0x11 (file 0x6f, written 0x4f)" "$PYTHON" tools/formats/validate.py "$VW/lossy.py" "$B/sample.dat" --write
+rm -rf "$VW"
 rm -f $B/broken.dat
 C=$(mktemp -d)
 mkdir "$C/game" && cp $B/sample.dat "$C/game/"
@@ -1260,8 +1338,10 @@ if [[ "${1:-}" == --ghidra ]]; then
   C="$(mktemp -d)"; printf '// Original: `simulate`\n' > "$C/sim.rs"
   expect "coverage reads a real export" "1 of" "$PYTHON" tools/triage/coverage.py --binary game.exe "$C"
   rm -rf "$C"
-  scripts/ghidra-run.sh game.exe decompile analysis/notes/test.txt 0x140001090 >/dev/null 2>&1
+  scripts/ghidra-run.sh game.exe decompile analysis/notes/test.txt 0xnothere 0x140001090 >/dev/null 2>&1
   expect "ghidra-run decompiles by address" "FUNCTION 140001090 simulate" cat analysis/notes/test.txt
+  expect "ghidra-run decompile reports a bad address and goes on" "ADDRESS 0xnothere ERROR" cat analysis/notes/test.txt
+  expect "exportcov reads a real Ghidra export" "functions cover" "$PYTHON" tools/triage/exportcov.py $B/game.exe analysis/export/game.exe/functions.tsv --min 0
   scripts/ghidra-run.sh game.exe callargs analysis/notes/callargs.tsv rng_seed printf >/dev/null 2>&1
   expect "ghidra-run callargs resolves a constant argument" "0x4d2 (1234)" cat analysis/notes/callargs.tsv
   expect "ghidra-run callargs resolves a string argument" '"after 10 s: %f' cat analysis/notes/callargs.tsv

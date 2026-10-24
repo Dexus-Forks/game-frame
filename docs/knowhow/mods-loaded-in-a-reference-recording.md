@@ -9,7 +9,7 @@ runtime: [wine, virtual-machine]
 genre: []
 symptom: [wrong-picture]
 tags: [recording, reference, mods, ground-truth, shared-emulator, data-directory]
-tools: [modfolder, memrec]
+tools: [modfolder, memrec, emulock]
 skills: [re-observe, re-verify]
 docs: [docs/knowhow/context-mods-install-folder-first.md, docs/knowhow/record-a-run-from-memory.md]
 seen: ['POD: Planet of Death (1997), 2026-10-23']
@@ -42,5 +42,6 @@ Before recording a reference, check that no modded file is loaded: list the inst
 data directory (`C:\POD\Data` must not exist for POD) or compare the files the game opens
 with the disc. `./gameframe run modfolder list INSTALL_DIR` says whether a mod it installed is
 in place. Record the state in the recording's notes. In a shared emulator, ask the
-other sessions first and keep a note of who is using it. Re-record when in doubt. POD's
+other sessions first and keep a note of who is using it
+(`emulock.py take gf-vm --who SESSION --why "reference recording"`). Re-record when in doubt. POD's
 reference race `beltane-3` was recorded after the mods were cleared.

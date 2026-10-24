@@ -11,7 +11,7 @@ symptom: [crash, hang, no-input]
 tags: [qemu, cloud-init, xvfb, openbox, ssh, rsync, decision]
 commands:
   - '(?:^|[;&|(]\s*|/)qemu-system-x86_64(?=\s|$|")'
-tools: [emupc, discinfo, memrec, modfolder, winput, shot]
+tools: [emupc, discinfo, memrec, memlog, emulock, modfolder, winput, shot]
 skills: [re-observe, re-setup]
 docs: [docs/observe/running-the-original.md, docs/knowhow/wine-wow64-rosetta-fault.md]
 seen: ['POD: Planet of Death (1997), 2026-10-23 to 2026-10-24']
@@ -46,6 +46,7 @@ What each part fixed in POD:
   drops `DISPLAY` ([sudo and DISPLAY](sudo-drops-display.md)).
 - **A shared VM.** Give each session its own display and Wine prefix. Stop only your own
   processes ([pkill and a shared VM](shared-vm-pkill-display.md),
-  [pkill over SSH](vm-ssh-pkill-matches-itself.md)). Keep a note of who is using the VM.
+  [pkill over SSH](vm-ssh-pkill-matches-itself.md)). Keep a note of who is using the VM:
+  `emulock.py take gf-vm --who SESSION --why TEXT`, run inside the VM, and `free` after.
 - **Colours.** The two routes drew POD's menu in different colours. The VM showed the true
   ones. Compare against a second, independent run before trusting colours.
