@@ -191,7 +191,7 @@ fn dump(frame: u32, views: &[ViewDraw]) {
             out += &format!("  batch texture {} pass {} translucent {} fog {}: {} triangles, first {:?}\n", b.texture, b.pass, b.translucent, b.fog, b.verts.len() / 3, first);
         }
         for vol in &v.view.volumes {
-            out += &format!("  volume {} planes colour {:?}\n", vol.planes.len(), vol.colour);
+            out += &format!("  volume {:?} {} planes colour {:?}\n", vol.kind, vol.planes.len(), vol.colour);
         }
     }
     match std::fs::write(&path, out) {

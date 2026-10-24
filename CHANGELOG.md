@@ -9,6 +9,15 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `sgl.dll` draws the immediate mode's shadow and light volumes (`sgltri_shadow`), which it
+  only counted before. Each call's faces become the planes of one convex volume, oriented as
+  PowerVR's driver orients them, and every pixel is tested against them: a shadow multiplies
+  by its brightness, a light volume adds its colour. Texture wrapping now moves a vertex by one
+  turn at most, as measured in the driver. In shadow mode a Gouraud face with a translucent map
+  is drawn flat, as the driver does. The fog constant is 1.0, a person's choice until a PCX2
+  picture settles it. Free texture memory and the `sglhw.ini` the library writes follow the
+  driver's installer (`TSPParamSize` 256). `sgltritest.c` draws one volume of each kind.
+
 - `glide2x.dll` draws under Wine on macOS. There Wine gives OpenGL 2.1, which cannot compile
   the library's shaders. The library now asks for a forward-compatible 3.2 core context when the
   first one is older than OpenGL 3. `glidetest.exe` passes all 27 checks under Wine on an Apple

@@ -18,7 +18,8 @@ pub struct Viewport {
 /// The ini file SGL's driver installer writes into the Windows folder (`MIDAS.INF`,
 /// `[Midas4_UpdateInis]`). POD reads `SW_XRegionSize` and `SW_YRegionSize` from it before its
 /// first SGL call (`FUN_004a8480`) and divides by them (`FUN_0049db00`): without the file it
-/// divides by zero. Written here if it is missing, with the installer's values.
+/// divides by zero. Written here if it is missing, with the installer's `[default]` keys and
+/// values (`MIDAS.INF`; *observed*, `sgl2-defaults.md`).
 pub fn install_ini() {
     #[link(name = "kernel32")]
     unsafe extern "system" {
@@ -33,9 +34,9 @@ pub fn install_ini() {
     if std::path::Path::new(&path).exists() {
         return;
     }
-    let ini = "[mode]\r\nmode=ddraw\r\n[Default]\r\nSW_XRegionSize=32\r\nSW_YRegionSize=32\r\n";
+    let ini = "[mode]\r\nmode=ddraw\r\n[default]\r\nSW_XRegionSize=32\r\nSW_YRegionSize=32\r\nStrictLocks=0\r\nTSPParamSize=256\r\nResetTSPVSync=1\r\nRenderTimeout=5\r\n";
     match std::fs::write(&path, ini) {
-        Ok(()) => shim::log!("wrote {path} (32 x 32 regions, as the PowerVR installer does)"),
+        Ok(()) => shim::log!("wrote {path} (the PowerVR installer's settings)"),
         Err(e) => shim::log!("cannot write {path}: {e}"),
     }
 }
