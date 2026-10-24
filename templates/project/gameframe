@@ -13,15 +13,16 @@
 #   ./gameframe advise-hook AGENT    run GameFrame's know-how hook (scripts/hooks/advise.py) for
 #                                    the same agents' post-tool hooks
 #
-# GameFrame is found in $GAMEFRAME_ROOT (the environment, or the project's .env), then a clone
-# next to this project (../game-frame or ../reverse-engineer-games), then ~/code, then the
-# plugin's newest install in ~/.claude/plugins/cache. Each project should name its own clone
-# of GameFrame in .env, so projects side by side do not share one. Tools run in this folder,
-# and the scripts write here (analysis/, .venv, .env): GAMEFRAME_PROJECT tells them where that is.
+# GameFrame is found in $GAMEFRAME_ROOT (the environment, or the project's .env), then in
+# ~/code/game-frame or ~/code/reverse-engineer-games, then the plugin's newest install in
+# ~/.claude/plugins/cache. Keep one GameFrame checkout on the machine and pin every project to it
+# in .env; change GameFrame in a worktree of that checkout (docs/working/environments.md). It
+# never looks next to the project. Tools run in this folder, and the scripts write here
+# (analysis/, .venv, .env): GAMEFRAME_PROJECT tells them where that is.
 set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
-# The project's own clone of GameFrame: GAMEFRAME_ROOT in its .env (git-ignored), read here and
-# in the main checkout, so the project's git worktrees use the same clone.
+# The GameFrame checkout this project uses: GAMEFRAME_ROOT in its .env (git-ignored), read here
+# and in the main checkout, so the project's git worktrees use the same one.
 main="$(git -C "$here" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)"
 main="${main%/.git}"
 for envf in "$here/.env" ${main:+"$main/.env"}; do
@@ -30,14 +31,13 @@ for envf in "$here/.env" ${main:+"$main/.env"}; do
     if [[ -n "$v" ]]; then GAMEFRAME_ROOT="${v/#\~/$HOME}"; fi
   fi
 done
-for d in "${GAMEFRAME_ROOT:-}" "$here/../game-frame" "$here/../reverse-engineer-games" \
-         "$HOME/code/game-frame" "$HOME/code/reverse-engineer-games" \
+for d in "${GAMEFRAME_ROOT:-}" "$HOME/code/game-frame" "$HOME/code/reverse-engineer-games" \
          $(ls -d "$HOME"/.claude/plugins/cache/game-frame/gameframe/*/ 2>/dev/null | sort -V -r); do
   if [[ -n "$d" && -f "$d/gameframe" && -d "$d/tools" ]]; then gf="$(cd "$d" && pwd)"; break; fi
 done
 if [[ -z "${gf:-}" ]]; then
   echo "GameFrame not found. Enable its Claude Code plugin (.claude/settings.json), set GAMEFRAME_ROOT," >&2
-  echo "or clone it: git clone https://github.com/tanepiper/game-frame ../game-frame" >&2
+  echo "in .env, or clone it once: git clone https://github.com/tanepiper/game-frame ~/code/game-frame" >&2
   exit 1
 fi
 export GAMEFRAME_ROOT="$gf" GAMEFRAME_PROJECT="$here"

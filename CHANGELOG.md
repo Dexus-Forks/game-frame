@@ -13,9 +13,20 @@ Every release of GameFrame, newest first. The format follows
   `exportcov.py` reads it beside `functions.tsv` (or with `--bodies`). Before, a function whose
   body lies in several pieces counted as one run from its entry: Hardwar's export measured
   93.7% where 98.0% of its code is in functions.
-- Know-how: a project whose `./gameframe` runs another project's GameFrame or the source clone
-  (one clone per game, named in `.env`), and scripted edits that stop matching after a
-  formatter reflows the code.
+- Know-how: a project whose `./gameframe` runs a second clone or another project's copy of
+  GameFrame (pin the machine's one checkout in `.env`), and scripted edits that stop matching
+  after a formatter reflows the code.
+- Three guides from the POD: Planet of Death project:
+  [Recording the original, and replaying it](docs/observe/recording.md),
+  [Replacement libraries for a 1990s game](docs/hardware/replacement-libraries.md) and
+  [Writers, editors and mods](docs/working/mods.md); and a section on the emulated-PC route in
+  [Running the original](docs/observe/running-the-original.md).
+- `scripts/zcc.sh`: rustc's linker for 32-bit Windows DLLs through `zig cc`, exporting exactly
+  the names in a `.def` file.
+- `pe32_emu`: `array`, `put` and `get` lay out the game's structures; the sample DLL gains
+  `sum_list` and `heaviest_path` to test them.
+- `tools/formats/derived.py`: which fields next to geometry are bounds, centres, normals or
+  plane distances.
 - Reading the story, from the Hardwar project: the guide
   [Reading the story for design decisions](docs/working/lore.md), which makes the case that a
   game's manual and its own text say what each system is for and which must be exact, with
@@ -42,18 +53,6 @@ Every release of GameFrame, newest first. The format follows
   `0x0c7f`, a variable frame step in replays, 6-bit palettes shifted by 2, light tables with an
   unchanged level, worktrees without the ignored folders and Ghidra's project lock, and
   reading the story. The entries on missed functions and on Watcom name `exportcov` and Hardwar.
-- Three guides from the POD: Planet of Death project:
-  [Recording the original, and replaying it](docs/observe/recording.md),
-  [Replacement libraries for a 1990s game](docs/hardware/replacement-libraries.md) and
-  [Writers, editors and mods](docs/working/mods.md); and a section on the emulated-PC route in
-  [Running the original](docs/observe/running-the-original.md).
-- `scripts/zcc.sh`: rustc's linker for 32-bit Windows DLLs through `zig cc`, exporting exactly
-  the names in a `.def` file.
-- `pe32_emu`: `array`, `put` and `get` lay out the game's structures; the sample DLL gains
-  `sum_list` and `heaviest_path` to test them.
-- `tools/formats/derived.py`: which fields next to geometry are bounds, centres, normals or
-  plane distances.
-
 - Know-how entries for GameFrame's own tools: unmapped memory under the emulators, an import
   with no handler, a tool run without the `.venv`, and Ghidra refusing a path in a dot folder.
 - `dos_env` has a keyboard: `env.press(scan, at, hold)` and `env.key_script('10:39:3')` put
@@ -159,6 +158,12 @@ Every release of GameFrame, newest first. The format follows
 
 ### Changed
 
+- One GameFrame checkout per machine. A project made by `new-project.sh` pins it with
+  `GAMEFRAME_ROOT` in its `.env`, and `./gameframe` reads that from the project and from its main
+  checkout, so worktrees use the same one. The launcher no longer looks in `../game-frame` next
+  to a project, where projects side by side shared a stale symlinked clone. A game's session
+  changes GameFrame in a worktree of that checkout, never in a second clone
+  ([environments](docs/working/environments.md)).
 - `ExportAddressBatch` (`ghidra-run.sh decompile`) reports a bad address and goes on, and makes
   no function at an address that nothing refers to unless it follows a `ret` or padding, so a
   call site no longer splits the function around it.

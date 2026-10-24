@@ -51,6 +51,9 @@ These rules are for changes to GameFrame itself, which is a public repository.
    (unicorn, pefile, capstone). Shell scripts use bash and the tools `scripts/setup.sh` installs.
 8. **Improve GameFrame from real games.** When a game project hits something generic (a
    tool crash, a missing format, a pitfall), fix it here with a test against our own samples. Keep the game-specific part in the game's repository.
+   This checkout is the only GameFrame on the machine. Every project pins it with
+   `GAMEFRAME_ROOT` in its `.env`, and a game's session changes GameFrame in a git worktree of
+   it, never in a second clone ([docs/working/environments.md](docs/working/environments.md)).
 9. **Two licences.** Code is Apache 2.0 (`LICENSE-APACHE`); documentation, skills and other
    prose are CC0 1.0, dedicated to the public domain (`LICENSE-CC0-1.0`). A new file takes the licence of its kind; the
    README's Licence section lists which folders are which.

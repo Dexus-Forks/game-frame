@@ -22,12 +22,12 @@ windowed runs to see what happens and to find where to look.
 
 ### When Wine on the host fails
 
-Try Wine on the host first, with `./gameframe advise` at hand for each failure. When it fails in
-a way no patch to the game fixes, move to an emulated x86-64 PC: QEMU, a Debian cloud image,
-Wine with real 32-bit libraries, Xvfb with a window manager, and the disc as a CD-ROM drive.
-`tools/live/emupc.py init` writes the setup, and `tools/disc/discinfo.py IMAGE --iso` cuts the
-disc's data track for it ([the emulated-PC route](../knowhow/context-emulated-pc.md)). Record runs
-there from the game's memory ([Recording the original](recording.md)).
+Try Wine on the host first. Run `./gameframe advise` on each failure. When Wine fails in a way
+that no patch to the game fixes, move to an emulated x86-64 PC. The setup has QEMU, a Debian
+cloud image, Wine with real 32-bit libraries, Xvfb with a window manager, and the disc as a
+CD-ROM drive. `tools/live/emupc.py init` writes the setup. `tools/disc/discinfo.py IMAGE --iso`
+cuts the disc's data track for it ([the emulated-PC route](../knowhow/context-emulated-pc.md)).
+Record runs there from the game's memory ([Recording the original](recording.md)).
 
 ## What to capture
 

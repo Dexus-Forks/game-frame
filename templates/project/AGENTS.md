@@ -115,4 +115,8 @@ Work a subsystem at a time and verify by risk (`re-start`, "Spend effort where i
 against recorded frames.
 
 When something here would help any game (a tool fix, a new format reader, a pitfall), add it
-to GameFrame too, with a test against its own samples.
+to GameFrame too, with a test against its own samples. There is one GameFrame checkout on this
+machine (`./gameframe root` prints it, `GAMEFRAME_ROOT` in `.env` names it). Change it only in
+a git worktree of that checkout, never in a clone of your own, and merge into its `main`
+(GameFrame's `docs/working/environments.md`). Build this game's own tools, crates and scripts
+here as it needs them. Only what would help any game goes back to GameFrame.

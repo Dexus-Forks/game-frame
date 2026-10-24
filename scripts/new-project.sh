@@ -82,9 +82,10 @@ done
 mkdir -p "$dir/.cargo"
 printf '[build]\n# target/ holds your copy of the game: never let Cargo build (or clean) there.\ntarget-dir = "build"\n' > "$dir/.cargo/config.toml"
 [[ -f "$ROOT/.env" ]] && cp "$ROOT/.env" "$dir/.env"
-# Pin the project to the GameFrame clone that made it: each game keeps its own clone, cloned
-# from GitHub, and ./gameframe reads GAMEFRAME_ROOT from .env (also from git worktrees).
-printf '\n# The GameFrame clone this project uses (./gameframe reads it)\nGAMEFRAME_ROOT=%s\n' "$ROOT" >> "$dir/.env"
+# Pin a plugin project to the one GameFrame checkout that made it (docs/working/environments.md):
+# ./gameframe reads GAMEFRAME_ROOT from .env, also from the project's git worktrees. A copied
+# project carries its own tools and needs no pin.
+[[ $copy == 1 ]] || printf '\n# The GameFrame checkout this project uses (./gameframe reads it)\nGAMEFRAME_ROOT=%s\n' "$ROOT" >> "$dir/.env"
 [[ -d "$dir/tools" ]] && { find "$dir/tools" -name '__pycache__' -prune -exec rm -r {} + 2>/dev/null || true; }
 if [[ -n "$game" ]]; then
   find "$game" -maxdepth 2 -type f \( -iname '*.exe' -o -iname '*.dll' -o -iname '*.ovl' \) -exec cp {} "$dir/target/" \;

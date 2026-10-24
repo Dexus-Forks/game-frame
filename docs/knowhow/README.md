@@ -72,7 +72,7 @@ An entry has one of five statuses.
 | [A port diverges because a trace said "only this function writes that table" and was wrong](trace-claims-need-an-address-scan.md) | solved |
 | [A ported fixed-point function differs from the original in a few cases out of thousands](x87-magic-add-rounding.md) | solved |
 | [A privileged instruction under Wine, from a Windows 95 port probe](wine-privileged-instruction.md) | solved |
-| [A project's ./gameframe runs another project's GameFrame, or the source clone, and a tool is missing](project-uses-another-projects-gameframe.md) | solved |
+| [A project's ./gameframe runs a second clone or another project's copy of GameFrame, and a tool is missing](project-uses-another-projects-gameframe.md) | solved |
 | [A reference recording was made with modded files loaded](mods-loaded-in-a-reference-recording.md) | solved |
 | [A replay drifts from the original because the game steps by the measured frame time](variable-frame-step-replay.md) | solved |
 | [A replay matches the recording at the end but not at some samples, one sample early or late](replay-sample-straddles-frames.md) | solved |
