@@ -404,9 +404,21 @@ impl Decoder {
         let (trows, tcols) = (ph.div_ceil(layout.tile_height), pw.div_ceil(layout.tile_width));
         let mbs = bh.mb_size;
         if !valid {
-            // FUN_10018810: a band coming back after being empty starts from its fill value.
-            // Deviation: Intel's fill constants at 0x10077188 (Pentium path) are not read yet.
-            self.frames[cur][p][b].samples.fill(0x4000);
+            // FUN_10018810: a band coming back after being empty starts from a fill word, one
+            // for each band (0x10077188 on the Pentium path), unless its first word is already
+            // negative (filled). The word's halves are samples x and x + 8 (x + 4 for 4 × 4).
+            const FILL: [u32; 4] = [0xC000_4000, 0xC004_4004, 0xC00C_400C, 0xC008_4008];
+            let band = &mut self.frames[cur][p][b];
+            let half = if mbs == 4 { 4 } else { 8 };
+            let first = (band.samples.get(half).copied().unwrap_or(0) as u32) << 16 | band.samples[0] as u32;
+            if (first as i32) >= 0 {
+                let w = FILL.get(b).copied().unwrap_or(FILL[0]);
+                let row = (pitch / 2) as usize;
+                let n = (bh_h as usize * row).min(band.samples.len());
+                for (i, s) in band.samples[..n].iter_mut().enumerate() {
+                    *s = if (i % row) % (2 * half) < half { w as u16 } else { (w >> 16) as u16 };
+                }
+            }
         }
         let mut lists = Vec::new();
         let mut r = Bits::at(data, *at);

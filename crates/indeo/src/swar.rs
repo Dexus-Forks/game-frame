@@ -1,4 +1,4 @@
-//! Intel's inverse transforms, as its Pentium path runs them (docs/formats/video.md, "The
+//! Intel's inverse transforms, as its Pentium path runs them (POD's docs/formats/video.md, "The
 //! transforms"). Each works on a pair of blocks at once: the coefficient buffer holds 8 rows of
 //! 9 words (4×4 blocks use 4 rows of 9), and each 32-bit word packs the left block's value in
 //! its low half and the right block's in its high half, both biased (`0x0800` for the Slant
