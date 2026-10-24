@@ -7,6 +7,14 @@ Every release of GameFrame, newest first. The format follows
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-24
+
+GameFrame 1.1.0 brings the lessons of POD, Hardwar and Tyrian into the framework: a know-how
+layer of failure modes and context with a hook for every agent, tools for 32-bit and 1990s games
+(a 32-bit emulator, Watcom register arguments, export gaps, card-library probes, recordings and
+replays), guides for MMX, 3D cards, versions and the story, a website for each project, and one
+GameFrame checkout per machine.
+
 ### Added
 
 - `ghidra-run.sh ... callargs regs=watcom`: the constant each register gets before every call,
@@ -184,6 +192,8 @@ Every release of GameFrame, newest first. The format follows
 
 ### Changed
 
+- The plugin has an icon, `.claude-plugin/icon.png`, and the tests read the plugin validator's
+  own warning counts, allowing only GameFrame's own `CLAUDE.md` (Claude Code 2.1.310).
 - One GameFrame checkout per machine. A project made by `new-project.sh` pins it with
   `GAMEFRAME_ROOT` in its `.env`, and `./gameframe` reads that from the project and from its main
   checkout, so worktrees use the same one. The launcher no longer looks in `../game-frame` next
@@ -333,6 +343,7 @@ Copilot, Cursor and OpenCode can each use the skills, the agents, the gates and 
 - The Claude Code plugin now carries version `1.0.0`. Claude Code updates it when the version
   changes, so plugin projects move from release to release.
 
-[Unreleased]: https://github.com/tanepiper/game-frame/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/tanepiper/game-frame/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/tanepiper/game-frame/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/tanepiper/game-frame/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/tanepiper/game-frame/releases/tag/v1.0.0

@@ -1348,10 +1348,14 @@ PY
 rm -rf "$gen"
 if command -v claude >/dev/null; then
   # plugin.json carries the release's version: Claude Code updates the plugin when it changes.
+  # The one warning allowed: this repository is both the plugin and GameFrame's own working copy,
+  # whose CLAUDE.md is for developing GameFrame, never plugin context. Count the validator's own
+  # "Found N warning" lines: its output also has informational lines that start with ❯.
   out="$(claude plugin validate . 2>&1)"
-  warnings="$(echo "$out" | grep -c '❯' || true)"
-  [[ "$out" == *"Validation passed"* && "$warnings" == 0 ]] \
-    && ok "claude plugin validate passes with no warnings" || bad "claude plugin validate" "$out"
+  warnings="$(echo "$out" | sed -n 's/.*Found \([0-9][0-9]*\) .*warning.*/\1/p' | awk '{s += $1} END {print s + 0}')"
+  claude_md="$(echo "$out" | grep -c 'CLAUDE.md at the plugin root' || true)"
+  [[ "$out" == *"Validation passed"* && $((warnings - claude_md)) == 0 ]] \
+    && ok "claude plugin validate passes; the only warning allowed is GameFrame's own CLAUDE.md ($warnings)" || bad "claude plugin validate" "$out"
 else
   echo "  skip  claude plugin validate (no claude command)"
 fi
