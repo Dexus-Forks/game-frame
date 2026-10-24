@@ -1613,7 +1613,8 @@ if "$PYTHON" -c "import anthropic" 2>/dev/null; then
   expect "name_functions writes the suggestions to analysis/, never labels/" "401040	fake_name	low" cat "$L/analysis/llm/names/demo.exe/suggested.tsv"
   expect "ask sends the matching know-how entries" "entries sent: wine-privileged-instruction" llm tools/llm/ask.py privileged instruction under wine
   expect "ask --show lists the entries and spends nothing" "wine-privileged-instruction" "$PYTHON" tools/llm/ask.py --show privileged instruction under wine
-  expect "headless runs an agent and writes its report" "## re-decoder (done" bash -c "$(declare -f llm); L='$L' PYTHON='$PYTHON' ROOT='$ROOT'; llm tools/llm/headless.py re-decoder 'decode build/sample.dat' --dir '$L' >/dev/null; cat '$L'/analysis/llm/runs/*-re-decoder.md"
+  expect "headless runs an agent and writes its report" "## re-decoder (done" env CLAUDECODE=1 CLAUDE_CODE_ENTRYPOINT=test bash -c "$(declare -f llm); L='$L' PYTHON='$PYTHON' ROOT='$ROOT'; llm tools/llm/headless.py re-decoder 'decode build/sample.dat' --dir '$L' >/dev/null; cat '$L'/analysis/llm/runs/*-re-decoder.md"
+  expect "headless gives claude the prompt on stdin, without the calling session's CLAUDE* variables" "fake run: decode build/sample.dat; CLAUDE variables: 0" cat "$L"/analysis/llm/runs/*-re-decoder.md
   expect "headless docs-check runs re-checker and re-editor" "## re-editor (done" bash -c "$(declare -f llm); L='$L' PYTHON='$PYTHON' ROOT='$ROOT'; llm tools/llm/headless.py docs-check docs/knowhow --report '$L/dc.md' >/dev/null; cat '$L/dc.md'"
   expect "skillcheck passes a skill whose answer holds the ground truth" "1 of 1 skills passed" env FAKE_ANSWER="1 0.5 oak
 2 1.25 birch

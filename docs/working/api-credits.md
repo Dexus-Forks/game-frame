@@ -16,8 +16,11 @@ runs and checks that repeat each month.
 
 1. On claude.ai, open Settings, then Billing. In the API credits section, link a Console
    organization. A Team plan's owner does this in Organization settings.
-2. In the Console, create an API key in that organization.
+2. In the Console, create an API key in a workspace of that organization.
 3. Put the key in the project's `.env` as `ANTHROPIC_API_KEY=...`. The file is ignored by git.
+   A key that is not scoped to a workspace is refused with "must include the
+   anthropic-workspace-id header". Use a workspace's key instead, or add the workspace's ID to
+   `.env` as `ANTHROPIC_WORKSPACE_ID=...`.
 4. In the Console, set a spend limit on the key's workspace. The tools have their own limits,
    and the workspace limit is the one that cannot be bypassed.
 5. Install the SDK: `scripts/setup.sh --install`, or `.venv/bin/pip install -r requirements-llm.txt`.
@@ -25,6 +28,12 @@ runs and checks that repeat each month.
 
 `claude -p --bare` reads only `ANTHROPIC_API_KEY` and never your plan's login, so a headless
 run cannot spend your plan's usage by mistake.
+
+The `claude` command must be recent enough for the model. An old one fails with "does not
+support this model": run `claude update`, or set `GAMEFRAME_CLAUDE` to a newer one. A run
+started from inside a Claude Code session would inherit that session's `CLAUDE*` variables,
+which mark it as part of that session; the credits would then refuse it with "Credit balance
+is too low". `client.py` leaves those variables out of every run it starts.
 
 These tools send the game's decompiled code and data to the Claude API, the same as an
 interactive session does. The [legal notes](../LEGAL.md) cover what that can mean for you.

@@ -10,7 +10,7 @@ The server answers POST /v1/messages, and creates, reports and returns Message B
 (every batch has ended at once). Under a JSON schema (output_config.format) the answer fills
 the schema: each string is "fake_<property>", each enum its first value. Otherwise it echoes
 the start of the last user message. The claude mode answers "fake run: " and the start of the
-prompt, with a cost of 0.01. It writes FAKE_ANSWER, when set, to answer.txt in the current
+prompt (read from stdin) and the number of CLAUDE* variables it was given, with a cost of 0.01. It writes FAKE_ANSWER, when set, to answer.txt in the current
 folder (the tests of skillcheck.py use it).
 
 What it does not do: model anything. It checks the shape of requests only as far as the
@@ -105,11 +105,12 @@ def main(argv):
         open(argv[1], 'w').write(str(server.server_address[1]))
         server.serve_forever()
     elif argv[:1] == ['claude']:
-        prompt = argv[-1] if len(argv) > 1 else ''
+        prompt = sys.stdin.read()
         if os.environ.get('FAKE_ANSWER'):
             open('answer.txt', 'w').write(os.environ['FAKE_ANSWER'])
         print(json.dumps({'type': 'result', 'is_error': False, 'total_cost_usd': 0.01,
-                          'result': 'fake run: ' + prompt[:60]}))
+                          'result': 'fake run: ' + prompt[:60] + '; CLAUDE variables: '
+                                    + str(sum(k.startswith('CLAUDE') for k in os.environ))}))
     else:
         print(__doc__)
     return 0

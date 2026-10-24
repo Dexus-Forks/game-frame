@@ -15,7 +15,11 @@ organization that holds the credits. They never use your Claude plan's login.
                   GAMEFRAME_CLAUDE replaces the command (the tests use fake_api.py claude)
   MODEL           GAMEFRAME_MODEL, else claude-opus-5-5
 
-ANTHROPIC_API_KEY and GAMEFRAME_MODEL are read from the environment, else from the .env of the
+A key that is not scoped to a workspace needs ANTHROPIC_WORKSPACE_ID, the workspace to bill;
+both clients send it as the anthropic-workspace-id header. A key scoped to a workspace needs
+nothing more, and that workspace's spend limit then applies.
+
+ANTHROPIC_API_KEY, ANTHROPIC_WORKSPACE_ID and GAMEFRAME_MODEL are read from the environment, else from the .env of the
 current folder, the project or GameFrame (the first that exists). GAMEFRAME_NO_DOTENV=1 skips
 .env (the tests set it).
 
@@ -35,6 +39,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 PROJECT = os.environ.get('GAMEFRAME_PROJECT') or ROOT
 
 
+KEYS = ('ANTHROPIC_API_KEY', 'ANTHROPIC_WORKSPACE_ID', 'GAMEFRAME_MODEL')
+
+
 def load_env():
     """Take ANTHROPIC_API_KEY and GAMEFRAME_MODEL from the project's .env, when the environment
     has none (./gameframe run does not export .env)."""
@@ -45,7 +52,7 @@ def load_env():
         if os.path.exists(path):
             for line in open(path, encoding='utf-8'):
                 key, eq, value = line.strip().partition('=')
-                if eq and key in ('ANTHROPIC_API_KEY', 'GAMEFRAME_MODEL') and key not in os.environ:
+                if eq and key in KEYS and key not in os.environ:
                     os.environ[key] = value.strip().strip('"\'')
             return
 
@@ -67,7 +74,8 @@ def api():
     except ImportError:
         sys.exit('the anthropic package is missing: scripts/setup.sh --install, or '
                  '.venv/bin/pip install -r requirements-llm.txt')
-    return anthropic.Anthropic()
+    workspace = os.environ.get('ANTHROPIC_WORKSPACE_ID')
+    return anthropic.Anthropic(default_headers={'anthropic-workspace-id': workspace} if workspace else None)
 
 
 def text_of(msg):
@@ -92,7 +100,13 @@ def run_claude(prompt, system=None, cwd=None, tools='Read,Glob,Grep,Bash', budge
                               '--permission-mode', 'bypassPermissions', '--tools', tools]
     if system:
         cmd += ['--system-prompt', system]
-    run = subprocess.run(cmd + [prompt], cwd=cwd, capture_output=True, text=True, timeout=timeout)
+    # A run started from inside a Claude Code session inherits its CLAUDE* variables (its entry
+    # point, session id and sockets), and would join that session. Leave them out.
+    env = {k: v for k, v in os.environ.items() if not k.startswith('CLAUDE')}
+    if env.get('ANTHROPIC_WORKSPACE_ID'):
+        env['ANTHROPIC_CUSTOM_HEADERS'] = f'anthropic-workspace-id: {env["ANTHROPIC_WORKSPACE_ID"]}'
+    # The prompt goes on stdin: --tools takes a list, and would take a prompt after it as a tool.
+    run = subprocess.run(cmd, input=prompt, cwd=cwd, env=env, capture_output=True, text=True, timeout=timeout)
     try:
         return json.loads(run.stdout)
     except json.JSONDecodeError:

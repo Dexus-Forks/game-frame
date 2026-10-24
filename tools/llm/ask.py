@@ -62,7 +62,8 @@ def main(argv):
     msg = api().messages.create(model=model, max_tokens=4000, system=SYSTEM,
                                 messages=[{'role': 'user', 'content': f'{context}\n\nQuestion: {question}'}])
     print(text_of(msg))
-    print(f'\n(entries sent: {", ".join(h.entry.id for h in hits)})')
+    print(f'\n(entries sent: {", ".join(h.entry.id for h in hits)}; '
+          f'{msg.usage.input_tokens} tokens in, {msg.usage.output_tokens} out, {model})')
     return 0
 
 
