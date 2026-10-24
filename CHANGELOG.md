@@ -12,7 +12,8 @@ Every release of GameFrame, newest first. The format follows
 - A PC audio coverage map separates chip crates, card models, compatibility libraries and host
   audio backends. It inventories common PC audio from the speaker and Tandy PSG through Sound
   Blaster, Gravis UltraSound, MIDI modules and late-1990s Windows audio, and prioritizes OPL3,
-  Sound Blaster DSP/DMA, GF1 and MIDI work.
+  Sound Blaster DSP/DMA, GF1 and MIDI work. It records the clean-implementation process and
+  owner-selected licensing options.
 
 - `sgl.dll` draws the immediate mode's shadow and light volumes (`sgltri_shadow`), which it
   only counted before. Each call's faces become the planes of one convex volume, oriented as

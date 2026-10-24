@@ -79,10 +79,11 @@ shows this failure in a measured game.
 4. Build tests from generated inputs and measured outputs. Keep game binaries, game captures,
    card firmware and ROM or SoundFont data out of this repository.
 
-GameFrame code is Apache-2.0 under the repository's current license rule. Keep that license for
-new clean implementations. If a future crate needs `Apache-2.0 OR MIT`, make that a deliberate
-license change for the new crate and its documentation. Do not change the license of existing
-code as a side effect of audio work.
+GameFrame-authored code is currently Apache-2.0. The owner can choose to relicense existing work,
+including as `Apache-2.0 OR MIT`, or choose a different scope for new crates. Record the choice
+for each affected crate in its Cargo metadata and README, and update the repository's license
+files and summaries when the owner selects a project-wide change. Preserve the terms and notices
+for any third-party material. This clean-implementation path adds no emulator source code.
 
 ## Priority for new reusable work
 
