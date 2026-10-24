@@ -100,6 +100,20 @@ proposed again.
 - [x] `gameframe agents --emit`: the agents for Codex, Gemini CLI, Copilot and OpenCode ([the matrix](docs/working/agents.md#agents-in-every-client))
 - [x] `new-project.sh --copy` and `update-project.sh` copy the agents for clients other than Claude Code
 - [x] `tools/emu/pe32_emu.py`: 32-bit (x86) PE routines under Unicorn, with register inputs, MMX, and named import stubs
+- [x] `tools/triage/gaps.py`: the share of code Ghidra left outside functions, with likely starts (call targets, Watcom push prologues)
+- [x] `tools/formats/shadetable.py`: shade, fog and light tables of palette games
+- [x] `xorscan.py --records`, `--key-in`: a key XORed into one field of every directory record, found from zero padding and in the executable
+- [x] `rawimage.py` and `catalog.py --dac shift`: 6-bit palettes shifted left by 2, as many loaders do; short palettes filled with magenta
+- [x] `constants.py`: Park-Miller's 16807 reported when its modulus or Schrage's constants are beside it
+- [x] `new-site.sh --manual` and a theme to colour from the game
+
+## Reading the story ([lore.md](docs/working/lore.md))
+
+- [x] The case for the lore as evidence for design decisions, with Hardwar as the worked example
+- [x] A lore step in `re-inventory` and `re-start`, and the `docs/lore.md` template
+- [x] `tools/triage/sentences.py`: a program's sentences, for reading its story
+- [ ] Reading a PDF manual's text from the tools: needs a PDF library beyond `requirements.txt`
+- [ ] Gremlin Digital Video (`.GDV`): cut-scenes of Gremlin-published games, not yet decoded
 
 ## Know-how ([docs/knowhow/](docs/knowhow/README.md), [the design](docs/working/knowhow.md))
 

@@ -86,6 +86,7 @@ user may change any of them.
 | `derived/` | Ground truth from the emulator, extracted files (ignored) |
 | `docs/FINDINGS.md` | The overview: binaries, engine, formats, systems, with links |
 | `docs/CHECKLIST.md` | What is traced, measured and reimplemented, and what is next |
+| `docs/lore.md` | The game's world from its manual and its own text, and what it says each system is for ("in the story → in the code → evidence"). Read it again when a system's purpose is unclear |
 | `labels/names.tsv`, `labels/fields.tsv` | Names for original functions and struct fields, read by the tools |
 | `labels/dictionary.tsv` | The data dictionary: the meaning, unit, range and evidence of each value the rules use |
 | `./gameframe` | Runs GameFrame's toolkit here: `run NAME ARGS`, `python FILE`, `doctor`, and help on the method: `steps`, `skills`, `agents`, `tools`, `tool NAME`, `find WORD`. `root` prints where GameFrame is |

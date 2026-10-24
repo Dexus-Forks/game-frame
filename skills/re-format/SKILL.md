@@ -23,6 +23,8 @@ records of a fixed stride; float values (`0000803f` is 1.0, `0000003f` is 0.5). 
 ```bash
 python3 tools/triage/filetypes.py target/data/units.dat --blocks 4096   # where the dense parts are
 python3 tools/formats/xorscan.py target/data/script.dat                 # a simple XOR or add key?
+python3 tools/formats/xorscan.py target/data.pak --records DIR:28:4:16 --key-in target/GAME.EXE   # names XORed in each directory record
+python3 tools/formats/shadetable.py target/data/shade.rmp --offset 14 --levels 64 --palette PAL --png derived/shade.png   # a light or fog table
 python3 tools/formats/timestamps.py --scan saves/slot1.sav --from 1996 --to 1998   # a saved date?
 python3 tools/triage/similar.py saves/before.sav saves/after.sav                  # how much changed
 python3 tools/triage/constants.py target/GAME.EXE        # the decompressor or checksum, by its constants
@@ -36,7 +38,12 @@ python3 tools/formats/shaders.py target/data/shaders.pak --dump derived/shaders 
 
 Text that turns readable under one XOR byte or a short key is a common way games hid their
 scripts and tables. xorscan.py tries those weak schemes and shows a preview of each. Confirm
-the scheme in the reader's code before you port it. Two saves made a minute apart, with one
+the scheme in the reader's code before you port it. An archive's directory often XORs only
+the names: zero padding after each name then stores the key itself, and `--records` reads
+those bytes and finds the whole key in the executable. A palette game draws light and fog
+through a table of levels: `shadetable.py` finds the level that leaves every colour unchanged,
+which is the game's normal light. Palettes of 6-bit values are often shifted left by 2 (63 is
+252), not scaled: pass `--dac shift` to `rawimage.py` and `catalog.py` when the loader shifts. Two saves made a minute apart, with one
 setting changed, show which bytes hold that setting and where the save time is.
 
 ## 2. Find the reader in the code

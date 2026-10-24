@@ -16,6 +16,9 @@ work that spans several steps and several sessions.
   executable, carrying labels to a new build, Function ID, types, processors.
 - [Versions, patches and builds](versions.md): choosing the version to copy, comparing builds,
   and reading several versions' data in one port.
+- [Reading the story for design decisions](lore.md): why the manual and the program's own
+  text say what each system is for and which must be exact, with Hardwar as the worked
+  example, and the lore step of the method.
 - [A resource viewer from the first day](viewer.md): the catalogue of every file, then the
   project's own viewer on the port's readers, so people and agents can check decoded content.
 - [Building the port](building-the-port.md): the core and the platform layer, time, input,

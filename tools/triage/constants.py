@@ -15,7 +15,10 @@ Each 32-bit constant is searched little-endian and big-endian. For 16-bit code, 
 (marked "split"). Tables are matched by their first few entries. A hit is a lead: open the
 function at that address and confirm the algorithm before you port it. Short or common values
 (such as 5381 or 65521) are left out unless --all is given. For a Windows executable the
-virtual address is printed next to the file offset. Standard library only.
+virtual address is printed next to the file offset. Park-Miller's multiplier 16807 is
+reported without --all when its modulus 0x7fffffff, or Schrage's 127773 or 2836, lies within
+64 bytes (marked "paired"): `imul eax, eax, 0x41a7` and `and eax, 0x7fffffff` in one short
+function. Standard library only.
 """
 import json
 import struct
@@ -64,6 +67,12 @@ SCALARS = [
 ]
 COMMON = {'Adler-32 modulus 65521', 'djb2 hash start 5381', 'Park-Miller minimal standard 16807',
           'Super-Duper / VAX LCG multiplier 69069', 'LZSS (Okumura) window start 4078 = N - F'}
+# A common value that is reported without --all when a companion constant of the same algorithm
+# lies within NEAR bytes: Park-Miller's multiplier 16807 (0x41a7) beside its modulus 2^31 - 1, or
+# beside Schrage's q = 127773 and r = 2836, which compute the product without overflow.
+PAIRED = [('Park-Miller minimal standard 16807', 16807,
+           [(0x7FFFFFFF, 'modulus 0x7fffffff'), (127773, 'Schrage q 127773'), (2836, 'Schrage r 2836')])]
+NEAR = 64
 SCALARS64 = [
     ('FNV-1 64-bit offset basis', 'hash', 0xCBF29CE484222325),
     ('FNV-1 64-bit prime', 'hash', 0x100000001B3),
@@ -142,6 +151,13 @@ def scan(path, show_all):
                 window = data[max(0, at - 12):at + 14]
                 if hi in window and value.to_bytes(4, 'little') not in window:
                     hits.append((at, name, family, 'split'))
+    if not show_all:
+        for name, value, companions in PAIRED:
+            for at in find_all(data, value.to_bytes(4, 'little')):
+                window = data[max(0, at - NEAR):at + NEAR]
+                seen = [label for v, label in companions if v.to_bytes(4, 'little') in window]
+                if seen:
+                    hits.append((at, f'{name}, with {" and ".join(seen)} nearby', 'random', 'paired'))
     for name, family, value in SCALARS64:
         for at in find_all(data, value.to_bytes(8, 'little')):
             hits.append((at, name, family, 'le'))

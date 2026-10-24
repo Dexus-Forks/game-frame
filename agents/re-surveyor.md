@@ -1,6 +1,6 @@
 ---
 name: re-surveyor
-description: "First stage for a game. Checks the toolchain, takes the first look at the game's files (which binaries hold its own code, engine, packing, data containers, saves), classifies the kind of game, and records it in docs/FINDINGS.md. Use at the start of a project or when a new binary or file type appears."
+description: "First stage for a game. Checks the toolchain, takes the first look at the game's files (which binaries hold its own code, engine, packing, data containers, saves), classifies the kind of game, reads the manual and the program's long strings into docs/lore.md, and records it in docs/FINDINGS.md. Use at the start of a project or when a new binary or file type appears."
 skills:
   - re-setup
   - re-inventory
@@ -26,7 +26,10 @@ it is, so the later stages know where to start.
    time model, how exact the interface must be.
 4. Identify the version and build of the copy, list the other versions that exist, and
    record which one the port follows (`docs/working/versions.md`).
-5. Write all of it to `docs/FINDINGS.md`, and the first rows of `docs/CHECKLIST.md`.
+5. Read the story (`re-inventory` section 7): the manual and the program's long strings
+   (`./gameframe run sentences`). Write `docs/lore.md` with the table "in the story → in the
+   code → evidence", and say in the hand-off which systems the lore marks as exact.
+6. Write all of it to `docs/FINDINGS.md`, and the first rows of `docs/CHECKLIST.md`.
    Run the catalogue (`tools/formats/catalog.py target/game derived/catalog`, `re-browse`
    section 1) and copy its coverage line into the checklist.
 

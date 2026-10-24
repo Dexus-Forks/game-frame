@@ -4,6 +4,7 @@ a byte, a key that steps by a fixed amount each byte, or each byte XORed with th
 
 Usage: xorscan.py FILE [--offset N] [--length N] [--known HEX@OFFSET] [--top N]
        xorscan.py FILE --apply SCHEME -o OUT
+       xorscan.py FILE --records START:STRIDE:FIELD:LENGTH[:COUNT] [--key-in BINARY]
 
   --offset, --length   scan only part of the file (a header's encrypted body, one entry)
   --known HEX@OFFSET   bytes you know are there once decoded (a magic number, a name, zeros),
@@ -11,6 +12,18 @@ Usage: xorscan.py FILE [--offset N] [--length N] [--known HEX@OFFSET] [--top N]
   --top N              how many candidates to show (default 8)
   --apply SCHEME       decode the whole file with one result line's scheme, such as
                        xor:5a  xor-key:1f2e3d  add:80  step:5a+3  chain:00  rol:3
+  --records ...        a table of fixed-size records (an archive's directory) where one field
+                       of each record, such as the entry name, is XORed with the same key.
+                       START is the table's offset, STRIDE the record size, FIELD the field's
+                       offset in the record, LENGTH its size, COUNT the records (default: to the
+                       end of the file). Names are padded with zero bytes, and a zero XORed with
+                       the key is the key itself: the stored bytes of the padding are the key.
+                       Prints the key bytes the padding shows, ?? for the columns it never
+                       reaches
+  --key-in BINARY      with --records: look in BINARY (the game's executable keeps the key) for
+                       the bytes the padding showed, and take the whole key from there when it
+                       turns every field into a name. Prints where it is stored, with the
+                       virtual address for a PE file, and the first decoded fields
 
 Many games hide their text, scripts or tables with a simple XOR so that people cannot read
 them in a file viewer. The schemes are weak, and the decoded bytes give the key away: game
@@ -23,6 +36,7 @@ If nothing scores well, the file may be compressed (filetypes.py shows its entro
 a real cipher. Then find the decoder in the code. Decoded files are game material: write
 them into target/ or another folder that git ignores. Standard library only.
 """
+import os
 import sys
 
 MAGICS = [b'RIFF', b'MZ', b'PK\x03\x04', b'FORM', b'MThd', b'BM', b'\x89PNG', b'GIF8', b'OggS',
@@ -142,6 +156,80 @@ def from_known(data, start, known):
     return out
 
 
+NAME_CHARS = set(b'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ._-~!$#')
+
+
+def record_key(data, spec):
+    """The key bytes that zero padding shows in one XORed field of every record, right to left.
+    A column's key byte is known when at least two records still pad there: their stored byte
+    is the key itself. To the left of the shortest padding nothing is known (None)."""
+    parts = [int(x, 0) for x in spec.split(':')]
+    start, stride, field, length = parts[:4]
+    count = parts[4] if len(parts) > 4 else (len(data) - start) // stride
+    fields = [data[start + i * stride + field:start + i * stride + field + length] for i in range(count)]
+    fields = [f for f in fields if len(f) == length]
+    key = [None] * length
+    padding = list(range(len(fields)))              # records that are still padding at this column
+    for c in reversed(range(length)):
+        counts = {}
+        for i in padding:
+            counts[fields[i][c]] = counts.get(fields[i][c], 0) + 1
+        if not counts:
+            break
+        k = max(counts, key=counts.get)
+        if counts[k] < 2 or counts[k] * 2 < len(padding):
+            break
+        key[c] = k
+        padding = [i for i in padding if fields[i][c] == k]
+    return key, fields
+
+
+def names_fit(fields, key):
+    """True when the key turns every field into name characters followed by zero padding."""
+    for f in fields:
+        plain = bytes(a ^ b for a, b in zip(f, key)).rstrip(b'\0')
+        if not plain or any(b not in NAME_CHARS for b in plain):
+            return False
+    return True
+
+
+def show_records(whole, spec, key_in):
+    key, fields = record_key(whole, spec)
+    known = sum(k is not None for k in key)
+    shown = ' '.join('??' if k is None else f'{k:02x}' for k in key)
+    text = ''.join('?' if k is None else chr(k) if 32 <= k < 127 else '.' for k in key)
+    print(f'{len(fields)} records; zero padding shows {known} of {len(key)} key bytes: {shown}  "{text}"')
+    if known and key_in:
+        exe = open(key_in, 'rb').read()
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'triage'))
+        from constants import pe_mapper
+        to_va = pe_mapper(exe)
+        first = next(c for c, k in enumerate(key) if k is not None)
+        found = set()
+        # The left end of what the padding showed is the least sure: try shorter tails too.
+        for skip in range(first, max(first + 1, len(key) - 3)):
+            tail = bytes(key[skip:])
+            at = exe.find(tail)
+            while at >= 0:
+                full = exe[at - skip:at - skip + len(key)] if at >= skip else b''
+                if len(full) == len(key) and at - skip not in found and names_fit(fields, full):
+                    found.add(at - skip)
+                    va = to_va(at - skip)[0] if to_va else None
+                    text = ''.join(chr(b) if 32 <= b < 127 else '.' for b in full)
+                    print(f'key {full.hex()}  "{text}" stored in {key_in} at file offset 0x{at - skip:x}'
+                          + (f', address 0x{va:x}' if va else '') + '; every field decodes to a name')
+                    for f in fields[:8]:
+                        print('  ' + preview(bytes(a ^ b for a, b in zip(f, full)).rstrip(b'\0')))
+                at = exe.find(tail, at + 1)
+            if found:
+                break
+        if not found:
+            print(f'no stored copy of the known bytes in {key_in} gives readable names')
+    elif known:
+        print('find the rest: --key-in the executable, or --known with a name you expect')
+    print('Confirm the key in the code that reads the table (re-trace) before porting it.')
+
+
 def preview(d):
     return ''.join(chr(b) if 32 <= b < 127 else '.' for b in d[:64])
 
@@ -160,6 +248,9 @@ def main(argv):
         with open(out, 'wb') as f:
             f.write(decode(whole, opt('--apply')))
         print(f'wrote {out}')
+        return 0
+    if '--records' in argv:
+        show_records(whole, opt('--records'), opt('--key-in'))
         return 0
     start = int(opt('--offset', '0'), 0)
     length = int(opt('--length', str(min(len(whole) - start, 1 << 16))), 0)

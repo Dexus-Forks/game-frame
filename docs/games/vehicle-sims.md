@@ -18,6 +18,7 @@ through (a galaxy, a theatre of war), and often with docked screens that wait fo
 | X-Wing | 1993, DOS | Flat-shaded 3D, mission scripts with goals and triggers |
 | Falcon 3.0 | 1991, DOS | A full flight model and a dynamic campaign |
 | Descent | 1995, DOS | Six degrees of freedom inside portal-connected cubes |
+| Hardwar | 1998, Windows 95 | Solar-powered craft over a city economy that runs while unseen, a world clock, a plot that changes the world, four renderers ([case study](../case-studies/hardwar.md)) |
 
 ## Projects to learn from
 

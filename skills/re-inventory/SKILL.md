@@ -1,6 +1,6 @@
 ---
 name: re-inventory
-description: First look at a game's files (Windows PE, or DOS MZ/NE/LE executables) - which binaries hold the game's own code, which engine and middleware it uses, whether it is native, managed, scripted or packed, which data containers and save files exist - and record it in docs/FINDINGS.md. Use at the start of a project, or when a new binary or file type turns up.
+description: First look at a game's files (Windows PE, or DOS MZ/NE/LE executables) - which binaries hold the game's own code, which engine and middleware it uses, whether it is native, managed, scripted or packed, which data containers and save files exist - and record it in docs/FINDINGS.md; then read the manual and the program's long strings into docs/lore.md, which says what each system is for. Use at the start of a project, or when a new binary or file type turns up.
 ---
 
 # Inventory a game
@@ -176,4 +176,33 @@ simulation, an environment, turns and choices), its time model, where its rules 
 must repeat exactly, and its family. Read the family page and copy its rule set into the
 project's `AGENTS.md`, adjusted to the game. Record in `docs/FINDINGS.md` how exact the
 interface must be, and why. A mixed game gets one line per mode, and the state that switches
-between them. Next: `re-observe`.
+between them. Then read the story (section 7). Next: `re-observe`.
+
+## 7. Read the story
+
+A game's manual and the text inside its program often say what a system is for before the
+code does. That tells you which systems the designers cared about, and so which must be exact
+(`docs/working/lore.md`, with Hardwar as the worked example). Do this now, before the tracing
+starts:
+
+```bash
+find target -iname '*.pdf' -o -iname '*.txt' -o -iname '*.doc' -o -iname '*.hlp' | head   # manual, README
+./gameframe run sentences target/GAME.EXE --min-words 6 > analysis/notes/sentences.txt    # the program's long strings
+./gameframe run sentences analysis/export/GAME.EXE/strings.txt --min-words 6              # the same from Ghidra's export
+```
+
+1. Read the manual, the README and any text the publisher shipped. Read the long strings in
+   address order: messages, mission text and item descriptions often hold the plot and state
+   rules in plain words (a production chain, a deadline, a limit).
+2. Write `docs/lore.md` (the project's template): the setting in your own words, the rules the
+   text states with the source of each, and the table "in the story → in the code →
+   evidence". Mark each code side *not yet traced* until it is.
+3. Copy what the lore says must be exact into `AGENTS.md`, "Rules for this kind of game": a
+   resource the player plans around, a timed rule, a limit, a world the plot changes (the save
+   must hold it), an ending that tests something.
+4. Go back to `docs/lore.md` whenever a system's purpose is unclear or a constant has no
+   reason, and fill in its code side as each system is traced.
+
+The sentences list is the game's text: keep it in `analysis/`. In tracked files, name a string
+by its address and say what it states. A manual describes the design, which can differ from
+the build: a rule from it is a lead until the code shows it.

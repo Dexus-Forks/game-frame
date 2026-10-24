@@ -26,7 +26,7 @@
 # project already has. Each agent's skill link, agents, gate hooks and MCP servers are added or
 # refreshed by scripts/clients.py; an agent left out keeps its files. With --plugin, only the
 # chosen agents' files are written again, since the old ones call the removed scripts/.
-# The project's own files (AGENTS.md, README.md, docs/FINDINGS.md, docs/CHECKLIST.md, labels/,
+# The project's own files (AGENTS.md, README.md, docs/FINDINGS.md, docs/CHECKLIST.md, docs/lore.md, labels/,
 # its code) are never touched. With --dry-run nothing is written. The project's git history shows
 # every change; commit it like any other.
 set -euo pipefail

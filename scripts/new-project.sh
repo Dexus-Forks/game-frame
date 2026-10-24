@@ -10,7 +10,7 @@
 #                             the gates and the MCP servers come from it and stay current
 #   gameframe                 runs GameFrame's toolkit on this project (./gameframe help); it finds
 #                             GameFrame in a clone or in the plugin's install
-#   docs/FINDINGS.md, docs/CHECKLIST.md, labels/names.tsv, labels/fields.tsv
+#   docs/FINDINGS.md, docs/CHECKLIST.md, docs/lore.md, labels/names.tsv, labels/fields.tsv
 #   target/, analysis/, derived/   for the game, Ghidra output and ground truth: ignored by git
 # The guides stay in GameFrame (`./gameframe root` prints where), and on its website.
 # --copy instead copies GameFrame's toolkit, skills, agents, gates and guides into the project,
@@ -74,7 +74,7 @@ python3 "$ROOT/scripts/clients.py" write "$dir" --agent "$agents" $([[ $copy == 
 cp "$ROOT/templates/project/licences/LICENSE-APACHE" "$ROOT/templates/project/licences/LICENSE-CC0-1.0" "$dir/"
 cp "$ROOT/templates/project/gitignore" "$dir/.gitignore"
 cp "$ROOT/templates/project/labels/"*.tsv "$dir/labels/"
-for f in AGENTS.md README.md docs/FINDINGS.md docs/CHECKLIST.md; do
+for f in AGENTS.md README.md docs/FINDINGS.md docs/CHECKLIST.md docs/lore.md; do
   sed -e "s/GAME_NAME/$name/g" -e "s/DATE/$(date +%Y-%m-%d)/" "$ROOT/templates/project/$f" > "$dir/$f"
 done
 [[ $claude == 1 ]] && printf 'The instructions for this repository are in AGENTS.md:\n\n@AGENTS.md\n' > "$dir/CLAUDE.md"
