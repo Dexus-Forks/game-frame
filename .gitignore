@@ -16,5 +16,16 @@ __pycache__/
 /wrappers/target/
 /wrappers/Cargo.lock
 
-# macOS folder metadata
+# Operating system and editor files
 .DS_Store
+._*
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*~
+# VitePress writes these while the dev server reloads its config
+site/.vitepress/*.timestamp-*.mjs
+# Tool output in a checkout (projects keep theirs in their own derived/)
+/derived/
