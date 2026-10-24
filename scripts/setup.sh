@@ -19,6 +19,8 @@
 #   Frida in .venv (~40 MB, optional)                    traces a running game (tools/live/frida_trace.py)
 # Nothing is installed without --install. On Linux, Ghidra is not in apt: the script prints the
 # download page instead of fetching a large archive itself.
+# In a game project (./gameframe doctor) it also checks target/, the copy of the game: missing or
+# empty counts as missing, and its note GAME-FILES-NOT-BUILD-OUTPUT.txt is written when absent.
 set -uo pipefail
 . "$(dirname "$0")/lib.sh"
 install=0; rea=0; client="${REA_CLIENT:-claude_code}"
@@ -27,7 +29,7 @@ while [[ $# -gt 0 ]]; do
     --install) install=1 ;;
     --rea) rea=1 ;;
     --client) client="${2:?--client needs a name}"; shift ;;
-    -h|--help) sed -n '2,21p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,23p' "$0"; exit 0 ;;
     *) echo "unknown option $1" >&2; exit 2 ;;
   esac
   shift
@@ -104,6 +106,11 @@ if [[ -n "$hooks" ]] && git -C "$PROJECT" rev-parse --git-dir >/dev/null 2>&1; t
   if [[ -z "$current" ]]; then git -C "$PROJECT" config core.hooksPath "$hooks" && row "git hook" set "core.hooksPath $hooks"
   elif [[ "$current" == "$hooks" ]]; then row "git hook" ok "core.hooksPath $hooks"
   else row "git hook" other "core.hooksPath is $current: call $hooks/pre-commit from there to check commits"; fi
+fi
+
+# A project's game folder, target/: the user's copy of the game, which git does not keep.
+if [[ "$PROJECT" != "$ROOT" ]]; then
+  python3 "$ROOT/scripts/hooks/gates/game_folder.py" check "$PROJECT" || missing=$((missing + 1))
 fi
 
 # The environment file the scripts and .mcp.json read.

@@ -1,6 +1,6 @@
 """The checks behind every gate. No agent's hook format appears here.
 
-A Check names one action: a commit, a push or a write. reason(check) returns why the action is
+A Check names one action: a commit, a push, a write or a shell command that may delete. reason(check) returns why the action is
 blocked, or None. The adapters build Check records from each agent's hook input; the git
 pre-commit hook builds one from the environment.
 """
@@ -8,6 +8,11 @@ import os
 import re
 import subprocess
 from dataclasses import dataclass
+
+try:
+    from . import deletes  # imported as gates.checks (tools/site/check.py)
+except ImportError:
+    import deletes
 
 # Folders that hold the game, its derivatives or decompiled code. They are ignored by git; a
 # staged path there was force-added.
@@ -45,10 +50,10 @@ COMMIT_ALL = re.compile(r'(^|\s)(-a|--all|-[a-zA-Z]*a[a-zA-Z]*)(\s|$)')
 
 @dataclass
 class Check:
-    kind: str                # 'commit', 'push' or 'write'
+    kind: str                # 'commit', 'push', 'write' or 'delete'
     cwd: str
     agent: str = None        # a GameFrame agent (re-tracer), or None for a person or main session
-    command: str = ''        # the shell command, for commit and push
+    command: str = ''        # the shell command, for commit, push and delete
     path: str = ''           # the file written, for write
     text: str = ''           # the text written, for write
 
@@ -126,6 +131,8 @@ def reason(check):
     """Why this action is blocked, or None."""
     if check.kind == 'write':
         return write_reason(check.cwd, check.path, check.text)
+    if check.kind == 'delete':
+        return deletes.reason(check.cwd, check.command)
     why = agent_reason(check.kind, check.agent)
     if why or check.kind == 'push':
         return why

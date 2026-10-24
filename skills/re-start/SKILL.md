@@ -36,6 +36,8 @@ user may change any of them for their project.
    disassembly. Keep
    them in ignored folders (`target/`, `analysis/`, `derived/`). Publish findings as prose,
    tables, addresses (`FUN_1400be770`), field offsets (`+0x44`) and constants.
+   `target/` is the user's copy of the game and git keeps none. It is not build output (Cargo
+   builds into `build/`), so never delete, move or `git clean -x` it.
 2. **Label every claim** with how you know it:
    - *observed*: read in the code or the data (name the function or file);
    - *measured*: produced by running original code (emulator or game), with the inputs;

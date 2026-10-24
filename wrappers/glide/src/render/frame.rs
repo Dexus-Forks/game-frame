@@ -17,6 +17,8 @@ pub struct Frame {
     depth: u32,
     /// Index of the back buffer.
     pub back: usize,
+    /// Drawing goes to the front buffer (`grRenderBuffer(GR_BUFFER_FRONTBUFFER)`).
+    pub front: bool,
     // A buffer at the game's resolution, for reads: depth and colour are copied down into it.
     small_fbo: u32,
     small_color: u32,
@@ -71,7 +73,7 @@ impl Frame {
             let small_depth = depth_buffer(gl, w, h);
             let small_color = color_texture(gl, w, h);
             let small_fbo = framebuffer(gl, small_color, small_depth)?;
-            let f = Frame { w, h, ow, oh, fbo, color, depth, back: 0, small_fbo, small_color, small_depth };
+            let f = Frame { w, h, ow, oh, fbo, color, depth, back: 0, front: false, small_fbo, small_color, small_depth };
             f.bind_back(gl);
             Ok(f)
         }
@@ -83,17 +85,28 @@ impl Frame {
         let _ = (self.depth, self.small_depth);
     }
 
+    /// Bind the buffer drawing goes to: the back one, or the front one.
     pub unsafe fn bind_back(&self, gl: &Gl) {
         unsafe {
-            (gl.BindFramebuffer)(FRAMEBUFFER, self.fbo[self.back]);
+            (gl.BindFramebuffer)(FRAMEBUFFER, self.fbo[self.back ^ self.front as usize]);
             (gl.Viewport)(0, 0, self.ow as i32, self.oh as i32);
         }
     }
 
-    /// Draw the back buffer into the window (`cw × ch`, the picture kept 4:3 and centred) with
-    /// `gamma`, show it, and swap the buffers.
+    /// Draw the back buffer into the window and swap the buffers.
     pub unsafe fn present(&mut self, gl: &Gl, p: &Program, gamma: f32, cw: i32, ch: i32, dc: crate::win32::HDC) {
         unsafe {
+            self.show(gl, p, gamma, cw, ch, dc, self.back);
+            self.back ^= 1;
+            self.bind_back(gl);
+        }
+    }
+
+    /// Draw colour buffer `which` into the window (`cw × ch`, the picture kept 4:3 and
+    /// centred) with `gamma`, and show it.
+    pub unsafe fn show(&self, gl: &Gl, p: &Program, gamma: f32, cw: i32, ch: i32, dc: crate::win32::HDC, which: usize) {
+        unsafe {
+            (gl.ColorMask)(1, 1, 1, 1);
             (gl.BindFramebuffer)(FRAMEBUFFER, 0);
             (gl.Disable)(SCISSOR_TEST);
             (gl.Disable)(DEPTH_TEST);
@@ -108,14 +121,14 @@ impl Frame {
             }
             if gamma == 1.0 || gamma <= 0.0 {
                 // No gamma: a plain copy, cheaper than a shader pass in software OpenGL.
-                (gl.BindFramebuffer)(READ_FRAMEBUFFER, self.fbo[self.back]);
+                (gl.BindFramebuffer)(READ_FRAMEBUFFER, self.fbo[which]);
                 let filter = if (vw, vh) == (self.ow as i32, self.oh as i32) { NEAREST } else { LINEAR };
                 (gl.BlitFramebuffer)(0, 0, self.ow as i32, self.oh as i32, x0, y0, x0 + vw, y0 + vh, COLOR_BUFFER_BIT, filter as u32);
             } else {
                 (gl.Viewport)(x0, y0, vw, vh);
                 (gl.UseProgram)(p.id);
                 (gl.ActiveTexture)(TEXTURE0);
-                (gl.BindTexture)(TEXTURE_2D, self.color[self.back]);
+                (gl.BindTexture)(TEXTURE_2D, self.color[which]);
                 (gl.Uniform1i)(p.loc("uImg"), 0);
                 (gl.Uniform1f)(p.loc("uGamma"), gamma);
                 (gl.Uniform4f)(p.loc("uRect"), 0.0, 0.0, 1.0, 1.0);
@@ -124,7 +137,6 @@ impl Frame {
             }
             crate::gl::check(gl, "in the frame");
             crate::win32::SwapBuffers(dc);
-            self.back ^= 1;
             self.bind_back(gl);
         }
     }

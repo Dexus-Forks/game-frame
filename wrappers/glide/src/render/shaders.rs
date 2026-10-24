@@ -12,6 +12,7 @@ in vec4 aColor; // r, g, b, a: 0-255
 in vec2 aST;    // sow, tow
 uniform vec2 uScreen;
 uniform int uDepthMode;
+uniform float uDepthBias; // grDepthBiasLevel, in 16-bit depth units
 uniform vec2 uSTScale;
 smooth out vec2 vST;
 noperspective out vec4 vColor;
@@ -22,7 +23,9 @@ void main() {
     vec2 ndc = vec2(aPos.x / uScreen.x * 2.0 - 1.0, 1.0 - aPos.y / uScreen.y * 2.0);
     // Depth rises with the value the Voodoo stores, so Glide's compare functions map to
     // OpenGL's as they are: W buffer 1/oow (here 1 - oow, linear on screen), Z buffer ooz.
-    float d = uDepthMode == 2 ? 1.0 - oow : aPos.z / 65535.0;
+    // Deviation: in the W buffer the bias is added to this linear depth. The Voodoo added
+    // it to its floating point w.
+    float d = (uDepthMode == 2 ? 1.0 - oow : aPos.z / 65535.0) + uDepthBias / 65535.0;
     gl_Position = vec4(ndc * w, (2.0 * d - 1.0) * w, w);
     vST = aST * w * uSTScale;
     vColor = aColor / 255.0;
@@ -43,6 +46,7 @@ uniform vec3 uKey;
 uniform int uFog;        // 0 off, 1 iterated alpha, 2 table
 uniform float uFogTable[64];
 uniform vec3 uFogColor;
+uniform ivec2 uAlphaTest; // GrCmpFnc_t (7 always), reference 0-255
 smooth in vec2 vST;
 noperspective in vec4 vColor;
 noperspective in float vOow;
@@ -121,6 +125,11 @@ void main() {
     if (uCCInvert != 0) c = 1.0 - c;
     float a = clamp(afunc(uAC.x, afactor(uAC.y, al, ao, tex.a), al, ao), 0.0, 1.0);
     if (uACInvert != 0) a = 1.0 - a;
+    if (uAlphaTest.x != 7) {
+        int ai = int(a * 255.0 + 0.5), r = uAlphaTest.y, f = uAlphaTest.x;
+        bool pass = f == 1 ? ai < r : f == 2 ? ai == r : f == 3 ? ai <= r : f == 4 ? ai > r : f == 5 ? ai != r : f == 6 ? ai >= r : false;
+        if (!pass) discard;
+    }
     if (uFog == 2) c = mix(c, uFogColor, fogTable(vOow) / 255.0);
     else if (uFog == 1) c = mix(c, uFogColor, vColor.a);
     oColor = vec4(c, a);
@@ -244,7 +253,7 @@ pub unsafe fn build(gl: &Gl) -> Result<Programs, String> {
         let present = program(gl, QUAD_VS, PRESENT_FS, &[])?;
         Ok(Programs {
             scene: with_uniforms(gl, scene, &[
-                "uScreen", "uDepthMode", "uSTScale", "uTex", "uTexFn", "uCC", "uCCInvert", "uAC", "uACInvert",
+                "uScreen", "uDepthMode", "uDepthBias", "uAlphaTest", "uSTScale", "uTex", "uTexFn", "uCC", "uCCInvert", "uAC", "uACInvert",
                 "uConst", "uChroma", "uKey", "uFog", "uFogTable", "uFogColor",
             ]),
             lfb: with_uniforms(gl, lfb, &["uRect", "uScreen", "uImg", "uChroma", "uKey"]),

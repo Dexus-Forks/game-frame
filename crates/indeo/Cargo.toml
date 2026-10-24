@@ -1,0 +1,16 @@
+[package]
+name = "gameframe-indeo"
+description = "Intel Indeo Video Interactive 4.1 (IV41), decoded as Intel's own IR41_32.DLL decodes it, picture for picture (clean room)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+keywords = ["indeo", "iv41", "video", "decoder", "avi"]
+categories = ["multimedia::video", "multimedia::encoding"]
+
+[lib]
+name = "indeo"
+
+[dependencies]

@@ -305,6 +305,7 @@ under Apache 2.0. See [docs/crates](docs/crates/README.md).
 | [gameframe-wma](crates/wma/README.md) | A WMA v2 decoder for xWMA and ASF streams, building for WebAssembly |
 | [gameframe-msvc-crt](crates/msvc-crt/README.md) | MSVC's `sinf`, `cosf`, `acosf`, `atan2f`, `qsort` order and `rand`, bit for bit |
 | [gameframe-turbo-pascal](crates/turbo-pascal/README.md) | Turbo Pascal's 6-byte `Real`, `Random` and Pascal data layouts |
+| [gameframe-indeo](crates/indeo/README.md) | An Indeo Video Interactive 4.1 (`IV41`) decoder, picture for picture as Intel's own codec (clean room) |
 
 ## Replacement libraries
 

@@ -17,6 +17,7 @@ library, with pictures of POD's runs.
 | `s3dtkw.dll` | S3 ViRGE (S3D Toolkit, `S3DTKW.dll`) | The same | [s3dtkw](s3dtkw/README.md) |
 | `sgl.dll` | PowerVR SGL, the scene graph and the immediate mode | The game's scene graph or its screen-space faces, drawn with OpenGL at any size; the 2D picture over it through `ddraw.dll` or SGL's own 2D callback | [sgl](sgl/README.md) |
 | `94DLL32.dll` (`maxi94`) | Guillemot Maxi Sound 64 (Dream SAM9407) | No picture: the card's wave streams are Wine's wave outputs, so the game's sound plays | [maxi94](maxi94/README.md) |
+| `ir41_32.dll` (`ir41`) | Intel's Indeo Video Interactive 4.1 codec (Video for Windows, `IV41`) | The game's videos, decoded by GameFrame's clean-room decoder, picture for picture as Intel's | [ir41](ir41/README.md) |
 
 The shared crates:
 
@@ -42,7 +43,7 @@ each library, one call at a time.
 
 | DLL | The original | Implemented | Exported |
 |---|---|---|---|
-| `glide2x.dll` | Glide 2.43 (`glide2x.dll`) and Glide 2.1.1 (`glide.dll`) | 55 | 156 |
+| `glide2x.dll` | Glide 2.43 (`glide2x.dll`) and Glide 2.1.1 (`glide.dll`) | 131 | 156 |
 | `sgl.dll` | PowerVR driver 3.1.0's `sgl.dll`, `sgl_delete_all_textures` from a later SGL, and `sgl_wrapper_present` | 61 | 134 |
 | `ati3dcif.dll` | ATI 3D Rage Pro SDK 4.1's `ATI3DCIF.LIB` | 6 | 17 |
 | `s3dtkw.dll` | S3's 1996 ViRGE driver's `S3DTKW.DLL` | 6 | 6 |

@@ -44,6 +44,7 @@ An entry has one of five statuses.
 | [A decompiled switch drops values: run the function for every case instead](jump-table-measure-not-read.md) | solved |
 | [A DirectDraw game asks for an impossible mode, because its mode table overflowed](directdraw-mode-table-overflow.md) | solved |
 | [A DirectDraw game runs in a window only on a 16-bit desktop, else goes fullscreen](directdraw-windowed-16bit-desktop.md) | solved |
+| [A disk cleanup deletes a project's target/, the copy of the game, as Cargo build output](game-folder-deleted-as-build-output.md) | solved |
 | [A driver run with sudo sends no keys: "Can't open display"](sudo-drops-display.md) | solved |
 | [A flag patched in the data is set back in code by a newer build](patched-flag-reset-in-code.md) | solved |
 | [A function has no callers, or no function exists, because Ghidra missed code reached through pointers](decompile-missed-pointer-functions.md) | solved |

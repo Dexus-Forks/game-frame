@@ -3,10 +3,12 @@
 `glide2x.dll` replaces 3dfx's Glide 2.x library. The game runs unchanged. It loads this
 library in place of 3dfx's, and the library draws everything the Voodoo would have drawn with
 OpenGL, at any output size (2×, 4×, or a size you name). It was made for POD's 3dfx builds
-(`WPOD3DFX.EXE`, first edition and Gold). It implements the 55 functions they call. It
-exports all 156 functions of Glide 2.43 and Glide 2.1.1, under the decorated `__stdcall` names
-the games link to (`_grGlideInit@0` and so on, in `glide2x.def`). The other 101 are stubs that
-log their calls (`api.tsv`, [wrappers](../README.md)).
+(`WPOD3DFX.EXE`, first edition and Gold), and then grew to the rest of Glide 2 that games
+use. It exports all 156 functions of Glide 2.43 and Glide 2.1.1, under the decorated
+`__stdcall` names the games link to (`_grGlideInit@0` and so on, in `glide2x.def`). It
+implements 131 of them. The other 25 are stubs that log their calls (`api.tsv`,
+[wrappers](../README.md)): the PCI helpers (`pci*`), the multi-pass calls (`guMP*`), the
+movie recorder (`guMovie*`), the RLE helpers, `grSstConfigPipeline` and `grSstVidMode`.
 
 Early Glide 2 games import the file `glide.dll`. Later ones import `glide2x.dll`. Copy the DLL
 under the name your game's import table gives (`./gameframe run peinfo GAME.EXE --imports`).
@@ -38,16 +40,19 @@ emulated CPU. `LP_NATIVE_VECTOR_WIDTH=128` made llvmpipe faster under QEMU.
 
 | Module | Does |
 |---|---|
-| `api/` | The exported calls (`sst`, `state`, `tex`, `draw`, `lfb`). They answer queries and record everything else as commands |
+| `api/` | The exported calls (`sst`, `state`, `tex`, `gutex`, `draw`, `lfb`, `lfbread`, `query`). They answer queries and record everything else as commands. `shadow` keeps the state as the game set it, for `grGlideGetState` and for what acts before a triangle is recorded: the origin, culling, the delta-0 colour and the STW hint |
+| `vertex.rs`, `layout.rs`, `fog.rs`, `tdf.rs` | Plain Rust, tested on the host: culling, polygon fans and clipping; where mip levels lie in texture memory (each level takes at least 2 × 2 texels, as on the Voodoo); the `gu` fog tables; 3DF texture files |
 | `cmd.rs` | The commands and the queue. A frame's commands go to the render thread at `grBufferSwap`. A game may call Glide from more than one thread, and an OpenGL context belongs to one |
 | `render/` | The render thread: the frame buffer (`frame.rs`, two colour buffers and one depth buffer, like Glide's), the state (`state.rs`), the texture memory (`textures.rs`, decoded with `gameframe-gpu-1997`), the shaders (`shaders.rs`) |
 | `window.rs` | The early Glide 2 `grSstOpen` takes no window. So the library finds the game's own window (`WRAPPER_WINDOW_CLASS`, which may still be hidden; without it the first visible window of the process), makes it borderless at the output size, and draws into it. Without a game window it makes one. The later `grSstWinOpen` names the window |
 | `shim` (crate) | Port I/O emulated, and patches from `WRAPPER_PATCHES` ([shim](../shim/README.md)) |
 
 The Voodoo's pixel pipeline is one fragment shader. It does the colour and alpha combiners
-(`grColorCombine`, `guColorCombineFunction`, `guAlphaSource`), the chroma key, and table fog
-(the 64 entries indexed by *w*, as the Voodoo does). It also does the texture combine for one
-TMU. Depth is the W buffer (or Z buffer), mapped so that Glide's compare functions are
+(`grColorCombine`, `grAlphaCombine` and their `gu` forms), the chroma key, the alpha test,
+and table fog (the 64 entries indexed by *w*, as the Voodoo does). It also does the texture
+combine for one TMU. Textures are decoded with all their mip levels, so `grTexMipMapMode`
+picks or blends levels as the Voodoo did. NCC textures read the table `grTexNCCTable` names,
+and multibase textures read each level range from its own address. Depth is the W buffer (or Z buffer), mapped so that Glide's compare functions are
 OpenGL's unchanged. Gamma (`grGammaCorrectionValue`) is applied when the frame is shown, as
 the Voodoo's output table did.
 
@@ -65,6 +70,33 @@ Each is marked `Deviation:` in the code.
 - 2D writes through the pixel pipeline are blended and chroma-keyed, but neither depth-tested
   nor fogged.
 - The destination blend factor `GR_BLEND_PREFOG_COLOR` is taken as zero.
-- Only TMU 0 draws. NCC textures and mipmaps are not handled (POD has none).
+- Only TMU 0 draws, as `grSstQueryHardware` reports one TMU. Detail textures
+  (`grTexDetailControl`) need a second one and are ignored.
+- The `grAADraw*` calls draw without antialiased edges. Nothing is dithered.
+- In the W buffer, `grDepthBiasLevel` is added to a linear depth. The Voodoo added it to its
+  floating point *w*.
+- `GR_COMBINE_LOCAL_DEPTH` in the alpha combiner is taken as the iterated alpha.
+- `grSstVRetraceOn` always answers yes, and `grSstPerfStats` counts no pixels.
+
+## Test
+
+`test/glidetest.c` draws a known scene through the DLL and checks it. It opens 640 × 480 on
+its own window, draws, reads pixels back with `grLfbReadRegion` and prints one line per check:
+culling, clipping, `gu` and NCC textures, the alpha test, fog, points, an LFB write, saved
+state, statistics, a 3DF file and the queries. Then it animates a mipmapped checker in
+perspective. The exit code is the number of failed checks. `tests/run.sh` builds it. Running
+it needs Wine or Windows.
+
+```bash
+zig cc -target x86-windows-gnu -O2 wrappers/glide/test/glidetest.c -o glidetest.exe -luser32
+```
+
+```bash
+WINEDLLOVERRIDES=glide2x=n GLIDE_SCALE=2 wine glidetest.exe 120
+```
+
+The host tests (`cargo test --release --target <host> -p glide` in `wrappers/`) check the
+plain-Rust modules. The fog tables match Glide 2.43's own output byte for byte (*measured*,
+the original run under `tools/emu/pe32_emu.py`).
 
 Build: `../README.md`. Licence: Apache-2.0 (code), CC0-1.0 (this text).

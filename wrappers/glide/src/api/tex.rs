@@ -1,10 +1,16 @@
 //! Texture calls. Texture memory is the game's to lay out (`grTexMinAddress`,
-//! `grTexCalcMemRequired`); downloads are copied into the render thread's copy of it, and
-//! `grTexSource` names an address and a `GrTexInfo` there. Only TMU 0 draws: POD uses one
-//! (POD's `docs/hardware/3d-cards.md`).
+//! `grTexCalcMemRequired`); downloads are copied into the render thread's copy of it, at the
+//! level addresses `layout` gives, and `grTexSource` names an address and a `GrTexInfo` there.
+//! Only TMU 0 draws: `grSstQueryHardware` reports one TMU, as POD uses (POD's
+//! `docs/hardware/3d-cards.md`).
 
+use super::shadow::{self, send};
 use crate::cmd::{Cmd, TexInfo, push};
-use gpu_1997::glide::{Format, chain_bytes};
+use crate::layout;
+use gpu_1997::glide::{Format, TEXTABLE_PALETTE, size};
+
+/// The TMU's memory as `grSstQueryHardware` reports it: 4 MB.
+pub const TMU_MEMORY: u32 = 4 << 20;
 
 /// `GrTexInfo`: smallLod, largeLod, aspectRatio, format, data.
 #[repr(C)]
@@ -17,13 +23,9 @@ pub struct GrTexInfo {
 }
 
 impl GrTexInfo {
-    fn info(&self) -> TexInfo {
+    pub fn info(&self) -> TexInfo {
         TexInfo { small_lod: self.small_lod, large_lod: self.large_lod, aspect: self.aspect, format: self.format }
     }
-}
-
-fn bytes(small_lod: u32, large_lod: u32, aspect: u32, format: u32) -> usize {
-    Format::from_u32(format).and_then(|f| chain_bytes(small_lod, large_lod, aspect, f)).unwrap_or(0)
 }
 
 #[unsafe(no_mangle)]
@@ -31,10 +33,24 @@ pub extern "system" fn grTexMinAddress(_tmu: u32) -> u32 {
     0
 }
 
-/// The chain's size, rounded up to 8 bytes as the Voodoo's texture addresses are.
+/// The highest address a texture may start at: the memory size less 8 (*measured*,
+/// `grTexMaxAddress` in the Win95 `glide2x.dll`).
+#[unsafe(no_mangle)]
+pub extern "system" fn grTexMaxAddress(_tmu: u32) -> u32 {
+    TMU_MEMORY - 8
+}
+
 #[unsafe(no_mangle)]
 pub extern "system" fn grTexCalcMemRequired(small_lod: u32, large_lod: u32, aspect: u32, format: u32) -> u32 {
-    (bytes(small_lod, large_lod, aspect, format) as u32 + 7) & !7
+    Format::from_u32(format).map_or(0, |f| layout::mem_required(small_lod, large_lod, aspect, f))
+}
+
+/// The memory a `GrTexInfo` needs. Deviation: the even/odd split between two TMUs is not
+/// made, so the whole chain is counted.
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn grTexTextureMemRequired(_even_odd: u32, info: *const GrTexInfo) -> u32 {
+    let Some(i) = (unsafe { info.as_ref() }) else { return 0 };
+    grTexCalcMemRequired(i.small_lod, i.large_lod, i.aspect, i.format)
 }
 
 #[unsafe(no_mangle)]
@@ -42,67 +58,161 @@ pub unsafe extern "system" fn grTexSource(tmu: u32, start: u32, _even_odd: u32, 
     if tmu != 0 || info.is_null() {
         return;
     }
-    push(Cmd::TexSource { start, info: unsafe { &*info }.info() });
+    shadow::source(start, unsafe { &*info }.info());
+}
+
+/// Copy levels `large`..=`small` from the game's packed data into TMU memory at `start`,
+/// each level at its padded offset. Deviation: the even/odd mask is taken as both, as with
+/// one TMU every level is on it.
+pub unsafe fn download_chain(start: u32, small: u32, large: u32, aspect: u32, format: u32, data: *const u8) {
+    let Some(f) = Format::from_u32(format) else { return };
+    let (Some(total), Some(host)) = (layout::level_offset(large, small + 1, aspect, f), layout::host_offset(large, small + 1, aspect, f)) else {
+        return;
+    };
+    if data.is_null() || total == 0 {
+        return;
+    }
+    let src = unsafe { std::slice::from_raw_parts(data, host) };
+    let mut buf = vec![0u8; total];
+    for lod in large..=small {
+        let (to, from, n) = (
+            layout::level_offset(large, lod, aspect, f).unwrap_or(0),
+            layout::host_offset(large, lod, aspect, f).unwrap_or(0),
+            layout::host_level_bytes(lod, aspect, f).unwrap_or(0),
+        );
+        buf[to..to + n].copy_from_slice(&src[from..from + n]);
+    }
+    push(Cmd::Download { start, data: buf });
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn grTexDownloadMipMap(tmu: u32, start: u32, even_odd: u32, info: *const GrTexInfo) {
-    if tmu != 0 || info.is_null() {
-        return;
+pub unsafe extern "system" fn grTexDownloadMipMap(tmu: u32, start: u32, _even_odd: u32, info: *const GrTexInfo) {
+    let Some(i) = (unsafe { info.as_ref() }) else { return };
+    if tmu == 0 {
+        unsafe { download_chain(start, i.small_lod, i.large_lod, i.aspect, i.format, i.data) };
     }
-    let info = unsafe { &*info };
-    if even_odd != 3 {
-        shim::gap!("grTexDownloadMipMap even/odd", "mask {even_odd} treated as both");
-    }
-    let n = bytes(info.small_lod, info.large_lod, info.aspect, info.format);
-    if n == 0 || info.data.is_null() {
-        return;
-    }
-    let data = unsafe { std::slice::from_raw_parts(info.data, n) }.to_vec();
-    push(Cmd::Download { start, data });
 }
 
-/// Only `GR_TEXTABLE_PALETTE` (2): 256 words `0x00RRGGBB`. POD has no NCC textures.
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn grTexDownloadMipMapLevel(
+    tmu: u32, start: u32, lod: u32, large_lod: u32, aspect: u32, format: u32, even_odd: u32, data: *const u8,
+) {
+    let h = size(lod, aspect).map_or(1, |(_, h)| h as i32);
+    unsafe { grTexDownloadMipMapLevelPartial(tmu, start, lod, large_lod, aspect, format, even_odd, data, 0, h - 1) };
+}
+
+/// Rows `first`..=`last` of one level. `data` holds those rows only, from row `first` on (the
+/// Glide 2.x reference manual's reading; the original's own code was not traced for it).
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn grTexDownloadMipMapLevelPartial(
+    tmu: u32, start: u32, lod: u32, large_lod: u32, aspect: u32, format: u32, _even_odd: u32, data: *const u8, first: i32, last: i32,
+) {
+    let (Some(f), Some((w, h))) = (Format::from_u32(format), size(lod, aspect)) else { return };
+    if tmu != 0 || data.is_null() || first < 0 || last < first || last as usize >= h {
+        return;
+    }
+    let Some(offset) = layout::level_offset(large_lod, lod, aspect, f) else { return };
+    let row = f.texel().bytes(w, 1);
+    let n = row * (last - first + 1) as usize;
+    let data = unsafe { std::slice::from_raw_parts(data, n) }.to_vec();
+    push(Cmd::Download { start: start + (offset + row * first as usize) as u32, data });
+}
+
+/// `GR_TEXTABLE_PALETTE`: 256 words `0x00RRGGBB`. `GR_TEXTABLE_NCC0` and `NCC1`: a
+/// `GuNccTable`, of which the first 64 bytes are read.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grTexDownloadTable(tmu: u32, kind: u32, data: *const u32) {
+    unsafe { grTexDownloadTablePartial(tmu, kind, data, 0, 255) };
+}
+
+/// Palette entries `first`..=`last`, read from their own places in the full table. An NCC
+/// table is always loaded whole.
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn grTexDownloadTablePartial(tmu: u32, kind: u32, data: *const u32, first: i32, last: i32) {
     if tmu != 0 || data.is_null() {
         return;
     }
-    if kind != gpu_1997::glide::TEXTABLE_PALETTE {
-        shim::gap!("grTexDownloadTable NCC", "NCC tables are not handled");
-        return;
+    if kind == TEXTABLE_PALETTE {
+        let (first, last) = (first.clamp(0, 255) as usize, last.clamp(0, 255) as usize);
+        if first <= last {
+            let words = (first..=last).map(|i| unsafe { data.add(i).read_unaligned() }).collect();
+            push(Cmd::Palette { first, words });
+        }
+    } else if kind < 2 {
+        let mut t = Box::new([0u8; 112]);
+        unsafe { std::ptr::copy_nonoverlapping(data.cast::<u8>(), t.as_mut_ptr(), 112) };
+        push(Cmd::Ncc(kind as u8, t));
     }
-    let mut p = Box::new([0u32; 256]);
-    unsafe { std::ptr::copy_nonoverlapping(data, p.as_mut_ptr(), 256) };
-    push(Cmd::Palette(p));
+}
+
+/// Which NCC table (`GR_NCCTABLE_NCC0` or `NCC1`) the NCC formats read.
+#[unsafe(no_mangle)]
+pub extern "system" fn grTexNCCTable(tmu: u32, table: u32) {
+    if tmu == 0 {
+        shadow::set(|s| s.ncc = table & 1);
+        shadow::resend_source();
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "system" fn grTexMultibase(tmu: u32, enable: u32) {
+    if tmu == 0 {
+        shadow::set(|s| s.multibase = (enable != 0) as u32);
+        shadow::resend_source();
+    }
+}
+
+/// The address of one multibase range (`GR_TEXBASE_256`, `_128`, `_64`, `_32_TO_1`).
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn grTexMultibaseAddress(tmu: u32, range: u32, start: u32, _even_odd: u32, _info: *const GrTexInfo) {
+    if tmu == 0 && range < 4 {
+        shadow::set(|s| s.bases[range as usize] = start);
+        shadow::resend_source();
+    }
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grTexFilterMode(tmu: u32, min: u32, mag: u32) {
     if tmu == 0 {
-        push(Cmd::TexFilter(min, mag));
+        send(Cmd::TexFilter(min, mag));
     }
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grTexClampMode(tmu: u32, s: u32, t: u32) {
     if tmu == 0 {
-        push(Cmd::TexClamp(s, t));
+        send(Cmd::TexClamp(s, t));
     }
 }
 
-/// POD passes `GR_MIPMAP_DISABLE`; with one level per texture there is nothing to choose.
+/// `GR_MIPMAP_DISABLE` draws the largest level only; `GR_MIPMAP_NEAREST` (and its dithered
+/// form, drawn without dither) picks a level per pixel, and `lod_blend` blends between two
+/// (trilinear).
 #[unsafe(no_mangle)]
-pub extern "system" fn grTexMipMapMode(_tmu: u32, mode: u32, _lod_blend: u32) {
-    if mode != 0 {
-        shim::gap!("grTexMipMapMode", "mode {mode}: mipmaps are not handled");
+pub extern "system" fn grTexMipMapMode(tmu: u32, mode: u32, lod_blend: u32) {
+    if tmu == 0 {
+        send(Cmd::MipMap(mode, lod_blend != 0));
     }
+}
+
+#[unsafe(no_mangle)]
+pub extern "system" fn grTexLodBiasValue(tmu: u32, bias: f32) {
+    if tmu == 0 {
+        send(Cmd::LodBias(bias));
+    }
+}
+
+/// Deviation: detail textures blend a second texture by the level of detail, which needs a
+/// second TMU; with one, nothing changes.
+#[unsafe(no_mangle)]
+pub extern "system" fn grTexDetailControl(_tmu: u32, _lod_bias: i32, _scale: u32, _max: f32) {
+    shim::gap!("grTexDetailControl", "detail textures need a second TMU; ignored");
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grTexCombineFunction(tmu: u32, f: u32) {
     if tmu == 0 {
-        push(Cmd::TexCombine(f));
+        send(Cmd::TexCombine(f));
     }
 }
 
@@ -146,5 +256,5 @@ pub extern "system" fn grTexCombine(tmu: u32, rgb_func: u32, rgb_factor: u32, _a
             1
         }
     };
-    push(Cmd::TexCombine(f));
+    send(Cmd::TexCombine(f));
 }

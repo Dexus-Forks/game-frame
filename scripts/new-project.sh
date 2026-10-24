@@ -12,6 +12,8 @@
 #                             GameFrame in a clone or in the plugin's install
 #   docs/FINDINGS.md, docs/CHECKLIST.md, docs/lore.md, docs/versions.md, labels/names.tsv, labels/fields.tsv
 #   target/, analysis/, derived/   for the game, Ghidra output and ground truth: ignored by git
+#   target/GAME-FILES-NOT-BUILD-OUTPUT.txt   says target/ is the game, not Cargo's output
+#   .cargo/config.toml        Cargo builds into build/, never into target/
 # The guides stay in GameFrame (`./gameframe root` prints where), and on its website.
 # --copy instead copies GameFrame's toolkit, skills, agents, gates and guides into the project,
 # for agents that cannot use the Claude Code plugin. The skills go in skills/, with the links
@@ -37,7 +39,7 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 set -- ${args[@]+"${args[@]}"}
-[[ $# -ge 2 ]] || { sed -n '2,26p' "$0"; exit 2; }
+[[ $# -ge 2 ]] || { sed -n '2,28p' "$0"; exit 2; }
 # The chosen agents, checked before anything is written.
 agents="$(python3 -c 'import sys; sys.path.insert(0, sys.argv[1]); import clients; print(",".join(clients.parse(sys.argv[2])))' "$ROOT/scripts" "$agent")"
 claude=0; [[ ",$agents," == *",claude,"* ]] && claude=1
@@ -81,6 +83,8 @@ done
 # target/ holds the game: Cargo must build elsewhere, or `cargo clean` deletes the game.
 mkdir -p "$dir/.cargo"
 printf '[build]\n# target/ holds your copy of the game: never let Cargo build (or clean) there.\ntarget-dir = "build"\n' > "$dir/.cargo/config.toml"
+# A note in target/ itself, for people and cleaners that see a target/ beside a Cargo.toml.
+python3 "$ROOT/scripts/hooks/gates/game_folder.py" mark "$dir"
 [[ -f "$ROOT/.env" ]] && cp "$ROOT/.env" "$dir/.env"
 # Pin a plugin project to the one GameFrame checkout that made it (docs/working/environments.md):
 # ./gameframe reads GAMEFRAME_ROOT from .env, also from the project's git worktrees. A copied

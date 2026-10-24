@@ -1273,6 +1273,55 @@ print('commit, push, write and session gates; Codex, Gemini, Cursor and Copilot 
 PY
 )"
 [[ $? == 0 ]] && ok "the gates block game material, decompiled code and non-lander commits ($out)" || bad "gates" "$out"
+echo "Game folder (scripts/hooks/gates/game_folder.py, deletes.py)"
+out="$("$PYTHON" - <<'PY' 2>&1
+import json, os, subprocess, tempfile
+G = os.path.abspath('scripts/hooks/gate.py')
+F = os.path.abspath('scripts/hooks/gates/game_folder.py')
+root = tempfile.mkdtemp(); game = f'{root}/game'; rust = f'{root}/rusty'
+for d in (f'{game}/target', f'{game}/.cargo', f'{game}/docs', f'{rust}/target'):
+    os.makedirs(d)
+open(f'{game}/Cargo.toml', 'w').close(); open(f'{rust}/Cargo.toml', 'w').close()
+open(f'{rust}/target/CACHEDIR.TAG', 'w').close()
+open(f'{game}/.cargo/config.toml', 'w').write('[build]\ntarget-dir = "build"\n')
+open(f'{game}/target/GAME.EXE', 'w').write('x')
+def run(cmd, cwd=game, agent='delete'):
+    ev = {'cwd': cwd, 'tool_input': {'command': cmd}}
+    if agent == 'codex':
+        ev['tool_name'] = 'Bash'
+    return subprocess.run(['python3', G, agent], input=json.dumps(ev), capture_output=True, text=True).returncode
+blocked = ['rm -rf target', 'rm -rf target/', 'rm -rf target/*', f'rm -rf {game}/target', 'cd .. && rm -rf game/target',
+           'trash target', 'mv target ~/.Trash/', 'cargo clean --target-dir target', 'CARGO_TARGET_DIR=target cargo clean',
+           f'find {root} -name target -type d -prune -exec rm -rf {{}} +', f'find {root} -type d -name target -delete',
+           'git clean -fdx', f'kondo {root}', "python3 -c \"import shutil; shutil.rmtree('target')\"", 'rm -rf ../game']
+passed = ['cargo clean', 'rm -rf build', 'rm target/GAME.EXE', 'ls target', 'git clean -fd', f'rm -rf {rust}/target',
+          'GAMEFRAME_DELETE_GAME=1 rm -rf target', 'mv target/GAME.EXE target/game.exe', f'find {root} -name "*.o" -delete']
+assert [c for c in blocked if run(c) != 2] == [], [c for c in blocked if run(c) != 2]
+assert [c for c in passed if run(c) != 0] == [], [c for c in passed if run(c) != 0]
+assert run('mv game game-old', cwd=root) == 0 and run('mv game ~/.Trash/', cwd=root) == 2, 'rename passes, Trash does not'
+assert run('rm -rf target', agent='codex') == 2 and run('git status', agent='codex') == 0, 'codex delete gate'
+check = lambda: subprocess.run(['python3', F, 'check', game], capture_output=True, text=True)
+c = check(); assert c.returncode == 0 and 'marker written' in c.stdout, c.stdout
+assert os.path.isfile(f'{game}/target/GAME-FILES-NOT-BUILD-OUTPUT.txt'), 'doctor writes the marker'
+open(f'{game}/docs/FINDINGS.md', 'w').write('The levels are in `target/DATA/LEVELS.PKG`.\n')
+os.remove(f'{game}/target/GAME.EXE')
+c = check(); assert c.returncode == 1 and 'EMPTY' in c.stdout and 'DATA/LEVELS.PKG' in c.stdout, c.stdout
+os.remove(f'{game}/target/GAME-FILES-NOT-BUILD-OUTPUT.txt'); os.rmdir(f'{game}/target')
+c = check(); assert c.returncode == 1 and 'MISSING' in c.stdout, c.stdout
+print('the delete gate blocks rm, the Trash, find, git clean -x, cargo clean and cleaners on target/; doctor reports a missing game')
+PY
+)"
+[[ $? == 0 ]] && ok "$out" || bad "game folder" "$out"
+tmp="$(mktemp -d)/proj"
+scripts/new-project.sh "$tmp" "Test Game" --agent claude >/dev/null 2>&1
+if [[ -f "$tmp/target/GAME-FILES-NOT-BUILD-OUTPUT.txt" ]] && grep -q 'target-dir = "build"' "$tmp/.cargo/config.toml"; then
+  rm -rf "$tmp/target" "$tmp/.cargo"
+  out="$(scripts/update-project.sh "$tmp" 2>&1)"
+  [[ -f "$tmp/target/GAME-FILES-NOT-BUILD-OUTPUT.txt" ]] && grep -q 'target-dir = "build"' "$tmp/.cargo/config.toml" \
+    && ok "new-project marks target/ as the game; update-project adds the marker and .cargo/config.toml to an older project" \
+    || bad "update-project game folder" "$out"
+else bad "new-project game folder marker" "$(ls -la "$tmp" "$tmp/target" 2>&1)"; fi
+rm -rf "$(dirname "$tmp")"
 cfg=0
 for f in .codex/hooks.json .cursor/hooks.json .github/hooks/gameframe.json hooks/gemini-settings.json; do
   "$PYTHON" -m json.tool "$f" >/dev/null 2>&1 && grep -q "gate.py" "$f" || { bad "hook config $f is valid JSON and runs gate.py"; cfg=1; }
@@ -1610,8 +1659,8 @@ if command -v cargo >/dev/null; then
   [[ $? == 0 && "$out" == *"s3dtkw: 6 of 6 calls implemented"* ]] \
     && ok "stubgen: each wrapper's .def and stubs match its API table, every call with the original's convention ($(echo "$out" | grep -o '[0-9]* of [0-9]*' | paste -sd, - | sed 's/,/, /g'))" \
     || bad "stubgen --check" "$out"
-  out="$(cd wrappers && cargo test --release --target "$host" --target-dir "$WT" -p raster -p scalers -p pixels -p shim -p sgl -p maxi94 2>&1)"
-  [[ $? == 0 ]] && ok "the wrappers' host tests pass: rasteriser, scalers, pixels, settings, SGL scene graph and immediate mode, Maxi Sound 64 streams and mixer ($(echo "$out" | grep -o '[0-9]* passed' | awk '{s+=$1} END {print s}') tests)" \
+  out="$(cd wrappers && cargo test --release --target "$host" --target-dir "$WT" -p raster -p scalers -p pixels -p shim -p sgl -p maxi94 -p glide 2>&1)"
+  [[ $? == 0 ]] && ok "the wrappers' host tests pass: rasteriser, scalers, pixels, settings, SGL scene graph and immediate mode, Maxi Sound 64 streams and mixer, Glide clipping, mip layout, fog tables and 3DF files ($(echo "$out" | grep -o '[0-9]* passed' | awk '{s+=$1} END {print s}') tests)" \
     || bad "wrappers host tests" "$(echo "$out" | grep -E 'FAILED|panicked|error' | head -8)"
   if rustup target list --installed 2>/dev/null | grep -q i686-pc-windows-gnu && command -v zig >/dev/null; then
     out="$(cd wrappers && cargo build -q --release --target-dir "$WT" 2>&1)"
@@ -1639,6 +1688,12 @@ print(', '.join(out))"
       && ok "sgltest.c, the SGL stand-in's test program, builds" || bad "sgltest.c does not build"
     zig cc -target x86-windows-gnu -O2 wrappers/sgl/test/sgltritest.c -o "$WT/sgltritest.exe" -luser32 >/dev/null 2>&1 \
       && ok "sgltritest.c, the test program for SGL's immediate mode, builds" || bad "sgltritest.c does not build"
+    out="$(zig cc -target x86-windows-gnu -O2 wrappers/glide/test/glidetest.c -o "$WT/glidetest.exe" -luser32 2>&1)"
+    [[ $? == 0 ]] && expect "glidetest.c, the Glide library's test program, builds and finds every call it uses in glide2x.dll" "50 calls found" "$PYTHON" -c "
+import re, pefile
+names = set(re.findall(rb'_(?:gr|gu)\w+@\d+', open('$WT/glidetest.exe', 'rb').read()))
+dll = {e.name for e in pefile.PE('$WT/i686-pc-windows-gnu/release/glide2x.dll').DIRECTORY_ENTRY_EXPORT.symbols}
+print(f'{len(names)} calls found' if names <= dll else f'missing: {sorted(names - dll)}')" || bad "glidetest.c does not build" "$out"
   else
     echo "  skip  the wrapper DLLs (needs rustup target i686-pc-windows-gnu and zig)"
   fi

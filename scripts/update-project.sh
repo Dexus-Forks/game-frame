@@ -26,12 +26,15 @@
 # project already has. Each agent's skill link, agents, gate hooks and MCP servers are added or
 # refreshed by scripts/clients.py; an agent left out keeps its files. With --plugin, only the
 # chosen agents' files are written again, since the old ones call the removed scripts/.
+# Every project also gets the game folder's safeguards when they are missing: the note
+# target/GAME-FILES-NOT-BUILD-OUTPUT.txt and .cargo/config.toml with target-dir = "build"
+# (an existing .cargo/config.toml is kept, with a warning when it builds into target/).
 # The project's own files (AGENTS.md, README.md, docs/FINDINGS.md, docs/CHECKLIST.md, docs/lore.md, labels/,
 # its code) are never touched. With --dry-run nothing is written. The project's git history shows
 # every change; commit it like any other.
 set -euo pipefail
 . "$(dirname "$0")/lib.sh"
-[[ $# -ge 1 ]] || { sed -n '2,31p' "$0"; exit 2; }
+[[ $# -ge 1 ]] || { sed -n '2,34p' "$0"; exit 2; }
 dir="$1"; shift; dry=""; plugin=""; agent=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -289,3 +292,15 @@ if kept:
         print(f'  {f}')
 print('This project holds a copy of GameFrame. scripts/update-project.sh DIR --plugin moves it to the plugin.')
 PY
+# The game folder's safeguards (docs/knowhow/game-folder-deleted-as-build-output.md).
+cfg="$dir/.cargo/config.toml"
+if [[ ! -f "$cfg" ]]; then
+  echo "Game folder: .cargo/config.toml $([[ -n "$dry" ]] && echo would be || echo was) added (Cargo builds into build/, never target/)."
+  [[ -n "$dry" ]] || { mkdir -p "$dir/.cargo"; printf '[build]\n# target/ holds your copy of the game: never let Cargo build (or clean) there.\ntarget-dir = "build"\n' > "$cfg"; }
+elif ! grep -Eq '^[[:space:]]*target-dir[[:space:]]*=' "$cfg" || grep -Eq '^[[:space:]]*target-dir[[:space:]]*=[[:space:]]*["'"'"']target/?["'"'"']' "$cfg"; then
+  echo "Game folder: $cfg does not move Cargo out of target/. Add target-dir = \"build\" under [build], or cargo clean deletes the game."
+fi
+if [[ ! -f "$dir/target/GAME-FILES-NOT-BUILD-OUTPUT.txt" ]]; then
+  echo "Game folder: target/GAME-FILES-NOT-BUILD-OUTPUT.txt $([[ -n "$dry" ]] && echo would be || echo was) written."
+  [[ -n "$dry" ]] || python3 "$ROOT/scripts/hooks/gates/game_folder.py" mark "$dir"
+fi
