@@ -1,14 +1,14 @@
 # Crates
 
-Clean Rust implementations of hardware and runtime pieces that many old games need. Each one
-comes from a case-study reimplementation, where it was checked against the original program.
-Here they are generic and tested without any game's files. They are free to use under Apache 2.0.
+These crates provide generic Rust implementations of hardware and runtime pieces used by games.
+Each one comes from case-study code or source inspection. Its README says what was compared with an
+original and what remains open. Its tests use no game's files. All crates are Apache 2.0.
 
 | Crate | What it is | Comes from |
 |---|---|---|
 | [gameframe-opl2](../../crates/opl2/README.md) | The Yamaha YM3812 (OPL2) FM chip of the AdLib and Sound Blaster cards, at its own 49,716 Hz, with a band-limited resampler | Frontier: Elite II, where its output matches the original AdLib driver sample for sample |
 | [gameframe-wma](../../crates/wma/README.md) | A Windows Media Audio v2 decoder for xWMA and ASF streams, with no dependencies, building for WebAssembly | Un-Banished, where it decodes every sound of the game within 60 dB of FFmpeg |
-| [gameframe-msvc-crt](../../crates/msvc-crt/README.md) | The Microsoft C runtime's `sinf`, `cosf`, `acosf`, `atan2f`, `qsort` order and `rand`, bit for bit | Un-Banished, matching the game's runtime on 200,000 calls per function |
+| [gameframe-msvc-crt](../../crates/msvc-crt/README.md) | MSVC math, `qsort` and `rand`, plus safe byte, string and integer text routines | Un-Banished's runtime math and sort; the added x86 CRT routines are source-inspected and await runtime comparison |
 | [gameframe-mmx](../../crates/mmx/README.md) | The Intel MMX instructions bit for bit: wrapping and saturating packed arithmetic, `pmulhw`, `pmaddwd`, packs, unpacks and shifts | POD: Planet of Death (1997), where a model of the game's MMX mixer built on it matched the original on 500 random channels |
 | [gameframe-gpu-1997](../../crates/gpu-1997/README.md) | The texture formats and API constants of 3dfx Glide 2.x (with NCC), ATI3DCIF and the S3D Toolkit, one texel decoder, and what each card accepts | POD: Planet of Death (1997), whose 3dfx, ATI and S3 builds were traced with it |
 | [gameframe-scale](../../crates/scale/README.md) | Whole-multiple scaling of a finished frame: nearest, Scale2x (EPX) and a CRT-style look, for any pixel type | POD: Planet of Death (1997), whose replacement Glide and DirectDraw libraries show the game's frame scaled this way |

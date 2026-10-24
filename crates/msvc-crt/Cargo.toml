@@ -1,6 +1,6 @@
 [package]
 name = "gameframe-msvc-crt"
-description = "Bit-exact pieces of the Microsoft C runtime that game logic depends on: sinf, cosf, acosf, atan2f, qsort's order and rand"
+description = "MSVC CRT math, sort and RNG routines plus safe byte, string and integer conversions"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
