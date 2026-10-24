@@ -49,7 +49,8 @@
         "matcher": "Bash",
         "hooks": [
           { "type": "command", "if": "Bash(git commit *)", "command": "python3", "args": ["${CLAUDE_PROJECT_DIR}/scripts/hooks/gate.py", "commit"], "timeout": 30 },
-          { "type": "command", "if": "Bash(git push *)", "command": "python3", "args": ["${CLAUDE_PROJECT_DIR}/scripts/hooks/gate.py", "push"], "timeout": 10 }
+          { "type": "command", "if": "Bash(git push *)", "command": "python3", "args": ["${CLAUDE_PROJECT_DIR}/scripts/hooks/gate.py", "push"], "timeout": 10 },
+          { "type": "command", "command": "python3", "args": ["${CLAUDE_PROJECT_DIR}/scripts/hooks/gate.py", "delete"], "timeout": 10 }
         ]
       },
       {

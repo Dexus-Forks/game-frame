@@ -51,6 +51,10 @@ user may change any of them.
    `derived/`. All three are ignored by git; never force-add past `.gitignore`. Do not paste
    decompiled code, disassembly or data dumps into tracked files: describe findings in prose,
    tables, addresses (`FUN_1400be770`), field offsets (`+0x44`) and constants.
+   `target/` is your copy of the game, not build output: Cargo builds into `build/`
+   (`.cargo/config.toml`). Git keeps no copy of it, so never delete, move or clean it, and
+   never run `git clean -x` here. `target/GAME-FILES-NOT-BUILD-OUTPUT.txt` says so, and the
+   gates block such commands. A folder with a `CACHEDIR.TAG` is Cargo's; this one has none.
 2. **Evidence before code.** Every finding and every reimplemented behaviour names the original
    function it came from, and says how it is known: *observed* (read in code or data),
    *measured* (emulated or run), *inferred* (a reasoned guess) or *unknown* (an open question).
@@ -81,7 +85,8 @@ user may change any of them.
 
 | Path | What |
 |---|---|
-| `target/` | Your copy of the game (ignored) |
+| `target/` | Your copy of the game (ignored, and the only copy: never delete or clean it) |
+| `build/` | Cargo's build output (ignored, safe to clean) |
 | `analysis/export/<binary>/` | Ghidra's text export: decomp.c, functions.tsv, strings.txt, imports, exports (ignored) |
 | `derived/` | Ground truth from the emulator, extracted files (ignored) |
 | `docs/FINDINGS.md` | The overview: binaries, engine, formats, systems, with links |

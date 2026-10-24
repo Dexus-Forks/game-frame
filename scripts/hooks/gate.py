@@ -6,6 +6,7 @@ Usage (an agent's hook JSON is on stdin):
     gate.py commit     Claude Code PreToolUse, Bash `git commit ...`
     gate.py push       Claude Code PreToolUse, Bash `git push ...`
     gate.py write      Claude Code PreToolUse, Write and Edit
+    gate.py delete     Claude Code PreToolUse, every Bash command
     gate.py session    Claude Code SessionStart
     gate.py codex      Codex PreToolUse (Bash, apply_patch)
     gate.py gemini     Gemini CLI BeforeTool (run_shell_command, write_file, replace)
@@ -24,12 +25,16 @@ What the checks do (scripts/hooks/gates/checks.py):
   people can push; the project's permissions ask the user first.
 - write: blocks writing decompiled code (Ghidra pseudocode) into a file outside analysis/,
   derived/ and target/. Findings are written in prose, with addresses and constants.
+- delete: blocks a shell command that would delete or move a project's game folder, target/,
+  the user's own copy of the game (scripts/hooks/gates/deletes.py): rm, mv to the Trash, find
+  -delete, git clean -x, cargo clean into target/, and build-folder cleaners. A command that
+  starts with GAMEFRAME_DELETE_GAME=1 passes, for when the user wants it gone.
 - session: adds a few facts to the start of a session: the tools found, and the next open
   items in docs/CHECKLIST.md.
 
 The agent comes from Claude Code's agent_type, else from GAMEFRAME_AGENT in the environment,
-else from a leading GAMEFRAME_AGENT=re-name on the shell command. The agent modes find commit
-and push in the command themselves, because not every agent can filter hooks by command.
+else from a leading GAMEFRAME_AGENT=re-name on the shell command. The agent modes find commit,
+push and deletes in the command themselves, because not every agent can filter hooks by command.
 
 A block exits with status 2 and says why on stderr. Claude Code, Codex, Gemini CLI, Cursor,
 Copilot and git all treat that as a refusal. Every other case exits 0 with nothing on stdout
@@ -49,7 +54,7 @@ from adapters import AGENTS, checks_for  # noqa: E402
 from checks import Check, env_agent, reason  # noqa: E402
 from session import context  # noqa: E402
 
-CLAUDE = ('commit', 'push', 'write')
+CLAUDE = ('commit', 'push', 'write', 'delete')
 MODES = (*CLAUDE, 'session', *AGENTS[1:], 'staged')
 
 

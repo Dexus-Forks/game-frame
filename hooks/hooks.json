@@ -1,5 +1,5 @@
 {
-  "description": "GameFrame's gates: no game material or decompiled code in commits or tracked files, only re-lander commits and pushes, a short status at the start of a session, and known failure modes after a shell command (docs/working/knowhow.md). See docs/working/gates.md.",
+  "description": "GameFrame's gates: no game material or decompiled code in commits or tracked files, only re-lander commits and pushes, no deleting a project's game folder (target/), a short status at the start of a session, and known failure modes after a shell command (docs/working/knowhow.md). See docs/working/gates.md.",
   "hooks": {
     "SessionStart": [
       {
@@ -13,7 +13,8 @@
         "matcher": "Bash",
         "hooks": [
           { "type": "command", "if": "Bash(git commit *)", "command": "python3", "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/hooks/gate.py", "commit"], "timeout": 30 },
-          { "type": "command", "if": "Bash(git push *)", "command": "python3", "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/hooks/gate.py", "push"], "timeout": 10 }
+          { "type": "command", "if": "Bash(git push *)", "command": "python3", "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/hooks/gate.py", "push"], "timeout": 10 },
+          { "type": "command", "command": "python3", "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/hooks/gate.py", "delete"], "timeout": 10 }
         ]
       },
       {
