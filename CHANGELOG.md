@@ -9,6 +9,11 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `glide2x.dll` draws under Wine on macOS. There Wine gives OpenGL 2.1, which cannot compile
+  the library's shaders. The library now asks for a forward-compatible 3.2 core context when the
+  first one is older than OpenGL 3. `glidetest.exe` passes all 27 checks under Wine on an Apple
+  M3 Max (`docs/knowhow/wine-macos-opengl-2-1.md`).
+
 - `glide2x.dll` now implements all 156 Glide 2 calls. The last 25 are in. The PCI library
   (`pci*`) shows one Voodoo Graphics. `guMPDrawTriangle` draws two textures in two passes, as
   Glide 2.43 does. The `guMovie*` calls record each frame shown as a TGA file. That is a

@@ -136,6 +136,56 @@ pub fn context(hwnd: HWND) -> Result<HDC, String> {
         if rc.is_null() || wglMakeCurrent(dc, rc) == 0 {
             return Err("wglCreateContext failed".into());
         }
+        if legacy_version() < 3 {
+            core_context(dc, rc);
+        }
         Ok(dc)
+    }
+}
+
+/// Set when the context is a 3.2 core one: the shaders are then GLSL 1.50 (`render::shaders`).
+pub static CORE: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+
+/// The major OpenGL version of the current context, from `glGetString(GL_VERSION)`.
+unsafe fn legacy_version() -> u32 {
+    unsafe {
+        let lib = LoadLibraryA(c"opengl32.dll".as_ptr().cast());
+        let f = GetProcAddress(lib, c"glGetString".as_ptr().cast());
+        if f.is_null() {
+            return 0;
+        }
+        let get: unsafe extern "system" fn(u32) -> *const u8 = std::mem::transmute(f);
+        let v = get(0x1f02);
+        if v.is_null() { 0 } else { (*v as char).to_digit(10).unwrap_or(0) }
+    }
+}
+
+/// Replace a context older than OpenGL 3 with a 3.2 core one, where the driver offers it. Wine's
+/// macOS driver gives OpenGL 2.1 by default, which has no GLSL 1.30 (*observed*: "version '130'
+/// is not supported" on an Apple M3 Max), and 3.2 or later only as a core profile.
+unsafe fn core_context(dc: HDC, old: crate::win32::HGLRC) {
+    unsafe {
+        let f = wglGetProcAddress(c"wglCreateContextAttribsARB".as_ptr().cast());
+        if (f as usize) < 4 || f as isize == -1 {
+            log!("OpenGL below 3 and no wglCreateContextAttribsARB: the shaders will not compile");
+            return;
+        }
+        type Create = unsafe extern "system" fn(HDC, crate::win32::HGLRC, *const i32) -> crate::win32::HGLRC;
+        let create: Create = std::mem::transmute(f);
+        // WGL_CONTEXT_MAJOR_VERSION, MINOR, FLAGS forward compatible (macOS has no other core
+        // profile), PROFILE_MASK core: the first version the driver gives.
+        let rc = [(3, 2), (3, 3), (4, 1)]
+            .into_iter()
+            .map(|(major, minor)| create(dc, std::ptr::null_mut(), [0x2091, major, 0x2092, minor, 0x2094, 2, 0x9126, 1, 0].as_ptr()))
+            .find(|rc| !rc.is_null())
+            .unwrap_or(std::ptr::null_mut());
+        if !rc.is_null() && wglMakeCurrent(dc, rc) != 0 {
+            crate::win32::wglDeleteContext(old);
+            CORE.store(true, std::sync::atomic::Ordering::Relaxed);
+            log!("OpenGL below 3: using a 3.2 core context");
+        } else {
+            log!("OpenGL below 3 and no 3.2 core context: the shaders will not compile");
+            wglMakeCurrent(dc, old);
+        }
     }
 }
