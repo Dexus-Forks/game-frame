@@ -34,7 +34,7 @@ runs in the same Wine prefix as the game. It finds the game's window, brings it 
 calls `SendInput`. It sends keys as scancodes, which DirectInput reads. No step needs macOS's
 permission. Run `./gameframe run winput run --prefix derived/wine window "GAME" key enter`.
 
-Clicks work on Windows dialogs. A game that moves its own cursor from DirectInput's relative
-mouse movement ignores a warped cursor. Relative moves through `SendInput` may work in such a
-game (`winput ... move DX DY`). No one has tried this in a game yet. `./gameframe tool winput`
-lists every step.
+Clicks work on Windows dialogs. A game that draws its own cursor from DirectInput follows a
+warped cursor, but may read the press before its cursor arrives: move, wait, then press
+(`winput ... point X Y wait 1000 button`; [click timing](directinput-cursor-click-timing.md)).
+`./gameframe tool winput` lists every step.

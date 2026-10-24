@@ -8,8 +8,12 @@ Usage: winput.py build [--out FILE]             build winput.exe (32-bit Windows
 
 STEP is one of winput's steps, in order (tools/live/winput.c has them all):
 
-  list | window TITLE | key NAME[:MS] | down NAME | up NAME | type TEXT |
-  move DX DY | click X Y [right] | wait MS
+  list | window TITLE | key NAME[:MS] | down NAME | up NAME | release | type TEXT |
+  move DX DY | click X Y [right] | point X Y | button [right] | wait MS
+
+  --hold MS before the steps sets how long `key` holds a key (default 50; 500 for a game at a
+  low frame rate). Keys that `down` holds are released when winput ends. For a game that draws
+  its own cursor, `point X Y wait 1000 button` clicks where `click` may miss.
 
   winput.py run --prefix derived/wine window "POD" wait 500 key enter key down:200 type abc
 

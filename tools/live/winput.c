@@ -1,18 +1,27 @@
 /* winput: send keys, mouse moves and clicks to a Windows game from inside Wine (or Windows).
  *
- * Usage: winput.exe [--dry-run] STEP [STEP ...]
+ * Usage: winput.exe [--dry-run] [--hold MS] STEP [STEP ...]
  *
  * Steps run in order:
  *   list                 print the visible top-level windows: handle, size and title
  *   window TITLE         find the first visible window whose title contains TITLE (any case),
  *                        restore it and bring it to the foreground; clicks are then relative to it
- *   key NAME[:MS]        press and release a key, held MS milliseconds (default 50)
+ *   key NAME[:MS]        press and release a key, held MS milliseconds (default --hold, 50)
  *   down NAME, up NAME   press or release a key, to hold it across other steps
+ *   release              release every key that `down` holds
  *   type TEXT            type letters, digits and spaces as keys; other characters (UTF-8,
  *                        up to U+FFFF) as Unicode input
  *   move DX DY           move the mouse by DX, DY mickeys (relative, as DirectInput reads it)
  *   click X Y [right]    click at X, Y: in the window's client area after `window`, else the screen
+ *   point X Y            move the cursor to X, Y without a click
+ *   button [right]       press and release a button where the cursor is
  *   wait MS              sleep MS milliseconds
+ *
+ * Keys that `down` holds are released when winput ends, after the last step or a failed one, and
+ * on Ctrl-C or a console close. A process killed outright cannot release them; send `release`.
+ * A game that draws its own cursor from DirectInput may read a click before its cursor reaches
+ * the point: use `point X Y wait 1000 button`. At a low frame rate, hold keys longer
+ * (`--hold 500`), so a poll sees each press (docs/knowhow/directinput-cursor-click-timing.md).
  *
  * NAME is a letter, a digit, enter, esc, space, tab, backspace, shift, ctrl, alt, up, down,
  * left, right, home, end, pgup, pgdn, insert, delete, f1 to f12, or a scancode such as 0x1c.
@@ -45,6 +54,7 @@
 #endif
 
 static int dry = 0;
+static int hold_ms = 50;
 
 struct key { const char *name; unsigned short scan; int ext; };
 static const struct key KEYS[] = {
@@ -134,6 +144,31 @@ static int press(struct key k, int ms) {
     return key_event(k, 1);
 }
 
+static struct key held[16];
+static int nheld = 0;
+
+static void hold(struct key k, int down) {
+    int i;
+    for (i = 0; i < nheld; i++)
+        if (held[i].scan == k.scan && held[i].ext == k.ext) break;
+    if (down && i == nheld && nheld < 16) held[nheld++] = k;
+    if (!down && i < nheld) held[i] = held[--nheld];
+}
+
+static int release_all(void) {
+    int ok = 1;
+    while (nheld > 0) ok &= key_event(held[--nheld], 1);
+    return ok;
+}
+
+#ifdef _WIN32
+static BOOL WINAPI on_console(DWORD event) {
+    (void)event;
+    release_all();
+    return FALSE;
+}
+#endif
+
 static int move(int dx, int dy) {
     if (dry) { printf("move %d %d\n", dx, dy); return 1; }
 #ifdef _WIN32
@@ -149,8 +184,26 @@ static int move(int dx, int dy) {
 #endif
 }
 
-static int click(int x, int y, int right) {
-    if (dry) { printf("click %d %d %s\n", x, y, right ? "right" : "left"); return 1; }
+static int button(int right) {
+    if (dry) { printf("button %s\n", right ? "right" : "left"); return 1; }
+#ifdef _WIN32
+    {
+        INPUT in[2]; memset(in, 0, sizeof in);
+        in[0].type = in[1].type = INPUT_MOUSE;
+        in[0].mi.dwFlags = right ? MOUSEEVENTF_RIGHTDOWN : MOUSEEVENTF_LEFTDOWN;
+        in[1].mi.dwFlags = right ? MOUSEEVENTF_RIGHTUP : MOUSEEVENTF_LEFTUP;
+        if (SendInput(1, &in[0], sizeof in[0]) != 1) return 0;
+        Sleep(50);
+        return SendInput(1, &in[1], sizeof in[1]) == 1;
+    }
+#else
+    return 0;
+#endif
+}
+
+/* Move to x, y (client area after `window`, else the screen); with press, click there. */
+static int click(int x, int y, int right, int press_it) {
+    if (dry) { if (press_it) printf("click %d %d %s\n", x, y, right ? "right" : "left"); else printf("point %d %d\n", x, y); return 1; }
 #ifdef _WIN32
     {
         POINT p = {x, y};
@@ -164,6 +217,7 @@ static int click(int x, int y, int right) {
         in[1].mi.dwFlags = right ? MOUSEEVENTF_RIGHTDOWN : MOUSEEVENTF_LEFTDOWN;
         in[2].mi.dwFlags = right ? MOUSEEVENTF_RIGHTUP : MOUSEEVENTF_LEFTUP;
         if (SendInput(1, &in[0], sizeof in[0]) != 1) return 0;
+        if (!press_it) return 1;
         Sleep(30);
         if (SendInput(1, &in[1], sizeof in[1]) != 1) return 0;
         Sleep(50);
@@ -272,16 +326,28 @@ static int need(int argc, int i, int n, const char *step) {
     return 0;
 }
 
+static int run(int argc, char **argv);
+
 int main(int argc, char **argv) {
+    int code = run(argc, argv);
+    if (nheld && !release_all()) fprintf(stderr, "winput: could not release every held key\n");
+    return code;
+}
+
+static int run(int argc, char **argv) {
     int i = 1;
     if (i < argc && strcmp(argv[i], "--dry-run") == 0) { dry = 1; i++; }
+    if (i + 1 < argc && strcmp(argv[i], "--hold") == 0) { hold_ms = atoi(argv[i + 1]); i += 2; }
+#ifdef _WIN32
+    SetConsoleCtrlHandler(on_console, TRUE);
+#endif
 #ifndef _WIN32
     if (!dry) { fprintf(stderr, "winput: this build has only --dry-run; build it for Windows to send input\n"); return 2; }
 #endif
     if (i >= argc || strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
-        printf("usage: winput.exe [--dry-run] STEP ...\n"
-               "steps: list | window TITLE | key NAME[:MS] | down NAME | up NAME | type TEXT |\n"
-               "       move DX DY | click X Y [right] | wait MS\n");
+        printf("usage: winput.exe [--dry-run] [--hold MS] STEP ...\n"
+               "steps: list | window TITLE | key NAME[:MS] | down NAME | up NAME | release |\n"
+               "       type TEXT | move DX DY | click X Y [right] | point X Y | button [right] | wait MS\n");
         return i >= argc ? 2 : 0;
     }
     for (; i < argc; i++) {
@@ -290,13 +356,14 @@ int main(int argc, char **argv) {
         if (strcmp(s, "list") == 0) ok = list_windows();
         else if (strcmp(s, "window") == 0) { if (!need(argc, i, 1, s)) return 2; ok = window(argv[++i]); }
         else if (strcmp(s, "key") == 0 || strcmp(s, "down") == 0 || strcmp(s, "up") == 0) {
-            char name[32]; const char *colon; int ms = 50; struct key k;
+            char name[32]; const char *colon; int ms = hold_ms; struct key k;
             if (!need(argc, i, 1, s)) return 2;
             colon = strchr(argv[i + 1], ':');
             snprintf(name, sizeof name, "%.*s", colon ? (int)(colon - argv[i + 1]) : (int)strlen(argv[i + 1]), argv[i + 1]);
             if (colon) ms = atoi(colon + 1);
             if (!find_key(name, &k)) { fprintf(stderr, "winput: unknown key \"%s\"\n", name); return 2; }
             ok = s[0] == 'k' ? press(k, ms) : key_event(k, s[0] == 'u');
+            if (s[0] != 'k') hold(k, s[0] == 'd');
             i++;
         }
         else if (strcmp(s, "type") == 0) { if (!need(argc, i, 1, s)) return 2; ok = type_text(argv[++i]); }
@@ -305,9 +372,16 @@ int main(int argc, char **argv) {
             int right = 0;
             if (!need(argc, i, 2, s)) return 2;
             if (i + 3 < argc && strcmp(argv[i + 3], "right") == 0) right = 1;
-            ok = click(atoi(argv[i + 1]), atoi(argv[i + 2]), right);
+            ok = click(atoi(argv[i + 1]), atoi(argv[i + 2]), right, 1);
             i += 2 + right;
         }
+        else if (strcmp(s, "point") == 0) { if (!need(argc, i, 2, s)) return 2; ok = click(atoi(argv[i + 1]), atoi(argv[i + 2]), 0, 0); i += 2; }
+        else if (strcmp(s, "button") == 0) {
+            int right = i + 1 < argc && strcmp(argv[i + 1], "right") == 0;
+            ok = button(right);
+            i += right;
+        }
+        else if (strcmp(s, "release") == 0) ok = release_all();
         else if (strcmp(s, "wait") == 0) { if (!need(argc, i, 1, s)) return 2; pause_ms(atoi(argv[++i])); }
         else { fprintf(stderr, "winput: unknown step \"%s\" (see --help)\n", s); return 2; }
         if (!ok) { fprintf(stderr, "winput: step \"%s\" failed\n", s); return 1; }

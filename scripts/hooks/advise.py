@@ -84,6 +84,9 @@ def main(agent):
             return 0
         run = post_events.read(agent, event)
         text = note(run) if run else None
+        if os.environ.get('GAMEFRAME_ADVISE_LOG'):     # for finding out why an entry was named
+            with open(os.environ['GAMEFRAME_ADVISE_LOG'], 'a', encoding='utf-8') as f:
+                f.write(json.dumps({'agent': agent, 'event': event, 'named': text}) + '\n')
         if text:
             print(json.dumps(post_events.reply(agent, event, text)))
     except Exception:            # a hint must never break the agent's work

@@ -2,7 +2,7 @@
 """First look at a CD image (CUE/BIN, raw BIN or ISO): its tracks, its file systems, its dates,
 and the files on it. It can also copy the files and the audio tracks out.
 
-Usage: discinfo.py IMAGE [--files] [--map] [--extract DIR] [--audio DIR] [--swap] [--json]
+Usage: discinfo.py IMAGE [--files] [--map] [--extract DIR] [--audio DIR] [--iso FILE] [--swap] [--json]
 
   IMAGE           a .cue sheet (its BIN files beside it), a raw .bin, or a .iso
   --files         list every file: disc sector, size, date, path
@@ -10,6 +10,8 @@ Usage: discinfo.py IMAGE [--files] [--map] [--extract DIR] [--audio DIR] [--swap
                   reads every sector of the data tracks)
   --extract DIR   copy every file of the first readable volume into DIR (Joliet names if present)
   --audio DIR     write each audio track as a WAV file (44,100 Hz, 16-bit stereo) into DIR
+  --iso FILE      write the first data track as a plain ISO (2048 bytes a sector): the image to
+                  attach as a CD-ROM drive to an emulator or a VM, from a mixed-mode BIN/CUE
   --swap          the audio was ripped big-endian: swap the bytes of each sample
   --json          print everything as JSON
 
@@ -69,7 +71,7 @@ def main(argv):
     if not argv or argv[0] in ('-h', '--help'):
         print(__doc__)
         return 0 if argv else 2
-    opts = {a: argv[i + 1] for i, a in enumerate(argv) if a in ('--extract', '--audio')}
+    opts = {a: argv[i + 1] for i, a in enumerate(argv) if a in ('--extract', '--audio', '--iso')}
     flags = set(argv)
     disc = open_image(argv[0])
     report = {'image': os.path.basename(argv[0]), 'tracks': [], 'volumes': [], 'notes': list(disc.notes)}
@@ -159,6 +161,16 @@ def main(argv):
             dest = os.path.join(opts['--audio'], f'track{t.number:02d}.wav')
             wav(dest, t.raw(0, t.frames), '--swap' in flags)
         report['notes'].append(f'--audio: {len(audio)} WAV files in {opts["--audio"]}')
+
+    if '--iso' in opts:
+        data = next((t for t in disc.tracks if not t.audio), None)
+        if data is None:
+            report['notes'].append('--iso: the image has no data track')
+        else:
+            with open(opts['--iso'], 'wb') as f:
+                for i in range(0, data.frames, 64):
+                    f.write(data.read(i, min(64, data.frames - i)))
+            report['notes'].append(f'--iso: track {data.number}, {data.frames} sectors, in {opts["--iso"]}')
 
     if '--json' in flags:
         print(json.dumps(report, indent=2))

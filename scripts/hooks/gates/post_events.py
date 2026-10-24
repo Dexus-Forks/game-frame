@@ -68,6 +68,10 @@ def read(agent, event):
         return None
     tool = _args(event.get('tool_input') if 'tool_input' in event else event.get('toolArgs'))
     result = [event.get(k) for k in ('tool_response', 'tool_output', 'toolResult', 'tool_result', 'error')]
+    if agent == 'claude' and isinstance(event.get('tool_response'), dict):
+        # Only what the command printed: a client may add other fields (notes on changed files).
+        r = event['tool_response']
+        result[0] = {k: r.get(k) for k in ('stdout', 'stderr', 'error') if isinstance(r.get(k), str)}
     roots = event.get('workspace_roots') or []
     cwd = event.get('cwd') or (roots[0] if roots else None) or os.getcwd()
     session = (event.get('session_id') or event.get('sessionId') or event.get('conversation_id')

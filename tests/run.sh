@@ -66,6 +66,14 @@ print(subprocess.run([sys.executable, 'tools/triage/screenmarks.py', f.name, '--
                      capture_output=True, text=True).stdout)
 PY
 expect "relocs finds the vtable as a run of code pointers" "$vt  .rdata      2 pointers  (2 code)" "$PYTHON" tools/pe/relocs.py $B/game.exe
+ot=$("$PYTHON" -c "import pefile;p=pefile.PE('$B/mixer32.dll');print(hex(p.OPTIONAL_HEADER.ImageBase+[e.address for e in p.DIRECTORY_ENTRY_EXPORT.symbols if e.name==b'order_table'][0]))")
+out="$("$PYTHON" tools/triage/refs.py $B/mixer32.dll "$ot")"
+[[ $(grep -c "  write  " <<<"$out") == 2 && $(grep -c "  read   " <<<"$out") == 2 && "$out" == *"  value  "* ]] \
+  && ok "refs finds both writes, both reads and the address taken of a 32-bit table, from the code bytes" || bad "refs on mixer32.dll" "$out"
+sw=$("$PYTHON" -c "import pefile;p=pefile.PE('$B/mixer32.dll');print(hex(p.OPTIONAL_HEADER.ImageBase+[e.address for e in p.DIRECTORY_ENTRY_EXPORT.symbols if e.name==b'swap_order@8'][0]))")
+printf '%s\t4\tswap_head\t\n' "${sw#0x}" > "$B/refs-functions.tsv"
+expect "refs marks a hit outside every function the export knows" "(no function)" "$PYTHON" tools/triage/refs.py $B/mixer32.dll "$ot" --functions "$B/refs-functions.tsv"
+expect "refs finds a RIP-relative reference in 64-bit code" "lea " "$PYTHON" tools/triage/refs.py $B/game.exe "$table"
 
 echo "Input inside Wine (tools/live/winput)"
 if command -v zig >/dev/null; then
@@ -79,10 +87,73 @@ if command -v zig >/dev/null; then
   expect "winput runs its steps in order" $'window POD\nmove 5 -3\nclick 10 20 right\nwait 5' "$WI/winput-host" --dry-run window POD move 5 -3 click 10 20 right wait 5
   expect "winput refuses an unknown key" "rc 2" sh -c "'$WI/winput-host' --dry-run key nope 2>/dev/null; echo rc \$?"
   expect "winput.py lists the key names" "enter" "$PYTHON" tools/live/winput.py keys
+  expect "winput releases a key that down holds when it ends" "key left scancode 0x4b extended up" "$WI/winput-host" --dry-run down left wait 1
+  expect "winput points, then presses where the cursor is" $'point 10 20\nwait 5\nbutton right' "$WI/winput-host" --dry-run point 10 20 wait 5 button right
+  expect "winput --hold sets how long a key is held" $'down\nwait 500' "$WI/winput-host" --dry-run --hold 500 key enter
   rm -rf "$WI"
 else
   echo "  skip  winput (needs zig)"
 fi
+
+out="$("$PYTHON" - <<'PY' 2>&1
+import json, os, struct, subprocess, sys, tempfile, time
+d = tempfile.mkdtemp(); pd = f'{d}/4242'; os.makedirs(pd)
+open(f'{pd}/cmdline', 'wb').write(b'C:\\GAME\\GAME.EXE\0-window\0')
+open(f'{pd}/maps', 'w').write('00400000-00401000 r-xp 00000000 00:00 0 GAME.EXE\n00500000-00502000 rw-p 00000000 00:00 0 [heap]\n')
+mem = f'{pd}/mem'
+with open(mem, 'wb') as f:
+    f.truncate(0x502000)
+def put(addr, fmt, *v):
+    with open(mem, 'r+b') as f:
+        f.seek(addr); f.write(struct.pack(fmt, *v))
+put(0x500100, '<I', 0); put(0x500200, '<iii', 10, 20, 30)
+spec = f'{d}/spec.txt'; open(spec, 'w').write('# test\nclock 0x500100 u32\nxs 0x500200 i32 3\n')
+writer = subprocess.Popen([sys.executable, '-c', f'''
+import struct, time
+def put(a, fmt, *v):
+    with open({mem!r}, "r+b") as f: f.seek(a); f.write(struct.pack(fmt, *v))
+time.sleep(0.4); put(0x500300, "<I", 2)
+for i in range(1, 40):
+    put(0x500100, "<I", i * 100); put(0x500200, "<iii", 10 + i, 20, 30 - i); time.sleep(0.02)
+'''])
+M = 'tools/live/memrec.py'
+r = subprocess.run([sys.executable, M, 'record', spec, '--name', 'GAME.EXE', '--proc', d, '--rate', '20', '--seconds', '0.4', '--wait', '0x500300=2'], capture_output=True, text=True, timeout=20)
+writer.wait()
+rows = [json.loads(l) for l in r.stdout.splitlines()]
+assert len(rows) >= 4, (r.stdout, r.stderr)
+assert all(isinstance(x['xs'], list) and len(x['xs']) == 3 and x['xs'][1] == 20 for x in rows)
+assert rows[-1]['clock'] >= rows[0]['clock'] and rows[-1]['clock'] > 0, rows
+assert all(0 <= x['xs'][0] - 10 - x['clock'] // 100 <= 2 for x in rows), rows   # a sample may straddle writer steps
+r = subprocess.run([sys.executable, M, 'snap', '--pid', '4242', '--proc', d, '--out', f'{d}/snap'], capture_output=True, text=True)
+data = open(f'{d}/snap/0x500000.bin', 'rb').read()
+assert len(data) == 0x2000 and struct.unpack_from('<I', data, 0x100)[0] == 3900 and not os.path.exists(f'{d}/snap/0x400000.bin'), r.stdout
+r = subprocess.run([sys.executable, M, 'read', '--pid', '4242', '--proc', d, '0x500200', 'i32', '3'], capture_output=True, text=True)
+assert r.stdout.strip() == '[49, 20, -9]', r.stdout
+print('record with --wait and arrays, snap of writable mappings, read')
+PY
+)"
+[[ $? == 0 ]] && ok "memrec records named values and arrays after --wait, snaps writable mappings and reads a value ($out)" || bad "memrec" "$out"
+T2="$(mktemp -d)"; printf 'PNG' > "$T2/a.png"
+for n in 1 2; do "$PYTHON" tools/live/shot.py s3-error --from "$T2/a.png" --text "S3DTK Error : SetState" --dir "$T2/c" >/dev/null; done
+[[ $(ls "$T2"/c/*/ | tr '\n' ' ') == "s3-error-2.png s3-error-2.txt s3-error.png s3-error.txt " && "$(cat "$T2"/c/*/s3-error.txt)" == "S3DTK Error : SetState" ]] \
+  && ok "shot keeps each capture under a new name with its text, never overwriting" || bad "shot" "$(ls -R "$T2/c")"
+mkdir -p "$T2/mod/Data/Binary/Cars" "$T2/inst/Data"; echo a > "$T2/mod/Data/Binary/Cars/CAR.BIN"; echo own > "$T2/inst/Data/OWN.BIN"
+"$PYTHON" tools/live/modfolder.py install "$T2/mod" "$T2/inst" >/dev/null
+rm "$T2/mod/Data/Binary/Cars/CAR.BIN"; mkdir -p "$T2/mod/Data/Text"; echo b > "$T2/mod/Data/Text/T.BIN"
+"$PYTHON" tools/live/modfolder.py install "$T2/mod" "$T2/inst" >/dev/null
+after="$(cd "$T2/inst" && find . -type f | sort | tr '\n' ' ')"
+"$PYTHON" tools/live/modfolder.py clear "$T2/inst" >/dev/null
+cleared="$(cd "$T2/inst" && find . | sort | tr '\n' ' ')"
+[[ "$after" == "./.gameframe-mod.json ./Data/OWN.BIN ./Data/Text/T.BIN " && "$cleared" == ". ./Data ./Data/OWN.BIN " ]] \
+  && ok "modfolder replaces an earlier mod with no stale file, and clear leaves only the game's own" || bad "modfolder" "$after | $cleared"
+echo own > "$T2/mod/Data/OWN.BIN"
+expect "modfolder refuses to replace the game's own file" "the game's own" "$PYTHON" tools/live/modfolder.py install "$T2/mod" "$T2/inst"
+echo "ssh-ed25519 AAAAtest me@example" > "$T2/k.pub"; touch "$T2/img.qcow2" "$T2/disc.iso"
+"$PYTHON" tools/live/emupc.py init "$T2/vm" --image "$T2/img.qcow2" --key "$T2/k.pub" --disc "$T2/disc.iso" >/dev/null
+bash -n "$T2/vm/start.sh" && grep -q "IdentitiesOnly yes" "$T2/vm/ssh_config" && grep -q "disc.iso,media=cdrom" "$T2/vm/start.sh" \
+  && grep -q "wine32:i386" "$T2/vm/cloud-init/user-data" && grep -q "openbox" "$T2/vm/cloud-init/user-data" && grep -q "ssh-ed25519 AAAAtest" "$T2/vm/cloud-init/user-data" \
+  && ok "emupc writes cloud-init, an SSH config with IdentitiesOnly, and a QEMU start script with the disc as a CD-ROM" || bad "emupc init" "$(ls -R "$T2/vm")"
+rm -rf "$T2"
 
 echo "Live tracing"
 if "$PYTHON" -c "import frida" 2>/dev/null && command -v cc >/dev/null; then
@@ -426,6 +497,9 @@ expect "extract-installer hands a CUE sheet to discinfo" "CD image -> discinfo" 
 "$PYTHON" tools/disc/discinfo.py "$W/test.cue" --extract "$W/x" --audio "$W/wav" >/dev/null
 [[ "$(cat "$W/x/ReadMe File.txt")" == "hello from the disc" && $(wc -c < "$W/wav/track02.wav") -eq 352844 ]] \
   && ok "discinfo copies the files and writes the audio track as WAV" || bad "discinfo --extract --audio"
+"$PYTHON" tools/disc/discinfo.py "$W/test.cue" --iso "$W/cut.iso" >/dev/null
+expect "discinfo --iso cuts the data track of a BIN/CUE into an ISO that reads the same" "Secret Data.dat" "$PYTHON" tools/disc/discinfo.py "$W/cut.iso" --files
+[[ $(( $(wc -c < "$W/cut.iso") % 2048 )) == 0 ]] && ok "the cut ISO holds whole 2048-byte sectors" || bad "discinfo --iso sector size"
 expect "filetypes names a PE executable" "executable (PE, Windows)" "$PYTHON" tools/triage/filetypes.py $B/game.exe
 head -c 65536 /dev/urandom > "$W/noise.dat"
 expect "filetypes flags a high-entropy file" "compressed or encrypted" "$PYTHON" tools/triage/filetypes.py "$W/noise.dat"
@@ -1022,6 +1096,8 @@ ok = {'hook_event_name': 'PostToolUse', 'tool_name': 'Bash', 'tool_input': {'com
 out = hook(ok)
 assert out and 'fixture-open' in out['additionalContext'] and 'Tried 2 things' in out['additionalContext'], out
 assert hook({**ok, 'tool_response': {'stdout': 'all fine', 'stderr': ''}}) is None, 'ordinary output says nothing'
+sid = uuid.uuid4().hex
+assert hook({**ok, 'tool_response': {'stdout': 'listed', 'stderr': '', 'notes': 'widget overflow at 0x1'}}) is None, 'only stdout and stderr count'
 sid = uuid.uuid4().hex
 out = hook({**ok, 'tool_input': {'command': 'fixture-run --fast'}, 'tool_response': {'stdout': ''}})
 assert out and 'fixture-open' in out['additionalContext'], 'a context pattern matches the command'

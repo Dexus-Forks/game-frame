@@ -1,14 +1,15 @@
 # Case studies
 
-Three reimplementations built with GameFrame, of three different kinds of game, on three
-different platforms. Each took a different route. All three aim
-for the same results as the original for the same inputs.
+Four projects built with GameFrame, of four different kinds of game, on four different
+platforms. Each took a different route. All four aim for the same results as the original
+for the same inputs.
 
 | Project | Game | Family | Platform | Route |
 |---|---|---|---|---|
 | [Un-Banished](banished.md) | Banished (2014) | [City building](../games/management.md) | Windows x64, C++ | Port from the decompile, check each part against the original run in an emulator, then whole runs and saves |
 | [Tyrian 2026](tyrian.md) | Tyrian 2000 (1999) | [Arcade action](../games/arcade-action.md) | DOS, 16-bit Borland Pascal | Names from debug symbols; the main loop ported in fragments, each checked from captured states |
 | [Frontier](frontier.md) | Frontier: Elite II (1993) | [Space simulation](../games/vehicle-sims.md) | DOS, assembly and C, overlays | Run the original inside the port, replace it routine by routine |
+| [POD](pod.md) | POD: Planet of Death (1997) | [Racing](../games/racing-sports.md) | Windows 95, Watcom C, DirectDraw, five builds for CPUs and 3D cards | Formats with writers first; the original under Wine, then in an emulated PC; races recorded from memory; the rules ported before the physics |
 
 ## The tooling they built to capture a game
 

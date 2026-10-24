@@ -204,6 +204,7 @@ between agents, the outcome, and the failure path.
 | `tools/triage/tables.py` | Sine and cosine lookup tables, with their steps, scale, type and rounding |
 | `tools/triage/sigscan.py` | Byte signatures with wildcards: make them from named functions, find them in another build or a game |
 | `tools/triage/insns.py` | Every instruction of a kind: port access, interrupts, timers, divisions |
+| `tools/triage/refs.py` | Every instruction that refers to an address, found in the raw code bytes (32-bit and RIP-relative), read, write or value, with hits in no function marked |
 | `tools/triage/pointerpaths.py` | A chain of pointers from a global to a value that moves between runs |
 | `tools/triage/coverdiff.py` | The code that ran only with an action: two coverage logs (drcov or address lists) compared, by function |
 | `tools/triage/fixity.py` | A BagIt bag of a game copy with checksums; manifests in place; verification over time |
@@ -220,6 +221,10 @@ between agents, the outcome, and the failure path.
 | `tools/pe/relocs.py` | The pointers in a PE's data, from its base relocations: vtables and tables of functions, strings and records |
 | `tools/triage/screenmarks.py` | Marks positions read from memory on a screenshot, through the camera's view and projection matrices |
 | `tools/triage/dates.py` | Dates and times in a file, in nine stored forms (Unix, FILETIME, DOS, HFS, OLE, ISO 9660, SYSTEMTIME), near a date you give |
+| `tools/live/memrec.py` | Snapshots of a running game's writable memory for `memscan.py`, and recordings of named values as JSON Lines, from `/proc/PID/mem` (Wine on Linux, or in a VM); `--wait` starts at a phase |
+| `tools/live/shot.py` | A capture of the screen, a window or a file kept under a name of its own in `derived/captures/DATE/`, with its text, never overwritten |
+| `tools/live/modfolder.py` | Installs a folder of changed files into a game's install folder, lists it and takes it out again, with no stale files |
+| `tools/live/emupc.py` | Writes an emulated PC for the original: QEMU, a Debian cloud image, cloud-init with Wine and 32-bit Mesa, Xvfb and openbox, SSH, the disc as a CD-ROM |
 | `tools/live/winput.py` | Keys, mouse moves and clicks sent to a game from inside Wine with `SendInput`, for macOS, where synthetic input needs a permission and Wine windows belong to no app. Builds `winput.c` with zig |
 | `tools/live/frida_trace.py` | Calls to chosen functions, and accesses to chosen memory, in a running game, with Frida. Calls use the same format as the emulator's call traces |
 | `tools/emu/mem_trace.py` | Which instructions read and write chosen memory while an emulated function runs. It is the first step of taint analysis |
@@ -301,8 +306,8 @@ The documentation is in [docs/](docs/README.md). It is also built as a website
   write findings in plain English.
 - **[Observing the original](docs/observe/README.md)**: running the original, every kind of
   input, capturing the interface, and an object model with entry points for tests and agents.
-- **[Case studies](docs/case-studies/README.md)**: Un-Banished, Tyrian 2000 and Frontier:
-  Elite II, and the tooling each built to capture its game.
+- **[Case studies](docs/case-studies/README.md)**: Un-Banished, Tyrian 2000, Frontier: Elite II
+  and POD: Planet of Death, and the tooling each built to capture its game.
 - [docs/GAME-PATTERNS.md](docs/GAME-PATTERNS.md): main loops, random generators, entities,
   resources, saves, rendering, as they appear in machine code.
 - [docs/DOS.md](docs/DOS.md): 16-bit DOS programs, Borland debug symbols, the DOS emulators.

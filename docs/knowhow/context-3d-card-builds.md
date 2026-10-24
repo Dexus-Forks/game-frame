@@ -14,7 +14,7 @@ commands:
 tools: [peinfo, match_functions, insns, pe32_emu]
 skills: [re-inventory, re-trace, re-observe]
 docs: [docs/hardware/card-apis.md, docs/hardware/graphics-3d.md, docs/hardware/simd.md]
-seen: ['POD: Planet of Death (1997), 2026-10-23']
+seen: ['POD: Planet of Death (1997), 2026-10-23 and 2026-10-24']
 ---
 
 # Games with a build per 3D card: Glide, ATI3DCIF and the S3D Toolkit
@@ -39,9 +39,20 @@ to the card.
   read a field that the reference build skips.
 - **Pick the reference.** The software build is usually the one to copy exactly. The card
   builds show what was drawn differently. Record which build each finding comes from.
+- **Measure what the card gets.** A build named after a card does not always hand it the
+  scene. POD's ATI Rage and S3 ViRGE builds draw the textured track and cars with the game's
+  software renderer, into DirectDraw surfaces at 640 × 480, and give the chip only untextured
+  faces: shadows and light beams (*measured*: in one race the S3 build made 15,000
+  `S3DTK_TriangleSet` calls, all Gouraud, and never made a texture surface). Redrawing such a
+  build's card calls at a higher resolution sharpens only what the card drew. Count the card
+  calls by kind in one real scene, and check whether texture surfaces are ever made, before
+  choosing between scaling the finished frame and redrawing it.
 - **Running a card build today.** Glide needs a wrapper that translates it to a modern API
   (dgVoodoo 2 or nGlide on Windows), or a virtual machine with an emulated Voodoo card
-  (86Box). ATI3DCIF and S3D builds generally need the real card or an emulator of it. Start with
-  the software build.
+  (86Box). Wine has none of the card libraries, so a build that imports one does not start
+  ([missing card library](wine-missing-card-library.md)). A replacement written for the game
+  is the other way ([a Glide 2 replacement](context-glide2-wrapper.md),
+  [S3D Toolkit return values](s3dtk-error-setstate.md), [ViRGE pixels](s3-virge-15-bit-surfaces.md)).
+  Start with the software build.
 - **MMX builds.** [docs/hardware/simd.md](../hardware/simd.md) covers a separate MMX
   executable and a path chosen by CPUID.

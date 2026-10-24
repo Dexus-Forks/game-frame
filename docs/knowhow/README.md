@@ -27,27 +27,62 @@ An entry has one of five statuses.
 
 | Entry | Status |
 |---|---|
-| [Windows 95 and DirectDraw games](context-windows-9x-directdraw.md) | context |
-| [Wine on macOS with Apple silicon](context-wine-macos.md) | context |
-| [Watcom C/C++ programs](context-watcom.md) | context |
-| [DOS games in DOSBox-X](context-dos-dosbox.md) | context |
-| [Games with a build per 3D card](context-3d-card-builds.md) | context |
-| [16-bit Windows (Windows 3.x) programs](context-windows-3x.md) | context |
-| [A privileged instruction under Wine: port I/O](wine-privileged-instruction.md) | solved |
-| [A DirectDraw mode table overflows](directdraw-mode-table-overflow.md) | solved |
-| [A window only on a 16-bit desktop](directdraw-windowed-16bit-desktop.md) | solved |
-| [16-bit pixels on a 32-bit surface](directdraw-16bit-back-surface.md) | solved |
-| ["Insert the CD" with the disc present](insert-cd-file-open-failed.md) | solved |
-| [An installer's ini path without its last backslash](installer-ini-path-separator.md) | solved |
-| [A PE section with a VirtualSize of 0](pe-virtualsize-zero.md) | solved |
-| [`SuspendThread` under Wine on macOS](wine-macos-suspendthread.md) | workaround |
-| [DirectInput: the window is not foreground](directinput-not-foreground.md) | workaround |
-| [Clicks and keys do not reach a Wine window](wine-input-without-accessibility.md) | workaround |
-| [macOS drops `DYLD_*` through `/bin/sh`](macos-dyld-stripped.md) | solved |
-| [`wineserver -w` never returns](wineserver-wait-hangs.md) | solved |
-| [A leftover game process holds the single-instance mutex](single-instance-leftover.md) | solved |
-| [Attaching winedbg kills the game](winedbg-attach-kills.md) | dead-end |
-| [A system call faults in `wow64cpu` under Rosetta](wine-wow64-rosetta-fault.md) | open |
+| [16-bit Windows (Windows 3.x) programs: what to know before the first run](context-windows-3x.md) | context |
+| [A changed value in a data file loads but changes nothing in the game](context-mod-value-replaced-at-run-time.md) | context |
+| [A data editor agents and tests can drive: one edit type for the window and the command line](context-editor-one-edit-type.md) | context |
+| [Before modding a format: a writer that gives every file back byte for byte](writer-round-trip-every-file.md) | context |
+| [Before moving geometry: find the bounds and normals stored with it](context-geometry-derived-data.md) | context |
+| [CD-era games often look in their install folder before the CD: a mod can be a file, with no patch](context-mods-install-folder-first.md) | context |
+| [DOS games in DOSBox-X: what to know before the first run](context-dos-dosbox.md) | context |
+| [Games with a build per 3D card: Glide, ATI3DCIF and the S3D Toolkit](context-3d-card-builds.md) | context |
+| [Keep a capture of every error dialog and crash, as it happens](context-keep-every-dialog.md) | context |
+| [Measure a function that walks the game's data structures under the emulator](emulate-function-on-game-structures.md) | context |
+| [Port a game's rules before its physics, driven by a recorded run](context-port-rules-before-physics.md) | context |
+| [Record a whole run of the original from its memory as the reference for a port](record-a-run-from-memory.md) | context |
+| [Running the original in an emulated PC when Wine on the host fails](context-emulated-pc.md) | context |
+| [Start a recorder when the next race begins instead of driving the menus](wait-for-the-next-race.md) | context |
+| [The game's clock runs at a slightly different rate from real time](game-clock-not-real-time.md) | context |
+| [Watcom C/C++ programs: calling convention, runtime and linker quirks](context-watcom.md) | context |
+| [Windows 95 and DirectDraw games: what to know before the first run](context-windows-9x-directdraw.md) | context |
+| [Wine on macOS with Apple silicon: what to know before running a game there](context-wine-macos.md) | context |
+| [Writing a Glide 2 replacement for an early Glide game](context-glide2-wrapper.md) | context |
+| [A 32-bit game's system call faults in wow64cpu under Wine on Apple silicon](wine-wow64-rosetta-fault.md) | open |
+| [Attaching winedbg to the running game kills it](winedbg-attach-kills.md) | dead-end |
+| [A game suspends its own thread with SuspendThread under Wine on macOS](wine-macos-suspendthread.md) | workaround |
+| [Clicks and keys from the agent do not reach a Wine window on macOS](wine-input-without-accessibility.md) | workaround |
+| [DirectInput ignores keys, because a window that is not foreground cannot acquire the device](directinput-not-foreground.md) | workaround |
+| [Scripted menu clicks land one time in three in a game with its own cursor](directinput-cursor-click-timing.md) | workaround |
+| ["S3DTK Error : SetState" from a stand-in S3D Toolkit](s3dtk-error-setstate.md) | solved |
+| [`pkill -f` or `pgrep -f` run over SSH matches its own command line](vm-ssh-pkill-matches-itself.md) | solved |
+| [A 16-bit game on a 32-bit surface shows a doubled picture, then wrong colours](directdraw-16bit-back-surface.md) | solved |
+| [A 3D view draws every level upside down and nothing looks wrong](axes-measure-in-the-running-game.md) | solved |
+| [A 3D-card build will not start under Wine: no ati3dcif.dll, S3DTKW.dll or glide.dll](wine-missing-card-library.md) | solved |
+| [A DirectDraw game asks for an impossible mode, because its mode table overflowed](directdraw-mode-table-overflow.md) | solved |
+| [A DirectDraw game runs in a window only on a 16-bit desktop, else goes fullscreen](directdraw-windowed-16bit-desktop.md) | solved |
+| [A driver run with sudo sends no keys: "Can't open display"](sudo-drops-display.md) | solved |
+| [A function has no callers, or no function exists, because Ghidra missed code reached through pointers](decompile-missed-pointer-functions.md) | solved |
+| [A helper script named like a standard module breaks an import, such as dis.py and capstone](python-script-shadows-stdlib.md) | solved |
+| [A line-following driver stalls or wedges at the same place every lap](racing-line-must-be-a-closed-lap.md) | solved |
+| [A path from an installer's ini file lacks its last backslash, so files are not found](installer-ini-path-separator.md) | solved |
+| [A PE section has a VirtualSize of 0, and a tool skips or misreads it](pe-virtualsize-zero.md) | solved |
+| [A port diverges because a trace said "only this function writes that table" and was wrong](trace-claims-need-an-address-scan.md) | solved |
+| [A ported fixed-point function differs from the original in a few cases out of thousands](x87-magic-add-rounding.md) | solved |
+| [A privileged instruction under Wine, from a Windows 95 port probe](wine-privileged-instruction.md) | solved |
+| [A reference recording was made with modded files loaded](mods-loaded-in-a-reference-recording.md) | solved |
+| [A replay matches the recording at the end but not at some samples, one sample early or late](replay-sample-straddles-frames.md) | solved |
+| [A run in a shared test VM dies: "X connection to :2 broken"](shared-vm-pkill-display.md) | solved |
+| [A run script hangs on `wineserver -w`](wineserver-wait-hangs.md) | solved |
+| [An editor's save changes bytes nobody edited (fixed point through floats)](editor-float-view-changes-bytes.md) | solved |
+| [Every new run exits at once, because a leftover game process holds its mutex](single-instance-leftover.md) | solved |
+| [Keys reach a game under Wine on Xvfb only with a window manager running](xvfb-needs-window-manager.md) | solved |
+| [macOS drops DYLD_ variables through /bin/sh, so a Wine build cannot load its libraries](macos-dyld-stripped.md) | solved |
+| [Porting more of the original made a replay agree less with the recording](replay-stand-in-for-unported-logic.md) | solved |
+| [S3 ViRGE builds draw 15-bit pixels: their 16-bit surfaces are 5-5-5](s3-virge-15-bit-surfaces.md) | solved |
+| [SSH to a VM fails with "Too many authentication failures"](ssh-too-many-auth-failures.md) | solved |
+| [The game asks for its CD under Wine on Linux, though the disc's folder is mapped with the right label](wine-linux-cd-drive.md) | solved |
+| [The game asks for its CD while the disc is there, because some file failed to open](insert-cd-file-open-failed.md) | solved |
+| [The player's car drives itself after a scripted driver was stopped](input-driver-keys-held-after-kill.md) | solved |
+| [Times printed by the game differ by a hundredth from the same values printed by a tool](x87-truncating-time-format.md) | solved |
 
 A project keeps the entries for its own game in its own `docs/knowhow/`, in the same format.
 `./gameframe advise` reads both. An entry that holds for other games too moves here, with a
