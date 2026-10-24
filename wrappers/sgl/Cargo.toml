@@ -1,8 +1,8 @@
 # A stand-in for PowerVR's SGL library (sgl.dll): see README.md. Part of the wrappers
-# workspace (../Cargo.toml), built for 32-bit Windows; the scene graph (src/scene) is plain Rust and its tests run on the host.
+# workspace (../Cargo.toml), built for 32-bit Windows; the scene graph and the immediate mode (src/scene) are plain Rust and its tests run on the host.
 [package]
 name = "sgl"
-description = "PowerVR SGL (sgl.dll), scene-graph half: the game's scene graph kept and drawn with OpenGL at any resolution"
+description = "PowerVR SGL (sgl.dll): the game's scene graph, or its immediate-mode faces, drawn with OpenGL at any resolution"
 edition.workspace = true
 license.workspace = true
 version.workspace = true

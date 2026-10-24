@@ -1,30 +1,45 @@
-# sgl: PowerVR's SGL on OpenGL, the scene-graph half
+# sgl: PowerVR's SGL on OpenGL
 
 `sgl.dll` stands in for VideoLogic's SGL library for the PowerVR PCX1 and PCX2. The game runs
-unchanged. It loads this library in place of SGL's. The library keeps the scene graph the game
-builds and draws it with OpenGL at any size. It was made for POD Gold's PowerVR build
-(`WPODPVR.EXE`).
+unchanged. It loads this library in place of SGL's. The library draws with OpenGL at any size.
+It was made for POD Gold's PowerVR build (`WPODPVR.EXE`).
 
 SGL has two halves. The scene-graph half takes display lists of transforms, materials,
-meshes, lights and cameras, built once; each frame the game moves transforms, switches lists
-on and off and calls `sgl_render`. The immediate-mode half (`sgltri_*`) takes lists of
-triangles and quads every frame. This library implements the scene-graph half: the 46 calls
-POD imports, under their own names (`sgl.def`, `__cdecl`, undecorated), and one more,
-`sgl_wrapper_present`, for `ddraw.dll`. It exports all 132 calls of PowerVR driver 3.1.0's
-`sgl.dll`. It also exports `sgl_delete_all_textures`, which Hardwar imports from a later SGL.
-The 87 calls it does not implement are stubs that log their calls (`api.tsv`,
-[wrappers](../README.md)). How POD uses each call, with evidence, is in POD's
-`docs/hardware/3d-cards.md` ("The PowerVR build").
+meshes, lights and cameras, built once. Each frame the game moves transforms, switches lists
+on and off and calls `sgl_render`. The immediate-mode half (`sgltri_*`) takes triangles and
+quads already projected to the screen, every frame. This library implements both. It has the
+46 calls POD imports, under their own names (`sgl.def`, `__cdecl`, undecorated), and 14 for
+the immediate mode, which Hardwar (1998) uses. One more, `sgl_wrapper_present`, is for
+`ddraw.dll`. It exports all 132 calls of PowerVR driver 3.1.0's `sgl.dll`. It also exports
+`sgl_delete_all_textures`, which Hardwar imports from a later SGL. The 73 calls it does not
+implement are stubs that log their calls (`api.tsv`, [wrappers](../README.md)). How POD uses
+each call, with evidence, is in POD's `docs/hardware/3d-cards.md` ("The PowerVR build").
 
-## Not yet here: the immediate-mode half
+## The immediate mode
 
-Hardwar (1998) loads `sgl.dll` at run time for its PowerVR mode and uses the immediate-mode
-half. It shares 7 names with POD. These 13 are stubs here: `sgl_delete_all_textures`,
-`sgl_get_errors`, `sgl_get_free_texture_mem`, `sgl_get_versions`, `sgl_get_win_versions`,
-`sgl_use_ddraw_mode`, `sgl_use_eor_callback`, `sgltri_isrendercomplete`, `sgltri_quads`,
-`sgltri_render`, `sgltri_shadow`, `sgltri_startofframe` and `sgltri_triangles`
-([GAPS.md](../../GAPS.md)). The textures, the render thread and the address-mode frame here
-are the parts an immediate-mode stand-in would reuse.
+These calls are here: `sgltri_startofframe`, `sgltri_triangles`, `sgltri_quads`,
+`sgltri_shadow`, `sgltri_render`, `sgltri_rerender`, `sgltri_isrendercomplete`,
+`sgl_use_ddraw_mode`, `sgl_use_eor_callback`, `sgl_get_errors`, `sgl_get_versions`,
+`sgl_get_win_versions`, `sgl_get_free_texture_mem` and `sgl_delete_all_textures`.
+`sgltri_renderstrip`, which sgl.h says is for VideoLogic's own use, is a stub.
+
+Each face's vertices are `SGLVERTEX`, the layout of Direct3D's `D3DTLVERTEX`: a screen place,
+`1/w`, a colour, a specular colour and texture coordinates. The library turns them into the
+batches the scene graph's renderer draws, so the textures, the render thread and the output
+size are the same for both halves. The details sgl.h leaves open come from PowerVR's own
+implementation, SGLMID4.dll of the same driver. `scene/tri.rs` lists each with its function.
+
+The frame reaches the window in one of SGL's two output modes, in the driver's order:
+
+- **Address mode** (`sgl_use_address_mode`). This works as for the scene graph (below).
+- **DirectDraw mode** (`sgl_use_ddraw_mode`). SGL owns the screen. At each `sgltri_render` it
+  calls the game's 2D callback with the finished frame's surface, then shows the frame. Here
+  the surface is a 16-bit picture of the device's size in this library's memory. What the game
+  draws into it goes over the frame, except where it still holds the marker.
+
+After each render the end-of-render callback runs, if the game set one. If it returns a value
+other than 0, the next `sgltri_render` reports that value as its error. `sgltri_isrendercomplete`
+always returns 0 (complete).
 
 ## Run
 
@@ -59,16 +74,27 @@ zig cc -target x86-windows-gnu -O2 wrappers/sgl/test/sgltest.c -o sgltest.exe -l
 WRAPPER_WINDOW_CLASS=SglTest SGL_SHOT_DIR='C:\shots' SGL_SHOT_EVERY=30 SGL_SCALE=2 wine sgltest.exe 120
 ```
 
-The scene graph's tests run on the host (`../README.md`). `tests/run.sh` builds `sgltest.exe`
+Neither program needs a game. `test/sgltritest.c` draws a known immediate-mode scene: a fogged
+floor of quads, a Gouraud triangle, a turning textured quad, a flat triangle with a highlight,
+a translucent triangle and the same 2D bar. Pass `ddraw` after the frame count to use the
+DirectDraw mode's 2D callback. At the end it prints what the information calls return.
+
+```bash
+zig cc -target x86-windows-gnu -O2 wrappers/sgl/test/sgltritest.c -o sgltritest.exe -luser32
+WRAPPER_WINDOW_CLASS=SglTest SGL_SHOT_DIR='C:\shots' SGL_SHOT_EVERY=30 wine sgltritest.exe 120 ddraw
+```
+
+The scene graph's tests run on the host (`../README.md`). `tests/run.sh` builds both programs
 when zig is there.
 
 ## How it works
 
 | Module | Does |
 |---|---|
-| `scene/` | The graph (`graph.rs`: lists, transforms, meshes, materials, lights, cameras, textures, one method per call) and the traversal (`walk.rs`: from the root list to lit triangles in the camera's space; `convex.rs`: light volumes). Plain Rust, tested on the host |
+| `scene/` | `tri.rs`: the immediate mode, from the game's contexts and vertices to batches. The graph (`graph.rs`: lists, transforms, meshes, materials, lights, cameras, textures, one method per call) and the traversal (`walk.rs`: from the root list to lit triangles in the camera's space; `convex.rs`: light volumes). Plain Rust, tested on the host |
 | `api/` | The exported calls: they read the game's pointers and edit the graph |
 | `frame.rs` | `sgl_render`: the address callback, the marker, the frame to the render thread; `sgl_wrapper_present` |
+| `immediate.rs` | `sgltri_render`: the frame through the address callback or the DirectDraw mode's 2D callback, then the end-of-render callback |
 | `render/` | The render thread: OpenGL on the game's window, the off-screen 3D frame, the 2D picture on top |
 
 The PowerVR chip rendered into memory the game named through its address callback
@@ -97,6 +123,24 @@ Each is marked `Deviation:` in the code.
   specular highlight is added of the terms it does not affect.
 - A frame shows under at most three of the game's pictures.
 - A 2D pixel of exactly the marker colour counts as not drawn by the game.
+
+In the immediate mode:
+
+- Translucent faces are drawn after the opaque ones, in the order sent. The PCX2 sorted them
+  itself.
+- The library counts the shadow and light volumes sent with `sgltri_shadow`. It does not
+  draw them.
+- The fog's rate per unit of `w` is read from SGL's fog register (0 to 31) as SGL writes it
+  for the scene graph (*inferred*). `SGL_FOG` scales it.
+- The DirectDraw mode's 2D callback gets null for both DirectDraw objects. Only the memory is
+  real.
+- Mipmaps, bilinear filtering switches and mipmap offsets are ignored. Every texture is
+  filtered.
+- `sgl_get_free_texture_mem` reports 4 MB less 2 bytes for each texel of each texture.
+- Only the immediate-mode calls and the information calls record errors for
+  `sgl_get_errors`.
+- `sgl_get_versions` reports driver 3.1.0's strings. `sgl_delete_all_textures` takes no
+  arguments (*inferred* from its name).
 
 ## Known problems
 

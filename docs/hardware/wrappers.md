@@ -53,7 +53,7 @@ game met, with a count. The log of a new game's first run then lists what to wri
 | DLL | Stands in for | What it draws | State | Known gaps |
 |---|---|---|---|---|
 | [`glide2x.dll`](../../wrappers/glide/README.md) | 3dfx Glide 2.x (`glide.dll`, `glide2x.dll`) | The whole scene with OpenGL, at any size. The Voodoo's colour combiners, chroma key and table fog are one fragment shader. The W buffer is OpenGL's depth test | 55 of 156 calls (Glide 2.43 and 2.1.1). POD's 3dfx builds (first edition and Gold) race at 1280 × 960 | Only TMU 0 draws. No NCC textures or mipmaps. `GR_BLEND_PREFOG_COLOR` is taken as zero |
-| [`sgl.dll`](../../wrappers/sgl/README.md) | PowerVR PCX1 and PCX2, SGL's scene-graph half | It keeps the scene graph the game builds and draws it with OpenGL, with the 2D picture laid on top through `ddraw.dll` | 47 of 134 calls (46 of SGL's 133, and one for `ddraw.dll`). POD Gold's PowerVR build races at 1280 × 960 | The immediate-mode half (`sgltri_*`) is stubs. Shadow volumes and other convex objects except light volumes are skipped |
+| [`sgl.dll`](../../wrappers/sgl/README.md) | PowerVR PCX1 and PCX2, SGL's scene graph and its immediate mode | It keeps the scene graph the game builds, or takes the faces it sends each frame (`sgltri_*`), and draws them with OpenGL. The 2D picture goes on top through `ddraw.dll` or SGL's own 2D callback | 61 of 134 calls (60 of SGL's 133, and one for `ddraw.dll`). POD Gold's PowerVR build races at 1280 × 960. The immediate mode is tested only with our own program | Shadow volumes, and convex objects other than light volumes, are skipped |
 | [`ati3dcif.dll`](../../wrappers/ati3dcif/README.md) | ATI 3D Rage (ATI3DCIF) | Solid, flat and Gouraud triangles and quads, blended by source alpha, in software into the game's DirectDraw surface | 6 of 17 calls. POD's ATI build races with the frame scaled | No textures, lines, rectangles, points, Z buffer or fog. Whether the Rage rounded edges the same way is *unknown* |
 | [`s3dtkw.dll`](../../wrappers/s3dtkw/README.md) | S3 ViRGE (S3D Toolkit) | Gouraud lists, strips and fans, blended by source alpha, in software into a 15-bit or 8-bit surface | All 6 calls, and 3 slots of the function table. POD's S3 build races with the frame scaled | Textured faces are drawn Gouraud. Fog is logged and not drawn |
 | [`ddraw.dll`](../../wrappers/ddraw/README.md) | DirectDraw 1 to 3 | Every surface in memory and every mode granted. Each flip shows the frame in a window, scaled | 2 of 9 calls, and the methods of DirectDraw 1 to 3 that POD calls. Used by POD's ATI, S3 and PowerVR builds. Made for its software and MMX builds too (not confirmed with them) | No Direct3D. `DDRAW_SYSTEM=1` hands DirectDraw to the system's own library for a game that needs it. Methods POD does not call return `DDERR_UNSUPPORTED` |
@@ -272,7 +272,7 @@ GameFrame keeps no game material. A test for a new call uses our own code, such 
 
 `tests/run.sh` builds the release and debug DLLs, runs the host tests, checks each export table
 against its `.def` file, checks that the `.def` files and stubs match the API tables, and builds
-`sgltest.exe` when zig is installed. A stub's argument bytes are checked when the DLL links. The
+`sgltest.exe` and `sgltritest.exe` when zig is installed. A stub's argument bytes are checked when the DLL links. The
 `.def` file names each stdcall export by its decorated name, such as `grAADrawLine@8`. Rust
 gives a function that name only when it takes exactly 8 bytes of arguments. To run the host
 tests alone:
@@ -293,6 +293,11 @@ translucent pane and a 2D bar over the marker colour. Build it and run it beside
 zig cc -target x86-windows-gnu -O2 wrappers/sgl/test/sgltest.c -o sgltest.exe -luser32
 WRAPPER_WINDOW_CLASS=SglTest SGL_SHOT_DIR='C:\shots' SGL_SHOT_EVERY=30 SGL_SCALE=2 wine sgltest.exe 120
 ```
+
+[`sgltritest.c`](../../wrappers/sgl/test/sgltritest.c) does the same for SGL's immediate mode
+(`sgltri_*`). It draws a fogged floor, a Gouraud triangle, a turning textured quad, a
+highlighted triangle and a translucent one. A 2D bar goes on top. Pass `ddraw` after the
+frame count to use `sgl_use_ddraw_mode`'s 2D callback in place of the address callback.
 
 The other libraries have no such test program yet. They were checked against POD's own runs.
 
