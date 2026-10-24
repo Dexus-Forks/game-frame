@@ -30,6 +30,7 @@ An entry has one of five statuses.
 | [16-bit Windows (Windows 3.x) programs: what to know before the first run](context-windows-3x.md) | context |
 | [A changed value in a data file loads but changes nothing in the game](context-mod-value-replaced-at-run-time.md) | context |
 | [A data editor agents and tests can drive: one edit type for the window and the command line](context-editor-one-edit-type.md) | context |
+| [A newer edition of the game turns up mid-project](context-newer-edition-mid-project.md) | context |
 | [Before modding a format: a writer that gives every file back byte for byte](writer-round-trip-every-file.md) | context |
 | [Before moving geometry: find the bounds and normals stored with it](context-geometry-derived-data.md) | context |
 | [CD-era games often look in their install folder before the CD: a mod can be a file, with no patch](context-mods-install-folder-first.md) | context |

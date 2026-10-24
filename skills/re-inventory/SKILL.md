@@ -163,10 +163,33 @@ Also record the hardware the game was written for: the minimum CPU, the video mo
 APIs, the sound devices and the input devices it supports (`docs/hardware/`). Its setup program
 and its readme list them.
 
-Record the version too: the build the player has, the other versions that exist (patches,
-regions, re-releases, demos), and which one the port follows (`docs/working/versions.md`).
-Comparing builds is often the quickest way to find a rule: a patch note names it, and the
-function that changed between two builds is it.
+### Every edition, and the reference
+
+Before deep work, find every edition of the game and record them in `docs/versions.md` (the
+project template; copy `templates/project/docs/versions.md` from GameFrame if the project is
+older):
+
+1. **List the editions**: the first release, regional releases with other languages, "Gold"
+   and budget re-releases, official patches and updates, store builds, ports and demos, with
+   the date of each. Look in the readme and manual, the publisher's old pages, archive sites,
+   magazine cover discs and fan sites. Note the extras that came with each (tools, extra
+   levels, fan files).
+2. **Record each one**: its source, the checksums of its files or image, its languages, content
+   and builds.
+3. **Measure the data delta** between each pair:
+   `.venv/bin/python tools/triage/versiondiff.py target/first/GAME.CUE target/latest/GAME.CUE`.
+   It reads folders or disc images in place and prints the files added, removed and changed by
+   folder, the PE link dates of the executables, and the languages. Paste it into the
+   data-delta section.
+4. **Pick the reference**: by default the last version released, which has the most fixes and
+   improvements. Write down the reason when you pick another.
+
+The code delta comes after the Ghidra export of each edition: `match_functions.py` matches
+their functions and carries labels across. When a newer edition turns up mid-project, follow
+"Moving to a newer version mid-project" in `docs/working/versions.md`: export it, match the
+functions, record the ground truth again, verify the port again, and keep the old edition as
+documented differences. Comparing builds is often the quickest way to find a rule: a patch note
+names it, and the function that changed between two builds is it.
 
 ## 6. Classify the game
 

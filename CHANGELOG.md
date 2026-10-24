@@ -9,6 +9,15 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- Versions and their deltas: [the versions guide](docs/working/versions.md) now starts with
+  finding every edition, takes the last version released as the default reference, and has the
+  steps for moving to a newer edition mid-project. A project template, `docs/versions.md`,
+  records each edition, its checksums, languages, content and builds, the data and code
+  deltas, the extras and the reference. `re-inventory` and `re-start` have the step.
+- `tools/triage/versiondiff.py`: two editions compared as folders or disc images: files added,
+  removed and changed by folder, PE link dates and languages, as Markdown.
+- Know-how: `context-newer-edition-mid-project`, from POD's first edition and POD Gold.
+
 - Three guides from the POD: Planet of Death project:
   [Recording the original, and replaying it](docs/observe/recording.md),
   [Replacement libraries for a 1990s game](docs/hardware/replacement-libraries.md) and

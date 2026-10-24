@@ -205,6 +205,7 @@ between agents, the outcome, and the failure path.
 | `tools/triage/tables.py` | Sine and cosine lookup tables, with their steps, scale, type and rounding |
 | `tools/triage/sigscan.py` | Byte signatures with wildcards: make them from named functions, find them in another build or a game |
 | `tools/triage/insns.py` | Every instruction of a kind: port access, interrupts, timers, divisions |
+| `tools/triage/versiondiff.py` | Two editions compared, as folders or disc images read in place: files added, removed and changed by folder, the executables' link dates, the languages; Markdown for `docs/versions.md` |
 | `tools/triage/exportcov.py` | How much code a Ghidra export covers, its largest gaps, and the likely starts of the functions it missed, for a batch decompile |
 | `tools/triage/refs.py` | Every instruction that refers to an address, found in the raw code bytes (32-bit and RIP-relative), read, write or value, with hits in no function marked |
 | `tools/triage/pointerpaths.py` | A chain of pointers from a global to a value that moves between runs |

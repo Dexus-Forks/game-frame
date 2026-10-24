@@ -213,6 +213,31 @@ fi
 expect "zcc prints its usage" "rustc's linker for 32-bit Windows DLLs" scripts/zcc.sh --help
 rm -rf "$T4"
 
+out="$("$PYTHON" - <<'PY' 2>&1
+import os, shutil, struct, subprocess, sys, tempfile
+d = tempfile.mkdtemp(); A, B = f'{d}/old', f'{d}/new'
+def put(root, rel, data):
+    p = os.path.join(root, rel); os.makedirs(os.path.dirname(p), exist_ok=True); open(p, 'wb').write(data)
+exe = open('examples/sample-game/build/game.exe', 'rb').read()
+off = struct.unpack_from('<I', exe, 0x3c)[0]
+old_exe = exe[:off + 8] + struct.pack('<I', 857692800) + exe[off + 12:]     # 1997-03-07
+new_exe = exe[:off + 8] + struct.pack('<I', 877910400) + exe[off + 12:]     # 1997-10-27
+put(A, 'GAME.EXE', old_exe); put(B, 'game.exe', new_exe)
+put(A, 'Data/Text/French/T.DAT', b'bonjour'); put(B, 'DATA/TEXT/FRENCH/T.DAT', b'bonjour')
+put(B, 'Data/Text/English/T.DAT', b'hello')
+put(A, 'Data/Cars.bin', b'x' * 10); put(B, 'Data/Cars.bin', b'x' * 12)
+put(B, 'Data/Tracks/Lake.bl4', b't' * 5); put(A, 'Data/Old.brt', b'r')
+r = subprocess.run([sys.executable, 'tools/triage/versiondiff.py', A, B], capture_output=True, text=True)
+out = r.stdout.lower()     # folder names keep whichever case the file system gave
+for want in ('2 added, 1 removed, 2 changed, 1 the same', '| `data/tracks` | 1 | 0 | 0 | 0 |', '| `data` | 0 | 1 | 1 | 0 |',
+             '| `game.exe` | 1997-03-07 00:00 | 1997-10-27 00:00 | yes |', '| english |  | yes |', '| french | yes | yes |',
+             '- `data/cars.bin` (10 -> 12 bytes)', '- `data/old.brt` (1 byte)'):
+    assert want in out, (want, out)
+print('folders by group, link dates, languages, added, removed and changed')
+PY
+)"
+[[ $? == 0 ]] && ok "versiondiff writes the data delta of two editions: folders, link dates, languages ($out)" || bad "versiondiff" "$out"
+
 echo "Live tracing"
 if "$PYTHON" -c "import frida" 2>/dev/null && command -v cc >/dev/null; then
   T="$(mktemp -d)"
@@ -637,6 +662,7 @@ expect "extract-installer hands a CUE sheet to discinfo" "CD image -> discinfo" 
 [[ "$(cat "$W/x/ReadMe File.txt")" == "hello from the disc" && $(wc -c < "$W/wav/track02.wav") -eq 352844 ]] \
   && ok "discinfo copies the files and writes the audio track as WAV" || bad "discinfo --extract --audio"
 "$PYTHON" tools/disc/discinfo.py "$W/test.cue" --iso "$W/cut.iso" >/dev/null
+expect "versiondiff reads a disc image in place and finds no change against its own extracted files" "0 removed, 0 changed" "$PYTHON" tools/triage/versiondiff.py "$W/test.cue" "$W/x"
 expect "discinfo --iso cuts the data track of a BIN/CUE into an ISO that reads the same" "Secret Data.dat" "$PYTHON" tools/disc/discinfo.py "$W/cut.iso" --files
 [[ $(( $(wc -c < "$W/cut.iso") % 2048 )) == 0 ]] && ok "the cut ISO holds whole 2048-byte sectors" || bad "discinfo --iso sector size"
 expect "filetypes names a PE executable" "executable (PE, Windows)" "$PYTHON" tools/triage/filetypes.py $B/game.exe
@@ -816,7 +842,7 @@ rm -rf "$L"
 echo "Project scaffold"
 tmp="$(mktemp -d)/re-test"
 scripts/new-project.sh "$tmp" "Test Game" $B >/dev/null 2>&1
-[[ -f "$tmp/AGENTS.md" && -f "$tmp/README.md" && -f "$tmp/LICENSE-APACHE" && -f "$tmp/LICENSE-CC0-1.0" && ! -e "$tmp/LICENSE-CC-BY-4.0" && ! -e "$tmp/LICENSE-MIT" && -f "$tmp/.cargo/config.toml" && -f "$tmp/.claude/settings.json" && -x "$tmp/gameframe" && -f "$tmp/target/game.exe" && -d "$tmp/.git" && ! -e "$tmp/tools" && ! -e "$tmp/scripts" && ! -e "$tmp/.claude/skills" && -f "$tmp/skills/re-start/SKILL.md" && -L "$tmp/.agents/skills" && ! -e "$tmp/docs/DOS.md" ]] \
+[[ -f "$tmp/AGENTS.md" && -f "$tmp/docs/versions.md" && -f "$tmp/README.md" && -f "$tmp/LICENSE-APACHE" && -f "$tmp/LICENSE-CC0-1.0" && ! -e "$tmp/LICENSE-CC-BY-4.0" && ! -e "$tmp/LICENSE-MIT" && -f "$tmp/.cargo/config.toml" && -f "$tmp/.claude/settings.json" && -x "$tmp/gameframe" && -f "$tmp/target/game.exe" && -d "$tmp/.git" && ! -e "$tmp/tools" && ! -e "$tmp/scripts" && ! -e "$tmp/.claude/skills" && -f "$tmp/skills/re-start/SKILL.md" && -L "$tmp/.agents/skills" && ! -e "$tmp/docs/DOS.md" ]] \
   && grep -q "Test Game" "$tmp/AGENTS.md" && grep -q '"gameframe@game-frame": true' "$tmp/.claude/settings.json" && ! grep -q "gate.py" "$tmp/.claude/settings.json" \
   && grep -q 'gameframe gate cursor' "$tmp/.cursor/hooks.json" && grep -q 'gameframe\\" gate codex' "$tmp/.codex/hooks.json" && grep -q '"AGENTS.md"' "$tmp/.gemini/settings.json" \
   && ! (cd "$tmp" && git ls-files | grep -q '^target/') \

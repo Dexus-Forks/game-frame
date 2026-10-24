@@ -6,11 +6,35 @@ bugs, data and code. A reimplementation must choose which version it copies, and
 the other versions as evidence. This page covers choosing the version, comparing builds,
 and keeping a port faithful to one version while it reads the data of several.
 
+## Find every edition first
+
+Before deep work, list every edition of the game: the first release, regional releases with
+other languages, budget and "Gold" re-releases, patches and official updates, store builds,
+ports, demos, and what came with each (manuals, readmes, extra tracks or levels, tools). Look in
+the game's own readme and manual, the publisher's old web pages, archive sites, magazine cover
+discs, store pages and fan sites, and note each edition's date. A month of work on one edition
+can be checked again on a newer one, but a newer edition found late costs that month again.
+
+Record what you find in `docs/versions.md` (the project template has the table): each edition
+with its source and checksums, its languages, content and builds, the data and code deltas
+between editions, the extras, and which edition is the reference.
+
+```bash
+.venv/bin/python tools/triage/versiondiff.py target/first/POD.CUE target/gold/POD.CUE > derived/versions-data.md
+```
+
+`versiondiff.py` compares two editions, as folders or as disc images read in place: files
+added, removed and changed by folder, the executables' link dates, and the languages each has.
+Its Markdown goes into the data-delta section. The code delta comes from the Ghidra exports of
+both, with `match_functions.py` (below).
+
 ## Choosing the version
 
 ![The versions of one game, and the one the port follows](../assets/diagrams/version-tree.svg)
 
-Decide this at the start and record the decision in the project's evidence log:
+Decide this at the start and record the decision in `docs/versions.md`. GameFrame's default is
+**the last version released**: it has the most fixes and improvements, and it is usually the
+one players own. Choose another for a reason, and write the reason down:
 
 - **The version players have.** Usually the last official patch, or the version sold today in
   digital stores. Players expect the port to read their copy.
@@ -49,6 +73,32 @@ A port may need to read the data of several versions even when it copies the rul
   add it as an option, marked as a deviation, never silently.
 - Saves from different versions may differ. Test the port with saves from each version it
   claims to read.
+
+## Moving to a newer version mid-project
+
+A newer edition can turn up after weeks of work ([know-how](../knowhow/context-newer-edition-mid-project.md)).
+Moving the project to it keeps the work, if it is done in this order:
+
+1. **Record both editions** in `docs/versions.md`: sources, checksums, dates, and the data delta
+   from `versiondiff.py`.
+2. **Export the new binaries** with `scripts/ghidra-export.sh`, beside the old export.
+3. **Match functions so the labels carry over**: `match_functions.py analysis/export/OLD
+   analysis/export/NEW --labels labels/names.tsv --out labels/NEW/names.tsv`. Review the fuzzy
+   matches the port depends on, then apply the labels (`ghidra-run.sh NEW labels ...`). Keep the
+   map from old to new addresses (`labels/NEW/map.tsv`): every finding that cites an old address
+   can then be found again.
+4. **List what changed in the code**: functions matched and identical, matched and changed, new,
+   and gone. Read each changed function the port uses, and write what changed in the code-delta
+   section.
+5. **Run the readers over the new data** with `validate.py`, and fix each format variant.
+6. **Record the ground truth again** on the new edition: emulator measurements
+   (`re-emulate`) and recordings of whole runs (`docs/observe/recording.md`). Patches made for
+   the old edition check its bytes, so the new edition needs its own.
+7. **Verify the port again** against the new truth (`re-verify`). A test that passes on both
+   editions needs no note; one that differs is a change between editions.
+8. **Keep the old edition as documented differences**: what the old edition did, where the new
+   one differs, with both addresses. A port can offer the old behaviour as an option, marked as
+   a deviation.
 
 ## Demos and prototypes
 
