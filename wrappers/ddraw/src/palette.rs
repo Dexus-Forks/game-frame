@@ -12,12 +12,9 @@ pub struct Palette {
 
 static VTBL: OnceLock<Vec<usize>> = OnceLock::new();
 
-/// QueryInterface, AddRef, Release, GetCaps, GetEntries, Initialize, SetEntries.
-const ARGS: [usize; 7] = [2, 0, 0, 1, 4, 3, 4];
-
 fn vtbl() -> *const Slot {
     VTBL.get_or_init(|| {
-        table(&ARGS, &[(1, add_ref as Slot), (2, release as Slot), (4, get_entries as Slot), (6, set_entries as Slot)])
+        table(palette::stubs(), &[(1, add_ref as Slot), (2, release as Slot), (4, get_entries as Slot), (6, set_entries as Slot)])
             .into_iter()
             .map(|p| p as usize)
             .collect()

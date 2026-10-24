@@ -1,5 +1,5 @@
 //! The 46 calls POD's `WPODPVR.EXE` imports from `sgl.dll`, under their own names (`__cdecl`, as
-//! sgl.h declares them; `sgl.def`). Each reads the game's pointers and edits the scene graph
+//! sgl.h declares them; `sgl.def`). The rest of SGL's calls are stubs (`crate::stubs`). Each reads the game's pointers and edits the scene graph
 //! (`scene::Scene`); `sgl_render` hands a frame to `frame`.
 //!
 //! - `device`: devices, viewports, the address callback, `sgl_render`.

@@ -4,7 +4,6 @@
 //! (POD's `docs/hardware/3d-cards.md`).
 
 use crate::cmd::{Cmd, TexInfo, push};
-use crate::log::log_once;
 use gpu_1997::glide::{Format, chain_bytes};
 
 /// `GrTexInfo`: smallLod, largeLod, aspectRatio, format, data.
@@ -53,7 +52,7 @@ pub unsafe extern "system" fn grTexDownloadMipMap(tmu: u32, start: u32, even_odd
     }
     let info = unsafe { &*info };
     if even_odd != 3 {
-        log_once!("grTexDownloadMipMap: even/odd mask {even_odd} treated as both");
+        shim::gap!("grTexDownloadMipMap even/odd", "mask {even_odd} treated as both");
     }
     let n = bytes(info.small_lod, info.large_lod, info.aspect, info.format);
     if n == 0 || info.data.is_null() {
@@ -70,7 +69,7 @@ pub unsafe extern "system" fn grTexDownloadTable(tmu: u32, kind: u32, data: *con
         return;
     }
     if kind != gpu_1997::glide::TEXTABLE_PALETTE {
-        log_once!("grTexDownloadTable: NCC tables are not handled");
+        shim::gap!("grTexDownloadTable NCC", "NCC tables are not handled");
         return;
     }
     let mut p = Box::new([0u32; 256]);
@@ -96,7 +95,7 @@ pub extern "system" fn grTexClampMode(tmu: u32, s: u32, t: u32) {
 #[unsafe(no_mangle)]
 pub extern "system" fn grTexMipMapMode(_tmu: u32, mode: u32, _lod_blend: u32) {
     if mode != 0 {
-        log_once!("grTexMipMapMode {mode}: mipmaps are not handled");
+        shim::gap!("grTexMipMapMode", "mode {mode}: mipmaps are not handled");
     }
 }
 
@@ -134,7 +133,7 @@ pub extern "system" fn grTexCombine(tmu: u32, rgb_func: u32, rgb_factor: u32, _a
         (0x6, Some(_)) => 0,
         (0x7 | 0x9, Some(k)) => if k == 0.0 { 1 } else { 0 },
         _ => {
-            log_once!("grTexCombine({rgb_func}, {rgb_factor}): taken as decal");
+            shim::gap!("grTexCombine function", "({rgb_func}, {rgb_factor}) taken as decal");
             1
         }
     };
@@ -143,7 +142,7 @@ pub extern "system" fn grTexCombine(tmu: u32, rgb_func: u32, rgb_factor: u32, _a
         (true, 0) => 10,
         (true, 10) => 0,
         (true, _) => {
-            log_once!("grTexCombine: an inverted texel is taken as decal");
+            shim::gap!("grTexCombine invert", "an inverted texel is taken as decal");
             1
         }
     };

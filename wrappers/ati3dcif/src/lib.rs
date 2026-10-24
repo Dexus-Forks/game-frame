@@ -11,6 +11,7 @@ use std::sync::Mutex;
 mod api;
 mod raster;
 mod state;
+mod stubs;
 
 /// `C3D_EC_OK`.
 const OK: u32 = 0;
@@ -23,6 +24,9 @@ pub extern "system" fn DllMain(_module: *mut c_void, reason: u32, _reserved: *mu
         shim::log::init("ati3dcif", "ATI3DCIF_LOG");
         shim::ports::install();
         shim::patch::apply();
+    }
+    if reason == 0 {
+        shim::log::summary();
     }
     1
 }

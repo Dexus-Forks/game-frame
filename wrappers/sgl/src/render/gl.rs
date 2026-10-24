@@ -138,6 +138,7 @@ gl_functions! {
     PixelStorei: fn(name: u32, v: i32);
     DrawArrays: fn(mode: u32, first: i32, count: i32);
     GetString: fn(name: u32) -> *const u8;
+    GetError: fn() -> u32;
     ActiveTexture: fn(t: u32);
     GenBuffers: fn(n: i32, b: *mut u32);
     BindBuffer: fn(target: u32, b: u32);
@@ -175,4 +176,18 @@ gl_functions! {
     FramebufferRenderbuffer: fn(target: u32, attach: u32, rbtarget: u32, r: u32);
     CheckFramebufferStatus: fn(target: u32) -> u32;
     BlitFramebuffer: fn(sx0: i32, sy0: i32, sx1: i32, sy1: i32, dx0: i32, dy0: i32, dx1: i32, dy1: i32, mask: u32, filter: u32);
+}
+
+/// In a debug build, log every OpenGL error raised since the last check, named by `when`.
+/// A release build does nothing.
+pub unsafe fn check(gl: &Gl, when: &str) {
+    if cfg!(debug_assertions) {
+        for _ in 0..8 {
+            let e = unsafe { (gl.GetError)() };
+            if e == 0 {
+                break;
+            }
+            shim::log!("OpenGL error {e:#x} {when}");
+        }
+    }
 }

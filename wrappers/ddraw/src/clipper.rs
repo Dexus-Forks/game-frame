@@ -12,10 +12,6 @@ pub struct Clipper {
 
 static VTBL: OnceLock<Vec<usize>> = OnceLock::new();
 
-/// QueryInterface, AddRef, Release, GetClipList, GetHWnd, Initialize, IsClipListChanged,
-/// SetClipList, SetHWnd.
-const ARGS: [usize; 9] = [2, 0, 0, 3, 1, 2, 1, 2, 2];
-
 unsafe extern "system" fn ok2(_this: *mut Clipper, _a: u32, _b: u32) -> Hr {
     DD_OK
 }
@@ -26,7 +22,7 @@ unsafe extern "system" fn count(_this: *mut Clipper) -> u32 {
 
 pub fn new() -> *mut Clipper {
     let vtbl = VTBL.get_or_init(|| {
-        table(&ARGS, &[(1, count as Slot), (2, count as Slot), (7, ok2 as Slot), (8, ok2 as Slot)])
+        table(clipper::stubs(), &[(1, count as Slot), (2, count as Slot), (7, ok2 as Slot), (8, ok2 as Slot)])
             .into_iter()
             .map(|p| p as usize)
             .collect()

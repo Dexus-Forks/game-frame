@@ -9,6 +9,26 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- Every wrapper DLL now exports every call of the original library, so any game that uses one
+  loads. Calls implemented of calls exported: Glide 55 of 156 (Glide 2.43 and 2.1.1), SGL 47
+  of 134, ATI3DCIF 6 of 17, S3D Toolkit 6 of 6, DirectDraw 2 of 9. Each crate's `api.tsv`
+  holds the original's API table. `wrappers/stubgen.py` writes the crate's `.def` and
+  `src/stubs.rs` from it. It stubs each call not written yet. It fails on a call written with
+  the wrong convention. The originals stay outside the repository.
+- `tools/pe/apitable.py` writes the API table of a 32-bit DLL or of an SDK's import library.
+  For a DLL, each export's convention and argument bytes come from the `ret N` its code ends
+  with. A header gives the parameter counts and return kinds. The tool is tested on a DLL
+  built from our own C.
+- The wrappers log what they lack in one way. `shim::stub!` and `shim::gap!` log the first call
+  of each stub and unhandled mode with its arguments. They count the later calls. When the game
+  exits, they list them all with their counts. `ddraw.dll` names each COM method that is a stub. `sgl.dll` now logs the
+  convex objects it skips.
+- Debug and release builds of the wrappers. `cargo build` gives symbols, debug assertions, the
+  first 50 calls of each stub logged and OpenGL errors checked after each frame. `cargo build
+  --release` gives link-time optimisation and stripped DLLs. Each log names its build.
+- `S3DTK_ExitLib` and `S3DTK_PhysicalToLinear`, from the original's code. With them the S3D
+  Toolkit is complete.
+
 - `wrappers/`, a Cargo workspace of replacement libraries for the 3D cards of 1997, moved from
   the POD project: `glide2x.dll` (Glide 2.x on OpenGL), `ddraw.dll` (DirectDraw in memory,
   scaled), `ati3dcif.dll` and `s3dtkw.dll` (the chips' faces drawn in software), and `sgl.dll`

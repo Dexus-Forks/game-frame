@@ -412,6 +412,21 @@ PY
 else
   echo "  skip  probegen (needs zig)"
 fi
+if command -v zig >/dev/null; then
+  A="$(mktemp -d)"
+  zig cc -target x86-windows-gnu -O1 -shared tests/fixtures/apitable/api.c tests/fixtures/apitable/api.def -o "$A/api.dll" >/dev/null 2>&1
+  expect "apitable reads each export's convention and argument bytes from the code, with the header's parameters and returns" \
+    "_decorated@8 stdcall 8 2 int name+ret|nothing cdecl 0 0 void ret|plain_c cdecl 0 2 int ret|plain_std stdcall 12 3 int ret|ratio cdecl 0 1 float ret|table_data data 0 - - -" \
+    sh -c "'$PYTHON' tools/pe/apitable.py '$A/api.dll' --header tests/fixtures/apitable/api.h | sed 1d | cut -f2,4-8 | tr '\t' ' ' | paste -sd'|' -"
+  printf 'LIBRARY api.dll\nEXPORTS\ndecorated@8\nplain_std@12\n' > "$A/imp.def"
+  zig dlltool -d "$A/imp.def" -l "$A/imp.lib" -m i386 >/dev/null 2>&1
+  expect "apitable reads the stdcall names of an import library" "_decorated@8 stdcall 8 2 lib|_plain_std@12 stdcall 12 3 lib" \
+    sh -c "'$PYTHON' tools/pe/apitable.py '$A/imp.lib' --header tests/fixtures/apitable/api.h | sed 1d | cut -f2,4,5,6,8 | tr '\t' ' ' | paste -sd'|' -"
+  rm -rf "$A"
+else
+  echo "  skip  apitable (needs zig)"
+fi
+expect "apitable prints its usage" "Write the API table of a 32-bit Windows DLL" "$PYTHON" tools/pe/apitable.py --help
 expect "probegen prints its usage" "probegen.py GAME.EXE DLL OUT_DIR" "$PYTHON" tools/pe/probegen.py
 expect "pe32_emu loads an FPU control word: a magic-number add rounds to nearest, or truncates" "nearest 4, chop 3; 103 of 200 cases differ; whole multiples none" "$PYTHON" - <<'PY'
 import sys; sys.path.insert(0, 'tools/emu')
@@ -1591,23 +1606,31 @@ echo "Wrappers"
 if command -v cargo >/dev/null; then
   WT="$(mktemp -d)"
   host="$(rustc -vV | sed -n 's/^host: //p')"
+  out="$("$PYTHON" wrappers/stubgen.py --check 2>&1)"
+  [[ $? == 0 && "$out" == *"s3dtkw: 6 of 6 calls implemented"* ]] \
+    && ok "stubgen: each wrapper's .def and stubs match its API table, every call with the original's convention ($(echo "$out" | grep -o '[0-9]* of [0-9]*' | paste -sd, - | sed 's/,/, /g'))" \
+    || bad "stubgen --check" "$out"
   out="$(cd wrappers && cargo test --release --target "$host" --target-dir "$WT" -p raster -p scalers -p pixels -p shim -p sgl 2>&1)"
   [[ $? == 0 ]] && ok "the wrappers' host tests pass: rasteriser, scalers, pixels, settings, SGL scene graph ($(echo "$out" | grep -o '[0-9]* passed' | awk '{s+=$1} END {print s}') tests)" \
     || bad "wrappers host tests" "$(echo "$out" | grep -E 'FAILED|panicked|error' | head -8)"
   if rustup target list --installed 2>/dev/null | grep -q i686-pc-windows-gnu && command -v zig >/dev/null; then
     out="$(cd wrappers && cargo build -q --release --target-dir "$WT" 2>&1)"
     [[ $? == 0 ]] || bad "wrappers build for 32-bit Windows" "$(echo "$out" | grep -E 'error' | head -8)"
-    expect "each wrapper DLL exports exactly its .def's names (glide2x 55, sgl 47, ddraw, ati3dcif, s3dtkw)" "ati3dcif 6 ok, ddraw 2 ok, glide2x 55 ok, s3dtkw 4 ok, sgl 47 ok" "$PYTHON" -c "
+    expect "each wrapper DLL exports exactly its .def's names: every call of the original library" "94DLL32 6 ok, ati3dcif 17 ok, ddraw 9 ok, glide2x 156 ok, S3DTKW 6 ok, sgl 134 ok" "$PYTHON" -c "
 import glob, os, pefile
 out = []
 for d in sorted(glob.glob('wrappers/*/*.def')):
     name = os.path.basename(d)[:-4]
-    lines = open(d).read().split('EXPORTS', 1)[1].split()
-    want = sorted(l.split('=')[0] for l in lines)
+    lines = [l.split() for l in open(d).read().split('EXPORTS', 1)[1].splitlines() if l.strip()]
+    want = sorted(l[0].split('=')[0] for l in lines)
     p = pefile.PE('$WT/i686-pc-windows-gnu/release/' + name + '.dll')
     got = sorted(e.name.decode() for e in p.DIRECTORY_ENTRY_EXPORT.symbols)
-    out.append(f'{name} {len(got)} ' + ('ok' if got == want else f'differs: {sorted(set(got) ^ set(want))[:5]}'))
-print(', '.join(out))"
+    lib = open(d).readline().split()[1].rsplit('.', 1)[0]
+    out.append(f'{lib} {len(got)} ' + ('ok' if got == want else f'differs: {sorted(set(got) ^ set(want))[:5]}'))
+print(', '.join(sorted(out, key=str.lower)))"
+    out="$(cd wrappers && cargo build -q --target-dir "$WT" 2>&1)"
+    [[ $? == 0 && -f "$WT/i686-pc-windows-gnu/debug/glide2x.dll" ]] && ok "the wrappers' debug build builds too" \
+      || bad "wrappers debug build" "$(echo "$out" | grep -E 'error' | head -8)"
     zig cc -target x86-windows-gnu -O2 wrappers/sgl/test/sgltest.c -o "$WT/sgltest.exe" -luser32 >/dev/null 2>&1 \
       && ok "sgltest.c, the SGL stand-in's test program, builds" || bad "sgltest.c does not build"
   else

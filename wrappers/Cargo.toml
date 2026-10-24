@@ -12,9 +12,23 @@ license = "Apache-2.0"
 version = "0.1.0"
 repository = "https://github.com/tanepiper/game-frame"
 
+# Two builds of every DLL, in target/i686-pc-windows-gnu/<profile>/:
+# - debug (`cargo build`): symbols, overflow and debug assertions, the first 50 calls of each
+#   stub and each gap logged one by one, and OpenGL errors checked after each frame. Optimised
+#   a little, so a game still runs at a usable speed.
+# - release (`cargo build --release`): fully optimised with link-time optimisation, no symbols,
+#   only the first call of each stub and gap logged. For players.
 [profile.dev]
 panic = "abort"
+opt-level = 1
+debug = true
+
+[profile.dev.package."*"]
+opt-level = 2
 
 [profile.release]
 panic = "abort"
 opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = "symbols"

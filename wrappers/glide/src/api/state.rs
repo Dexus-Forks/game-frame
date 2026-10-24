@@ -59,7 +59,7 @@ pub extern "system" fn guAlphaSource(mode: u32) {
 #[unsafe(no_mangle)]
 pub extern "system" fn grAlphaControlsITRGBLighting(enable: u32) {
     if enable != 0 {
-        crate::log::log_once!("grAlphaControlsITRGBLighting(TRUE) is not handled");
+        shim::gap!("grAlphaControlsITRGBLighting", "TRUE is not handled");
     }
 }
 

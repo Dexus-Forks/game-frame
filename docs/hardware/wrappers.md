@@ -42,24 +42,26 @@ today's graphics libraries. How much it can improve the picture depends on the A
   well. `ddraw.dll` then scales the finished frame up. The scaled frame has no more detail
   than the original. Its edges stay clean.
 
-Each library logs the modes and states it does not draw, mostly the first time the game uses
-them. The first run of a new game shows much of what is missing ([Reading the
-logs](#reading-the-logs)).
+Each library exports every call of the original, so any game that uses the library loads.
+The calls not written yet are stubs. A stub logs its call with its arguments and returns a
+failure value. When the game exits, the library lists every stub and every unhandled mode the
+game met, with a count. The log of a new game's first run then lists what to write next
+([Reading the logs](#reading-the-logs)). The aim is a full replacement for each library.
 
 ## The libraries
 
 | DLL | Stands in for | What it draws | State | Known gaps |
 |---|---|---|---|---|
-| [`glide2x.dll`](../../wrappers/glide/README.md) | 3dfx Glide 2.x (`glide.dll`, `glide2x.dll`) | The whole scene with OpenGL, at any size. The Voodoo's colour combiners, chroma key and table fog are one fragment shader. The W buffer is OpenGL's depth test | 55 exports. POD's 3dfx builds (first edition and Gold) race at 1280 × 960 | Only TMU 0 draws. No NCC textures or mipmaps. `GR_BLEND_PREFOG_COLOR` is taken as zero |
-| [`sgl.dll`](../../wrappers/sgl/README.md) | PowerVR PCX1 and PCX2, SGL's scene-graph half | It keeps the scene graph the game builds and draws it with OpenGL, with the 2D picture laid on top through `ddraw.dll` | 46 of SGL's calls and one for `ddraw.dll`. POD Gold's PowerVR build races at 1280 × 960 | The immediate-mode half (`sgltri_*`) is missing. Shadow volumes and other convex objects except light volumes are skipped |
-| [`ati3dcif.dll`](../../wrappers/ati3dcif/README.md) | ATI 3D Rage (ATI3DCIF) | Solid, flat and Gouraud triangles and quads, blended by source alpha, in software into the game's DirectDraw surface | 6 exports. POD's ATI build races with the frame scaled | No textures, lines, rectangles, points, Z buffer or fog. Whether the Rage rounded edges the same way is *unknown* |
-| [`s3dtkw.dll`](../../wrappers/s3dtkw/README.md) | S3 ViRGE (S3D Toolkit) | Gouraud lists, strips and fans, blended by source alpha, in software into a 15-bit or 8-bit surface | 4 exports and the function table. POD's S3 build races with the frame scaled | Textured faces are drawn Gouraud. Fog is logged and not drawn |
-| [`ddraw.dll`](../../wrappers/ddraw/README.md) | DirectDraw 1 to 3 | Every surface in memory and every mode granted. Each flip shows the frame in a window, scaled | Used by POD's ATI, S3 and PowerVR builds. Made for its software and MMX builds too (not confirmed with them) | No Direct3D. `DDRAW_SYSTEM=1` hands DirectDraw to the system's own library for a game that needs it. Methods POD does not call return `DDERR_UNSUPPORTED` |
+| [`glide2x.dll`](../../wrappers/glide/README.md) | 3dfx Glide 2.x (`glide.dll`, `glide2x.dll`) | The whole scene with OpenGL, at any size. The Voodoo's colour combiners, chroma key and table fog are one fragment shader. The W buffer is OpenGL's depth test | 55 of 156 calls (Glide 2.43 and 2.1.1). POD's 3dfx builds (first edition and Gold) race at 1280 × 960 | Only TMU 0 draws. No NCC textures or mipmaps. `GR_BLEND_PREFOG_COLOR` is taken as zero |
+| [`sgl.dll`](../../wrappers/sgl/README.md) | PowerVR PCX1 and PCX2, SGL's scene-graph half | It keeps the scene graph the game builds and draws it with OpenGL, with the 2D picture laid on top through `ddraw.dll` | 47 of 134 calls (46 of SGL's 133, and one for `ddraw.dll`). POD Gold's PowerVR build races at 1280 × 960 | The immediate-mode half (`sgltri_*`) is stubs. Shadow volumes and other convex objects except light volumes are skipped |
+| [`ati3dcif.dll`](../../wrappers/ati3dcif/README.md) | ATI 3D Rage (ATI3DCIF) | Solid, flat and Gouraud triangles and quads, blended by source alpha, in software into the game's DirectDraw surface | 6 of 17 calls. POD's ATI build races with the frame scaled | No textures, lines, rectangles, points, Z buffer or fog. Whether the Rage rounded edges the same way is *unknown* |
+| [`s3dtkw.dll`](../../wrappers/s3dtkw/README.md) | S3 ViRGE (S3D Toolkit) | Gouraud lists, strips and fans, blended by source alpha, in software into a 15-bit or 8-bit surface | All 6 calls, and 3 slots of the function table. POD's S3 build races with the frame scaled | Textured faces are drawn Gouraud. Fog is logged and not drawn |
+| [`ddraw.dll`](../../wrappers/ddraw/README.md) | DirectDraw 1 to 3 | Every surface in memory and every mode granted. Each flip shows the frame in a window, scaled | 2 of 9 calls, and the methods of DirectDraw 1 to 3 that POD calls. Used by POD's ATI, S3 and PowerVR builds. Made for its software and MMX builds too (not confirmed with them) | No Direct3D. `DDRAW_SYSTEM=1` hands DirectDraw to the system's own library for a game that needs it. Methods POD does not call return `DDERR_UNSUPPORTED` |
 
 The libraries share four crates:
 
 - [`shim`](../../wrappers/shim/README.md): the shared settings, port I/O as Windows 95
-  allowed it, patches to the game's code in memory, and the log.
+  allowed it, patches to the game's code in memory, and the log with its stubs.
 - [`raster`](../../wrappers/raster/README.md): a small software triangle rasteriser for 8-,
   15- and 16-bit frame buffers.
 - [`scalers`](../../wrappers/scalers/README.md): whole-multiple, Scale2x and CRT-style
@@ -87,12 +89,27 @@ needed.
 
 ```bash
 rustup target add i686-pc-windows-gnu
-cd wrappers && cargo build --release
+cd wrappers && cargo build --release     # for playing
+cd wrappers && cargo build               # for working on a library
 ```
+
+The two builds go to their own folders:
+
+| | Release | Debug |
+|---|---|---|
+| Folder | `wrappers/target/i686-pc-windows-gnu/release/` | `wrappers/target/i686-pc-windows-gnu/debug/` |
+| Speed | Fully optimised, with link-time optimisation | Lightly optimised, so a game still runs |
+| Symbols | Stripped | Kept, for a debugger |
+| Stubs and unhandled modes | The first call of each logged | The first 50 of each logged |
+| OpenGL errors | Not checked | Logged after each frame (`glide2x.dll`, `sgl.dll`) |
+| Size of a DLL | About 0.4 to 1.2 MB | About 6 to 10 MB |
+
+Both builds count every stub and unhandled mode. They list them when the game exits. The first
+line of each log names the build.
 
 `wrappers/.cargo/config.toml` sets the target and links through GameFrame's `scripts/zcc.sh`.
 zcc takes each DLL's exports from the `.def` file in its crate, so each DLL exports exactly the
-names a game imports. The built DLLs are in `wrappers/target/i686-pc-windows-gnu/release/`.
+original library's names.
 
 To draw, `glide2x.dll` and `sgl.dll` need OpenGL. Software OpenGL works. Under Wine without a
 GPU, Mesa's llvmpipe draws. A 32-bit game needs 32-bit OpenGL libraries. On Debian these are
@@ -188,24 +205,33 @@ first applies each patch and the others find the new bytes already in place. The
 
 ### Reading the logs
 
-`glide2x.dll` and `s3dtkw.dll` write a line the first time the game uses a mode they do not
-draw, such as mipmaps, NCC textures or fog. The S3 library also logs every call to a slot of its
-function table that it does not fill. `ddraw.dll` writes one line the first time a stub method
-is called, once for each number of arguments, without the method's name. The ATI library logs
-the first four values of every state the game sets, and once each primitive type it does not
-draw. `sgl.dll` does not log what it skips; `SGL_TRACE` logs its calls instead. The applied
-patches are logged with their reasons.
+Every library writes the same three kinds of line:
 
-A call that a DLL does not export is not in its log at all. The game then fails to load, or
-the system's loader names the missing import (not confirmed for Wine). `glide2x.dll` also logs
-frames per second, and `sgl.dll` pictures a second. That shows whether the output size is too
-large for the machine.
+```text
+glide: release build, GameFrame wrappers 0.1.0
+glide: not implemented: grTexDetailControl(0x0, 0x4, 0x2, 0x3f800000) (later calls are counted)
+glide: not handled: grTexMipMapMode: mode 2: mipmaps are not handled (later calls are counted)
+glide: not implemented or not handled, by count: grTexDetailControl ×812, grTexMipMapMode ×3
+```
+
+- `not implemented` is a call to a stub, with its arguments as 32-bit words.
+- `not handled` is a mode, state or kind of object that an implemented call does not draw yet.
+- The last line comes when the game exits. It lists everything the game met that the library
+  lacks, most frequent first. If it reads "every call this game made is implemented", nothing
+  was missing.
+
+`ddraw.dll` names each COM method that is a stub, such as `IDirectDrawSurface::GetDC`. Some
+libraries log more of their own. The ATI library logs the first four values of each state the
+game sets. The S3 library logs each call to a slot of its function table that it does not fill.
+`SGL_TRACE=N` logs the first N calls of each SGL function. The applied patches are logged with
+their reasons. `glide2x.dll` also logs frames per second, and `sgl.dll` pictures a second. That
+shows whether the output size is too large for the machine.
 
 ## Add a game
 
 1. Find the card libraries it imports, and copy the stand-ins beside it, as above.
 2. Find its window class and set `WRAPPER_WINDOW_CLASS`.
-3. Run it, and read the log. Each line names a call or a state the game needs.
+3. Run it, and read the log. The list at the end names each call and mode the game needs.
 4. If the game stops before its first card call, look for a hardware check: the CPU, the
    desktop's colour depth, the card's name or its memory. Write a patch for it, in the game's
    own repository.
@@ -219,14 +245,20 @@ about windows, threads and the frame buffer, and how to measure what a card was 
 
 ## Add a missing call
 
+Every call of the original is already exported as a stub. Each library's `api.tsv` lists them
+all. `tools/pe/apitable.py` read the convention and argument bytes of each call from the
+original DLL's own code. For ATI3DCIF, which had no DLL at hand, it read them from the SDK's
+import library.
+
 1. **Find the call in the original API.** The card makers' SDK headers give its arguments and
    structures. [The card makers' 3D APIs](card-apis.md) lists sources for each.
 2. **Find how the game uses it.** Trace the call site in the game's code. Note which arguments
    it passes and what it does with the result.
-3. **Add it to the library's `api` module**, beside the calls of the same kind. Keep the
-   original's name and calling convention.
-4. **Add the export to the crate's `.def` file.** `tests/run.sh` checks each DLL's export table
-   against its `.def` file.
+3. **Write it in the library's `api` module**, beside the calls of the same kind, with
+   `#[unsafe(no_mangle)]`. Keep the original's name and calling convention: `extern "system"`
+   for stdcall, `extern "C"` for cdecl. `api.tsv` says which.
+4. **Run `python3 wrappers/stubgen.py`.** It removes the stub and keeps the export. It stops with
+   an error if the call has the wrong convention. `tests/run.sh` runs it with `--check`.
 5. **Test it on the host if it holds logic.** The rasteriser, the scalers, the settings and
    SGL's scene graph are plain Rust with host tests. Put new logic there when you can.
 6. **Mark each difference from the card** with a `Deviation:` comment in the code, and list it
@@ -237,8 +269,12 @@ GameFrame keeps no game material. A test for a new call uses our own code, such 
 
 ## Testing
 
-`tests/run.sh` builds the DLLs, runs the host tests, checks each export table against its `.def`
-file, and builds `sgltest.exe` when zig is installed. To run the host tests alone:
+`tests/run.sh` builds the release and debug DLLs, runs the host tests, checks each export table
+against its `.def` file, checks that the `.def` files and stubs match the API tables, and builds
+`sgltest.exe` when zig is installed. A stub's argument bytes are checked when the DLL links. The
+`.def` file names each stdcall export by its decorated name, such as `grAADrawLine@8`. Rust
+gives a function that name only when it takes exactly 8 bytes of arguments. To run the host
+tests alone:
 
 ```bash
 cd wrappers && cargo test --release --target "$(rustc -vV | sed -n 's/^host: //p')" -p raster -p scalers -p pixels -p shim -p sgl
@@ -303,9 +339,11 @@ second. Play needs a real GPU.
 
 ## Limits and next steps
 
-- **One game.** Each library implements the calls POD makes. A second game for each card would
-  show how general they are. For example, Hardwar's PowerVR mode uses SGL's immediate-mode half,
-  which is not here yet ([GAPS.md](../../GAPS.md)).
+- **One game.** Each library implements the calls POD makes. It stubs the rest. A second game
+  for each card would show how general they are. For example, Hardwar's PowerVR mode uses SGL's
+  immediate-mode half, which is only stubs so far ([GAPS.md](../../GAPS.md)).
+- **OpenGL only.** The drawing goes through OpenGL. Vulkan and Metal back ends are a later step,
+  for machines where OpenGL is slow or missing.
 - **No run on real Windows yet.** All testing so far was under Wine. Windows 10 and 11 may load
   `ddraw.dll` from the system folder, and their OpenGL drivers differ from Mesa.
 - **No built release.** You build the DLLs yourself for now. A release of built DLLs would let

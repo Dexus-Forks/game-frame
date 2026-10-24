@@ -32,9 +32,12 @@ Implemented: `DirectDrawCreate`, `DirectDrawEnumerateA`; `IDirectDraw` and `IDir
 (cooperative level, modes, caps, video memory, surfaces, palettes, clippers);
 `IDirectDrawSurface` up to version 3 (lock, unlock, flip, attached surface, `Blt` with colour
 fill or copy and source colour key, `BltFast`, colour keys, palettes, descriptions). Every
-other method is a stub that removes its arguments and returns `DDERR_UNSUPPORTED`, logged
-once. A game that needs one of them shows it in the log. Modules: `ddraw.rs`, `surface.rs`,
-`palette.rs`, `clipper.rs`, `desc.rs` (`DDSURFACEDESC`), `present.rs` (the frame to the
-window), `com.rs` (interface tables).
+other method is a stub that removes its arguments and returns `DDERR_UNSUPPORTED`. The log
+names it (`IDirectDrawSurface::GetDC`) with its arguments. The DLL also exports these calls
+as stubs (`api.tsv`): `DirectDrawCreateClipper`, `DirectDrawEnumerateW`, `DirectDrawCreateEx`,
+`DirectDrawEnumerateExA`, `DirectDrawEnumerateExW`, `DllCanUnloadNow` and
+`DllGetClassObject`. A game that needs one of them shows it in the log. Modules: `ddraw.rs`,
+`surface.rs`, `palette.rs`, `clipper.rs`, `desc.rs` (`DDSURFACEDESC`), `present.rs` (the
+frame to the window), `com.rs` (interface tables).
 
 Build: `../README.md`. Licence: Apache-2.0 (code), CC0-1.0 (this text).

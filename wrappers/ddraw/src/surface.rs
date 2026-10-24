@@ -37,15 +37,9 @@ pub struct Surface {
 
 static VTBL: OnceLock<Vec<usize>> = OnceLock::new();
 
-/// Argument counts of the 40 methods of `IDirectDrawSurface3`.
-const ARGS: [usize; 40] = [
-    2, 0, 0, 1, 1, 5, 3, 5, 2, 2, 3, 2, 2, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 2, 0, 4, 1, 0, 1, 2, 2, 1,
-    1, 5, 1, 2, 1, 1, 1, 2,
-];
-
 fn vtbl() -> *const Slot {
     VTBL.get_or_init(|| {
-        table(&ARGS, &[
+        table(surface::stubs(), &[
             (0, query as Slot),
             (1, add_ref as Slot),
             (2, release as Slot),

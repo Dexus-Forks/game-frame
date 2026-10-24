@@ -177,6 +177,7 @@ impl Renderer {
                     shot(&g.gl, cw, ch, &format!("{dir}\\sgl-{:06}.bmp", self.pictures));
                 }
             }
+            super::gl::check(&g.gl, "in the frame");
             SwapBuffers(g.dc);
         }
         self.shown += 1;

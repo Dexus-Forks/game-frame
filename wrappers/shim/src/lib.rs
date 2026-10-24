@@ -6,10 +6,11 @@
 //!   NT stop, emulated by an exception handler; each DLL installs it from its `DllMain`.
 //! - `patch`: the game's own code patched in memory at load, from the file `WRAPPER_PATCHES`
 //!   names, so the EXE on disk stays unchanged.
-//! - `log`: a log to the file a DLL names by an environment variable, or to standard error.
+//! - `log`: a log to the file a DLL names by an environment variable, or to standard error,
+//!   and the counted log of what is not implemented yet (`stub!`, `gap!`). Plain Rust, so
+//!   the scene code tested on the host can use it.
 
 pub mod config;
-#[cfg(windows)]
 pub mod log;
 #[cfg(windows)]
 pub mod patch;

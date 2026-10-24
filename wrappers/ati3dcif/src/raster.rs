@@ -7,7 +7,6 @@
 
 use crate::state::*;
 use raster::{Format, Target, Vertex, polygon};
-use shim::log_once;
 
 /// `C3D_EPRIM_*`.
 const TRI: u32 = 1;
@@ -74,7 +73,7 @@ pub unsafe fn prim(c: &Context, vs: &[*const u32]) {
         TRI => 3,
         QUAD => 4,
         p => {
-            log_once!("primitive type {p} is not drawn");
+            shim::gap!("C3D_EPRIM", "primitive type {p} is not drawn");
             return;
         }
     };

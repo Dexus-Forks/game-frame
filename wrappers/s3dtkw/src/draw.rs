@@ -13,7 +13,6 @@
 use crate::table::State;
 use gpu_1997::s3;
 use raster::{Format, Target, Vertex, polygon, triangle};
-use shim::log_once;
 
 /// `S3DTK_TRILIST`, `S3DTK_TRISTRIP`, `S3DTK_TRIFAN` (POD uses the fan).
 const LIST: u32 = 0;
@@ -35,16 +34,16 @@ pub unsafe fn triangles(s: &State, list: *const u32, n: u32, kind: u32) {
         s3::VIDEORGB15 => Format::Rgb555,
         s3::VIDEORGB8 => Format::Index8,
         _ => {
-            log_once!("draw surface format {format:#x} (24-bit) is not drawn");
+            shim::gap!("surface format", "{format:#x} (24-bit) is not drawn");
             return;
         }
     };
     let mut t = Target { ptr, pitch: w * format.bytes(), w, h, format };
     if s.values[RENDERINGTYPE] != s3::GOURAUD {
-        log_once!("rendering type {:#x}: textures are not drawn, Gouraud instead", s.values[RENDERINGTYPE]);
+        shim::gap!("S3DTK_RENDERINGTYPE textured", "type {:#x}: textures are not drawn, Gouraud instead", s.values[RENDERINGTYPE]);
     }
     if s.values[FOGCOLOR] != 0xffff_ffff {
-        log_once!("fog colour {:#x}: fog is not drawn", s.values[FOGCOLOR]);
+        shim::gap!("S3DTK_FOGCOLOR", "fog colour {:#x}: fog is not drawn", s.values[FOGCOLOR]);
     }
     let verts: Vec<Vertex> = (0..n as usize)
         .map(|i| {

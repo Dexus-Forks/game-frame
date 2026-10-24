@@ -11,7 +11,6 @@
 use crate::api::sst::screen;
 use crate::cmd::{Cmd, LfbImage, push, read};
 use crate::consts::*;
-use crate::log::log_once;
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicBool, Ordering};
 
@@ -147,7 +146,7 @@ pub extern "system" fn grLfbEnd() {
 pub extern "system" fn grLfbGetWritePtr(buffer: u32) -> *mut u32 {
     finish_write();
     if buffer != BUFFER_BACK {
-        log_once!("grLfbGetWritePtr({buffer}): only the back buffer is handled");
+        shim::gap!("grLfbGetWritePtr buffer", "buffer {buffer}: only the back buffer is handled");
     }
     OUTSTANDING.store(true, Ordering::Release);
     with(|l| l.write.as_mut_ptr())
@@ -169,7 +168,7 @@ pub extern "system" fn grLfbGetReadPtr(buffer: u32) -> *const u16 {
 pub extern "system" fn grLfbWriteMode(mode: u32) {
     with(|l| l.mode = mode);
     if !matches!(mode, LFB_565 | LFB_555 | LFB_1555 | LFB_888 | LFB_8888) {
-        log_once!("grLfbWriteMode({mode}) is not handled");
+        shim::gap!("grLfbWriteMode", "mode {mode} is not handled");
     }
 }
 

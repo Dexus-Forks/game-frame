@@ -122,6 +122,7 @@ impl Frame {
                 (gl.Uniform2f)(p.loc("uScreen"), 1.0, 1.0);
                 (gl.DrawArrays)(0x0005, 0, 4);
             }
+            crate::gl::check(gl, "in the frame");
             crate::win32::SwapBuffers(dc);
             self.back ^= 1;
             self.bind_back(gl);

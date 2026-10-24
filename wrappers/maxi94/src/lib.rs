@@ -26,6 +26,9 @@ pub extern "system" fn DllMain(_module: *mut c_void, reason: u32, _reserved: *mu
         shim::ports::install();
         shim::patch::apply();
     }
+    if reason == 0 {
+        shim::log::summary();
+    }
     1
 }
 

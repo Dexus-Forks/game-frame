@@ -37,7 +37,8 @@ run through. Try them before you write your own.
 7. If the game must be patched in memory (a CPU check that quits on today's CPUs), write the
    patches into a file in your project and name it in `WRAPPER_PATCHES`
    ([shim](../../wrappers/shim/README.md)). The EXE on disk stays unchanged.
-8. Read the logs. Each DLL logs every call it does not handle, once. Add the missing calls to
+8. Read the logs. Each DLL logs the first call of each stub and of each mode it does not
+   handle, and lists them all with their counts when the game exits. Add the missing calls to
    `wrappers/` with a test, so the next game finds them there.
 
 The libraries cover the calls POD makes. SGL's immediate-mode half (`sgltri_*`) is still open
@@ -76,6 +77,19 @@ surface layouts of two APIs this way.
    argument size. An undecorated `__stdcall` import needs `--stdcall NAME=BYTES`, or the
    game's stack goes wrong after the call. Then add record dumps to the stubs that take
    vertices or surfaces.
+5. **Read the original library's API table, if you have its DLL or SDK.**
+   `tools/pe/apitable.py` lists every export with its calling convention and argument bytes,
+   read from the `ret N` each function ends with. It reads an SDK's import library too. It
+   takes the parameter counts and return types from the SDK's header:
+
+   ```bash
+   ./gameframe run apitable DRIVER/S3DTKW.DLL                      # six cdecl calls
+   ./gameframe run apitable SDK/ATI3DCIF.LIB --header SDK/ATI3DCIF.H
+   ```
+
+   The table lists the calls a game might import that your library does not export. In
+   `wrappers/`, each library's `api.tsv` is such a table. `wrappers/stubgen.py` makes a stub
+   of every call not yet written ([wrappers](../../wrappers/README.md)).
 
 ## Build it
 

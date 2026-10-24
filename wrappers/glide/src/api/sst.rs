@@ -50,7 +50,7 @@ pub extern "system" fn grSstOpen(res: u32, refresh: u32, format: u32, origin: u3
     let (w, h) = consts::resolution(res).unwrap_or((640, 480));
     log!("grSstOpen {w}x{h} (res {res}, refresh {refresh}, format {format}, origin {origin}, smoothing {smoothing}, {buffers} buffers)");
     if format != 0 || origin != 0 {
-        crate::log::log_once!("only GR_COLORFORMAT_ARGB and GR_ORIGIN_UPPER_LEFT are handled");
+        shim::gap!("grSstOpen format", "only GR_COLORFORMAT_ARGB and GR_ORIGIN_UPPER_LEFT are handled");
     }
     WIDTH.store(w, Ordering::Relaxed);
     HEIGHT.store(h, Ordering::Relaxed);

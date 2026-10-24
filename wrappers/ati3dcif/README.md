@@ -1,10 +1,12 @@
 # ati3dcif: ATI 3D Rage (ATI3DCIF)
 
-`ati3dcif.dll` exports the six ATI3DCIF calls POD's ATI build (`WPODATI.EXE`) imports. It
-draws what the game gives the chip in software into the game's DirectDraw back buffer, 16-bit
-RGB565, with the `raster` crate. That covers triangles and quads with solid, flat or Gouraud
-colour, blended by source alpha. Vertices are `C3D_VTCF`. In a POD race these faces are the
-cars' shadows. How POD uses each call is in POD's `docs/hardware/3d-cards.md`.
+`ati3dcif.dll` implements the six ATI3DCIF calls POD's ATI build (`WPODATI.EXE`) imports. It
+exports all 17 calls of ATI's 3D Rage Pro SDK 4.1. The other 11 are stubs. Each logs its call
+and returns `C3D_EC_NOTIMPYET` (`api.tsv`, [wrappers](../README.md)). The library draws what
+the game gives the chip in software into the game's DirectDraw back buffer, 16-bit RGB565,
+with the `raster` crate. That covers triangles and quads with solid, flat or Gouraud colour,
+blended by source alpha. Vertices are `C3D_VTCF`. In a POD race these faces are the cars'
+shadows. How POD uses each call is in POD's `docs/hardware/3d-cards.md`.
 
 Not handled (POD does not use them): textures, lines, rectangles, points, Z buffering, fog.
 A game that sets those states gets a log line for each. *Unknown*: whether the Rage rounded
