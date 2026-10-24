@@ -11,7 +11,10 @@ Every release of GameFrame, newest first. The format follows
 
 - Know-how entries for GameFrame's own tools: unmapped memory under the emulators, an import
   with no handler, a tool run without the `.venv`, and Ghidra refusing a path in a dot folder.
-
+- `dos_env` has a keyboard: `env.press(scan, at, hold)` and `env.key_script('10:39:3')` put
+  make and break codes on port 0x60 and raise IRQ 1 through the game's INT 9 handler, which
+  acknowledges through port 0x20. The BIOS's INT 9 feeds the INT 16h queue, and INT 16h waits
+  for a key still to come. The DOS sample gains `wait_keys` and a keyboard handler.
 - `tools/triage/exportcov.py`: how much code a Ghidra export covers, its largest gaps, and the
   likely starts of the functions it missed (call targets, starts after a return or padding),
   written for the batch decompile.
@@ -133,6 +136,10 @@ Every release of GameFrame, newest first. The format follows
 
 ### Fixed
 
+- `tools/site/check.py` and the gates no longer take the English word "undefined" in prose for
+  decompiled code. The pattern now matches Ghidra's sized types, pointers and variables of
+  those types, and statements with `FUN_` and `DAT_` names (calls, assignments and
+  declarations). Names cited in a sentence pass, as before.
 - The animated diagrams: in every animated diagram the static labels are drawn last, so a
   moving token or highlight passes under the text it crosses instead of hiding it. Tokens that
   loop start with a negative `begin`, so none waits in the card's top-left corner before its

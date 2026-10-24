@@ -65,8 +65,9 @@ class BiosServices:
 
     def int16(self, emu):
         """Keyboard BIOS with a queue: env.keys holds (scan << 8 | ascii) words. Reading a key
-        when the queue is empty stops the run (a real BIOS would wait), so a script decides what
-        is typed; AX = 0 would be Ctrl-Break."""
+        when the queue is empty waits, as a real BIOS does, while a key pressed with env.press
+        is still to come through INT 9; otherwise it stops the run, so a script decides what
+        is typed. AX = 0 would be Ctrl-Break."""
         ah = emu.reg('ax') >> 8
         flags = emu.reg('flags')
         if ah in (0x01, 0x11):
@@ -75,6 +76,9 @@ class BiosServices:
             else:
                 emu.set(flags=flags | 0x40)            # ZF: no key waiting
         elif ah in (0x00, 0x10):
+            if not self.keys and (self.key_events or self.key_queue or self.key_in_service):
+                emu.set(ip=emu.reg('ip') - 2, flags=flags | 0x200)   # run INT 16h again, IF set
+                return
             if not self.keys:
                 emu.error = 'the program waits for a key (INT 16h): put keys in env.keys'
                 emu.uc.emu_stop()

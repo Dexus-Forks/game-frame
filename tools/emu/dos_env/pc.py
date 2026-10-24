@@ -1,5 +1,5 @@
 """The PC around the CPU: ports (VGA status, the DAC, the PIT, the PIC, sound cards), the
-timer interrupt, the BIOS tick, and screenshots.
+timer interrupt, the BIOS tick, and screenshots. The keyboard is in keyboard.py.
 Part of DosEnv (see __init__.py); the methods use its state."""
 import struct
 
@@ -27,13 +27,22 @@ class PcHardware:
 
     def set_timer_slice(self):
         hz = 1_193_182 / self.divisor
-        self.emu.slice = max(1000, int(self.ips / hz))
+        self.timer_slice = max(1000, int(self.ips / hz))
+        self.emu.slice = self.irq0_due = self.timer_slice
 
     def on_slice(self, emu):
-        """Between slices: deliver IRQ 0 (the timer) through INT 8's handler."""
-        v = self.vector(8)
-        if emu.interrupt(v.seg, v.off):
-            self.irq0_count += 1
+        """Between slices: deliver IRQ 0 (the timer) through INT 8's handler when it is due,
+        else IRQ 1 (the keyboard) when a byte waits. A slice is shortened while a key waits."""
+        self.irq0_due -= emu.slice
+        delivered = False
+        if self.irq0_due <= 0:
+            v = self.vector(8)
+            delivered = emu.interrupt(v.seg, v.off)
+            if delivered:
+                self.irq0_count += 1
+            self.irq0_due = self.timer_slice          # missed while IF was clear: skipped
+        wait = self.keyboard_slice(delivered)
+        emu.slice = min(self.irq0_due, wait) if wait else self.irq0_due
 
     def bios_int8(self, uc, address, size, _):
         self.ticks = (self.ticks + 1) & 0xFFFFFFFF
@@ -63,6 +72,10 @@ class PcHardware:
             v = self.dac[self.dac_read % 768]
             self.dac_read += 1
             return v
+        if port == 0x60:
+            return self.key_data
+        if port == 0x64:
+            return 0x1C | (1 if self.key_queue or self.key_in_service else 0)
         if port == 0x201:
             return 0xFF
         if port in (0x21, 0xA1):
@@ -82,6 +95,8 @@ class PcHardware:
             self.dac_index += 1
         elif port in (0x21, 0xA1):
             self.ports[('mask', port)] = value & 0xFF
+        elif port == 0x20 and value & 0xFF in (0x20, 0x61):
+            self.key_in_service = False                # EOI (non-specific, or IRQ 1's)
         elif port == 0x43:
             self.pit_high = False                     # a latch or mode command restarts the read
             self.pit_write_high = False
