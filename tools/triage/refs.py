@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""List every instruction that refers to an address, found in the raw code bytes, whatever
-function holds it, and whether it reads it, writes it or takes it as a value.
+"""List every instruction that refers to an address. The search reads the raw code bytes, so it
+finds hits in any function or in none. Each hit says whether the instruction reads the address,
+writes it or takes it as a value.
 
 Usage: refs.py BINARY ADDRESS [ADDRESS ...] [--near N] [--functions functions.tsv] [--json]
 
@@ -11,19 +12,19 @@ Usage: refs.py BINARY ADDRESS [ADDRESS ...] [--near N] [--functions functions.ts
   --functions  a Ghidra export's functions.tsv, to name the function each hit is in; a hit in
                no function is marked `(no function)`, which is code the export missed
 
-Why: a search of the decompiled text finds only the code Ghidra made functions for, and a
-linear disassembly stops at the first data inside a code section. Neither can prove "only this
+Why: a search of the decompiled text finds only the code Ghidra made functions for. A linear
+disassembly stops at the first data inside a code section. Neither can prove "only this
 function writes that table". This tool searches the bytes themselves. In 32-bit code it finds
-the address as a 32-bit immediate or displacement; in 64-bit code also as a RIP-relative
-displacement. Each hit is decoded backwards, one to ten bytes, until an instruction holds that
-operand, so the result does not depend on where a disassembly started.
+the address as a 32-bit immediate or displacement. In 64-bit code it also finds it as a
+RIP-relative displacement. Each hit is decoded backwards, one to ten bytes, until an
+instruction holds that operand, so the result does not depend on where a disassembly started.
 
 Output: one line per instruction: its address, read, write or value (an immediate: the address
 taken, pushed or compared), the instruction, and the function. Then the count.
 
-It cannot find an address built at run time (a base plus a computed index) or held in data;
-`tools/pe/relocs.py` lists the pointers in data. A hit inside data that decodes as an
-instruction is possible: check each one in Ghidra. Needs capstone (.venv).
+It cannot find an address built at run time (a base plus a computed index) or held in data.
+`tools/pe/relocs.py` lists the pointers in data. A hit can be data that happens to decode as an
+instruction, so check each hit in Ghidra. Needs capstone (.venv).
 """
 import bisect
 import json

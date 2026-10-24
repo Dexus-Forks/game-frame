@@ -23,14 +23,15 @@ seen: ['POD: Planet of Death (1997), Wine 10 on Debian, 2026-10-23']
 
 ## Symptoms
 
-"Insert the CD" with the disc's files mapped as drive D: and the volume label set. With a
-real CD device attached, Wine's `+volume` trace shows `cannot open device D: c0000022`.
+The game asks to "Insert the CD", though the disc's files are mapped as drive D: and the
+volume label is set. With a real CD device attached, Wine's `+volume` trace shows
+`cannot open device D: c0000022`.
 
 ## Cause
 
-Two causes, one after the other (*observed* in POD with `WINEDEBUG=+volume`):
+Two causes came one after the other (*observed* in POD with `WINEDEBUG=+volume`).
 
-- Under Wine on Linux a folder mapped as a drive is a fixed drive: `GetDriveTypeW` returns 3,
+- Under Wine on Linux a folder mapped as a drive is a fixed drive. `GetDriveTypeW` returns 3,
   even with the drive's type set in `HKLM\Software\Wine\Drives`. On macOS the same setting
   worked. A game that looks for a drive of type 5 never finds the disc.
 - Wine opens the CD device to read its label. `/dev/sr1` was readable by root only, so the open
@@ -38,7 +39,8 @@ Two causes, one after the other (*observed* in POD with `WINEDEBUG=+volume`):
 
 ## What to do
 
-Attach the disc's data track as a CD-ROM device, not a folder: cut it out of the BIN/CUE with
-`./gameframe run discinfo IMAGE.cue --iso DISC.iso`, attach the ISO as a CD-ROM drive in the
-emulator, and map Wine's D: to the device's mount point. Make the device readable by everyone
-(a udev rule: `KERNEL=="sr[0-9]*", MODE="0644"`; `emupc.py` writes it).
+Attach the disc's data track as a CD-ROM device. A mapped folder stays a fixed drive. Cut the
+track out of the BIN/CUE with `./gameframe run discinfo IMAGE.cue --iso DISC.iso`. Attach the
+ISO as a CD-ROM drive in the emulator. Map Wine's D: to the device's mount point. Make the
+device readable by everyone with a udev rule, `KERNEL=="sr[0-9]*", MODE="0644"`. `emupc.py`
+writes that rule.

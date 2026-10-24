@@ -28,13 +28,14 @@ It writes:
 
 Why: when Wine on the host fails in ways no patch fixes (Wine under Rosetta on Apple silicon,
 docs/knowhow/wine-wow64-rosetta-fault.md), an emulated x86-64 Linux with Wine runs the game
-as Wine on a PC would. Each choice here fixed a failure (docs/knowhow/context-emulated-pc.md):
-rsync over SSH, since the cloud kernel has no 9p; the disc as a real CD-ROM device, since Wine
-on Linux reads the drive type and label from the device; a window manager with Xvfb, since
-without one no window becomes the foreground and DirectInput reads no keys.
+as Wine on a PC would. Each choice here fixed a failure (docs/knowhow/context-emulated-pc.md).
+Files go over rsync and SSH because the cloud kernel has no 9p. The disc is a real CD-ROM
+device because Wine on Linux reads the drive type and label from the device. Xvfb runs with a
+window manager because without one no window becomes the foreground. Then DirectInput reads
+no keys.
 
-It does not download anything, install QEMU, or copy the game: copy the install folder in
-with rsync over SSH. It needs qemu-system-x86_64 and qemu-img, and one of cloud-localds,
+It does not download anything, install QEMU or copy the game. Copy the install folder in with
+rsync over SSH. It needs qemu-system-x86_64 and qemu-img, and one of cloud-localds,
 genisoimage, mkisofs, xorriso or hdiutil to make the seed. Standard library only.
 """
 import os

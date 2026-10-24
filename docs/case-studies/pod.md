@@ -2,9 +2,9 @@
 
 [POD: Planet of Death](https://github.com/tanepiper/pod-planet-of-death) documents and rebuilds
 the racing game POD: Planet of Death (Ubi Soft, 1997) for Windows 95, from the player's own
-copy. It reads the game's disc image, decodes its formats with a tested reader and writer for
-each, runs the original under Wine and in an emulated PC, and ports the race rules exactly.
-It ships none of the game's files.
+copy. It reads the game's disc image. It decodes each format with a tested reader and writer.
+It runs the original under Wine and in an emulated PC. It ports the race rules exactly. It
+ships none of the game's files.
 
 ## Why it is a useful example
 
@@ -13,7 +13,7 @@ game: software, MMX, 3dfx Glide, ATI Rage (ATI3DCIF) and S3 ViRGE (S3D Toolkit).
 Watcom C with register calls, DirectDraw for 2D and DirectInput for the controls. The game
 assumes Windows 95: port I/O, a 16-bit desktop, a short list of display modes, a CD in the
 drive and an installer that wrote its settings. Nearly every one of those assumptions failed on
-a modern machine, each in its own way. GameFrame's [know-how](../knowhow/README.md) began here.
+a modern machine. GameFrame's [know-how](../knowhow/README.md) began here.
 
 ## What the project did, step by step
 
@@ -37,15 +37,15 @@ a modern machine, each in its own way. GameFrame's [know-how](../knowhow/README.
   Some values in the files are replaced at run time by settings
   ([a value replaced at run time](../knowhow/context-mod-value-replaced-at-run-time.md)).
 - **Recording the original:** whole races recorded from the game's memory through
-  `/proc/PID/mem` in the emulated PC, checked digit for digit against the results screens
+  `/proc/PID/mem` in the emulated PC, checked against every digit on the results screens
   ([record a run from memory](../knowhow/record-a-run-from-memory.md)).
 - **Porting the rules before the physics:** the race rules take each car's move as input and
-  replay a recorded race to the original's last word of every race record
+  replay a recorded race and match every word of the original's race records
   ([rules before physics](../knowhow/context-port-rules-before-physics.md)). The gate test and
   the time format were measured under Unicorn on 20,000 cases each, which settled the FPU's
   rounding mode ([x87 rounding](../knowhow/x87-magic-add-rounding.md)).
-- **A track editor:** one edit type for the window and the command line, byte-identical saves
-  with no edits, and edits seen in the original game
+- **A track editor:** the window and the command line share one edit type. A save with no
+  edits is byte-identical. The original game shows the edits
   ([one edit type](../knowhow/context-editor-one-edit-type.md)).
 
 ## What it gave GameFrame
@@ -63,8 +63,8 @@ a modern machine, each in its own way. GameFrame's [know-how](../knowhow/README.
 
 ## The lessons in short
 
-- Ask the know-how before debugging a run: most failures of a 1997 game on a modern machine
-  are known, and some are known dead ends.
+- Ask the know-how before you debug a run. Most failures of a 1997 game on a modern machine
+  are already known. Some of them are known dead ends.
 - When the host's translator fails, move to an emulated PC early instead of patching around it.
 - Trust no claim like "only this function writes that table" until the code bytes have been
   scanned for the address ([an address scan](../knowhow/trace-claims-need-an-address-scan.md)).

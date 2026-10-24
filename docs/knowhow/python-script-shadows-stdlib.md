@@ -1,6 +1,6 @@
 ---
 id: python-script-shadows-stdlib
-title: A helper script named like a standard module breaks an import, such as dis.py and capstone
+title: A helper script named like a standard module breaks imports, as dis.py broke capstone
 kind: failure
 status: solved
 symptom: [tool-error]
@@ -14,7 +14,7 @@ docs: [docs/working/agents.md]
 seen: ['POD: Planet of Death (1997), 2026-10-24']
 ---
 
-# A helper script named like a standard module breaks an import, such as dis.py and capstone
+# A helper script named like a standard module breaks imports, as dis.py broke capstone
 
 ## Symptoms
 
@@ -24,11 +24,12 @@ module: `module 'dis' has no attribute ...`, or `partially initialized module`.
 ## Cause
 
 Python puts the script's own folder first on the import path. A file in that folder named like
-a standard module (`dis.py`, `code.py`, `struct.py`) is imported in its place, by the library
-too. In POD a disassembly helper named `dis.py` broke capstone, which imports `inspect`, which
-imports `dis` (*observed*).
+a standard module (`dis.py`, `code.py`, `struct.py`) is imported in place of that module. The
+libraries the script uses import it too. In POD a disassembly helper named `dis.py` broke
+capstone. Capstone imports `inspect`, and `inspect` imports `dis` (*observed*).
 
 ## What to do
 
-Rename the script (`disasm_at.py`), and delete its `__pycache__` copy. Name helper scripts after
-the game or the job (`pod_dis.py`, `measure_gates.py`), never after a single common word.
+Rename the script (`disasm_at.py`) and delete its `__pycache__` copy. Name helper scripts after
+the game or the job (`pod_dis.py`, `measure_gates.py`). A single common word can match the name
+of a standard module.

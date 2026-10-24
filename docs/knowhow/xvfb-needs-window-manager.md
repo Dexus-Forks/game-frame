@@ -18,8 +18,8 @@ seen: ['POD: Planet of Death (1997), Wine 10 on Debian, 2026-10-23']
 
 ## Symptoms
 
-On a headless X server (Xvfb), the mouse works in the game but keys do nothing. `xdotool`
-keys reach the window, and the game ignores them.
+On a headless X server (Xvfb), the mouse works in the game but keys do nothing. Keys sent
+with `xdotool` reach the window. The game ignores them.
 
 ## Cause
 
@@ -30,8 +30,8 @@ the menu highlight only after a window manager ran).
 ## What to do
 
 Start a small window manager on the display before the game: `openbox &` (or any other). Wine's
-virtual desktop (`explorer /desktop=`) is no substitute: on Xvfb under Wine 10 it gave a black,
-wrongly sized desktop.
+virtual desktop (`explorer /desktop=`) does not replace it. On Xvfb under Wine 10 it gave a
+black desktop of the wrong size.
 
 ## Tried
 

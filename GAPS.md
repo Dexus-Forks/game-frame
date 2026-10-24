@@ -129,33 +129,33 @@ proposed again.
   had matched entries' own text)
 - [ ] Queries that `advise` missed, to decide on embeddings (none recorded yet)
 
-Proposed by POD and not built yet, each with why:
+Proposed by POD and not built yet, each with the reason:
 
 - [ ] Export coverage after `ghidra-export` and a `ghidra-run fill-gaps` pass that makes
   functions at call targets and after `ret` in gaps: needs a sample with a function reached
-  only through a pointer table, and a Ghidra change; `refs.py --functions` finds such code now
+  only through a pointer table, and a Ghidra change. `refs.py --functions` finds such code now
 - [ ] Per-address errors in `ExportAddressBatch`, and a search back for a function's start:
   a Ghidra script change with its own test
 - [ ] Watcom register order (EAX, EDX, EBX, ECX) in `ExportCallArgs`: needs a Watcom-built
-  sample, and GameFrame has no Watcom compiler in its toolchain
+  sample. GameFrame has no Watcom compiler in its toolchain
 - [ ] A control word in `pe32_emu` (`fpu_cw=`) and an `fpu-modes` probe: needs a sample routine
   with the 1.5 × 2^68 `fadd` trick
 - [ ] Stop at a call and read its arguments in `pe32_emu`, and a helper that lays out linked
-  structures in scratch memory: small, each needs a sample function
+  structures in scratch memory: small. Each needs a sample function
 - [ ] A replay harness for `re-verify` (frames rebuilt at recorded clocks, a window for samples
-  that straddle frames): a crate-sized piece, best moved from POD's `crates/pod-race` tests
+  that straddle frames): a crate-sized piece. It is best moved from POD's `crates/pod-race` tests
 - [ ] A reader for `memrec` recordings (summary, CSV, values printed the game's way): wait for a
   second project's needs
-- [ ] A lock for a shared emulator: a convention first, written in `context-emulated-pc`
+- [ ] A lock for a shared emulator: start with a convention, written in `context-emulated-pc`
 - [ ] A round-trip harness (`validate.py --write`) and a multi-entry block-container writer:
   need writer samples in GameFrame's own formats
 - [ ] An editor stage in `re-browse`, an axes check, and a derived-data finder for geometry: each
   needs a sample format with fixed-point positions, bounds and normals
-- [ ] A closed-lap check for recorded racing lines: racing only; the know-how entry covers it
+- [ ] A closed-lap check for recorded racing lines: racing only. The know-how entry covers it
 - [ ] `zcc`, a `zig cc` linker script for 32-bit Windows DLLs from Rust, and the wrapper pieces
   (port-I/O shim, DirectDraw in memory, Glide 2 on OpenGL, scalers, rasteriser, probe-library
-  generator, render-thread timing): large, each needs a Windows test program run under Wine,
-  which GameFrame's tests cannot run yet
+  generator, render-thread timing): large. Each needs a Windows test program run under Wine.
+  GameFrame's tests cannot run those programs yet
 - [ ] A Wine runner for `tests/run.sh` (Wine on Linux CI), so the Windows-side tools above and
   `winput` can be tested for real
 

@@ -9,21 +9,22 @@ Usage: modfolder.py install MOD_DIR INSTALL_DIR
   INSTALL_DIR  the game's install folder: under Wine, drive_c/GAME inside the prefix
                (derived/wine/drive_c/POD); in a VM, the same path there (run this inside it)
 
-install copies every file of MOD_DIR to the same relative path under INSTALL_DIR, after
-removing the files an earlier install put there, so a second install replaces the first and no
-stale file stays behind. It refuses to replace a file the game already had: those are the
-player's own, and a mod that needs it changed is a patch. It writes a manifest,
-INSTALL_DIR/.gameframe-mod.json, with every file it added. list prints the manifest; clear
+install first removes the files an earlier install put there. Then it copies every file of
+MOD_DIR to the same relative path under INSTALL_DIR. A second install replaces the first. No
+stale file stays behind. It refuses to replace a file the game already had. Those files are the
+player's own. A mod that needs one of them changed is a patch. It writes a manifest,
+INSTALL_DIR/.gameframe-mod.json, with every file it added. list prints the manifest. clear
 removes those files, then any folder left empty, then the manifest.
 
-Why: many CD-era games open each data file under the install folder first and fall back to the
-CD, so a changed file placed there replaces the disc's copy with no patch to the game
-(docs/knowhow/context-mods-install-folder-first.md). Before recording a reference run, `list`
-says whether any mod is in place (docs/knowhow/mods-loaded-in-a-reference-recording.md).
+Why: many CD-era games open each data file under the install folder first. They fall back to
+the CD when the file is not there. A changed file placed in the install folder replaces the
+disc's copy with no patch to the game (docs/knowhow/context-mods-install-folder-first.md).
+Before recording a reference run, `list` says whether any mod is in place
+(docs/knowhow/mods-loaded-in-a-reference-recording.md).
 
-Under Wine the folder names match in any case; on a case-sensitive file system the files are
-copied with MOD_DIR's spelling. It does not edit ini files or the registry, does not change the
-game's own files, and does not touch the disc. Standard library only.
+Under Wine the folder names match in any case. On a case-sensitive file system the files are
+copied with MOD_DIR's spelling. It does not edit ini files or the registry. It does not change
+the game's own files or touch the disc. Standard library only.
 """
 import json
 import os

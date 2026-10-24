@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Keep a capture of the screen, a window or a file, under a name of its own, never overwritten.
+"""Keep a capture of the screen, a window or a file under a name of its own. Never overwrite one.
 
 Usage: shot.py NAME [--from FILE | --window ID | --display :N] [--text TEXT | --text-file FILE]
                [--dir DIR]
@@ -15,14 +15,14 @@ Usage: shot.py NAME [--from FILE | --window ID | --display :N] [--text TEXT | --
   --dir DIR     where captures go (default derived/captures, which git ignores)
 
 The capture goes to DIR/YYYY-MM-DD/NAME.EXT. When that name is taken, it becomes NAME-2.EXT,
-NAME-3.EXT and so on: no capture is ever overwritten. It prints the path it wrote.
+NAME-3.EXT and so on. No capture is ever overwritten. It prints the path it wrote.
 
-Why: the dialogs a game shows on the way to running are evidence, and they are easy to lose.
-A scratch capture is overwritten by the next run, and once the cause is fixed the dialog never
-comes back (docs/knowhow/context-keep-every-dialog.md). Captures of the game are game material:
-keep them out of git; a few go into documents with a caption.
+Why: the dialogs a game shows on the way to running are evidence. They are easy to lose. The
+next run overwrites a scratch capture. Once the cause is fixed, the dialog never comes back
+(docs/knowhow/context-keep-every-dialog.md). Captures of the game are game material. Keep them
+out of git. A few go into documents, each with a caption.
 
-It does not click the dialog away, read its text, or crop. Standard library only; the screen
+It does not click the dialog away, read its text or crop. Standard library only. The screen
 capture itself needs screencapture (macOS) or ImageMagick's import or xwd (X11).
 """
 import datetime

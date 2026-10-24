@@ -9,9 +9,10 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
-- Thirty-five know-how entries promoted from the POD: Planet of Death project: replacement
-  card libraries under Wine (Glide 2, the S3D Toolkit, ViRGE surfaces, missing card libraries),
-  mods (the install folder first, values replaced at run time, mods in a reference recording),
+- Thirty-five know-how entries promoted from the POD: Planet of Death project. They cover
+  replacement card libraries under Wine (Glide 2, the S3D Toolkit, ViRGE surfaces, missing
+  card libraries), mods (the install folder first, values replaced at run time, mods in a
+  reference recording),
   recording a run from memory and replaying it (samples that straddle frames, stand-ins for
   unported logic, a game clock that is not real time, waiting for a phase), x87 rounding and
   truncating helpers, functions Ghidra missed and claims that need an address scan, editors
@@ -21,19 +22,21 @@ Every release of GameFrame, newest first. The format follows
   route (CD drives under Wine on Linux, Xvfb and a window manager, SSH, a script that shadows a
   standard module). The card builds' context now says to measure what the card is given.
 - `tools/triage/refs.py`: every instruction that refers to an address, found in the code bytes
-  (32-bit immediates and displacements, 64-bit RIP-relative), as read, write or value, with
-  hits in no function marked. The sample's 32-bit DLL has a table with two writers to test it.
-- `tools/live/memrec.py`: snapshots of a running game's writable memory for `memscan.py`, and
-  recordings of named values and arrays as JSON Lines, from `/proc/PID/mem`, with `--wait`.
+  (32-bit immediates and displacements, 64-bit RIP-relative). Each hit is marked as a read, a
+  write or a value. Hits outside any function are marked too. The sample's 32-bit DLL has a
+  table with two writers to test it.
+- `tools/live/memrec.py`: snapshots of a running game's writable memory for `memscan.py`. It
+  also records named values and arrays as JSON Lines. It reads `/proc/PID/mem`. `--wait` waits
+  for a phase.
 - `discinfo.py --iso`: the data track of a BIN/CUE as a plain ISO.
 - `tools/live/emupc.py`: the files that run the original in an emulated PC (QEMU, a Debian
   cloud image, cloud-init with Wine and 32-bit Mesa, Xvfb, openbox, SSH, the disc as a CD-ROM).
-- `tools/live/shot.py`: captures kept under names of their own with their text, never
-  overwritten.
+- `tools/live/shot.py`: captures kept under names of their own, with their text. It never
+  overwrites a capture.
 - `tools/live/modfolder.py`: install, list and clear a folder of changed files in an install
   folder.
-- `winput`: keys held by `down` are released at exit; new steps `release`, `point` and
-  `button`, and `--hold MS`.
+- `winput`: keys held by `down` are released at exit. New steps `release`, `point` and
+  `button`, and a new option `--hold MS`.
 - A case study of POD: Planet of Death.
 - Know-how: `pgrep-wait-matches-itself`. A wait loop with `pgrep -f` never ends, because the
   pattern matches the waiting shell's own command line.
@@ -94,7 +97,8 @@ Every release of GameFrame, newest first. The format follows
 ### Changed
 
 - The know-how hook reads only `stdout`, `stderr` and the error of a Claude Code command. The
-  desktop app adds notes on changed files to the result, and those had matched entries' own text.
+  desktop app adds notes on changed files to the result. Those notes had matched the text of
+  the entries themselves.
 
 - `peinfo --imports`, `--exports` and `--strings` list their items again. The section loop had
   reused the name of the flags.

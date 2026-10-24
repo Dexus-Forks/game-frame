@@ -22,16 +22,16 @@ SPEC is a text file, one value a line: `NAME ADDRESS TYPE [COUNT [STRIDE]]`, wit
 TYPE is u8 i8 u16 i16 u32 i32 u64 i64 f32 f64; COUNT values STRIDE bytes apart (default the
 type's size) make an array, such as eight cars' x positions: `car_x 0x61aad0 i32 8 0x558`.
 
-Why: a port that must behave like the original needs a reference run, and the simplest
-recorder reads the game's memory from outside. Nothing is injected, and the game is not
-changed or slowed. Values are kept as raw integers, so 16.16 fixed point is not rounded. A
-sample is not atomic: values are read one after another while the game runs, so a sample can
-straddle frames, and at 10 Hz an outside reader sees about one frame in eight
+Why: a port that must behave like the original needs a reference run. The simplest recorder
+reads the game's memory from outside. Nothing is injected. The game is not changed or slowed.
+Values are kept as raw integers, so 16.16 fixed point is not rounded. A sample is not atomic.
+The values are read one after another while the game runs, so one sample can straddle frames.
+At 10 Hz an outside reader sees about one frame in eight
 (docs/knowhow/record-a-run-from-memory.md).
 
 It reads /proc/PID/mem, so it runs where the game runs on Linux: Wine on Linux, or Wine inside
 a Linux VM. Reading another process's memory needs root, or the same user with
-kernel.yama.ptrace_scope set to 0. It does not run on macOS or Windows, and never writes to the
+kernel.yama.ptrace_scope set to 0. It does not run on macOS or Windows. It never writes to the
 process. Standard library only.
 """
 import json

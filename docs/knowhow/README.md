@@ -61,7 +61,7 @@ An entry has one of five statuses.
 | [A DirectDraw game runs in a window only on a 16-bit desktop, else goes fullscreen](directdraw-windowed-16bit-desktop.md) | solved |
 | [A driver run with sudo sends no keys: "Can't open display"](sudo-drops-display.md) | solved |
 | [A function has no callers, or no function exists, because Ghidra missed code reached through pointers](decompile-missed-pointer-functions.md) | solved |
-| [A helper script named like a standard module breaks an import, such as dis.py and capstone](python-script-shadows-stdlib.md) | solved |
+| [A helper script named like a standard module breaks imports, as dis.py broke capstone](python-script-shadows-stdlib.md) | solved |
 | [A line-following driver stalls or wedges at the same place every lap](racing-line-must-be-a-closed-lap.md) | solved |
 | [A path from an installer's ini file lacks its last backslash, so files are not found](installer-ini-path-separator.md) | solved |
 | [A PE section has a VirtualSize of 0, and a tool skips or misreads it](pe-virtualsize-zero.md) | solved |

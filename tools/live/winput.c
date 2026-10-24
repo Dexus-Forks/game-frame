@@ -18,10 +18,11 @@
  *   wait MS              sleep MS milliseconds
  *
  * Keys that `down` holds are released when winput ends, after the last step or a failed one, and
- * on Ctrl-C or a console close. A process killed outright cannot release them; send `release`.
- * A game that draws its own cursor from DirectInput may read a click before its cursor reaches
- * the point: use `point X Y wait 1000 button`. At a low frame rate, hold keys longer
- * (`--hold 500`), so a poll sees each press (docs/knowhow/directinput-cursor-click-timing.md).
+ * on Ctrl-C or a console close. A process killed outright cannot release them. Then send
+ * `release`. A game that draws its own cursor from DirectInput may read a click before its
+ * cursor reaches the point. For such a game, use `point X Y wait 1000 button`. At a low frame
+ * rate, hold keys longer (`--hold 500`), so a poll sees each press
+ * (docs/knowhow/directinput-cursor-click-timing.md).
  *
  * NAME is a letter, a digit, enter, esc, space, tab, backspace, shift, ctrl, alt, up, down,
  * left, right, home, end, pgup, pgdn, insert, delete, f1 to f12, or a scancode such as 0x1c.
