@@ -7,6 +7,21 @@ Every release of GameFrame, newest first. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- The harness ([docs/harness](docs/harness/README.md)): `tools/triage/needs.py` lists what a
+  game needs (CPU features, OS, APIs, libraries, extenders, DRM, media) from an executable, a
+  folder or a disc image; `tools/live/harness.py` picks a runtime module and a layer for each
+  need from `docs/harness/modules/`, names the gaps, and writes the set-up steps as one script.
+  Eight modules to start: `wine-host`, `emupc-wine`, `dosbox-x`, `steam-client-wine`,
+  `xaudio2-wma`, `silent-audio`, `disc-drive` and `glide-wrapper`. The Steam, WMA and
+  silent-audio modules come from the Banished project's emulated PC.
+- `tools/live/align.py`: lines up a known picture of a screen with a capture of it now, frame
+  and scale included, and maps click points between them. `tools/llm/locate.py` asks a model
+  instead, when the screen changed too much. `tools/formats/pngio.py` reads and writes PNG.
+- `re-observe` lists the needs and plans the harness before the first run, and maps click
+  points before clicking.
+
 ## [1.1.0] - 2026-10-24
 
 GameFrame 1.1.0 brings the lessons of POD, Hardwar and Tyrian into the framework: a know-how

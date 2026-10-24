@@ -1640,12 +1640,70 @@ if "$PYTHON" -c "import anthropic" 2>/dev/null; then
 3 2.0 pine" bash -c "$(declare -f llm); L='$L' PYTHON='$PYTHON' ROOT='$ROOT'; llm tools/llm/skillcheck.py --skill re-format"
   expect "skillcheck fails a skill whose answer misses it" "missing: 18467, 6334" env FAKE_ANSWER="41" bash -c "$(declare -f llm); L='$L' PYTHON='$PYTHON' ROOT='$ROOT'; llm tools/llm/skillcheck.py --skill re-emulate"
   expect "the API tools refuse to run without a key" "ANTHROPIC_API_KEY is not set" env -u ANTHROPIC_API_KEY GAMEFRAME_NO_DOTENV=1 ANTHROPIC_BASE_URL=http://127.0.0.1:9 "$PYTHON" tools/llm/ask.py privileged instruction
+  "$PYTHON" - "$L" <<'PY'
+import sys; sys.path.insert(0, 'tools/formats')
+from pngio import write_png
+write_png(sys.argv[1] + '/shot.png', 4, 2, bytes(range(24)))
+PY
+  expect "locate --find gives an element's centre in the capture's pixels" "0 0   (fake_note)" llm tools/llm/locate.py "$L/shot.png" --find "the Exit button"
+  llm tools/llm/locate.py "$L/shot.png" --ref "$L/shot.png" --save "$L/loc.json" >/dev/null
+  expect "locate --ref saves a result align.py map reads" "0.0 0.0" "$PYTHON" tools/live/align.py map "$L/loc.json" 5 5
   printf 'ANTHROPIC_API_KEY="from-dotenv"\n' > "$L/.env"
   expect "client reads the key from the project's .env" "ANTHROPIC_API_KEY: set" env -u ANTHROPIC_API_KEY GAMEFRAME_PROJECT="$L" "$PYTHON" tools/llm/client.py
   kill $fake 2>/dev/null; rm -rf "$L"
 else
   echo "  skip  tools/llm (the anthropic package is missing: pip install -r requirements-llm.txt)"
 fi
+
+echo "Screen alignment, needs and the harness"
+A="$(mktemp -d)"
+rt="$("$PYTHON" - "$A" <<'PY'
+import random, sys; sys.path.insert(0, 'tools/formats')
+from pngio import write_png, read_png
+out, r = sys.argv[1], random.Random(7)
+rw, rh, S, DX, DY = 160, 100, 1.5, 61, 93
+ref = bytearray(b'\x20\x30\x50' * rw * rh)
+for _ in range(25):                      # buttons and panels
+    x, y, w, h = r.randrange(rw - 20), r.randrange(rh - 10), r.randrange(6, 40), r.randrange(4, 20)
+    c = bytes(r.randrange(256) for _ in range(3))
+    for yy in range(y, min(rh, y + h)):
+        ref[(yy * rw + x) * 3:(yy * rw + min(rw, x + w)) * 3] = c * (min(rw, x + w) - x)
+write_png(f'{out}/ref.png', rw, rh, bytes(ref))
+nw, nh = 420, 320                        # a busy desktop, a window frame and title bar, the screen scaled
+now = bytearray(r.randrange(256) for _ in range(nw * nh * 3))
+for yy in range(DY - 26, DY + int(rh * S) + 4):
+    now[(yy * nw + DX - 4) * 3:(yy * nw + DX + int(rw * S) + 4) * 3] = (b'\xc0' if yy < DY else b'\x80') * 3 * (int(rw * S) + 8)
+for yy in range(int(rh * S)):
+    for xx in range(int(rw * S)):
+        s = (int(yy / S) * rw + int(xx / S)) * 3
+        now[((DY + yy) * nw + DX + xx) * 3:((DY + yy) * nw + DX + xx) * 3 + 3] = ref[s:s + 3]
+write_png(f'{out}/now.png', nw, nh, bytes(now))
+w, h, back = read_png(f'{out}/ref.png')
+print('roundtrip', (w, h) == (rw, rh) and back == bytes(ref))
+PY
+)"
+[[ "$rt" == "roundtrip True" ]] && ok "pngio writes a picture and reads it back unchanged" || bad "pngio round trip" "$rt"
+expect "pngio prints a picture's size and type" "160 x 100, colour type 2, 8-bit" "$PYTHON" tools/formats/pngio.py "$A/ref.png"
+out="$("$PYTHON" tools/live/align.py find "$A/ref.png" "$A/now.png" --point 50,30 --save "$A/a.json" --check "$A/check.png")"
+pt="$(sed -n 's/^point 50,30 in REF is \([0-9.]*\),\([0-9.]*\) in NOW$/\1 \2/p' <<<"$out")"
+read -r px py <<<"${pt:-0 0}"
+"$PYTHON" -c "import sys; sys.exit(0 if abs($px - 136) <= 2 and abs($py - 138) <= 2 else 1)" \
+  && ok "align finds a screen scaled 1.5 inside a window frame, and maps a point to within 2 pixels" || bad "align find" "$out"
+expect "align map gives a point back in REF with --inverse" "50.0 30.0" "$PYTHON" tools/live/align.py map "$A/a.json" "$px" "$py" --inverse
+expect "align map divides by --units for a Retina capture" "$("$PYTHON" -c "print(f'{$px/2:.1f}')")" "$PYTHON" tools/live/align.py map "$A/a.json" 50 30 --units 2
+expect "needs reads a 64-bit PE's needs" "cpu:x64" "$PYTHON" tools/triage/needs.py $B
+expect "needs reads the CRT a PE imports" "lib:vc-runtime" "$PYTHON" tools/triage/needs.py $B --no-cpu
+expect "needs reads an NE's target OS and Windows version" "os:windows-3x                sample-td.exe is a 16-bit NE for target OS 2, version 3.10" "$PYTHON" tools/triage/needs.py $D --no-cpu
+mkdir -p "$A/game" && touch "$A/game/steam_api64.dll" && echo 480 > "$A/game/steam_appid.txt"
+expect "needs reads Steam from the files in a game's folder" "drm:steam" "$PYTHON" tools/triage/needs.py "$A/game"
+expect "harness check finds no problem in the modules" "0 problems" "$PYTHON" tools/live/harness.py check
+expect "harness plans the Windows sample with one runtime and no gaps" "cpu:x64                      emupc-wine" "$PYTHON" tools/live/harness.py plan $B --runtime emupc-wine
+expect "harness names a need no module covers" "os:windows-3x                NO MODULE" "$PYTHON" tools/live/harness.py plan $D --no-cpu
+"$PYTHON" tools/live/harness.py plan $D --no-cpu >/dev/null; [[ $? == 1 ]] && ok "harness exits 1 when a need has no module" || bad "harness exit code for a gap"
+expect "harness adds the Steam layer for a Steam game" "steam-client-wine" "$PYTHON" tools/live/harness.py plan "$A/game" --runtime emupc-wine --with silent-audio --script "$A/h.sh"
+expect "harness writes the modules' steps as a script, with its variables checked first" ': "${STEAM_APP_ID:?set STEAM_APP_ID first}"' cat "$A/h.sh"
+expect "harness's script keeps each module's steps" "GameOverlayRenderer64.dll" cat "$A/h.sh"
+rm -rf "$A"
 
 if [[ "${1:-}" == --ghidra ]]; then
   echo "Ghidra"

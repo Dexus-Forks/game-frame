@@ -236,6 +236,10 @@ between agents, the outcome, and the failure path.
 | `tools/live/emulock.py` | A note of who uses a shared emulator or VM, since when and for what; a second session is refused and told who holds it |
 | `tools/live/loopcut.py` | Cuts a recorded path at its first return to the start, so a racing line or patrol is one closed loop; refuses a path shorter than a loop |
 | `tools/live/winput.py` | Keys, mouse moves and clicks sent to a game from inside Wine with `SendInput`, for macOS, where synthetic input needs a permission and Wine windows belong to no app. Builds `winput.c` with zig |
+| `tools/live/align.py` | Lines up a known picture of a screen with a capture of it now (window frame, title bar, scale) and maps click points between them, with a picture to check before clicking |
+| `tools/live/harness.py` | Puts together the modules a game needs from `docs/harness/modules/`: a runtime, a layer for each need, the gaps, and the set-up steps as one script to read |
+| `tools/triage/needs.py` | What a game needs to run, from an executable, a folder or a disc image: CPU features, OS, graphics and sound APIs, libraries, extenders, DRM and media, each with its evidence |
+| `tools/formats/pngio.py` | Reads and writes PNG pictures with the standard library alone |
 | `tools/live/frida_trace.py` | Calls to chosen functions, and accesses to chosen memory, in a running game, with Frida. Calls use the same format as the emulator's call traces |
 | `tools/emu/mem_trace.py` | Which instructions read and write chosen memory while an emulated function runs. It is the first step of taint analysis |
 | `tools/triage/decomp_query.py` | A function with your labels; callers; callees; who uses a string; who writes a field; where the work is |
@@ -284,6 +288,7 @@ such as a Max or Team plan's monthly credits ([API credits](docs/working/api-cre
 | `tools/llm/name_functions.py` | A suggested name, signature and summary for every unnamed function in a Ghidra export, in one Message Batch, written to `analysis/` for you to confirm |
 | `tools/llm/skillcheck.py` | Gives an agent one skill and a task on the sample game, and checks its answer against the ground truth: is each skill enough on its own? |
 | `tools/llm/headless.py` | Runs one of GameFrame's agents unattended under a budget and saves its report; `docs-check` runs `re-checker` and `re-editor` over the documents |
+| `tools/llm/locate.py` | Finds a screen element, or a reference screen, in a capture by asking a model, when `align.py` cannot line them up |
 | `tools/llm/ask.py` | A question answered from the know-how entries `gameframe advise` finds, naming each entry it uses |
 | `tools/llm/client.py` | The shared client; run it to check the SDK, the key and the `claude` command |
 
@@ -330,6 +335,9 @@ The documentation is in [docs/](docs/README.md). It is also built as a website
   write findings in plain English.
 - **[Observing the original](docs/observe/README.md)**: running the original, every kind of
   input, capturing the interface, and an object model with entry points for tests and agents.
+- **[The harness](docs/harness/README.md)**: what a game needs to run, the modules that
+  provide it (runtimes such as Wine, an emulated PC and DOSBox-X; layers such as the Steam
+  client), and how each game adds the modules it taught us.
 - **[Case studies](docs/case-studies/README.md)**: Un-Banished, Tyrian 2000, Frontier: Elite II
   and POD: Planet of Death, and the tooling each built to capture its game.
 - [docs/GAME-PATTERNS.md](docs/GAME-PATTERNS.md): main loops, random generators, entities,

@@ -107,6 +107,18 @@ are already covered, and sentences that break [the writing rules](writing.md).
 
 `--show` lists the entries it would send and spends nothing.
 
+### Find something on the screen
+
+`locate.py` asks a model where an element is in a capture, or where a reference screen sits in
+it. Use it when `tools/live/align.py` reports a weak match because the screen has changed. It
+gives positions as fractions of the picture, so they survive the API's resizing. One call
+costs under a cent.
+
+```bash
+./gameframe run tools/llm/locate.py derived/captures/now.png --find "the Exit button" --units 2
+./gameframe run tools/llm/locate.py derived/captures/now.png --ref derived/port-menu.png --save derived/align.json
+```
+
 ## A month of credits
 
 Credits expire at the end of each cycle, so plan work that spends them before then. One way

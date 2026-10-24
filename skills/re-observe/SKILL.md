@@ -29,6 +29,19 @@ model, how exact the interface must be. They decide what to capture.
 Prefer headless, scripted runs for evidence. Use windowed runs to see what happens and where to
 look. `docs/observe/running-the-original.md` has the full table.
 
+Before the first run, list what the game needs and the modules that provide it
+(`docs/harness/README.md`):
+
+```bash
+./gameframe run needs target/                  # cpu, os, api, lib, drm, media: each with its evidence
+./gameframe run harness plan target/ --script derived/harness.sh   # a runtime, the layers, the gaps
+```
+
+Read the script, set its variables, then run it. A need marked NO MODULE is a gap. When a
+change around the game makes it run (a client, a decoder, a setting), write that change as a
+module from `docs/harness/modules/_template.md`: in the project, or in GameFrame when any game
+with that need could use it. Check modules with `./gameframe run harness check`.
+
 To record a whole run as the reference for a port, read `docs/observe/recording.md`:
 `tools/live/memrec.py` records named values from the game's memory, `memlog.py` reads them
 back, and the replay checks every sample with a window (`tools/verify/replay.py`, `re-verify`).
@@ -60,6 +73,7 @@ material.
 | Frames | `tools/formats/rawimage.py` turns a dump of video memory into a PNG in the original's mode and palette |
 | Inputs | the game's demo or replay files; breakpoints on input reads |
 | Driving a game under Wine | `tools/live/winput.py run --prefix PREFIX window TITLE key enter ...` sends keys as scancodes, mouse moves and clicks from inside Wine. It needs no macOS permission |
+| Where to click | `tools/live/align.py find REF.png NOW.png --point X,Y --check out.png` lines up a known picture of the screen (a frame from the port, an earlier capture) with a capture of the window now, frame and scale included, and gives the click point in the capture. Look at `out.png` before clicking. When the screen changed too much (score below 0.5), `tools/llm/locate.py NOW.png --find "the Exit button"` asks a model, on API credits |
 | Calls and random draws | `tools/emu/call_trace.py`; debugger traces |
 | File reads | `tools/dos/fileio_trace.py` on DOSBox-X logs; Process Monitor; Wine's `WINEDEBUG=+file` (`docs/observe/system-calls.md`) |
 | Calls to the system | Wine's relay log, strace, a proxy library (`docs/observe/system-calls.md`) |

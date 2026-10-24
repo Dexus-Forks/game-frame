@@ -54,6 +54,8 @@ the order of this page and of each folder's `README.md` is the order of the site
 
 - [Observing the original](observe/README.md): running the original, inputs, the interface,
   an object model of the game.
+- [The harness](harness/README.md): what a game needs to run, and the modules that provide it:
+  runtimes, layers, and the steps to set each up.
 
 ## Agent teams
 

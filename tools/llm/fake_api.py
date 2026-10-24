@@ -8,7 +8,8 @@ Usage:
 
 The server answers POST /v1/messages, and creates, reports and returns Message Batches
 (every batch has ended at once). Under a JSON schema (output_config.format) the answer fills
-the schema: each string is "fake_<property>", each enum its first value. Otherwise it echoes
+the schema: each string is "fake_<property>", each enum its first value, each number 0 and each
+boolean true. Otherwise it echoes
 the start of the last user message. The claude mode answers "fake run: " and the start of the
 prompt (read from stdin) and the number of CLAUDE* variables it was given, with a cost of 0.01. It writes FAKE_ANSWER, when set, to answer.txt in the current
 folder (the tests of skillcheck.py use it).
@@ -36,7 +37,7 @@ def fill(schema, key='value'):
     if t in ('integer', 'number'):
         return 0
     if t == 'boolean':
-        return False
+        return True
     return f'fake_{key}'
 
 
