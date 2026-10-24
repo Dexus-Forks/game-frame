@@ -1650,6 +1650,8 @@ PY
   expect "locate --ref saves a result align.py map reads" "0.0 0.0" "$PYTHON" tools/live/align.py map "$L/loc.json" 5 5
   printf 'ANTHROPIC_API_KEY="from-dotenv"\n' > "$L/.env"
   expect "client reads the key from the project's .env" "ANTHROPIC_API_KEY: set" env -u ANTHROPIC_API_KEY GAMEFRAME_PROJECT="$L" "$PYTHON" tools/llm/client.py
+  mkdir -p "$L/here" && printf 'GHIDRA_INSTALL_DIR=/x\n' > "$L/here/.env"
+  expect "client reads on past a .env without the key" "ANTHROPIC_API_KEY: set" bash -c "cd '$L/here' && env -u ANTHROPIC_API_KEY GAMEFRAME_PROJECT='$L' '$PYTHON' '$PWD/tools/llm/client.py'"
   kill $fake 2>/dev/null; rm -rf "$L"
 else
   echo "  skip  tools/llm (the anthropic package is missing: pip install -r requirements-llm.txt)"
