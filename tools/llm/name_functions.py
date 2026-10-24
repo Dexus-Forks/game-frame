@@ -3,17 +3,21 @@
 
 Usage:
   name_functions.py prepare [--export DIR] [--binary NAME] [--min-size N] [--max N] [--all]
-  name_functions.py submit  [--binary NAME] [--model ID]
+  name_functions.py submit  [--binary NAME] [--model ID] [--size N]
   name_functions.py status  [--binary NAME]
   name_functions.py fetch   [--binary NAME]
+  name_functions.py cancel  [--binary NAME]
 
   prepare   picks the functions and writes one request each to
             analysis/llm/names/<binary>/requests.jsonl, then prints how many and their size.
             Nothing is sent. Read the count before you submit.
-  submit    sends them as one batch and records its id in batch.txt beside them
-  status    prints the batch's progress (most batches end within an hour)
-  fetch     writes the answers to analysis/llm/names/<binary>/suggested.tsv:
-            address, name, confidence (low/medium/high), signature, summary, evidence
+  submit    sends them as batches of --size requests each and records their ids in batch.txt
+            beside them, one per line. Small batches end sooner and can be fetched one by one
+  status    prints each batch's progress and the total (most small batches end within an hour)
+  fetch     writes the answers of every batch that has ended to
+            analysis/llm/names/<binary>/suggested.tsv: address, name, confidence
+            (low/medium/high), signature, summary, evidence. Run it again as more batches end
+  cancel    cancels the batches that have not ended (their finished answers can still be fetched)
 
   --export    the Ghidra export (default: analysis/export in the project)
   --binary    the binary in the export (default: the only one, or the first .exe)
@@ -21,6 +25,7 @@ Usage:
   --max       send at most N functions, the largest first (default 2000)
   --all       include functions that already have a name (to check the names)
   --model     the model (default: GAMEFRAME_MODEL, else claude-opus-5-5)
+  --size      requests per batch for submit (default 200)
 
 Each request holds the function's pseudocode, the names of its callers and callees, and the
 strings it uses. Functions named in labels/names.tsv are skipped.
@@ -117,30 +122,55 @@ def prepare(ex, min_size, limit, everything):
     print('Nothing was sent. Next: name_functions.py submit')
 
 
-def submit(binary, model):
+def submit(binary, model, size):
     out = folder(binary)
     rows = [json.loads(l) for l in open(os.path.join(out, 'requests.jsonl'), encoding='utf-8')]
     reqs = [{'custom_id': r['custom_id'], 'params': {
         'model': model, 'max_tokens': 4000, 'system': SYSTEM,
         'output_config': {'effort': 'low', 'format': {'type': 'json_schema', 'schema': SCHEMA}},
         'messages': [{'role': 'user', 'content': r['text']}]}} for r in rows]
-    batch = api().messages.batches.create(requests=reqs)
-    open(os.path.join(out, 'batch.txt'), 'w').write(batch.id + '\n')
-    print(f'batch {batch.id}: {len(reqs)} requests, {batch.processing_status}')
+    # Small batches: one large batch can sit for most of the 24 hours the API allows, and
+    # nothing in it can be fetched until it ends.
+    ids = []
+    with open(os.path.join(out, 'batch.txt'), 'w') as f:
+        for i in range(0, len(reqs), size):
+            batch = api().messages.batches.create(requests=reqs[i:i + size])
+            ids.append(batch.id)
+            f.write(batch.id + '\n')
+            f.flush()
+            print(f'batch {batch.id}: {len(reqs[i:i + size])} requests, {batch.processing_status}')
+    print(f'{len(ids)} batches, {len(reqs)} requests')
 
 
-def batch_id(binary):
+def batch_ids(binary):
     path = os.path.join(folder(binary), 'batch.txt')
     if not os.path.exists(path):
         sys.exit('no batch yet: name_functions.py submit')
-    return open(path).read().strip()
+    return [l.strip() for l in open(path) if l.strip()]
 
 
 def status(binary):
-    b = api().messages.batches.retrieve(batch_id(binary))
-    c = b.request_counts
-    print(f'{b.id}: {b.processing_status}; {c.processing} processing, {c.succeeded} succeeded, '
-          f'{c.errored} errored, {c.expired} expired')
+    total = {'processing': 0, 'succeeded': 0, 'errored': 0, 'expired': 0, 'canceled': 0}
+    ended = 0
+    ids = batch_ids(binary)
+    for i in ids:
+        b = api().messages.batches.retrieve(i)
+        c = b.request_counts
+        for k in total:
+            total[k] += getattr(c, k)
+        ended += b.processing_status == 'ended'
+        print(f'{b.id}: {b.processing_status}; {c.processing} processing, {c.succeeded} succeeded, '
+              f'{c.errored} errored, {c.expired} expired')
+    state = 'ended' if ended == len(ids) else 'in_progress'
+    print(f'all {len(ids)} batches: {state}; {ended} ended; ' + ', '.join(f'{v} {k}' for k, v in total.items()))
+
+
+def cancel(binary):
+    for i in batch_ids(binary):
+        b = api().messages.batches.retrieve(i)
+        if b.processing_status == 'in_progress':
+            b = api().messages.batches.cancel(i)
+        print(f'{b.id}: {b.processing_status}')
 
 
 def clean(text):
@@ -148,8 +178,14 @@ def clean(text):
 
 
 def fetch(binary):
-    rows, failed = [], 0
-    for r in api().messages.batches.results(batch_id(binary)):
+    rows, failed, waiting = [], 0, 0
+    results = []
+    for i in batch_ids(binary):
+        if api().messages.batches.retrieve(i).processing_status != 'ended':
+            waiting += 1
+            continue
+        results.extend(api().messages.batches.results(i))
+    for r in results:
         if r.result.type != 'succeeded':
             failed += 1
             continue
@@ -166,7 +202,8 @@ def fetch(binary):
     with open(path, 'w', encoding='utf-8') as f:
         f.write('# address\tname\tconfidence\tsignature\tsummary\tevidence (suggestions: confirm before labelling)\n')
         f.writelines('\t'.join(r) + '\n' for r in rows)
-    print(f'{len(rows)} suggestions in {os.path.relpath(path, PROJECT)}; {failed} failed or unreadable')
+    print(f'{len(rows)} suggestions in {os.path.relpath(path, PROJECT)}; {failed} failed or unreadable'
+          + (f'; {waiting} batches not ended yet, fetch again later' if waiting else ''))
 
 
 def main(argv):
@@ -174,7 +211,7 @@ def main(argv):
         print(__doc__); return 0
     cmd, argv = argv[0], argv[1:]
     opts = {'--export': os.path.join(PROJECT, 'analysis', 'export'), '--binary': None,
-            '--min-size': '16', '--max': '2000', '--model': MODEL}
+            '--min-size': '16', '--max': '2000', '--model': MODEL, '--size': '200'}
     everything = False
     while argv:
         if argv[0] == '--all':
@@ -187,11 +224,13 @@ def main(argv):
     if cmd == 'prepare':
         prepare(ex, int(opts['--min-size']), int(opts['--max']), everything)
     elif cmd == 'submit':
-        submit(ex.binary, opts['--model'])
+        submit(ex.binary, opts['--model'], int(opts['--size']))
     elif cmd == 'status':
         status(ex.binary)
     elif cmd == 'fetch':
         fetch(ex.binary)
+    elif cmd == 'cancel':
+        cancel(ex.binary)
     else:
         sys.exit(f'unknown command {cmd}')
     return 0
