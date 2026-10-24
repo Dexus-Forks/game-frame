@@ -15,7 +15,7 @@ signatures:
 tools: []
 skills: [re-observe]
 docs: [docs/knowhow/context-wine-macos.md, docs/knowhow/wine-macos-suspendthread.md]
-seen: ['POD: Planet of Death (1997), Wine 11.0 and 11.18, 2026-10-23']
+seen: ['POD: Planet of Death (1997), Wine 11.0 and 11.18, 2026-10-23', 'POD Gold PowerVR and ATI builds with stand-in card libraries, Wine 11.0, 2026-10-24']
 ---
 
 # A 32-bit game's system call faults in wow64cpu under Wine on Apple silicon
@@ -51,6 +51,13 @@ threads would show the fault without the game. Write that program before any rep
 - Not reloading FS and GS in the Watcom runtime's handlers: the fault stays.
 - Wine 11.18 (staging) in place of 11.0: the same fault, shown more clearly, and a freeze at 100% CPU.
 - Sikarugir's CrossOver 23.7.1 engine: also WOW64, the fault stays.
+
+- POD Gold's PowerVR and ATI builds, with stand-in card and DirectDraw libraries (Rust DLLs
+  linked by zig): the same fault, `wow64cpu+0x1139`, read of `0x4ECD`, 32-bit SS shown as 0,
+  every run at the same step of the main menu's second drawing. Without the stand-ins' OpenGL,
+  without their vectored exception handler, without sound, and on Wine 11.18 (which shows
+  `nested exception on signal stack`): the fault stays. A small 32-bit test program that loads
+  the same libraries and draws through OpenGL from a second thread runs cleanly.
 
 Not tried yet: the small test program above, a Linux x86-64 host, a virtual machine with a real
 Windows 95 or 98.
