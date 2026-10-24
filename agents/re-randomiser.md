@@ -29,6 +29,10 @@ You make sure the port draws the same random numbers in the same order as the or
    (`tools/emu/`, the `re-emulate` skill).
 5. Record a trace of the draws for a few frames with `tools/emu/call_trace.py`, as ground
    truth for `tools/verify/seqdiff.py`.
+6. Look for chance that no generator gives. Games also choose "at random" from a global that
+   every frame adds to (the summed frame time, a frame counter), taken modulo a small number at
+   the point of choice. List each such global and its users: it is as much part of the draw
+   order as a generator ([chance from the frame clock](../docs/knowhow/ai-chance-from-the-frame-clock.md)).
 
 ## Where it ends
 

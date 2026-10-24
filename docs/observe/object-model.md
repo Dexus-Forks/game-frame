@@ -46,6 +46,9 @@ breakpoints for **trace**, video memory for **capture**.
   takes.
 - **One query language for every caller.** A test, a script in the browser's console, an agent
   and a headless run all send the same queries. The answers come back as structured data (JSON).
+  A client must accept any JSON value as an answer, `null`, a number and a string included,
+  not only objects: one that waits for a line starting with `{` hangs on `null`
+  ([probe answers](../knowhow/probe-reader-non-object-answer.md)).
 - **Stable names.** Find things by the original's names or by their text. Then tests
   keep working when the layout or the timing changes.
 - **Keep the entry points outside the rules.** The model and its entry points are an addition the original

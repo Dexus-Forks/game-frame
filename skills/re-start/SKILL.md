@@ -152,7 +152,10 @@ a diagram of each team's hand-offs and the failure path.
    archive.org and the GOG and Steam pages for later official releases. The reference is by default the
    last version released (`re-inventory`, "Every edition, and the reference";
    `docs/working/versions.md`). Do this before deep work: a newer edition found late costs
-   the work again.
+   the work again. If one turns up mid-project, follow the move's order
+   ([moving to a newer version](../../docs/knowhow/context-move-to-a-newer-version.md)): export
+   both, fill the gaps, match the functions (`match_functions.py`), carry the labels and
+   patches, record the references again, and keep tests for both.
 5. `re-inventory`: run `tools/pe/peinfo.py` (Windows) or `tools/dos/dosinfo.py` (DOS) on every binary; decide which hold the game's own
    code, and whether the game is native C/C++ (GameFrame), managed (.NET, IL2CPP, Mono),
    scripted (Lua, Python, GameMaker), packed (unpack first), or 16-bit DOS (docs/DOS.md; check

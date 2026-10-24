@@ -70,6 +70,10 @@ a racing line or a patrol that must be a closed loop
 - **The game's clock is not wall time.** A game converts its timer into its own unit, often
   with a rounded factor. POD's race clock runs 0.82 % slow. Measure the ratio over a long run
   ([game clock](../knowhow/game-clock-not-real-time.md)).
+- **The FPU's control word is part of the state.** A game may change it after its start-up,
+  POD races with 0x027f (53-bit), not the 0x037f its C library leaves. Record it in every
+  in-game recording or step log, and measure with that word
+  ([the control word](../knowhow/fpu-control-word-thread.md)).
 
 ## Replay into the port
 
@@ -106,3 +110,8 @@ the FPU's control word (`fpu_cw=`). It lists the inputs whose result depends on 
 mode (`fpu_modes`). It can stop at a call to a library routine to read its arguments (`until=`)
 ([functions on game structures](../knowhow/emulate-function-on-game-structures.md),
 [x87 rounding](../knowhow/x87-magic-add-rounding.md)).
+
+A test of one step from a fresh state cannot show that state carries over from step to step.
+Measure sequences too: call the routine N times without `reset()` between calls, so the
+emulator's memory keeps what each step wrote, write each step's outputs, and let the port's
+test keep its own state the same way. Compare the two sequences step by step.

@@ -41,10 +41,27 @@ What the recording is good for: levels, pans, which sound plays when. In POD the
 came out with a gain of 1.00006 against the port and 94% of samples within ±1. What it is not
 good for: sample-for-sample checks. Wine's audio path adds ±1 noise (*inferred*: it converts
 to floating point and back), and an emulated PC (QEMU's TCG) misses deadlines, leaving gaps
-of silence in the recording. Line the recording up with the port window by window
+of silence in the recording; in POD half of a race's sound was lost until Wine got a second
+of PulseAudio buffer (`PULSE_LATENCY_MSEC=1000`), after which none was. Line the recording up
+with the port window by window
 (`measure/sound_recorded.py`), not once for the whole sound, and keep the emulator's
 measurement of the mixer as the exact evidence.
+
+Debian enables a systemd user socket, `pulseaudio.socket`, that starts a default daemon (a
+44,100 Hz sink) whenever a client connects and none runs; stop and mask it, and set
+`autospawn = no`, or the game's sound is quietly resampled into the wrong sink.
 
 Two traps on a VM shared by several sessions: `pgrep -x Xvfb` finds another session's display
 and a start script then skips starting its own; and `pkill -f "Xvfb :1"` run over SSH matches
 the SSH command itself. Match the process name with `pgrep -a -x` and filter on the display.
+
+CD audio is a separate problem: QEMU's CD drive takes a plain ISO, so an image's audio tracks
+never reach the guest, and the game's MCI calls play nothing. Inside the guest, CDEmu fixes
+it: `vhba-dkms` (a virtual SCSI host, built for the running kernel) and `cdemu-daemon -a pulse`
+load the whole CUE/BIN into a drive that reports the audio tracks and plays them. Wine's MCI
+cdaudio then plays them digitally (raw sector reads, out through DirectSound), so the music
+arrives in PulseAudio as a second stream of the game, which can be moved to a sink of its own
+(`pactl move-sink-input`) and recorded apart. In POD that showed when the game starts its music
+(with a race's countdown), which the code alone had not. Under QEMU's TCG the digital path
+stalls: the music came in consecutive bursts at about 45% of real time. Good for when and
+which track, not for listening.

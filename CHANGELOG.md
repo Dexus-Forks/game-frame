@@ -9,6 +9,27 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- Thirty-seven know-how entries: thirteen from POD (POD Gold, the PowerVR build, the emulated
+  PC, ptrace under Wine, the FPU control word in the game's own thread and more) and
+  twenty-four from Hardwar, among them running the original on a whole-process snapshot,
+  registers left by callees, fake worlds and Ghidra function recovery. The taxonomy gains the
+  API `sgl` (PowerVR).
+
+### Changed
+
+- Three know-how entries take POD's newer findings: the game races with the x87 word 0x027f,
+  and CD audio and PulseAudio in the emulated PC.
+- `re-randomiser` lists chance taken from the frame clock; the recording guide records the
+  FPU's control word and measures sequences; `re-start` gives the order for moving to a newer
+  version; the object-model guide says a probe client takes any JSON answer.
+
+### Fixed
+
+- `memrec --name` takes the game's own process, never the shell or launcher that started it,
+  whose command line names the game too.
+
+### Added
+
 - The harness ([docs/harness](docs/harness/README.md)): `tools/triage/needs.py` lists what a
   game needs (CPU features, OS, APIs, libraries, extenders, DRM, media) from an executable, a
   folder or a disc image; `tools/live/harness.py` picks a runtime module and a layer for each

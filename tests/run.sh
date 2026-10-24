@@ -99,6 +99,12 @@ out="$("$PYTHON" - <<'PY' 2>&1
 import json, os, struct, subprocess, sys, tempfile, time
 d = tempfile.mkdtemp(); pd = f'{d}/4242'; os.makedirs(pd)
 open(f'{pd}/cmdline', 'wb').write(b'C:\\GAME\\GAME.EXE\0-window\0')
+# The shell and the launcher that started the game come first, and name it too: --name must
+# still find the game's own process (they have no memory to read).
+for pid, argv in ((100, [b'bash', b'-c', b'wine C:\\GAME\\GAME.EXE -window']), (200, [b'wine', b'C:\\GAME\\GAME.EXE', b'-window'])):
+    os.makedirs(f'{d}/{pid}'); open(f'{d}/{pid}/cmdline', 'wb').write(b'\0'.join(argv) + b'\0')
+sys.path.insert(0, 'tools/live'); import memrec
+assert memrec.find(d, 'GAME.EXE') == 4242, memrec.find(d, 'GAME.EXE')
 open(f'{pd}/maps', 'w').write('00400000-00401000 r-xp 00000000 00:00 0 GAME.EXE\n00500000-00502000 rw-p 00000000 00:00 0 [heap]\n')
 mem = f'{pd}/mem'
 with open(mem, 'wb') as f:

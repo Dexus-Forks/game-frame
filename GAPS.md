@@ -186,30 +186,50 @@ Proposed by POD, now built:
 
 Proposed by POD and not built yet, each with the reason:
 
-- [ ] Watcom register order (EAX, EDX, EBX, ECX) in `ExportCallArgs`: needs a Watcom-built
-  sample. GameFrame has no Watcom compiler in its toolchain
+- [x] Watcom register order (EAX, EDX, EBX, ECX) in `ExportCallArgs` (`regs=watcom`), tested on
+  a register call in the sample DLL, built with zig and inline assembly
 - [x] Layout helpers in `pe32_emu` (`array`, `put`, `get`), tested on a linked list and a graph
-- [ ] A replay harness for `re-verify` (frames rebuilt at recorded clocks, a window for samples
-  that straddle frames): a crate-sized piece. It is best moved from POD's `crates/pod-race` tests
-- [ ] Printing recorded values the game's way (a game's own time format): game-specific; it
-  belongs beside the port
-- [ ] A multi-entry block-container writer: needs a sample container format with checksums in
-  GameFrame's samples
+- [x] A replay harness for `re-verify`: `tools/verify/replay.py`, a window for samples that
+  straddle frames, tested on a toy game; rebuilding frames at recorded clocks stays in the port
+- [x] Printing recorded values the game's way (a game's own time format): game-specific, so it
+  stays beside the port; `memlog.py` says so
+- [x] A multi-entry block-container writer: the method is in [Writers, editors and
+  mods](docs/working/mods.md); the writer belongs to each format
 - [x] A derived-data finder for geometry (`tools/formats/derived.py`), tested on generated
   records with stored bounds and normals
 - [x] Guides: [Recording the original](docs/observe/recording.md),
   [Replacement libraries](docs/hardware/replacement-libraries.md),
   [Writers, editors and mods](docs/working/mods.md), and an emulated-PC section in
   [Running the original](docs/observe/running-the-original.md)
-- [ ] An editor stage in `re-browse` and an axes check: each needs a sample format with
-  fixed-point positions in GameFrame's samples; the mods guide has the method
+- [x] An editor stage in `re-browse` (section 5) and an axes check (`tools/triage/axes.py`,
+  tested on a generated level and its mirror)
 - [x] `scripts/zcc.sh`, the `zig cc` linker for 32-bit Windows DLLs from Rust, tested with a
   two-export crate whose stdcall export runs under `pe32_emu`
-- [ ] The wrapper pieces (port-I/O shim, DirectDraw in memory, Glide 2 on OpenGL, scalers,
-  rasteriser, probe-library generator, render-thread timing): large. Each needs a Windows test
-  program run under Wine. GameFrame's tests cannot run those programs yet
+- [x] From the wrapper: the scalers (the `gameframe-scale` crate) and the probe-library
+  generator (`tools/pe/probegen.py`, its stubs run under `pe32_emu`)
+- [ ] The other wrapper pieces (port-I/O shim, DirectDraw in memory, Glide 2 on OpenGL,
+  rasteriser, render-thread timing): large. Each needs a Windows test program run under Wine.
+  GameFrame's tests cannot run those programs yet
 - [ ] A Wine runner for `tests/run.sh` (Wine on Linux CI), so the Windows-side tools above and
   `winput` can be tested for real
+
+From POD's move to POD Gold and the vehicle creator (its `docs/gameframe-lessons.md`):
+
+- [x] `memrec --name` finds the game's own process, never the shell or launcher that started
+  it, tested with both ahead of it
+- [x] Chance from the frame clock in `re-randomiser`, the FPU's control word in recordings,
+  sequence measurements, the version move in `re-start`, and probe clients that take any JSON
+  answer, as guidance with their know-how entries
+- [ ] Byte-level build matching beside `match_functions.py`: instructions with `.reloc` words,
+  call displacements and padding masked; globals paired through aligned references; a grade
+  per pair (same bytes, same code, same logic, changed). Test: two builds of a sample with
+  different compiler settings, every function matched, one changed constant reported alone
+- [ ] Build detection in `memrec`: an address spec per build, chosen by the PE link time read
+  from the process. Test: a test program built twice, each recording reads the right addresses
+- [ ] A palette from a twin picture, beside the image decoders: infer an 8-bit picture's
+  palette from the same picture in 16 bits. Test: a generated pair recovers the palette
+- [ ] A line follower that drives a port along a recorded path through its probe, to compare
+  two versions of a vehicle or a level
 
 ## Out of scope
 

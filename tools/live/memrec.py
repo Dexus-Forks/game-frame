@@ -6,8 +6,10 @@ Usage: memrec.py snap   PROCESS --out DIR
                         [--out FILE]
        memrec.py read   PROCESS ADDR [TYPE] [COUNT]
 
-  PROCESS        --pid PID, or --name TEXT (the first process whose command line holds TEXT,
-                 found again on every poll, so a game that restarts is followed)
+  PROCESS        --pid PID, or --name TEXT: the process whose program holds TEXT (Wine names
+                 a game's process after its EXE), else one whose arguments hold it, never a
+                 shell or launcher that started the game. Found again on every poll, so a game
+                 that restarts is followed
   --proc DIR     where the process folders are (default /proc); tests use a folder of their own
   snap           copy every writable mapping (rw in /proc/PID/maps) to DIR/0xSTART.bin and list
                  them. Take one, change the value in the game, take another, then compare them
@@ -49,18 +51,29 @@ class Gone(Exception):
     """The process ended, or its memory cannot be read."""
 
 
+SHELLS = {'sh', 'bash', 'zsh', 'dash', 'ksh', 'fish', 'env', 'sudo', 'timeout', 'nohup', 'xvfb-run'}
+
+
 def find(proc, name):
-    """The lowest PID whose command line holds `name`, or None."""
+    """The game's PID, or None: the lowest PID whose program (the command line's first word)
+    holds `name`; failing that, the lowest whose command line holds it, leaving out shells and
+    launchers, whose arguments name the game too (docs/knowhow/pgrep-wait-matches-itself.md)."""
     pids = sorted(int(p) for p in os.listdir(proc) if p.isdigit())
+    loose = None
     for pid in pids:
         try:
             with open(os.path.join(proc, str(pid), 'cmdline'), 'rb') as f:
-                cmd = f.read().replace(b'\0', b' ').decode(errors='replace')
+                argv = [a.decode(errors='replace') for a in f.read().split(b'\0') if a]
         except OSError:
             continue
-        if name in cmd and 'memrec' not in cmd:
+        if not argv or 'memrec' in ' '.join(argv):
+            continue
+        if name in argv[0]:
             return pid
-    return None
+        program = os.path.basename(argv[0].replace('\\', '/'))
+        if loose is None and program not in SHELLS and any(name in a for a in argv[1:]):
+            loose = pid
+    return loose
 
 
 class Process:
