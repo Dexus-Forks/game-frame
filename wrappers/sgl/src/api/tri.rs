@@ -117,14 +117,16 @@ pub unsafe extern "C" fn sgltri_render(ctx: *const u8) {
     show(view);
 }
 
-/// Draw the last frame again.
+/// Draw the last frame again. The driver ignores the context and restarts the chip on the
+/// display list it already built; with no earlier frame that draws nothing and still reports
+/// error 0 (Original: `sgltri_rerender` at `10032430`).
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sgltri_rerender(ctx: *const u8) {
     trace!("sgltri_rerender", "{ctx:?}");
     let view = sgl().last_tri.clone();
     match view {
         Some(v) => show(v),
-        None => error(ERR_BAD_PARAMETER),
+        None => error(0),
     }
 }
 

@@ -26,6 +26,14 @@
 //! - Fog: `bFogOn` is read per call. The colour and the density (0 to 31) come from the
 //!   context given to `sgltri_render`, which writes the density into the chip's fog register
 //!   unchanged (`sgltri_render`, `FUN_100019b0`). `rate` below says how that is read here.
+//! - Texture filtering and mipmaps are not chosen per call (`FUN_1003daf0`). No immediate-mode
+//!   code reads `SGLTT_BILINEAR` (0x80000): bilinear filtering is one global setting,
+//!   `BilinearFilteringMode` in sglhw.ini, written to the chip at start-up (`FUN_10001e50`).
+//!   There is no per-call mipmap flag: a texture is mipmapped when it was made with a
+//!   mipmapped map type. `SGLTT_MIPMAPOFFSET` (0x400) copies `n32MipmapOffset`, which only
+//!   the packer for mipmapped textures reads (`FUN_10048d60`), and which stays set until the
+//!   next call that sets it. Deviation: this library ignores all three and filters every
+//!   texture (`render`).
 //! - `sgltri_isrendercomplete` returns 0 when the chip is idle, 1 when busy with a timeout of
 //!   0, and 2 when the timeout ran out.
 

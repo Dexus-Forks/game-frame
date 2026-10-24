@@ -6,11 +6,15 @@
 //!   and names the memory for the next, as for the scene graph (`frame`). The device's pixels
 //!   in that memory are filled with the marker. The game's 2D goes on top through
 //!   `wrappers/ddraw`.
-//! - DirectDraw mode (`sgl_use_ddraw_mode`). SGL owns the screen. It calls the game's 2D
-//!   callback with the finished frame's surface, so the game draws over it. Then SGL flips.
-//!   Here the surface is a 16-bit picture of the device's size, kept by this library. The
-//!   callback draws into it. The picture goes over the previous frame. Then the library fills
-//!   it with the marker again.
+//! - DirectDraw mode (`sgl_use_ddraw_mode`). SGL owns the screen. At each render it first
+//!   calls the game's 2D callback with the back buffer that holds the frame the chip has just
+//!   drawn (the one before this render), before the flip. The surface is not locked during
+//!   the call: SGL locked it after the last flip only to read its address and pitch, then
+//!   unlocked it (with sglhw.ini's `StrictLocks` 0). Then SGL flips, and the chip draws the
+//!   new frame into the next back buffer. The order here is the same. The surface is a 16-bit
+//!   picture of the device's size, kept by this library. The callback draws into it. The
+//!   picture goes over the previous frame and is shown (the flip). Then the library fills it
+//!   with the marker again, and the new frame goes to the render thread.
 //!
 //! Then the frame goes to the render thread. The end-of-render callback
 //! (`sgl_use_eor_callback`) runs after that. If it returns a value other than 0, the next
@@ -72,7 +76,9 @@ fn ddraw_picture(dev: (i32, i32)) {
     }
     let f = PROC_2D.load(Ordering::Relaxed);
     if f != 0 {
-        // Deviation: the game gets no DirectDraw objects (both are null), only the memory.
+        // Deviation: the game gets no DirectDraw objects (both are null), only the memory; the
+        // driver passes its DirectDraw object and the back buffer's surface. The size is the
+        // device's, where the driver snaps it to 320 x 240, 640 x 400 or 480, or 800 x 600.
         let mut p = SurfaceParams { ddraw: 0, surface: 0, mem: buf.as_mut_ptr() as usize, bpp: 16, stride: (w * 2) as u32, w: w as u16, h: h as u16 };
         let f: unsafe extern "C" fn(*mut SurfaceParams) -> i32 = unsafe { std::mem::transmute(f) };
         let r = unsafe { f(&mut p) };

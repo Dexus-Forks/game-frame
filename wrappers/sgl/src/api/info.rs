@@ -79,15 +79,11 @@ pub extern "C" fn sgl_get_win_versions() -> *const Strings<13> {
     if crate::immediate::ddraw_mode() { &WIN_DDRAW } else { &WIN_ADDRESS }
 }
 
-/// The texture memory of a PCX2 board: 4 MB.
-const TEXTURE_MEMORY: u64 = 4 << 20;
-
-/// Deviation: the 4 MB of a PCX2 board less 2 bytes a texel for each texture made, with no
-/// mipmaps; the textures here live in the host's memory and never run out.
+/// The driver's counter: a 4 MB board's memory less the charge of each texture that exists
+/// (`scene::texmem`, with its deviations). Original: `sgl_get_free_texture_mem` at `10015830`.
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_get_free_texture_mem() -> u32 {
-    let used: u64 = sgl().scene.textures.values().map(|t| t.w as u64 * t.h as u64 * 2).sum();
-    let free = TEXTURE_MEMORY.saturating_sub(used) as u32;
+    let free = sgl().texmem.free();
     trace!("sgl_get_free_texture_mem", "-> {free}");
     error(0);
     free
@@ -101,6 +97,7 @@ pub extern "C" fn sgl_delete_all_textures() {
         let mut s = sgl();
         let names: Vec<u32> = s.scene.textures.keys().copied().collect();
         s.scene.textures.clear();
+        s.texmem.give_back_all();
         names
     };
     trace!("sgl_delete_all_textures", "{} textures", names.len());

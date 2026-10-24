@@ -45,6 +45,8 @@ pub struct Sgl {
     pub tri: crate::scene::tri::Frame,
     pub last_tri: Option<crate::scene::walk::View>,
     pub frames: u32,
+    /// The texture memory each texture takes, for `sgl_get_free_texture_mem`.
+    pub texmem: crate::scene::texmem::TexMem,
 }
 
 static SGL: OnceLock<Mutex<Sgl>> = OnceLock::new();
@@ -60,6 +62,7 @@ pub fn sgl() -> MutexGuard<'static, Sgl> {
             tri: Default::default(),
             last_tri: None,
             frames: 0,
+            texmem: Default::default(),
         })
     })
     .lock()
