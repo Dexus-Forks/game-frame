@@ -17,6 +17,10 @@ Every release of GameFrame, newest first. The format follows
   is drawn flat, as the driver does. The fog constant is 1.0, a person's choice until a PCX2
   picture settles it. Free texture memory and the `sglhw.ini` the library writes follow the
   driver's installer (`TSPParamSize` 256). `sgltritest.c` draws one volume of each kind.
+- `gameframe-msvc-crt` adds safe byte memory operations, C byte-string functions, integer parsing
+  and integer formatting. It models Windows `long` as 32 bits and documents its C-locale limits.
+  The 2008, 2010, 2012 and 2013 x86 CRT exports and selected decompiles informed the new routines.
+  Their runtime parity is still open.
 
 - `glide2x.dll` draws under Wine on macOS. There Wine gives OpenGL 2.1, which cannot compile
   the library's shaders. The library now asks for a forward-compatible 3.2 core context when the
