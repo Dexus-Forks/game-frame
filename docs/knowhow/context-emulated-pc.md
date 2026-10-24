@@ -44,7 +44,11 @@ What each part fixed in POD:
   ([too many authentication failures](ssh-too-many-auth-failures.md)).
 - **Root for memory.** Reading the game's memory (`memrec.py`) needs root in the VM. `sudo`
   drops `DISPLAY` ([sudo and DISPLAY](sudo-drops-display.md)).
-- **A shared VM.** Give each session its own display and Wine prefix. Stop only your own
+- **One VM per game.** Give each game project its own VM, in its own `derived/vm`, with its own
+  port and name (`emupc.py init` refuses a port in use and names the VM after the project).
+  Hardwar first ran in POD's VM: it tied one game to another's machine and load, and put one
+  game's files inside the other's.
+- **Sessions of one game sharing its VM.** Give each session its own display and Wine prefix. Stop only your own
   processes ([pkill and a shared VM](shared-vm-pkill-display.md),
   [pkill over SSH](vm-ssh-pkill-matches-itself.md)). Keep a note of who is using the VM:
   `emulock.py take gf-vm --who SESSION --why TEXT`, run inside the VM, and `free` after.

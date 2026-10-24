@@ -4,7 +4,7 @@ cloud-init, Wine with 32-bit libraries, Xvfb and a window manager, and the game'
 CD-ROM drive.
 
 Usage: emupc.py init DIR --image QCOW2 --key PUBKEY [--disc ISO] [--memory 4G] [--cpus 4]
-                        [--ssh-port 2222] [--disk 20G] [--name gf-vm]
+                        [--ssh-port 2222] [--disk 20G] [--name gf-vm-PROJECT]
        emupc.py image                 print where to download the Debian cloud image
 
   DIR        the VM's folder, which git ignores (derived/vm)
@@ -13,7 +13,11 @@ Usage: emupc.py init DIR --image QCOW2 --key PUBKEY [--disc ISO] [--memory 4G] [
   --key      your SSH public key (~/.ssh/id_ed25519.pub), for the VM's user `gf`
   --disc     the game's disc as an ISO (tools/disc/discinfo.py IMAGE --iso FILE cuts the data
              track out of a BIN/CUE), attached as a CD-ROM drive
-  --ssh-port the port on this machine that reaches the VM's SSH (default 2222)
+  --ssh-port the port on this machine that reaches the VM's SSH (default 2222). Each game has
+             its own VM, so each needs its own port: init refuses a port that something else
+             already listens on
+  --name     the VM's host name and SSH alias (default gf-vm-PROJECT, from the project folder
+             in GAMEFRAME_PROJECT, which ./gameframe sets; gf-vm without one)
 
 It writes:
 
@@ -34,11 +38,16 @@ device because Wine on Linux reads the drive type and label from the device. Xvf
 window manager because without one no window becomes the foreground. Then DirectInput reads
 no keys.
 
+One VM per game: give each game project its own DIR (its derived/vm), port and name, and
+never run one game in another game's VM. A shared VM ties a game to another project's
+machine, its load and its changes, and puts one game's files inside the other's.
+
 It does not download anything, install QEMU or copy the game. Copy the install folder in with
 rsync over SSH. It needs qemu-system-x86_64 and qemu-img, and one of cloud-localds,
 genisoimage, mkisofs, xorriso or hdiutil to make the seed. Standard library only.
 """
 import os
+import socket
 import shlex
 import stat
 import sys
@@ -128,6 +137,27 @@ def write(path, text, executable=False):
         os.chmod(path, os.stat(path).st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
 
+def default_name():
+    project = os.environ.get('GAMEFRAME_PROJECT')
+    if not project:
+        return 'gf-vm'
+    base = ''.join(c if c.isalnum() else '-' for c in os.path.basename(project.rstrip('/')).lower())
+    return f'gf-vm-{base.strip("-") or "project"}'
+
+
+def port_in_use(port, d):
+    """True when something listens on 127.0.0.1:port and it is not this DIR's own running VM."""
+    try:
+        pid = int(open(os.path.join(d, 'qemu.pid')).read().strip())
+        os.kill(pid, 0)
+        return False
+    except (OSError, ValueError):
+        pass
+    with socket.socket() as s:
+        s.settimeout(0.5)
+        return s.connect_ex(('127.0.0.1', int(port))) == 0
+
+
 def init(argv):
     opt = lambda k, d=None: argv[argv.index(k) + 1] if k in argv and argv.index(k) + 1 < len(argv) else d
     args = [x for i, x in enumerate(argv) if not x.startswith('--') and (i == 0 or not argv[i - 1].startswith('--'))]
@@ -135,7 +165,10 @@ def init(argv):
         sys.exit('usage: emupc.py init DIR --image QCOW2 --key PUBKEY [--disc ISO] ...')
     a = {'dir': args[0], 'image': opt('--image'), 'key': opt('--key'), 'disc': opt('--disc'),
          'memory': opt('--memory', '4G'), 'cpus': opt('--cpus', '4'), 'ssh_port': opt('--ssh-port', '2222'),
-         'disk': opt('--disk', '20G'), 'name': opt('--name', 'gf-vm')}
+         'disk': opt('--disk', '20G'), 'name': opt('--name', default_name())}
+    if port_in_use(a['ssh_port'], a['dir']):
+        sys.exit(f'emupc.py: port {a["ssh_port"]} is in use, probably by another game\'s VM. '
+                 'Give each game its own VM and port: --ssh-port N')
     key = open(a['key'], encoding='utf-8').read().strip()
     if not key.startswith(('ssh-', 'ecdsa-', 'sk-')):
         sys.exit(f'emupc.py: {a["key"]} is not an SSH public key (want the .pub file)')
