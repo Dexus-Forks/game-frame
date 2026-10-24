@@ -83,12 +83,24 @@ pub struct Batch {
     pub verts: Vec<Vert>,
 }
 
-/// A light volume in the camera's space: its planes as `(n, d)` with `n · p <= d` inside, and
-/// the light it adds where a surface lies inside all of them.
+/// What a volume does to a surface inside it.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum VolumeKind {
+    /// A light volume adds its colour (sgl.h).
+    #[default]
+    Light,
+    /// A shadow volume multiplies by its colour, the shadow's brightness (sgl.h: 0 is black,
+    /// 1 no shadow). Only the immediate mode makes them (`scene::shadow`).
+    Shadow,
+}
+
+/// A light or shadow volume in the camera's space: its planes as `(n, d)` with `n · p <= d`
+/// inside, and the colour it adds or multiplies by where a surface lies inside all of them.
 #[derive(Clone, Debug, Default)]
 pub struct Volume {
     pub planes: Vec<[f32; 4]>,
     pub colour: Colour,
+    pub kind: VolumeKind,
 }
 
 /// One camera's view of the scene.
@@ -224,7 +236,7 @@ pub fn view(scene: &Scene, camera: u32) -> Option<View> {
                 [n[0], n[1], n[2], dot(n, p)]
             })
             .collect();
-        volumes.push(Volume { planes, colour });
+        volumes.push(Volume { planes, colour, kind: VolumeKind::Light });
     }
     Some(View { camera: cam, batches, volumes })
 }

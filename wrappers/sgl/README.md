@@ -39,6 +39,15 @@ The frame reaches the window in one of SGL's two output modes, in the driver's o
   library's memory. What the game draws into it goes over the frame, except where it still
   holds the marker.
 
+Shadow and light volumes (`sgltri_shadow`) are drawn. Each call is one convex volume: every
+face is a plane, and a pixel is inside when it is inside them all. A face that faces the
+camera on the screen is a near side, one that faces away a far side, and a face seen edge-on
+is a cut across the screen, as in the driver (`scene/shadow.rs`). So wind each face so that
+its normal points out of the volume. After the opaque faces, every pixel is tested against
+the planes. Inside a shadow the colour is multiplied by `fShadowBrightness`; inside a light
+volume `u32LightVolColour` is added. In those modes a Gouraud face with a translucent map is
+drawn flat, as in the driver, which has no smooth translucent format for them.
+
 After each render the end-of-render callback runs, if the game set one. If it returns a value
 other than 0, the next `sgltri_render` reports that value as its error. `sgltri_isrendercomplete`
 always returns 0 (complete).
@@ -63,7 +72,10 @@ both: `WINEDLLOVERRIDES="sgl=n;ddraw=n,b"`.
 SGL's driver installer writes `sglhw.ini` into the Windows folder, with the region size of
 the chip's tiles. A game may read it before its first SGL call: POD divides by
 `SW_XRegionSize` and `SW_YRegionSize`. The library writes the file with the installer's
-32 × 32 when it is missing.
+settings when it is missing: `[mode] mode=ddraw`, and in `[default]` `SW_XRegionSize=32`,
+`SW_YRegionSize=32`, `StrictLocks=0`, `TSPParamSize=256`, `ResetTSPVSync=1` and
+`RenderTimeout=5` (`MIDAS.INF`). The driver's own defaults differ (`TSPParamSize` 128,
+`RenderTimeout` 2); the library follows the installed driver.
 
 ## Test without a game
 
@@ -77,8 +89,9 @@ WRAPPER_WINDOW_CLASS=SglTest SGL_SHOT_DIR='C:\shots' SGL_SHOT_EVERY=30 SGL_SCALE
 ```
 
 Neither program needs a game. `test/sgltritest.c` draws a known immediate-mode scene: a fogged
-floor of quads, a Gouraud triangle, a turning textured quad, a flat triangle with a highlight,
-a translucent triangle and the same 2D bar. Pass `ddraw` after the frame count to use the
+floor of quads, a shadow volume and a light volume through the floor, a Gouraud triangle, a
+turning textured quad, a flat triangle with a highlight, a translucent triangle and the same
+2D bar. Pass `ddraw` after the frame count to use the
 DirectDraw mode's 2D callback. At the end it prints what the information calls return.
 
 ```bash
@@ -93,7 +106,7 @@ when zig is there.
 
 | Module | Does |
 |---|---|
-| `scene/` | `tri.rs`: the immediate mode, from the game's contexts and vertices to batches. The graph (`graph.rs`: lists, transforms, meshes, materials, lights, cameras, textures, one method per call) and the traversal (`walk.rs`: from the root list to lit triangles in the camera's space; `convex.rs`: light volumes; `texmem.rs`: free texture memory). Plain Rust, tested on the host |
+| `scene/` | `tri.rs`: the immediate mode, from the game's contexts and vertices to batches; `shadow.rs`: its shadow and light volumes as planes. The graph (`graph.rs`: lists, transforms, meshes, materials, lights, cameras, textures, one method per call) and the traversal (`walk.rs`: from the root list to lit triangles in the camera's space; `convex.rs`: light volumes; `texmem.rs`: free texture memory). Plain Rust, tested on the host |
 | `api/` | The exported calls: they read the game's pointers and edit the graph |
 | `frame.rs` | `sgl_render`: the address callback, the marker, the frame to the render thread; `sgl_wrapper_present` |
 | `immediate.rs` | `sgltri_render`: the frame through the address callback or the DirectDraw mode's 2D callback, then the end-of-render callback |
@@ -113,8 +126,8 @@ With another DirectDraw the 3D frame is shown alone.
 Each is marked `Deviation:` in the code.
 
 - Light volumes are drawn, tested per pixel against their planes. A light volume of more than
-  64 planes keeps the first 64. Other convex objects (shadow volumes, solids drawn from their
-  planes) are skipped.
+  64 planes keeps the first 64. Other convex objects of the scene graph (shadow volumes,
+  solids drawn from their planes) are skipped.
 - A translucent map's clear pixels are cut out. Only a material's opacity blends.
 - Faces are lit from both sides. SGL's default material is assumed (white, opaque).
 - Point lights are placed from the camera: SGL positions a light with `sgl_position_light`,
@@ -134,11 +147,22 @@ In the immediate mode:
   faces in a pass in the order sent, as the driver does.
 - Translucency level 15 is drawn fully clear (*inferred*). The driver does not say how clear
   the chip makes it.
-- The library counts the shadow and light volumes sent with `sgltri_shadow`. It does not
-  draw them. It checks the arguments in the driver's order.
+- Shadow and light volumes are applied once, after the opaque faces and before the
+  translucent ones. The driver applies them after every pass, translucent ones too.
+- One brightness and one light colour serve the whole frame: the last a `sgltri_triangles`
+  or `sgltri_quads` call gave in that mode. The driver packs them into each face as it is
+  sent. Faces sent outside shadow mode are darkened too (*inferred*: the driver leaves
+  them).
+- `sgltri_shadow`'s bounding box is not used: a volume covers the whole screen. The driver
+  files it only into the 32 × 32 regions the box covers.
+- A volume of more than 64 planes keeps the first 64 (a call may give 100 faces).
+- The light colour is read as a `D3DCOLOR` (0x00RRGGBB). The driver's packer puts its red
+  and blue the other way round from the shadow packer's (*measured*); what the chip does with
+  that is not known.
 - Fog keeps `2^(-c × 2^(R - 22) × w / 0.01)` of a colour, with R the fog register (0 to 31)
   (*inferred* from how SGL sets the register for the scene graph). The chip's constant `c`
-  lies between 0.5 and 1, and 0.75 is taken. `SGL_FOG` scales it.
+  lies between 0.5 and 1 (*inferred*). The library takes 1.0, a person's choice; the chip's
+  own value needs a picture from a PCX2. `SGL_FOG` scales it.
 - `SGLTT_VERTEXFOG` and the specular alpha are ignored, as the driver ignores them. A face
   fogs by its `w` whenever `bFogOn` is set.
 - The DirectDraw mode's 2D callback gets null for both DirectDraw objects. Only the memory is
@@ -149,10 +173,10 @@ In the immediate mode:
   There is no per-call mipmap flag: mipmapped map types make mipmapped textures. The
   mipmap offset (`SGLTT_MIPMAPOFFSET`) only changes mipmapped textures. The library ignores
   mipmaps and the offset.
-- `sgl_get_free_texture_mem` counts as the driver does: 4 MB less 4 bytes at the start, less
-  a fixed charge for each texture by its map type and size (`scene/texmem.rs`). The driver
-  also takes two buffers of `TSPParamSize` KB at the start; that setting's default is not
-  known, so they are not taken out. A texture is never refused for lack of memory.
+- `sgl_get_free_texture_mem` counts as the driver does: 4 MB less two TSP buffers of 256 KB
+  (`TSPParamSize` as the installer sets it) and 4 bytes at the start, less a fixed charge for
+  each texture by its map type and size (`scene/texmem.rs`). A texture is never refused for
+  lack of memory.
 - Only the immediate-mode calls and the information calls record errors for
   `sgl_get_errors`.
 - `sgl_get_versions` reports driver 3.1.0's strings. `sgl_delete_all_textures` takes no

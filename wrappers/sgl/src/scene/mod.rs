@@ -7,6 +7,7 @@
 //! - `graph`: the objects and the editing state (`Scene`), one method per SGL call.
 //! - `walk`: the traversal, from the root list to triangles in camera space.
 //! - `tri`: immediate mode (`sgltri_*`), faces already on the screen, as batches like `walk`'s.
+//! - `shadow`: immediate mode's shadow and light volumes (`sgltri_shadow`), as planes.
 //! - `convex`: a convex object's solid from its planes (light volumes).
 //! - `texmem`: free texture memory, as the driver counts it.
 //! - `math`: affine matrices.
@@ -16,6 +17,7 @@ pub mod convex;
 pub mod dump;
 pub mod graph;
 pub mod math;
+pub mod shadow;
 pub mod texmem;
 pub mod tri;
 pub mod walk;

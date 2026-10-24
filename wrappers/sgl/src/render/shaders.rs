@@ -8,7 +8,7 @@
 //! rectangle's centre and `sx`, `sy` zoom times its half sizes. Depth is `1 - 2 near / z`.
 //!
 //! `overlay` draws a picture over a rectangle given in normalised device coordinates;
-//! `volume` adds a light volume's light.
+//! `volume` adds a light volume's light or darkens by a shadow volume's brightness.
 
 use super::gl::*;
 
@@ -77,7 +77,8 @@ void main() {
 }
 "#;
 
-/// The most planes a light volume may have here (POD's has 41).
+/// The most planes a light or shadow volume may have here (POD's light volume has 41; a
+/// `sgltri_shadow` volume may have 100).
 pub const MAX_PLANES: usize = 64;
 
 const VOLUME_VS: &str = r#"#version 120
@@ -127,7 +128,8 @@ impl Program {
 pub struct Programs {
     pub scene: Program,
     pub overlay: Program,
-    /// A light volume's light, where the surface is inside its planes.
+    /// A light volume's light, or a shadow volume's brightness, where the surface is inside
+    /// its planes.
     pub volume: Program,
 }
 

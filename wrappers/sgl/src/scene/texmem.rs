@@ -10,12 +10,15 @@ use std::collections::HashMap;
 /// The texture memory of a PCX2 board: 4 MB (Original: the board probe at `100436b4`).
 pub const BOARD_MEMORY: u32 = 4 << 20;
 
-/// The counter at start-up: the board's memory less the 4 bytes the driver allocates
-/// (Original: `1001b370`, after the initialiser `10005400`).
-/// Deviation: the driver also takes two buffers of `TSPParamSize` KB (Original: `1001b3e0`).
-/// The default of that setting is not known (its reader `10001460` decompiles badly), so they
-/// are not taken out here.
-pub const START: u32 = BOARD_MEMORY - 4;
+/// `TSPParamSize` in KB, as the driver's installer writes it into `sglhw.ini` (`MIDAS.INF`,
+/// `[Midas4_UpdateInis]`; *observed*). The driver's own default, with no setting, is 128
+/// (`10001460` called at `100013a8`; *observed*). `api::device::install_ini` writes 256.
+pub const TSP_PARAM_KB: u32 = 256;
+
+/// The counter at start-up: the board's memory less two TSP parameter buffers of
+/// `TSPParamSize` KB (Original: `1001b3e0`, twice) and 4 bytes (Original: `1001b370`), taken
+/// after the initialiser `10005400` (*inferred* from the order of the calls).
+pub const START: u32 = BOARD_MEMORY - 2 * (TSP_PARAM_KB << 10) - 4;
 
 /// Bytes for size index 0 to 3 (32, 64, 128, 256 pixels square), for maps without mipmaps
 /// (Original: the table at `0x100c1768`).
@@ -102,16 +105,16 @@ mod tests {
     #[test]
     fn counter() {
         let mut m = TexMem::default();
-        assert_eq!(m.free(), 4194300);
+        assert_eq!(m.free(), 3670012);
         m.take(2, 0, 3);
         m.take(3, 4, 2);
-        assert_eq!(m.free(), 4194300 - 131072 - 44032);
+        assert_eq!(m.free(), START - 131072 - 44032);
         m.give_back(2);
-        assert_eq!(m.free(), 4194300 - 44032);
+        assert_eq!(m.free(), START - 44032);
         m.give_back(2);
-        assert_eq!(m.free(), 4194300 - 44032);
+        assert_eq!(m.free(), START - 44032);
         m.take(4, 9, 9);
-        assert_eq!(m.free(), 4194300 - 44032);
+        assert_eq!(m.free(), START - 44032);
         m.give_back_all();
         assert_eq!(m.free(), START);
     }

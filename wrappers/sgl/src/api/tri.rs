@@ -5,7 +5,8 @@
 //! back.
 
 use super::{error, sgl, trace};
-use crate::scene::tri::{CONTEXT_SIZE, Context, FACESIND3DFORMAT, VERTEX_SIZE, Vertex, shadow_args};
+use crate::scene::shadow::shadow_args;
+use crate::scene::tri::{CONTEXT_SIZE, Context, FACESIND3DFORMAT, VERTEX_SIZE, Vertex};
 use crate::scene::{ERR_BAD_PARAMETER, walk::View};
 
 /// The most vertices one call may use: the chip's own buffer held far fewer.
@@ -27,6 +28,14 @@ unsafe fn faces<const N: usize>(p: *const u8, n: usize, d3d: bool) -> Vec<[u32; 
         .collect()
 }
 
+/// The vertices up to the highest index the faces name. Deviation: a face that names a vertex
+/// past MAX_VERTICES is skipped.
+unsafe fn vertices<const N: usize>(fs: &[[u32; N]], pv: *const u8) -> Vec<Vertex> {
+    let count = fs.iter().flatten().copied().filter(|&i| i < MAX_VERTICES).max().map_or(0, |m| m as usize + 1);
+    let vb = unsafe { std::slice::from_raw_parts(pv, count * VERTEX_SIZE) };
+    vb.chunks_exact(VERTEX_SIZE).map(Vertex::read).collect()
+}
+
 /// Add `n` faces of `N` vertices, as `sgltri_triangles` and `sgltri_quads` do.
 unsafe fn add<const N: usize>(name: &str, ctx: *const u8, n: i32, pf: *const u8, pv: *const u8) {
     if n == 0 {
@@ -39,10 +48,7 @@ unsafe fn add<const N: usize>(name: &str, ctx: *const u8, n: i32, pf: *const u8,
     }
     let d3d = N == 3 && c.flags & FACESIND3DFORMAT != 0;
     let fs = unsafe { faces::<N>(pf, n as usize, d3d) };
-    // Deviation: a face that names a vertex past MAX_VERTICES is skipped.
-    let count = fs.iter().flatten().copied().filter(|&i| i < MAX_VERTICES).max().map_or(0, |m| m as usize + 1);
-    let vb = unsafe { std::slice::from_raw_parts(pv, count * VERTEX_SIZE) };
-    let vs: Vec<Vertex> = vb.chunks_exact(VERTEX_SIZE).map(Vertex::read).collect();
+    let vs = unsafe { vertices(&fs, pv) };
     let mut s = sgl();
     let translucent_map = s.scene.textures.get(&(c.texture as u32)).is_some_and(|t| t.translucent);
     s.tri.add(&c, &fs, &vs, translucent_map);
@@ -79,18 +85,24 @@ pub unsafe extern "C" fn sgltri_quads(ctx: *const u8, n: i32, faces: *const u8, 
     unsafe { add::<4>("sgltri_quads", ctx, n, faces, verts) };
 }
 
-/// One convex shadow or light volume, from the planes of up to 100 faces, limited to the
-/// screen regions `bbox` (`{x0, y0, x1, y1}`) covers. The arguments are checked as the driver
-/// checks them (`scene::tri::shadow_args`). Deviation: the volume is counted, not drawn.
+/// One convex shadow or light volume, from the planes of up to 100 faces (`int[3]` each),
+/// limited to the screen regions `bbox` (`{x0, y0, x1, y1}`) covers (Original: `sgltri_shadow`
+/// at `10003080`). The arguments are checked as the driver checks them
+/// (`scene::shadow::shadow_args`). The volume is drawn with the frame (`scene::shadow`).
+/// Deviation: `SGLTT_FACESIND3DFORMAT` is not read here; whether the driver reads it for
+/// shadows was not traced. The bounding box is not used (`Frame::shadow`).
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sgltri_shadow(ctx: *const u8, n: i32, faces: *const u8, verts: *const u8, _bbox: *const f32) {
     trace!("sgltri_shadow", "{ctx:?} {n} {faces:?} {verts:?}");
-    let mode = unsafe { context(ctx) }.map(|c| c.shadow_mode);
-    if let Some(e) = shadow_args(n, mode, !faces.is_null() && !verts.is_null()) {
+    let c = unsafe { context(ctx) };
+    if let Some(e) = shadow_args(n, c.map(|c| c.shadow_mode), !faces.is_null() && !verts.is_null()) {
         return error(e);
     }
-    sgl().tri.shadows += n as u32;
-    shim::log_once!("sgltri_shadow: {n} faces, mode {mode:?}, not drawn");
+    let Some(c) = c else { return error(ERR_BAD_PARAMETER) };
+    let fs = unsafe { self::faces::<3>(faces, n as usize, false) };
+    let vs = unsafe { vertices(&fs, verts) };
+    sgl().tri.shadow(&c, &fs, &vs);
+    shim::log_once!("sgltri_shadow: first call, {n} faces, mode {}", c.shadow_mode);
     error(0);
 }
 

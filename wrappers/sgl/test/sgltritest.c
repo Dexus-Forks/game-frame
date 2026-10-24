@@ -1,6 +1,8 @@
 /* sgltritest.exe: draws a known scene through sgl.dll's immediate mode (sgltri_*, wrappers/sgl)
  * without a game. A window of class "SglTest", a screen device, then each frame:
- * sgltri_startofframe, a fogged floor of quads going into the distance, a Gouraud triangle,
+ * sgltri_startofframe, a fogged floor of quads going into the distance, a box-shaped shadow
+ * volume darkening the floor in the middle and a light volume lighting it on the right
+ * (sgltri_shadow), a Gouraud triangle,
  * a textured quad that turns (perspective-correct, a red and yellow checker), a flat
  * triangle with a specular highlight, a translucent triangle with vertex alpha in front, and
  * sgltri_render. A 2D bar goes over the top rows, as a game's dashboard does: through the
@@ -69,6 +71,7 @@ F(int, sgl_create_texture, int, int, int, int, imap *, void *)
 F(void, sgltri_startofframe, SGLCONTEXT *)
 F(void, sgltri_triangles, SGLCONTEXT *, int, int (*)[3], SGLVERTEX *)
 F(void, sgltri_quads, SGLCONTEXT *, int, int (*)[4], SGLVERTEX *)
+F(void, sgltri_shadow, SGLCONTEXT *, int, int (*)[3], SGLVERTEX *, float (*)[2])
 F(void, sgltri_render, SGLCONTEXT *)
 F(int, sgltri_isrendercomplete, SGLCONTEXT *, unsigned)
 F(void, sgl_get_errors, int *, int *)
@@ -130,6 +133,29 @@ static SGLVERTEX project(float x, float y, float z, unsigned colour, float u, fl
     return o;
 }
 
+/* A box from lo to hi as twelve triangles for sgltri_shadow. Each is wound so that its normal
+ * (v1 - v0) x (v2 - v0) in screen (x, y, z) points out of the box, as the driver's planes need
+ * (wrappers/sgl/src/scene/shadow.rs). */
+static void box_volume(const float lo[3], const float hi[3], SGLVERTEX bv[8], int faces[12][3]) {
+    static const int quads[6][4] = {{0, 1, 3, 2}, {4, 5, 7, 6}, {0, 1, 5, 4}, {2, 3, 7, 6}, {0, 2, 6, 4}, {1, 3, 7, 5}};
+    float centre[3] = {0, 0, 0};
+    for (int i = 0; i < 8; i++) {
+        bv[i] = project(i & 1 ? hi[0] : lo[0], i & 2 ? hi[1] : lo[1], i & 4 ? hi[2] : lo[2], 0, 0, 0);
+        centre[0] += bv[i].fX / 8; centre[1] += bv[i].fY / 8; centre[2] += bv[i].fZ / 8;
+    }
+    for (int q = 0; q < 6; q++)
+        for (int t = 0; t < 2; t++) {
+            int *f = faces[q * 2 + t];
+            f[0] = quads[q][0]; f[1] = quads[q][t + 1]; f[2] = quads[q][t + 2];
+            SGLVERTEX *a = &bv[f[0]], *b = &bv[f[1]], *c = &bv[f[2]];
+            float e1[3] = {b->fX - a->fX, b->fY - a->fY, b->fZ - a->fZ};
+            float e2[3] = {c->fX - a->fX, c->fY - a->fY, c->fZ - a->fZ};
+            float n[3] = {e1[1] * e2[2] - e1[2] * e2[1], e1[2] * e2[0] - e1[0] * e2[2], e1[0] * e2[1] - e1[1] * e2[0]};
+            float m[3] = {(a->fX + b->fX + c->fX) / 3 - centre[0], (a->fY + b->fY + c->fY) / 3 - centre[1], (a->fZ + b->fZ + c->fZ) / 3 - centre[2]};
+            if (n[0] * m[0] + n[1] * m[1] + n[2] * m[2] < 0) { int k = f[1]; f[1] = f[2]; f[2] = k; }
+        }
+}
+
 int main(int argc, char **argv) {
     int frames = argc > 1 ? atoi(argv[1]) : 120;
     int ddraw = argc > 2 && !strcmp(argv[2], "ddraw");
@@ -137,7 +163,7 @@ int main(int argc, char **argv) {
     if (!lib) { fprintf(stderr, "no sgl.dll\n"); return 1; }
     L(sgl_use_address_mode); L(sgl_use_ddraw_mode); L(sgl_use_eor_callback); L(sgl_create_screen_device);
     L(sgl_preprocess_texture); L(sgl_create_texture); L(sgltri_startofframe); L(sgltri_triangles);
-    L(sgltri_quads); L(sgltri_render); L(sgltri_isrendercomplete); L(sgl_get_errors); L(sgl_get_versions);
+    L(sgltri_quads); L(sgltri_shadow); L(sgltri_render); L(sgltri_isrendercomplete); L(sgl_get_errors); L(sgl_get_versions);
     L(sgl_get_win_versions); L(sgl_get_free_texture_mem); L(sgl_delete_all_textures); L(sgl_wrapper_present);
 
     WNDCLASSA wc = {0};
@@ -172,7 +198,7 @@ int main(int argc, char **argv) {
     memset(&c, 0, sizeof c);
     c.cBackgroundColour[0] = 0.1f; c.cBackgroundColour[1] = 0.15f; c.cBackgroundColour[2] = 0.3f;
     c.fFogR = 0.5f; c.fFogG = 0.5f; c.fFogB = 0.6f;
-    c.u32FogDensity = 10; /* about 97% of the colour kept at z = 2, 43% at z = 66 (scene/tri.rs `rate`) */
+    c.u32FogDensity = 10; /* about 97% of the colour kept at z = 2, 33% at z = 66 (scene/tri.rs `rate`) */
     c.bCullBackfacing = 1;
     c.u32GlobalTrans = 255;
 
@@ -192,8 +218,22 @@ int main(int argc, char **argv) {
             quads[k][0] = k * 2 + 2; quads[k][1] = k * 2 + 3; quads[k][2] = k * 2 + 1; quads[k][3] = k * 2;
         }
         c.u32Flags = 0; c.bFogOn = 1; c.nTextureName = 0;
+        /* In shadow mode, with a shadow's brightness of 0.4. */
+        c.eShadowLightVolMode = 1; c.u.fShadowBrightness = 0.4f;
         sgltri_quads(&c, 8, quads, v);
         c.bFogOn = 0;
+
+        /* A shadow box through the floor in the middle, a yellow light box on the right. */
+        static const float slo[3] = {-3, -2, 7}, shi[3] = {1, -1, 11};
+        static const float llo[3] = {3, -2, 10}, lhi[3] = {6, -1, 18};
+        SGLVERTEX bv[8];
+        int bf[12][3];
+        box_volume(slo, shi, bv, bf);
+        sgltri_shadow(&c, 12, bf, bv, NULL);
+        box_volume(llo, lhi, bv, bf);
+        c.eShadowLightVolMode = 2; c.u.u32LightVolColour = 0x00606000;
+        sgltri_shadow(&c, 12, bf, bv, NULL);
+        c.eShadowLightVolMode = 0; c.u.u32LightVolColour = 0;
 
         /* A Gouraud triangle on the left: red, green and blue corners. */
         v[0] = project(-3.5f, -1, 6, 0xffff0000, 0, 0);

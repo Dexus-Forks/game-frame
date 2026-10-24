@@ -9,6 +9,14 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `sgl.dll` draws the immediate mode's shadow and light volumes (`sgltri_shadow`), which it
+  only counted before. Each call's faces become the planes of one convex volume, oriented as
+  PowerVR's driver orients them, and every pixel is tested against them: a shadow multiplies
+  by its brightness, a light volume adds its colour. Texture wrapping now moves a vertex by one
+  turn at most, as measured in the driver. In shadow mode a Gouraud face with a translucent map
+  is drawn flat, as the driver does. The fog constant is 1.0, a person's choice until a PCX2
+  picture settles it. Free texture memory and the `sglhw.ini` the library writes follow the
+  driver's installer (`TSPParamSize` 256). `sgltritest.c` draws one volume of each kind.
 - `gameframe-msvc-crt` adds safe byte memory operations, C byte-string functions, integer parsing
   and integer formatting. It models Windows `long` as 32 bits and documents its C-locale limits.
   The 2008, 2010, 2012 and 2013 x86 CRT exports and selected decompiles informed the new routines.
