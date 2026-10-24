@@ -126,12 +126,19 @@ Each is marked `Deviation:` in the code.
 
 In the immediate mode:
 
-- Translucent faces are drawn after the opaque ones, in the order sent. The PCX2 sorted them
-  itself.
+- Translucent passes are sorted once for the whole screen. The driver sorts them in each
+  32 × 32 region, with that region's own depths. Each call gives one pass for its faces kept
+  as sent and one for the faces turned round. The passes are drawn farthest first, and the
+  faces in a pass in the order sent, as the driver does.
+- Translucency level 15 is drawn fully clear (*inferred*). The driver does not say how clear
+  the chip makes it.
 - The library counts the shadow and light volumes sent with `sgltri_shadow`. It does not
-  draw them.
-- The fog's rate per unit of `w` is read from SGL's fog register (0 to 31) as SGL writes it
-  for the scene graph (*inferred*). `SGL_FOG` scales it.
+  draw them. It checks the arguments in the driver's order.
+- Fog keeps `2^(-c × 2^(R - 22) × w / 0.01)` of a colour, with R the fog register (0 to 31)
+  (*inferred* from how SGL sets the register for the scene graph). The chip's constant `c`
+  lies between 0.5 and 1, and 0.75 is taken. `SGL_FOG` scales it.
+- `SGLTT_VERTEXFOG` and the specular alpha are ignored, as the driver ignores them. A face
+  fogs by its `w` whenever `bFogOn` is set.
 - The DirectDraw mode's 2D callback gets null for both DirectDraw objects. Only the memory is
   real.
 - Mipmaps, bilinear filtering switches and mipmap offsets are ignored. Every texture is

@@ -53,7 +53,9 @@ there:
   it straight back, with the nearest `w` as the near plane. PowerVR's own SGLMID4.dll answers
   what the header leaves open. A face clockwise on the screen faces the camera. Faces of less
   than 1/32 pixel are dropped. Flat shading takes the first vertex's colour. The fog density
-  (0 to 31) is a power-of-two register.
+  (0 to 31) is a power-of-two register on a depth of 0.01 / w. Translucency is one 4-bit
+  level per face. The driver sorts translucent passes, one per call and facing, farthest
+  first; it never sorts single faces. It never reads `SGLTT_VERTEXFOG`.
 - **A test without the game.** A small Windows program that makes the same calls on a known
   scene (a textured cube under a 2D bar) checks the projection, lighting, textures and the
   overlay where the game itself cannot run (`wrappers/sgl/test/sgltest.c`, and `sgltritest.c` for

@@ -5,7 +5,7 @@
 //! back.
 
 use super::{error, sgl, trace};
-use crate::scene::tri::{CONTEXT_SIZE, Context, FACESIND3DFORMAT, VERTEX_SIZE, Vertex};
+use crate::scene::tri::{CONTEXT_SIZE, Context, FACESIND3DFORMAT, VERTEX_SIZE, Vertex, shadow_args};
 use crate::scene::{ERR_BAD_PARAMETER, walk::View};
 
 /// The most vertices one call may use: the chip's own buffer held far fewer.
@@ -79,15 +79,18 @@ pub unsafe extern "C" fn sgltri_quads(ctx: *const u8, n: i32, faces: *const u8, 
     unsafe { add::<4>("sgltri_quads", ctx, n, faces, verts) };
 }
 
-/// Deviation: shadow and light volumes given as triangles are counted, not drawn.
+/// One convex shadow or light volume, from the planes of up to 100 faces, limited to the
+/// screen regions `bbox` (`{x0, y0, x1, y1}`) covers. The arguments are checked as the driver
+/// checks them (`scene::tri::shadow_args`). Deviation: the volume is counted, not drawn.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sgltri_shadow(ctx: *const u8, n: i32, faces: *const u8, verts: *const u8, _bbox: *const f32) {
     trace!("sgltri_shadow", "{ctx:?} {n} {faces:?} {verts:?}");
-    if ctx.is_null() || faces.is_null() || verts.is_null() || n < 0 {
-        return error(ERR_BAD_PARAMETER);
+    let mode = unsafe { context(ctx) }.map(|c| c.shadow_mode);
+    if let Some(e) = shadow_args(n, mode, !faces.is_null() && !verts.is_null()) {
+        return error(e);
     }
     sgl().tri.shadows += n as u32;
-    shim::log_once!("sgltri_shadow: {n} faces, not drawn");
+    shim::log_once!("sgltri_shadow: {n} faces, mode {mode:?}, not drawn");
     error(0);
 }
 
@@ -103,8 +106,7 @@ pub unsafe extern "C" fn sgltri_render(ctx: *const u8) {
     let Some(c) = (unsafe { context(ctx) }) else { return error(ERR_BAD_PARAMETER) };
     let view = {
         let mut s = sgl();
-        let dev = s.device.unwrap_or((640, 480));
-        let view = s.tri.view(&c, dev);
+        let view = s.tri.view(&c);
         if s.frames == 0 {
             shim::log!("first immediate-mode frame: {} faces sent, {} drawn, {} batches", s.tri.sent, s.tri.kept, view.batches.len());
         }
