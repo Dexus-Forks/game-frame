@@ -47,7 +47,7 @@ The game then falls back to plain DirectSound or to no 3D sound, if it was writt
 
 | Library | Stand-in | Effect lost or kept |
 |---|---|---|
-| `94DLL32.dll` | **Done** (`wrappers/maxi94`). The card's wave streams become Wine's wave outputs, and the game's mixer lines are answered for | POD's sound plays. Front and rear outputs are mixed into two speakers |
+| `94DLL32.dll` | **Done** (`wrappers/maxi94`). The card's wave streams become Wine's wave outputs, and the game's mixer lines are answered for | POD's sound effects play through a whole race (*measured*, emulated PC, recorded). Front and rear outputs are mixed into two speakers |
 | `sfman32.dll` | Possible. Accept the banks the game loads, and give them to a software synthesiser that the game's MIDI goes to (FluidSynth reads SoundFont 2 files; the AWE's own `.sbk` banks are older) | The game's own instruments heard, as on the AWE |
 | `a3d.dll` | Possible as a COM server. Map sources and the listener onto OpenAL Soft (HRTF), or onto DirectSound 3D. A3D 2.0's reflections need its geometry traced into an effect | 3D placement kept. A3D 2.0's wavetracing must be emulated, or it is lost |
 | EAX | Needs no stand-in of its own. Use DSOAL with OpenAL Soft in place of Wine's DirectSound | Reverb kept, through OpenAL Soft's EAX |
