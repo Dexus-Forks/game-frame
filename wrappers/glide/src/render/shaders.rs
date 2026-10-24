@@ -180,6 +180,8 @@ void main() {
 unsafe fn shader(gl: &Gl, kind: u32, src: &str) -> Result<u32, String> {
     unsafe {
         let s = (gl.CreateShader)(kind);
+        // GLSL 1.50 in a core context: the same language for these shaders.
+        let src = if crate::window::CORE.load(std::sync::atomic::Ordering::Relaxed) { src.replacen("#version 130", "#version 150", 1) } else { src.to_string() };
         let p = src.as_ptr();
         let n = src.len() as i32;
         (gl.ShaderSource)(s, 1, &p, &n);

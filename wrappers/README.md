@@ -43,7 +43,7 @@ each library, one call at a time.
 
 | DLL | The original | Implemented | Exported |
 |---|---|---|---|
-| `glide2x.dll` | Glide 2.43 (`glide2x.dll`) and Glide 2.1.1 (`glide.dll`) | 131 | 156 |
+| `glide2x.dll` | Glide 2.43 (`glide2x.dll`) and Glide 2.1.1 (`glide.dll`) | 156 | 156 |
 | `sgl.dll` | PowerVR driver 3.1.0's `sgl.dll`, `sgl_delete_all_textures` from a later SGL, and `sgl_wrapper_present` | 61 | 134 |
 | `ati3dcif.dll` | ATI 3D Rage Pro SDK 4.1's `ATI3DCIF.LIB` | 6 | 17 |
 | `s3dtkw.dll` | S3's 1996 ViRGE driver's `S3DTKW.DLL` | 6 | 6 |

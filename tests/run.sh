@@ -1665,7 +1665,7 @@ if command -v cargo >/dev/null; then
   if rustup target list --installed 2>/dev/null | grep -q i686-pc-windows-gnu && command -v zig >/dev/null; then
     out="$(cd wrappers && cargo build -q --release --target-dir "$WT" 2>&1)"
     [[ $? == 0 ]] || bad "wrappers build for 32-bit Windows" "$(echo "$out" | grep -E 'error' | head -8)"
-    expect "each wrapper DLL exports exactly its .def's names and ordinals: every call of the original library" "ati3dcif 17 ok, ddraw 9 ok, glide2x 156 ok, maxi94 6 ok, s3dtkw 6 ok, sgl 134 ok" "$PYTHON" -c "
+    expect "each wrapper DLL exports exactly its .def's names and ordinals: every call of the original library" "ati3dcif 17 ok, ddraw 9 ok, glide2x 156 ok, ir41_32 1 ok, maxi94 6 ok, s3dtkw 6 ok, sgl 134 ok" "$PYTHON" -c "
 import glob, os, pefile
 out = []
 for d in sorted(glob.glob('wrappers/*/*.def')):
@@ -1689,9 +1689,9 @@ print(', '.join(out))"
     zig cc -target x86-windows-gnu -O2 wrappers/sgl/test/sgltritest.c -o "$WT/sgltritest.exe" -luser32 >/dev/null 2>&1 \
       && ok "sgltritest.c, the test program for SGL's immediate mode, builds" || bad "sgltritest.c does not build"
     out="$(zig cc -target x86-windows-gnu -O2 wrappers/glide/test/glidetest.c -o "$WT/glidetest.exe" -luser32 2>&1)"
-    [[ $? == 0 ]] && expect "glidetest.c, the Glide library's test program, builds and finds every call it uses in glide2x.dll" "50 calls found" "$PYTHON" -c "
+    [[ $? == 0 ]] && expect "glidetest.c, the Glide library's test program, builds and finds every call it uses in glide2x.dll" "60 calls found" "$PYTHON" -c "
 import re, pefile
-names = set(re.findall(rb'_(?:gr|gu)\w+@\d+', open('$WT/glidetest.exe', 'rb').read()))
+names = set(re.findall(rb'_(?:gr|gu|pci)\w+@\d+', open('$WT/glidetest.exe', 'rb').read()))
 dll = {e.name for e in pefile.PE('$WT/i686-pc-windows-gnu/release/glide2x.dll').DIRECTORY_ENTRY_EXPORT.symbols}
 print(f'{len(names)} calls found' if names <= dll else f'missing: {sorted(names - dll)}')" || bad "glidetest.c does not build" "$out"
   else

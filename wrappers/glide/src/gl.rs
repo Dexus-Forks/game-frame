@@ -168,3 +168,21 @@ pub unsafe fn check(gl: &Gl, when: &str) {
         }
     }
 }
+
+/// Make and bind one vertex array object, which a core context needs before it draws. Loaded
+/// apart from the table, as an OpenGL 2.1 context has no such call.
+pub unsafe fn bind_vertex_array() {
+    unsafe {
+        let gen_ = wglGetProcAddress(c"glGenVertexArrays".as_ptr().cast());
+        let bind = wglGetProcAddress(c"glBindVertexArray".as_ptr().cast());
+        if (gen_ as usize) < 4 || (bind as usize) < 4 {
+            shim::log!("no glGenVertexArrays in a core context");
+            return;
+        }
+        let gen_: unsafe extern "system" fn(i32, *mut u32) = std::mem::transmute(gen_);
+        let bind: unsafe extern "system" fn(u32) = std::mem::transmute(bind);
+        let mut vao = 0;
+        gen_(1, &mut vao);
+        bind(vao);
+    }
+}

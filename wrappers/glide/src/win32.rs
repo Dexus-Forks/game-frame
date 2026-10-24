@@ -113,6 +113,7 @@ unsafe extern "system" {
 unsafe extern "system" {
     pub fn wglCreateContext(dc: HDC) -> HGLRC;
     pub fn wglMakeCurrent(dc: HDC, rc: HGLRC) -> BOOL;
+    pub fn wglDeleteContext(rc: HGLRC) -> BOOL;
     pub fn wglGetProcAddress(name: *const u8) -> *const c_void;
     pub fn wglGetCurrentContext() -> HGLRC;
 }

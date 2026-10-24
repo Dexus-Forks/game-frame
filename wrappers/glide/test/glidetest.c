@@ -8,8 +8,10 @@
  * window; a texture through the gu memory manager (guTexAllocateMemory, guTexDownloadMipMap,
  * guTexSource); an NCC texture with its table (grTexDownloadTable, grTexNCCTable); the alpha
  * test; table fog (guFogGenerateExp); a point; a 2D bar written through grLfbLock;
- * grGlideGetState and grGlideSetState; grTriStats; a 3DF file (gu3dfGetInfo, gu3dfLoad); and
- * the queries (grGlideGetVersion, grSstScreenWidth, guFogTableIndexToW, grTexCalcMemRequired).
+ * grGlideGetState and grGlideSetState; grTriStats; a 3DF file (gu3dfGetInfo, gu3dfLoad); the
+ * queries (grGlideGetVersion, grSstScreenWidth, guFogTableIndexToW, grTexCalcMemRequired); the
+ * card through the PCI library (pciFindCard, pciGetConfigData); guEncodeRLE16; two textures
+ * multiplied and added by guMPDrawTriangle; and a frame recorded by guMovieStart.
  *
  *   zig cc -target x86-windows-gnu -O2 wrappers/glide/test/glidetest.c -o glidetest.exe -luser32
  *   WINEDLLOVERRIDES=glide2x=n GLIDE_SCALE=2 wine glidetest.exe [FRAMES]
@@ -85,7 +87,17 @@ typedef struct {
     G(void, grTriStats, 8, unsigned *, unsigned *) \
     G(unsigned, grSstScreenWidth, 0, void) \
     G(int, gu3dfGetInfo, 8, const char *, Gu3dfInfo *) \
-    G(int, gu3dfLoad, 8, const char *, Gu3dfInfo *)
+    G(int, gu3dfLoad, 8, const char *, Gu3dfInfo *) \
+    G(int, pciFindCard, 12, unsigned, unsigned, unsigned *) \
+    G(int, pciGetConfigData, 20, unsigned, unsigned, unsigned, unsigned, unsigned *) \
+    G(unsigned, guEncodeRLE16, 16, void *, const void *, unsigned, unsigned) \
+    G(void, guMPInit, 0, void) \
+    G(void, guMPTexSource, 8, int, int) \
+    G(void, guMPTexCombineFunction, 4, int) \
+    G(void, guMPDrawTriangle, 12, const GrVertex *, const GrVertex *, const GrVertex *) \
+    G(void, guMovieSetName, 4, const char *) \
+    G(void, guMovieStart, 0, void) \
+    G(void, guMovieStop, 0, void)
 
 #define DECLARE(ret, name, n, ...) static ret(__stdcall *name)(__VA_ARGS__);
 CALLS(DECLARE)
@@ -172,6 +184,40 @@ static int test_3df(void) {
     return ok;
 }
 
+/* Three runs. Glide 2.43's encoder gives 12 bytes for them, which hold the first 13 pixels
+ * (measured, the original run in an emulator): each run takes one pixel too many from its count. */
+static int test_rle(void) {
+    unsigned short img[16], back[32];
+    unsigned code[16] = {0};
+    for (int k = 0; k < 16; k++) img[k] = k < 3 ? 0x1234 : k < 9 ? 0x4321 : 0x0101;
+    unsigned bytes = guEncodeRLE16(code, img, 16, 1);
+    if (bytes != 12 || guEncodeRLE16(0, img, 16, 1) != bytes) return 0;
+    int n = 0;
+    for (unsigned k = 0; k < bytes / 4; k++)
+        for (unsigned r = code[k] >> 16; r > 0 && n < 32; r--) back[n++] = (unsigned short)code[k];
+    return n == 13 && memcmp(back, img, sizeof back[0] * n) == 0;
+}
+
+/* A quad of two triangles through guMPDrawTriangle, s and t over 0..8. */
+static void mpquad(float x0, float y0, float x1, float y1) {
+    GrVertex v[4];
+    float xs[4] = {x0, x1, x1, x0}, ys[4] = {y0, y0, y1, y1}, ss[4] = {0, 8, 8, 0}, ts[4] = {0, 0, 8, 8};
+    for (int k = 0; k < 4; k++) {
+        v[k] = vtx(xs[k], ys[k], 255, 255, 255, 255);
+        v[k].tmu[0].sow = ss[k]; v[k].tmu[0].tow = ts[k];
+    }
+    guMPDrawTriangle(&v[0], &v[1], &v[2]);
+    guMPDrawTriangle(&v[0], &v[2], &v[3]);
+}
+
+/* A flat 8 x 8 RGB565 texture through the gu memory manager. */
+static int flat(unsigned short *texels, unsigned short c) {
+    for (int k = 0; k < 64; k++) texels[k] = c;
+    int id = guTexAllocateMemory(0, 3, 8, 8, 0xa, 0, 5, 5, 3, 1, 1, 0, 0, 0.0f, 0); /* GR_LOD_8, 1x1 */
+    guTexDownloadMipMap(id, texels, 0);
+    return id;
+}
+
 int main(int argc, char **argv) {
     int frames = argc > 1 ? atoi(argv[1]) : 120;
     WNDCLASSA wc = {0};
@@ -196,6 +242,12 @@ int main(int argc, char **argv) {
     check(guFogTableIndexToW(4) == 2.0f && guFogTableIndexToW(0) == 1.0f, "guFogTableIndexToW");
     check(grTexCalcMemRequired(8, 0, 3, 0xa) == 174768, "grTexCalcMemRequired pads levels to 2x2");
     check(test_3df(), "gu3dfGetInfo and gu3dfLoad read a 3DF file");
+    {
+        unsigned dev = 99, ids = 0;
+        check(pciFindCard(0x121a, 1, &dev) && dev == 0 && pciGetConfigData(0, 4, 0, dev, &ids) && ids == 0x0001121a,
+              "pciFindCard finds the Voodoo Graphics, 0x121a:0x0001");
+    }
+    check(test_rle(), "guEncodeRLE16 output decodes back to the pixels it covers");
 
     /* The static scene: everything drawn flat, without depth, then read back. */
     grDepthBufferMode(0);
@@ -268,6 +320,25 @@ int main(int argc, char **argv) {
         check(pixel(380, 280) == RGB565(240, 160, 220), "an NCC texture decodes through its table");
     }
 
+    /* Multi-pass texturing: two flat textures on one TMU, multiplied, then added. */
+    {
+        static unsigned short t[4][64];
+        int yellow = flat(t[0], 0xffe0), cyan = flat(t[1], 0x07ff), red = flat(t[2], 0xf800), blue = flat(t[3], 0x001f);
+        guColorCombineFunction(4); /* GR_COLORCOMBINE_DECAL_TEXTURE */
+        grTexCombineFunction(0, 1);
+        guMPInit();
+        guMPTexSource(0, yellow);
+        guMPTexSource(1, cyan);
+        guMPTexCombineFunction(1); /* GR_MPTEXCOMBINE_MULTIPLY */
+        mpquad(540, 40, 620, 120);
+        check(pixel(580, 80) == 0x07e0, "guMPDrawTriangle multiplies two textures: yellow times cyan is green");
+        guMPTexSource(0, red);
+        guMPTexSource(1, blue);
+        guMPTexCombineFunction(0); /* GR_MPTEXCOMBINE_ADD */
+        mpquad(540, 130, 620, 210);
+        check(pixel(580, 170) == 0xf81f, "guMPDrawTriangle adds two textures: red plus blue is magenta");
+    }
+
     /* The alpha test: alpha 64 fails GREATER than 128. */
     guColorCombineFunction(2);
     grAlphaTestFunction(4);
@@ -306,7 +377,16 @@ int main(int argc, char **argv) {
         }
         check(pixel(320, 4) == 0xf81f, "a 2D bar written through grLfbLock");
     }
+    guMovieSetName("glidetest_movie");
+    guMovieStart();
     grBufferSwap(1);
+    guMovieStop();
+    {
+        FILE *f = fopen("glidetest_movie0000.tga", "rb");
+        long size = -1;
+        if (f) { fseek(f, 0, SEEK_END); size = ftell(f); fclose(f); remove("glidetest_movie0000.tga"); }
+        check(size == 18 + W * H * 3, "guMovieStart writes the frame shown at grBufferSwap as a TGA file");
+    }
 
     /* The moving scene: a turning checker with trilinear mipmaps in perspective, fogged. */
     unsigned char fog[64];

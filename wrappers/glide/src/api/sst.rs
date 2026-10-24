@@ -107,6 +107,26 @@ pub extern "system" fn grSstOrigin(origin: u32) {
     super::shadow::origin(origin & 1);
 }
 
+/// Sets one register of the FBI or a TMU (`which` 3, or 0–2), for the chip's pipeline. The
+/// render state here is OpenGL's, so there is nothing to set.
+///
+/// Original: `grSstConfigPipeline` (glide2x.dll 2.43, 0x10009c40) writes `value` to register
+/// `param` of that chip (*measured*).
+#[unsafe(no_mangle)]
+pub extern "system" fn grSstConfigPipeline(which: u32, param: u32, value: u32) {
+    log!("grSstConfigPipeline {which} {param} {value:#x}: ignored");
+}
+
+/// A `GrVidTiming` for board `which`, for the next open. The window and its size are this
+/// library's, so the timing is not used.
+///
+/// Original: `grSstVidMode` (glide2x.dll 2.43, 0x10004660) only stores the pointer in the
+/// board's settings (*measured*).
+#[unsafe(no_mangle)]
+pub extern "system" fn grSstVidMode(which: u32, _timing: *const u8) {
+    log!("grSstVidMode {which}: ignored");
+}
+
 /// The Voodoo hands the monitor to the 2D card when this is 1 (the videos, dialogs). Here the
 /// window stays; nothing to do.
 #[unsafe(no_mangle)]
@@ -119,6 +139,7 @@ pub extern "system" fn grBufferSwap(_interval: u32) {
     super::lfb::finish_write();
     push(Cmd::Swap);
     flush();
+    super::movie::frame();
 }
 
 #[unsafe(no_mangle)]
