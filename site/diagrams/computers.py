@@ -955,7 +955,7 @@ def amiga_chips():
     s.line(115, 160, 115, 202, DIM, 1.5)
     # DMA slots flowing between chip RAM and the chips.
     for k, (path, colour) in enumerate((('M410 286L410 230', GREEN), ('M524 120L636 115', PURPLE), ('M524 190L636 211', AMBER))):
-        s.add(f'<circle r="5" fill="{colour}"><animateMotion path="{path}" dur="1.2s" begin="{k * 0.4}s" '
+        s.add(f'<circle r="5" fill="{colour}"><animateMotion path="{path}" dur="1.2s" begin="{k * 0.4 - 1.2:.1f}s" '
               f'repeatCount="indefinite"/></circle>')
     lines(s, 640, 280, ['Time is counted in colour clocks', 'of 280 ns. Audio DMA peaks near', '28,867 samples/s (NTSC) and',
                         '28,837 (PAL) per channel.'], 11)

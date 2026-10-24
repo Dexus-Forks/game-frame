@@ -11,3 +11,6 @@
 .venv/
 .env
 __pycache__/
+
+# macOS folder metadata
+.DS_Store

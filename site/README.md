@@ -49,6 +49,16 @@ GitHub and on the site with no script. Change a diagram in `make.py`, then run
 draws. The build fails on a link to a page
 that does not exist.
 
+Two checks keep the animations readable. `site/diagrams/animcheck.py` reads the files and
+fails on loops that drift apart, animations a browser would drop, elements that show before
+their turn and loops that jump; the tests run it. `site/diagrams/animrender.html` plays every
+animated diagram in a browser, frame by frame, and lists shapes drawn over a label, tokens that
+leave the card or wait in its corner, and boxes that light up when the playhead is elsewhere:
+serve the repository's root (`python3 -m http.server 5181`) and open
+`http://127.0.0.1:5181/site/diagrams/animrender.html`. In an animated diagram, `Svg.render`
+draws the static labels last, so a moving token passes under the text it crosses. A token that
+loops starts with a negative `begin`, so it is on its path from the first frame.
+
 After the build, `.vitepress/llms.mts` writes text for AI agents into the output, with no extra
 dependency:
 

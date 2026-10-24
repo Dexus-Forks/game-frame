@@ -112,7 +112,7 @@ def arcade_pong_netlist():
     s.rect(866, 120, 4, 24, TEXT, rx=0)
     arrow(s, 754, 148, 766, 148)
     s.add(f'<rect width="5" height="5" fill="{TEXT}"><animate attributeName="x" values="788;860;788" dur="2s" repeatCount="indefinite"/>'
-          f'<animate attributeName="y" values="104;190;104" dur="1.3s" repeatCount="indefinite"/></rect>')
+          f'<animate attributeName="y" values="104;190;104" dur="1.3s" repeatCount="indefinite" data-drift="free"/></rect>')
     lines(s, 24, 246, ['The game\'s behaviour comes from the gates, the counters and their timing. Use MAME\'s netlist as the',
                        'description of the circuit. Breakout uses the same approach.'], 12)
     return s.render()
@@ -527,7 +527,7 @@ def arcade_namco_s21():
     s.text(212, 164, 'display list', 10, DIM, 'middle')
     for k in range(4):
         s.add(f'<circle r="4" fill="{AMBER}"><animateMotion path="M414 172L496 {106 + k * 56}L674 {106 + k * 56}L736 172" dur="2s" '
-              f'begin="{k * 0.5}s" repeatCount="indefinite"/></circle>')
+              f'begin="{k * 0.5 - 2:.1f}s" repeatCount="indefinite"/></circle>')
     lines(s, 24, 330 - 12, ['A C67 is a TMS320C25 with custom ROM. MAME clocks them from a 40 MHz crystal. Winning Run and Driver\'s Eyes',
                             'use one TMS320C25 each. Ghidra has no TMS320C25 module.'], 12)
     return s.render()

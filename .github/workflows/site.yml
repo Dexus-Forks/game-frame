@@ -23,8 +23,11 @@ permissions:
   pages: write
   id-token: write
 
+# One deploy at a time. The group was "pages" until run 39803187786 (22 October 2026) stuck in
+# "waiting" and could not be cancelled, which held that group for every later run. A new name
+# leaves it behind; change it back once GitHub clears that run.
 concurrency:
-  group: pages
+  group: pages-site
   cancel-in-progress: false
 
 jobs:

@@ -5,7 +5,7 @@ the checks on an agent's work, and replacing a program one function at a time.
 site/diagrams/make.py writes them.
 """
 from engines import arrow, box, during, group, legend, lines, scratch
-from svg import AMBER, BG, BLUE, DIM, EDGE, GREEN, GREY, MONO, PURPLE, RED, TEAL, TEXT, Svg
+from svg import AMBER, BG, BLUE, DIM, EDGE, FONT, GREEN, GREY, MONO, PURPLE, RED, TEAL, TEXT, Svg
 
 
 # ---------------------------------------------------------------- out of print
@@ -195,8 +195,11 @@ def function_swap():
         r, c = divmod(k, 12)
         x, y = 24 + c * 71, 96 + r * 56
         s.rect(x, y, 66, 46, GREY, rx=4, extra=' fill-opacity="0.25"')
-        s.text(x + 33, y + 28, 'original', 10, DIM, 'middle')
         t0 = 0.9 * ((k * 7) % n) / n
+        # The label hides while the new function's tile shows, so the two labels never overlap.
+        s.add(f'<text x="{x + 33:.1f}" y="{y + 28:.1f}" font-family="{FONT}" font-size="10" fill="{DIM}" '
+              f'text-anchor="middle">original<animate attributeName="opacity" values="1;0;1" '
+              f'keyTimes="0;{t0 + 0.02:.4f};0.97" dur="{dur}s" calcMode="discrete" repeatCount="indefinite"/></text>')
         body = scratch(lambda t, x=x, y=y: box(t, x, y, 66, 46, TEAL, 'new', 'checked', op=0.45, size=11))
         s.add(group(body, t0 + 0.02, 0.97, dur))
     lines(s, 24, 238, ['Each new function must give the original\'s answers before the next is replaced. At every step the game runs,',

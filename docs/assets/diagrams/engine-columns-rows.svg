@@ -2,8 +2,6 @@
 <title>A 2.5D renderer draws walls as vertical columns, one screen column at a time, then floors and ceilings as horizontal rows</title>
 <rect x="0.5" y="0.5" width="899" height="329" rx="10" fill="#0d1b1e" stroke="#1f3d40"/>
 <defs><marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" fill="#8fa9a5"/></marker></defs>
-<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">HOW A 2.5D RENDERER DRAWS WALLS AND FLOORS</text>
-<text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">A wall has one depth down each screen column, so walls are drawn column by column. Floors are drawn row by row.</text>
 <rect x="40.0" y="84.0" width="400.0" height="220.0" rx="3" fill="#64748b" stroke="none" fill-opacity="0.12"/>
 <rect x="40.0" y="147.5" width="10.3" height="93.0" fill="#3b82c4" opacity="0"><animate attributeName="opacity" values="1;0" keyTimes="0;0.9700" dur="6.0s" calcMode="discrete" repeatCount="indefinite"/></rect>
 <rect x="50.0" y="145.3" width="10.3" height="97.4" fill="#3b82c4" opacity="0"><animate attributeName="opacity" values="0;1;0" keyTimes="0;0.0125;0.9700" dur="6.0s" calcMode="discrete" repeatCount="indefinite"/></rect>
@@ -74,6 +72,8 @@
 <g opacity="0"><animate attributeName="opacity" values="0;0.17;0" keyTimes="0;0.8714;0.9700" dur="6.0s" calcMode="discrete" repeatCount="indefinite"/></g>
 <g opacity="0"><animate attributeName="opacity" values="0;0.17;0" keyTimes="0;0.8714;0.9700" dur="6.0s" calcMode="discrete" repeatCount="indefinite"/></g>
 <rect y="76" width="10.0" height="4" fill="#2dd4bf"><animate attributeName="x" values="40;440;440" keyTimes="0;0.5;1" dur="6.0s" calcMode="linear" repeatCount="indefinite"/></rect>
+<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">HOW A 2.5D RENDERER DRAWS WALLS AND FLOORS</text>
+<text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">A wall has one depth down each screen column, so walls are drawn column by column. Floors are drawn row by row.</text>
 <text x="480.0" y="100.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#8fa9a5" text-anchor="start"></text>
 <text x="480.0" y="118.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#8fa9a5" text-anchor="start">For each screen column, find the wall it sees and its</text>
 <text x="480.0" y="136.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#8fa9a5" text-anchor="start">distance. Draw one vertical strip, scaled by that distance.</text>

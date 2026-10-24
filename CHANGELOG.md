@@ -35,7 +35,16 @@ Every release of GameFrame, newest first. The format follows
 - `winput`: keys held by `down` are released at exit; new steps `release`, `point` and
   `button`, and `--hold MS`.
 - A case study of POD: Planet of Death.
-
+- Know-how: `pgrep-wait-matches-itself`. A wait loop with `pgrep -f` never ends, because the
+  pattern matches the waiting shell's own command line.
+- `re-observe`: a capture script prints its usage for `--help` and runs nothing, and never
+  overwrites an earlier capture. Seen when checking a script's usage started a 15-minute run
+  over the saved data.
+- `gameframe progress`: every agent keeps a progress log, one line per step, in
+  `derived/progress/<agent>.log` (`gameframe progress <agent> --add TEXT`). `gameframe progress`
+  shows each log's last lines, newest first, so the main session can answer "how is it going?"
+  without reading an agent's transcript. Each agent's file has a Progress section that says
+  when to write.
 - Know-how: a taxonomy of failure modes and context, one Markdown entry per failure, each with
   its symptoms, cause, evidence, status (solved, workaround, dead end, open) and what was tried
   ([the design](docs/working/knowhow.md), [the entries](docs/knowhow/README.md)).
@@ -98,8 +107,22 @@ Every release of GameFrame, newest first. The format follows
   original game and of the project's viewer in documents and on the site, a few at a time,
   each captioned with its source. The game's files, extracted assets in bulk and decompiled
   code still stay out of git.
+
 ### Fixed
 
+- The animated diagrams: in every animated diagram the static labels are drawn last, so a
+  moving token or highlight passes under the text it crosses instead of hiding it. Tokens that
+  loop start with a negative `begin`, so none waits in the card's top-left corner before its
+  path starts. Each "original" label in the function-swap diagram hides while its new tile
+  shows. The raster-split and Atari 2600 beams now keep step with what they trigger, and the
+  raster scroll loops with no seam.
+- `site/diagrams/animcheck.py` (run by the tests) fails on loops that drift apart, animations a
+  browser would drop and elements shown before their turn. `site/diagrams/animrender.html`
+  plays every animated diagram in a browser and lists shapes over labels, tokens off the card
+  and boxes that light up when the playhead is elsewhere.
+
+- `readseg.py` stops with a clear message when an argument is not an address, such as a count
+  written without `--count`. It printed the first value and then crashed.
 - The Claude Code commit and push gates check the command's own git verbs. Claude Code's
   `if: Bash(git commit *)` also matches commands it cannot parse (a heredoc, a shell variable,
   a for loop), so the gates fired on commands that neither commit nor push.

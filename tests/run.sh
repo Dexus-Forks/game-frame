@@ -299,6 +299,7 @@ expect "dosinfo finds a Pascal string right after another, with a printable leng
 expect "dosinfo reads a real-mode MZ" "3 relocations" "$PYTHON" tools/dos/dosinfo.py $D/sample-mz.exe
 expect "dosinfo finds Turbo Debugger symbols" "debug symbols: Turbo Debugger" "$PYTHON" tools/dos/dosinfo.py $D/sample-td.exe
 expect "readseg reads a typed constant" "1008:0000  4660" "$PYTHON" tools/dos/readseg.py $D/sample.exe u32 DAT_1008_0000
+expect "readseg says where a count goes" "a count goes after --count" bash -c "\"$PYTHON\" tools/dos/readseg.py $D/sample.exe hex 1008:0000 2 2>&1; true"
 expect "readseg reads a Pascal string" "'DOS SAMPLE 1'" "$PYTHON" tools/dos/readseg.py $D/sample.exe pstr 1008:0010
 expect "readseg decodes a Turbo Pascal Real" "[1.0, -2.5, 0.0]" "$PYTHON" - <<'PY'
 import sys; sys.path.insert(0, 'tools/dos')
@@ -1033,6 +1034,11 @@ expect "gameframe tool suggests a close name" "Did you mean: peinfo" $G tool pei
 expect "gameframe run gives the same output as the tool" "$("$PYTHON" tools/pe/peinfo.py $B/game.exe | head -1)" $G run peinfo $B/game.exe
 expect "gameframe run passes the tool's exit code" "rc 1" sh -c "$G run bitcompare f32 $B/truth/seed-1.f32 $B/naive/seed-1.f32 >/dev/null; echo rc \$?"
 expect "gameframe run refuses a library and says why" "a library to import" $G run pe_emu
+pt=$(mktemp -d)
+GAMEFRAME_PROJECT=$pt $G progress re-tester --add "first step done" >/dev/null
+expect "gameframe progress shows an agent's latest line" "first step done" env GAMEFRAME_PROJECT=$pt $G progress
+expect "gameframe progress writes the log under derived/progress" "re-tester.log" ls $pt/derived/progress
+rm -rf "$pt"
 expect "gameframe find names the skills and tools for a word" "tool vtable" $G find vtable
 expect "gameframe mcp: every agent's MCP file is current with .mcp.json" "rc 0" sh -c "$G mcp --emit all --check; echo rc \$?"
 
@@ -1223,6 +1229,15 @@ printf '$ tests/run.sh\n  ok    a check <&>\n' | "$PYTHON" site/captures/term_sv
 rm -f "$svg"
 out="$("$PYTHON" site/diagrams/make.py --check 2>&1)" && ok "the guides' diagrams match their generator" \
   || bad "the guides' diagrams differ: run python3 site/diagrams/make.py" "$out"
+out="$(python3 site/diagrams/animcheck.py 2>&1)" && ok "the animated diagrams keep their loops in step and their animations valid ($(echo "$out" | tail -1))" \
+  || bad "site/diagrams/animcheck.py" "$out"
+expect "animcheck.py prints its usage" "site/diagrams/animcheck.py [FILE.svg" python3 site/diagrams/animcheck.py --help
+d="$(mktemp -d)"
+printf '<svg xmlns="http://www.w3.org/2000/svg"><rect><animate attributeName="x" values="0;9" dur="6s" repeatCount="indefinite"/></rect><rect><animate attributeName="x" values="0;9;0" keyTimes="0;1" dur="4s" repeatCount="indefinite"/></rect><rect><animate attributeName="opacity" values="0;1" begin="2s" dur="1s"/></rect></svg>' > "$d/t.svg"
+out="$(python3 site/diagrams/animcheck.py "$d/t.svg" 2>&1)"
+[[ $? == 1 && "$out" == *"does not divide"* && "$out" == *"3 values but 2 keyTimes"* && "$out" == *"visible until then"* ]] \
+  && ok "animcheck.py finds drift, dropped animations and elements shown before their turn" || bad "animcheck.py faults" "$out"
+rm -rf "$d"
 if [[ -d site/node_modules ]]; then
   out="$(npm --prefix site run build 2>&1)"
   [[ $? == 0 && -f site/.vitepress/dist/games/interaction.html && -f site/.vitepress/dist/skills/re-observe.html ]] \

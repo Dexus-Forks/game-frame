@@ -72,6 +72,7 @@ An entry has one of five statuses.
 | [A replay matches the recording at the end but not at some samples, one sample early or late](replay-sample-straddles-frames.md) | solved |
 | [A run in a shared test VM dies: "X connection to :2 broken"](shared-vm-pkill-display.md) | solved |
 | [A run script hangs on `wineserver -w`](wineserver-wait-hangs.md) | solved |
+| [A wait loop with `pgrep -f` never ends after the process has finished](pgrep-wait-matches-itself.md) | solved |
 | [An editor's save changes bytes nobody edited (fixed point through floats)](editor-float-view-changes-bytes.md) | solved |
 | [Every new run exits at once, because a leftover game process holds its mutex](single-instance-leftover.md) | solved |
 | [Keys reach a game under Wine on Xvfb only with a window manager running](xvfb-needs-window-manager.md) | solved |
