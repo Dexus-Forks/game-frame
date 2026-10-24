@@ -56,10 +56,24 @@ pub fn send(c: Cmd) {
     let _ = q.lock().unwrap_or_else(|e| e.into_inner()).send(c);
 }
 
+/// Everything waiting is taken at once: textures in order, only the latest frame, and only the
+/// last picture. Software OpenGL draws slower than the game sends, and an unbounded backlog of
+/// pictures (1.2 MB each at 640 x 480) filled the emulated PC's memory (*measured*: the guest
+/// ran out of memory in a race).
 fn run(rx: Receiver<Cmd>) {
     let mut r = draw::Renderer::new();
-    for c in rx {
-        r.exec(c);
+    while let Ok(first) = rx.recv() {
+        let mut batch = vec![first];
+        batch.extend(rx.try_iter());
+        let last_present = batch.iter().rposition(|c| matches!(c, Cmd::Present(_)));
+        let last_frame = batch.iter().rposition(|c| matches!(c, Cmd::Frame(_)));
+        for (i, c) in batch.into_iter().enumerate() {
+            match c {
+                Cmd::Present(_) if Some(i) != last_present => {}
+                Cmd::Frame(_) if Some(i) != last_frame && last_present.is_some_and(|p| p > i) && last_frame.is_some_and(|f| f < last_present.unwrap()) => {}
+                c => r.exec(c),
+            }
+        }
     }
 }
 
