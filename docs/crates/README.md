@@ -41,9 +41,9 @@ gameframe-opl2 = { git = "https://github.com/tanepiper/game-frame" }
 ```
 
 Each crate's page shows its API, an example, what it does not model, and how to check that it
-matches your game. The [PC audio coverage map](../hardware/audio-coverage.md) lists OPL3 and MIDI
-engines that could extend the current audio crate. They remain candidates until their behavior
-meets GameFrame's parity and licensing rules.
+matches your game. The [PC audio coverage map](../hardware/audio-coverage.md) records hardware
+gaps and external projects that may provide black-box comparison output. New GameFrame crates
+follow the repository's Apache-2.0 rule and the clean-implementation process in that guide.
 
 ## When to use a crate, and when to check it first
 

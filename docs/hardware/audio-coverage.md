@@ -67,6 +67,23 @@ and streaming buffers. A successful stub can make a game disable sound; first tr
 uses each answer. The [Maxi Sound empty-map finding](../knowhow/sound-card-library-empty-answer-silences.md)
 shows this failure in a measured game.
 
+## Clean implementation and licensing
+
+1. Identify the exact chip, card revision, driver and game-facing interface.
+2. Gather public datasheets, manuals, errata and patents. Where an original card driver or
+   firmware binary is available, inspect its imports, strings, tables and disassembly to recover
+   the interface and behavior. Record addresses and evidence in a behavior specification.
+3. Write the implementation from that specification. Do not read, copy, adapt or link another
+   emulator's source code. Use another emulator only as a black-box comparison target when the
+   original hardware or driver cannot answer a question. Label that evidence as emulated.
+4. Build tests from generated inputs and measured outputs. Keep game binaries, game captures,
+   card firmware and ROM or SoundFont data out of this repository.
+
+GameFrame code is Apache-2.0 under the repository's current license rule. Keep that license for
+new clean implementations. If a future crate needs `Apache-2.0 OR MIT`, make that a deliberate
+license change for the new crate and its documentation. Do not change the license of existing
+code as a side effect of audio work.
+
 ## Priority for new reusable work
 
 | Priority | Piece | Why it comes next | Main proof needed |
@@ -78,23 +95,24 @@ shows this failure in a measured game.
 | 5 | MPU-401 bridge and synth adapters | Enables MIDI routing to MT-32 and General MIDI engines without coupling the sequencer to one synthesizer. | Preserve event timing and SysEx uploads. Compare MIDI output against captures. Keep ROM and SoundFont files outside GameFrame unless their rights allow redistribution. |
 | 6 | Windows-specific libraries on demand | Add A3D COM or an AWE SoundFont Manager only when a game's imports and call sites show a need. Reuse DirectSound/EAX implementations such as DSOAL when they already meet the game's path. | Identify the exact library version and interfaces, capture the game's calls, and test the fallback behavior as well as playback. |
 
-## External engines to evaluate
+## Existing projects for black-box comparison
 
-These projects cover useful chips and libraries. GameFrame has not checked their output against
-the original hardware or an accepted reference capture.
+These projects cover useful chips and libraries. Their docs identify possible comparison
+targets. Their source is outside the clean-implementation path. GameFrame has not checked their
+output against the original hardware or an accepted reference capture.
 
-| Project | Coverage | Fit and checks before adoption |
+| Project | Reported coverage | Use in a clean-room comparison |
 |---|---|---|
-| [oplon](https://docs.rs/oplon/latest/oplon/) | Rust `no_std` OPL2/OPL3 core; MIT | Its Rust API may fit the crate. Review its source for the no-`unsafe` requirement. Its documentation says its log-sine and exponent ROMs and envelope increments match canonical values within ±1 LSB. Compare chip output and timers against a trusted YMF262 reference and GameFrame's OPL2 behavior. |
-| [nuked-opl3-rs](https://github.com/tgies/nuked-opl3-rs) | Pure Rust port of Nuked-OPL3; LGPL-2.1-or-later | Its README reports bit-identical output to the C implementation and includes optional C reference tests. Check unsafe use, build requirements, timer coverage and how the LGPL dependency is delivered. |
-| [ymfm](https://github.com/aaronsgiles/ymfm) | Yamaha FM cores, including YMF262; BSD-3-Clause | C++14 requires a wrapper and a build decision. Its stated accuracy target is audibly indistinguishable rather than cycle- or bit-exact. |
-| [Munt](https://github.com/munt/munt) | MT-32, CM-32L and LAPC-I; LGPL-2.1-or-later | C++ library with a C API. It requires compatible ROM images supplied separately. |
-| [moont](https://crates.io/crates/moont) | Rust CM-32L emulator based on Munt; LGPL-2.1-or-later | `no_std` crate with runtime ROM loading. Its README describes comparison tests against Munt; GameFrame has not run those tests. It models CM-32L and has limited model coverage. |
-| [DSOAL](https://github.com/kcat/dsoal) | DirectSound and EAX through OpenAL; LGPL-2.1 | Existing Windows DLL replacement. Check whether it covers the game's DirectSound path before adding a new wrapper. |
+| [oplon](https://docs.rs/oplon/latest/oplon/) | Rust `no_std` OPL2/OPL3 core | Its docs describe a clean-room core and say its log-sine and exponent ROMs and envelope increments match canonical values within ±1 LSB. Compare a built binary's output and timer behavior against hardware or a measured reference. |
+| [nuked-opl3-rs](https://github.com/tgies/nuked-opl3-rs) | Rust OPL3 core based on Nuked-OPL3 | Its project reports bit-identical output to its C reference. Treat that as a project claim; compare binary output without using its code. |
+| [ymfm](https://github.com/aaronsgiles/ymfm) | Yamaha FM cores, including YMF262 | Its project states an audibly indistinguishable accuracy goal. A compiled build can provide a comparison signal; it is not GameFrame source. |
+| [Munt](https://github.com/munt/munt) | MT-32, CM-32L and LAPC-I | Use output from a built engine as an emulated comparison. Keep its required ROM images separate. |
+| [moont](https://crates.io/crates/moont) | Rust CM-32L emulator based on Munt | Its docs describe comparisons against Munt. Compare rendered output as an emulated reference; it covers CM-32L only. |
+| [DSOAL](https://github.com/kcat/dsoal) | DirectSound and EAX through OpenAL | Use its DLL as a Windows runtime option or black-box reference for the API path. |
 
-For OPL3, evaluate the pure Rust candidates against a named reference before writing a new core.
-Each candidate handles chip synthesis differently from card-level status, timers, interrupts
-and mixer state. Keep those layers separate. Do not treat OPL3 as OPL2 with extra registers.
+For OPL3, compare behavior against the original chip or a named black-box reference before
+writing a new core. Keep chip synthesis separate from card-level status, timers, interrupts and
+mixer state. Do not treat OPL3 as OPL2 with extra registers.
 
 Keep Munt and CM-32L ROM images separate from GameFrame's source and release. DSOAL already
 provides the DirectSound and EAX path. A GameFrame wrapper should implement a missing API such
