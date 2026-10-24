@@ -282,7 +282,7 @@ impl Renderer {
             (gl.Uniform1f)(p.loc("uNear"), cam.foreground.max(1e-3));
             (gl.Uniform1i)(p.loc("uTex"), 0);
             let fog = cam.fog.unwrap_or(([0.0; 3], 0.0));
-            (gl.Uniform4f)(p.loc("uFog"), fog.0[0], fog.0[1], fog.0[2], fog.1 * fog_scale());
+            (gl.Uniform4f)(p.loc("uFog"), fog.0[0], fog.0[1], fog.0[2], fog_rate(fog.1) * fog_scale());
             (gl.ActiveTexture)(TEXTURE0);
             (gl.Enable)(SCISSOR_TEST);
             (gl.BindBuffer)(ARRAY_BUFFER, g.vbo);
@@ -495,8 +495,18 @@ unsafe fn shot(gl: &Gl, w: i32, h: i32, path: &str) {
     }
 }
 
-/// `SGL_FOG`: a factor on SGL's fog density (*inferred* scale, to be measured against the
-/// original's picture).
+/// The fog's rate per unit of depth from SGL's density, as PowerVR's driver works it out
+/// (SGLMID4.dll `sgl_set_fog`: `-log2(1 - density)`, folded into the chip's depth scale with
+/// the camera's foreground distance, `FUN_10006bf0`): a surface keeps `(1 - density)` of its
+/// colour per unit (*observed*; that the chip applies it as `2^(-rate z)` is *inferred*).
+/// Here the shader's `exp`, so the rate in natural logarithms.
+fn fog_rate(density: f32) -> f32 {
+    let keep = (1.0 - density).clamp(0.0, 1.0);
+    if keep <= 1e-20 { 1000.0 } else { -keep.ln() }
+}
+
+/// `SGL_FOG`: a factor on the fog rate, for comparing pictures (default 1; the
+/// rate itself comes from PowerVR's driver).
 fn fog_scale() -> f32 {
     static S: std::sync::OnceLock<f32> = std::sync::OnceLock::new();
     *S.get_or_init(|| std::env::var("SGL_FOG").ok().and_then(|v| v.parse().ok()).unwrap_or(1.0))
