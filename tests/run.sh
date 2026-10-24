@@ -1597,6 +1597,41 @@ else
   echo "  skip  the site (run: npm --prefix site install)"
 fi
 
+echo "API credit tools (tools/llm), against fake_api.py: nothing is sent"
+if "$PYTHON" -c "import anthropic" 2>/dev/null; then
+  L="$(mktemp -d)"
+  "$PYTHON" tools/llm/fake_api.py serve "$L/port" & fake=$!
+  for _ in 1 2 3 4 5 6 7 8 9 10; do [[ -s "$L/port" ]] && break; sleep 0.2; done
+  mkdir -p "$L/analysis/export/demo.exe"
+  printf '401000\t40\tFUN_00401000\t\n401040\t60\tFUN_00401040\t\n401090\t8\tFUN_00401090\t\n' > "$L/analysis/export/demo.exe/functions.tsv"
+  printf '// ==== 401000 FUN_00401000\nvoid FUN_00401000(void) { FUN_00401040("SAVE0001.DAT"); }\n// ==== 401040 FUN_00401040\nint FUN_00401040(char *p) { return fopen(p, "rb") != 0; }\n// ==== 401090 FUN_00401090\nvoid FUN_00401090(void) { }\n' > "$L/analysis/export/demo.exe/decomp.c"
+  printf '402000\tSAVE0001.DAT\n' > "$L/analysis/export/demo.exe/strings.txt"
+  llm() { ANTHROPIC_BASE_URL="http://127.0.0.1:$(cat "$L/port")" ANTHROPIC_API_KEY=fake GAMEFRAME_NO_DOTENV=1 GAMEFRAME_PROJECT="$L" \
+          GAMEFRAME_CLAUDE="$PYTHON $ROOT/tools/llm/fake_api.py claude" "$PYTHON" "$@"; }
+  expect "name_functions prepare picks the unnamed functions above --min-size and sends nothing" "2 functions" llm tools/llm/name_functions.py prepare
+  expect "name_functions puts a function's callers and strings in its request" 'Called by: FUN_00401000' grep -o 'Called by: FUN_00401000' "$L/analysis/llm/names/demo.exe/requests.jsonl"
+  expect "name_functions puts the strings a function uses in its request" 'SAVE0001.DAT' grep -oF 'Strings: [\"SAVE0001.DAT' "$L/analysis/llm/names/demo.exe/requests.jsonl"
+  expect "name_functions submits one batch" "2 requests" llm tools/llm/name_functions.py submit
+  expect "name_functions reports the batch" "2 succeeded" llm tools/llm/name_functions.py status
+  llm tools/llm/name_functions.py fetch >/dev/null
+  expect "name_functions writes the suggestions to analysis/, never labels/" "401040	fake_name	low" cat "$L/analysis/llm/names/demo.exe/suggested.tsv"
+  expect "ask sends the matching know-how entries" "entries sent: wine-privileged-instruction" llm tools/llm/ask.py privileged instruction under wine
+  expect "ask --show lists the entries and spends nothing" "wine-privileged-instruction" "$PYTHON" tools/llm/ask.py --show privileged instruction under wine
+  expect "headless runs an agent and writes its report" "## re-decoder (done" env CLAUDECODE=1 CLAUDE_CODE_ENTRYPOINT=test bash -c "$(declare -f llm); L='$L' PYTHON='$PYTHON' ROOT='$ROOT'; llm tools/llm/headless.py re-decoder 'decode build/sample.dat' --dir '$L' >/dev/null; cat '$L'/analysis/llm/runs/*-re-decoder.md"
+  expect "headless gives claude the prompt on stdin, without the calling session's CLAUDE* variables" "fake run: decode build/sample.dat; CLAUDE variables: 0" cat "$L"/analysis/llm/runs/*-re-decoder.md
+  expect "headless docs-check runs re-checker and re-editor" "## re-editor (done" bash -c "$(declare -f llm); L='$L' PYTHON='$PYTHON' ROOT='$ROOT'; llm tools/llm/headless.py docs-check docs/knowhow --report '$L/dc.md' >/dev/null; cat '$L/dc.md'"
+  expect "skillcheck passes a skill whose answer holds the ground truth" "1 of 1 skills passed" env FAKE_ANSWER="1 0.5 oak
+2 1.25 birch
+3 2.0 pine" bash -c "$(declare -f llm); L='$L' PYTHON='$PYTHON' ROOT='$ROOT'; llm tools/llm/skillcheck.py --skill re-format"
+  expect "skillcheck fails a skill whose answer misses it" "missing: 18467, 6334" env FAKE_ANSWER="41" bash -c "$(declare -f llm); L='$L' PYTHON='$PYTHON' ROOT='$ROOT'; llm tools/llm/skillcheck.py --skill re-emulate"
+  expect "the API tools refuse to run without a key" "ANTHROPIC_API_KEY is not set" env -u ANTHROPIC_API_KEY GAMEFRAME_NO_DOTENV=1 ANTHROPIC_BASE_URL=http://127.0.0.1:9 "$PYTHON" tools/llm/ask.py privileged instruction
+  printf 'ANTHROPIC_API_KEY="from-dotenv"\n' > "$L/.env"
+  expect "client reads the key from the project's .env" "ANTHROPIC_API_KEY: set" env -u ANTHROPIC_API_KEY GAMEFRAME_PROJECT="$L" "$PYTHON" tools/llm/client.py
+  kill $fake 2>/dev/null; rm -rf "$L"
+else
+  echo "  skip  tools/llm (the anthropic package is missing: pip install -r requirements-llm.txt)"
+fi
+
 if [[ "${1:-}" == --ghidra ]]; then
   echo "Ghidra"
   scripts/ghidra-export.sh $B/game.exe $B/engine.dll >/dev/null 2>&1 && ok "ghidra-export exports both binaries" || bad "ghidra-export"

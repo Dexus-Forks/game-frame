@@ -87,6 +87,14 @@ else
   row frida MISSING "optional: traces a running game (pip install -r requirements-live.txt into .venv)"
   missing=$((missing + 1))
 fi
+if [[ -x "$PROJECT/.venv/bin/python" && $install == 1 ]] && ! "$PYTHON" -c "import anthropic" 2>/dev/null; then
+  "$PROJECT/.venv/bin/pip" install -q -r "$ROOT/requirements-llm.txt"
+fi
+if "$PYTHON" -c "import anthropic" 2>/dev/null; then
+  row anthropic ok "$("$PYTHON" -c 'import anthropic; print(anthropic.__version__)') (tools/llm, with an API key)"
+else
+  row anthropic MISSING "optional: tools/llm, which spend API credits (pip install -r requirements-llm.txt into .venv)"
+fi
 
 # The git pre-commit hook, the commit gate for people and every agent (docs/working/gates.md).
 # It is set only when core.hooksPath is unset, so a hooks folder of your own stays in place.

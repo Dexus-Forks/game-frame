@@ -1,0 +1,17 @@
+[
+  {
+    "skill": "re-inventory",
+    "task": "Look at build/game.exe. Write its architecture, its image base and every DLL it imports to answer.txt, one per line.",
+    "expect": ["x64", "0x140000000", "engine.dll"]
+  },
+  {
+    "skill": "re-format",
+    "task": "build/sample.dat is one of the game's data files. Decode it and write each record's id, weight and name to answer.txt, one record per line.",
+    "expect": ["oak", "birch", "pine", "1.25"]
+  },
+  {
+    "skill": "re-emulate",
+    "task": "build/engine.dll exports rng_seed and rng_next. Run them under the emulator: seed with 1, then call rng_next three times. Write the three results in decimal to answer.txt.",
+    "expect": ["41", "18467", "6334"]
+  }
+]
