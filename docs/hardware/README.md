@@ -58,6 +58,9 @@ In my GameFrame project, find every place the game touches hardware.
   installed DOS 6.22 and Windows 3.11 setup.
 - [Win16 SB16 auxiliary volume contract](sbbasic-driver-behavior.md): a bounded query and update
   slice, with unknown behavior and software-only verification suggestions.
+- [Win16 SB16 wave-output contract](sb16-wave-output-contract.md): a bounded logical contract for
+  format opening and buffer submission. The accepted PCM matrix, callback behavior, pause and
+  restart semantics, reset behavior and hardware effects remain unknown.
 - [The sound card makers' APIs](sound-card-apis.md): the Maxi Sound 64, A3D, EAX, the AWE's
   SoundFont Manager, Sensaura and QSound: how a game finds each, what Wine offers, and which
   can be stood in for.
