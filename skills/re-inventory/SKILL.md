@@ -163,6 +163,9 @@ Also record the hardware the game was written for: the minimum CPU, the video mo
 APIs, the sound devices and the input devices it supports (`docs/hardware/`). Its setup program
 and its readme list them.
 
+When the first inventory and game classification are in place, run `re-profile` to turn the
+evidence into a quick start and identify any high-impact questions for the user.
+
 ### Every edition, and the reference
 
 Before deep work, find every edition of the game and record them in `docs/versions.md` (the

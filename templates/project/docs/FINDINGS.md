@@ -4,6 +4,8 @@ What is known about GAME_NAME VERSION, with the evidence for each claim. Start h
 section links to a topic document. Every claim is *observed*, *measured*, *inferred* or listed
 under Open questions.
 
+The project quick start is in [`GAME_PROFILE.md`](GAME_PROFILE.md).
+
 ## Binaries
 
 | File | Role | Architecture | Notes |

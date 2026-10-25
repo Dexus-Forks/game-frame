@@ -5,7 +5,7 @@ kind: context
 status: context
 era: [early-1990s]
 platform: [windows-3x]
-runtime: [winevdm, dosbox, 86box, virtual-machine, unicorn]
+runtime: [winevdm, dosbox, virtual-machine, unicorn]
 api: [win32]
 compiler: [borland, turbo-pascal, msvc]
 tags: [ne, win16, selectors, gdi, wing]

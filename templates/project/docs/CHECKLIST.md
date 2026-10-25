@@ -12,6 +12,7 @@ ground truth). Keep it short; details belong in the topic documents.
 - [ ] Ghidra export of the game's own binaries (`./gameframe run ghidra-export`)
 - [ ] Data containers identified and listed
 - [ ] The story read: the manual and the program's long strings, `docs/lore.md` written (`re-inventory`, "Read the story")
+- [ ] Quick-start profile written in `docs/GAME_PROFILE.md` (`re-profile`)
 
 ## Viewer (before the game: every format becomes a reader, a document and a panel)
 
