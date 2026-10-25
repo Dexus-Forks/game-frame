@@ -20,10 +20,10 @@ PCjr and original Tandy 1000 interfaces documented here.
 - A normalized input at the chip's AUDIO IN pin, including the original Tandy 1000 PIT channel 2
   route.
 
-The chip register map, counter divisor, attenuation steps, clock and write-ready behavior follow
-the [TI SN76489AN data sheet](https://map.grauw.nl/resources/sound/texas_instruments_sn76489an.pdf)
-and the IBM PCjr and Tandy 1000 technical references. The Tandy 1000 port range, write-only
-decode and approximate wait-state count follow its
+The IBM PCjr Technical Reference documents the SN76496N clock, tone divisor, fixed noise rates,
+attenuation steps, register map and READY interval. The Tandy 1000 service manual schematic shows
+the same 3.579 MHz clock on its SN76496. The Tandy port range, write-only decode and approximate
+wait-state count follow its
 [service manual](https://ftp.oldskool.org/pub/drivers/Tandy/1000/Tandy_1000_Service_Manual.pdf).
 The implementation follows hardware documents and static traces of the original Sierra drivers.
 It contains no copied emulator code. The software-only follow-up plan is in

@@ -15,7 +15,8 @@ Every release of GameFrame, newest first. The format follows
   traces of Sierra's original `JR.DRV` and `TANDY.DRV` confirm tone latch/data writes, attenuation
   writes, startup mutes and PSG-source selection. TI noise details, period-zero behavior, the
   Tandy mux's fourth input, NCR/PSSJ variants, sample parity, CPU wait mapping and analog behavior
-  have software-only follow-up checks.
+  have software-only follow-up checks. The SN76496N timing source is the IBM PCjr reference; the
+  Tandy service schematic confirms its matching 3.579 MHz clock.
 
 - `gameframe-saa1099` adds a Philips SAA1099 stereo sound generator and a two-chip Creative Music
   System/Game Blaster port model. It applies tone and octave writes at generator transitions,

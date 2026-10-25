@@ -1,7 +1,11 @@
 /// Tandy 1000 and IBM PCjr SN76496 reference clock, in hertz.
+/// Original: Tandy 1000 Service Manual, main logic schematic, sheet 9 of 12; IBM PCjr Technical
+/// Reference, Sound Subsystem, pp. 2-89–2-94.
 pub const TANDY_PSG_CLOCK_HZ: u32 = 3_579_545;
 /// TI divides the reference clock by 16 before advancing the tone counters.
+/// Original: IBM PCjr Technical Reference, Sound Subsystem, pp. 2-91–2-94.
 pub const TONE_CLOCK_DIVIDER: u32 = 16;
+// Original: IBM PCjr Technical Reference, Sound Subsystem, p. 2-94 (32 input clock cycles).
 const READY_CLOCKS_PER_WRITE: u32 = 32;
 const TONE_REGISTER_MASK: u16 = 0x03ff;
 const NOISE_LFSR_MASK: u16 = 0x7fff;

@@ -16,15 +16,16 @@ feedback taps, zero-period behavior or power-up contents.
 
 | Finding | Primary source | Evidence |
 |---|---|---|
-| Tone counters use the reference clock divided by 16; nonzero period n gives N/(32n). Fixed noise rates are N/512, N/1024 and N/2048. | [TI SN76489AN data sheet](https://map.grauw.nl/resources/sound/texas_instruments_sn76489an.pdf) | Operation: tone generators, noise generator and CPU interface |
+| The PCjr SN76496N uses a 3.579 MHz input clock. Tone counters decrement at N/16, giving f=N/(32n); fixed noise rates are N/512, N/1024 and N/2048. READY takes 32 input clocks. | [IBM PCjr Technical Reference](https://bitsavers.trailing-edge.com/pdf/ibm/pc/pc_jr/PCjr_Technical_Reference_Nov83.pdf) | Sound Subsystem, pp. 2-89–2-94 |
 | PCjr port 61h bits 5–6 select timer 2, cassette input, I/O-channel audio or the SN76496. | [IBM PCjr Technical Reference](https://bitsavers.trailing-edge.com/pdf/ibm/pc/pc_jr/PCjr_Technical_Reference_Nov83.pdf) | PPI Port B and Sound Subsystem |
-| The original Tandy 1000 routes PIT channel 2 into the sound chip's external input and uses a separate external-output mux controlled by 8255 PB5/PB6. | [Tandy 1000 service manual](https://ftp.oldskool.org/pub/drivers/Tandy/1000/Tandy_1000_Service_Manual.pdf) | Keyboard/Timer/Sound Circuits, pp. 32–35 |
+| The original Tandy 1000's U96 is an SN76496 clocked at 3.579 MHz. It receives PIT channel 2 at AUDIO IN and uses a separate external-output mux controlled by 8255 PB5/PB6. | [Tandy 1000 service manual](https://ftp.oldskool.org/pub/drivers/Tandy/1000/Tandy_1000_Service_Manual.pdf) | Keyboard/Timer/Sound Circuits, pp. 32–35; main logic schematic, sheet 9 of 12 |
 | Tandy BIOS audio source `00h` selects PIT channel 2, `02h` selects bus Audio In and `03h` selects the complex sound generator. | [Tandy 1000 MS-DOS Programmer's Reference Manual](https://manualzz.com/doc/55015064/tandy-1000-ms-dos-programmer-s-reference-manual) | INT 1Ah, function `80h`, p. 209 |
 | The Tandy 1000 HX identifies an NCR 8496 and describes its output stage. | [Tandy 1000 HX Technical Reference](https://www.manualslib.com/manual/1366743/Tandy-1000-Hx.html) | Sound Generator, §2.6, p. 323 |
 
 The GameFrame implementation lives in [`gameframe-sn76496`](../../crates/sn76496/README.md).
-It uses a 3,579,545 Hz reference clock, models the serial register protocol, generates normalized
-mono samples and advances chip/READY state by input-clock cycles. The PCjr adapter maps writes to
+It uses the documented 3,579,545 Hz reference clock, models the serial register protocol, generates
+normalized mono samples and advances chip/READY state by input-clock cycles. The IBM PCjr reference
+gives the timing formula and fixed noise rates implemented by the crate. The PCjr adapter maps writes to
 `C0h`; the original Tandy 1000 adapter maps writes to `C0h`–`C7h`. Tone period zero, the noise
 sequence and the initial attenuation state remain implementation choices pending comparison.
 
