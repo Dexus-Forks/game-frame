@@ -154,7 +154,7 @@ stops at the same points:
 | `re-publisher` | re-site, re-land | Agent, WebFetch, WebSearch | re-lander |
 | `re-randomiser` | re-trace, re-emulate | Agent, WebFetch, WebSearch | re-porter, re-verifier |
 | `re-specifier` | re-cleanroom | Agent | re-cleanroomporter |
-| `re-surveyor` | re-setup, re-inventory | Agent | re-decompiler, re-observer |
+| `re-surveyor` | re-setup, re-inventory, re-profile | Agent | re-decompiler, re-observer |
 | `re-tracer` | re-trace, re-ghidra, re-rea | Agent, WebFetch, WebSearch | re-decoder, re-measurer, re-porter |
 | `re-typer` | re-trace, re-ghidra | Agent, WebFetch, WebSearch | re-decoder, re-porter, re-tracer |
 | `re-vectoriser` | re-trace, re-emulate | Agent, WebFetch, WebSearch | re-measurer, re-porter, re-tracer |

@@ -9,7 +9,7 @@ section sorts games into families, gives each family a **rule set** (what must b
 the rules live, what to capture, how to check), names reference games, and lists public
 projects that rebuilt such games, so you can learn from them.
 
-Use it at the start of a project, together with the `re-inventory` skill:
+Use it after the first inventory, together with the `re-profile` skill:
 
 1. Decide who drives: the game or the player ([Who drives](interaction.md)).
 2. Place the game on the axes below.
@@ -20,23 +20,19 @@ Use it at the start of a project, together with the `re-inventory` skill:
    system is for and which the family's rules make exact for this game
    ([Reading the story](../working/lore.md)).
 
-## Ask your agent
+## Build the project profile
 
-Classify my game. Copy this prompt into your coding agent:
+After `re-inventory`, ask your agent to build or update `docs/GAME_PROFILE.md` with `re-profile`.
+The skill uses the evidence in the game files and the project's findings before it asks you
+about choices it cannot determine. It produces a quick start with the game's family, engine,
+hardware support, likely traps and the next steps.
+
+If the agent needs a direct prompt, use this:
 
 ```text
-In my GameFrame project, classify the game.
-
-1. Read docs/games/README.md and docs/games/interaction.md.
-2. Look at the game's files and its manual. Ask me how it plays if you cannot tell.
-3. Decide who drives (a stream, a simulation, an environment, or turns), the time model,
-   where the rules live and what must repeat exactly. Name the family.
-4. Read that family's page. Write the kind of game, its axes and its family into
-   docs/FINDINGS.md, with the evidence for each.
-5. Copy the family's rule set into the project's AGENTS.md and adjust it to this game.
-6. Ask me how exact the interface must be, and record my answer.
-7. Read the manual and the program's long strings (./gameframe run sentences). Write
-   docs/lore.md: what the story says each system is for, and which must be exact.
+In my GameFrame project, follow skills/re-profile/SKILL.md to build or update
+docs/GAME_PROFILE.md from the existing inventory. Ask only questions whose answers could
+change the goal or recommended route. Leave other gaps marked unknown with a way to resolve them.
 ```
 
 ## Axes

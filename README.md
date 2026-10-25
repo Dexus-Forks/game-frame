@@ -134,6 +134,7 @@ to produce, and the pitfalls that cost time.
 | [re-start](skills/re-start/SKILL.md) | Rules, the loop, a first-session checklist, routing to the other skills |
 | [re-setup](skills/re-setup/SKILL.md) | Install and check the toolchain; register REA for your agent |
 | [re-inventory](skills/re-inventory/SKILL.md) | Which files hold the game's code; native, managed, scripted or packed; engine and middleware; data containers; what kind of game it is; the story from the manual and the program's text, in `docs/lore.md` |
+| [re-profile](skills/re-profile/SKILL.md) | After the first inventory, build an evidence-backed quick start with the game's family, engine, release, hardware support, likely traps and next steps |
 | [re-browse](skills/re-browse/SKILL.md) | A resource viewer from day one: the catalogue of every file (`catalog.py`), then the project's own viewer on the port's readers, for people and agents to check decoded content |
 | [re-observe](skills/re-observe/SKILL.md) | Run the original where you can watch, drive and capture it; every input; every screen; an object model with entry points for tests and agents |
 | [re-rea](skills/re-rea/SKILL.md) | When to use REA's MCP tools, and how they fit with the text export |

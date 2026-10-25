@@ -53,7 +53,7 @@ user may change any of them for their project.
 ## The loop
 
 ```
-inventory -> observe -> decompile -> trace -> format -> emulate -> reimplement -> verify -> land
+inventory -> profile -> observe -> decompile -> trace -> format -> emulate -> reimplement -> verify -> land
                                        ^                                             |
                                        +---------------- when a check fails ---------+
 ```
@@ -62,6 +62,7 @@ inventory -> observe -> decompile -> trace -> format -> emulate -> reimplement -
 |---|---|---|
 | Set up | Are Ghidra, Java, Python, Unicorn and REA ready? | `re-setup` |
 | Inventory | Which files hold the game's own code? Which engine, which protection, which data containers? What kind of game is it? | `re-inventory` |
+| Profile | What is the game's genre, engine, release, presentation and hardware support? What should we check first? | `re-profile` |
 | View | Can a person and an agent see every file and what the decoders make of it? | `re-browse` |
 | Observe | What does the original actually do? Run it, drive it, capture frames, state, inputs; list every input and screen | `re-observe` |
 | Investigate with REA | Quick, evidence-backed answers about a binary, package, browser or Electron app | `re-rea` |
@@ -99,7 +100,7 @@ version of the game.
 
 | Agent | Stage | Usually hands off to |
 |---|---|---|
-| `re-surveyor` | Setup check, inventory, kind of game | `re-decompiler`, `re-observer` |
+| `re-surveyor` | Setup check, inventory, kind of game and project profile | `re-decompiler`, `re-observer` |
 | `re-observer` | Run, drive and capture the original | `re-tracer`, `re-verifier` |
 | `re-decompiler` | Ghidra export, REA | `re-tracer` |
 | `re-tracer` | How the game does one thing | `re-decoder`, `re-measurer`, `re-porter` |
@@ -175,12 +176,16 @@ a diagram of each team's hand-offs and the failure path.
    sentences`), into `docs/lore.md` with the table "in the story → in the code → evidence"
    (`re-inventory`, "Read the story"). The lore says what each system is for and which must
    be exact. Read it again whenever a system's purpose is unclear.
-7. `re-browse`: run the catalogue (`tools/formats/catalog.py target/game derived/catalog`)
+7. `re-profile`: after the first inventory, create `docs/GAME_PROFILE.md`. Gather the release,
+   engine, presentation, graphics, sound and input evidence. Distinguish official support,
+   file/code evidence, measured behavior and community reports. Ask the human only about open
+   choices that would change the goal or next route.
+8. `re-browse`: run the catalogue (`tools/formats/catalog.py target/game derived/catalog`)
    so the person and you can see every file, and grow it into the project's viewer as the
    decoders come (`docs/working/viewer.md`).
-8. `re-observe`: get the original running where you can watch, drive and capture it.
-9. `re-ghidra`: export the game's own binaries (`scripts/ghidra-export.sh`).
-10. When the work on the game starts, pick the foundations first: the random number generator, the maths helpers, the game clock
+9. `re-observe`: get the original running where you can watch, drive and capture it.
+10. `re-ghidra`: export the game's own binaries (`scripts/ghidra-export.sh`).
+11. When the work on the game starts, pick the foundations first: the random number generator, the maths helpers, the game clock
    and the data container. Everything else depends on them. They are small enough to emulate and verify in one session.
 
 ## Goals for a new project
@@ -189,15 +194,16 @@ Give the work goals a reader would notice, in this order unless the user's goal 
 (the project's `AGENTS.md`, "Milestones"):
 
 1. **Inventory**: every file known (`re-inventory`).
-2. **A viewer of every asset, before the game**: pictures, palettes, sounds, music, models,
+2. **Profile**: a quick start from the game's family, engine, release and hardware (`re-profile`).
+3. **A viewer of every asset, before the game**: pictures, palettes, sounds, music, models,
    levels, text and saves, opened by the project's own readers (`re-browse`, `re-format`). This
    is the best first goal. Each format becomes three things that the rest of the project
    reuses: a reader crate or module, proved on every file; a document in `docs/`; and a panel
    in the viewer. The port starts with its data layer done and tested, mod tools come for free,
    and the person directing the work can check every decoder by looking.
-3. **A site**: the diary and the format documents, for the people who use them (`re-site`).
-4. **The foundations**: random generator, maths, clock and main loop, measured and verified.
-5. **The game**, one system at a time.
+4. **A site**: the diary and the format documents, for the people who use them (`re-site`).
+5. **The foundations**: random generator, maths, clock and main loop, measured and verified.
+6. **The game**, one system at a time.
 
 At each goal, write a diary entry and update `docs/CHECKLIST.md`. When a goal turns up something
 generic, a reader or a pitfall another game will meet, fix it in GameFrame or its `crates/`.

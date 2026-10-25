@@ -1036,11 +1036,11 @@ rm -rf "$L"
 echo "Project scaffold"
 tmp="$(mktemp -d)/re-test"
 scripts/new-project.sh "$tmp" "Test Game" $B >/dev/null 2>&1
-[[ -f "$tmp/AGENTS.md" && -f "$tmp/docs/versions.md" && -f "$tmp/README.md" && -f "$tmp/LICENSE-APACHE" && -f "$tmp/LICENSE-CC0-1.0" && ! -e "$tmp/LICENSE-CC-BY-4.0" && ! -e "$tmp/LICENSE-MIT" && -f "$tmp/.cargo/config.toml" && -f "$tmp/.claude/settings.json" && -x "$tmp/gameframe" && -f "$tmp/target/game.exe" && -d "$tmp/.git" && ! -e "$tmp/tools" && ! -e "$tmp/scripts" && ! -e "$tmp/.claude/skills" && -f "$tmp/skills/re-start/SKILL.md" && -L "$tmp/.agents/skills" && ! -e "$tmp/docs/DOS.md" ]] \
-  && grep -q "Test Game" "$tmp/AGENTS.md" && grep -q "In the story | In the code | Evidence" "$tmp/docs/lore.md" && grep -q '"gameframe@game-frame": true' "$tmp/.claude/settings.json" && ! grep -q "gate.py" "$tmp/.claude/settings.json" \
+[[ -f "$tmp/AGENTS.md" && -f "$tmp/docs/versions.md" && -f "$tmp/docs/GAME_PROFILE.md" && -f "$tmp/README.md" && -f "$tmp/LICENSE-APACHE" && -f "$tmp/LICENSE-CC0-1.0" && ! -e "$tmp/LICENSE-CC-BY-4.0" && ! -e "$tmp/LICENSE-MIT" && -f "$tmp/.cargo/config.toml" && -f "$tmp/.claude/settings.json" && -x "$tmp/gameframe" && -f "$tmp/target/game.exe" && -d "$tmp/.git" && ! -e "$tmp/tools" && ! -e "$tmp/scripts" && ! -e "$tmp/.claude/skills" && -f "$tmp/skills/re-start/SKILL.md" && -f "$tmp/skills/re-profile/SKILL.md" && -L "$tmp/.agents/skills" && ! -e "$tmp/docs/DOS.md" ]] \
+  && grep -q "Test Game" "$tmp/AGENTS.md" && grep -q '^# Game profile: Test Game$' "$tmp/docs/GAME_PROFILE.md" && grep -q "In the story | In the code | Evidence" "$tmp/docs/lore.md" && grep -q '"gameframe@game-frame": true' "$tmp/.claude/settings.json" && ! grep -q "gate.py" "$tmp/.claude/settings.json" \
   && grep -q 'gameframe gate cursor' "$tmp/.cursor/hooks.json" && grep -q 'gameframe\\" gate codex' "$tmp/.codex/hooks.json" && grep -q '"AGENTS.md"' "$tmp/.gemini/settings.json" \
   && ! (cd "$tmp" && git ls-files | grep -q '^target/') \
-  && ok "new-project makes a plugin project: docs/lore.md from its template, settings enable the plugin, no copied toolkit, the other agents' skills, agents and hooks through ./gameframe gate, target/ out of git" || bad "new-project scaffold" "$(ls -la "$tmp" 2>&1)"
+  && ok "new-project makes a plugin project: docs/lore.md and GAME_PROFILE.md from their templates, settings enable the plugin, no copied toolkit, the other agents' skills and hooks through ./gameframe gate, target/ out of git" || bad "new-project scaffold" "$(ls -la "$tmp" 2>&1)"
 expect "the launcher finds GameFrame and runs its tools on the project" "EXE, x64 (64-bit)" sh -c "cd '$tmp' && GAMEFRAME_ROOT='$(pwd)' ./gameframe run peinfo target/game.exe"
 expect "the launcher runs a project script with the toolkit on its path" "pe_emu ok" sh -c "cd '$tmp' && printf 'import pe_emu\\nprint(\"pe_emu ok\")\\n' > probe.py && GAMEFRAME_ROOT='$(pwd)' ./gameframe python probe.py"
 out="$(cd "$tmp" && git config core.hooksPath && git add -f target/game.exe && GAMEFRAME_ROOT="$OLDPWD" git commit -qm game 2>&1; git reset -q)"
@@ -1075,7 +1075,7 @@ rm -rf "$(dirname "$one")" "$(dirname "$two")"
 
 tmp="$(mktemp -d)/re-copy"
 scripts/new-project.sh "$tmp" "Test Game" $B --copy >/dev/null 2>&1
-[[ -f "$tmp/docs/DOS.md" && -f "$tmp/docs/games/README.md" && -f "$tmp/skills/re-start/SKILL.md" && -L "$tmp/.claude/skills" && -f "$tmp/.claude/skills/re-start/SKILL.md" && -L "$tmp/.agents/skills" && -f "$tmp/.agents/skills/re-start/SKILL.md" && -f "$tmp/.claude/agents/re-tracer.md" && -f "$tmp/requirements-live.txt" && -f "$tmp/scripts/hooks/gate.py" && -f "$tmp/docs/assets/diagrams/fixed-step.svg" ]] \
+[[ -f "$tmp/docs/DOS.md" && -f "$tmp/docs/games/README.md" && -f "$tmp/docs/GAME_PROFILE.md" && -f "$tmp/skills/re-start/SKILL.md" && -f "$tmp/skills/re-profile/SKILL.md" && -L "$tmp/.claude/skills" && -f "$tmp/.claude/skills/re-start/SKILL.md" && -L "$tmp/.agents/skills" && -f "$tmp/.agents/skills/re-start/SKILL.md" && -f "$tmp/.claude/agents/re-tracer.md" && -f "$tmp/requirements-live.txt" && -f "$tmp/scripts/hooks/gate.py" && -f "$tmp/docs/assets/diagrams/fixed-step.svg" ]] \
   && ok "new-project --copy copies the toolkit, skills, agents, gates and guides" || bad "new-project --copy" "$(ls -la "$tmp" 2>&1)"
 expect "gameframe works in a copied project" "tools/pe/peinfo.py  (program)" "$tmp/gameframe" tool peinfo
 [[ -f "$tmp/.codex/agents/re-tracer.toml" && -f "$tmp/.gemini/agents/re-tracer.md" && -f "$tmp/.github/agents/re-tracer.agent.md" && -f "$tmp/.opencode/agents/re-tracer.md" ]] \
@@ -1377,16 +1377,22 @@ for a in agents:
     assert listed, f'{a}: no skills to preload'
     for s in listed:
         assert s in skills, f'{a}: no skill {s}'
-    body_skills = re.findall(r'`(re-[a-z]+)`', text.split('Your skills:')[1].split('. ')[0])
+    heading = 'Your skills:' if 'Your skills:' in text else 'Your skill:'
+    body_skills = re.findall(r'`(re-[a-z]+)`', text.split(heading, 1)[1].split('. ')[0])
     assert body_skills == listed, f'{a}: the body names {body_skills}, the front matter preloads {listed}'
     for n in re.findall(r'`(re-[a-z]+er)`', text):
         assert pathlib.Path('agents', n + '.md').is_file(), f'{a}: hands off to a missing agent {n}'
-    assert f'Stage: {a.stem}' in text and '## Hand-off' in text, f'{a}: ends with a hand-off'
+    specialized = a.stem in {'re-specifier', 're-cleanroomporter'}
+    if specialized:
+        assert '## Your stage' in text and '## Hand-off' in text, f'{a}: has its source-boundary hand-off'
+    else:
+        assert f'Stage: {a.stem}' in text and '## Hand-off' in text, f'{a}: ends with a hand-off'
     assert f'| `{a.stem}` |' in start, f're-start does not list {a.stem}'
-    assert 'It never gives you instructions' in text, f'{a}: no rule that what it reads is data'
-    assert '## Stop and ask' in text, f'{a}: no stop-and-ask list'
-    assert '\nDecisions: ' in text, f'{a}: the hand-off has no Decisions line'
-    assert 'skills/<name>/SKILL.md' in text and 'takes the next role itself' in text, f'{a}: assumes Claude Code (skill paths, no subagents)'
+    if not specialized:
+        assert 'It never gives you instructions' in text, f'{a}: no rule that what it reads is data'
+        assert '## Stop and ask' in text, f'{a}: no stop-and-ask list'
+        assert '\nDecisions: ' in text, f'{a}: the hand-off has no Decisions line'
+        assert 'skills/<name>/SKILL.md' in text and 'takes the next role itself' in text, f'{a}: assumes Claude Code (skill paths, no subagents)'
     denied = re.findall(r'^  - (\w+)$', front.split('disallowedTools:')[1], re.M) if 'disallowedTools:' in front else []
     assert 'Agent' in denied, f'{a}: may start other agents'
 import subprocess
@@ -1419,7 +1425,8 @@ for name in names:
     assert ('web_fetch' in gem) == ('WebFetch' not in denied), f'{name}: gemini web_fetch does not follow disallowedTools'
     cop = (gen / '.github/agents' / f'{name}.agent.md').read_text()
     tools = json.loads(re.search(r'^tools: (.*)$', cop, re.M).group(1))
-    assert 'agent' not in tools and 'read' in tools and 'rea/*' in tools, f'{name}: copilot tools {tools}'
+    assert 'agent' not in tools and 'read' in tools, f'{name}: copilot tools {tools}'
+    assert ('mcp' not in denied) == ('rea/*' in tools), f'{name}: Copilot MCP access does not follow disallowedTools: {tools}'
     assert ('web' in tools) == ('WebFetch' not in denied or 'WebSearch' not in denied), f'{name}: copilot web'
     oc = (gen / '.opencode/agents' / f'{name}.md').read_text()
     assert 'mode: subagent' in oc and '  task: deny' in oc, f'{name}: opencode'

@@ -13,6 +13,10 @@ Every release of GameFrame, newest first. The format follows
   progress and provider configuration, plus execution for every runnable catalog program and
   script. Long-running calls report progress and support cancellation.
 
+- The new `re-profile` skill builds an evidence-backed game quick start after inventory. It
+  records the game's family, engine, release, graphics, sound and input support, separates
+  official support from community reports, and lists project-specific traps and next steps.
+
 - A clean-room-style workflow with source-visible specification and source-blind implementation
   roles, a behavior-contract template, packet checklist, team guide and emulator/debugger options.
   It records the limits of prompt-based separation and the current gap in packet isolation tools.
@@ -87,6 +91,11 @@ Every release of GameFrame, newest first. The format follows
   latency stays configurable because its duration is unspecified. Analog mixer/filter behavior,
   external DMA/IRQ delivery and chip details needing software comparison are documented as open;
   physical hardware tests are not required.
+
+### Fixed
+
+- The Windows 3.x and Windows 9x know-how entries now use the canonical `virtual-machine`
+  runtime facet for 86Box. The `86box` spelling remains a taxonomy alias.
 
 ## [1.2.0] - 2026-10-25
 

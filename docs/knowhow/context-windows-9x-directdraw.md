@@ -5,7 +5,7 @@ kind: context
 status: context
 era: [late-1990s]
 platform: [windows-9x]
-runtime: [wine, 86box, virtual-machine]
+runtime: [wine, virtual-machine]
 hardware: [display, ports, cd-rom, x86-cpu, mmx]
 api: [win32, directdraw, directinput, directsound, mci]
 tags: [directx, cd-check, ini, registry, single-instance, indeo]

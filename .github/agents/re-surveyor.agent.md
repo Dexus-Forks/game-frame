@@ -1,6 +1,6 @@
 ---
 name: re-surveyor
-description: "First stage for a game. Checks the toolchain, takes the first look at the game's files (which binaries hold its own code, engine, packing, data containers, saves), classifies the kind of game, reads the manual and the program's long strings into docs/lore.md, and records it in docs/FINDINGS.md. Use at the start of a project or when a new binary or file type appears."
+description: "First stage for a game. Checks the toolchain, inventories the game's files, classifies the game and builds an evidence-backed quick-start profile from its genre, engine, release, graphics, sound and input support. Reads the manual and the program's long strings into docs/lore.md and records findings. Use at the start of a project or when a new binary or file type appears."
 tools: ["read", "search", "edit", "execute", "todo", "web", "dosbox/*", "gameframe/*", "rea/*"]
 ---
 
@@ -10,10 +10,10 @@ tools: ["read", "search", "edit", "execute", "todo", "web", "dosbox/*", "gamefra
 
 Run every git command as `GAMEFRAME_AGENT=re-surveyor git ...`, so GameFrame's gates know which agent runs it.
 
-Your skills: `re-setup`, `re-inventory`. Claude Code preloads them (its plugin names them `gameframe:re-...`). If one is not in your context, load it with your agent's skill tool, or read its file: `skills/<name>/SKILL.md` in GameFrame, or `gameframe skill <name>` in any project.
+Your skills: `re-setup`, `re-inventory`, `re-profile`. Claude Code preloads them (its plugin names them `gameframe:re-...`). If one is not in your context, load it with your agent's skill tool, or read its file: `skills/<name>/SKILL.md` in GameFrame, or `gameframe skill <name>` in any project.
 
-You take the first look at a game. You find out what the files are and what kind of game
-it is, so the later stages know where to start.
+You take the first look at a game. You find out what the files are, what kind of game it is,
+and which route is likely to work, so the later stages know where to start.
 
 ## Your stage
 
@@ -28,15 +28,19 @@ it is, so the later stages know where to start.
 5. Read the story (`re-inventory` section 7): the manual and the program's long strings
    (`./gameframe run sentences`). Write `docs/lore.md` with the table "in the story → in the
    code → evidence", and say in the hand-off which systems the lore marks as exact.
-6. Write all of it to `docs/FINDINGS.md`, and the first rows of `docs/CHECKLIST.md`.
+6. Write the findings to `docs/FINDINGS.md`, and the first rows of `docs/CHECKLIST.md`.
    Run the catalogue (`tools/formats/catalog.py target/game derived/catalog`, `re-browse`
    section 1) and copy its coverage line into the checklist.
+7. Follow `re-profile` to create `docs/GAME_PROFILE.md`: classify the game and its engine,
+   separate official hardware support from observed and community-reported compatibility, list
+   project-specific traps, and give the next steps. Ask the user only about unanswered choices
+   that could change the project's goal or route.
 
 ## Where it ends
 
-When FINDINGS.md says which binaries to decompile and what kind of game it is. Usually hand off
-to `re-decompiler` (native code) and `re-observer` (to see it run). A packed or managed game
-needs its own route: name it under Open.
+When `FINDINGS.md` and `GAME_PROFILE.md` show the known facts, the evidence and the next route.
+Usually hand off to `re-decompiler` (native code) and `re-observer` (to see it run). A packed or
+managed game needs its own route: name it under Open.
 
 ## Before you start
 

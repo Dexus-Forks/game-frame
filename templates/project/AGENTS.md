@@ -24,14 +24,16 @@ The usual order for a new project. Change it to suit the goal; the user decides.
 gets an entry in the project's diary (`re-site`).
 
 1. **Inventory.** Every file known: binaries, engine, containers, the kind of game (`re-inventory`).
-2. **A viewer of every asset.** Pictures, palettes, sounds, music, models, levels, text and
+2. **Profile.** A quick start based on the game's family, engine, release, presentation, hardware,
+   input and likely traps (`re-profile`).
+3. **A viewer of every asset.** Pictures, palettes, sounds, music, models, levels, text and
    saves, all opened by the project's own readers (`re-browse`, `re-format`). Build it before
    the game. Each format becomes a reader crate or module with tests on every file, a document
    in `docs/`, and a panel in the viewer. The port, mod tools and the site reuse all three.
-3. **A site.** The diary and the format documents, for the people who will use them (`re-site`).
-4. **The foundations.** The random generator, the maths, the game clock and the main loop,
+4. **A site.** The diary and the format documents, for the people who will use them (`re-site`).
+5. **The foundations.** The random generator, the maths, the game clock and the main loop,
    measured and verified (`re-trace`, `re-emulate`, `re-verify`).
-5. **The game.** One system at a time, each verified before the next (`re-port`, `re-verify`).
+6. **The game.** One system at a time, each verified before the next (`re-port`, `re-verify`).
 
 ## The user decides
 
@@ -94,6 +96,7 @@ user may change any of them.
 | `analysis/export/<binary>/` | Ghidra's text export: decomp.c, functions.tsv, strings.txt, imports, exports (ignored) |
 | `derived/` | Ground truth from the emulator, extracted files (ignored) |
 | `docs/FINDINGS.md` | The overview: binaries, engine, formats, systems, with links |
+| `docs/GAME_PROFILE.md` | The evidence-backed quick start: game type, engine, release, hardware, traps and next steps |
 | `docs/CHECKLIST.md` | What is traced, measured and reimplemented, and what is next |
 | `docs/lore.md` | The game's world from its manual and its own text, and what it says each system is for ("in the story → in the code → evidence"). Read it again when a system's purpose is unclear |
 | `labels/names.tsv`, `labels/fields.tsv` | Names for original functions and struct fields, read by the tools |
@@ -106,7 +109,7 @@ user may change any of them.
 
 ## The loop
 
-inventory → observe → decompile → trace → (format) → emulate → reimplement → verify → land. Start each
+inventory → profile → observe → decompile → trace → (format) → emulate → reimplement → verify → land. Start each
 session by reading `docs/CHECKLIST.md` and searching `docs/` and `labels/` for the addresses
 and names you are about to work on. `./gameframe find WORD` shows which skills and
 tools cover a subject, and `./gameframe tool NAME` prints a tool's usage. When a command
