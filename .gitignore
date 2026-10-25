@@ -4,6 +4,8 @@
 /examples/sample-game/build/
 .venv/
 .env
+# Codex-generated local cloud environment metadata
+/.codex/environments/environment.toml
 __pycache__/
 # The DOS sample build
 /examples/dos-sample/build/

@@ -61,7 +61,7 @@ proposed again.
 - [x] The card makers' 3D APIs in detail: Glide 2.x, ATI3DCIF, S3D Toolkit; one build per card ([card-apis.md](docs/hardware/card-apis.md), `gameframe-gpu-1997`, `re-accelerator`)
 - [x] Hand-written MMX code: finding it, matching it to the plain build, measuring, porting ([simd.md](docs/hardware/simd.md), `gameframe-mmx`, `re-vectoriser`)
 - [x] PowerVR SGL's scene-graph half: the 46 calls of POD's PowerVR build, a stand-in `sgl.dll` on OpenGL ([wrappers/sgl](wrappers/sgl/README.md))
-- [x] PowerVR SGL's immediate-mode half (`sgltri_*`), which Hardwar's PowerVR mode uses. The 13 calls it lacked, and `sgltri_rerender`, are in `wrappers/sgl` ([sgl](wrappers/sgl/README.md), `test/sgltritest.c`). Shadow volumes given as triangles are still not drawn. No run of Hardwar has checked it
+- [x] PowerVR SGL's immediate-mode half (`sgltri_*`), which Hardwar's PowerVR mode uses. The 13 calls it lacked, and `sgltri_rerender`, are in `wrappers/sgl` ([sgl](wrappers/sgl/README.md), `test/sgltritest.c`). `sgltri_shadow` draws shadow volumes; Hardwar has not been run against it
 - [ ] Rendition RRedline and Matrox MSI in the same detail
 
 ## Sound ([sound.md](docs/hardware/sound.md), [audio coverage](docs/hardware/audio-coverage.md))
@@ -222,6 +222,8 @@ needs the test named there before it moves:
 
 - [x] A taxonomy of failure modes by era, platform, runtime, hardware, API, compiler, genre and symptom
 - [x] The entry format, `gameframe advise` and its `--check`
+- [x] Broad starting entries for major topics, alongside specific failure notes: sound cards,
+  CPU behavior, display output, CD-ROMs, input, networking, game files and timing
 - [x] A hook that names matching entries after a shell command in Claude Code
 - [x] Seed entries from running a 1997 Windows game under Wine on Apple silicon, and the
   context for Windows 95 DirectDraw games, Wine on macOS and Watcom programs
@@ -244,7 +246,8 @@ needs the test named there before it moves:
 - [x] `winput`: held keys released at exit, `release`, `point` and `button`, `--hold`
 - [x] The know-how hook reads only what a command printed (a client's notes on changed files
   had matched entries' own text)
-- [ ] Queries that `advise` missed, to decide on embeddings (none recorded yet)
+- [ ] Keep a record of topics `advise` misses before deciding whether embeddings would help. The
+  missing `sound-card` entry prompted the broad topic overviews above.
 
 Proposed by POD, now built:
 
@@ -261,7 +264,7 @@ Proposed by POD, now built:
 - [x] A round-trip check (`validate.py --write`, with `encode` in the decoder)
 - [x] A closed-loop cut for recorded paths (`tools/live/loopcut.py`)
 
-Proposed by POD and not built yet, each with the reason:
+Proposed by POD. Checked items are built; open items give the remaining work:
 
 - [x] Watcom register order (EAX, EDX, EBX, ECX) in `ExportCallArgs` (`regs=watcom`), tested on
   a register call in the sample DLL, built with zig and inline assembly
@@ -284,9 +287,9 @@ Proposed by POD and not built yet, each with the reason:
   two-export crate whose stdcall export runs under `pe32_emu`
 - [x] From the wrapper: the scalers (the `gameframe-scale` crate) and the probe-library
   generator (`tools/pe/probegen.py`, its stubs run under `pe32_emu`)
-- [ ] The other wrapper pieces (port-I/O shim, DirectDraw in memory, Glide 2 on OpenGL,
-  rasteriser, render-thread timing): large. Each needs a Windows test program run under Wine.
-  GameFrame's tests cannot run those programs yet
+- [x] The shared wrapper workspace now includes the port-I/O shim, DirectDraw in memory, Glide 2
+  on OpenGL, the rasteriser and the ATI3DCIF and S3D Toolkit libraries. Host tests, Windows test
+  programs and Wine runs are documented in [the wrapper guide](docs/hardware/wrappers.md).
 - [ ] A Wine runner for `tests/run.sh` (Wine on Linux CI), so the Windows-side tools above and
   `winput` can be tested for real
 

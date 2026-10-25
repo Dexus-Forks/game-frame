@@ -80,6 +80,18 @@ Every release of GameFrame, newest first. The format follows
   external DMA/IRQ delivery and chip details needing software comparison are documented as open;
   physical hardware tests are not required.
 
+## [1.2.0] - 2026-10-25
+
+GameFrame 1.2.0 expands the late-1990s replacement libraries, adds a clean-room Indeo 4.1
+decoder and a runtime harness, and improves input capture and project safety. Know-how now has
+broad starting entries for major topics alongside its specific failure notes.
+
+### Added
+
+- Know-how now has broad starting entries for sound cards, CPU behavior, display output,
+  CD-ROMs, input, networking, game files, and timing. The entries link to detailed guides, with
+  case notes where available. Know-how guidance now calls for an overview when a major topic has
+  only narrow entries.
 - `sgl.dll` draws the immediate mode's shadow and light volumes (`sgltri_shadow`), which it
   only counted before. Each call's faces become the planes of one convex volume, oriented as
   PowerVR's driver orients them, and every pixel is tested against them: a shadow multiplies
@@ -177,6 +189,22 @@ Every release of GameFrame, newest first. The format follows
   why games had a build per card, what each DLL draws and lacks, how to build and use them,
   patch files, logs, adding a game or a call, tests, and POD as the worked example with
   screenshots of its runs. The home page has a section on them.
+- `gameframe-indeo`, a clean-room Indeo 4.1 decoder that matches Intel's `IR41_32.DLL` byte
+  for byte, and `ir41_32.dll`, a Video for Windows codec built on it. The decoder's empty-band
+  path now uses the same fill words as Intel's Pentium path.
+- `wrappers/maxi94` supplies a silent `94DLL32.dll` so POD Gold's Maxi Sound 64 build starts,
+  then maps its opened wave outputs and mixer lines to host audio. A full race measured the
+  output. The sound-card API guide distinguishes measured behavior from unverified descriptions.
+- `tools/live/emupc.py` gives each game's emulated PC a project-specific name and refuses to
+  start a second copy for the same project.
+- The runtime harness inspects a game folder, names its runtime needs and writes setup steps.
+  Its initial modules cover Wine, emulated PCs, DOSBox-X, Steam, audio, disc drives and Glide
+  wrappers. `tools/live/align.py` maps a known screen to a capture so scripts can place clicks;
+  `tools/llm/locate.py` can locate a changed screen, and `tools/formats/pngio.py` reads and writes
+  PNG. `re-observe` now plans the harness before the first run and maps click points before
+  driving it.
+- The repository now backs up its Codex Cloud environment settings, install script and start
+  instructions under `docs/working/` and `scripts/`.
 
 ### Changed
 
@@ -188,26 +216,17 @@ Every release of GameFrame, newest first. The format follows
 - `re-randomiser` lists chance taken from the frame clock; the recording guide records the
   FPU's control word and measures sequences; `re-start` gives the order for moving to a newer
   version; the object-model guide says a probe client takes any JSON answer.
+- `tools/llm/name_functions.py` submits functions in batches, reports each batch's status,
+  fetches every result, and can cancel the run.
 
 ### Fixed
 
 - `memrec --name` takes the game's own process, never the shell or launcher that started it,
   whose command line names the game too.
-
-### Added
-
-- The harness ([docs/harness](docs/harness/README.md)): `tools/triage/needs.py` lists what a
-  game needs (CPU features, OS, APIs, libraries, extenders, DRM, media) from an executable, a
-  folder or a disc image; `tools/live/harness.py` picks a runtime module and a layer for each
-  need from `docs/harness/modules/`, names the gaps, and writes the set-up steps as one script.
-  Eight modules to start: `wine-host`, `emupc-wine`, `dosbox-x`, `steam-client-wine`,
-  `xaudio2-wma`, `silent-audio`, `disc-drive` and `glide-wrapper`. The Steam, WMA and
-  silent-audio modules come from the Banished project's emulated PC.
-- `tools/live/align.py`: lines up a known picture of a screen with a capture of it now, frame
-  and scale included, and maps click points between them. `tools/llm/locate.py` asks a model
-  instead, when the screen changed too much. `tools/formats/pngio.py` reads and writes PNG.
-- `re-observe` lists the needs and plans the harness before the first run, and maps click
-  points before clicking.
+- `client.py` keeps reading a project `.env` file after a key is absent, so later settings are
+  still available.
+- `new-project.sh --copy` removes generated Python caches from copied `scripts/` as well as
+  `tools/`, so they do not keep GameFrame's scripts behind when a project moves to the plugin.
 
 ## [1.1.0] - 2026-10-24
 
@@ -554,7 +573,8 @@ Copilot, Cursor and OpenCode can each use the skills, the agents, the gates and 
 - The Claude Code plugin now carries version `1.0.0`. Claude Code updates it when the version
   changes, so plugin projects move from release to release.
 
-[Unreleased]: https://github.com/tanepiper/game-frame/compare/v1.1.0...HEAD
+[1.2.0]: https://github.com/tanepiper/game-frame/compare/v1.1.0...v1.2.0
+[Unreleased]: https://github.com/tanepiper/game-frame/compare/v1.2.0...HEAD
 [1.1.0]: https://github.com/tanepiper/game-frame/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/tanepiper/game-frame/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/tanepiper/game-frame/releases/tag/v1.0.0

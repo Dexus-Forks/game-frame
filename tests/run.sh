@@ -1049,6 +1049,7 @@ expect "the session hook says where GameFrame's guides are" "read docs/NAME.md a
 out="$("$PWD/scripts/update-project.sh" "$tmp" 2>&1)"
 [[ "$out" == *"Plugin project: the gameframe launcher is current"* && "$out" == *"0 were added, 0 were replaced"* ]] && ok "update-project leaves a plugin project's launcher, settings and agent files current" || bad "update-project on a plugin project" "$out"
 expect "scripts/clients.py prints its usage" "scripts/clients.py write DEST" python3 scripts/clients.py --help
+expect "Codex Cloud environment installer prints its usage" "Usage: scripts/codex-cloud-environment-install.sh" bash scripts/codex-cloud-environment-install.sh --help
 one="$(mktemp -d)/re-claude"
 scripts/new-project.sh "$one" "Test Game" --agent claude >/dev/null 2>&1
 [[ -f "$one/.claude/settings.json" && -f "$one/CLAUDE.md" && ! -e "$one/skills" && ! -e "$one/.agents" && ! -e "$one/.codex" && ! -e "$one/.gemini" && ! -e "$one/.cursor" && ! -e "$one/opencode.json" ]] \
