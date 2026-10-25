@@ -11,6 +11,8 @@ work that spans several steps and several sessions.
   do when stuck, and how to report.
 - [Clean-room-style implementations](clean-room-implementations.md): source-visible specification,
   source-blind implementation, behavior contracts, packet limits and software-only verification.
+- [The GameFrame MCP tool surface](mcp-toolchain.md): discover and run local tools through MCP,
+  keep the server modular, and understand its boundaries with external providers.
 - [Linux, cloud and container environments](environments.md): what an agent installs on Linux
   or in a cloud workspace, `scripts/env.sh` for each session, headless runs, REA, and game
   files on someone else's machine.
