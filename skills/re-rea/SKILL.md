@@ -28,7 +28,7 @@ targeted questions and evidence, the export for broad search.
 
 ## The workflow
 
-1. **Route by target** (from REA's skill): a native EXE/DLL → `open_binary` with the path;
+1. **Route by target** (from REA's skill): a native EXE/DLL → use the Ghidra workflow below;
    an archive or package → `open_binary` then `inspect_artifact`; .NET → `inspect_managed_artifact`;
    Android → `inspect_android_package`; extracted JavaScript or ASAR →
    `analyze_javascript_application`; Windows resources and icons → `inspect_pe_resources`.
@@ -43,25 +43,35 @@ targeted questions and evidence, the export for broad search.
 
 ## Native functions through Ghidra
 
-REA can provide a focused Ghidra session when a question needs one native function or its exact
-instructions. Check `binary_session` first. In `analysis_provider_candidates`, confirm that
-`ghidra` is available and note the reported Ghidra and Java versions. An available candidate is
-not yet the selected provider and does not prove that a particular target can be analyzed.
+Use this path when a question needs one native function or its exact instructions. It assumes the
+REA tools are connected. If they are missing, follow [When REA is not connected](#when-rea-is-not-connected).
 
-Open the exact executable with `open_binary(path=..., provider_id="ghidra")`. Record its reported
-format, architecture and SHA-256. Ghidra completes its default analysis before REA serves
-function results. Then use `analyze_function(procedure="0x...")` for the function identity and
-body, pseudocode, assembly, calls, references, strings and control-flow blocks. Its Evidence
-record carries coverage and limitations; keep the evidence ID with the finding.
-
-For arithmetic, calling-convention or register questions, read every instruction with
-`read_function_instructions(procedure="0x...")` or use `procedure_assembly`. Check the relevant
-instructions against the decompiler's claims. REA is useful for a focused trace; use GameFrame's
-Ghidra export for repeated whole-program searches and the emulator for measured behavior.
-
-Before closing, use `export_evidence_bundle(path=...)` when the evidence must persist. The
-provider's imported program and project are temporary; closing the session removes them. Store
-target-derived evidence under an ignored analysis directory, never in tracked files.
+1. Check the active session with `binary_session`. Then call `analysis_provider_candidates` and
+   confirm that `ghidra` is available. Note the reported Ghidra and Java versions. Availability
+   describes the local provider; it does not prove that a particular binary can be analyzed.
+2. If `ghidra` is unavailable or `open_binary` returns `provider_unavailable`, inspect
+   `details.rejections` and the provider's `diagnostics`. Run `rea doctor` in the same environment
+   that starts REA. See [re-setup](re-setup/SKILL.md) for the versioned, client-specific command
+   and setup options. Set `GHIDRA_INSTALL_DIR` to the extracted Ghidra folder and `JAVA_HOME` to
+   JDK 21, unless the diagnostics require different versions. The GameFrame project launcher
+   reads these from its ignored `.env`; the Ghidra folder must contain `support/analyzeHeadless`.
+   Restart the agent after changing the server configuration or its environment, then check
+   provider availability again.
+3. Open the exact executable with `open_binary(path=..., provider_id="ghidra")`. Record its
+   reported format, architecture and SHA-256. Ghidra completes its default analysis before REA
+   serves function results. Start with `binary_overview` when available before asking about a
+   specific function.
+4. Use `analyze_function(procedure="0x...")` for the function identity and body, pseudocode,
+   assembly, calls, references, strings and control-flow blocks. Keep its Evidence ID and note
+   its coverage and limitations with the finding.
+5. For arithmetic, calling-convention or register questions, read every relevant instruction
+   with `read_function_instructions(procedure="0x...")` or `procedure_assembly`. Check those
+   instructions against the decompiler's claims. Use GameFrame's Ghidra export for repeated
+   whole-program searches and the emulator for measured behavior.
+6. Before closing with `close_binary`, use `export_evidence_bundle(path=...)` if the evidence
+   must persist. The imported program and project are temporary; closing the session removes
+   them. Store target-derived evidence under an ignored analysis directory, never in tracked
+   files.
 
 ## Rules that carry over
 
@@ -75,7 +85,9 @@ target-derived evidence under an ignored analysis directory, never in tracked fi
 
 ## When REA is not connected
 
-No REA tools in the session (no `mcp__rea__*` in Claude Code) means the MCP server is not enabled
+No REA tools in the session (no `mcp__rea__*` in the client) means the MCP server is not enabled
 or did not start. If REA would help, enable it with `./gameframe mcp --enable rea`, then restart
-the agent session. Follow `re-setup` section 3 to install it. Meanwhile, continue with GameFrame's own tools: Ghidra export,
-`decomp_query.py`, `ghidra-run.sh` and the emulator cover native binaries completely.
+the agent session. Follow `re-setup` section 3 to install or register it. If REA tools are
+connected but Ghidra is unavailable, use the provider diagnostics in the previous section.
+Meanwhile, GameFrame's Ghidra export, `decomp_query.py`, `ghidra-run.sh` and the emulator cover
+native binaries.

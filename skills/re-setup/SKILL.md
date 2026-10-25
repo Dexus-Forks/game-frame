@@ -97,9 +97,14 @@ Ghidra analysis of a large binary can take minutes, longer than many clients wai
 tool call. Raise the client's tool timeout for REA (in Codex, `tool_timeout_sec` in the
 server's entry).
 
-If REA tools do not appear: restart the agent (MCP servers start with the session), then check
-`npx -y rea-agents@6.7.0 doctor --client claude_code --json`. A tool that reports
-`provider_unavailable` usually means Ghidra or Java is not where `.env` says.
+If REA tools do not appear, first restart the agent because MCP servers start with the session.
+Then check the REA registration for that client with
+`npx -y rea-agents@6.7.0 doctor --client CLIENT --json`, replacing `CLIENT` with its name from
+the setup list above. If the tools connect but report `provider_unavailable`, inspect the
+rejection diagnostics. They identify which provider check failed. For a GameFrame project
+server, correct `GHIDRA_INSTALL_DIR` or `JAVA_HOME` in the project's ignored `.env`; for REA's
+own user-level server, use REA's setup for that client. Restart the agent after changing the
+server configuration or its environment, then run the doctor check again.
 
 ## 4. DOS games: DOSBox-X and its debugger
 

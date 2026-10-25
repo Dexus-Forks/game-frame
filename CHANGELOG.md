@@ -9,10 +9,11 @@ Every release of GameFrame, newest first. The format follows
 
 ### Changed
 
-- The REA skill now documents how to check Ghidra provider readiness, open an explicit Ghidra
-  session, inspect a native function and its raw instructions, retain the Evidence bundle, and
-  close the temporary project. It separates focused REA analysis from whole-program Ghidra
-  searches and emulator measurements.
+- The REA workflow documents Ghidra readiness checks, recovery from `provider_unavailable`,
+  explicit provider selection, function and instruction inspection, evidence export, and session
+  cleanup. The setup guide separates a missing MCP connection from provider configuration errors
+  and points to the right diagnostics and local paths. The guides distinguish focused REA analysis
+  from whole-program Ghidra searches and emulator measurements.
 
 ## [1.3.0] - 2026-10-25
 
