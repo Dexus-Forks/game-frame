@@ -46,6 +46,10 @@ name = "gameframe-scale"
 version = "0.1.0"
 
 [[package]]
+name = "gameframe-sn76496"
+version = "0.1.0"
+
+[[package]]
 name = "gameframe-sound-blaster"
 version = "0.1.0"
 dependencies = [

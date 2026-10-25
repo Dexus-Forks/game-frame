@@ -33,6 +33,16 @@ model includes the common CMS detection-port response reported by a compatible-c
 noise seed, combined tone/noise gate, full custom-chip behavior, bus waits and analog output still
 have software-only follow-up checks. See the [CMS/SAA1099 evidence and check plan](cms-saa1099.md).
 
+## PCjr and Tandy 1000 PSG
+
+The IBM PCjr and early Tandy 1000 use the TI SN76496 family for three tone channels and one noise
+channel. The [`gameframe-sn76496` crate](../../crates/sn76496/README.md) models the serial register
+protocol and sample generation. The Tandy adapter maps writes at `C0h`–`C7h` and exposes the
+service manual's approximate 42 CPU wait states. Static traces of Sierra's original `JR.DRV` and
+`TANDY.DRV` confirm tone latch/data writes, attenuation writes and three-channel mute setup. Noise
+feedback details, period-zero behavior, board mixing and exact output parity remain open with
+software-only checks. See the [Tandy PSG findings and check plan](tandy-psg.md).
+
 ## FM synthesis (OPL2 and OPL3)
 
 ![An OPL2 voice: a modulator, a carrier and their envelopes](../assets/diagrams/opl2-operators.svg)

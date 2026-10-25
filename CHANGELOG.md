@@ -9,6 +9,14 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `gameframe-sn76496` adds an initial TI SN76496 tone/noise model, a PCjr adapter at `C0h` and a
+  Tandy 1000 write-port adapter for `C0h`–`C7h`. The Tandy adapter exposes the service manual's
+  approximate 42 CPU wait states. Static traces of Sierra's original `JR.DRV` and `TANDY.DRV`
+  confirm its tone latch/data writes, attenuation writes and three-channel startup mute. Noise
+  details, period-zero behavior, sample
+  parity, CPU timing and board audio routing have software-only follow-up checks; physical testing
+  is optional.
+
 - `gameframe-saa1099` adds a Philips SAA1099 stereo sound generator and a two-chip Creative Music
   System/Game Blaster port model. It applies tone and octave writes at generator transitions,
   buffers envelope controls to waveform boundaries and models common CMS detection-port behavior.

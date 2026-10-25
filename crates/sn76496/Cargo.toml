@@ -1,0 +1,10 @@
+[package]
+name = "gameframe-sn76496"
+description = "TI SN76496 programmable tone/noise generator with PCjr and Tandy 1000 port models"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["sn76496", "sn76489", "tandy", "pcjr", "audio"]
+categories = ["emulators", "multimedia::audio"]
