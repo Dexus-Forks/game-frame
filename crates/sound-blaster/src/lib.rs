@@ -11,6 +11,7 @@ mod fm;
 mod mixer;
 mod mpu;
 pub mod win16_aux;
+pub mod win16_midi_output;
 pub mod win16_wave;
 pub mod win16_wave_input;
 
@@ -28,6 +29,20 @@ pub use win16_aux::{
     AuxiliaryVolumeOperation, ImmediateApply, LowerServiceState, LowerServiceVolumeUpdate,
     StereoVolume, VolumeState, Win16Aux, AUXILIARY_UNIT_COUNT, AUX_VOLUME_QUERY_MESSAGE,
     AUX_VOLUME_UPDATE_MESSAGE,
+};
+pub use win16_midi_output::{
+    CallbackInfo as MidiOutputCallbackInfo, CallbackTargetState as MidiOutputCallbackTargetState,
+    DeviceContextState as MidiOutputDeviceContextState,
+    FailedInitializationContext as MidiOutputFailedInitializationContext,
+    LowerAudioState as MidiOutputLowerAudioState, MidiOutputOpenReply, MidiOutputOpenRequest,
+    OpenCallback as MidiOutputOpenCallback, PortInitialization as MidiOutputPortInitialization,
+    PortStateAllocation as MidiOutputPortStateAllocation,
+    ReentrancyDecision as MidiOutputReentrancyDecision, ShortMessageReply, ShortMessageRequest,
+    ShortMessageStatusEffect, StatusByteState, SystemStatusEffect as MidiOutputSystemStatusEffect,
+    Win16MidiOutput, MIDI_OUTPUT_CALLBACK_VALUE_OPEN, MIDI_OUTPUT_STATUS_INITIALIZATION_FAILED,
+    MIDI_OUTPUT_STATUS_INVALID_PORT_OR_CONTEXT, MIDI_OUTPUT_STATUS_LOWER_SERVICE_UNAVAILABLE,
+    MIDI_OUTPUT_STATUS_REENTRANCY_REJECTED, MIDI_OUTPUT_STATUS_STATE_ALLOCATION_FAILED,
+    MIDI_OUTPUT_STATUS_SUCCESS,
 };
 pub use win16_wave::{
     open_wave_output, ActiveStreamState, CallbackDelivery, CallbackTargetState,
