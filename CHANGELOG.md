@@ -15,6 +15,38 @@ Every release of GameFrame, newest first. The format follows
   Sound Blaster DSP/DMA, GF1 and MIDI work. It records the clean-implementation process and
   owner-selected licensing options.
 
+- `gameframe-opl3` adds a YMF262 chip model with two register banks, 18 channels, six selectable
+  four-operator pairs, four connection algorithms, eight waveforms, four output words,
+  OPL2 compatibility mode, shared note-select, timers, indexed I/O ports with timestamped
+  write-spacing checks, and serial DAC frames. Timer divider phase resets when a timer starts. It reuses
+  GameFrame's OPL2 engine and follows Yamaha's datasheet and YM3812 Application Manual. An original
+  AdLib Gold Windows driver trace records its register write path, voice pools, busy polling and
+  second data-port reads. The AdLib Gold Control Chip and port overlay are modeled separately in
+  `gameframe-adlib-gold`. Independent four-operator carrier routing, physical parity, YAC512 analog
+  conversion and card-level audio processing remain open.
+
+- `gameframe-yac512` adds a clean model of the YAC512's LSB-first serial receiver, offset-binary or
+  two's-complement input selection, falling-edge channel latches and held digital input words. The
+  floating DAC transfer and analog sample-and-hold stage stay documented as open behavior because
+  Yamaha's available datasheet does not provide the conversion formula. The open-question page
+  proposes software-only protocol and integration checks; physical hardware testing is optional.
+
+- `gameframe-adlib-gold` combines the YMF262 with the documented AdLib Gold Control Chip port
+  overlay, status, register reads/writes, EEPROM save/restore commands and audio-port relocation.
+  The Developer Toolkit v1.01 resolves the Windows driver's `0xFF`/`0xFE` bank switches and second
+  data-port reads. It routes the MMA at offsets `+4` through `+7` and feeds its sampling request
+  into Control Chip status. `mix_sources()` now applies the documented linear source-volume,
+  speaker/microphone/telephone routing, output-channel selection, forced mono, mute and final
+  output-volume controls. Analog tone and spatial processing remain documented limits.
+
+- `gameframe-ymz263` adds the YMZ263B/MMA digital model used by AdLib Gold. It includes dual
+  128-byte PCM/ADPCM FIFOs, documented rates and sample layouts, timer counters, per-channel DMA
+  request state, MIDI FIFOs and timestamped UART output. A static trace of the original GSS Wave/MIDI
+  driver confirms its two index/data pairs and timer, sample and MIDI register use. EEPROM save
+  latency stays configurable because its duration is unspecified. Analog mixer/filter behavior,
+  external DMA/IRQ delivery and chip details needing software comparison are documented as open;
+  physical hardware tests are not required.
+
 - `sgl.dll` draws the immediate mode's shadow and light volumes (`sgltri_shadow`), which it
   only counted before. Each call's faces become the planes of one convex volume, oriented as
   PowerVR's driver orients them, and every pixel is tested against them: a shadow multiplies

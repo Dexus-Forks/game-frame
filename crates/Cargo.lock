@@ -3,6 +3,14 @@
 version = 3
 
 [[package]]
+name = "gameframe-adlib-gold"
+version = "0.1.0"
+dependencies = [
+ "gameframe-opl3",
+ "gameframe-ymz263",
+]
+
+[[package]]
 name = "gameframe-gpu-1997"
 version = "0.1.0"
 
@@ -23,6 +31,13 @@ name = "gameframe-opl2"
 version = "0.1.0"
 
 [[package]]
+name = "gameframe-opl3"
+version = "0.1.0"
+dependencies = [
+ "gameframe-opl2",
+]
+
+[[package]]
 name = "gameframe-scale"
 version = "0.1.0"
 
@@ -32,4 +47,12 @@ version = "0.1.0"
 
 [[package]]
 name = "gameframe-wma"
+version = "0.1.0"
+
+[[package]]
+name = "gameframe-yac512"
+version = "0.1.0"
+
+[[package]]
+name = "gameframe-ymz263"
 version = "0.1.0"

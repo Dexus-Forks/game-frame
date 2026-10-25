@@ -1,0 +1,10 @@
+[package]
+name = "gameframe-yac512"
+description = "Yamaha YAC512 serial input and sample latch model"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["yac512", "ymf262", "dac", "audio"]
+categories = ["emulators", "multimedia::audio"]

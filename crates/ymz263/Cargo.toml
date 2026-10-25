@@ -1,0 +1,12 @@
+[package]
+name = "gameframe-ymz263"
+description = "Yamaha YMZ263B (MMA) PCM/ADPCM, FIFO, timer, MIDI and indexed-port model"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["ymz263", "mma", "adlib-gold", "pcm", "adpcm"]
+categories = ["emulators", "multimedia::audio"]
+
+[dependencies]

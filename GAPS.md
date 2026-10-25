@@ -68,7 +68,38 @@ proposed again.
 
 - [x] Map common PC audio device families by era, separate chip emulation from card behavior,
   compatibility libraries and host output, and record current GameFrame coverage
-- [ ] YMF262 OPL3 synthesis and register behavior, with a proof against a named reference
+- [x] Implement the documented YMF262 register banks, two- and four-operator synthesis, eight
+  waveforms, four output words, compatibility mode, timers, indexed ports and serial DAC frames
+  (`gameframe-opl3`). Software tests cover native output routing and mode-gated pair selection.
+- [x] Implement YAC512 serial input, FSEL decoding and channel latches (`gameframe-yac512`);
+  software tests cover bit order, channel latches and captured FSEL mode. Its floating-DAC
+  transfer remains open with software-only checks documented.
+- [ ] Establish the YAC512 floating-DAC transfer curve from reliable specifications or a named
+  software reference ([test plan](docs/hardware/ymf262-open-questions.md)); physical testing is not
+  a blocker
+- [ ] Verify how four-operator carrier groups use the paired `C0` output selectors across YMF262
+  outputs A–D. The AdLib Gold Toolkit documents its D4/D5 stereo rule; a software black-box capture
+  can resolve the remaining four-output mapping ([test plan](docs/hardware/ymf262-open-questions.md));
+  physical hardware testing is not a blocker
+- [ ] Compare YMF262 output and access timing against a named software reference when useful; this
+  is not a release blocker and physical hardware testing is optional
+- [x] Implement the documented AdLib Gold Control Chip bank switch, register/status access,
+  EEPROM commands and audio-port relocation (`gameframe-adlib-gold`). Software tests cover the
+  busy windows, restore, relocation, mixer controls and MMA-to-Control-Chip interrupt path. The
+  Developer Toolkit resolves the driver's `0xFE`/`0xFF` toggles and second data-port reads.
+- [ ] Compare those card paths with the original GSS drivers under an instrumented NE emulator;
+  external DMA/IRQ delivery and revision-specific defaults remain open. Physical testing is not
+  required.
+- [x] Add the YMZ263B/MMA digital model and route its ports and sampling interrupt through
+  `gameframe-adlib-gold`; implement the documented FIFO, rate, timer and MIDI surfaces
+- [x] Apply AdLib Gold's documented linear source volumes, speaker/microphone/telephone gates,
+  output channel selection, forced mono, mute and final volume controls in `mix_sources()`
+- [ ] Compare YMZ263 ADPCM rounding, interleave parity and FIFO threshold transitions against the
+  original GSS Wave/MIDI driver or a named software reference. The digital status map and MIDI
+  request masks follow the toolkit. Add software-only checks as behavior is resolved; physical
+  hardware is not required.
+- [ ] Model TDA8425 tone and pseudo/spatial processing, analog filter/ADC paths and connect external
+  DMA/IRQ controllers where software call paths establish their card-specific behavior
 - [ ] PC speaker, Tandy PSG, CMS/SAA1099 and LPT DAC components
 - [ ] Sound Blaster DSP generations, DMA, mixer and IRQ timing, layered over OPL2/OPL3
 - [ ] Gravis UltraSound GF1 and InterWave voice, memory and interrupt behavior

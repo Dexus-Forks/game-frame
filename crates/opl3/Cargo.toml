@@ -1,0 +1,13 @@
+[package]
+name = "gameframe-opl3"
+description = "Yamaha YMF262 (OPL3) FM synthesis with four output channels and indexed ports"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["opl3", "ymf262", "sound-blaster", "fm-synthesis", "emulation"]
+categories = ["emulators", "multimedia::audio"]
+
+[dependencies]
+gameframe-opl2 = { path = "../opl2" }

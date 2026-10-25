@@ -33,8 +33,23 @@ which frequency, which instrument settings, key on and key off. The chip turns t
   emulator. This is exact ground truth for the music code, independent of the chip.
 - **Port the music driver** so it produces the same writes at the same times. Compare the two
   lists write by write.
-- **Emulate the chip** in the port to turn writes into samples. Good OPL emulators (Nuked OPL3,
-  DOSBox's) are close to the real chip; Nuked OPL3 aims at exact output.
+- **Emulate the chip** in the port to turn writes into samples. `gameframe-opl2` covers the
+  YM3812, including CSM speech mode and its timer-triggered key pulses. `gameframe-opl3` models
+  both YMF262 register banks, two- and four-operator voices, four sample outputs, OPL2
+  compatibility mode, shared note selection, timers and indexed ports. Its status signature
+  stays distinct from the YM3812 in compatibility mode, and it omits the YM3812's CSM feature.
+  The original AdLib Gold `GSSOPL3.DRV` binary documents its banked writes, busy polling, second
+  data-port reads and setup of registers `0x104` and `0x105` ([trace](adlib-gold-gssopl3.md)). The
+  Ad Lib Gold Developer Toolkit identifies the second-bank `0xFF`/`0xFE` switches as Control Chip
+  access and documents its status and registers. `gameframe-adlib-gold` models that port overlay
+  and register interface around `gameframe-opl3`. The chip model follows Yamaha's datasheet
+  through its serial DAC interface. `gameframe-yac512` models the external DAC's serial input,
+  FSEL decoding and sample latches. `gameframe-ymz263` models the AdLib Gold's digital PCM/ADPCM
+  channels, FIFOs, timers, DMA request state and MIDI UART. The card routes the MMA ports and
+  sampling interrupt. YMZ263 ADPCM rounding, interleave and some status details still need a
+  software comparison. Independent carrier routing in four-operator mode, output parity, YAC512's
+  floating analog transfer, AdLib Gold analog mixer/filter behavior and analog input paths remain
+  open.
 - The driver's tempo usually comes from a timer interrupt the game programmed. Find the
   interrupt rate and the driver's tick counter. Small errors in the rate change the music's
   speed over a song.

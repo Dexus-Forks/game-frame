@@ -8,7 +8,7 @@ Blaster family. DOS games play their music by writing to the chip's registers. G
 - It models what the published die and datasheet analyses describe: the log-sine and exponent
   tables, the phase generators with vibrato, the envelope generator with its global counter,
   the four waveforms, feedback, FM and additive connections, rhythm mode, the noise generator,
-  and the two timers with the status register.
+  the two timers with the status register, and timer-1 CSM key pulses.
 - Everything is integer and deterministic. The same writes give the same samples on every
   platform, including WebAssembly.
 - A band-limited resampler converts the output to 44.1 or 48 kHz without aliasing. It can adjust its ratio a little to keep a host's audio buffer steady.
@@ -66,8 +66,14 @@ from the timer programming; a small error changes a song's length.
 ## Not modelled
 
 - The YM3014 DAC and the card's analogue stage. The output is the chip's 16-bit digital sum.
-- CSM speech mode (register 08h bit 7), which games rarely use.
-- The OPL3 (YMF262). Its extra channels, waveforms and stereo are not here.
+- OPL3 four-operator channel linking and its four routed outputs. The sibling `gameframe-opl3`
+  crate adds two-bank YMF262 playback, OPL2 compatibility mode and the four native output
+  channels.
+
+Register 08h bit 7 implements CSM speech mode. Timer 1 overflow pulses key-on across the operator
+bank, followed by key-off on the next generated sample. This sample-boundary timing is a
+discrete approximation of the immediate key-off in Yamaha's [YM3812 Application
+Manual](https://c64.xentax.com/media/Yamaha_YM3812_Application_Manual.pdf).
 
 ## Tests
 
