@@ -85,6 +85,9 @@ does not carry a block length.
   descriptors. It validates shapes and limits, returns stored values, and emits opaque apply and
   client-notification events. The master-volume control ID, channel mapping, and gain scale remain
   unknown.
+- A logical Win16 SB16 FM synth wrapper open and packed short-message transform with driver-global
+  retained-status state. It does not model the delegated synth service, note conversion, or OPL
+  register writes.
 - SB16 MPU-401 UART reset, UART-mode acknowledgement, readiness status, input/output and interrupt
   state. Its output-ready interval can be configured with `set_write_busy_ns`; the default is zero
   because the programming reference gives no byte duration.
