@@ -9,7 +9,7 @@ mod routing;
 mod tandy;
 
 pub use chip::{Sn76496, Sn76496Sample, TANDY_PSG_CLOCK_HZ, TONE_CLOCK_DIVIDER};
-pub use routing::{PcjrAudioMux, PcjrAudioSource};
+pub use routing::{PcjrAudioMux, PcjrAudioSource, TandyAudioOutputMux, TandyAudioSource};
 pub use tandy::{PcjrPsgCard, TandyPsgCard, TANDY_PSG_WRITE_WAIT_STATES};
 
 /// Whether a PSG machine port drives the data bus during an input read.

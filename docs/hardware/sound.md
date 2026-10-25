@@ -41,10 +41,12 @@ protocol, input-clock advancement, sample generation and the PCjr four-source ou
 by port `61h` bits 5–6. The Tandy adapter maps writes at `C0h`–`C7h`, routes PIT channel 2 to
 the chip's AUDIO IN pin and exposes the service manual's approximate 42 CPU wait states. Static
 traces of Sierra's original `JR.DRV` and `TANDY.DRV` confirm tone latch/data writes, attenuation
-writes, startup mutes and PSG-output selection. Tandy has a separate output mux whose full source
-table remains open. Tandy 1000 HX documentation identifies an NCR 8496, while later PSSJ machines
-add an 8-bit DAC. Those variants, noise feedback details, period-zero behavior and analog output
-still need software-only comparisons. See the [Tandy PSG findings and check plan](tandy-psg.md).
+writes, startup mutes and PSG-output selection. The Tandy external-output mux routes PIT channel 2,
+bus Audio In or the complex sound generator using its documented `00b`, `10b` and `11b` selections;
+the fourth input remains unidentified. Tandy 1000 HX documentation identifies an NCR 8496, while
+later PSSJ machines add an 8-bit DAC. Those variants, noise feedback details, period-zero behavior
+and analog output still need software-only comparisons. See the
+[Tandy PSG findings and check plan](tandy-psg.md).
 
 ## FM synthesis (OPL2 and OPL3)
 

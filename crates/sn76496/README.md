@@ -12,6 +12,7 @@ PCjr and original Tandy 1000 interfaces documented here.
 - An IBM PCjr adapter for the write-only PSG port `C0h`.
 - An original Tandy 1000 adapter for writes to the eight decoded ports `C0h` through `C7h`.
 - The PCjr port `61h` output mux for timer 2, cassette, I/O-channel audio and PSG output.
+- The original Tandy 1000 external Audio Out mux for PIT channel 2, bus audio input and PSG output.
 - The service manual's approximate 42 CPU wait states per PSG write, exposed for the host machine
   adapter to apply.
 - The TI READY interval of 32 input clock cycles, exposed as `ready()` and
@@ -39,7 +40,9 @@ It contains no copied emulator code. The software-only follow-up plan is in
 - `TANDY_PSG_WRITE_WAIT_STATES` is the service manual's approximate value. A machine adapter still
   has to turn it into the selected CPU's bus timing.
 - The PCjr `PcjrAudioMux` selects one of four normalized sources. Tandy has a separate analog
-  output mux, speaker path and filtering; its complete source mapping remains open.
+  output mux and speaker path. The Tandy BIOS documents three mux selections. Its fourth analog
+  input is not identified, so `TandyAudioOutputMux::route_sample` returns `None` for that select
+  code. The speaker path and filtering remain separate host behavior.
 - Later Tandy PSSJ hardware, including its additional 8-bit DAC, is outside this crate.
 - Tone period zero is treated as a constant-high tone. This is a deterministic placeholder. The
   manuals do not define its output; the software-only check plan records how to resolve it.

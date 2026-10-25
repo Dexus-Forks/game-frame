@@ -109,11 +109,12 @@ proposed again.
   DTACK timing with a cycle-counted fake bus. The original custom-chip state machine and analog
   output remain documented software-only work ([findings](docs/hardware/cms-saa1099.md)).
 - [x] Add the TI SN76496 model, PCjr and original Tandy port adapters, input-clock advancement and
-  PCjr port 61h output mux (`gameframe-sn76496`). Sierra's original `JR.DRV` and `TANDY.DRV`
-  binaries confirm register writes, startup mutes and PSG-source selection.
+  PCjr and Tandy port 61h output muxes (`gameframe-sn76496`). Sierra's original `JR.DRV` and
+  `TANDY.DRV` binaries confirm register writes, startup mutes and PSG-source selection.
 - [ ] Compare the TI SN76496 against software-emulator captures and resolve its noise taps/seed,
-  period-zero behavior and sample parity. Record the NCR 8496 and PSSJ differences as separate
-  profiles when software references establish them; physical testing is not required
+  period-zero behavior and sample parity. Identify the undocumented fourth Tandy output-mux input.
+  Record the NCR 8496 and PSSJ differences as separate profiles when software references establish
+  them; physical testing is not required
   ([findings](docs/hardware/tandy-psg.md)).
 - [ ] PC speaker/PIT audio and LPT DAC components
 - [x] Add a reusable Sound Blaster DSP, mixer and SB16 MPU-401 UART model for Creative DSP

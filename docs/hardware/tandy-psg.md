@@ -19,6 +19,7 @@ feedback taps, zero-period behavior or power-up contents.
 | Tone counters use the reference clock divided by 16; nonzero period n gives N/(32n). Fixed noise rates are N/512, N/1024 and N/2048. | [TI SN76489AN data sheet](https://map.grauw.nl/resources/sound/texas_instruments_sn76489an.pdf) | Operation: tone generators, noise generator and CPU interface |
 | PCjr port 61h bits 5–6 select timer 2, cassette input, I/O-channel audio or the SN76496. | [IBM PCjr Technical Reference](https://bitsavers.trailing-edge.com/pdf/ibm/pc/pc_jr/PCjr_Technical_Reference_Nov83.pdf) | PPI Port B and Sound Subsystem |
 | The original Tandy 1000 routes PIT channel 2 into the sound chip's external input and uses a separate external-output mux controlled by 8255 PB5/PB6. | [Tandy 1000 service manual](https://ftp.oldskool.org/pub/drivers/Tandy/1000/Tandy_1000_Service_Manual.pdf) | Keyboard/Timer/Sound Circuits, pp. 32–35 |
+| Tandy BIOS audio source `00h` selects PIT channel 2, `02h` selects bus Audio In and `03h` selects the complex sound generator. | [Tandy 1000 MS-DOS Programmer's Reference Manual](https://manualzz.com/doc/55015064/tandy-1000-ms-dos-programmer-s-reference-manual) | INT 1Ah, function `80h`, p. 209 |
 | The Tandy 1000 HX identifies an NCR 8496 and describes its output stage. | [Tandy 1000 HX Technical Reference](https://www.manualslib.com/manual/1366743/Tandy-1000-Hx.html) | Sound Generator, §2.6, p. 323 |
 
 The GameFrame implementation lives in [`gameframe-sn76496`](../../crates/sn76496/README.md).
@@ -30,10 +31,16 @@ sequence and the initial attenuation state remain implementation choices pending
 Port `61h` bits 5 and 6 select the output sent to the PCjr audio outputs. The new `PcjrAudioMux`
 implements this digital selection: `00b` selects timer 2, `01b` cassette input, `10b` I/O-channel
 audio and `11b` the PSG. The Tandy 1000 service manual shows a separate external-output mux
-controlled by port 61h bits 5 and 6. It identifies the PSG, timer 2 and external audio as sources,
-but does not provide the full selection table. Both Sierra drivers set bits 5 and 6 during sound
-initialization. Other port 61h behavior, source generation, analog gain and filtering remain with
-the host machine model.
+controlled by port 61h bits 5 and 6. The Tandy BIOS sound-multiplexer service documents `00b` as
+PIT channel 2, `10b` as bus Audio In and `11b` as the complex sound generator. The new
+`TandyAudioOutputMux` routes those three external Audio Out sources. The manual does not identify
+the fourth mux input at `01b`; `route_sample` returns `None` for that selection. The complex sound
+generator input includes the signal at the SN76496 AUDIO IN pin, which the service manual connects
+to PIT channel 2. Bus Audio In is a separate external source at connector pin B08. Both Sierra
+drivers set port 61h bits 5 and 6 during sound initialization, selecting the complex sound
+generator. Treating BIOS source codes as the port 61h select values is an inference from the
+matching codes and PPI wiring; software capture can confirm it. Other port 61h behavior, source
+generation, analog gain and filtering remain with the host machine model.
 
 The Tandy 1000 service manual maps writes to the SN76496 at `C0h`–`C7h`. Those addresses alias the
 same device. The service manual says the chip select is write-only and about 42 CPU wait states
@@ -43,8 +50,9 @@ machine adapter to apply.
 
 The SN76496 AUDIO IN pin can be mixed with its four generated channels. The crate accepts a
 normalized sample at that pin. The Tandy 1000 service manual routes PIT channel 2 to this input.
-The board's external-output mux is a separate path. The PCjr source table is implemented; the
-Tandy table remains open.
+The board's external-output mux is a separate path. The PCjr and documented Tandy source
+selections are implemented. The Tandy selection `01b`, the internal speaker control path and
+analog gain/filtering remain open.
 
 The original Tandy 1000 service manual identifies an SN76496 and documents its port range and wait
 states. The Tandy 1000 HX Technical Reference identifies an NCR 8496 instead. The TI profile here
@@ -99,10 +107,11 @@ is optional.
 4. Exercise all four fixed noise rates, tone-3 clocking, periodic and white noise, and repeated
    noise-register writes. Compare captured samples with software-emulator output; record the
    reference profile because TI does not publish the taps or seed.
-5. Verify the PCjr port 61h mux with four distinct generated sources. For Tandy, capture each
-   port 61h selection and compare the PSG, timer 2 and external audio routes against a software
-   Tandy model. Compare the Tandy 1000 HX profile separately for its NCR 8496 behavior. Keep output
-   gain and filtering separate from digital chip state.
+5. Verify the PCjr port 61h mux with four distinct generated sources. For the original Tandy,
+   exercise port 61h selections `00b`, `10b` and `11b` and compare PIT 2, bus Audio In and PSG
+   output in a named software model. Probe `01b` in that model or through a BIOS `INT 1Ah` call to
+   identify the undocumented fourth mux input. Compare the Tandy 1000 HX profile separately for
+   its NCR 8496 behavior. Keep output gain and filtering separate from digital chip state.
 
 ## Open questions
 
@@ -110,6 +119,9 @@ is optional.
 - What tone output does zero period produce, and what is the initial phase?
 - Does the 32-clock TI READY interval exactly account for the board's approximate 42 CPU waits, or
   does the Tandy bus add extra cycles under some CPU profiles?
+- What signal is connected to Tandy external-audio mux input `01b`? The 1984 BIOS reference lists
+  source codes `00h`, `02h` and `03h` only. A software-only port 61h probe or BIOS call can capture
+  the missing behavior; no physical card is needed.
 - How does the NCR 8496 differ from TI for noise reset, feedback taps and output polarity?
 - Which later Tandy models use the PSSJ audio block, and what are its DAC and port behaviors?
 - What gain and filtering does each board's input and output path apply?
