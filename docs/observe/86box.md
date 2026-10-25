@@ -42,9 +42,11 @@ before depending on either debugger.
 
 86Box also has an optional GDB stub in source builds. A project maintainer described enabling it
 with the `GDBSTUB` build option and attaching a GDB-compatible debugger. This gives machine-level
-access such as stepping and port I/O, not the guest's Win16 source symbols. It is not integrated
-into GameFrame's MCP configuration today. See the [86Box discussion](https://github.com/86Box/86Box/discussions/7090)
-and the [debugger guide](debuggers.md) for the current scope.
+access such as stepping and port I/O, not the guest's Win16 source symbols. The current
+`.mcp.json` does not expose 86Box control. It is a candidate adapter for the broader MCP tool
+surface; first confirm a stable control protocol and test its operations against disposable VM
+clones. See the [86Box discussion](https://github.com/86Box/86Box/discussions/7090) and the
+[debugger guide](debuggers.md) for the current scope.
 
 ## Record the setup
 

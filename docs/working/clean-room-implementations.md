@@ -127,11 +127,22 @@ lists CodeView for Windows and WDEB386. The archived
 documents WDEB386's serial-terminal connection. Confirm the available tool media and VM wiring
 before investing in setup.
 
-The repository's `.mcp.json` defines server entries for REA, DOSBox-X and GameFrame's own
-discovery service. A configured server may not have a live process attached, so check its ping
-before using live debugger commands. No external machine or 86Box endpoint was named for this
-project, so there is no project-specific external connector to configure yet. Add an adapter only
-after the target, protocol and testable use case are known.
+The repository's `.mcp.json` defines servers for REA, DOSBox-X and GameFrame's discovery service.
+They cover separate parts of the workflow, and a configured server may not have a live process
+attached. Check connection status before using live commands.
+
+MCP should become the agent-facing surface for the full GameFrame toolchain. The target is to
+cover every stable GameFrame capability and make configured external tools discoverable through
+the project's MCP setup. This includes inventory and triage, binary analysis, format decoding,
+emulation and observation, debugger control, verification, clean-room packet handling and project
+records. Each operation should report its inputs, connection state, output paths and evidence
+provenance. Long-running work should report progress and support cancellation. Keep the command
+line tools available, with MCP operations calling the same underlying implementations.
+
+Grow coverage in phases. Start with reliable emulator and debugger control, including an 86Box
+adapter when its control protocol can be tested. Then fill gaps across the remaining tools and
+configured MCP providers. Project configuration should let agents discover which tools are
+available for that machine and task.
 
 ## Lessons from the audio-driver work
 

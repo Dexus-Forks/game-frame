@@ -169,10 +169,13 @@ proposed again.
   files, hashes the packet, and records excluded source artifacts. Test it against repository
   samples before use. Until then, follow the manual
   [packet checklist](skills/re-cleanroom/references/packet-checklist.md).
-- [ ] Add a reusable 86Box debugger connector only after a stable, testable control protocol is
-  selected. DOSBox-X already has debugger scripts and an MCP channel; current 86Box workflows use
-  the emulator separately. Keep named external machine integrations project-specific until their
-  endpoint and access method are known.
+- [ ] Make MCP the agent-facing surface for the full GameFrame toolchain. Expose every stable
+  capability through typed operations for inventory and triage, binary analysis, format decoding,
+  emulation and observation, debugger control, verification, clean-room packets and project
+  records. Discover configured external MCP providers and report each server's connection state.
+  Keep the CLI available and share the underlying implementations. Add sample-based coverage for
+  new operations. Grow the emulator and debugger adapters first, including 86Box after a stable,
+  testable control protocol is selected.
 
 - [x] `tools/pe/relocs.py`: pointers in data from base relocations
 - [x] `tools/pe/peinfo.py`: delay-loaded imports, relocation count
