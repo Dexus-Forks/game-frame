@@ -71,6 +71,9 @@ does not carry a block length.
 - A logical Win16 SB16 auxiliary volume surface for unit count, stereo volume queries, and update
   requests. It preserves unknown initial values and selector 7 behavior. It does not implement the
   Win16 driver ABI or the lower sound-driver service.
+- A logical Win16 SB16 wave-output open/query and prepared-header queue model. It records observed
+  status and flag changes, but does not implement the driver ABI, full PCM format matrix, lower
+  service, completion callbacks, or timing.
 - SB16 MPU-401 UART reset, UART-mode acknowledgement, readiness status, input/output and interrupt
   state. Its output-ready interval can be configured with `set_write_busy_ns`; the default is zero
   because the programming reference gives no byte duration.
