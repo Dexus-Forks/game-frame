@@ -54,6 +54,8 @@ In my GameFrame project, find every place the game touches hardware.
   GameFrame coverage today and priorities for the next hardware models and replacements.
 - [Sound Blaster DSP, mixer and MPU-401](sound-blaster-dsp.md): the new Creative card model,
   its programming reference, tested interface paths, remaining limits and software-only checks.
+- [Creative SBBASIC driver package](sbbasic-driver-interface.md): source provenance, a hash-verified
+  package copy and the remaining DOSBox-X extraction step. No driver behavior is claimed yet.
 - [The sound card makers' APIs](sound-card-apis.md): the Maxi Sound 64, A3D, EAX, the AWE's
   SoundFont Manager, Sensaura and QSound: how a game finds each, what Wine offers, and which
   can be stood in for.

@@ -33,6 +33,11 @@ Every release of GameFrame, newest first. The format follows
   assessment limits, the clean-implementation boundary, ADPCM/analog/timing limits, and software-
   only follow-up checks. Physical card testing is optional.
 
+- An investigation of Creative's SBBASIC SB16/SB32/AWE32 package verifies the archive hash and
+  release metadata. Its driver payload remains inside TTComp `.PVL` archives until the DOSBox-X
+  installer can be driven to a temporary destination. The findings document records the exact
+  software-only next step; no driver behavior is claimed.
+
 - A PC audio coverage map separates chip crates, card models, compatibility libraries and host
   audio backends. It inventories common PC audio from the speaker and Tandy PSG through Sound
   Blaster, Gravis UltraSound, MIDI modules and late-1990s Windows audio, and prioritizes OPL3,
