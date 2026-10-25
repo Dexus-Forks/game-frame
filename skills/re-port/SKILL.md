@@ -15,6 +15,19 @@ clear names and the target language's own types and structure. By default, do no
 decompiled code into the new code base: it is the original author's work. It is also unreadable. This is the line between a reimplementation and a copy; keep it visible (see
 `docs/LEGAL.md`). If the user chooses otherwise, say this once and follow their decision.
 
+New standalone reimplementations use Rust by default. Rust gives the project native builds
+across platforms and can also target WebAssembly. Follow an explicit language choice from the
+user.
+
+When the user points to an existing source project, first decide what role it has. If the goal is
+to extend that project, work in its language and use its build and test system. If it is a
+reference for a new reimplementation, keep Rust as the default output and set up a small harness
+in the source project's own toolchain. The harness must build or run the source with controlled
+inputs and expose results that the Rust port can compare. Inspect its manifests, build scripts,
+CI and tests first. Reuse the project's commands and toolchain, record their versions, and
+document the exact setup and run steps. Add an adapter only where the existing interfaces do
+not expose the values needed for comparison.
+
 Before you write a sound chip, a codec or a language runtime yourself, check `docs/crates/`:
 GameFrame may already have a checked implementation (OPL2, WMA v2, the MSVC maths functions,
 Turbo Pascal's `Real`). Compare it with your game's version before you rely on it.

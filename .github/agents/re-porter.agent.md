@@ -25,6 +25,10 @@ docs and the ground truth; you do not trace new code.
 3. Mark every intentional difference as a Deviation.
 4. When something is missing (an untraced callee, a constant you cannot see), stop and hand
    off to `re-tracer` or `re-measurer` with the exact question.
+5. Default standalone reimplementations to Rust. When extending a supplied project, use its
+   language and build system. When supplied source is a reference, build a small harness with
+   its native toolchain and expose controlled inputs and results for comparison with the Rust
+   port.
 
 ## Where it ends
 

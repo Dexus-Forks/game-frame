@@ -141,7 +141,7 @@ to produce, and the pitfalls that cost time.
 | [re-trace](skills/re-trace/SKILL.md) | From a string, import, export or class name to the function, its fields and constants |
 | [re-format](skills/re-format/SKILL.md) | Decode archives, resources and saves; prove decoders on every file |
 | [re-emulate](skills/re-emulate/SKILL.md) | Run original functions under Unicorn for ground truth; trace random draws |
-| [re-port](skills/re-port/SKILL.md) | Reimplement exactly: precision, order of operations, draw order, iteration order; an exact core with commands, digests and a headless runner; additions (multiplayer, mods) kept apart |
+| [re-port](skills/re-port/SKILL.md) | Reimplement exactly, with Rust as the default for new ports; use an existing project's language when extending it, and build a native harness when its source is the reference |
 | [re-cleanroom](skills/re-cleanroom/SKILL.md) | Write a neutral behavior contract in a source-visible role, then implement it in a fresh source-blind role |
 | [re-verify](skills/re-verify/SKILL.md) | Bit-exact parity, draw order, determinism with digests and on every platform, recordings, saves, pictures, version against version, test tiers |
 | [re-land](skills/re-land/SKILL.md) | Document in evidence style, label, commit safely |

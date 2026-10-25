@@ -18,6 +18,11 @@ GOAL: write one paragraph here. For example: "a 1:1 reimplementation of GAME_NAM
 LANGUAGE, reading the player's own data files", or "document the save format", or "a mod
 loader". Say what "done" means and how exact it must be.
 
+New standalone reimplementations default to Rust for cross-platform builds. State another
+language in the goal when the user requests it or wants to extend an existing codebase. If
+non-Rust source is a reference for a new port, set up a small harness in its own toolchain to
+run controlled inputs and collect comparison results (`re-port`).
+
 ### Milestones
 
 The usual order for a new project. Change it to suit the goal; the user decides. Each milestone

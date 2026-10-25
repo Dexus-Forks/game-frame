@@ -9,6 +9,10 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- Porting guidance now defaults new standalone reimplementations to Rust for cross-platform
+  builds. When existing non-Rust source is the reference, it calls for a small harness in that
+  source's own toolchain, with controlled inputs and results the Rust port can compare.
+
 - A clean-room-style workflow with source-visible specification and source-blind implementation
   roles, a behavior-contract template, packet checklist, team guide and emulator/debugger options.
   It records the limits of prompt-based separation and the current gap in packet isolation tools.
