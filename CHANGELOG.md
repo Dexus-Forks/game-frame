@@ -29,8 +29,9 @@ Every release of GameFrame, newest first. The format follows
   CT1335/CT1345/CT1745 mixer registers, SB16 MPU-401 UART, and FM routing through GameFrame's OPL2
   and OPL3 crates. Profiles cover SB Pro 1's dual YM3812 stereo path, Pro 2 YMF262 ports, and SB16
   8/16-bit mono/stereo DMA. DSP MIDI timestamps and UART reset restoration follow the published
-  interface. The docs record the driver-license boundary, ADPCM/analog/timing limits, and
-  software-only follow-up checks. Physical card testing is optional.
+  interface. The docs record preservation context, the bundled driver restriction and its
+  assessment limits, the clean-implementation boundary, ADPCM/analog/timing limits, and software-
+  only follow-up checks. Physical card testing is optional.
 
 - A PC audio coverage map separates chip crates, card models, compatibility libraries and host
   audio backends. It inventories common PC audio from the speaker and Tandy PSG through Sound

@@ -86,6 +86,19 @@ shows this failure in a measured game.
 4. Build tests from generated inputs and measured outputs. Keep game binaries, game captures,
    card firmware and ROM or SoundFont data out of this repository.
 
+Preserving compatibility for discontinued cards can keep old software usable. That purpose informs
+project scope, but does not decide the effect of a license clause by itself. See the
+[interoperability guidance](../LEGAL.md#interoperability) before choosing a method for a particular
+driver package.
+
+Phoenix Technologies' IBM-compatible BIOS work is a documented historical example of a clean-room
+process: one group wrote functional specifications, and a separate group implemented from them.
+This is an industry precedent, not a court ruling or a guarantee about a particular license. See
+the [clean-room background](../LEGAL.md#clean-room-or-not). The Sound Blaster work is a clean
+implementation, not a strict clean room: the same project team can study functional evidence and
+write the implementation. A future strict clean-room effort would need separate people and a
+written specification.
+
 GameFrame-authored code is currently Apache-2.0. The owner can choose to relicense existing work,
 including as `Apache-2.0 OR MIT`, or choose a different scope for new crates. Record the choice
 for each affected crate in its Cargo metadata and README, and update the repository's license

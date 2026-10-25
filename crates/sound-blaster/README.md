@@ -5,9 +5,14 @@ their CT1335/CT1345/CT1745 mixer register interfaces, the SB16 MPU-401 UART port
 YM3812/YMF262 FM synthesizer. It reuses GameFrame's `gameframe-opl2` and `gameframe-opl3` crates.
 
 The command and port model follows Creative's *Developer Kit for Sound Blaster Series, Second
-Edition, Hardware Programming Reference*. The original Creative DOS/Windows driver package was
-located as an interface reference. Its bundled license restricts reverse engineering, so this
-crate does not use its code or contain its binaries. No other emulator source is used.
+Edition, Hardware Programming Reference*. The original Creative DOS/Windows driver package is a
+possible preservation and compatibility target. Its bundled terms contain a reverse-engineering
+restriction. This model did not use the driver binary and the crate contains no package files or
+driver code. The cards are discontinued, so preserving the interface can keep old software
+usable. That purpose informs future work, while the effect of the package terms depends on the
+applicable law and facts. GameFrame records the restriction as a consideration rather than a
+blanket ban. See the [Sound Blaster findings](../../docs/hardware/sound-blaster-dsp.md) and
+[licensing guidance](../../docs/LEGAL.md).
 
 ## Use it
 

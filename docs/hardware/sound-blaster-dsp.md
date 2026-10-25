@@ -17,9 +17,15 @@ license terms. This repository stores no copy of the manual, driver binaries, ca
 files or captures.
 
 The Creative `SBBASIC.EXE` driver package was located as a possible compatibility target. Its
-included license restricts reverse engineering, so its binaries and code were not inspected or
-used. The model was written from the published port and command interface. It does not use another
-emulator's source.
+included terms contain a restriction on reverse engineering. The driver binary was not inspected
+or used for this model, and the crate contains no package files or driver code. The cards are
+discontinued, and this project aims to preserve compatibility with software that still expects
+them. That purpose belongs in the assessment of future work; it does not settle the effect of the
+package terms by itself. GameFrame records the clause as a consideration rather than a blanket
+stop. The current model follows published port documentation and a separate firmware behavior
+trace. It does not use another emulator's source. See the [clean implementation and licensing
+guidance](audio-coverage.md#clean-implementation-and-licensing) for the distinction between this
+process and a strict clean room.
 
 ## Card profiles
 
@@ -153,8 +159,9 @@ both nibbles, continuation blocks and DMA request intervals. Physical testing is
 - Creative, [*Sound Blaster Series Hardware Programming Guide*](https://www.ardent-tool.com/sound/Sound_Blaster_HW_Programming_Guide_1st.pdf):
   profile identification and Appendix A's Pro, Pro 2 and SB16 FM port maps.
 - Creative, [SBBASIC.EXE support listing](https://cn.creative.com/support/downloads/download.asp?DriverLang=2052&searchString=SBBASIC.EXE):
-  package identified for later compatibility work; its included license prevents reverse
-  engineering.
+  package identified as a possible compatibility target; its included terms contain a
+  reverse-engineering restriction. The restriction's effect on preservation work has not been
+  determined here.
 - [CT1741 DSP firmware archive](https://github.com/S95Sedan/CT1741_DSP): v4.05 firmware binary
   used for the static 8051 trace above; firmware ownership remains with Creative Labs.
 
