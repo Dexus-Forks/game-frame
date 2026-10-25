@@ -90,7 +90,9 @@ python3 "$ROOT/scripts/hooks/gates/game_folder.py" mark "$dir"
 # ./gameframe reads GAMEFRAME_ROOT from .env, also from the project's git worktrees. A copied
 # project carries its own tools and needs no pin.
 [[ $copy == 1 ]] || printf '\n# The GameFrame checkout this project uses (./gameframe reads it)\nGAMEFRAME_ROOT=%s\n' "$ROOT" >> "$dir/.env"
-[[ -d "$dir/tools" ]] && { find "$dir/tools" -name '__pycache__' -prune -exec rm -r {} + 2>/dev/null || true; }
+for copied in tools scripts; do
+  [[ -d "$dir/$copied" ]] && { find "$dir/$copied" -name '__pycache__' -prune -exec rm -r {} + 2>/dev/null || true; }
+done
 if [[ -n "$game" ]]; then
   find "$game" -maxdepth 2 -type f \( -iname '*.exe' -o -iname '*.dll' -o -iname '*.ovl' \) -exec cp {} "$dir/target/" \;
   echo "Copied $(ls "$dir/target" | wc -l | tr -d ' ') binaries into $dir/target/"

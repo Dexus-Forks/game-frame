@@ -1,4 +1,22 @@
 #!/usr/bin/env bash
+# Install the pinned toolchain and checks used by the GameFrame Codex Cloud environment.
+#
+# Usage: scripts/codex-cloud-environment-install.sh [--help]
+#
+# Inputs: a Linux workspace at /workspace/game-frame, network access, and permission to install
+# user-level toolchains under /workspace. It pins the Python, Rust, Zig, Ghidra, Java and DOSBox-X
+# dependencies used by the cloud environment, then runs GameFrame's setup checks.
+# Output: tools under /workspace/toolchains, caches under /workspace/cache, and dependencies in
+# the repository's ignored .venv and site/node_modules folders.
+# It does not modify tracked GameFrame source files or access a game's files.
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  sed -n '2,11s/^# *//p' "$0"
+  exit 0
+fi
+if [[ $# -gt 0 ]]; then
+  echo "Usage: scripts/codex-cloud-environment-install.sh [--help]" >&2
+  exit 2
+fi
 set -euo pipefail
 cd /workspace/game-frame
 mkdir -p /workspace/toolchains /workspace/cache
