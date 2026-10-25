@@ -165,6 +165,15 @@ proposed again.
 
 ## Tools
 
+- [ ] Build a clean-room packet tool that copies only allow-listed contract and public interface
+  files, hashes the packet, and records excluded source artifacts. Test it against repository
+  samples before use. Until then, follow the manual
+  [packet checklist](skills/re-cleanroom/references/packet-checklist.md).
+- [ ] Add a reusable 86Box debugger connector only after a stable, testable control protocol is
+  selected. DOSBox-X already has debugger scripts and an MCP channel; current 86Box workflows use
+  the emulator separately. Keep named external machine integrations project-specific until their
+  endpoint and access method are known.
+
 - [x] `tools/pe/relocs.py`: pointers in data from base relocations
 - [x] `tools/pe/peinfo.py`: delay-loaded imports, relocation count
 - [x] `tools/triage/compare_trees.py --similar`: shared content, renamed files

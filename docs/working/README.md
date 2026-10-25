@@ -9,6 +9,8 @@ work that spans several steps and several sessions.
 - [Working well as an agent](agents.md): writing everything down in the repository, how to start a session,
   measuring before porting, working in subsystems, splitting work between sessions, what to
   do when stuck, and how to report.
+- [Clean-room-style implementations](clean-room-implementations.md): source-visible specification,
+  source-blind implementation, behavior contracts, packet limits and software-only verification.
 - [Linux, cloud and container environments](environments.md): what an agent installs on Linux
   or in a cloud workspace, `scripts/env.sh` for each session, headless runs, REA, and game
   files on someone else's machine.

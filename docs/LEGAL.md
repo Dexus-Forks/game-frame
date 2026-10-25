@@ -57,7 +57,9 @@ of this process ([Lemley, *Rise of the API Copyright Dead?*](https://jolt.law.ha
 It shows a way to organize independent implementation; it is not a court ruling or a guarantee.
 When the same agent studies and writes (as in Un-Banished), say so in the project's documents.
 Then follow the defaults above: no copied code, findings in your own words, every claim traceable
-to evidence.
+to evidence. GameFrame's `re-cleanroom` skill supports separate source-visible and source-blind
+tasks. Task separation is a working method; it does not create technical access controls or settle
+whether a project meets a legal clean-room standard.
 
 ## Respect
 

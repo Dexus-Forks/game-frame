@@ -60,8 +60,8 @@ music driver, Turbo Pascal's 6-byte `Real` arithmetic, and its own drawing to VG
 ## Brought up to GameFrame's standard
 
 The project was made with an early version of GameFrame. In October 2026
-`scripts/update-project.sh` brought it to the current standard: GameFrame's 18 agents and its
-gates, the current toolkit (71 tools, up from 30) and skills, the guides with their diagrams,
+`scripts/update-project.sh` brought it to the current standard: GameFrame's stage and task agents
+and its gates, the current toolkit (71 tools, up from 30) and skills, the guides with their diagrams,
 and a deviations ledger generated from the code (23 deviations and 6 pieces not ported). Its
 copy of the guides leaves out the row on another Tyrian port, as its clean-room rule requires. The
 check also found seven commits of verified start-up work on a branch that had not been merged,

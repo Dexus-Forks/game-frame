@@ -9,6 +9,10 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- A clean-room-style workflow with source-visible specification and source-blind implementation
+  roles, a behavior-contract template, packet checklist, team guide and emulator/debugger options.
+  It records the limits of prompt-based separation and the current gap in packet isolation tools.
+
 - The observation guidance now covers 86Box as a configurable full-PC reference for DOS and
   Windows 3.x/9x games. It records sound-card resource settings, guest OS and machine details,
   and labels captures as emulator measurements rather than physical-hardware evidence.

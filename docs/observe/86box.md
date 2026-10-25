@@ -33,6 +33,19 @@ Match the card and resources to the game's driver setup. For Windows, install th
 card in the guest OS. For DOS, set the game's configuration to the selected ports, IRQ and DMA.
 Change one variable at a time when comparing card or driver behavior.
 
+## Debugging
+
+For Windows 3.x drivers, the Windows 3.1 SDK documents CodeView for Windows and WDEB386. The
+driver kit notes that CVW needs debug symbols and may use a secondary display. WDEB386 uses a
+serial terminal. Confirm that the tool media and the VM's display or serial setup are available
+before depending on either debugger.
+
+86Box also has an optional GDB stub in source builds. A project maintainer described enabling it
+with the `GDBSTUB` build option and attaching a GDB-compatible debugger. This gives machine-level
+access such as stepping and port I/O, not the guest's Win16 source symbols. It is not integrated
+into GameFrame's MCP configuration today. See the [86Box discussion](https://github.com/86Box/86Box/discussions/7090)
+and the [debugger guide](debuggers.md) for the current scope.
+
 ## Record the setup
 
 Record enough detail to recreate each run:

@@ -2,6 +2,9 @@
 
 The earlier extraction blocker is resolved. The package installed in a disposable DOS and Windows environment. A bounded Win16 auxiliary volume contract is available in the [driver behavior contract](sbbasic-driver-behavior.md).
 
+The source-specification and source-blind implementation process, its slice boundaries and
+remaining software-only probes are recorded in the [SBBASIC workflow note](sbbasic-cleanroom-process.md).
+
 ## Package and install provenance
 
 [Observed] The installed package is Creative SBBASIC SDR-31STD-1-US Revision 1. Its SHA-256 is `c28f21521e8d9d8cd02a0c683aadbe369f7a9e182950ccbd46ba21762371871f`.

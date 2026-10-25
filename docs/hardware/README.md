@@ -56,6 +56,8 @@ In my GameFrame project, find every place the game touches hardware.
   its programming reference, tested interface paths, remaining limits and software-only checks.
 - [Creative SBBASIC driver package](sbbasic-driver-interface.md): package provenance and the
   installed DOS 6.22 and Windows 3.11 setup.
+- [SBBASIC clean-room-style workflow](sbbasic-cleanroom-process.md): source/implementer handoffs,
+  the bounded driver slices, debugger options and the limits of the logical models.
 - [Win16 SB16 auxiliary volume contract](sbbasic-driver-behavior.md): a bounded query and update
   slice, with unknown behavior and software-only verification suggestions.
 - [Win16 SB16 wave-output contract](sb16-wave-output-contract.md): a bounded logical contract for
