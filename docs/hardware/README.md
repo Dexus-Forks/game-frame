@@ -77,6 +77,9 @@ In my GameFrame project, find every place the game touches hardware.
 - [Win16 SB16 mixer volume-details contract](sb16-mixer-volume-contract.md): a bounded view of
   the descriptor-driven control-details read and write paths. The master selector, channel
   shape and numeric scale remain unknown.
+- [Win16 SB16 FM synth note contract](sb16-fm-note-contract.md): a bounded trace of the Win16
+  FM synth wrapper's open and short-message paths. The lower-service event format and
+  note-to-OPL conversion remain unknown.
 - [The sound card makers' APIs](sound-card-apis.md): the Maxi Sound 64, A3D, EAX, the AWE's
   SoundFont Manager, Sensaura and QSound: how a game finds each, what Wine offers, and which
   can be stood in for.
