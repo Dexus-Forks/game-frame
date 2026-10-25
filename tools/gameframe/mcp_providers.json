@@ -20,7 +20,7 @@
   "mcp-emulate": {
     "version": "0.1.0",
     "description": "CPU emulation, disassembly, assembly and trace tools",
-    "install": "uv (the launcher uses uvx with the pinned PyPI version)",
+    "install": "uv with Python 3.11 and MCP SDK 1.30.0 compatibility pins",
     "server": {
       "command": "./gameframe",
       "args": ["mcp-provider", "mcp-emulate", "0.1.0"]

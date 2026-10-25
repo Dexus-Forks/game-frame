@@ -33,6 +33,10 @@ def executable(path, text):
 
 
 def main():
+    launcher = (ROOT / 'scripts/mcp-provider.sh').read_text()
+    assert 'python_version="${MCP_EMULATE_PYTHON:-3.11}"' in launcher
+    assert 'sdk_version="$(version "${MCP_EMULATE_SDK_VERSION:-1.30.0}" MCP_EMULATE_SDK_VERSION)"' in launcher
+    assert 'uv run --python "$python_version" --with "mcp==$sdk_version" --with "mcp-emulate==$selected" --no-project mcp-emulate' in launcher
     with tempfile.TemporaryDirectory(prefix='gameframe-mcp-providers-') as temp:
         project = Path(temp)
         listed = run(project, 'mcp', '--list')

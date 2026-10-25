@@ -44,11 +44,13 @@ case "$provider" in
     ;;
   mcp-emulate)
     selected="$(version "${MCP_EMULATE_VERSION:-$pinned}" MCP_EMULATE_VERSION)"
-    command -v uvx >/dev/null 2>&1 || {
+    sdk_version="$(version "${MCP_EMULATE_SDK_VERSION:-1.30.0}" MCP_EMULATE_SDK_VERSION)"
+    python_version="${MCP_EMULATE_PYTHON:-3.11}"
+    command -v uv >/dev/null 2>&1 || {
       echo 'MCPEmulate needs uv; install uv or set it on PATH before starting the agent' >&2
       exit 127
     }
-    exec uvx --from "mcp-emulate==$selected" mcp-emulate
+    exec uv run --python "$python_version" --with "mcp==$sdk_version" --with "mcp-emulate==$selected" --no-project mcp-emulate
     ;;
   86box)
     revision="${BOX86_MCP_REVISION:-$pinned}"
