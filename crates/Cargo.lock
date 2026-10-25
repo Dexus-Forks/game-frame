@@ -38,6 +38,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "gameframe-saa1099"
+version = "0.1.0"
+
+[[package]]
 name = "gameframe-scale"
 version = "0.1.0"
 

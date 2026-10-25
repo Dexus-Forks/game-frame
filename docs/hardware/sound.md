@@ -22,6 +22,16 @@ the sound exactly, you need to know which device the game wrote for and how it d
 | AWE32/AWE64 | 1994 | Sound Blaster PCM plus EMU8000 wavetable voices and uploaded banks | Games may use the SoundFont Manager as well as `midiOut` |
 | Aureal A3D and Creative EAX | 1997–1998 | DirectSound 3D extensions for positional audio and environmental effects | APIs differ: A3D exposes COM interfaces; EAX uses DirectSound property sets |
 
+## Creative Music System and Game Blaster
+
+The CMS/Game Blaster uses two Philips SAA1099 chips. Each chip provides six square-wave channels,
+two noise generators, two envelope controllers and stereo amplitude registers. The
+[`gameframe-saa1099` crate](../../crates/saa1099/README.md) models the chip registers and the
+four-port card window. Its port map and default address come from static traces of `CMSDRV.COM`
+and Sierra's `CMS35.BIN`; the register behavior follows Philips's data handbook. The noise
+polynomial, combined tone/noise gate, card-detection read and analog output still need software
+comparisons or better documentation. See the [CMS/SAA1099 evidence and check plan](cms-saa1099.md).
+
 ## FM synthesis (OPL2 and OPL3)
 
 ![An OPL2 voice: a modulator, a carrier and their envelopes](../assets/diagrams/opl2-operators.svg)

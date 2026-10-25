@@ -100,7 +100,15 @@ proposed again.
   hardware is not required.
 - [ ] Model TDA8425 tone and pseudo/spatial processing, analog filter/ADC paths and connect external
   DMA/IRQ controllers where software call paths establish their card-specific behavior
-- [ ] PC speaker, Tandy PSG, CMS/SAA1099 and LPT DAC components
+- [x] Add a Philips SAA1099 and Creative Music System/Game Blaster model using the chip data
+  handbook and static traces of the original CMS drivers. The four-port write window, two-chip
+  routing and documented registers are implemented; generated tone/noise vectors and CMS driver
+  port traces still need software comparison ([findings](docs/hardware/cms-saa1099.md)). Physical
+  testing is optional.
+- [ ] Compare the SAA1099 noise sequence, tone-plus-noise gate, envelope update boundaries and
+  CMS card-detection read against a named software reference or traced DOS driver. Physical card
+  testing is optional ([findings](docs/hardware/cms-saa1099.md)).
+- [ ] PC speaker, Tandy PSG and LPT DAC components
 - [x] Add a reusable Sound Blaster DSP, mixer and SB16 MPU-401 UART model for Creative DSP
   generations 1.xx–4.xx (`gameframe-sound-blaster`); reuse the OPL2/OPL3 crates for card FM ports,
   including SB Pro 1's dual-OPL2 stereo routing. Software checks cover reset/version, MIDI

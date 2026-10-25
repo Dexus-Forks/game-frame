@@ -1,0 +1,10 @@
+[package]
+name = "gameframe-saa1099"
+description = "Philips SAA1099 sound generator and Creative Music System card model"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["saa1099", "creative-music-system", "game-blaster", "audio"]
+categories = ["emulators", "multimedia::audio"]

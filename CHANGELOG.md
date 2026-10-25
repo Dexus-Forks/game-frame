@@ -9,6 +9,12 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `gameframe-saa1099` adds a Philips SAA1099 stereo sound generator and a two-chip Creative Music
+  System/Game Blaster port model. Its register behavior follows Philips's data handbook. Static
+  traces of `CMSDRV.COM` and Sierra's `CMS35.BIN` establish the four-port layout and default base.
+  Noise taps, combined tone/noise mixing, card detection and analog output remain open with
+  software-only comparison steps; physical card testing is optional.
+
 - `gameframe-sound-blaster` adds port-level Creative DSP models for 1.xx through 4.xx cards,
   CT1335/CT1345/CT1745 mixer registers, SB16 MPU-401 UART, and FM routing through GameFrame's OPL2
   and OPL3 crates. Profiles cover SB Pro 1's dual YM3812 stereo path, Pro 2 YMF262 ports, and SB16
