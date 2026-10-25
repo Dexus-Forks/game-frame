@@ -1364,6 +1364,12 @@ assert pathlib.Path(plugin['skills'], 're-start', 'SKILL.md').is_file(), 'the pl
 assert pathlib.Path('.claude/agents').resolve() == pathlib.Path('agents').resolve(), '.claude/agents links to agents/'
 skills = {p.parent.name for p in pathlib.Path('skills').glob('*/SKILL.md')}
 start = pathlib.Path('skills/re-start/SKILL.md').read_text()
+start_text = ' '.join(start.split())
+assert 'Continue in the current session by default.' in start_text, 're-start does not make delegation optional'
+assert 'A task being self-contained is not permission to start a subagent' in start_text, 're-start treats self-contained tasks as authorization to delegate'
+credits = pathlib.Path('docs/working/api-credits.md').read_text()
+credits_text = ' '.join(credits.split())
+assert 'Ask the user before making a paid API call' in credits_text, 'API-credit guide does not require opt-in'
 agents = sorted(pathlib.Path('agents').glob('*.md'))
 assert agents, 'no agents'
 for a in agents:

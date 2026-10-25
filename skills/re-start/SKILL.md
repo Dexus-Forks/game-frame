@@ -83,20 +83,30 @@ GameFrame also has one agent per stage, in `agents/` (a project has them in
 `.claude/agents/`; from the Claude Code plugin they are named `gameframe:re-tracer` and so on).
 Codex, Gemini CLI, GitHub Copilot and OpenCode read copies in their own formats
 ([Agents in every client](../../docs/working/agents.md#agents-in-every-client)). If your agent
-can start subagents, send each agent as a subagent. If it cannot, take each role yourself in
-this session: read the agent's file, load its skills, do its stage and write its hand-off. The
-clean-room team is an exception. Its source-blind implementer must use a fresh task with only the
-approved packet. If the client cannot provide that boundary, stop after the contract and report
-that source-blind implementation is unavailable in this setup.
-Each one has its skills preloaded, does only its stage, and ends with a
-`## Hand-off` block that names the next agent and gives it a one-line brief. You, the main
-session, send the agents: read each hand-off, check its evidence, and send the next one.
+By default, take each role yourself in this session: read the agent's file, load its skills, do
+its stage and write its hand-off. If the user chooses delegation and your client can start
+subagents, use these roles for only the stages in the agreed scope. The clean-room team is an
+exception after the user chooses that workflow. Its source-blind implementer must use a fresh
+task with only the approved packet. Ask before creating that task if the user has not already
+chosen the clean-room workflow. If the client cannot provide the boundary, stop after the
+contract and report that source-blind implementation is unavailable in this setup.
+
+These role agents are optional. Continue in the current session by default. When separate work
+could help, explain why and ask whether the user wants delegation. A task being self-contained is
+not permission to start a subagent, create another task or make a worktree. Paid API runs have
+their own opt-in rule in `docs/working/api-credits.md`.
+
+When the user chooses subagents, use only the stages in the agreed scope. Each agent has its
+skills preloaded, does only its stage, and ends with a `## Hand-off` block that names the next
+agent and gives it a one-line brief. You, the main session, read each hand-off and check its
+evidence. Continue in this session by default. Send the next agent only when that stage is within
+the user's agreed scope; otherwise ask before extending the delegation.
 While an agent runs, `./gameframe progress` shows the lines it has logged so far, newest first
 (`./gameframe progress re-porter` for one agent's whole log). Read that rather than the agent's
 transcript. Show the user each hand-off's `Decisions` line and anything under `Open` that asks them a
-question, before you send the next agent. Agents do not start other agents. They stop and ask
-before downloading, working around protection, writing outside the project or choosing a
-version of the game.
+question, before continuing to another stage. Agents do not start other agents. They stop and ask
+before downloading, working around protection, writing outside the project or choosing a version
+of the game.
 
 | Agent | Stage | Usually hands off to |
 |---|---|---|

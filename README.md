@@ -292,7 +292,7 @@ such as a Max or Team plan's monthly credits ([API credits](docs/working/api-cre
 |---|---|
 | `tools/llm/name_functions.py` | A suggested name, signature and summary for every unnamed function in a Ghidra export, in one Message Batch, written to `analysis/` for you to confirm |
 | `tools/llm/skillcheck.py` | Gives an agent one skill and a task on the sample game, and checks its answer against the ground truth: is each skill enough on its own? |
-| `tools/llm/headless.py` | Runs one of GameFrame's agents unattended under a budget and saves its report; `docs-check` runs `re-checker` and `re-editor` over the documents |
+| `tools/llm/headless.py` | Optional paid API run of one agent under a budget; requires the user's opt-in and saves its report; `docs-check` runs `re-checker` and `re-editor` over the documents |
 | `tools/llm/locate.py` | Finds a screen element, or a reference screen, in a capture by asking a model, when `align.py` cannot line them up |
 | `tools/llm/ask.py` | A question answered from the know-how entries `gameframe advise` finds, naming each entry it uses |
 | `tools/llm/client.py` | The shared client; run it to check the SDK, the key and the `claude` command |
