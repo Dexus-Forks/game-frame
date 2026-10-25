@@ -298,7 +298,13 @@ impl WaveOutputStream {
     }
 
     /// Submit a prepared header and append its logical ID in submission order.
+    ///
+    /// After reset, queue membership is unresolved. Submission then returns that state without
+    /// reading or changing header flags and without appending to the stale queue vectors.
     pub fn submit(&mut self, header: &mut WaveHeader) -> WaveSubmissionReply {
+        if self.queue_knowledge == QueueKnowledge::UnresolvedAfterReset {
+            return WaveSubmissionReply::UnresolvedAfterReset;
+        }
         let prepared = header.flags & WAVE_HEADER_PREPARED != 0;
         let in_queue = header.flags & WAVE_HEADER_IN_QUEUE != 0;
         match (prepared, in_queue) {
@@ -647,6 +653,8 @@ pub enum WaveSubmissionReply {
     Failed(WaveSubmissionFailure),
     /// Both rejection conditions are present; the contract does not establish which status wins.
     IndeterminateFailurePrecedence,
+    /// Reset left queue state unresolved; no status or resubmission behavior is inferred.
+    UnresolvedAfterReset,
 }
 
 impl WaveSubmissionReply {
@@ -654,7 +662,7 @@ impl WaveSubmissionReply {
         match self {
             Self::Accepted => Some(WAVE_STATUS_SUCCESS),
             Self::Failed(failure) => Some(failure.status_code()),
-            Self::IndeterminateFailurePrecedence => None,
+            Self::IndeterminateFailurePrecedence | Self::UnresolvedAfterReset => None,
         }
     }
 
@@ -662,7 +670,9 @@ impl WaveSubmissionReply {
     pub const fn lower_service_dispatch(self) -> Option<LowerServiceDispatch> {
         match self {
             Self::Accepted => Some(LowerServiceDispatch::MayBeCalledIfNotPaused),
-            Self::Failed(_) | Self::IndeterminateFailurePrecedence => None,
+            Self::Failed(_) | Self::IndeterminateFailurePrecedence | Self::UnresolvedAfterReset => {
+                None
+            }
         }
     }
 }
