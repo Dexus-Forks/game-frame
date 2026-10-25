@@ -6,6 +6,7 @@
 
 mod card;
 mod dsp;
+mod fm;
 mod mixer;
 mod mpu;
 
@@ -14,5 +15,6 @@ pub use dsp::{
     DmaDirection, DmaRequest, Dsp, DspEvent, DspVersion, InterruptSource, PcmChannel, PcmSample,
     TimeError, TransferWidth,
 };
+pub use fm::{FmChipKind, FmSample, FmSynth};
 pub use mixer::{Mixer, MixerKind};
 pub use mpu::{Mpu401, MpuEvent};

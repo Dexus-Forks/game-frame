@@ -1,8 +1,8 @@
 # gameframe-sound-blaster
 
 A clean Rust device model for the Creative Sound Blaster DSP generations 1.xx through 4.xx,
-their CT1335/CT1345/CT1745 mixer register interfaces, and the SB16 MPU-401 UART ports. Existing
-`gameframe-opl2` and `gameframe-opl3` crates remain the FM synthesizer components.
+their CT1335/CT1345/CT1745 mixer register interfaces, the SB16 MPU-401 UART ports, and the card's
+YM3812/YMF262 FM synthesizer. It reuses GameFrame's `gameframe-opl2` and `gameframe-opl3` crates.
 
 The command and port model follows Creative's *Developer Kit for Sound Blaster Series, Second
 Edition, Hardware Programming Reference*. The original Creative DOS/Windows driver package was
@@ -31,9 +31,9 @@ assert_eq!(card.read_port_at(0x22A, 103_000).unwrap(), Some(0xAA));
 let _events: Vec<DspEvent> = card.advance_to(200_000).unwrap();
 ```
 
-`SoundBlasterConfig` provides SB 1.5, SB 2.0, SB 2.0 CD, SB Pro 2 and SB16 profiles. A custom
-configuration selects another DSP version, base port, mixer chip and SB16 MPU port. Every time
-argument is a monotonic virtual nanosecond timestamp. The host services playback requests through
+`SoundBlasterConfig` provides SB 1.5, SB 2.0, SB 2.0 CD, the dual-OPL2 SB Pro 1, SB Pro 2 and SB16
+profiles. A custom configuration selects another DSP version, base port, mixer chip, FM chip and
+SB16 MPU port. Every time argument is a monotonic virtual nanosecond timestamp. The host services playback requests through
 `service_dma_read`, sends capture input through `push_capture_sample`, forwards raised IRQ events
 to its PIC, and calls `dma_terminal_count_at` for legacy auto-initialize blocks whose DSP command
 does not carry a block length.
@@ -51,6 +51,13 @@ does not carry a block length.
 - ADPCM command recognition for 2-, 3- and 4-bit streams. It marks the initial reference byte and
   emits compressed input bytes with the selected format. It does not decode them to PCM.
 - DSP MIDI polling/interrupt and UART command modes, timestamped input, and MIDI output events.
+- OPL2 FM ports at `388h`/`389h` and the card's legacy `base + 8` ports. OPL3 profiles expose both
+  YMF262 banks at `388h` through `38Bh`. Pro and SB16 profiles also expose their FM ports at
+  `base + 0` through `base + 3`; the original Pro profile routes its two YM3812 chips to separate
+  stereo channels, while Pro 2 and SB16 route to one YMF262.
+  `FmSynth::generate` returns mono-duplicated or stereo frames for the host mixer.
+- YMF262 register-write spacing on SB Pro 2/SB16 ports. The OPL2 profile currently applies no
+  timed write rejection because its port busy interval is not established here.
 - CT1335, CT1345 and CT1745 indexed register maps, documented reset values and writable masks.
   SB16 mixer registers 80h, 81h and 82h expose the selected IRQ, DMA and interrupt source state.
 - SB16 MPU-401 UART reset, UART-mode acknowledgement, readiness status, input/output and interrupt
@@ -76,7 +83,7 @@ against this crate, and send looped capture/playback vectors through a fake DMA/
 Creative driver bundle is not needed for these checks.
 
 The card does not contain an ISA DMA controller, PIC, MPU-401 intelligent mode, joystick/Game
-Control Adapter, CD interface, CSP/ASP signal processor, EMU8000 wavetable synthesizer, OPL
+Control Adapter, CD interface, C/MS SAA1099 chips, CSP/ASP signal processor, EMU8000 wavetable
 synthesizer or analog circuitry. DSP clones may expose extensions beyond the Creative command set.
 The machine model combines these devices as required. Physical hardware testing is optional.
 

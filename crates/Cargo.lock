@@ -44,6 +44,10 @@ version = "0.1.0"
 [[package]]
 name = "gameframe-sound-blaster"
 version = "0.1.0"
+dependencies = [
+ "gameframe-opl2",
+ "gameframe-opl3",
+]
 
 [[package]]
 name = "gameframe-turbo-pascal"

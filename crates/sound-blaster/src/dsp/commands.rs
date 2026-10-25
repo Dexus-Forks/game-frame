@@ -54,7 +54,7 @@ impl Dsp {
             0x10 | 0x40 => 1,
             0x14 | 0x24 | 0x16 | 0x17 | 0x74..=0x77 | 0x80 => 2,
             0x41 | 0x42 if self.version.major >= 4 => 2,
-            0x48 => 2,
+            0x48 if self.version.at_least(2, 0) => 2,
             0xC0..=0xCF | 0xB0..=0xBF if self.version.major >= 4 => 3,
             _ => 0,
         }
@@ -211,13 +211,15 @@ impl Dsp {
                 self.response.push_back(self.version.major);
                 self.response.push_back(self.version.minor);
             }
-            0x30 => self.midi_mode = MidiMode::NormalPolling,
-            0x31 => self.midi_mode = MidiMode::NormalInterrupt,
-            0x34 if self.version.at_least(2, 0) => self.midi_mode = MidiMode::UartPolling,
-            0x35 if self.version.at_least(2, 0) => self.midi_mode = MidiMode::UartInterrupt,
-            0x36 if self.version.at_least(2, 0) => self.midi_mode = MidiMode::UartTimestampPolling,
+            0x30 => self.set_midi_mode(MidiMode::NormalPolling),
+            0x31 => self.set_midi_mode(MidiMode::NormalInterrupt),
+            0x34 if self.version.at_least(2, 0) => self.set_midi_mode(MidiMode::UartPolling),
+            0x35 if self.version.at_least(2, 0) => self.set_midi_mode(MidiMode::UartInterrupt),
+            0x36 if self.version.at_least(2, 0) => {
+                self.set_midi_mode(MidiMode::UartTimestampPolling)
+            }
             0x37 if self.version.at_least(2, 0) => {
-                self.midi_mode = MidiMode::UartTimestampInterrupt
+                self.set_midi_mode(MidiMode::UartTimestampInterrupt)
             }
             0x38 => self.midi_output_armed = true,
             _ => {}
@@ -291,6 +293,17 @@ impl Dsp {
                 self.active_transfer = Some(transfer);
             }
         }
+    }
+}
+
+impl Dsp {
+    pub(super) fn set_midi_mode(&mut self, mode: MidiMode) {
+        if mode.uart() && !self.midi_mode.uart() {
+            self.midi_mode_before_uart = Some(self.midi_mode);
+        } else if !mode.uart() {
+            self.midi_mode_before_uart = None;
+        }
+        self.midi_mode = mode;
     }
 }
 

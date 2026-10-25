@@ -1,8 +1,8 @@
 use std::collections::VecDeque;
 
 use crate::{
-    DmaDirection, DmaRequest, Dsp, DspEvent, DspVersion, InterruptSource, Mixer, MixerKind, Mpu401,
-    MpuEvent, TimeError, TransferWidth,
+    DmaDirection, DmaRequest, Dsp, DspEvent, DspVersion, FmChipKind, FmSynth, InterruptSource,
+    Mixer, MixerKind, Mpu401, MpuEvent, TimeError, TransferWidth,
 };
 
 /// I/O and chip revisions for one Creative Sound Blaster family card.
@@ -11,6 +11,7 @@ pub struct SoundBlasterConfig {
     pub base_port: u16,
     pub dsp_version: DspVersion,
     pub mixer: MixerKind,
+    pub fm_chip: FmChipKind,
     pub mpu401_base: Option<u16>,
 }
 
@@ -20,6 +21,7 @@ impl SoundBlasterConfig {
             base_port: 0x220,
             dsp_version: DspVersion::SB_1_5,
             mixer: MixerKind::None,
+            fm_chip: FmChipKind::Opl2,
             mpu401_base: None,
         }
     }
@@ -29,6 +31,7 @@ impl SoundBlasterConfig {
             base_port: 0x220,
             dsp_version: DspVersion::new(2, 1),
             mixer: MixerKind::None,
+            fm_chip: FmChipKind::Opl2,
             mpu401_base: None,
         }
     }
@@ -38,6 +41,18 @@ impl SoundBlasterConfig {
             base_port: 0x220,
             dsp_version: DspVersion::new(2, 1),
             mixer: MixerKind::Ct1335,
+            fm_chip: FmChipKind::Opl2,
+            mpu401_base: None,
+        }
+    }
+
+    /// Sound Blaster Pro 1 profile with separate left and right YM3812 chips.
+    pub const fn sb_pro() -> Self {
+        Self {
+            base_port: 0x220,
+            dsp_version: DspVersion::new(3, 1),
+            mixer: MixerKind::Ct1345,
+            fm_chip: FmChipKind::DualOpl2,
             mpu401_base: None,
         }
     }
@@ -47,6 +62,7 @@ impl SoundBlasterConfig {
             base_port: 0x220,
             dsp_version: DspVersion::SB_PRO_2,
             mixer: MixerKind::Ct1345,
+            fm_chip: FmChipKind::Opl3,
             mpu401_base: None,
         }
     }
@@ -56,6 +72,7 @@ impl SoundBlasterConfig {
             base_port: 0x220,
             dsp_version: DspVersion::SB_16_4_05,
             mixer: MixerKind::Ct1745,
+            fm_chip: FmChipKind::Opl3,
             mpu401_base: Some(0x330),
         }
     }
@@ -75,6 +92,7 @@ impl Default for SoundBlasterConfig {
 pub struct SoundBlaster {
     config: SoundBlasterConfig,
     dsp: Dsp,
+    fm: FmSynth,
     mixer: Mixer,
     mpu: Option<Mpu401>,
     events: VecDeque<DspEvent>,
@@ -85,6 +103,11 @@ impl SoundBlaster {
         Self {
             config,
             dsp: Dsp::new(config.dsp_version),
+            fm: FmSynth::new(
+                config.fm_chip,
+                config.base_port,
+                matches!(config.mixer, MixerKind::Ct1345 | MixerKind::Ct1745),
+            ),
             mixer: Mixer::new(config.mixer),
             mpu: config.mpu401_base.map(Mpu401::new),
             events: VecDeque::new(),
@@ -101,6 +124,14 @@ impl SoundBlaster {
 
     pub fn dsp_mut(&mut self) -> &mut Dsp {
         &mut self.dsp
+    }
+
+    pub fn fm(&self) -> &FmSynth {
+        &self.fm
+    }
+
+    pub fn fm_mut(&mut self) -> &mut FmSynth {
+        &mut self.fm
     }
 
     pub fn mixer(&self) -> &Mixer {
@@ -122,6 +153,9 @@ impl SoundBlaster {
     /// Read a mapped port. None indicates an address outside this modeled card's ports.
     pub fn read_port_at(&mut self, port: u16, at_ns: u64) -> Result<Option<u8>, TimeError> {
         self.advance_and_queue(at_ns)?;
+        if let Some(value) = self.fm.read_port(port) {
+            return Ok(Some(value));
+        }
         let offset = port.wrapping_sub(self.config.base_port);
         let value = match offset {
             0x05 if self.config.mixer != MixerKind::None => Some(self.read_mixer_data()),
@@ -141,6 +175,10 @@ impl SoundBlaster {
     /// Write a mapped port. False indicates an unmapped address or a write rejected while busy.
     pub fn write_port_at(&mut self, port: u16, value: u8, at_ns: u64) -> Result<bool, TimeError> {
         self.advance_and_queue(at_ns)?;
+        if let Some(accepted) = self.fm.write_port_at(port, value, at_ns) {
+            self.refresh_mixer_status();
+            return Ok(accepted);
+        }
         let offset = port.wrapping_sub(self.config.base_port);
         let accepted = match offset {
             0x04 if self.config.mixer != MixerKind::None => {
@@ -193,7 +231,9 @@ impl SoundBlaster {
             return Ok(false);
         };
         let was_pending = mpu.irq_pending();
-        mpu.push_input(value);
+        if !mpu.push_input(value) {
+            return Ok(true);
+        }
         if !was_pending && mpu.irq_pending() {
             self.events.push_back(DspEvent::InterruptRaised {
                 at_ns,
@@ -268,11 +308,10 @@ impl SoundBlaster {
             return false;
         };
         if port == mpu.base() {
-            let _ = mpu.write_data(value, at_ns);
-            true
+            mpu.write_data(value, at_ns).is_some()
         } else if port == mpu.base().wrapping_add(1) {
             let was_pending = mpu.irq_pending();
-            mpu.write_command(value, at_ns);
+            let accepted = mpu.write_command(value, at_ns);
             let raised = !was_pending && mpu.irq_pending();
             if raised {
                 self.events.push_back(DspEvent::InterruptRaised {
@@ -280,7 +319,7 @@ impl SoundBlaster {
                     source: InterruptSource::Mpu401,
                 });
             }
-            true
+            accepted
         } else {
             false
         }

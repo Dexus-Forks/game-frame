@@ -74,7 +74,7 @@ impl Mpu401 {
     }
 
     pub fn write_data(&mut self, value: u8, at_ns: u64) -> Option<MpuEvent> {
-        if !self.uart_mode {
+        if !self.uart_mode || at_ns < self.busy_until_ns {
             return None;
         }
         let event = MpuEvent { at_ns, value };
@@ -83,10 +83,15 @@ impl Mpu401 {
         Some(event)
     }
 
-    pub fn write_command(&mut self, value: u8, at_ns: u64) {
+    pub fn write_command(&mut self, value: u8, at_ns: u64) -> bool {
+        if at_ns < self.busy_until_ns {
+            return false;
+        }
+
         if value == 0xFF {
             self.uart_mode = false;
             self.input.clear();
+            self.acknowledge.clear();
             self.irq_pending = false;
             self.acknowledge.push_back(0xFE);
         } else if value == 0x3F {
@@ -95,13 +100,16 @@ impl Mpu401 {
             self.irq_pending = true;
         }
         self.busy_until_ns = at_ns.saturating_add(self.write_busy_ns);
+        true
     }
 
-    pub fn push_input(&mut self, value: u8) {
-        self.input.push_back(value);
-        if self.uart_mode {
-            self.irq_pending = true;
+    pub fn push_input(&mut self, value: u8) -> bool {
+        if !self.uart_mode {
+            return false;
         }
+        self.input.push_back(value);
+        self.irq_pending = true;
+        true
     }
 
     pub fn drain_output(&mut self) -> Vec<MpuEvent> {

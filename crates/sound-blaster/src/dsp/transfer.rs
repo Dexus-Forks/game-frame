@@ -128,6 +128,8 @@ impl Dsp {
                 };
                 return rate.saturating_mul(if transfer.stereo { 2 } else { 1 });
             }
+            // The 1.xx–3.xx time constant represents the aggregate transfer rate. Stereo
+            // callers encode two channels into this value using Creative's documented formula.
             return 1_000_000 / (256_u32 - self.time_constant as u32).max(1);
         }
         if self.direct_sample.is_some() || self.pause_samples > 0 {

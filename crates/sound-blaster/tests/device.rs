@@ -1,5 +1,5 @@
 use gameframe_sound_blaster::{
-    DspEvent, Mixer, MixerKind, PcmChannel, SoundBlaster, SoundBlasterConfig,
+    DspEvent, FmChipKind, FmSample, Mixer, MixerKind, PcmChannel, SoundBlaster, SoundBlasterConfig,
 };
 
 fn command(card: &mut SoundBlaster, value: u8, t: u64) {
@@ -101,6 +101,24 @@ fn sb20_auto_init_raises_irq_when_the_host_reports_dma_terminal_count() {
     assert!(card.irq_pending());
     assert_eq!(card.read_port_at(0x22E, 1_000).unwrap(), Some(0x00));
     assert!(!card.irq_pending());
+}
+
+#[test]
+fn sbpro_stereo_time_constant_already_contains_both_channel_transfers() {
+    let mut card = SoundBlaster::new(SoundBlasterConfig::sb_pro_2());
+    command(&mut card, 0xA8, 0); // Stereo input.
+    command(&mut card, 0x40, 1);
+    command(&mut card, 0xE9, 1); // 1 MHz / (256 - 233) ≈ 43.5 kB/s aggregate.
+    command(&mut card, 0x2C, 2);
+
+    let events = card.advance_to(100_000).unwrap();
+    assert_eq!(
+        events
+            .iter()
+            .filter(|event| matches!(event, DspEvent::DmaWrite { .. }))
+            .count(),
+        4
+    );
 }
 
 #[test]
@@ -236,9 +254,11 @@ fn sb16_mpu_uart_acknowledges_mode_and_forwards_midi_data() {
     assert!(card.irq_pending());
     assert_eq!(card.read_port_at(0x330, 11).unwrap(), Some(0x90));
     assert!(!card.irq_pending());
-    card.write_port_at(0x330, 0x90, 12).unwrap();
-    card.write_port_at(0x330, 60, 13).unwrap();
-    card.write_port_at(0x330, 100, 14).unwrap();
+    assert!(card.write_port_at(0x330, 0x90, 12).unwrap());
+    assert!(!card.write_port_at(0x330, 60, 13).unwrap());
+    assert!(card.write_port_at(0x330, 60, 22).unwrap());
+    assert!(!card.write_port_at(0x330, 100, 23).unwrap());
+    assert!(card.write_port_at(0x330, 100, 32).unwrap());
     assert_eq!(
         card.drain_mpu_output()
             .iter()
@@ -246,6 +266,45 @@ fn sb16_mpu_uart_acknowledges_mode_and_forwards_midi_data() {
             .collect::<Vec<_>>(),
         [0x90, 60, 100]
     );
+}
+
+#[test]
+fn dsp_timestamped_midi_emits_wrapping_little_endian_millisecond_packets() {
+    let mut card = SoundBlaster::new(SoundBlasterConfig::sb_20());
+    command(&mut card, 0x37, 0); // UART with timestamps and interrupts.
+    card.push_midi_input_at(0x90, 66_051_000_000).unwrap(); // 0x010203 milliseconds.
+    assert!(card.dsp().irq_pending());
+    assert_eq!(
+        card.read_port_at(0x22E, 66_051_000_000).unwrap(),
+        Some(0x80)
+    );
+    assert!(!card.dsp().irq_pending());
+    assert_eq!(
+        (0..4)
+            .map(|_| card.read_port_at(0x22A, 66_051_000_000).unwrap().unwrap())
+            .collect::<Vec<_>>(),
+        [0x03, 0x02, 0x01, 0x90]
+    );
+    assert_eq!(
+        card.read_port_at(0x22E, 66_051_000_000).unwrap(),
+        Some(0x00)
+    );
+}
+
+#[test]
+fn dsp_uart_reset_restores_prior_midi_mode_and_keeps_other_dsp_settings() {
+    let mut card = SoundBlaster::new(SoundBlasterConfig::sb_20());
+    command(&mut card, 0x31, 0); // Normal interrupt mode.
+    command(&mut card, 0xD1, 1); // Speaker state is preserved across UART exit.
+    command(&mut card, 0x34, 2);
+    card.write_port_at(0x226, 1, 3).unwrap();
+    card.write_port_at(0x226, 0, 3_003).unwrap();
+    assert!(card.dsp().speaker_on());
+    assert_eq!(card.read_port_at(0x22A, 103_003).unwrap(), Some(0xAA));
+
+    card.push_midi_input_at(0xF8, 103_004).unwrap();
+    assert_eq!(card.read_port_at(0x22A, 103_004).unwrap(), Some(0xF8));
+    assert!(card.dsp().irq_pending());
 }
 
 #[test]
@@ -267,4 +326,110 @@ fn sb16_interrupt_status_register_reports_8_and_16_bit_sources() {
     card.read_port_at(0x22F, 1_100_000).unwrap();
     card.write_port_at(0x224, 0x82, 1_100_000).unwrap();
     assert_eq!(card.read_port_at(0x225, 1_100_000).unwrap(), Some(0x00));
+}
+
+#[test]
+fn sb_pro_1_routes_two_opl2_chips_to_separate_stereo_channels() {
+    let mut card = SoundBlaster::new(SoundBlasterConfig::sb_pro());
+    assert_eq!(card.fm().kind(), FmChipKind::DualOpl2);
+    assert_eq!(card.read_port_at(0x220, 0).unwrap(), Some(0x06));
+    assert_eq!(card.read_port_at(0x222, 0).unwrap(), Some(0x06));
+    let left_tone = [
+        (0x20, 0x21),
+        (0x23, 0x21),
+        (0x40, 0x3F),
+        (0x43, 0x00),
+        (0x60, 0xF0),
+        (0x63, 0xF0),
+        (0x80, 0x0F),
+        (0x83, 0x0F),
+        (0xA0, 0x98),
+        (0xB0, 0x31),
+    ];
+    for (index, (register, value)) in left_tone.into_iter().enumerate() {
+        let t = index as u64 * 2;
+        assert!(card.write_port_at(0x220, register, t).unwrap());
+        assert!(card.write_port_at(0x221, value, t + 1).unwrap());
+    }
+
+    let mut samples = [FmSample::default(); 512];
+    card.fm_mut().generate(&mut samples);
+    assert!(samples.iter().any(|sample| sample.left != 0));
+    assert!(samples.iter().all(|sample| sample.right == 0));
+}
+
+#[test]
+fn sb16_exposes_opl3_at_card_and_legacy_ports_with_write_spacing() {
+    let mut card = SoundBlaster::new(SoundBlasterConfig::sb16());
+    assert_eq!(card.fm().kind(), FmChipKind::Opl3);
+    assert_eq!(card.read_port_at(0x220, 0).unwrap(), Some(0x00));
+    assert_eq!(card.read_port_at(0x222, 0).unwrap(), None);
+    assert!(card.write_port_at(0x220, 0x20, 0).unwrap());
+    assert!(!card.write_port_at(0x221, 0x21, 1_000).unwrap());
+    assert!(card.write_port_at(0x221, 0x21, 3_000).unwrap());
+
+    let tone = [
+        (0x23, 0x21),
+        (0x40, 0x3F),
+        (0x43, 0x00),
+        (0x60, 0xF0),
+        (0x63, 0xF0),
+        (0x80, 0x0F),
+        (0x83, 0x0F),
+        (0xA0, 0x98),
+        (0xB0, 0x31),
+    ];
+    let mut t = 6_000;
+    for (register, value) in tone {
+        assert!(card.write_port_at(0x220, register, t).unwrap());
+        t += 3_000;
+        assert!(card.write_port_at(0x221, value, t).unwrap());
+        t += 3_000;
+    }
+    assert!(card.write_port_at(0x388, 0x01, t).unwrap());
+    assert!(card.write_port_at(0x389, 0x20, t + 3_000).unwrap());
+
+    let mut samples = [FmSample::default(); 512];
+    card.fm_mut().generate(&mut samples);
+    assert!(samples.iter().any(|sample| sample.left != 0));
+    assert!(samples.iter().all(|sample| sample.left == sample.right));
+}
+
+#[test]
+fn sb16_legacy_opl3_ports_expose_the_second_bank_and_write_only_status_port() {
+    let mut card = SoundBlaster::new(SoundBlasterConfig::sb16());
+    assert_eq!(card.read_port_at(0x388, 0).unwrap(), Some(0x00));
+    assert_eq!(card.read_port_at(0x38A, 0).unwrap(), None);
+
+    let registers = [
+        (0x105, 0x01), // Enable native OPL3 mode through bank one's 05h register.
+        (0x120, 0x21),
+        (0x123, 0x21),
+        (0x140, 0x3F),
+        (0x143, 0x00),
+        (0x160, 0xF0),
+        (0x163, 0xF0),
+        (0x180, 0x0F),
+        (0x183, 0x0F),
+        (0x1C0, 0x10), // Bank-one channel zero routes to output A.
+        (0x1A0, 0x98),
+        (0x1B0, 0x31),
+    ];
+    let mut at_ns = 0;
+    for (register, value) in registers {
+        let (index_port, data_port, index) = if register > 0xFF {
+            (0x38A, 0x38B, register as u8)
+        } else {
+            (0x388, 0x389, register as u8)
+        };
+        assert!(card.write_port_at(index_port, index, at_ns).unwrap());
+        at_ns += 3_000;
+        assert!(card.write_port_at(data_port, value, at_ns).unwrap());
+        at_ns += 3_000;
+    }
+
+    let mut samples = [FmSample::default(); 512];
+    card.fm_mut().generate(&mut samples);
+    assert!(samples.iter().any(|sample| sample.left != 0));
+    assert!(samples.iter().all(|sample| sample.right == 0));
 }

@@ -10,3 +10,5 @@ keywords = ["sound-blaster", "dsp", "sb16", "audio", "emulation"]
 categories = ["emulators", "multimedia::audio"]
 
 [dependencies]
+gameframe-opl2 = { path = "../opl2" }
+gameframe-opl3 = { path = "../opl3" }

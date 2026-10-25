@@ -102,14 +102,15 @@ proposed again.
   DMA/IRQ controllers where software call paths establish their card-specific behavior
 - [ ] PC speaker, Tandy PSG, CMS/SAA1099 and LPT DAC components
 - [x] Add a reusable Sound Blaster DSP, mixer and SB16 MPU-401 UART model for Creative DSP
-  generations 1.xx–4.xx (`gameframe-sound-blaster`); software checks cover reset/version,
-  8-bit playback/capture, 16-bit playback/capture, high-speed command gating, IRQ acknowledgement,
-  mixer profiles and MPU-401 UART behavior
+  generations 1.xx–4.xx (`gameframe-sound-blaster`); reuse the OPL2/OPL3 crates for card FM ports,
+  including SB Pro 1's dual-OPL2 stereo routing. Software checks cover reset/version, MIDI
+  timestamps and UART reset, 8-bit playback/capture, 16-bit playback/capture, FM port maps,
+  high-speed command gating, IRQ acknowledgement and mixer profiles
 - [ ] Decode Creative 2-, 3- and 4-bit ADPCM to PCM. The reference specifies command flow and the
   initial reference byte but not the predictor recurrence; compare generated vectors against a
   documented software reference
-- [ ] Establish exact DSP busy, FIFO, stereo cadence and DMA terminal-count timing with generated
-  software comparisons. Physical testing is optional
+- [ ] Establish exact DSP busy, OPL2 port busy, FIFO, stereo cadence and DMA terminal-count timing
+  with generated software comparisons. Physical testing is optional
 - [ ] Connect the card events to a host ISA DMA and PIC model, including DMA pages, channel state,
   bus arbitration and PIC edge/EOI behavior
 - [ ] Apply mixer source selection, analog gain, tone and filter behavior when a game-facing path

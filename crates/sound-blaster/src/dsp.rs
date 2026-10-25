@@ -176,6 +176,7 @@ pub struct Dsp {
     reset_high_since: Option<u64>,
     reset_ready_at: Option<u64>,
     reset_min_pulse_met: bool,
+    uart_mode_during_reset: Option<MidiMode>,
     response: VecDeque<u8>,
     pending_command: Option<PendingCommand>,
     parameters: Vec<u8>,
@@ -196,8 +197,8 @@ pub struct Dsp {
     block_size: u32,
     pause_samples: u32,
     midi_mode: MidiMode,
+    midi_mode_before_uart: Option<MidiMode>,
     midi_output_armed: bool,
-    midi_input: VecDeque<(u64, u8)>,
     midi_irq: bool,
     irq_8bit: bool,
     irq_16bit: bool,
@@ -213,6 +214,7 @@ impl Dsp {
             reset_high_since: None,
             reset_ready_at: None,
             reset_min_pulse_met: false,
+            uart_mode_during_reset: None,
             response: VecDeque::new(),
             pending_command: None,
             parameters: Vec::new(),
@@ -233,8 +235,8 @@ impl Dsp {
             block_size: 0x1000,
             pause_samples: 0,
             midi_mode: MidiMode::Off,
+            midi_mode_before_uart: None,
             midi_output_armed: false,
-            midi_input: VecDeque::new(),
             midi_irq: false,
             irq_8bit: false,
             irq_16bit: false,
@@ -306,15 +308,26 @@ impl Dsp {
     pub fn write_reset_at(&mut self, value: u8, at_ns: u64) -> Result<(), TimeError> {
         self.advance_clock_to(at_ns)?;
         if value & 1 != 0 {
-            self.reset_device_state();
+            if self.midi_mode.uart() {
+                self.uart_mode_during_reset = Some(self.midi_mode);
+                self.midi_mode = MidiMode::Off;
+            } else {
+                self.reset_device_state();
+            }
             self.reset_high_since = Some(at_ns);
             self.reset_ready_at = None;
             self.reset_min_pulse_met = false;
         } else if let Some(started) = self.reset_high_since.take() {
             self.reset_min_pulse_met = at_ns.saturating_sub(started) >= RESET_MIN_NS;
             if self.reset_min_pulse_met {
-                self.reset_device_state();
+                if self.uart_mode_during_reset.take().is_some() {
+                    self.restore_after_uart_reset();
+                } else {
+                    self.reset_device_state();
+                }
                 self.reset_ready_at = Some(at_ns.saturating_add(RESET_READY_NS));
+            } else if let Some(mode) = self.uart_mode_during_reset.take() {
+                self.midi_mode = mode;
             }
         }
         Ok(())
@@ -323,25 +336,15 @@ impl Dsp {
     /// Read one byte from DSP data port 2xAh. None means its response FIFO is empty.
     pub fn read_data_at(&mut self, at_ns: u64) -> Result<Option<u8>, TimeError> {
         self.advance_clock_to(at_ns)?;
-        let value = self.response.pop_front();
-        if self.response.is_empty() && !self.midi_input.is_empty() {
-            self.midi_input.clear();
-            self.midi_irq = false;
-        }
-        Ok(value)
+        Ok(self.response.pop_front())
     }
 
     /// Read port 2xEh and acknowledge the backward-compatible 8-bit/MIDI DSP interrupt.
     pub fn read_buffer_status_at(&mut self, at_ns: u64) -> Result<u8, TimeError> {
         self.advance_clock_to(at_ns)?;
         self.irq_8bit = false;
-        if matches!(
-            self.midi_mode,
-            MidiMode::NormalInterrupt | MidiMode::UartInterrupt | MidiMode::UartTimestampInterrupt
-        ) && self.midi_input.is_empty()
-        {
-            self.midi_irq = false;
-        }
+        // Creative documents a read of this port as the SB-MIDI interrupt acknowledge.
+        self.midi_irq = false;
         Ok(self.read_status())
     }
 
@@ -364,16 +367,15 @@ impl Dsp {
         if self.midi_mode == MidiMode::Off {
             return Ok(());
         }
-        self.midi_input.push_back((at_ns, value));
         if self.midi_mode.timestamp() {
+            // The Creative reference specifies a wrapping 24-bit millisecond timestamp, but
+            // does not state its epoch. This model uses the host virtual clock's zero point.
             let millis = (at_ns / 1_000_000) as u32;
             self.response.push_back(millis as u8);
             self.response.push_back((millis >> 8) as u8);
             self.response.push_back((millis >> 16) as u8);
         }
-        if self.midi_mode != MidiMode::Off {
-            self.response.push_back(value);
-        }
+        self.response.push_back(value);
         if self.midi_mode.interrupt() {
             self.midi_irq = true;
             self.events.push_back(DspEvent::InterruptRaised {
@@ -406,12 +408,24 @@ impl Dsp {
         self.pending_dma.clear();
         self.pause_samples = 0;
         self.midi_mode = MidiMode::Off;
+        self.midi_mode_before_uart = None;
+        self.uart_mode_during_reset = None;
         self.midi_output_armed = false;
-        self.midi_input.clear();
         self.midi_irq = false;
         self.irq_8bit = false;
         self.irq_16bit = false;
         self.stereo_next_right = false;
+    }
+
+    fn restore_after_uart_reset(&mut self) {
+        self.response.clear();
+        self.pending_command = None;
+        self.parameters.clear();
+        self.midi_mode = self.midi_mode_before_uart.take().unwrap_or(MidiMode::Off);
+        self.midi_output_armed = false;
+        self.midi_irq = false;
+        self.irq_8bit = false;
+        self.irq_16bit = false;
     }
 }
 
