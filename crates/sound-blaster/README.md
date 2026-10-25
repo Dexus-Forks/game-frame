@@ -81,6 +81,10 @@ does not carry a block length.
   the observed running-status byte transitions and one-active-call guard. Callers supply ordered
   bytes and opaque lower-service events; packed arguments, the data-count table, long messages, and
   physical MIDI output are not modeled.
+- A generic logical Win16 Mixer control-details read/write path driven by caller-supplied control
+  descriptors. It validates shapes and limits, returns stored values, and emits opaque apply and
+  client-notification events. The master-volume control ID, channel mapping, and gain scale remain
+  unknown.
 - SB16 MPU-401 UART reset, UART-mode acknowledgement, readiness status, input/output and interrupt
   state. Its output-ready interval can be configured with `set_write_busy_ns`; the default is zero
   because the programming reference gives no byte duration.
