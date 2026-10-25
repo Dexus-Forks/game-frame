@@ -74,6 +74,9 @@ does not carry a block length.
 - A logical Win16 SB16 wave-output open/query, prepared-header queue, caller-driven completion,
   callback-event, pause/restart, and reset model. It does not implement the driver ABI, full PCM
   format matrix, lower service, callback timing, or the unresolved reset effects on queued headers.
+- A logical Win16 SB16 wave-input open/query and prepared-header queue model. Callers supply
+  capture byte counts; it reports recorded-byte progress and completion events without modeling
+  captured samples, hardware capture, or callback timing.
 - SB16 MPU-401 UART reset, UART-mode acknowledgement, readiness status, input/output and interrupt
   state. Its output-ready interval can be configured with `set_write_busy_ns`; the default is zero
   because the programming reference gives no byte duration.
