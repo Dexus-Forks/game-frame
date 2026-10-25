@@ -9,6 +9,10 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- The modular GameFrame MCP server now exposes workflow and tool discovery, knowledge queries,
+  progress and provider configuration, plus execution for every runnable catalog program and
+  script. Long-running calls report progress and support cancellation.
+
 - A clean-room-style workflow with source-visible specification and source-blind implementation
   roles, a behavior-contract template, packet checklist, team guide and emulator/debugger options.
   It records the limits of prompt-based separation and the current gap in packet isolation tools.

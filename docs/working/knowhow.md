@@ -180,9 +180,11 @@ same check by hand with `... 2>&1 | ./gameframe advise - --signatures`.
 
 ## The MCP server
 
-`./gameframe serve` is an MCP server on stdio (`tools/gameframe/serve.py`). `.mcp.json` names it
-`gameframe`. `./gameframe mcp --emit all` writes it into every other agent's file. It has four
-tools.
+`./gameframe serve` starts GameFrame's stdio MCP server. `.mcp.json` names it `gameframe`, and
+`./gameframe mcp --emit all` writes that server entry into each supported agent client's file.
+The protocol, registry, request context and capability groups live in separate modules. See the
+[MCP tool surface guide](mcp-toolchain.md) for the full tool list and module boundaries. These
+four tools cover know-how and text search:
 
 | Tool | Gives |
 |---|---|
@@ -191,7 +193,9 @@ tools.
 | `knowhow_list()` | every entry with its status and title |
 | `find(word)` | which skills and tools mention a word, as `gameframe find --json` |
 
-It wraps `tools/gameframe/advise.py`. It needs no index and keeps no state.
+The server also exposes workflow and tool discovery plus execution of catalog programs and
+scripts. It reuses the existing APIs and CLI rather than duplicating their behavior. The know-how
+tools read files and keep no state.
 
 ## A project's own entries
 

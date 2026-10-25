@@ -1599,7 +1599,11 @@ r = subprocess.run(['./gameframe', 'serve'], input=''.join(json.dumps(m) + '\n' 
 out = {m['id']: m for m in map(json.loads, r.stdout.splitlines())}
 assert sorted(out) == [1, 2, 3, 4, 5], out.keys()
 assert out[1]['result']['capabilities'] == {'tools': {}}
-assert {t['name'] for t in out[2]['result']['tools']} == {'advise', 'knowhow_entry', 'knowhow_list', 'find'}
+assert {t['name'] for t in out[2]['result']['tools']} == {
+    'advise', 'knowhow_entry', 'knowhow_list', 'find',
+    'gameframe_steps', 'gameframe_skills', 'gameframe_skill', 'gameframe_agents',
+    'gameframe_tool_catalog', 'gameframe_tool_help', 'gameframe_progress',
+    'gameframe_mcp_providers', 'gameframe_run_tool'}
 hits = json.loads(out[3]['result']['content'][0]['text'])
 assert hits[0]['id'] == 'wine-privileged-instruction' and not out[3]['result']['isError']
 assert out[4]['result']['isError'] and out[5]['error']['code'] == -32601

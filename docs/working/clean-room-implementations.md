@@ -127,11 +127,12 @@ lists CodeView for Windows and WDEB386. The archived
 documents WDEB386's serial-terminal connection. Confirm the available tool media and VM wiring
 before investing in setup.
 
-The repository's `.mcp.json` defines server entries for REA, DOSBox-X and GameFrame's own
-discovery service. A configured server may not have a live process attached, so check its ping
-before using live debugger commands. No external machine or 86Box endpoint was named for this
-project, so there is no project-specific external connector to configure yet. Add an adapter only
-after the target, protocol and testable use case are known.
+The GameFrame MCP server exposes workflow discovery, knowledge, tool help and catalog-based
+execution for every runnable GameFrame program and script. It calls the existing CLI and keeps
+the tool implementation in small capability modules. REA and DOSBox-X remain independent
+configured providers. See the [MCP tool surface guide](mcp-toolchain.md) for the operation list
+and module boundaries. Import-only libraries still need dedicated operations where agents need
+their APIs, and 86Box control needs a stable, testable protocol before an adapter is added.
 
 ## Lessons from the audio-driver work
 

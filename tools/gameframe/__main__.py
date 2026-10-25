@@ -24,7 +24,7 @@ Commands:
   progress [AGENT]      what running agents have done: each log's last lines, newest first
       --add TEXT        append a line to AGENT's log (derived/progress/AGENT.log)
       --lines N         lines shown per log (default 5); naming AGENT shows its whole log
-  serve                 GameFrame's MCP server on stdio: advise, knowhow_entry, knowhow_list, find
+  serve                 GameFrame's modular MCP server on stdio: discovery, know-how and tool execution
   agents                every agent: its skills, the tools it cannot use, its hand-offs
       --table           the Markdown table that docs/working/agents.md holds
       --emit CLIENT     write the agents in a client's format: codex, gemini, copilot, opencode or all
