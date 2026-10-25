@@ -68,6 +68,9 @@ does not carry a block length.
   timed write rejection because its port busy interval is not established here.
 - CT1335, CT1345 and CT1745 indexed register maps, documented reset values and writable masks.
   SB16 mixer registers 80h, 81h and 82h expose the selected IRQ, DMA and interrupt source state.
+- A logical Win16 SB16 auxiliary volume surface for unit count, stereo volume queries, and update
+  requests. It preserves unknown initial values and selector 7 behavior. It does not implement the
+  Win16 driver ABI or the lower sound-driver service.
 - SB16 MPU-401 UART reset, UART-mode acknowledgement, readiness status, input/output and interrupt
   state. Its output-ready interval can be configured with `set_write_busy_ns`; the default is zero
   because the programming reference gives no byte duration.
