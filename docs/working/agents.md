@@ -95,17 +95,23 @@ seconds. A difference that shows up later in a whole game run can take hours to 
 
 ## Split work between sessions
 
-Several agent sessions can work on one project at the same time.
+Parallel sessions are optional. Continue in the current session by default. A task being
+independent or self-contained does not authorize delegation. When another session or worktree
+could materially help, explain the trade-off and ask the user. Start it only when the user asks
+or agrees.
 
 | Kind of work | Where it goes |
 |---|---|
 | Hard reasoning: maths, timing, the main loop, exactness bugs | The main session, with the most capable model |
-| Long mechanical work: generated types, text tables, menus, moving code without changing it | A separate session with an exact brief, possibly a faster and cheaper model |
-| Independent subsystems | One session each, in separate git worktrees, each touching its own files |
-| Questions that only need reading | A read-only session in the same checkout |
+| Long mechanical work: generated types, text tables, menus, moving code without changing it | Current session by default; a separate session with an exact brief if the user chooses it |
+| Independent subsystems | If the user chooses parallel work, one session per subsystem in separate git worktrees |
+| Questions that only need reading | Current session, or a read-only session if the user chooses it |
 
 Rules for parallel sessions:
 
+- Do not start a subagent, another task or a worktree without the user's request or agreement.
+- A paid unattended API run is also opt-in. Follow [API credits](api-credits.md) and ask before
+  spending credits or sending project material to the provider.
 - Each session stages only its own files (`git add path`). Never `git add -A`.
 - Sessions in one checkout share one git index. A plain `git commit` also takes files another
   session has staged. Commit with a pathspec (`git commit -m "..." -- path1 path2`), which

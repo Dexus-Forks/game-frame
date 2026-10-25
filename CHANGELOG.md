@@ -7,6 +7,12 @@ Every release of GameFrame, newest first. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- Stage agents, separate tasks and worktrees are optional. The current session is the default,
+  and a task being self-contained does not imply permission to delegate. Paid unattended runs
+  and recurring schedules require the user's choice.
+
 ### Added
 
 - The modular GameFrame MCP server now exposes workflow and tool discovery, knowledge queries,

@@ -12,6 +12,12 @@ desktop app or the web. They do not pay for the Claude Code GitHub Action either
 The tools in `tools/llm/` use the credits for work that suits them: large batches, unattended
 runs and checks that repeat each month.
 
+These tools are optional. A task being self-contained, suitable for automation or covered by
+available credits is not a request to run it. Continue in the current session by default. Ask the
+user before making a paid API call, starting an unattended agent or sending project material to
+the provider. Run it only if the user asks or agrees. Ask separately before setting up recurring
+runs.
+
 ## Set up
 
 1. On claude.ai, open Settings, then Billing. In the API credits section, link a Console
@@ -85,12 +91,16 @@ Add a task when a skill changes. Take the expected strings from the sample's own
 `headless.py` runs one of the agents in `agents/` with its skills and a budget. It saves the
 agent's final report to `analysis/llm/runs/`.
 
+Use it only after the user asks or agrees. A self-contained task or a good fit for unattended
+work is not permission to start the run. Ask before creating a branch or worktree for it.
+
 ```bash
 ./gameframe run tools/llm/headless.py re-decoder "Decode every .PAK file and prove the decoder with validate.py" --write --budget 10
 ```
 
-Without `--write` the agent can read files and run commands, and it changes nothing. With
-`--write`, run it on a branch or a worktree of its own and read the diff before you merge.
+Without `--write` the agent can read files and run commands, and it changes nothing. Before a
+`--write` run, agree with the user where changes should go. Use the branch or worktree they
+choose, and read the diff before merging. Do not create an isolated checkout by default.
 
 `headless.py docs-check` runs `re-checker` and then `re-editor` over the documents. It changes
 nothing. The report lists missing evidence, addresses and files that do not exist, gaps that
@@ -126,18 +136,18 @@ costs under a cent.
 
 ## A month of credits
 
-Credits expire at the end of each cycle, so plan work that spends them before then. One way
-to plan a month of $200:
+If the user chooses to spend credits, a budget can help keep the work within the limit. This is
+an optional example for a month of $200, not a schedule to enact:
 
-| When | What | Limit |
+| Possible timing | What | Limit |
 |---|---|---|
 | A new game | `name_functions.py` over its main binaries | `--max` from the `prepare` count |
 | After skill edits | `skillcheck.py` | `--budget 1` a task |
 | Each week | `headless.py docs-check` | `--budget 5` |
 | The last days | `headless.py` with a long task the project has put off | what is left |
 
-Schedule the repeating runs with cron or launchd. Each tool stops at its own limit. The
-workspace spend limit in the Console stops everything.
+Only set up recurring runs with cron or launchd when the user asks for them. Each tool stops at
+its own limit. The workspace spend limit in the Console stops everything.
 
 ## Tests
 
