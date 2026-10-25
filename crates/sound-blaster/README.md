@@ -48,8 +48,11 @@ does not carry a block length.
 - Transfer-rate scheduling from the legacy time constant or SB16 sampling-rate commands, DMA
   request events, capture writes, playback sample conversion, pause/resume, per-block interrupts,
   and deferred auto-init exit.
-- ADPCM command recognition for 2-, 3- and 4-bit streams. It marks the initial reference byte and
-  emits compressed input bytes with the selected format. It does not decode them to PCM.
+- ADPCM decoding for Creative 2-, 3- and 4-bit streams. Each returned compressed-byte event
+  includes its expanded unsigned PCM samples, the output sample rate, and whether the byte was a
+  predictor reference. The reference byte emits one sample; compressed bytes emit four, three or
+  two samples. The decoder uses the CT1741 firmware 4.05 recurrence and preserves state across
+  continuation blocks.
 - DSP MIDI polling/interrupt and UART command modes, timestamped input, and MIDI output events.
 - OPL2 FM ports at `388h`/`389h` and the card's legacy `base + 8` ports. OPL3 profiles expose both
   YMF262 banks at `388h` through `38Bh`. Pro and SB16 profiles also expose their FM ports at
@@ -68,10 +71,13 @@ does not carry a block length.
 
 ## Limits and software checks to add
 
-The public reference describes ADPCM reference-byte and block-command handling, but not the
-predictor recurrence or update tables. Commands and transfer counts are recognized, and the initial
-reference byte is marked, but compressed bytes are not decoded to PCM. Compare generated vectors
-against an independently documented bitstream reference before adding the decoder.
+The CT1741 firmware 4.05 static trace supplies the decoder recurrence and packed-byte order. The
+implementation has not yet been compared sample-for-sample with an executed firmware image or a
+named software reference. The initial predictor state for a no-reference transfer before any
+reference byte is not established by the trace; it starts at zero. A software-only check can run
+the three firmware helpers in Ghidra's 8051 p-code emulator with a stub for the sample output port,
+then compare predictor, step and output bytes for sign, magnitude, clamp, tail-code and continuation
+vectors. Physical hardware is not required.
 
 The public reference gives approximate reset readiness but not per-command DSP busy durations, DMA
 FIFO depth, bus arbitration, all DMA terminal-count edge timing, or exact SB16 stereo word/frame

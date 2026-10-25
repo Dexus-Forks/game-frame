@@ -90,7 +90,7 @@ reference gives no byte duration. MPU-401 intelligent mode is not implemented.
 
 | Behavior | Current model | Useful software check |
 |---|---|---|
-| ADPCM | Recognizes 2-, 3- and 4-bit commands, transfer length and the initial reference byte. It passes compressed bytes through and does not decode PCM. A static trace of CT1741 firmware 4.05 found the decode helpers and reference state setup. Their complete output sequence has not been compared with a running reference. | Run a Ghidra 8051 emulator harness over crafted reference and compressed bytes. Record the predictor, step, output byte and reservoir after each sample. Compare a Rust decoder against every result, including byte boundaries and continuation blocks. No physical card is needed. |
+| ADPCM | Decodes 2-, 3- and 4-bit transfers to unsigned PCM samples. Reference bytes set the predictor and step. DMA requests follow the decoded sample cadence. The implementation follows CT1741 firmware 4.05 static disassembly; sample parity is not yet measured. A no-reference transfer before any prior reference starts from predictor zero, which remains unconfirmed. | Run the three decode helpers in a Ghidra 8051 p-code harness with a stub sample port. Record predictor, step and each output byte. Compare sign and magnitude combinations, predictor clamps, step limits, the packed 3-bit tail, nibble order, request cadence and continuation blocks. This software-only check does not need a physical card. |
 | DSP and OPL2 port timing | DSP command busy time and YM3812 port busy time are not specified by the reference used here. DSP busy time defaults to zero. YMF262 writes enforce its documented spacing. | Run generated reset, status-polling and FM register sequences in a DOS virtual machine. Compare port reads and accepted writes at boundary timestamps. |
 | DMA and IRQ timing | Timestamped requests, captured writes and DSP-side IRQ state. DMA controller and PIC remain host responsibilities. | Connect a fake 8237-style DMA adapter and PIC. Check exact transfer counts, terminal count, 64 KiB page behavior, IRQ source bits, acknowledgement and auto-init exit. |
 | SB16 FIFO and stereo cadence | Separate output/input rates and left/right PCM words. FIFO depth and exact bus cadence are not modeled. | Drive the same generated stereo stream through a fake DMA adapter at several rates. Compare request count, timestamps, channel order and block IRQs with a documented software reference. |
@@ -120,11 +120,30 @@ not compared with a software or hardware reference.
 | `10ad` | The 4-bit path reads the high nibble, then the low nibble. It forms a delta from the magnitude, step and half-step, then clamps the predictor to one byte. |
 | `0dce`, `0e52` | The reference-byte paths initialize the predictor from the input byte and set the step to one. |
 
-These findings identify the code paths, but not yet a verified decoder contract. The next software
-check should run each helper with the firmware's register bank and a stub external sample port.
-Vectors should cover both signs, every magnitude, predictor values near zero and 255, step changes,
-the 3-bit tail, both nibbles and a continuation block without a reference byte. Then compare the
-port output and updated state with the Rust decoder. Physical testing is optional.
+The static disassembly supports the current decoder contract. It does not prove sample parity.
+`1056` reads a sign bit followed by one magnitude bit. A zero magnitude uses half the step and
+halves the step with a minimum of one. A one magnitude uses one-and-a-half times the step and
+doubles the step up to 32. The predictor clamps to an unsigned byte.
+
+`10ad` consumes the high nibble before the low nibble. The high bit is sign and the next three bits
+are magnitude. Its delta is `magnitude * step + floor(step / 2)`. Magnitude zero halves the step
+with a minimum of one. Magnitudes five through seven double it, capped at eight. The predictor
+clamps to an unsigned byte.
+
+`10f8` consumes two 3-bit codes and a final 2-bit code from each input byte. Each code starts with
+sign. The remaining bits are magnitude. The delta is `magnitude * step + floor(step / 2)`. A zero
+magnitude halves the step with a minimum of one. Magnitudes one and two set the step to that
+magnitude. Magnitude three doubles the step, except a step of 16 changes to 3. The predictor
+clamps to an unsigned byte.
+
+The DSP model requests a reference byte on the first output tick when that command includes one.
+It requests the first compressed byte on the next output tick, then requests each later compressed
+byte every four, three or two output ticks for 2-, 3- or 4-bit mode. Each `AdpcmByte` event returns
+the decoded samples in order and the output rate. The formulas above come from static instructions
+and have not been compared with executed firmware. A software-only check should run each helper with
+the firmware register bank and a stub sample port. Vectors should cover both signs, every
+magnitude, predictor values near zero and 255, step changes, byte boundaries, the 3-bit tail,
+both nibbles, continuation blocks and DMA request intervals. Physical testing is optional.
 
 ## Source
 

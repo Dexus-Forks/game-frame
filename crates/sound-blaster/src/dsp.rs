@@ -1,5 +1,7 @@
 use std::collections::VecDeque;
 
+use crate::adpcm::AdpcmDecoder;
+
 mod commands;
 mod transfer;
 
@@ -87,12 +89,18 @@ pub enum DspEvent {
         width: TransferWidth,
     },
     Pcm(PcmSample),
-    /// Compressed data is preserved as an event while the proprietary ADPCM recurrence is open.
+    /// One compressed byte and its decoded unsigned PCM samples.
+    ///
+    /// `samples` are in output order. The first sample is due at `at_ns`; each following sample
+    /// is one `sample_rate_hz` period later. Slots at or after `sample_count` are unused.
     AdpcmByte {
         at_ns: u64,
         value: u8,
         bits_per_sample: u8,
         reference_byte: bool,
+        sample_rate_hz: u32,
+        samples: [i16; 4],
+        sample_count: u8,
     },
     MidiOutput {
         at_ns: u64,
@@ -164,6 +172,12 @@ struct ActiveTransfer {
     paused: bool,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct PendingDma {
+    request: DmaRequest,
+    adpcm_reference_byte: bool,
+}
+
 /// The Sound Blaster DSP command processor and digital sample interface.
 ///
 /// All time arguments are monotonic nanoseconds on the host machine's virtual timeline.
@@ -193,7 +207,9 @@ pub struct Dsp {
     direct_input_pending: bool,
     capture_input: VecDeque<u16>,
     active_transfer: Option<ActiveTransfer>,
-    pending_dma: VecDeque<DmaRequest>,
+    pending_dma: VecDeque<PendingDma>,
+    adpcm_decoder: AdpcmDecoder,
+    adpcm_ticks_until_next_byte: u8,
     block_size: u32,
     pause_samples: u32,
     midi_mode: MidiMode,
@@ -232,6 +248,8 @@ impl Dsp {
             capture_input: VecDeque::new(),
             active_transfer: None,
             pending_dma: VecDeque::new(),
+            adpcm_decoder: AdpcmDecoder::new(),
+            adpcm_ticks_until_next_byte: 0,
             block_size: 0x1000,
             pause_samples: 0,
             midi_mode: MidiMode::Off,
@@ -406,6 +424,8 @@ impl Dsp {
         self.direct_input_pending = false;
         self.active_transfer = None;
         self.pending_dma.clear();
+        self.adpcm_decoder.reset();
+        self.adpcm_ticks_until_next_byte = 0;
         self.pause_samples = 0;
         self.midi_mode = MidiMode::Off;
         self.midi_mode_before_uart = None;

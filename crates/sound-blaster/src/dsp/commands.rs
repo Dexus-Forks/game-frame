@@ -249,6 +249,7 @@ impl Dsp {
         adpcm_reference_pending: bool,
     ) {
         self.pending_dma.clear();
+        self.adpcm_ticks_until_next_byte = 0;
         let count = count.map(|v| v.max(1));
         self.active_transfer = Some(ActiveTransfer {
             direction: if output {

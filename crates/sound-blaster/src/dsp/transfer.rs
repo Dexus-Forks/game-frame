@@ -1,7 +1,8 @@
 use super::{
     ActiveTransfer, DmaDirection, DmaRequest, Dsp, DspEvent, InterruptSource, PcmChannel,
-    PcmSample, TimeError, TransferWidth,
+    PcmSample, PendingDma, TimeError, TransferWidth,
 };
+use crate::adpcm::{AdpcmMode, AdpcmSamples};
 
 const NS_PER_SECOND: u128 = 1_000_000_000;
 
@@ -41,22 +42,41 @@ impl Dsp {
     }
 
     /// Respond to the oldest pending memory-to-card DMA read request.
-    /// A returned event contains the decoded PCM word or the raw ADPCM byte.
+    /// A returned event contains one decoded PCM word or one ADPCM byte with its expanded samples.
     pub fn service_dma_read(&mut self, value: u16) -> Option<DspEvent> {
-        let request = self.pending_dma.pop_front()?;
+        let pending = self.pending_dma.pop_front()?;
+        let request = pending.request;
         let mut transfer = self.active_transfer?;
         if transfer.direction != DmaDirection::MemoryToCard {
-            self.pending_dma.push_front(request);
+            self.pending_dma.push_front(pending);
             return None;
         }
         let event = if let Some(bits) = transfer.adpcm_bits {
-            let reference_byte = transfer.adpcm_reference_pending;
-            transfer.adpcm_reference_pending = false;
+            let mode = AdpcmMode::from_bits(bits)?;
+            let decoded = if pending.adpcm_reference_byte {
+                AdpcmSamples {
+                    values: [self.adpcm_decoder.set_reference(value as u8), 0, 0, 0],
+                    count: 1,
+                }
+            } else {
+                self.adpcm_decoder.decode_byte(mode, value as u8)
+            };
+            let mut samples = [0; 4];
+            for (destination, source) in samples.iter_mut().zip(decoded.values) {
+                *destination = if self.speaker_on {
+                    ((source as i16) - 128) << 8
+                } else {
+                    0
+                };
+            }
             DspEvent::AdpcmByte {
                 at_ns: request.at_ns,
                 value: value as u8,
                 bits_per_sample: bits,
-                reference_byte,
+                reference_byte: pending.adpcm_reference_byte,
+                sample_rate_hz: self.transfer_rate_hz(),
+                samples,
+                sample_count: decoded.count,
             }
         } else {
             let decoded = match transfer.width {
@@ -85,6 +105,7 @@ impl Dsp {
         self.complete_transfer(&mut transfer, request.at_ns);
         self.active_transfer =
             if transfer.remaining == Some(0) && (!transfer.auto_init || transfer.exit_at_block) {
+                self.adpcm_ticks_until_next_byte = 0;
                 None
             } else {
                 Some(transfer)
@@ -174,6 +195,27 @@ impl Dsp {
         if transfer.paused {
             return;
         }
+        let mut transfer = transfer;
+        let adpcm_reference_byte = if let Some(bits) = transfer.adpcm_bits {
+            if self.adpcm_ticks_until_next_byte > 0 {
+                self.adpcm_ticks_until_next_byte -= 1;
+                return;
+            }
+            let reference_byte = transfer.adpcm_reference_pending;
+            transfer.adpcm_reference_pending = false;
+            self.active_transfer = Some(transfer);
+            self.adpcm_ticks_until_next_byte = if reference_byte {
+                0
+            } else {
+                AdpcmMode::from_bits(bits)
+                    .map(AdpcmMode::samples_per_byte)
+                    .unwrap_or(1)
+                    .saturating_sub(1)
+            };
+            reference_byte
+        } else {
+            false
+        };
         let request = DmaRequest {
             at_ns,
             direction: transfer.direction,
@@ -181,7 +223,10 @@ impl Dsp {
         };
         match transfer.direction {
             DmaDirection::MemoryToCard => {
-                self.pending_dma.push_back(request);
+                self.pending_dma.push_back(PendingDma {
+                    request,
+                    adpcm_reference_byte,
+                });
                 self.events.push_back(DspEvent::DmaRequest(request));
             }
             DmaDirection::CardToMemory => {
