@@ -61,6 +61,10 @@ In my GameFrame project, find every place the game touches hardware.
 - [Win16 SB16 wave-output contract](sb16-wave-output-contract.md): a bounded logical contract for
   format opening and buffer submission. The accepted PCM matrix, callback behavior, pause and
   restart semantics, reset behavior and hardware effects remain unknown.
+- [Win16 SB16 wave-completion contract](sb16-wave-completion-contract.md): a bounded logical
+  contract for queue draining, header updates, callback delivery, and pause, restart and reset.
+  Callback timing and order, reset handling for queued headers, buffer limits, and lower-service
+  behavior remain unknown.
 - [The sound card makers' APIs](sound-card-apis.md): the Maxi Sound 64, A3D, EAX, the AWE's
   SoundFont Manager, Sensaura and QSound: how a game finds each, what Wine offers, and which
   can be stood in for.
