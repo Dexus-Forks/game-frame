@@ -11,6 +11,7 @@ mod fm;
 mod mixer;
 mod mpu;
 pub mod win16_aux;
+pub mod win16_fm_output;
 pub mod win16_midi_output;
 pub mod win16_mixer_details;
 pub mod win16_wave;
