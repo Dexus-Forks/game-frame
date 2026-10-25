@@ -11,6 +11,7 @@ mod fm;
 mod mixer;
 mod mpu;
 pub mod win16_aux;
+pub mod win16_wave;
 
 pub use adpcm::{AdpcmDecoder, AdpcmMode, AdpcmSamples};
 pub use card::{SoundBlaster, SoundBlasterConfig};
@@ -26,4 +27,13 @@ pub use win16_aux::{
     AuxiliaryVolumeOperation, ImmediateApply, LowerServiceState, LowerServiceVolumeUpdate,
     StereoVolume, VolumeState, Win16Aux, AUXILIARY_UNIT_COUNT, AUX_VOLUME_QUERY_MESSAGE,
     AUX_VOLUME_UPDATE_MESSAGE,
+};
+pub use win16_wave::{
+    open_wave_output, DeviceContextState, FormatCheckResult, HeaderLinkState, LowerOpenResult,
+    LowerServiceDispatch, OpenPossibility, QueryOpenReply, StreamAllocationResult, WaveHeader,
+    WaveOpenFailure, WaveOpenReply, WaveOpenRequest, WaveOutputStream, WaveSubmissionFailure,
+    WaveSubmissionReply, WAVE_HEADER_DONE, WAVE_HEADER_IN_QUEUE, WAVE_HEADER_PREPARED,
+    WAVE_OPEN_QUERY, WAVE_STATUS_HEADER_ALREADY_QUEUED, WAVE_STATUS_HEADER_NOT_PREPARED,
+    WAVE_STATUS_OPEN_CONTEXT_OR_ALLOCATION, WAVE_STATUS_OPEN_UNMAPPED_3,
+    WAVE_STATUS_OPEN_UNMAPPED_7, WAVE_STATUS_SUCCESS, WAVE_STATUS_UNSUPPORTED_FORMAT,
 };
