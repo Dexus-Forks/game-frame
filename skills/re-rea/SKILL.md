@@ -41,6 +41,28 @@ targeted questions and evidence, the export for broad search.
    address ("observed: FUN_1400be770 writes +0x44 (REA evidence ev_...)").
 5. **Close** native sessions with `close_binary` when done.
 
+## Native functions through Ghidra
+
+REA can provide a focused Ghidra session when a question needs one native function or its exact
+instructions. Check `binary_session` first. In `analysis_provider_candidates`, confirm that
+`ghidra` is available and note the reported Ghidra and Java versions. An available candidate is
+not yet the selected provider and does not prove that a particular target can be analyzed.
+
+Open the exact executable with `open_binary(path=..., provider_id="ghidra")`. Record its reported
+format, architecture and SHA-256. Ghidra completes its default analysis before REA serves
+function results. Then use `analyze_function(procedure="0x...")` for the function identity and
+body, pseudocode, assembly, calls, references, strings and control-flow blocks. Its Evidence
+record carries coverage and limitations; keep the evidence ID with the finding.
+
+For arithmetic, calling-convention or register questions, read every instruction with
+`read_function_instructions(procedure="0x...")` or use `procedure_assembly`. Check the relevant
+instructions against the decompiler's claims. REA is useful for a focused trace; use GameFrame's
+Ghidra export for repeated whole-program searches and the emulator for measured behavior.
+
+Before closing, use `export_evidence_bundle(path=...)` when the evidence must persist. The
+provider's imported program and project are temporary; closing the session removes them. Store
+target-derived evidence under an ignored analysis directory, never in tracked files.
+
 ## Rules that carry over
 
 - REA's evidence labels match ours: observations, inferences and unknowns stay separate; static

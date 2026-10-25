@@ -7,6 +7,13 @@ Every release of GameFrame, newest first. The format follows
 
 ## [1.4.0-dev] - Unreleased
 
+### Changed
+
+- The REA skill now documents how to check Ghidra provider readiness, open an explicit Ghidra
+  session, inspect a native function and its raw instructions, retain the Evidence bundle, and
+  close the temporary project. It separates focused REA analysis from whole-program Ghidra
+  searches and emulator measurements.
+
 ## [1.3.0] - 2026-10-25
 
 ### Changed
