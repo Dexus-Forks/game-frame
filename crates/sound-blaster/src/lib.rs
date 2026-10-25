@@ -12,6 +12,7 @@ mod mixer;
 mod mpu;
 pub mod win16_aux;
 pub mod win16_wave;
+pub mod win16_wave_input;
 
 pub use adpcm::{AdpcmDecoder, AdpcmMode, AdpcmSamples};
 pub use card::{SoundBlaster, SoundBlasterConfig};
