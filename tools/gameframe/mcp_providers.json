@@ -1,0 +1,40 @@
+{
+  "rea": {
+    "version": "6.7.0",
+    "description": "REA: binary, package, browser and runtime analysis",
+    "install": "Node.js 22.23.4+, 24.22.1+, or 26.12.1+; the launcher uses npx and the pinned package version",
+    "server": {
+      "command": "./gameframe",
+      "args": ["mcp-provider", "rea", "6.7.0"]
+    }
+  },
+  "dosbox": {
+    "version": "v0.1.2",
+    "description": "DOSBox-X built-in debugger control",
+    "install": "cargo install --git https://github.com/caiiiycuk/dosbox-x-mcp-server --tag v0.1.2 --locked",
+    "server": {
+      "command": "./gameframe",
+      "args": ["mcp-provider", "dosbox", "v0.1.2"]
+    }
+  },
+  "mcp-emulate": {
+    "version": "0.1.0",
+    "description": "CPU emulation, disassembly, assembly and trace tools",
+    "install": "uv (the launcher uses uvx with the pinned PyPI version)",
+    "server": {
+      "command": "./gameframe",
+      "args": ["mcp-provider", "mcp-emulate", "0.1.0"]
+    }
+  },
+  "86box": {
+    "version": "0.1.0 @ 9e6cdd02f6956e3ff32ec99c1dd4b0be7798d3ca",
+    "description": "86Box whole-PC control through the automation socket",
+    "install": "Local source checkout and server venv; build 86Box with AUTOMATION=ON",
+    "source_revision": "9e6cdd02f6956e3ff32ec99c1dd4b0be7798d3ca",
+    "minimum_emulator_revision": "1be46d317107f5219f160547d77614ff8e19a7c7",
+    "server": {
+      "command": "./gameframe",
+      "args": ["mcp-provider", "86box", "9e6cdd02f6956e3ff32ec99c1dd4b0be7798d3ca"]
+    }
+  }
+}

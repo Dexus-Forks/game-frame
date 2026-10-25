@@ -34,13 +34,16 @@ Never put game files, extracted assets or decompiled code inside a git checkout.
 | JDK | 21, the full JDK (with `javac`) | Ghidra |
 | Ghidra | 11 or 12 (12.1.4 tested) | decompiling |
 | objdump | GNU binutils or LLVM | reading instructions exactly |
-| Node.js | 18 or later (24 tested) | REA |
+| Node.js | 18 or later (24 tested) | VitePress and other Node tools |
+| Node.js for REA | 22.23.4+, 24.22.1+, or 26.12.1+ | optional REA MCP provider |
 | Zig | 0.14 | building the sample game in the tests |
 | DOSBox-X | 2026.10 or later, with the heavy debugger | DOS games, the debugger tests |
 | innoextract, 7-Zip | any recent | unpacking installers |
-| REA | 6.4.0 | the MCP server for agents (optional) |
+| REA | 6.7.0 | optional MCP server for agents; enable with `./gameframe mcp --enable rea` |
 
-`scripts/setup.sh` checks each one and prints a table. `--install` installs with apt on Debian
+`scripts/setup.sh` checks each one and prints a table. External MCP servers are off by default.
+Use `./gameframe mcp --list` and `./gameframe mcp --enable NAME` to add one to a project.
+`--install` installs with apt on Debian
 and Ubuntu. Ghidra is not in apt: download the release zip, check its SHA-256 against the
 release page, unzip it and set `GHIDRA_INSTALL_DIR`.
 

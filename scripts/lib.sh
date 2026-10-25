@@ -39,10 +39,20 @@ ghidra_project_dir() {
   esac
 }
 
+# DOSBox-X binary from the local project environment, or the one on PATH.
+dosbox_binary() {
+  if [[ -n "${DOSBOX_X_BINARY:-}" ]]; then
+    echo "$DOSBOX_X_BINARY"
+  else
+    command -v dosbox-x || return 1
+  fi
+}
+
 # DOSBox-X's version as YYYY.MM.DD, or nothing when it is not installed.
 dosbox_version() {
-  command -v dosbox-x >/dev/null || return 0
-  { dosbox-x -version 2>&1 || true; } | sed -n 's/^DOSBox-X version \([0-9][0-9.]*\).*/\1/p' | head -1
+  local binary; binary="$(dosbox_binary)" || return 0
+  [[ -x "$binary" ]] || return 0
+  { "$binary" -version 2>&1 || true; } | sed -n 's/^DOSBox-X version \([0-9][0-9.]*\).*/\1/p' | head -1
 }
 
 # True when DOSBox-X has the debugger control channel (the mcp_server setting), which

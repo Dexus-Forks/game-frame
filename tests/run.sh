@@ -1432,7 +1432,7 @@ for name in names:
     cop = (gen / '.github/agents' / f'{name}.agent.md').read_text()
     tools = json.loads(re.search(r'^tools: (.*)$', cop, re.M).group(1))
     assert 'agent' not in tools and 'read' in tools, f'{name}: copilot tools {tools}'
-    assert ('mcp' not in denied) == ('rea/*' in tools), f'{name}: Copilot MCP access does not follow disallowedTools: {tools}'
+    assert ('mcp' not in denied) == ('gameframe/*' in tools), f'{name}: Copilot MCP access does not follow disallowedTools: {tools}'
     assert ('web' in tools) == ('WebFetch' not in denied or 'WebSearch' not in denied), f'{name}: copilot web'
     oc = (gen / '.opencode/agents' / f'{name}.md').read_text()
     assert 'mode: subagent' in oc and '  task: deny' in oc, f'{name}: opencode'
@@ -1625,6 +1625,14 @@ print('initialize, tools/list, advise, a missing entry, an unknown method')
 PY
 )"
 [[ $? == 0 ]] && ok "gameframe serve answers MCP calls for the know-how ($out)" || bad "gameframe serve" "$out"
+out="$("$PYTHON" tests/mcp_provider_config.py 2>&1)"
+[[ $? == 0 && "$out" == *"MCP providers: opt-in, generated clients, version pins, project .env and local builds"* ]] \
+  && ok "optional MCP providers use project-local settings and preserve client configuration ($out)" \
+  || bad "MCP provider opt-in" "$out"
+out="$("$PYTHON" tests/mcp_tool_coverage.py 2>&1)"
+[[ $? == 0 && "$out" == *"MCP coverage: 117 catalog entries, 95 runnable tools, progress/cancel/timeout"* ]] \
+  && ok "the GameFrame MCP exposes every catalog entry and runs every program and script ($out)" \
+  || bad "GameFrame MCP tool coverage" "$out"
 out="$("$PYTHON" - <<'PY' 2>&1
 import json, re, subprocess, tomllib
 src = json.load(open('.mcp.json'))['mcpServers']
@@ -1635,11 +1643,11 @@ files = {'.codex/config.toml': lambda t: tomllib.loads(t)['mcp_servers'],
          'opencode.json': lambda t: json.loads(t)['mcp']}
 for path, get in files.items():
     servers = get(open(path).read())
-    assert set(servers) == set(src) >= {'rea', 'dosbox'}, f'{path} names {sorted(servers)}'
+    assert set(servers) == set(src) == {'gameframe'}, f'{path} names {sorted(servers)}'
     left = re.findall(r'\$\{\w+:-', json.dumps(servers))
     assert path == '.gemini/settings.json' or not left, f'{path} keeps a default its client does not expand'
 assert json.load(open('.gemini/settings.json'))['context']['fileName'] == ['AGENTS.md'], 'Gemini CLI does not read AGENTS.md'
-assert tomllib.loads(open('.codex/config.toml').read())['mcp_servers']['rea']['env_vars'] == ['GHIDRA_INSTALL_DIR', 'JAVA_HOME']
+assert not {'rea', 'dosbox'} & set(src), 'external MCP providers should be opt-in'
 # A stale file is caught, and a rewrite keeps the file's other settings.
 keep = {p: open(p).read() for p in ('.vscode/mcp.json', '.codex/config.toml')}
 try:

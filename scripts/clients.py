@@ -16,7 +16,8 @@ write puts each chosen client's files into DEST:
   of the skills in skills/ and only the .agents/skills link;
 - the agents' copies: .codex/agents, .gemini/agents, .github/agents, .opencode/agents. Cursor
   reads .claude/agents in a copied project. A plugin project gets a copy in .cursor/agents,
-  since agents in .claude/agents would stand beside the plugin's own in Claude Code;
+  since agents in .claude/agents would stand beside the plugin's own in Claude Code. Copilot's
+  tool allowlists include the MCP servers enabled in the project's .mcp.json;
 - the hooks (the gates and the know-how hook): .codex/hooks.json, the hooks in
   .gemini/settings.json, .cursor/hooks.json, .github/hooks/gameframe.json. In a plugin project
   they run through ./gameframe gate and ./gameframe advise-hook;
@@ -39,6 +40,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CLIENTS = ('claude', 'codex', 'gemini', 'copilot', 'cursor', 'opencode')
@@ -104,6 +106,21 @@ def shipped(blob):
     return bool(blob) and subprocess.run(['git', '-C', ROOT, 'cat-file', '-e', blob], capture_output=True).returncode == 0
 
 
+def copilot_agents(dest):
+    """Render Copilot agents with this project's enabled MCP server names."""
+    with tempfile.TemporaryDirectory(prefix='gameframe-copilot-agents-') as out:
+        env = {**os.environ, 'GAMEFRAME_ROOT': ROOT, 'GAMEFRAME_PROJECT': os.path.abspath(dest)}
+        result = subprocess.run([sys.executable, os.path.join(ROOT, 'gameframe'), 'agents',
+                                 '--emit', 'copilot', '--out', out], cwd=dest, env=env,
+                                capture_output=True, text=True)
+        if result.returncode:
+            raise SystemExit(result.stderr or result.stdout)
+        base = os.path.join(out, '.github', 'agents')
+        return {os.path.relpath(os.path.join(base, name), out):
+                open(os.path.join(base, name), encoding='utf-8').read()
+                for name in sorted(os.listdir(base)) if name.startswith('re-')}
+
+
 class Writer:
     def __init__(self, dest, dry):
         self.dest, self.dry = dest, dry
@@ -157,6 +174,7 @@ class Writer:
 def write(dest, clients, plugin=False, dry=False):
     w = Writer(os.path.abspath(dest), dry)
     others = [c for c in clients if c != 'claude']
+    generated_copilot = copilot_agents(dest) if 'copilot' in others else {}
     if plugin and others:
         w.tree('skills', 'skills')
     if 'claude' in clients and not plugin:
@@ -165,9 +183,13 @@ def write(dest, clients, plugin=False, dry=False):
         w.link('.agents/skills')
     for c in others:
         if c in AGENT_DIRS:
-            for name in sorted(os.listdir(os.path.join(ROOT, AGENT_DIRS[c]))):
-                if name.startswith('re-'):
-                    w.copy(f'{AGENT_DIRS[c]}/{name}')
+            if c == 'copilot':
+                for rel, text in generated_copilot.items():
+                    w.put(rel, text)
+            else:
+                for name in sorted(os.listdir(os.path.join(ROOT, AGENT_DIRS[c]))):
+                    if name.startswith('re-'):
+                        w.copy(f'{AGENT_DIRS[c]}/{name}')
         elif c == 'cursor' and plugin:
             for name in sorted(os.listdir(os.path.join(ROOT, 'agents'))):
                 w.copy(f'.cursor/agents/{name}', f'agents/{name}')
@@ -175,6 +197,19 @@ def write(dest, clients, plugin=False, dry=False):
             w.copy(rel, plugin=plugin)
         if c == 'gemini':
             w.put('.gemini/settings.json', gemini_settings(plugin))
+    if not dry:
+        mcp_clients = {'codex': 'codex', 'gemini': 'gemini', 'copilot': 'vscode',
+                       'cursor': 'cursor', 'opencode': 'opencode'}
+        env = {**os.environ, 'GAMEFRAME_ROOT': ROOT, 'GAMEFRAME_PROJECT': os.path.abspath(dest)}
+        for client in others:
+            mcp_client = mcp_clients.get(client)
+            if not mcp_client:
+                continue
+            result = subprocess.run([sys.executable, os.path.join(ROOT, 'gameframe'), 'mcp',
+                                     '--emit', mcp_client], cwd=dest, env=env,
+                                    capture_output=True, text=True)
+            if result.returncode:
+                raise SystemExit(result.stderr or result.stdout)
     return w
 
 

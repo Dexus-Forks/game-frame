@@ -61,12 +61,12 @@ if [[ -z "$(find_ghidra)" && $install == 1 && $os == Darwin ]] && have brew; the
 if [[ -n "$(find_ghidra)" ]]; then row ghidra ok "$(find_ghidra)"
 else row ghidra MISSING "https://github.com/NationalSecurityAgency/ghidra/releases (unzip, set GHIDRA_INSTALL_DIR)"; missing=$((missing + 1)); fi
 check objdump "objdump --version" binutils binutils "binutils or LLVM objdump"
-check node "node --version" node nodejs "Node.js 18+ (REA runs with npx)"
+check node "node --version" node nodejs "Node.js 18+ for site tools; REA needs 22.23.4+, 24.22.1+ or 26.12.1+"
 check zig "zig version" zig "" "optional: builds examples/sample-game (https://ziglang.org/download)"
 check innoextract "innoextract --version | head -1" innoextract innoextract "optional: extracts Inno Setup installers (GOG): scripts/extract-installer.sh"
 check 7z "command -v 7z || command -v 7zz" sevenzip p7zip-full "optional: extracts NSIS, MSI, cab, 7z and rar: scripts/extract-installer.sh"
-check dosbox-x "command -v dosbox-x >/dev/null && { dosbox-x -version 2>&1 || true; } | sed -n 's/^\\(DOSBox-X version [^ ,]*\\).*/\\1/p'" dosbox-x dosbox-x "optional, for DOS games: brew install --formula dosbox-x, or https://dosbox-x.com"
-if command -v dosbox-x >/dev/null && ! dosbox_has_debug_channel; then
+check dosbox-x 'db="$(dosbox_binary)" && [[ -x "$db" ]] && { "$db" -version 2>&1 || true; } | sed -n "s/^\\(DOSBox-X version [^ ,]*\\).*/\\1/p"' dosbox-x dosbox-x "optional, for DOS games: brew install --formula dosbox-x, or set DOSBOX_X_BINARY in .env"
+if [[ -n "$(dosbox_binary 2>/dev/null || true)" ]] && ! dosbox_has_debug_channel; then
   row "dosbox-x debugger" OLD "$(dosbox_version) has no debugger control channel (needs 2026.10+): build a current one, see the re-setup skill"
 fi
 
@@ -122,7 +122,7 @@ fi
 if [[ $rea == 1 ]]; then
   echo
   echo "REA registration plan (dry run; nothing is changed):"
-  npx -y rea-agents@6.4.0 setup --client "$client" --dry-run || \
+  npx -y rea-agents@6.7.0 setup --client "$client" --dry-run || \
     echo "  could not run REA's setup; see docs/SETUP.md"
 fi
 

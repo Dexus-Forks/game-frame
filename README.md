@@ -87,8 +87,9 @@ The skills and the stage agents are also a Claude Code plugin. In Claude Code:
 /plugin install gameframe@game-frame
 ```
 
-The plugin brings the skills, the agents, the gates and the MCP servers in `.mcp.json`. A
-project made with `scripts/new-project.sh` enables it in its `.claude/settings.json`, with
+The plugin brings the skills, the agents, the gates and GameFrame's MCP server. External MCPs are
+off until a project opts in with `./gameframe mcp --enable NAME`. A project made with
+`scripts/new-project.sh` enables the plugin in its `.claude/settings.json`, with
 auto-update on, and runs the toolkit through its own `./gameframe` launcher, which finds
 GameFrame in a clone or in the plugin's install. `plugin.json` carries the release's version.
 Claude Code updates the plugin when that version changes, so projects move from one release to
@@ -196,7 +197,7 @@ hand-offs, the data passed between agents, the outcome, and the failure path.
 | `scripts/zcc.sh` | rustc's linker for 32-bit Windows DLLs through `zig cc`, with no MinGW, exporting exactly the names in a `.def` file: replacement libraries a 1990s game imports by name |
 | `scripts/dosbox-run.sh [--fileio] [--break] [--mcp PORT] DIR PROGRAM` | Runs a DOS program in DOSBox-X without a window: exit code, file I/O log, debugger control |
 | `./gameframe COMMAND` | Help and discovery: the steps, the skills, every tool's own help; runs a tool with the `.venv` |
-| `tests/run.sh [--ghidra]` | 183 checks of every tool against the two sample games, and more with `--ghidra` |
+| `tests/run.sh [--ghidra]` | 381 checks against the two sample games (399 with `--ghidra`) |
 
 ## Tools
 

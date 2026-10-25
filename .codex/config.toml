@@ -1,14 +1,5 @@
 # BEGIN gameframe mcp (gameframe mcp --emit codex)
 
-[mcp_servers.rea]
-command = "npx"
-args = ["-y", "rea-agents@6.4.0", "mcp"]
-env_vars = ["GHIDRA_INSTALL_DIR", "JAVA_HOME"]
-
-[mcp_servers.dosbox]
-command = "dosbox-x-mcp-server"
-args = []
-
 [mcp_servers.gameframe]
 command = "./gameframe"
 args = ["serve"]

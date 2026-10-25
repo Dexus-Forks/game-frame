@@ -58,7 +58,11 @@ while [[ "${1:-}" == --* ]]; do
   esac
 done
 [[ $# -ge 2 ]] || { sed -n '2,31p' "$0"; exit 2; }
-command -v dosbox-x >/dev/null || { echo "dosbox-x not found: scripts/setup.sh --install" >&2; exit 1; }
+dbx="$(dosbox_binary || true)"
+[[ -n "$dbx" && -x "$dbx" ]] || {
+  echo "DOSBox-X not found or not executable: install it or set DOSBOX_X_BINARY in .env" >&2
+  exit 1
+}
 game="$(cd "$1" && pwd)"; shift
 mkdir -p "$out"; out="$(cd "$out" && pwd)"
 if [[ $inplace == 0 && "$out/" == "$game/"* ]]; then
@@ -83,7 +87,7 @@ env=()
 [[ $window == 0 ]] && env=(SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy)
 mode=(-silent)
 [[ $window == 1 ]] && mode=(-exit)
-cmd=(dosbox-x ${confs[@]+"${confs[@]}"} -conf "$conf" -set "sdl fullscreen=false" "${mode[@]}" -fastlaunch -nomenu
+cmd=("$dbx" ${confs[@]+"${confs[@]}"} -conf "$conf" -set "sdl fullscreen=false" "${mode[@]}" -fastlaunch -nomenu
   -time-limit "$time" ${flags[@]+"${flags[@]}"} ${sets[@]+"${sets[@]}"})
 # DOSBox-X enables its debugger only in a terminal: give it a pseudo-terminal with script(1).
 # macOS script takes the command as separate arguments; util-linux script (Linux) takes it as

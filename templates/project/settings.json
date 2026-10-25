@@ -27,7 +27,7 @@
     "ask": [
       "Bash(git push *)",
       "Bash(./gameframe doctor --install *)",
-      "Bash(npx -y rea-agents@6.4.0 setup *)",
+      "Bash(npx -y rea-agents@6.7.0 setup *)",
       "Bash(brew install *)",
       "Bash(sudo *)",
       "Bash(curl *)",

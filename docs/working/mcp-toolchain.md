@@ -21,9 +21,16 @@ returns the tool name and path, arguments, working directory, exit status, durat
 output. It caps output size, reports progress for long calls and stops a child process when the
 client cancels the request or the timeout expires. A tool's own output names files it created.
 
+The catalog currently has 117 entries. The runner can call all 95 programs and shell scripts.
+`tests/mcp_tool_coverage.py` checks the catalog and help for every entry, and runs each command's
+help path through MCP in a temporary project. It also checks a sample PE analysis and runner
+progress, cancellation and timeout handling.
+
 The catalog also lists import-only libraries. The runner does not import or execute those
-modules. Read their help and use a documented program, script or a dedicated MCP handler. Ghidra
-scripts run through the catalog's `ghidra-run` and `ghidra-export` scripts.
+modules. They are shared Python APIs, not standalone commands. Use the documented programs and
+scripts that call them. Add a purpose-built MCP operation when an agent needs a library API
+directly; the generic runner must not execute arbitrary Python. Ghidra scripts run through the
+catalog's `ghidra-run` and `ghidra-export` scripts.
 
 ## Modules
 
@@ -46,19 +53,44 @@ Do not add all new behavior to `serve.py`.
 
 ## Provider boundaries and limits
 
-The client starts and connects to each server in `.mcp.json`. `gameframe_mcp_providers` reports
-configuration only; the client owns live connection state and provider tools. REA and DOSBox-X
-therefore keep their own protocols and APIs. GameFrame does not proxy them through a second
-server.
+The client starts and connects to each server in its project settings. `gameframe_mcp_providers`
+reports configuration only; the client owns live connection state and provider tools. GameFrame
+does not proxy external providers through its own server.
 
-The current catalog runner covers runnable GameFrame programs and shell scripts. Import-only
-libraries need dedicated operations where agents need direct access to their APIs. 86Box control
-also needs its own adapter after a stable control protocol is available. The optional 86Box GDB
-stub is not connected by this server.
+The default configuration enables only GameFrame. List available providers and opt the project
+into the ones it needs:
+
+```bash
+./gameframe mcp --list
+./gameframe mcp --enable rea dosbox
+./gameframe mcp --disable dosbox
+```
+
+The command updates `.mcp.json`, refreshes MCP settings for configured clients, and updates
+unchanged generated Copilot agent allowlists. It preserves unrelated client settings and keeps
+edited Copilot agent files. Restart the agent session after enabling or disabling a server. No
+provider is installed by these commands.
+
+`mcp-provider.sh` reads the project's ignored `.env` before starting an opted-in provider. The
+catalog pins each package or source revision. Use `.env` to select a different exact package
+version or a local executable. The project commits only the provider choice and default pin.
+
+| Provider | Pin | Setup and local settings |
+|---|---|---|
+| REA | `rea-agents` 6.7.0 | Node.js 22.23.4+, 24.22.1+, or 26.12.1+. `.env` can set `REA_MCP_VERSION`. |
+| DOSBox-X debugger | `dosbox-x-mcp-server` tag v0.1.2 | Install with the pinned Cargo command in [re-setup](../../skills/re-setup/SKILL.md). `.env` can set `DOSBOX_X_MCP_SERVER` to a local server. Set `DOSBOX_X_BINARY` to use a custom DOSBox-X build; `scripts/setup.sh` checks its version. |
+| MCPEmulate | PyPI 0.1.0 | Requires `uv`. `.env` can set `MCP_EMULATE_VERSION`. This GPL-2.0-only server complements `pe32_emu`; it is a CPU emulator, not a Windows system or GameFrame's PE call harness. |
+| 86Box | `86box-mcp` 0.1.0 at commit `9e6cdd02f6956e3ff32ec99c1dd4b0be7798d3ca` | No packaged release is published. Build 86Box at or after `1be46d317107f5219f160547d77614ff8e19a7c7` with `-D AUTOMATION=ON`. Set `BOX86_MCP_DIR`, `BOX86_MCP_REVISION`, `BOX86_MCP_SERVER` and `BOX86_BINARY` in `.env`. The server checks the selected source revision and binary path before starting. |
+
+For 86Box, the upstream MCP source and server need a local checkout and venv. The server's
+automation socket is off in official 86Box builds. Build instructions and platform requirements
+are in the [86Box MCP guide](https://github.com/dafugg/86box-mcp/tree/9e6cdd02f6956e3ff32ec99c1dd4b0be7798d3ca).
+This provider controls a whole emulated PC. Its GDB stub is a separate feature.
 
 ## Checks when extending the server
 
 Keep protocol messages on stdout and diagnostics off it. Preserve newline-delimited JSON-RPC and
 the four original know-how/search tool names. Use repository sample programs and files to check
-new operations. Check cancellation and timeout behavior without leaving child processes behind.
-Do not put game binaries, outputs or other game material in the repository.
+new operations. Run `tests/mcp_tool_coverage.py` to check every catalog entry and runnable command
+through MCP, plus cancellation and timeout behavior. Do not leave child processes behind. Do not
+put game binaries, outputs or other game material in the repository.

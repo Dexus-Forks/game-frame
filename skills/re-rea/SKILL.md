@@ -9,7 +9,8 @@ REA (https://github.com/morluto/rea) is an MCP server that gives the agent rever
 tools and records every result as Evidence with an ID, coverage and limits. Its own skill,
 `reverse-engineer-anything`, documents each tool in detail: install it with REA's setup
 (`re-setup`) and read it before a large REA investigation. This skill says how REA fits into
-the playbook's loop.
+the playbook's loop. REA is opt-in for each project. Enable it with `./gameframe mcp --enable rea`;
+the project launcher uses the pinned `rea-agents` 6.7.0 and reads local overrides from `.env`.
 
 ## REA or the text export?
 
@@ -52,6 +53,7 @@ targeted questions and evidence, the export for broad search.
 
 ## When REA is not connected
 
-No REA tools in the session (no `mcp__rea__*` in Claude Code) means the MCP server is not registered or did not start.
-Follow `re-setup` section 3. Meanwhile, continue with GameFrame's own tools: Ghidra export,
+No REA tools in the session (no `mcp__rea__*` in Claude Code) means the MCP server is not enabled
+or did not start. If REA would help, enable it with `./gameframe mcp --enable rea`, then restart
+the agent session. Follow `re-setup` section 3 to install it. Meanwhile, continue with GameFrame's own tools: Ghidra export,
 `decomp_query.py`, `ghidra-run.sh` and the emulator cover native binaries completely.
