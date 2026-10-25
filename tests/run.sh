@@ -1357,8 +1357,8 @@ import json, re, pathlib
 plugin = json.loads(pathlib.Path('.claude-plugin/plugin.json').read_text())
 market = json.loads(pathlib.Path('.claude-plugin/marketplace.json').read_text())
 assert [p['name'] for p in market['plugins']] == [plugin['name']], 'the marketplace lists the plugin'
-assert re.fullmatch(r'\d+\.\d+\.\d+', plugin.get('version', '')), 'plugin.json has a release version (MAJOR.MINOR.PATCH)'
-released = re.findall(r'^## \[(\d+\.\d+\.\d+)\]', pathlib.Path('CHANGELOG.md').read_text(), re.M)
+assert re.fullmatch(r'\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?', plugin.get('version', '')), 'plugin.json has a release or development version'
+released = re.findall(r'^## \[(\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?)\]', pathlib.Path('CHANGELOG.md').read_text(), re.M)
 assert released and released[0] == plugin['version'], f'CHANGELOG.md\'s newest release {released[:1]} is plugin.json\'s version {plugin["version"]}'
 assert pathlib.Path(plugin['skills'], 're-start', 'SKILL.md').is_file(), 'the plugin finds the skills'
 assert pathlib.Path('.claude/agents').resolve() == pathlib.Path('agents').resolve(), '.claude/agents links to agents/'
