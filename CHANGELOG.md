@@ -5,7 +5,7 @@ Every release of GameFrame, newest first. The format follows
 [Semantic Versioning](https://semver.org/). The newest version here is the one in
 `.claude-plugin/plugin.json`, and `tests/run.sh` checks that the two match.
 
-## [Unreleased]
+## [1.3.0] - 2026-10-25
 
 ### Changed
 
@@ -601,8 +601,8 @@ Copilot, Cursor and OpenCode can each use the skills, the agents, the gates and 
 - The Claude Code plugin now carries version `1.0.0`. Claude Code updates it when the version
   changes, so plugin projects move from release to release.
 
+[1.3.0]: https://github.com/tanepiper/game-frame/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/tanepiper/game-frame/compare/v1.1.0...v1.2.0
-[Unreleased]: https://github.com/tanepiper/game-frame/compare/v1.2.0...HEAD
 [1.1.0]: https://github.com/tanepiper/game-frame/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/tanepiper/game-frame/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/tanepiper/game-frame/releases/tag/v1.0.0
