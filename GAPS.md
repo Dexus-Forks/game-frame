@@ -106,9 +106,10 @@ proposed again.
   including SB Pro 1's dual-OPL2 stereo routing. Software checks cover reset/version, MIDI
   timestamps and UART reset, 8-bit playback/capture, 16-bit playback/capture, FM port maps,
   high-speed command gating, IRQ acknowledgement and mixer profiles
-- [ ] Decode Creative 2-, 3- and 4-bit ADPCM to PCM. The reference specifies command flow and the
-  initial reference byte but not the predictor recurrence; compare generated vectors against a
-  documented software reference
+- [ ] Decode Creative 2-, 3- and 4-bit ADPCM to PCM. A static CT1741 firmware 4.05 trace found the
+  decode paths, reference initialization and packed 3-bit tail. Compare crafted register and byte
+  vectors against the firmware in a Ghidra 8051 emulator, then port the results. Physical testing
+  is optional; details are in `docs/hardware/sound-blaster-dsp.md`
 - [ ] Establish exact DSP busy, OPL2 port busy, FIFO, stereo cadence and DMA terminal-count timing
   with generated software comparisons. Physical testing is optional
 - [ ] Connect the card events to a host ISA DMA and PIC model, including DMA pages, channel state,

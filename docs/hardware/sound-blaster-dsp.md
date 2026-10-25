@@ -90,7 +90,7 @@ reference gives no byte duration. MPU-401 intelligent mode is not implemented.
 
 | Behavior | Current model | Useful software check |
 |---|---|---|
-| ADPCM | Recognizes 2-, 3- and 4-bit commands, transfer length and the initial reference byte. It passes compressed bytes through and does not decode PCM. The Creative reference describes the reference byte and command sequence, but not the predictor recurrence. | Generate compressed vectors from known PCM and compare against an independently documented bitstream implementation or an allowed black-box device model. Compare every output sample and state reset across reference and continuation blocks. |
+| ADPCM | Recognizes 2-, 3- and 4-bit commands, transfer length and the initial reference byte. It passes compressed bytes through and does not decode PCM. A static trace of CT1741 firmware 4.05 found the decode helpers and reference state setup. Their complete output sequence has not been compared with a running reference. | Run a Ghidra 8051 emulator harness over crafted reference and compressed bytes. Record the predictor, step, output byte and reservoir after each sample. Compare a Rust decoder against every result, including byte boundaries and continuation blocks. No physical card is needed. |
 | DSP and OPL2 port timing | DSP command busy time and YM3812 port busy time are not specified by the reference used here. DSP busy time defaults to zero. YMF262 writes enforce its documented spacing. | Run generated reset, status-polling and FM register sequences in a DOS virtual machine. Compare port reads and accepted writes at boundary timestamps. |
 | DMA and IRQ timing | Timestamped requests, captured writes and DSP-side IRQ state. DMA controller and PIC remain host responsibilities. | Connect a fake 8237-style DMA adapter and PIC. Check exact transfer counts, terminal count, 64 KiB page behavior, IRQ source bits, acknowledgement and auto-init exit. |
 | SB16 FIFO and stereo cadence | Separate output/input rates and left/right PCM words. FIFO depth and exact bus cadence are not modeled. | Drive the same generated stereo stream through a fake DMA adapter at several rates. Compare request count, timestamps, channel order and block IRQs with a documented software reference. |
@@ -103,6 +103,29 @@ register profiles, ADPCM reference-byte marking, timestamped SB-MIDI, UART reset
 MPU-401 readiness and the OPL2/OPL3 card port maps. A DOS virtual-machine differential harness can
 compare port traces without making hardware access a release gate.
 
+## CT1741 firmware trace
+
+A static Ghidra trace of CT1741 DSP firmware 4.05 recovered the ADPCM entry paths and their
+byte-level state operations. The file used for the trace has SHA-256
+`40cca2ff1a8caea58c0348bc6fa4191ed98bd31de8301719e6223b45ee4f22ab`. The [firmware archive](https://github.com/S95Sedan/CT1741_DSP)
+identifies the image as Creative Labs property. The firmware, its assembly listing and Ghidra
+output are not included here. The trace was static. It was not executed, and its sample output was
+not compared with a software or hardware reference.
+
+| Firmware address | Observed behavior |
+|---|---|
+| `0016`, `0186`, `022c`, `02d2` | The interrupt dispatcher selects separate 2-, 3- and 4-bit decode paths. Each path consumes sign and magnitude bits from a byte reservoir and writes the resulting byte to the external sample port. |
+| `1056` | The 2-bit path has its own predictor and step branches. Its zero-magnitude cases differ by sign, so a generic ADPCM formula should not replace this path. |
+| `10f8` | The 3-bit path reads a 2-bit tail when its counter reaches one. This gives the final sample in a packed byte fewer magnitude bits. |
+| `10ad` | The 4-bit path reads the high nibble, then the low nibble. It forms a delta from the magnitude, step and half-step, then clamps the predictor to one byte. |
+| `0dce`, `0e52` | The reference-byte paths initialize the predictor from the input byte and set the step to one. |
+
+These findings identify the code paths, but not yet a verified decoder contract. The next software
+check should run each helper with the firmware's register bank and a stub external sample port.
+Vectors should cover both signs, every magnitude, predictor values near zero and 255, step changes,
+the 3-bit tail, both nibbles and a continuation block without a reference byte. Then compare the
+port output and updated state with the Rust decoder. Physical testing is optional.
+
 ## Source
 
 - Creative, [*Developer Kit for Sound Blaster Series, Second Edition, Hardware Programming
@@ -113,5 +136,7 @@ compare port traces without making hardware access a release gate.
 - Creative, [SBBASIC.EXE support listing](https://cn.creative.com/support/downloads/download.asp?DriverLang=2052&searchString=SBBASIC.EXE):
   package identified for later compatibility work; its included license prevents reverse
   engineering.
+- [CT1741 DSP firmware archive](https://github.com/S95Sedan/CT1741_DSP): v4.05 firmware binary
+  used for the static 8051 trace above; firmware ownership remains with Creative Labs.
 
 Licence: CC0-1.0.
