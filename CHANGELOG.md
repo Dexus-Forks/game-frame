@@ -17,7 +17,10 @@ Every release of GameFrame, newest first. The format follows
 
 - The modular GameFrame MCP server now exposes workflow and tool discovery, knowledge queries,
   progress and provider configuration, plus execution for every runnable catalog program and
-  script. Long-running calls report progress and support cancellation.
+  script. Long-running calls report progress and support cancellation. Its sample coverage check
+  now resolves help for all 116 catalog entries, invokes the help path of all 94 runnable
+  commands, runs a sample PE analysis, and checks progress, cancellation and timeout handling.
+  Documentation covers the x86 CPU and 86Box MCPs as opt-in external providers.
 
 - The new `re-profile` skill builds an evidence-backed game quick start after inventory. It
   records the game's family, engine, release, graphics, sound and input support, separates

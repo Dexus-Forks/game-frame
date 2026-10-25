@@ -196,7 +196,7 @@ hand-offs, the data passed between agents, the outcome, and the failure path.
 | `scripts/zcc.sh` | rustc's linker for 32-bit Windows DLLs through `zig cc`, with no MinGW, exporting exactly the names in a `.def` file: replacement libraries a 1990s game imports by name |
 | `scripts/dosbox-run.sh [--fileio] [--break] [--mcp PORT] DIR PROGRAM` | Runs a DOS program in DOSBox-X without a window: exit code, file I/O log, debugger control |
 | `./gameframe COMMAND` | Help and discovery: the steps, the skills, every tool's own help; runs a tool with the `.venv` |
-| `tests/run.sh [--ghidra]` | 183 checks of every tool against the two sample games, and more with `--ghidra` |
+| `tests/run.sh [--ghidra]` | 356 checks against the two sample games (374 with `--ghidra`) |
 
 ## Tools
 

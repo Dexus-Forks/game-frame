@@ -1625,6 +1625,10 @@ print('initialize, tools/list, advise, a missing entry, an unknown method')
 PY
 )"
 [[ $? == 0 ]] && ok "gameframe serve answers MCP calls for the know-how ($out)" || bad "gameframe serve" "$out"
+out="$("$PYTHON" tests/mcp_tool_coverage.py 2>&1)"
+[[ $? == 0 && "$out" == *"MCP coverage: 116 catalog entries, 94 runnable tools, progress/cancel/timeout"* ]] \
+  && ok "the GameFrame MCP exposes every catalog entry and runs every program and script ($out)" \
+  || bad "GameFrame MCP tool coverage" "$out"
 out="$("$PYTHON" - <<'PY' 2>&1
 import json, re, subprocess, tomllib
 src = json.load(open('.mcp.json'))['mcpServers']

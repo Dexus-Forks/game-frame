@@ -172,11 +172,14 @@ proposed again.
 - [x] Expose GameFrame workflow discovery, knowledge, tool help and execution of every runnable
   catalog program and script through the modular MCP server. Keep provider servers such as REA and
   DOSBox-X configured separately in `.mcp.json`.
-- [ ] Add sample-based checks for MCP discovery, tool execution, progress, cancellation and timeout
-  handling before treating the expanded server as verified.
-- [ ] Add direct MCP operations for import-only library APIs where an agent needs them, and add an
-  86Box control adapter after a stable, testable protocol is selected. The MCP client owns the
-  configured providers' live connections.
+- [x] Check every GameFrame catalog entry through MCP help, run every program and shell script
+  through the generic runner, and cover a sample PE, progress, cancellation and timeout in
+  `tests/mcp_tool_coverage.py`.
+- [ ] Add purpose-built MCP operations for import-only library APIs when a task needs direct access;
+  the generic runner does not execute arbitrary Python.
+- [x] 86Box control has an optional external provider, [`86box-mcp`](https://github.com/dafugg/86box-mcp).
+  It uses 86Box's merged automation socket, which must be enabled in a custom build. GameFrame
+  leaves it opt-in and does not proxy its tools through the GameFrame MCP server.
 
 - [x] `tools/pe/relocs.py`: pointers in data from base relocations
 - [x] `tools/pe/peinfo.py`: delay-loaded imports, relocation count
