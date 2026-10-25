@@ -346,7 +346,9 @@ impl Win16MidiOutput {
         }
 
         let status_before = active.status_byte;
-        let status_after = apply_status_effect(status_before, request.status_effect);
+        let Some(status_after) = apply_status_effect(status_before, request.status_effect) else {
+            return ShortMessageReply::Indeterminate;
+        };
         self.ports[index] = PortContext::Active(ActivePort {
             status_byte: status_after,
             ..active
@@ -411,18 +413,23 @@ fn open_callback(target: CallbackTargetState) -> OpenCallback {
 fn apply_status_effect(
     current: StatusByteState,
     effect: ShortMessageStatusEffect,
-) -> StatusByteState {
+) -> Option<StatusByteState> {
     match effect {
-        ShortMessageStatusEffect::ChannelStatus(status_byte) => StatusByteState::Known(status_byte),
+        ShortMessageStatusEffect::ChannelStatus(status_byte) => {
+            Some(StatusByteState::Known(status_byte))
+        }
         ShortMessageStatusEffect::SystemStatus {
             status_byte: _,
             effect,
         } => match effect {
-            SystemStatusEffect::Clear => StatusByteState::Empty,
-            SystemStatusEffect::Replace(replacement) => StatusByteState::Known(replacement),
-            SystemStatusEffect::Unknown => StatusByteState::Unknown,
+            SystemStatusEffect::Clear => Some(StatusByteState::Empty),
+            SystemStatusEffect::Replace(replacement) => Some(StatusByteState::Known(replacement)),
+            SystemStatusEffect::Unknown => None,
         },
-        ShortMessageStatusEffect::DataOnly => current,
-        ShortMessageStatusEffect::Unknown => StatusByteState::Unknown,
+        ShortMessageStatusEffect::DataOnly => match current {
+            StatusByteState::Known(_) => Some(current),
+            StatusByteState::Empty | StatusByteState::Unknown => None,
+        },
+        ShortMessageStatusEffect::Unknown => None,
     }
 }
