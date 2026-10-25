@@ -1,0 +1,123 @@
+# gameframe-sound-blaster
+
+A clean Rust device model for the Creative Sound Blaster DSP generations 1.xx through 4.xx,
+their CT1335/CT1345/CT1745 mixer register interfaces, the SB16 MPU-401 UART ports, and the card's
+YM3812/YMF262 FM synthesizer. It reuses GameFrame's `gameframe-opl2` and `gameframe-opl3` crates.
+
+The command and port model follows Creative's *Developer Kit for Sound Blaster Series, Second
+Edition, Hardware Programming Reference*. The original Creative DOS/Windows driver package is a
+possible preservation and compatibility target. Its bundled terms contain a reverse-engineering
+restriction. This model did not use the driver binary and the crate contains no package files or
+driver code. The cards are discontinued, so preserving the interface can keep old software
+usable. That purpose informs future work, while the effect of the package terms depends on the
+applicable law and facts. GameFrame records the restriction as a consideration rather than a
+blanket ban. See the [Sound Blaster findings](../../docs/hardware/sound-blaster-dsp.md) and
+[licensing guidance](../../docs/LEGAL.md).
+
+## Use it
+
+```toml
+[dependencies]
+gameframe-sound-blaster = { git = "https://github.com/tanepiper/game-frame" }
+```
+
+```rust
+use gameframe_sound_blaster::{DspEvent, SoundBlaster, SoundBlasterConfig};
+
+let mut card = SoundBlaster::new(SoundBlasterConfig::sb16());
+card.write_port_at(0x226, 1, 0).unwrap();
+card.write_port_at(0x226, 0, 3_000).unwrap();
+card.advance_to(103_000).unwrap();
+assert_eq!(card.read_port_at(0x22E, 103_000).unwrap(), Some(0x80));
+assert_eq!(card.read_port_at(0x22A, 103_000).unwrap(), Some(0xAA));
+
+// Route DmaRequest events to the machine's ISA DMA controller. The returned PCM can go to a
+// host mixer or resampler. This card model does not implement the ISA controller or PIC.
+let _events: Vec<DspEvent> = card.advance_to(200_000).unwrap();
+```
+
+`SoundBlasterConfig` provides SB 1.5, SB 2.0, SB 2.0 CD, the dual-OPL2 SB Pro 1, SB Pro 2 and SB16
+profiles. A custom configuration selects another DSP version, base port, mixer chip, FM chip and
+SB16 MPU port. Every time argument is a monotonic virtual nanosecond timestamp. The host services playback requests through
+`service_dma_read`, sends capture input through `push_capture_sample`, forwards raised IRQ events
+to its PIC, and calls `dma_terminal_count_at` for legacy auto-initialize blocks whose DSP command
+does not carry a block length.
+
+## Implemented surfaces
+
+- DSP reset pulse, ready signature, version query, write/read status, response FIFO and port-level
+  interrupt acknowledgement.
+- Direct 8-bit PCM output and capture; single-cycle 8-bit DMA; 2.x auto-initialize; 2.01+ 8-bit
+  high-speed transfers; Pro stereo input/output controls; and SB16 8/16-bit signed or unsigned,
+  mono or stereo, single-cycle or auto-initialize DMA commands.
+- Transfer-rate scheduling from the legacy time constant or SB16 sampling-rate commands, DMA
+  request events, capture writes, playback sample conversion, pause/resume, per-block interrupts,
+  and deferred auto-init exit.
+- ADPCM decoding for Creative 2-, 3- and 4-bit streams. Each returned compressed-byte event
+  includes its expanded unsigned PCM samples, the output sample rate, and whether the byte was a
+  predictor reference. The reference byte emits one sample; compressed bytes emit four, three or
+  two samples. The decoder uses the CT1741 firmware 4.05 recurrence and preserves state across
+  continuation blocks.
+- DSP MIDI polling/interrupt and UART command modes, timestamped input, and MIDI output events.
+- OPL2 FM ports at `388h`/`389h` and the card's legacy `base + 8` ports. OPL3 profiles expose both
+  YMF262 banks at `388h` through `38Bh`. Pro and SB16 profiles also expose their FM ports at
+  `base + 0` through `base + 3`; the original Pro profile routes its two YM3812 chips to separate
+  stereo channels, while Pro 2 and SB16 route to one YMF262.
+  `FmSynth::generate` returns mono-duplicated or stereo frames for the host mixer.
+- YMF262 register-write spacing on SB Pro 2/SB16 ports. The OPL2 profile currently applies no
+  timed write rejection because its port busy interval is not established here.
+- CT1335, CT1345 and CT1745 indexed register maps, documented reset values and writable masks.
+  SB16 mixer registers 80h, 81h and 82h expose the selected IRQ, DMA and interrupt source state.
+- A logical Win16 SB16 auxiliary volume surface for unit count, stereo volume queries, and update
+  requests. It preserves unknown initial values and selector 7 behavior. It does not implement the
+  Win16 driver ABI or the lower sound-driver service.
+- A logical Win16 SB16 wave-output open/query, prepared-header queue, caller-driven completion,
+  callback-event, pause/restart, and reset model. It does not implement the driver ABI, full PCM
+  format matrix, lower service, callback timing, or the unresolved reset effects on queued headers.
+- A logical Win16 SB16 wave-input open/query and prepared-header queue model. Callers supply
+  capture byte counts; it reports recorded-byte progress and completion events without modeling
+  captured samples, hardware capture, or callback timing.
+- A logical Win16 SB16 MIDI-port open and short-message state model for selectors 0 and 1. It applies
+  the observed running-status byte transitions and one-active-call guard. Callers supply ordered
+  bytes and opaque lower-service events; packed arguments, the data-count table, long messages, and
+  physical MIDI output are not modeled.
+- A generic logical Win16 Mixer control-details read/write path driven by caller-supplied control
+  descriptors. It validates shapes and limits, returns stored values, and emits opaque apply and
+  client-notification events. The master-volume control ID, channel mapping, and gain scale remain
+  unknown.
+- A logical Win16 SB16 FM synth wrapper open and packed short-message transform with driver-global
+  retained-status state. It does not model the delegated synth service, note conversion, or OPL
+  register writes.
+- SB16 MPU-401 UART reset, UART-mode acknowledgement, readiness status, input/output and interrupt
+  state. Its output-ready interval can be configured with `set_write_busy_ns`; the default is zero
+  because the programming reference gives no byte duration.
+- High-speed DSP mode rejects further command-port writes until reset. Physical DMA page boundaries,
+  DMA arbitration and PIC delivery belong to the host machine.
+
+## Limits and software checks to add
+
+The CT1741 firmware 4.05 static trace supplies the decoder recurrence and packed-byte order. The
+implementation has not yet been compared sample-for-sample with an executed firmware image or a
+named software reference. The initial predictor state for a no-reference transfer before any
+reference byte is not established by the trace; it starts at zero. A software-only check can run
+the three firmware helpers in Ghidra's 8051 p-code emulator with a stub for the sample output port,
+then compare predictor, step and output bytes for sign, magnitude, clamp, tail-code and continuation
+vectors. Physical hardware is not required.
+
+The public reference gives approximate reset readiness but not per-command DSP busy durations, DMA
+FIFO depth, bus arbitration, all DMA terminal-count edge timing, or exact SB16 stereo word/frame
+cadence. DSP and MPU output-busy durations are configurable and default to zero. Mixer tone,
+low-pass filters, analog gain, source mixing and the output amplifier are not applied to PCM. These
+details do not require physical hardware to proceed. Software checks can run generated port
+sequences under an instrumented DOS virtual machine, compare reset/version/status/IRQ results
+against this crate, and send looped capture/playback vectors through a fake DMA/PIC adapter. The
+Creative driver bundle is not needed for these checks.
+
+The card does not contain an ISA DMA controller, PIC, MPU-401 intelligent mode, joystick/Game
+Control Adapter, CD interface, C/MS SAA1099 chips, CSP/ASP signal processor, EMU8000 wavetable
+synthesizer or analog circuitry. DSP clones may expose extensions beyond the Creative command set.
+The machine model combines these devices as required. Physical hardware testing is optional.
+
+## Licence
+
+Apache 2.0.

@@ -10,7 +10,9 @@ that looks for it at run time starts, but plays less than it was made for.
 This page lists those libraries, how a game finds each one, what Wine offers, and whether a
 stand-in can replace it. Only one row is *measured* here: the Maxi Sound 64, from POD Gold.
 The other rows come from the libraries' own documentation and SDKs as remembered, and are not
-yet checked against a game. Check a row on your game before you rely on it.
+yet checked against a game. Check a row on your game before you rely on it. For the broader
+device-by-era inventory and GameFrame's next reusable chip and card models, see
+[PC audio coverage](audio-coverage.md).
 [Sound](sound.md) has the devices and DirectSound. [Replacement libraries](replacement-libraries.md)
 has the method for writing a stand-in. `wrappers/` holds the stand-ins written so far.
 

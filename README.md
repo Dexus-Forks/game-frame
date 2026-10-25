@@ -4,9 +4,10 @@ GameFrame is an agentic framework for reverse engineering games. Its playbook of
 document its formats and rules, and reimplement it so it behaves exactly like the original.
 
 The toolkit works with [Ghidra](https://ghidra-sre.org), the
-[Unicorn](https://www.unicorn-engine.org) emulator, [REA](https://github.com/morluto/rea)
-(Reverse Engineer Anything) and, for DOS games, [DOSBox-X](https://dosbox-x.com) and its
-debugger. GameFrame grew out of [Un-Banished](https://github.com/tanepiper/unbanished), a 1:1
+[Unicorn](https://www.unicorn-engine.org) emulator and [REA](https://github.com/morluto/rea)
+(Reverse Engineer Anything). It uses [DOSBox-X](https://dosbox-x.com) and its debugger for DOS
+runs, and [86Box](https://github.com/86Box/86Box) when tests need a configurable period PC.
+GameFrame grew out of [Un-Banished](https://github.com/tanepiper/unbanished), a 1:1
 reimplementation of the game Banished built this way; see
 [the case studies](docs/case-studies/README.md).
 
@@ -141,6 +142,7 @@ to produce, and the pitfalls that cost time.
 | [re-format](skills/re-format/SKILL.md) | Decode archives, resources and saves; prove decoders on every file |
 | [re-emulate](skills/re-emulate/SKILL.md) | Run original functions under Unicorn for ground truth; trace random draws |
 | [re-port](skills/re-port/SKILL.md) | Reimplement exactly: precision, order of operations, draw order, iteration order; an exact core with commands, digests and a headless runner; additions (multiplayer, mods) kept apart |
+| [re-cleanroom](skills/re-cleanroom/SKILL.md) | Write a neutral behavior contract in a source-visible role, then implement it in a fresh source-blind role |
 | [re-verify](skills/re-verify/SKILL.md) | Bit-exact parity, draw order, determinism with digests and on every platform, recordings, saves, pictures, version against version, test tiers |
 | [re-land](skills/re-land/SKILL.md) | Document in evidence style, label, commit safely |
 | [re-site](skills/re-site/SKILL.md) | The project's website in `sites/`: a diary entry per milestone, the documents shown as pages with `@include`, no commit dumps and no game material |
@@ -157,14 +159,15 @@ that block game material, decompiled code and commits by other agents.
 `re-porter` → `re-verifier` → `re-lander`, and back to the tracer or the porter when a check
 fails.
 
-Twelve task agents do one job each, in any stage: `re-identifier` (engine and libraries),
+Fourteen task agents do one job each, in any stage: `re-identifier` (engine and libraries),
 `re-randomiser` (random generators and draw order), `re-listener` (every input),
 `re-cataloguer` (every screen), `re-mapper` (hardware and memory), `re-typer` (structures and
 classes), `re-matcher` (a crate or
 library against the game), `re-editor` (documents to the writing rules), `re-checker`
 (claims and sources), `re-publisher` (the project's site and diary), and two hardware
 specialists, `re-vectoriser` (MMX and other SIMD code) and `re-accelerator` (the 3D card
-APIs). `re-start` ("Task agents") has their table.
+APIs), `re-specifier` (source-visible behavior contracts) and `re-cleanroomporter`
+(source-blind implementation). `re-start` ("Task agents") has their table.
 
 Claude Code, Cursor and VS Code read the agents in `agents/` (through `.claude/agents`). Codex,
 Gemini CLI, GitHub Copilot and OpenCode read copies in their own formats, which
@@ -172,10 +175,10 @@ Gemini CLI, GitHub Copilot and OpenCode read copies in their own formats, which
 session. [Agents in every client](docs/working/agents.md#agents-in-every-client) has the support
 matrix.
 
-[Agent teams](docs/teams/README.md) shows how the agents work together: seven teams for
+[Agent teams](docs/teams/README.md) shows how the agents work together: eight teams for
 common pieces of work (start-up, an exact system, a data format, the main loop, the interface,
-sound and hardware, documentation), each with a diagram of its hand-offs, the data passed
-between agents, the outcome, and the failure path.
+sound and hardware, clean-room implementation, documentation), each with a diagram of its
+hand-offs, the data passed between agents, the outcome, and the failure path.
 
 ## Scripts
 

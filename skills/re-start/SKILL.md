@@ -83,7 +83,10 @@ GameFrame also has one agent per stage, in `agents/` (a project has them in
 Codex, Gemini CLI, GitHub Copilot and OpenCode read copies in their own formats
 ([Agents in every client](../../docs/working/agents.md#agents-in-every-client)). If your agent
 can start subagents, send each agent as a subagent. If it cannot, take each role yourself in
-this session: read the agent's file, load its skills, do its stage and write its hand-off.
+this session: read the agent's file, load its skills, do its stage and write its hand-off. The
+clean-room team is an exception. Its source-blind implementer must use a fresh task with only the
+approved packet. If the client cannot provide that boundary, stop after the contract and report
+that source-blind implementation is unavailable in this setup.
 Each one has its skills preloaded, does only its stage, and ends with a
 `## Hand-off` block that names the next agent and gives it a one-line brief. You, the main
 session, send the agents: read each hand-off, check its evidence, and send the next one.
@@ -123,6 +126,8 @@ the same hand-off. Send them when a job is large enough to fill this session's c
 | `re-mapper` | Hardware registers, memory banks and RAM variables, named | `re-tracer`, `re-listener` |
 | `re-typer` | Structures, classes and enumerations, with sizes, fields and evidence | `re-tracer`, `re-decoder`, `re-porter` |
 | `re-matcher` | A crate, library or released source compared with the game's version | `re-porter`, `re-tracer` |
+| `re-specifier` | A neutral behavior contract with a separate source evidence ledger | `re-cleanroomporter` |
+| `re-cleanroomporter` | New code from an allow-listed behavior contract, without source access | `re-verifier` |
 | `re-vectoriser` | SIMD code (MMX, 3DNow!, SSE) and CPU builds: routines grouped, matched to their plain twins, measured | `re-porter`, `re-measurer`, `re-tracer` |
 | `re-accelerator` | 3D card APIs (Glide, ATI3DCIF, S3D): state calls named, texture paths, per-card builds and their data | `re-tracer`, `re-decoder`, `re-porter` |
 | `re-editor` | Documents edited to the writing rules, wording only | `re-checker`, `re-lander` |
@@ -132,7 +137,8 @@ the same hand-off. Send them when a job is large enough to fill this session's c
 
 
 `docs/teams/` describes teams of these agents for common pieces of work (start-up, an exact
-system, a data format, the main loop, the interface, sound and hardware, documentation), with
+system, a data format, the main loop, the interface, sound and hardware, clean-room
+implementation, documentation), with
 a diagram of each team's hand-offs and the failure path.
 ## First session on a new game
 

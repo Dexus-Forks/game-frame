@@ -1,0 +1,14 @@
+[package]
+name = "gameframe-sound-blaster"
+description = "Creative Sound Blaster DSP, mixer and MPU-401 UART device models"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["sound-blaster", "dsp", "sb16", "audio", "emulation"]
+categories = ["emulators", "multimedia::audio"]
+
+[dependencies]
+gameframe-opl2 = { path = "../opl2" }
+gameframe-opl3 = { path = "../opl3" }

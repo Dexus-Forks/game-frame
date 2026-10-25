@@ -7,6 +7,83 @@ Every release of GameFrame, newest first. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- A clean-room-style workflow with source-visible specification and source-blind implementation
+  roles, a behavior-contract template, packet checklist, team guide and emulator/debugger options.
+  It records the limits of prompt-based separation and the current gap in packet isolation tools.
+
+- The observation guidance now covers 86Box as a configurable full-PC reference for DOS and
+  Windows 3.x/9x games. It records sound-card resource settings, guest OS and machine details,
+  and labels captures as emulator measurements rather than physical-hardware evidence.
+
+- `gameframe-sn76496` adds a TI SN76496 tone/noise model, input-clock advancement, PCjr `C0h` and
+  original Tandy `C0h`–`C7h` adapters, PCjr and Tandy `61h` output muxes and the Tandy PIT-2 input
+  route. The Tandy adapter exposes the service manual's approximate 42 CPU wait states. Static
+  traces of Sierra's original `JR.DRV` and `TANDY.DRV` confirm tone latch/data writes, attenuation
+  writes, startup mutes and PSG-source selection. TI noise details, period-zero behavior, the
+  Tandy mux's fourth input, NCR/PSSJ variants, sample parity, CPU wait mapping and analog behavior
+  have software-only follow-up checks. The SN76496N timing source is the IBM PCjr reference; the
+  Tandy service schematic confirms its matching 3.579 MHz clock.
+
+- `gameframe-saa1099` adds a Philips SAA1099 stereo sound generator and a two-chip Creative Music
+  System/Game Blaster port model. It applies tone and octave writes at generator transitions,
+  buffers envelope controls to waveform boundaries and models common CMS detection-port behavior.
+  Static traces of `CMSDRV.COM` and Sierra's `CMS35.BIN` establish the chip ports, default base and
+  detection probe. The noise seed, combined tone/noise mixing, exact custom-chip behavior, bus waits
+  and analog output have software-only follow-up steps; physical card testing is optional.
+
+- `gameframe-sound-blaster` adds port-level Creative DSP models for 1.xx through 4.xx cards,
+  CT1335/CT1345/CT1745 mixer registers, SB16 MPU-401 UART, and FM routing through GameFrame's OPL2
+  and OPL3 crates. Profiles cover SB Pro 1's dual YM3812 stereo path, Pro 2 YMF262 ports, and SB16
+  8/16-bit mono/stereo DMA. DSP MIDI timestamps and UART reset restoration follow the published
+  interface. The docs record preservation context, the bundled driver restriction and its
+  assessment limits, the clean-implementation boundary, ADPCM/analog/timing limits, and software-
+  only follow-up checks. Physical card testing is optional.
+
+- An investigation of Creative's SBBASIC SB16/SB32/AWE32 package verifies the archive hash and
+  release metadata. Its driver payload remains inside TTComp `.PVL` archives until the DOSBox-X
+  installer can be driven to a temporary destination. The findings document records the exact
+  software-only next step; no driver behavior is claimed.
+
+- A PC audio coverage map separates chip crates, card models, compatibility libraries and host
+  audio backends. It inventories common PC audio from the speaker and Tandy PSG through Sound
+  Blaster, Gravis UltraSound, MIDI modules and late-1990s Windows audio, and prioritizes OPL3,
+  Sound Blaster DSP/DMA, GF1 and MIDI work. It records the clean-implementation process and
+  owner-selected licensing options.
+
+- `gameframe-opl3` adds a YMF262 chip model with two register banks, 18 channels, six selectable
+  four-operator pairs, four connection algorithms, eight waveforms, four output words,
+  OPL2 compatibility mode, shared note-select, timers, indexed I/O ports with timestamped
+  write-spacing checks, and serial DAC frames. Timer divider phase resets when a timer starts. It reuses
+  GameFrame's OPL2 engine and follows Yamaha's datasheet and YM3812 Application Manual. An original
+  AdLib Gold Windows driver trace records its register write path, voice pools, busy polling and
+  second data-port reads. The AdLib Gold Control Chip and port overlay are modeled separately in
+  `gameframe-adlib-gold`. Independent four-operator carrier routing, physical parity, YAC512 analog
+  conversion and card-level audio processing remain open.
+
+- `gameframe-yac512` adds a clean model of the YAC512's LSB-first serial receiver, offset-binary or
+  two's-complement input selection, falling-edge channel latches and held digital input words. The
+  floating DAC transfer and analog sample-and-hold stage stay documented as open behavior because
+  Yamaha's available datasheet does not provide the conversion formula. The open-question page
+  proposes software-only protocol and integration checks; physical hardware testing is optional.
+
+- `gameframe-adlib-gold` combines the YMF262 with the documented AdLib Gold Control Chip port
+  overlay, status, register reads/writes, EEPROM save/restore commands and audio-port relocation.
+  The Developer Toolkit v1.01 resolves the Windows driver's `0xFF`/`0xFE` bank switches and second
+  data-port reads. It routes the MMA at offsets `+4` through `+7` and feeds its sampling request
+  into Control Chip status. `mix_sources()` now applies the documented linear source-volume,
+  speaker/microphone/telephone routing, output-channel selection, forced mono, mute and final
+  output-volume controls. Analog tone and spatial processing remain documented limits.
+
+- `gameframe-ymz263` adds the YMZ263B/MMA digital model used by AdLib Gold. It includes dual
+  128-byte PCM/ADPCM FIFOs, documented rates and sample layouts, timer counters, per-channel DMA
+  request state, MIDI FIFOs and timestamped UART output. A static trace of the original GSS Wave/MIDI
+  driver confirms its two index/data pairs and timer, sample and MIDI register use. EEPROM save
+  latency stays configurable because its duration is unspecified. Analog mixer/filter behavior,
+  external DMA/IRQ delivery and chip details needing software comparison are documented as open;
+  physical hardware tests are not required.
+
 ## [1.2.0] - 2026-10-25
 
 GameFrame 1.2.0 expands the late-1990s replacement libraries, adds a clean-room Indeo 4.1

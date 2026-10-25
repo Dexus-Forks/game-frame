@@ -1,7 +1,6 @@
 #![doc = include_str!("../README.md")]
 #![forbid(unsafe_code)]
 
-
 //! Yamaha YM3812 (OPL2), the FM chip on the AdLib and Sound Blaster cards. DOS games wrote
 //! their music as register writes to this chip; this crate turns the same writes into samples.
 //!
@@ -17,7 +16,8 @@
 //!   decides when each rate steps, the exponential attack and linear decay, key scaling of rate
 //!   and level, total level and tremolo;
 //! - the four OPL2 waveforms (enabled by register 01h bit 5), operator feedback, FM and
-//!   additive connections, rhythm mode, and the two timers with the status register.
+//!   additive connections, rhythm mode, the two timers with the status register, and timer-1 CSM
+//!   key pulses.
 //!
 //! Output is the chip's 16-bit digital sum (the YM3014 DAC stage is not modelled, so there is
 //! no extra quantisation noise). Everything is integer and deterministic.
@@ -34,15 +34,17 @@ pub const SAMPLE_RATE: f64 = CLOCK_HZ / 72.0;
 /// Frequency multiplier ×2 (MULT 0 is ½).
 const MULT_X2: [u32; 16] = [1, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 20, 24, 24, 30, 30];
 /// Key-scale level ROM, indexed by the top four F-number bits (units of 0.75 dB at block 7).
-const KSL_ROM: [i32; 16] = [0, 32, 40, 45, 48, 51, 53, 55, 56, 58, 59, 60, 61, 62, 63, 64];
+const KSL_ROM: [i32; 16] = [
+    0, 32, 40, 45, 48, 51, 53, 55, 56, 58, 59, 60, 61, 62, 63, 64,
+];
 /// KSL register value → right shift of the key-scale attenuation (off, 3, 1.5, 6 dB/octave).
 const KSL_SHIFT: [u32; 4] = [8, 1, 2, 0];
 /// Extra envelope steps for rates ≥ 48, by the rate's low two bits and the counter phase.
 const RATE_STEP: [[u8; 4]; 4] = [[0, 0, 0, 0], [1, 0, 0, 0], [1, 0, 1, 0], [1, 1, 1, 0]];
 /// Register offset (low five bits of 20h–F5h) → operator slot, or none for the gaps.
 const SLOT_OF_OFFSET: [i8; 32] = [
-    0, 1, 2, 3, 4, 5, -1, -1, 6, 7, 8, 9, 10, 11, -1, -1, 12, 13, 14, 15, 16, 17, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1,
+    0, 1, 2, 3, 4, 5, -1, -1, 6, 7, 8, 9, 10, 11, -1, -1, 12, 13, 14, 15, 16, 17, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1,
 ];
 
 /// Attenuation meaning "silent" in the operator's log domain.
@@ -112,6 +114,7 @@ struct Channel {
     block: u8,
     feedback: u8,
     additive: bool,
+    key_on: bool,
 }
 
 /// One YM3812.
@@ -121,7 +124,12 @@ pub struct Opl2 {
     log_sin: [u16; 256],
     exp: [u16; 256],
     wave_select: bool,
+    extended_waveforms: bool,
+    four_op_pairs: u8,
     note_select: bool,
+    csm_mode: bool,
+    csm_supported: bool,
+    csm_release_pending: bool,
     deep_am: bool,
     deep_vib: bool,
     rhythm: bool,
@@ -134,6 +142,7 @@ pub struct Opl2 {
     vib_pos: u32,
     timer_reload: [u8; 2],
     timer_count: [u8; 2],
+    timer_phase: [u8; 2],
     timer_run: [bool; 2],
     timer_mask: [bool; 2],
     status: u8,
@@ -163,7 +172,12 @@ impl Opl2 {
             log_sin,
             exp,
             wave_select: false,
+            extended_waveforms: false,
+            four_op_pairs: 0,
             note_select: false,
+            csm_mode: false,
+            csm_supported: true,
+            csm_release_pending: false,
             deep_am: false,
             deep_vib: false,
             rhythm: false,
@@ -175,6 +189,7 @@ impl Opl2 {
             vib_pos: 0,
             timer_reload: [0; 2],
             timer_count: [0; 2],
+            timer_phase: [0; 2],
             timer_run: [false; 2],
             timer_mask: [false; 2],
             status: 0,
@@ -185,6 +200,59 @@ impl Opl2 {
     /// bits read back as `110b` on an OPL2, which is how programs tell it from an OPL3.
     pub fn status(&self) -> u8 {
         self.status | 0x06
+    }
+
+    /// Enable the extra YMF262 waveforms while keeping the YM3812 default unchanged.
+    /// This is used by the sibling OPL3 chip model.
+    pub fn set_extended_waveforms(&mut self, enabled: bool) {
+        self.extended_waveforms = enabled;
+    }
+
+    /// Select whether this YM3812-derived engine supports the OPL2 CSM feature.
+    ///
+    /// The YMF262 omits CSM, so the OPL3 wrapper disables it while reusing the shared operator
+    /// engine. Note-select remains available through register 08h in either mode.
+    pub fn set_csm_supported(&mut self, supported: bool) {
+        self.csm_supported = supported;
+        if !supported {
+            self.csm_mode = false;
+            self.csm_release_pending = false;
+        }
+    }
+
+    /// Enable YMF262 four-operator pairs. Bit 0 pairs channels 0 and 3, bit 1 pairs 1 and 4,
+    /// and bit 2 pairs 2 and 5. The OPL3 wrapper supplies this mask from register 104h.
+    pub fn set_four_operator_pairs(&mut self, pairs: u8) {
+        let pairs = pairs & 0x07;
+        let changed = self.four_op_pairs ^ pairs;
+        if changed == 0 {
+            return;
+        }
+        self.four_op_pairs = pairs;
+
+        for first in 0..3 {
+            let bit = 1 << first;
+            if changed & bit == 0 {
+                continue;
+            }
+
+            let (first_mod, first_car) = Self::channel_slots(first);
+            let (second_mod, second_car) = Self::channel_slots(first + 3);
+            if pairs & bit != 0 {
+                let on = self.chans[first].key_on;
+                self.set_key(first_mod, 1, on);
+                self.set_key(first_car, 1, on);
+                self.set_key(second_mod, 1, on);
+                self.set_key(second_car, 1, on);
+            } else {
+                let first_on = self.chans[first].key_on;
+                let second_on = self.chans[first + 3].key_on;
+                self.set_key(first_mod, 1, first_on);
+                self.set_key(first_car, 1, first_on);
+                self.set_key(second_mod, 1, second_on);
+                self.set_key(second_car, 1, second_on);
+            }
+        }
     }
 
     /// Write `value` to register `reg` (port 389h after selecting the index on 388h).
@@ -203,12 +271,18 @@ impl Opl2 {
                     let run = value & (1 << t) != 0;
                     if run && !self.timer_run[t] {
                         self.timer_count[t] = self.timer_reload[t];
+                        self.timer_phase[t] = 0;
+                    }
+                    if !run {
+                        self.timer_phase[t] = 0;
                     }
                     self.timer_run[t] = run;
                 }
             }
-            // Bit 7 (CSM speech mode) is rarely used by games and is not modelled.
-            0x08 => self.note_select = value & 0x40 != 0,
+            0x08 => {
+                self.csm_mode = self.csm_supported && value & 0x80 != 0;
+                self.note_select = value & 0x40 != 0;
+            }
             0x20..=0x35 | 0x40..=0x55 | 0x60..=0x75 | 0x80..=0x95 | 0xE0..=0xF5 => {
                 let slot = SLOT_OF_OFFSET[(reg & 0x1F) as usize];
                 if slot < 0 {
@@ -235,7 +309,7 @@ impl Opl2 {
                         op.sl = value >> 4;
                         op.rr = value & 0x0F;
                     }
-                    _ => op.wave = value & 0x03,
+                    _ => op.wave = value & 0x07,
                 }
             }
             0xA0..=0xA8 => {
@@ -244,13 +318,21 @@ impl Opl2 {
             }
             0xB0..=0xB8 => {
                 let ch = (reg - 0xB0) as usize;
-                let c = &mut self.chans[ch];
-                c.fnum = (c.fnum & 0xFF) | ((value as u16 & 3) << 8);
-                c.block = (value >> 2) & 7;
+                self.chans[ch].fnum = (self.chans[ch].fnum & 0xFF) | ((value as u16 & 3) << 8);
+                self.chans[ch].block = (value >> 2) & 7;
                 let on = value & 0x20 != 0;
+                self.chans[ch].key_on = on;
                 let (m, k) = Self::channel_slots(ch);
-                self.set_key(m, 1, on);
-                self.set_key(k, 1, on);
+                if ch < 3 && self.four_op_pairs & (1 << ch) != 0 {
+                    let (m2, k2) = Self::channel_slots(ch + 3);
+                    self.set_key(m, 1, on);
+                    self.set_key(k, 1, on);
+                    self.set_key(m2, 1, on);
+                    self.set_key(k2, 1, on);
+                } else if !(3..6).contains(&ch) || self.four_op_pairs & (1 << (ch - 3)) == 0 {
+                    self.set_key(m, 1, on);
+                    self.set_key(k, 1, on);
+                }
             }
             0xBD => {
                 self.deep_am = value & 0x80 != 0;
@@ -285,10 +367,23 @@ impl Opl2 {
         (slot / 6) * 3 + (slot % 6) % 3
     }
 
+    fn pitch_channel_of_slot(&self, slot: usize) -> usize {
+        let channel = Self::channel_of_slot(slot);
+        if (3..6).contains(&channel) && self.four_op_pairs & (1 << (channel - 3)) != 0 {
+            channel - 3
+        } else {
+            channel
+        }
+    }
+
     /// Key-scale rate offset for a channel (0–15 with KSR set, else 0–3).
     fn key_scale(&self, ch: usize, ksr: bool) -> u32 {
         let c = &self.chans[ch];
-        let bit = if self.note_select { (c.fnum >> 8) & 1 } else { (c.fnum >> 9) & 1 };
+        let bit = if self.note_select {
+            (c.fnum >> 8) & 1
+        } else {
+            (c.fnum >> 9) & 1
+        };
         let ks = ((c.block as u32) << 1) | bit as u32;
         if ksr {
             ks
@@ -302,7 +397,7 @@ impl Opl2 {
             return 0;
         }
         let op = &self.ops[slot];
-        let ks = self.key_scale(Self::channel_of_slot(slot), op.ksr);
+        let ks = self.key_scale(self.pitch_channel_of_slot(slot), op.ksr);
         (reg_rate as u32 * 4 + ks).min(63)
     }
 
@@ -323,18 +418,52 @@ impl Opl2 {
         }
     }
 
+    fn csm_key_on(&mut self) {
+        for slot in 0..self.ops.len() {
+            let instant = self.effective_rate(slot, self.ops[slot].ar) >= 60;
+            let op = &mut self.ops[slot];
+            op.key |= 4;
+            op.stage = Stage::Attack;
+            op.phase = 0;
+            if instant {
+                op.level = 0;
+            }
+        }
+        self.csm_release_pending = true;
+    }
+
+    fn csm_key_off(&mut self) {
+        for op in &mut self.ops {
+            op.key &= !4;
+            if op.key == 0 {
+                op.stage = Stage::Release;
+            }
+        }
+        self.csm_release_pending = false;
+    }
+
     /// Advance the timers by one sample. Timer 1 counts every 4 samples (80 µs), timer 2 every
     /// 16 (320 µs).
     fn tick_timers(&mut self) {
         for t in 0..2 {
             let period = if t == 0 { 4 } else { 16 };
-            if !self.timer_run[t] || self.clock % period != 0 {
+            if !self.timer_run[t] {
                 continue;
             }
+            self.timer_phase[t] += 1;
+            if self.timer_phase[t] < period {
+                continue;
+            }
+            self.timer_phase[t] = 0;
             let (v, overflow) = self.timer_count[t].overflowing_add(1);
             self.timer_count[t] = if overflow { self.timer_reload[t] } else { v };
-            if overflow && !self.timer_mask[t] {
-                self.status |= 0x80 | (0x40 >> t);
+            if overflow {
+                if !self.timer_mask[t] {
+                    self.status |= 0x80 | (0x40 >> t);
+                }
+                if t == 0 && self.csm_mode {
+                    self.csm_key_on();
+                }
             }
         }
     }
@@ -342,8 +471,9 @@ impl Opl2 {
     /// Attenuation of one operator this sample, 0 (loudest) to 511, in 0.1875 dB steps.
     fn attenuation(&self, slot: usize, tremolo: u32) -> u32 {
         let op = &self.ops[slot];
-        let c = &self.chans[Self::channel_of_slot(slot)];
-        let ksl = ((KSL_ROM[(c.fnum >> 6) as usize] << 2) - ((8 - c.block as i32) << 5)).max(0) as u32;
+        let c = &self.chans[self.pitch_channel_of_slot(slot)];
+        let ksl =
+            ((KSL_ROM[(c.fnum >> 6) as usize] << 2) - ((8 - c.block as i32) << 5)).max(0) as u32;
         let mut a = op.level as u32 + ((op.tl as u32) << 2) + (ksl >> KSL_SHIFT[op.ksl as usize]);
         if op.am {
             a += tremolo;
@@ -425,7 +555,7 @@ impl Opl2 {
     /// 10-bit phase of an operator this sample, then advance its accumulator.
     fn step_phase(&mut self, slot: usize) -> u32 {
         let op = self.ops[slot];
-        let c = self.chans[Self::channel_of_slot(slot)];
+        let c = self.chans[self.pitch_channel_of_slot(slot)];
         let mut f = c.fnum as i32;
         if op.vib {
             let range = (f >> 7) & 7;
@@ -453,16 +583,58 @@ impl Opl2 {
     /// Operator output (13-bit signed) for a 10-bit phase and a 9-bit attenuation.
     fn wave(&self, wave: u8, phase: u32, atten: u32) -> i32 {
         let p = phase & 0x3FF;
-        let w = if self.wave_select { wave } else { 0 };
+        let w = if self.wave_select {
+            if self.extended_waveforms {
+                wave
+            } else {
+                wave & 3
+            }
+        } else {
+            0
+        };
         let quarter = |p: u32| -> u32 {
             let i = if p & 0x100 != 0 { !p & 0xFF } else { p & 0xFF };
             self.log_sin[i as usize] as u32
         };
+        if w == 6 || w == 7 {
+            let total = (atten << 3).min(0x1FFF);
+            let magnitude = ((self.exp[(total & 0xFF) as usize] as i32) << 1) >> (total >> 8);
+            if w == 6 {
+                return if p & 0x200 == 0 {
+                    magnitude
+                } else {
+                    !magnitude
+                };
+            }
+            let ramp = magnitude * (1023 - 2 * p as i32) / 1023;
+            return if ramp < 0 { !-ramp } else { ramp };
+        }
         let (log, negative) = match w {
             0 => (quarter(p), p & 0x200 != 0),
             1 => (if p & 0x200 != 0 { SILENT } else { quarter(p) }, false),
             2 => (quarter(p), false),
-            _ => (if p & 0x100 != 0 { SILENT } else { quarter(p) }, false),
+            3 => (if p & 0x100 != 0 { SILENT } else { quarter(p) }, false),
+            4 => {
+                if p & 0x200 != 0 {
+                    (SILENT, false)
+                } else {
+                    (quarter(p), p & 0x100 != 0)
+                }
+            }
+            5 => {
+                if p & 0x200 != 0 {
+                    (SILENT, false)
+                } else {
+                    let doubled = (p & 0x1FF) << 1;
+                    let i = if doubled & 0x100 != 0 {
+                        !doubled & 0xFF
+                    } else {
+                        doubled & 0xFF
+                    };
+                    (self.log_sin[i as usize] as u32, false)
+                }
+            }
+            _ => unreachable!(),
         };
         let total = (log + (atten << 3)).min(0x1FFF);
         let mag = ((self.exp[(total & 0xFF) as usize] as i32) << 1) >> (total >> 8);
@@ -490,6 +662,75 @@ impl Opl2 {
 
     /// Generate one sample at [`SAMPLE_RATE`].
     pub fn sample(&mut self) -> i16 {
+        self.render_channels()
+            .iter()
+            .sum::<i32>()
+            .clamp(i16::MIN as i32, i16::MAX as i32) as i16
+    }
+
+    /// Generate one sample and return the unclipped output of each of the nine OPL2 channels.
+    /// Rhythm sounds are grouped in their owning channels 6, 7 and 8. The sibling OPL3 model
+    /// uses these outputs to route each channel to the YMF262's four output accumulators.
+    pub fn sample_channels(&mut self) -> [i32; 9] {
+        self.render_channels()
+    }
+
+    /// Generate channel outputs with the configured YMF262 four-operator pairs. A paired
+    /// channel's mixed output occupies the first channel's slot; the second slot is zero.
+    pub fn sample_channels_with_four_operator_pairs(&mut self) -> [i32; 9] {
+        self.render_channels()
+    }
+
+    fn render_four_operator_pair(&mut self, first: usize, phase: &[u32; 18], tremolo: u32) -> i32 {
+        let second = first + 3;
+        let (op1, op2) = Self::channel_slots(first);
+        let (op3, op4) = Self::channel_slots(second);
+        // Yamaha lists CNT(Cn) first and CNT(Cn+3) second in the four-operator
+        // diagrams, so Cn is the high bit of this local algorithm index.
+        let algorithm =
+            ((self.chans[first].additive as u8) << 1) | self.chans[second].additive as u8;
+
+        let feedback = self.feedback_input(op1, first);
+        let out1 = self.wave(
+            self.ops[op1].wave,
+            phase[op1].wrapping_add(feedback),
+            self.attenuation(op1, tremolo),
+        );
+        self.set_out(op1, out1);
+
+        let mod2 = if algorithm & 2 == 0 { out1 as u32 } else { 0 };
+        let out2 = self.wave(
+            self.ops[op2].wave,
+            phase[op2].wrapping_add(mod2),
+            self.attenuation(op2, tremolo),
+        );
+        self.set_out(op2, out2);
+
+        let mod3 = if algorithm == 1 { 0 } else { out2 as u32 };
+        let out3 = self.wave(
+            self.ops[op3].wave,
+            phase[op3].wrapping_add(mod3),
+            self.attenuation(op3, tremolo),
+        );
+        self.set_out(op3, out3);
+
+        let mod4 = if algorithm == 3 { 0 } else { out3 as u32 };
+        let out4 = self.wave(
+            self.ops[op4].wave,
+            phase[op4].wrapping_add(mod4),
+            self.attenuation(op4, tremolo),
+        );
+        self.set_out(op4, out4);
+
+        match algorithm {
+            0 => out4,
+            1 => out2 + out4,
+            2 => out1 + out4,
+            _ => out1 + out3 + out4,
+        }
+    }
+
+    fn render_channels(&mut self) -> [i32; 9] {
         // Global clocks: tremolo every 64 samples (210 positions, 3.7 Hz), vibrato every 1024
         // (8 positions, 6.1 Hz), the envelope counter every second sample.
         if self.clock & 63 == 63 {
@@ -503,33 +744,66 @@ impl Opl2 {
         if odd {
             self.env_counter += 1;
             let low = self.env_counter & 0x1FFF;
-            timer_add = if low == 0 { 0 } else { low.trailing_zeros() + 1 };
+            timer_add = if low == 0 {
+                0
+            } else {
+                low.trailing_zeros() + 1
+            };
         }
-        let tri = if self.trem_pos > 105 { 210 - self.trem_pos } else { self.trem_pos };
+        let tri = if self.trem_pos > 105 {
+            210 - self.trem_pos
+        } else {
+            self.trem_pos
+        };
         let tremolo = tri >> if self.deep_am { 2 } else { 4 };
 
         for slot in 0..18 {
             self.step_envelope(slot, odd, timer_add);
+        }
+        if self.csm_release_pending {
+            self.csm_key_off();
         }
         let mut phase = [0u32; 18];
         for (slot, p) in phase.iter_mut().enumerate() {
             *p = self.step_phase(slot);
         }
 
-        let mut mix: i32 = 0;
+        let mut channels = [0i32; 9];
         let melodic = if self.rhythm { 6 } else { 9 };
         for ch in 0..melodic {
+            if ch < 3 && self.four_op_pairs & (1 << ch) != 0 {
+                channels[ch] = self.render_four_operator_pair(ch, &phase, tremolo);
+                continue;
+            }
+            if (3..6).contains(&ch) && self.four_op_pairs & (1 << (ch - 3)) != 0 {
+                continue;
+            }
             let (m, k) = Self::channel_slots(ch);
             let fb = self.feedback_input(m, ch);
-            let mo = self.wave(self.ops[m].wave, phase[m].wrapping_add(fb), self.attenuation(m, tremolo));
+            let mo = self.wave(
+                self.ops[m].wave,
+                phase[m].wrapping_add(fb),
+                self.attenuation(m, tremolo),
+            );
             self.set_out(m, mo);
-            let modulation = if self.chans[ch].additive { 0 } else { mo as u32 };
-            let co = self.wave(self.ops[k].wave, phase[k].wrapping_add(modulation), self.attenuation(k, tremolo));
+            let modulation = if self.chans[ch].additive {
+                0
+            } else {
+                mo as u32
+            };
+            let co = self.wave(
+                self.ops[k].wave,
+                phase[k].wrapping_add(modulation),
+                self.attenuation(k, tremolo),
+            );
             self.set_out(k, co);
-            mix += if self.chans[ch].additive { mo + co } else { co };
+            channels[ch] = if self.chans[ch].additive { mo + co } else { co };
         }
         if self.rhythm {
-            mix += self.rhythm_section(&phase, tremolo);
+            let percussion = self.rhythm_section(&phase, tremolo);
+            channels[6] += percussion[0];
+            channels[7] += percussion[1];
+            channels[8] += percussion[2];
         }
 
         // Noise generator: 23-bit LFSR, taps 0 and 14.
@@ -537,24 +811,34 @@ impl Opl2 {
         self.noise = (self.noise >> 1) | (bit << 22);
         self.tick_timers();
         self.clock += 1;
-        mix.clamp(i16::MIN as i32, i16::MAX as i32) as i16
+        channels
     }
 
-    /// Channels 6–8 in rhythm mode: bass drum (both operators of 6), hi-hat (13), tom-tom (14),
-    /// snare (16) and cymbal (17). Each percussion output counts double.
-    fn rhythm_section(&mut self, phase: &[u32; 18], tremolo: u32) -> i32 {
+    /// Rhythm outputs grouped by their owning channels: bass drum on 6, hi-hat and snare on 7,
+    /// and tom-tom and cymbal on 8. Each percussion output counts double.
+    fn rhythm_section(&mut self, phase: &[u32; 18], tremolo: u32) -> [i32; 3] {
         // Bass drum: a normal two-operator voice, but only the carrier is heard.
         let fb = self.feedback_input(12, 6);
-        let mo = self.wave(self.ops[12].wave, phase[12].wrapping_add(fb), self.attenuation(12, tremolo));
+        let mo = self.wave(
+            self.ops[12].wave,
+            phase[12].wrapping_add(fb),
+            self.attenuation(12, tremolo),
+        );
         self.set_out(12, mo);
         let modulation = if self.chans[6].additive { 0 } else { mo as u32 };
-        let bd = self.wave(self.ops[15].wave, phase[15].wrapping_add(modulation), self.attenuation(15, tremolo));
+        let bd = self.wave(
+            self.ops[15].wave,
+            phase[15].wrapping_add(modulation),
+            self.attenuation(15, tremolo),
+        );
         self.set_out(15, bd);
 
         let hh_p = phase[13];
         let cy_p = phase[17];
         let bit = |p: u32, n: u32| (p >> n) & 1;
-        let ring = (bit(hh_p, 2) ^ bit(hh_p, 7)) | (bit(hh_p, 3) ^ bit(cy_p, 5)) | (bit(cy_p, 3) ^ bit(cy_p, 5));
+        let ring = (bit(hh_p, 2) ^ bit(hh_p, 7))
+            | (bit(hh_p, 3) ^ bit(cy_p, 5))
+            | (bit(cy_p, 3) ^ bit(cy_p, 5));
         let noise = self.noise & 1;
 
         let hh_phase = (ring << 9) | if ring ^ noise != 0 { 0xD0 } else { 0x34 };
@@ -569,7 +853,7 @@ impl Opl2 {
         let cy = self.wave(self.ops[17].wave, cy_phase, self.attenuation(17, tremolo));
         self.set_out(17, cy);
 
-        2 * (bd + hh + tt + sd + cy)
+        [2 * bd, 2 * (hh + sd), 2 * (tt + cy)]
     }
 
     /// Fill `out` with consecutive samples.
@@ -631,7 +915,10 @@ mod tests {
         opl.generate(&mut buf);
         let crossings = buf.windows(2).filter(|w| w[0] < 0 && w[1] >= 0).count() as f64;
         let expected = 577.0 * SAMPLE_RATE / (1u32 << 16) as f64;
-        assert!((crossings - expected).abs() < 2.0, "{crossings} vs {expected}");
+        assert!(
+            (crossings - expected).abs() < 2.0,
+            "{crossings} vs {expected}"
+        );
         let peak = buf.iter().map(|&s| (s as i32).abs()).max().unwrap();
         assert!((4000..=4085).contains(&peak), "peak {peak}");
     }

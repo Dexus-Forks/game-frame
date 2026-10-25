@@ -5,7 +5,7 @@ kind: context
 status: context
 era: [late-1990s]
 platform: [windows-9x]
-runtime: [wine, virtual-machine]
+runtime: [wine, 86box, virtual-machine]
 hardware: [display, ports, cd-rom, x86-cpu, mmx]
 api: [win32, directdraw, directinput, directsound, mci]
 tags: [directx, cd-check, ini, registry, single-instance, indeo]
@@ -54,8 +54,9 @@ Before the first run:
   offer to continue without them. Accept that until the picture works.
 
 The places to run it, best first for observing, are Wine on Linux or macOS (trace channels,
-scriptable), a virtual machine with a real Windows 98 (exact behaviour, harder to observe) and
-GameFrame's `pe32_emu` for single routines with no system calls.
+scriptable), 86Box with a recorded period machine profile when motherboard or card behavior
+matters, a virtual machine with Windows 98, and GameFrame's `pe32_emu` for single routines with
+no system calls. See the [86Box guide](../observe/86box.md) before using a profile as evidence.
 
 Wine's trace channels for this era are `+ddraw` (surfaces and modes), `+dinput`, `+dsound`,
 `+file` (every file open) and `+seh` (exceptions with registers). Use `+relay` with

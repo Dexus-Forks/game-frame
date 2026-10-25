@@ -78,7 +78,11 @@ user may change any of them.
    "Apache-2.0"` in manifests); documentation and other prose are CC0 1.0,
    dedicated to the public domain (LICENSE-CC0-1.0). Every part (core, player,
    viewer, tools) has build and run instructions in its README and a row in README.md.
-10. **Keep files small and modular.** One concern per module; split a file before it passes a
+10. **Clean-room-style tasks.** When the project asks for source-blind implementation, use
+    `re-cleanroom`. Keep the source evidence ledger out of the implementer's packet. Record
+    whether the task boundary is prompt-based, workspace-isolated or independently staffed.
+    A shared workspace does not provide technical access control.
+11. **Keep files small and modular.** One concern per module; split a file before it passes a
    few hundred lines, generated code included (one file per original unit or table).
 
 ## Where things are

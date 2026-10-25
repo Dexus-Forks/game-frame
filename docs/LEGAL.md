@@ -31,10 +31,19 @@ project does. An agent gives this advice when it bears on a choice. Then it foll
 
 ## Interoperability
 
-Many legal systems allow reverse engineering for interoperability (for example Article 6 of the
-EU Software Directive, and US case law such as Sega v. Accolade and Sony v. Connectix), within
-limits. A game's end-user licence may say otherwise; whether such a clause holds depends on the
-country.
+Many legal systems allow some reverse engineering for interoperability, within limits. Article 6
+of the [EU Software Directive](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32009L0024)
+allows necessary decompilation when its conditions are met, including that the needed information
+is not readily available and that the work is limited to the necessary parts. US Ninth Circuit
+decisions such as [Sega v. Accolade](https://law.justia.com/cases/federal/appellate-courts/ca9/92-15655/92-15655.html)
+and [Sony v. Connectix](https://www.copyright.gov/fair-use/summaries/sony-connectix-9thcir2000.pdf)
+considered reverse engineering for compatibility under US copyright law. These are jurisdiction-
+specific examples, not a ruling on a particular driver package or its terms. A package's end-user
+licence may raise separate questions; the effect depends on the country and the facts.
+
+Preservation gives a practical reason to keep discontinued hardware interfaces usable by old
+software. It informs the project's purpose and scope. The fact that a card is no longer made or
+sold does not, by itself, resolve copyright or contract questions.
 
 The rules differ a great deal between countries. Some allow decompiling only for interoperability. Others give it no express cover. [Your own copy and the law](preservation/law/README.md)
 summarises 35 countries, with one page per region.
@@ -42,9 +51,15 @@ summarises 35 countries, with one page per region.
 ## Clean room, or not
 
 A *clean-room* reimplementation separates the people who study the original from the people
-who write the new code: one group writes a specification, the other implements it without
-seeing the original. It gives the strongest legal protection but needs two separate groups. When the
-same agent studies and writes (as in Un-Banished), say so in the project's documents. Then follow the defaults above: no copied code, findings in your own words, every claim traceable to evidence.
+who write the new code: one group writes a specification, the other implements it without seeing
+the original. Phoenix Technologies' IBM-compatible BIOS work is a documented historical example
+of this process ([Lemley, *Rise of the API Copyright Dead?*](https://jolt.law.harvard.edu/assets/articlePDFs/v31/31HarvJLTech305.pdf)).
+It shows a way to organize independent implementation; it is not a court ruling or a guarantee.
+When the same agent studies and writes (as in Un-Banished), say so in the project's documents.
+Then follow the defaults above: no copied code, findings in your own words, every claim traceable
+to evidence. GameFrame's `re-cleanroom` skill supports separate source-visible and source-blind
+tasks. Task separation is a working method; it does not create technical access controls or settle
+whether a project meets a legal clean-room standard.
 
 ## Respect
 

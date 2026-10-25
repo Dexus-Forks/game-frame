@@ -139,6 +139,7 @@ stops at the same points:
 | `re-accelerator` | re-trace, re-ghidra | Agent | re-decoder, re-porter, re-tracer |
 | `re-cataloguer` | re-observe | Agent, WebFetch, WebSearch | re-porter, re-tracer |
 | `re-checker` | re-land, re-trace | Agent | re-lander |
+| `re-cleanroomporter` | re-cleanroom | Agent, WebFetch, WebSearch, mcp | re-verifier |
 | `re-decoder` | re-format | Agent, WebFetch, WebSearch | re-porter, re-tracer |
 | `re-decompiler` | re-ghidra, re-rea | Agent, WebFetch, WebSearch | re-tracer |
 | `re-editor` | re-land | Agent, WebFetch, WebSearch | re-checker, re-lander |
@@ -152,6 +153,7 @@ stops at the same points:
 | `re-porter` | re-port | Agent, WebFetch, WebSearch | re-verifier |
 | `re-publisher` | re-site, re-land | Agent, WebFetch, WebSearch | re-lander |
 | `re-randomiser` | re-trace, re-emulate | Agent, WebFetch, WebSearch | re-porter, re-verifier |
+| `re-specifier` | re-cleanroom | Agent | re-cleanroomporter |
 | `re-surveyor` | re-setup, re-inventory | Agent | re-decompiler, re-observer |
 | `re-tracer` | re-trace, re-ghidra, re-rea | Agent, WebFetch, WebSearch | re-decoder, re-measurer, re-porter |
 | `re-typer` | re-trace, re-ghidra | Agent, WebFetch, WebSearch | re-decoder, re-porter, re-tracer |

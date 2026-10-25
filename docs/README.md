@@ -62,12 +62,12 @@ the order of this page and of each folder's `README.md` is the order of the site
 ## Agent teams
 
 - [Agent teams](teams/README.md): how the agents work together, the hand-off, where the data
-  lives, and seven teams with diagrams.
+  lives, and eight teams with diagrams.
 
 ## Working on a project
 
-- [Working on a project](working/README.md): how agents work well on this, and how to write
-  findings.
+- [Working on a project](working/README.md): how agents work well on this, how to write findings,
+  and how to separate source analysis from implementation.
 
 ## Known failures and context
 

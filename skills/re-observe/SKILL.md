@@ -1,6 +1,6 @@
 ---
 name: re-observe
-description: Run the original game where it can be watched, driven and captured - GameFrame's emulators, DOSBox-X, Wine, a Windows machine or a streamed PC, console emulators - and capture frames, state, inputs, calls, file reads and sound as measured evidence. Also list every input from outside, inventory every interface screen, and build a queryable object model of the game with entry points for tests and agents. Use after inventory, before porting a system whose behaviour you need to see, and whenever a question can be settled by running the original.
+description: Run the original game where it can be watched, driven and captured - GameFrame's emulators, DOSBox-X, 86Box, Wine, a Windows machine or a streamed PC, console emulators - and capture frames, state, inputs, calls, file reads and sound as measured evidence. Also list every input from outside, inventory every interface screen, and build a queryable object model of the game with entry points for tests and agents. Use after inventory, before porting a system whose behaviour you need to see, and whenever a question can be settled by running the original.
 ---
 
 # Observe the running original
@@ -23,11 +23,19 @@ model, how exact the interface must be. They decide what to capture.
 | One routine of a DOS program | `tools/emu/dos_emu` | the same, 16-bit |
 | A whole DOS program, headless | `tools/emu/dos_env` | frames, memory and demos in scripts; keys from `env.keys` |
 | A DOS program with a window | DOSBox-X (debugger, file log), scripted with `tools/dos/dbx_control.py` | breakpoints, memory, `fileio_trace.py` |
+| A DOS or Windows 3.x/9x game that depends on its PC hardware | 86Box, with a recorded machine profile | the configured CPU, BIOS, chipset, buses, sound cards and resource assignments (`docs/observe/86box.md`) |
 | A Windows game | Wine (`WINEDEBUG=+relay`), a Windows machine or VM, or a PC streamed to you | API calls, screenshots, debuggers, RenderDoc |
 | A console or arcade game | an emulator with a debugger (Mesen, bsnes, Dolphin, PCSX2, MAME) | memory, input movies, frame advance |
 
 Prefer headless, scripted runs for evidence. Use windowed runs to see what happens and where to
 look. `docs/observe/running-the-original.md` has the full table.
+
+Use DOSBox-X for fast DOS runs that need its debugger or file log. Use 86Box when the question
+depends on a particular PC, BIOS, expansion bus, guest Windows version or card resource setting.
+Record the 86Box release, machine profile, guest OS, card model, I/O ports, IRQ, DMA and driver
+version with each capture. Treat the result as an observation of that 86Box build and profile,
+not as physical-hardware evidence. Keep 86Box source out of a source-blind implementation task;
+pass the behavior description and its setup conditions to the implementation stage.
 
 Before the first run, list what the game needs and the modules that provide it
 (`docs/harness/README.md`):

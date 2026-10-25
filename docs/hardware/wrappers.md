@@ -59,6 +59,10 @@ game met, with a count. The log of a new game's first run then lists what to wri
 | [`ddraw.dll`](../../wrappers/ddraw/README.md) | DirectDraw 1 to 3 | Every surface in memory and every mode granted. Each flip shows the frame in a window, scaled | 2 of 9 calls, and the methods of DirectDraw 1 to 3 that POD calls. Used by POD's ATI, S3 and PowerVR builds. Made for its software and MMX builds too (not confirmed with them) | No Direct3D. `DDRAW_SYSTEM=1` hands DirectDraw to the system's own library for a game that needs it. Methods POD does not call return `DDERR_UNSUPPORTED` |
 | [`94DLL32.dll`](../../wrappers/maxi94/README.md) (`maxi94`) | Guillemot Maxi Sound 64 (Dream SAM9407), the sound card library | No picture. The card's wave streams are Wine's wave outputs, and the mixer's wave and CD lines are answered for, so the game's sound plays | 6 exports by ordinal. POD Gold's `PODMAX64` races with its sound effects in the emulated PC (Wine on Linux, recorded) | Front and rear mixed into two speakers. Sample banks, the chip's voices and its effects are not exported. [Sound-card APIs](sound-card-apis.md) has the other cards |
 
+The Maxi Sound row is a Windows library bridge. DOS chip and card models need register timing,
+DMA, interrupts or MIDI event handling. The [PC audio coverage map](audio-coverage.md) tracks
+those layers and the engines that can be reused.
+
 The libraries share four crates:
 
 - [`shim`](../../wrappers/shim/README.md): the shared settings, port I/O as Windows 95

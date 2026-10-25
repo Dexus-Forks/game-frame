@@ -64,6 +64,81 @@ proposed again.
 - [x] PowerVR SGL's immediate-mode half (`sgltri_*`), which Hardwar's PowerVR mode uses. The 13 calls it lacked, and `sgltri_rerender`, are in `wrappers/sgl` ([sgl](wrappers/sgl/README.md), `test/sgltritest.c`). `sgltri_shadow` draws shadow volumes; Hardwar has not been run against it
 - [ ] Rendition RRedline and Matrox MSI in the same detail
 
+## Sound ([sound.md](docs/hardware/sound.md), [audio coverage](docs/hardware/audio-coverage.md))
+
+- [x] Map common PC audio device families by era, separate chip emulation from card behavior,
+  compatibility libraries and host output, and record current GameFrame coverage
+- [x] Implement the documented YMF262 register banks, two- and four-operator synthesis, eight
+  waveforms, four output words, compatibility mode, timers, indexed ports and serial DAC frames
+  (`gameframe-opl3`). Software tests cover native output routing and mode-gated pair selection.
+- [x] Implement YAC512 serial input, FSEL decoding and channel latches (`gameframe-yac512`);
+  software tests cover bit order, channel latches and captured FSEL mode. Its floating-DAC
+  transfer remains open with software-only checks documented.
+- [ ] Establish the YAC512 floating-DAC transfer curve from reliable specifications or a named
+  software reference ([test plan](docs/hardware/ymf262-open-questions.md)); physical testing is not
+  a blocker
+- [ ] Verify how four-operator carrier groups use the paired `C0` output selectors across YMF262
+  outputs A–D. The AdLib Gold Toolkit documents its D4/D5 stereo rule; a software black-box capture
+  can resolve the remaining four-output mapping ([test plan](docs/hardware/ymf262-open-questions.md));
+  physical hardware testing is not a blocker
+- [ ] Compare YMF262 output and access timing against a named software reference when useful; this
+  is not a release blocker and physical hardware testing is optional
+- [x] Implement the documented AdLib Gold Control Chip bank switch, register/status access,
+  EEPROM commands and audio-port relocation (`gameframe-adlib-gold`). Software tests cover the
+  busy windows, restore, relocation, mixer controls and MMA-to-Control-Chip interrupt path. The
+  Developer Toolkit resolves the driver's `0xFE`/`0xFF` toggles and second data-port reads.
+- [ ] Compare those card paths with the original GSS drivers under an instrumented NE emulator;
+  external DMA/IRQ delivery and revision-specific defaults remain open. Physical testing is not
+  required.
+- [x] Add the YMZ263B/MMA digital model and route its ports and sampling interrupt through
+  `gameframe-adlib-gold`; implement the documented FIFO, rate, timer and MIDI surfaces
+- [x] Apply AdLib Gold's documented linear source volumes, speaker/microphone/telephone gates,
+  output channel selection, forced mono, mute and final volume controls in `mix_sources()`
+- [ ] Compare YMZ263 ADPCM rounding, interleave parity and FIFO threshold transitions against the
+  original GSS Wave/MIDI driver or a named software reference. The digital status map and MIDI
+  request masks follow the toolkit. Add software-only checks as behavior is resolved; physical
+  hardware is not required.
+- [ ] Model TDA8425 tone and pseudo/spatial processing, analog filter/ADC paths and connect external
+  DMA/IRQ controllers where software call paths establish their card-specific behavior
+- [x] Add a Philips SAA1099 and Creative Music System/Game Blaster model using Philips documents
+  and static traces of the original CMS drivers. The model includes synchronized tone/octave
+  writes, envelope boundary updates, two-chip routing, the CMS write window and a compatible
+  detection-port profile ([findings](docs/hardware/cms-saa1099.md)). Physical testing is optional.
+- [ ] Compare the SAA1099 noise seed and tone-plus-noise gate with a named software reference; run
+  the original CMS driver through a software port harness for its detection sequence; and model
+  DTACK timing with a cycle-counted fake bus. The original custom-chip state machine and analog
+  output remain documented software-only work ([findings](docs/hardware/cms-saa1099.md)).
+- [x] Add the TI SN76496 model, PCjr and original Tandy port adapters, input-clock advancement and
+  PCjr and Tandy port 61h output muxes (`gameframe-sn76496`). Sierra's original `JR.DRV` and
+  `TANDY.DRV` binaries confirm register writes, startup mutes and PSG-source selection.
+- [ ] Compare the TI SN76496 against software-emulator captures and resolve its noise taps/seed,
+  period-zero behavior and sample parity. Identify the undocumented fourth Tandy output-mux input.
+  Record the NCR 8496 and PSSJ differences as separate profiles when software references establish
+  them; physical testing is not required
+  ([findings](docs/hardware/tandy-psg.md)).
+- [ ] PC speaker/PIT audio and LPT DAC components
+- [x] Add a reusable Sound Blaster DSP, mixer and SB16 MPU-401 UART model for Creative DSP
+  generations 1.xx–4.xx (`gameframe-sound-blaster`); reuse the OPL2/OPL3 crates for card FM ports,
+  including SB Pro 1's dual-OPL2 stereo routing. Software checks cover reset/version, MIDI
+  timestamps and UART reset, 8-bit playback/capture, 16-bit playback/capture, FM port maps,
+  high-speed command gating, IRQ acknowledgement and mixer profiles
+- [x] Decode Creative 2-, 3- and 4-bit ADPCM to PCM in `gameframe-sound-blaster`. The 2-, 3- and
+  4-bit recurrences, step changes, reference-byte initialization and packed-byte order come from
+  static CT1741 firmware 4.05 disassembly. Sample parity is not yet measured.
+- [ ] Compare the ADPCM decoder and byte request cadence against CT1741 firmware in a Ghidra 8051
+  emulator with a stub sample port. Cover signs, magnitudes, predictor clamps, step changes,
+  byte boundaries, the 3-bit tail, both nibbles, continuation blocks and request intervals.
+  Physical testing is optional; details are in `docs/hardware/sound-blaster-dsp.md`
+- [ ] Establish exact DSP busy, OPL2 port busy, FIFO, stereo cadence and DMA terminal-count timing
+  with generated software comparisons. Physical testing is optional
+- [ ] Connect the card events to a host ISA DMA and PIC model, including DMA pages, channel state,
+  bus arbitration and PIC edge/EOI behavior
+- [ ] Apply mixer source selection, analog gain, tone and filter behavior when a game-facing path
+  requires those outputs
+- [ ] Gravis UltraSound GF1 and InterWave voice, memory and interrupt behavior
+- [ ] MPU-401 event timing and adapters for MT-32 and General MIDI synthesizers
+- [ ] AWE SoundFont Manager and selected Windows card APIs, when a game's call sites require them
+
 ## Engines ([animation.md](docs/engines/animation.md))
 
 - [x] Pose changes after blending: inverse kinematics, look-at, hand placement
@@ -89,6 +164,15 @@ proposed again.
 - [x] Overlays: data reloaded with a part, functions copied into two parts
 
 ## Tools
+
+- [ ] Build a clean-room packet tool that copies only allow-listed contract and public interface
+  files, hashes the packet, and records excluded source artifacts. Test it against repository
+  samples before use. Until then, follow the manual
+  [packet checklist](skills/re-cleanroom/references/packet-checklist.md).
+- [ ] Add a reusable 86Box debugger connector only after a stable, testable control protocol is
+  selected. DOSBox-X already has debugger scripts and an MCP channel; current 86Box workflows use
+  the emulator separately. Keep named external machine integrations project-specific until their
+  endpoint and access method are known.
 
 - [x] `tools/pe/relocs.py`: pointers in data from base relocations
 - [x] `tools/pe/peinfo.py`: delay-loaded imports, relocation count

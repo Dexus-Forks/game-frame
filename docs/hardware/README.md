@@ -48,8 +48,42 @@ In my GameFrame project, find every place the game touches hardware.
   and use them, and how to add a game.
 - [MMX and other SIMD code](simd.md): finding hand-written MMX routines, matching them to the
   plain build, measuring both, and porting them exactly.
-- [Sound](sound.md): the PC speaker, AdLib and OPL FM synthesis, Sound Blaster, Gravis
-  Ultrasound, MIDI devices, DirectSound, A3D and EAX.
+- [Sound](sound.md): the PC speaker, Tandy, Covox, Game Blaster, AdLib and OPL FM synthesis,
+  Sound Blaster, Gravis Ultrasound, MIDI devices, DirectSound, A3D and EAX.
+- [PC audio coverage](audio-coverage.md): the reusable chip, card, library and backend layers;
+  GameFrame coverage today and priorities for the next hardware models and replacements.
+- [Sound Blaster DSP, mixer and MPU-401](sound-blaster-dsp.md): the new Creative card model,
+  its programming reference, tested interface paths, remaining limits and software-only checks.
+- [Creative SBBASIC driver package](sbbasic-driver-interface.md): package provenance and the
+  installed DOS 6.22 and Windows 3.11 setup.
+- [SBBASIC clean-room-style workflow](sbbasic-cleanroom-process.md): source/implementer handoffs,
+  the bounded driver slices, debugger options and the limits of the logical models.
+- [Win16 SB16 auxiliary volume contract](sbbasic-driver-behavior.md): a bounded query and update
+  slice, with unknown behavior and software-only verification suggestions.
+- [Win16 SB16 wave-output contract](sb16-wave-output-contract.md): a bounded logical contract for
+  format opening and buffer submission. The accepted PCM matrix, callback behavior, pause and
+  restart semantics, reset behavior and hardware effects remain unknown.
+- [Win16 SB16 wave-completion contract](sb16-wave-completion-contract.md): a bounded logical
+  contract for queue draining, header updates, callback delivery, and pause, restart and reset.
+  Callback timing and order, reset handling for queued headers, buffer limits, and lower-service
+  behavior remain unknown.
+- [Win16 SB16 wave-input contract](sb16-wave-input-contract.md): a bounded logical contract for
+  input open, capture queues and completion callbacks. PCM limits, callback timing, overrun,
+  stream concurrency and control-message effects remain unknown.
+- [Win16 SB16 MIDI-port output contract](sb16-midi-output-contract.md): a bounded logical
+  contract for port open and short-message sends. Port routing, system-message edge cases,
+  lower-service protocol, and output timing remain unknown.
+- [Win16 SB16 MIDI short-message contract](sb16-midi-short-message-contract.md): refined
+  status-byte handling and a one-level reentrancy guard. Packed argument layout and the
+  lower-service event format remain unknown.
+- [Win16 SB16 mixer volume-details contract](sb16-mixer-volume-contract.md): a bounded view of
+  the descriptor-driven control-details read and write paths. The master selector, channel
+  shape and numeric scale remain unknown.
+- [Win16 SB16 FM synth note contract](sb16-fm-note-contract.md): a bounded trace of the Win16
+  FM synth wrapper's open and short-message paths. The lower-service event format and
+  note-to-OPL conversion remain unknown.
+- [SB16FM synth-service boundary](sb16-fm-service-boundary.md): follows the note event to the
+  installed provider boundary. The provider identity and note-to-OPL conversion remain unknown.
 - [The sound card makers' APIs](sound-card-apis.md): the Maxi Sound 64, A3D, EAX, the AWE's
   SoundFont Manager, Sensaura and QSound: how a game finds each, what Wine offers, and which
   can be stood in for.

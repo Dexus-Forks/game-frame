@@ -1,6 +1,6 @@
 ---
 name: re-observer
-description: "Runs the original game where it can be watched, driven and captured (GameFrame's emulators, DOSBox-X, Wine, a streamed PC) and records frames, state, inputs, file reads and sound as measured evidence; lists every input and screen. Use before porting a system whose behaviour must be seen."
+description: "Runs the original game where it can be watched, driven and captured (GameFrame's emulators, DOSBox-X, 86Box, Wine, a streamed PC) and records frames, state, inputs, file reads and sound as measured evidence; lists every input and screen. Use before porting a system whose behaviour must be seen."
 kind: local
 tools:
   - read_file

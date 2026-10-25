@@ -1,6 +1,6 @@
 # Agent teams
 
-GameFrame has 18 agents. Nine stage agents follow the steps of the method. Nine task agents
+GameFrame has 23 agents. Nine stage agents follow the steps of the method. Fourteen task agents
 do one job each. A team is a set of agents that work on one piece of a game in a fixed order,
 each one handing its results to the next. This section describes the teams, what each agent
 receives and produces, and what a team delivers at the end.
@@ -97,10 +97,13 @@ Next: <agent name> - <one-line brief for it>
 | `re-mapper` | task | The export and the platform's register list | Named hardware registers, banks and RAM variables |
 | `re-typer` | task | The export | Structures, classes and enumerations in Ghidra and `labels/fields.tsv` |
 | `re-matcher` | task | A crate, library or released source | A bit-for-bit comparison with the game's version |
+| `re-specifier` | task | Authorized original artifacts | A neutral behavior contract and separate evidence ledger |
+| `re-cleanroomporter` | task | An allow-listed contract packet | New code written without source access |
 | `re-vectoriser` | task | The exports of the CPU builds | SIMD routines by job, their plain twins, measurements |
 | `re-accelerator` | task | The exports of the card builds | API use, texture paths, per-build data fields, renderer profiles |
 | `re-editor` | task | Documents | The same documents in plain English |
 | `re-checker` | task | Documents | Checked claims, doubtful ones marked |
+| `re-publisher` | task | The project site and milestone | A diary entry and pages for new documents |
 
 ## Teams
 
@@ -112,5 +115,7 @@ Next: <agent name> - <one-line brief for it>
 - [Interface team](interface.md): every screen, rebuilt and compared with captures.
 - [Sound and hardware team](sound-hardware.md): a sound chip or other device, driven by the
   game's own writes.
+- [Clean-room team](clean-room.md): a source-visible specification passed to a fresh source-blind
+  implementation task, with an explicit record of the access boundary.
 - [Documentation team](documentation.md): documents checked, edited and published.
 - [Failure path](failure.md): what a team does when a check fails.
