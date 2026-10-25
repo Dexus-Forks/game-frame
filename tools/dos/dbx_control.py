@@ -4,8 +4,9 @@
 DOSBox-X (2026.10 and later, built with the debugger) connects to 127.0.0.1:<mcp_server> when
 the [dosbox] setting mcp_server is set, and accepts one debugger command at a time over a
 line-based text protocol (README.debugger in DOSBox-X). The agent-facing side of the same
-channel is the dosbox-x-mcp-server program (registered in .mcp.json as "dosbox"); this module
-is the script-facing side, for repeatable ground-truth runs and tests.
+channel is the optional dosbox-x-mcp-server provider; enable it for a project with
+`./gameframe mcp --enable dosbox`. This module is the script-facing side, for repeatable
+ground-truth runs and tests.
 
     from dbx_control import Debugger
     with Debugger(port=0) as dbx:                      # listen first, on a free port...

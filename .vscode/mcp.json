@@ -1,23 +1,5 @@
 {
   "servers": {
-    "rea": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "rea-agents@6.4.0",
-        "mcp"
-      ],
-      "env": {
-        "GHIDRA_INSTALL_DIR": "${env:GHIDRA_INSTALL_DIR}",
-        "JAVA_HOME": "${env:JAVA_HOME}"
-      }
-    },
-    "dosbox": {
-      "type": "stdio",
-      "command": "dosbox-x-mcp-server",
-      "args": []
-    },
     "gameframe": {
       "type": "stdio",
       "command": "./gameframe",

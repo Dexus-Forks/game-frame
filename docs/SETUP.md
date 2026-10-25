@@ -18,14 +18,18 @@ session, `source scripts/env.sh` sets up the paths.
 `./gameframe doctor` runs the same check. `./gameframe tools` then lists every tool with its
 first line of help, and `./gameframe tool NAME` prints the rest.
 
-The MCP servers (GameFrame, REA and DOSBox-X's debugger) are in `.mcp.json` for Claude Code.
-Codex, Gemini CLI, Cursor, GitHub Copilot in VS Code and OpenCode read the same servers from
-their own files: `.codex/config.toml`, `.gemini/settings.json`, `.cursor/mcp.json`, `.vscode/mcp.json` and
-`opencode.json`. `./gameframe mcp --emit all` writes them from `.mcp.json`. Codex, Cursor,
-VS Code and OpenCode do not expand defaults such as `${JAVA_HOME:-...}`. Start them after
-`source scripts/env.sh`. See [the MCP tool surface guide](working/mcp-toolchain.md) for GameFrame's
-local tools and the boundaries with its provider servers.
-`scripts/setup.sh --rea --client codex` shows REA's own registration plan for one agent.
+Only GameFrame's MCP server is enabled by default. Opt a project into external providers with
+`./gameframe mcp --enable rea`, `./gameframe mcp --enable dosbox`, or another provider from
+`./gameframe mcp --list`. The command updates `.mcp.json`, refreshes configured clients, and updates
+unchanged generated Copilot agent allowlists. `./gameframe mcp --disable NAME` removes one. Restart
+the agent session after changing providers.
+
+REA, DOSBox-X MCP, MCPEmulate and 86Box MCP each have a pinned version or source revision. Their
+launchers read project-local overrides from the ignored `.env`, including paths to custom emulator
+builds. The server setup commands and local setting names are in
+[the MCP tool surface guide](working/mcp-toolchain.md). No external server is installed
+automatically. `scripts/setup.sh --rea --client codex` remains REA's separate user-level setup
+plan.
 
 ![tests/run.sh on the sample game. Each tool has a line marked ok, grouped by section, and the summary reads 94 passed, 0 failed.](assets/captures/run-tests.svg)
 
@@ -38,10 +42,11 @@ counts the checks that passed and failed. With `--ghidra` the run has more check
 | JDK 21 | Running Ghidra | Homebrew `openjdk@21`, apt `openjdk-21-jdk`, or Adoptium |
 | Python 3.10+ with unicorn, pefile, capstone | Emulation, PE reading, disassembly | `requirements.txt` into `.venv` |
 | objdump (binutils or LLVM) | Reading instructions exactly | Homebrew `binutils`/`llvm`, apt `binutils`; Xcode's on macOS |
-| Node.js 18+ | REA (`npx -y rea-agents@6.4.0 mcp`) | https://nodejs.org |
+| Node.js 18+ | VitePress and other Node tools | https://nodejs.org |
+| Node.js 22.23.4+, 24.22.1+, or 26.12.1+ | Optional REA MCP (`rea-agents` 6.7.0) | https://nodejs.org |
 | Zig (optional) | Building the sample game for Windows from any host | https://ziglang.org |
 | Frida (optional, about 40 MB) | Tracing calls in a running game (`tools/live/frida_trace.py`) | `requirements-live.txt` into `.venv` |
-| REA (optional, recommended) | Evidence-backed inspection of binaries, packages, apps, runtimes | https://github.com/morluto/rea |
+| REA (optional) | Evidence-backed inspection of binaries, packages, apps, runtimes; enable with `./gameframe mcp --enable rea` | https://github.com/morluto/rea |
 
 Other tools that fit the method, for targets the toolkit does not cover itself: ILSpy or
 dnSpyEx (.NET), Il2CppDumper or Cpp2IL (Unity IL2CPP), unluac (Lua bytecode), FModel and UE4SS

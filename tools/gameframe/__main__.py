@@ -30,8 +30,12 @@ Commands:
       --emit CLIENT     write the agents in a client's format: codex, gemini, copilot, opencode or all
       --out DIR         where --emit writes (default: the repository root)
   doctor [ARGS]         check the toolchain (scripts/setup.sh; ARGS such as --install pass on)
+  mcp --list            show providers enabled in this project and their pinned versions
+  mcp --enable NAME     opt this project into external provider(s); refresh client settings
+  mcp --disable NAME    remove external provider(s) from this project
   mcp --emit CLIENT     write .mcp.json's servers for codex, gemini, cursor, vscode, opencode or all
       --check           only report which files are not current (exit 1)
+  mcp-provider NAME VERSION  launch one enabled provider (used by generated settings)
 
 steps, skills, agents, tools, tool, find and advise take --json, for agents and scripts.
 
@@ -111,11 +115,18 @@ def parser():
     s.add_argument('--lines', type=int, default=5, metavar='N', help='lines shown per log (default 5)')
     s.add_argument('--json', action='store_true')
     sub.add_parser('serve', help='GameFrame\'s MCP server on stdio (see tools/gameframe/serve.py)')
-    s = sub.add_parser('mcp', help='write the MCP servers in each agent\'s format (see tools/gameframe/mcp.py)')
-    s.add_argument('--emit', required=True, choices=(*mcp.CLIENTS, 'all'), metavar='CLIENT',
-                   help=f'{", ".join(mcp.CLIENTS)} or all')
+    s = sub.add_parser('mcp', help='manage project MCP providers and client settings (see tools/gameframe/mcp.py)')
+    action = s.add_mutually_exclusive_group(required=True)
+    action.add_argument('--emit', choices=(*mcp.CLIENTS, 'all'), metavar='CLIENT',
+                        help=f'{", ".join(mcp.CLIENTS)} or all')
+    action.add_argument('--enable', nargs='+', metavar='PROVIDER', help='opt into external MCP provider(s)')
+    action.add_argument('--disable', nargs='+', metavar='PROVIDER', help='remove external MCP provider(s)')
+    action.add_argument('--list', action='store_true', help='list provider availability and versions')
     s.add_argument('--check', action='store_true', help='write nothing; exit 1 when a file is not current')
     s.add_argument('--stdout', action='store_true', help='print the files instead of writing them')
+    s = sub.add_parser('mcp-provider', help='start an opt-in provider through the project environment')
+    s.add_argument('provider')
+    s.add_argument('version')
     return p, sub
 
 
@@ -142,7 +153,8 @@ def main(argv):
         return 0
     return {'steps': commands.steps, 'skills': commands.list_skills, 'skill': commands.skill,
             'agents': commands.list_agents, 'tools': commands.list_tools, 'tool': commands.tool, 'find': commands.find, 'advise': commands.advise,
-            'progress': progress.show, 'mcp': mcp.emit, 'serve': serve.serve,
+            'progress': progress.show, 'mcp': mcp.emit, 'mcp-provider': mcp.run_provider,
+            'serve': serve.serve,
             }[args.command](args)
 
 

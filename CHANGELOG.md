@@ -18,9 +18,11 @@ Every release of GameFrame, newest first. The format follows
 - The modular GameFrame MCP server now exposes workflow and tool discovery, knowledge queries,
   progress and provider configuration, plus execution for every runnable catalog program and
   script. Long-running calls report progress and support cancellation. Its sample coverage check
-  now resolves help for all 116 catalog entries, invokes the help path of all 94 runnable
+  now resolves help for all 117 catalog entries, invokes the help path of all 95 runnable
   commands, runs a sample PE analysis, and checks progress, cancellation and timeout handling.
-  Documentation covers the x86 CPU and 86Box MCPs as opt-in external providers.
+  External REA, DOSBox-X, MCPEmulate and 86Box servers are opt-in through `gameframe mcp`, with
+  pinned package versions or source revisions. Their project-local launchers read custom server
+  and emulator paths from `.env`. Copilot agent allowlists track each project's enabled providers.
 
 - The new `re-profile` skill builds an evidence-backed game quick start after inventory. It
   records the game's family, engine, release, graphics, sound and input support, separates

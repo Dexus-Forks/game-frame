@@ -285,8 +285,11 @@ DOSBox-X can connect its debugger to an external controller (setting `mcp_server
 `--mcp PORT` option of dosbox-run.sh). Two controllers:
 
 - **For agents**: `dosbox-x-mcp-server` (https://github.com/caiiiycuk/dosbox-x-mcp-server),
-  registered in `.mcp.json` as `dosbox`. Install it with
+  opt in with `./gameframe mcp --enable dosbox`. Install the pinned v0.1.2 release with
   `cargo install --git https://github.com/caiiiycuk/dosbox-x-mcp-server --tag v0.1.2 --locked`.
+  Set `DOSBOX_X_MCP_SERVER` in the project's ignored `.env` to use a local server executable.
+  Set `DOSBOX_X_BINARY` there to run DOSBox-X from a local build; `scripts/setup.sh` checks that
+  it includes the debugger channel this provider needs.
   It listens on 58991; ask it with its `dosbox_mcp_port` tool, then start DOSBox-X with
   `--mcp 58991`. Tools: `debug_break`, `debug_exec` (any debugger command), `debug_snapshot`,
   `debug_run`. It has no licence file: use it, do not copy its code.

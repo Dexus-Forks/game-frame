@@ -45,17 +45,28 @@ All checks must pass. A failure names the tool and shows its output.
 REA ("Reverse Engineer Anything", https://github.com/morluto/rea, npm package `rea-agents`)
 gives the agent tools to open binaries, archives, Android packages, .NET assemblies, browser
 pages and Electron apps, decompile through Ghidra, and keep every result as cited Evidence.
-See `re-rea` for when to use it.
+See `re-rea` for when to use it. External MCPs are opt-in. Start with:
 
-- **Claude Code:** this repository has a project `.mcp.json` that starts REA with
-  `npx -y rea-agents@6.4.0 mcp`, passing `GHIDRA_INSTALL_DIR` and `JAVA_HOME`. Claude Code asks
-  once to approve project MCP servers; after that the `mcp__rea__*` tools appear.
+```bash
+./gameframe mcp --list
+./gameframe mcp --enable rea
+```
+
+This pins REA to `rea-agents` 6.7.0 in the project config and refreshes client settings already
+present in the project. It needs Node.js 22.23.4+, 24.22.1+, or 26.12.1+. Restart the agent
+session; Claude Code may ask to approve the project's MCP server.
+
+- **Project settings:** the generated entry calls `./gameframe mcp-provider rea 6.7.0`. The
+  launcher reads `GHIDRA_INSTALL_DIR`, `JAVA_HOME` and `REA_MCP_VERSION` from the project's
+  ignored `.env`. To use another exact REA version, set `REA_MCP_VERSION` there, then restart the
+  agent. GameFrame's own MCP server does not proxy REA tools.
 - **GameFrame's own server:** `gameframe` (`./gameframe serve`) gives the know-how to any MCP
   client. Its tools are `advise`, `knowhow_entry`, `knowhow_list` and `find`
   (`docs/working/knowhow.md`).
-- **Other agents:** the same servers (`rea`, `dosbox` and `gameframe`) are in each agent's own file,
-  written from `.mcp.json` by `./gameframe mcp --emit all`. Run it again after changing
-  `.mcp.json`; `tests/run.sh` fails while a file is out of date.
+- **Other agents:** provider settings and unchanged Copilot agent allowlists are refreshed when you
+  run `./gameframe mcp --enable` or `--disable`. To regenerate client settings by hand, run
+  `./gameframe mcp --emit all`. The test suite checks that the generated files match the project
+  `.mcp.json`.
 
   | Agent | File | Reads AGENTS.md |
   |---|---|---|
@@ -66,15 +77,14 @@ See `re-rea` for when to use it.
   | GitHub Copilot in VS Code | `.vscode/mcp.json` | yes (`chat.useAgentsMdFile`, on by default) |
   | OpenCode | `opencode.json` | yes |
 
-  Only Claude Code and Gemini CLI expand `${VAR:-default}`. The other files name the variable
-  without its default, so start those agents from a shell where `source scripts/env.sh` has
-  set `GHIDRA_INSTALL_DIR` and `JAVA_HOME`. Put `dosbox-x-mcp-server` on `PATH` for them.
+  The generated wrapper loads the project `.env` for each client, so the same local paths and
+  version pins work across clients.
 - **REA's own setup** writes REA into the agent's user configuration and installs REA's skill.
   Its client names are `claude_code`, `codex`, `gemini_cli`, `cursor`, `vscode` and `opencode`:
   ```bash
   scripts/setup.sh --rea                          # dry run: shows the plan for Claude Code
   scripts/setup.sh --rea --client codex           # the plan for another client
-  npx -y rea-agents@6.4.0 setup --client codex --yes   # apply, after the user agrees
+  npx -y rea-agents@6.7.0 setup --client codex --yes   # apply, after the user agrees
   ```
 - REA's own skill (`reverse-engineer-anything`) explains every tool. Install it with REA's setup,
   or from its repository.
@@ -88,7 +98,7 @@ tool call. Raise the client's tool timeout for REA (in Codex, `tool_timeout_sec`
 server's entry).
 
 If REA tools do not appear: restart the agent (MCP servers start with the session), then check
-`npx -y rea-agents@6.4.0 doctor --client claude_code --json`. A tool that reports
+`npx -y rea-agents@6.7.0 doctor --client claude_code --json`. A tool that reports
 `provider_unavailable` usually means Ghidra or Java is not where `.env` says.
 
 ## 4. DOS games: DOSBox-X and its debugger
@@ -115,11 +125,14 @@ If REA tools do not appear: restart the agent (MCP servers start with the sessio
   the repository's build script. It passes the compiler flags the code needs; a plain
   `./configure && make` with a newer compiler can stop on a warning treated as an error.
   Put the result on `PATH` (or `sudo make install`) and run `scripts/setup.sh` again.
-- The debugger MCP server for agents (ask the user first: it is a download and a build):
-  `cargo install --git https://github.com/caiiiycuk/dosbox-x-mcp-server --tag v0.1.2 --locked`.
-  `.mcp.json` registers it as `dosbox` (set `DOSBOX_X_MCP_SERVER` to its path if it is not on
-  PATH). Restart the agent session so the tools load, ask `dosbox_mcp_port`, then run
-  `scripts/dosbox-run.sh --mcp PORT ...`.
+- Opt into the debugger server with `./gameframe mcp --enable dosbox`. Install its pinned release
+  with `cargo install --git https://github.com/caiiiycuk/dosbox-x-mcp-server --tag v0.1.2 --locked`.
+  If you keep the executable elsewhere, set `DOSBOX_X_MCP_SERVER=/path/to/dosbox-x-mcp-server` in
+  the project's ignored `.env`. Set `DOSBOX_X_BINARY=/path/to/custom/dosbox-x` there to use a local
+  emulator build; GameFrame's runner and version check use that path. Restart the agent session,
+  ask `dosbox_mcp_port`, then run `scripts/dosbox-run.sh --mcp PORT ...`.
+
+For the opt-in CPU and whole-PC providers, follow [the MCP tool surface guide](../../docs/working/mcp-toolchain.md).
 
 ## Common problems
 

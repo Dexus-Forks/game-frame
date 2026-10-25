@@ -21,7 +21,7 @@ returns the tool name and path, arguments, working directory, exit status, durat
 output. It caps output size, reports progress for long calls and stops a child process when the
 client cancels the request or the timeout expires. A tool's own output names files it created.
 
-The catalog currently has 116 entries. The runner can call all 94 programs and shell scripts.
+The catalog currently has 117 entries. The runner can call all 95 programs and shell scripts.
 `tests/mcp_tool_coverage.py` checks the catalog and help for every entry, and runs each command's
 help path through MCP in a temporary project. It also checks a sample PE analysis and runner
 progress, cancellation and timeout handling.
@@ -53,63 +53,39 @@ Do not add all new behavior to `serve.py`.
 
 ## Provider boundaries and limits
 
-The client starts and connects to each server in `.mcp.json`. `gameframe_mcp_providers` reports
-configuration only; the client owns live connection state and provider tools. REA and DOSBox-X
-therefore keep their own protocols and APIs. GameFrame does not proxy them through a second
-server.
+The client starts and connects to each server in its project settings. `gameframe_mcp_providers`
+reports configuration only; the client owns live connection state and provider tools. GameFrame
+does not proxy external providers through its own server.
 
-The default configuration includes GameFrame, REA and DOSBox-X. Other MCPs are opt-in because they
-need separate software or emulator builds. Add an optional server to a project's client config
-only when that project needs it.
+The default configuration enables only GameFrame. List available providers and opt the project
+into the ones it needs:
 
-### Optional x86 providers
-
-Add either entry to the project's local MCP configuration. These examples show the full
-`mcpServers` object; merge the selected server into an existing object.
-
-[`MCPEmulate`](https://github.com/LabGuy94/MCPEmulate) adds general x86 and x86-64 CPU emulation,
-assembly, disassembly, register and memory access, breakpoints and instruction traces. It
-complements `pe32_emu`; it does not provide GameFrame's PE call harness or a whole Windows system.
-It is GPL-2.0-only, so keep it separate and check the licence before bundling it.
-The upstream project documents this local MCP client entry:
-
-```json
-{
-  "mcpServers": {
-    "mcp-emulate": {
-      "command": "uvx",
-      "args": ["mcp-emulate"]
-    }
-  }
-}
+```bash
+./gameframe mcp --list
+./gameframe mcp --enable rea dosbox
+./gameframe mcp --disable dosbox
 ```
 
-[`86box-mcp`](https://github.com/dafugg/86box-mcp) drives an 86Box PC through keyboard and mouse
-input, screenshots, memory inspection and held emulated time. It covers whole-machine DOS work
-that a function emulator cannot. The control socket was [merged into 86Box](https://github.com/86Box/86Box/pull/8365),
-but it is disabled in official builds. Build 86Box with `-D AUTOMATION=ON`, then install the server
-from its repository. The server needs the path to that build:
+The command updates `.mcp.json`, refreshes MCP settings for configured clients, and updates
+unchanged generated Copilot agent allowlists. It preserves unrelated client settings and keeps
+edited Copilot agent files. Restart the agent session after enabling or disabling a server. No
+provider is installed by these commands.
 
-```json
-{
-  "mcpServers": {
-    "86box": {
-      "command": "/absolute/path/to/86box-mcp/server/.venv/bin/box86mcp",
-      "args": [],
-      "env": {
-        "BOX86_BINARY": "/absolute/path/to/86Box"
-      }
-    }
-  }
-}
-```
+`mcp-provider.sh` reads the project's ignored `.env` before starting an opted-in provider. The
+catalog pins each package or source revision. Use `.env` to select a different exact package
+version or a local executable. The project commits only the provider choice and default pin.
 
-The 86Box MCP project describes itself as an early release; it has not been tested on macOS. It
-is GPL-2.0-or-later. Follow its setup guide for ROMs and other optional tools. These providers
-stay out of GameFrame's default `.mcp.json`; they are not installed or started automatically.
+| Provider | Pin | Setup and local settings |
+|---|---|---|
+| REA | `rea-agents` 6.7.0 | Node.js 22.23.4+, 24.22.1+, or 26.12.1+. `.env` can set `REA_MCP_VERSION`. |
+| DOSBox-X debugger | `dosbox-x-mcp-server` tag v0.1.2 | Install with the pinned Cargo command in [re-setup](../../skills/re-setup/SKILL.md). `.env` can set `DOSBOX_X_MCP_SERVER` to a local server. Set `DOSBOX_X_BINARY` to use a custom DOSBox-X build; `scripts/setup.sh` checks its version. |
+| MCPEmulate | PyPI 0.1.0 | Requires `uv`. `.env` can set `MCP_EMULATE_VERSION`. This GPL-2.0-only server complements `pe32_emu`; it is a CPU emulator, not a Windows system or GameFrame's PE call harness. |
+| 86Box | `86box-mcp` 0.1.0 at commit `9e6cdd02f6956e3ff32ec99c1dd4b0be7798d3ca` | No packaged release is published. Build 86Box at or after `1be46d317107f5219f160547d77614ff8e19a7c7` with `-D AUTOMATION=ON`. Set `BOX86_MCP_DIR`, `BOX86_MCP_REVISION`, `BOX86_MCP_SERVER` and `BOX86_BINARY` in `.env`. The server checks the selected source revision and binary path before starting. |
 
-The optional 86Box MCP is an external provider. GameFrame has no in-process 86Box adapter, and its
-MCP does not proxy the external provider's tools. The 86Box GDB stub remains separate.
+For 86Box, the upstream MCP source and server need a local checkout and venv. The server's
+automation socket is off in official 86Box builds. Build instructions and platform requirements
+are in the [86Box MCP guide](https://github.com/dafugg/86box-mcp/tree/9e6cdd02f6956e3ff32ec99c1dd4b0be7798d3ca).
+This provider controls a whole emulated PC. Its GDB stub is a separate feature.
 
 ## Checks when extending the server
 

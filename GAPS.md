@@ -170,8 +170,8 @@ proposed again.
   samples before use. Until then, follow the manual
   [packet checklist](skills/re-cleanroom/references/packet-checklist.md).
 - [x] Expose GameFrame workflow discovery, knowledge, tool help and execution of every runnable
-  catalog program and script through the modular MCP server. Keep provider servers such as REA and
-  DOSBox-X configured separately in `.mcp.json`.
+  catalog program and script through the modular MCP server. External servers are separate
+  processes, selected per project with `gameframe mcp --enable` and versioned in one provider catalog.
 - [x] Check every GameFrame catalog entry through MCP help, run every program and shell script
   through the generic runner, and cover a sample PE, progress, cancellation and timeout in
   `tests/mcp_tool_coverage.py`.
@@ -179,7 +179,8 @@ proposed again.
   the generic runner does not execute arbitrary Python.
 - [x] 86Box control has an optional external provider, [`86box-mcp`](https://github.com/dafugg/86box-mcp).
   It uses 86Box's merged automation socket, which must be enabled in a custom build. GameFrame
-  leaves it opt-in and does not proxy its tools through the GameFrame MCP server.
+  leaves it opt-in, checks its source revision and local emulator path, and does not proxy its
+  tools through the GameFrame MCP server.
 
 - [x] `tools/pe/relocs.py`: pointers in data from base relocations
 - [x] `tools/pe/peinfo.py`: delay-loaded imports, relocation count
