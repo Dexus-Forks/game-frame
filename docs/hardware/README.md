@@ -52,6 +52,8 @@ In my GameFrame project, find every place the game touches hardware.
   Sound Blaster, Gravis Ultrasound, MIDI devices, DirectSound, A3D and EAX.
 - [PC audio coverage](audio-coverage.md): the reusable chip, card, library and backend layers;
   GameFrame coverage today and priorities for the next hardware models and replacements.
+- [Sound Blaster DSP, mixer and MPU-401](sound-blaster-dsp.md): the new Creative card model,
+  its programming reference, tested interface paths, remaining limits and software-only checks.
 - [The sound card makers' APIs](sound-card-apis.md): the Maxi Sound 64, A3D, EAX, the AWE's
   SoundFont Manager, Sensaura and QSound: how a game finds each, what Wine offers, and which
   can be stood in for.

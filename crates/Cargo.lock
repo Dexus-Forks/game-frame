@@ -42,6 +42,10 @@ name = "gameframe-scale"
 version = "0.1.0"
 
 [[package]]
+name = "gameframe-sound-blaster"
+version = "0.1.0"
+
+[[package]]
 name = "gameframe-turbo-pascal"
 version = "0.1.0"
 

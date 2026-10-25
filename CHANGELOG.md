@@ -9,6 +9,13 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `gameframe-sound-blaster` adds port-level Creative DSP models for 1.xx through 4.xx cards,
+  CT1335/CT1345/CT1745 mixer register files and SB16 MPU-401 UART behavior. It schedules 8-bit
+  playback/capture and SB16 8/16-bit mono/stereo DMA, exposes IRQ events, and marks ADPCM reference
+  bytes. `docs/hardware/sound-blaster-dsp.md` records the command surface, driver-license boundary,
+  open ADPCM/timing/analog behavior and software-only follow-up checks. Physical card testing is
+  optional.
+
 - A PC audio coverage map separates chip crates, card models, compatibility libraries and host
   audio backends. It inventories common PC audio from the speaker and Tandy PSG through Sound
   Blaster, Gravis UltraSound, MIDI modules and late-1990s Windows audio, and prioritizes OPL3,

@@ -101,7 +101,19 @@ proposed again.
 - [ ] Model TDA8425 tone and pseudo/spatial processing, analog filter/ADC paths and connect external
   DMA/IRQ controllers where software call paths establish their card-specific behavior
 - [ ] PC speaker, Tandy PSG, CMS/SAA1099 and LPT DAC components
-- [ ] Sound Blaster DSP generations, DMA, mixer and IRQ timing, layered over OPL2/OPL3
+- [x] Add a reusable Sound Blaster DSP, mixer and SB16 MPU-401 UART model for Creative DSP
+  generations 1.xx–4.xx (`gameframe-sound-blaster`); software checks cover reset/version,
+  8-bit playback/capture, 16-bit playback/capture, high-speed command gating, IRQ acknowledgement,
+  mixer profiles and MPU-401 UART behavior
+- [ ] Decode Creative 2-, 3- and 4-bit ADPCM to PCM. The reference specifies command flow and the
+  initial reference byte but not the predictor recurrence; compare generated vectors against a
+  documented software reference
+- [ ] Establish exact DSP busy, FIFO, stereo cadence and DMA terminal-count timing with generated
+  software comparisons. Physical testing is optional
+- [ ] Connect the card events to a host ISA DMA and PIC model, including DMA pages, channel state,
+  bus arbitration and PIC edge/EOI behavior
+- [ ] Apply mixer source selection, analog gain, tone and filter behavior when a game-facing path
+  requires those outputs
 - [ ] Gravis UltraSound GF1 and InterWave voice, memory and interrupt behavior
 - [ ] MPU-401 event timing and adapters for MT-32 and General MIDI synthesizers
 - [ ] AWE SoundFont Manager and selected Windows card APIs, when a game's call sites require them
