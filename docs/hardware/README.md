@@ -71,6 +71,9 @@ In my GameFrame project, find every place the game touches hardware.
 - [Win16 SB16 MIDI-port output contract](sb16-midi-output-contract.md): a bounded logical
   contract for port open and short-message sends. Port routing, system-message edge cases,
   lower-service protocol, and output timing remain unknown.
+- [Win16 SB16 MIDI short-message contract](sb16-midi-short-message-contract.md): refined
+  status-byte handling and a one-level reentrancy guard. Packed argument layout and the
+  lower-service event format remain unknown.
 - [The sound card makers' APIs](sound-card-apis.md): the Maxi Sound 64, A3D, EAX, the AWE's
   SoundFont Manager, Sensaura and QSound: how a game finds each, what Wine offers, and which
   can be stood in for.
