@@ -1,47 +1,31 @@
-# Creative SBBASIC package: driver trace status
+# Creative SBBASIC driver package status
 
-This note records provenance and the extraction attempt for Creative's `SBBASIC.EXE` SDR-31STD-1-US
-Revision 1 package. Evidence is package metadata, a hash-verified archive and one DOSBox-X run. The
-driver payload was not extracted or inspected, so this note contains no behavior specification and
-must not be used as implementation input.
+The earlier extraction blocker is resolved. The package installed in a disposable DOS and Windows environment. A bounded Win16 auxiliary volume contract is available in the [driver behavior contract](sbbasic-driver-behavior.md).
 
-## Package provenance
+## Package and install provenance
 
-[Observed] Creative's [support listing](https://cn.creative.com/support/downloads/download.asp?DriverLang=2052&searchString=SBBASIC.EXE) identifies the package as the Sound Blaster 16/SB32/AWE32 Basic Disk for DOS/Windows 3.1, dated 30 December 1997. The included package identification file names release SDR-31STD-1-US, revision 1, and notes AWE64 upgrade support. The included README describes DOS audio drivers, a DOS mixer and diagnostic, plus Windows 3.1 utilities.
+[Observed] The installed package is Creative SBBASIC SDR-31STD-1-US Revision 1. Its SHA-256 is `c28f21521e8d9d8cd02a0c683aadbe369f7a9e182950ccbd46ba21762371871f`.
 
-[Observed] The extracted ZIP came from the [public mirror](https://software.shi.foo/drivers/sound-blaster-basic-dos-drivers/1/sound-blaster-basic-dos-drivers-extracted.zip). Its locally verified SHA-256 is `bc7889685a24aaa4dc01f73700297cdf16bab63b220a48cf0f856c0714641896`. The mirror's [checksum listing](https://software.shi.foo/drivers/sound-blaster-basic-dos-drivers/1/checksums) reports `c28f21521e8d9d8cd02a0c683aadbe369f7a9e182950ccbd46ba21762371871f` for the original `SBBASIC.EXE`; that executable was not separately downloaded or hash-checked in this run.
+[Observed] The installer completed in a disposable 86Box clone running MS-DOS 6.22 and Windows 3.11. No binding agreement appeared during installation. The installer reported edits to CONFIG.SYS, AUTOEXEC.BAT, WIN.INI, SYSTEM.INI and CONTROL.INI, and created backup files with B~K extensions.
 
-[Observed] The ZIP contains `INSTALL.EXE` (166,916 bytes; dated 1996-10-15) and multiple `.PVL` payload archives. `file` identifies the payloads as TTComp archives with a 4K dictionary. `7zz l DRIVER.PVL` reported that it could not open the file as an archive. No matching decoder appeared in GameFrame's format tools.
+[Observed] Installation used a disposable clone. The clean base image was left unchanged.
 
-## Extraction attempt
+[Observed] Read-only host inspection of the installed image found the drivers, utilities and support files. The primary Windows driver is `SB16SND.DRV`; the Creative stereo synthesizer is `SB16FM.DRV`. The package also installs `VSBPD.386`, `CSPMAN.DLL`, `AUXDRV.DRV`, `DIAGNOSE.EXE` and `MIXERSET.EXE`. The behavior contract records checksums for the traced files.
 
-[Observed] `INSTALL.EXE` was launched in DOSBox-X 2026.10.01 with a temporary writable C: drive and the extracted package mounted read-only as D:. The installer staged setup support files under `C:\ISFYZQVO.TWJ` and remained interactive. The same files appeared under `/tmp/sbbasic-trace.lJ24G6/dosroot/ISFYZQVO.TWJ` on the host.
+## Current findings
 
-[Unknown] The installer window was not accessible through the available UI connection, so its next prompt and subsequent file extraction could not be observed. No agreement was accepted. The DOS driver and diagnostic executable names remain unknown. No driver I/O or card-detection behavior was observed, and no functional behavior is inferred from the package inventory.
+[Observed] The installed DOS profile uses base I/O 220h, IRQ 5, low DMA 1, high DMA 5 and MPU-401 port 330h. AUTOEXEC sets SOUND, BLASTER and MIDI values, runs `DIAGNOSE /S`, then runs `MIXERSET /P /Q`.
 
-The command used for the interactive attempt was:
+[Observed] Windows setup registers `SB16SND.DRV` for Wave, Aux, Mixer and the SB16 MIDI port. It registers `SB16FM.DRV` for the Creative stereo synthesizer. Both entries use `VSBPD.386`.
 
-```sh
-dosbox-x -defaultconf -fastlaunch -noconfig -noautoexec \
-  -c "mount c /tmp/sbbasic-trace/dosroot" \
-  -c "mount d /tmp/sbbasic-trace/extracted -ro" \
-  -c "d:" -c "install.exe"
-```
+[Observed] On boot, the package reports that CSP is not detected in this 86Box SB16 profile. `DIAGNOSE /S` still reports A220, I5, D1, H5 as the configured card resources.
 
-The paths above stand in for the unique `mktemp` directory used in the run. Create a writable
-`dosroot` and an `extracted` folder containing the verified ZIP's contents before running it.
+[Inferred] The first bounded implementation target is the `AUXMESSAGE` volume query and update surface in `SB16SND.DRV`. The [behavior contract](sbbasic-driver-behavior.md) separates this surface from the DOS preset utility and lists the unresolved hardware behavior.
 
-## Unattended extraction check
+[Unknown] Wave format limits and buffer callback timing, MIDI scheduling and low-level port/IRQ/DMA operations still need software-only probes. The CSP capability remains unavailable in the observed emulated profile.
 
-[Observed] A second download of the extracted ZIP had the same verified SHA-256. The included
-README describes starting `INSTALL` and following on-screen instructions. It documents no
-unattended or extract-only command-line mode. A string search of `INSTALL.EXE` for silent,
-unattended, extract, help or usage terms and common slash-style switches found no matches.
+## Earlier extraction attempts
 
-[Unknown] No unattended option was documented, so no speculative switches were run in DOSBox-X. The driver payloads were not inspected. The package still requires an accessible DOSBox-X window to complete its documented interactive installation into a temporary destination.
+[Observed] Initial attempts under Windows 98 were rejected because the installer expects DOS or Windows 3.1. The supported DOS 6.22 and Windows 3.11 setup resolved that blocker. Those attempts produced no driver payload and are superseded by the installed-file evidence above.
 
-## Open
-
-Download the ZIP from the mirror, verify its SHA-256, and extract it outside the repository. Create an empty writable directory for DOSBox-X's C: drive. Mount the extracted package read-only as D:, run `INSTALL.EXE`, and use the visible installer to choose the temporary C: destination. The earlier command shows the mounts used in this run. Continue only after the DOSBox-X window can be controlled. The package README identifies a DOS diagnostic program; inspect its probes and the extracted driver after installation. No physical card is needed for this extraction step.
-
-Once the behavior is recorded in a neutral specification, a separate implementation agent can receive that specification without the package, disassembly or raw extraction output. The current source pass did not create that specification, so there is no implementation handoff yet.
+[Observed] No binary, disassembly, pseudocode or raw driver data was added to the repository.
