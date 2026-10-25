@@ -2,9 +2,10 @@
 //!
 //! This module does not implement the Win16 ABI, decode packed short-message fields, or model
 //! the lower service or physical MIDI output. Callers supply lower-service availability,
-//! initialization and allocation outcomes, the reentrancy decision, status-byte effects, and an
-//! opaque lower-service event. The accepted reentrancy depth, system-message parsing, callback
-//! timing, long messages, close/reset behavior, and hardware output remain unknown.
+//! initialization and allocation outcomes, the current per-port active-call count, an ordered
+//! byte sequence, and an opaque lower-service event. The packed input layout, data-count table,
+//! incomplete-message handling, callback timing, long messages, close/reset behavior, and hardware
+//! output remain unknown.
 
 pub const MIDI_OUTPUT_CALLBACK_VALUE_OPEN: u16 = 0x03C7;
 
@@ -124,57 +125,44 @@ impl MidiOutputOpenReply {
 /// Current status-byte state for one open port.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum StatusByteState {
-    /// No status byte is currently retained.
+    /// The retained state is zero, so no status byte is active.
     Empty,
-    /// A caller-classified status byte is retained.
+    /// A status byte in 0x80..=0xEF is retained.
     Known(u8),
     /// The contract or caller input does not establish the retained status byte.
     Unknown,
 }
 
-/// Caller-supplied interpretation of the status-byte effect of a short message.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum ShortMessageStatusEffect {
-    /// A caller-classified channel status byte replaces the retained status byte.
-    ChannelStatus(u8),
-    /// A system status byte's class-specific effect, as resolved by the caller.
-    SystemStatus {
-        status_byte: u8,
-        effect: SystemStatusEffect,
-    },
-    /// The message is data-only, so it uses the retained state without changing it.
-    DataOnly,
-    /// Parsing or the effect on retained state is not known.
-    Unknown,
-}
-
-/// Caller-supplied effect for a system status byte.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum SystemStatusEffect {
-    Clear,
-    Replace(u8),
-    Unknown,
-}
-
-/// Result of the observed reentrancy counter check.
+/// Caller-supplied current active-call count for the selected port.
 ///
-/// The accepted depth is unknown, so the caller supplies the result of the guard check instead
-/// of this model choosing a numeric threshold.
+/// The caller reports the per-port counter before this send enters its guard. A count of zero
+/// admits the call. Any nonzero count means the new invocation would raise it above one.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum ReentrancyDecision {
-    Admitted,
-    Rejected,
+pub enum CurrentActiveCallCount {
+    Known(u32),
     Unknown,
+}
+
+/// What the trace establishes about expected data-byte count for the supplied byte sequence.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ExpectedDataCount {
+    /// No data byte reached the count lookup, or parsing did not begin.
+    NotObserved,
+    /// A data byte was seen while no status was retained; the expected count is zero.
+    Zero,
+    /// A data byte was seen with retained status, but the status-to-count table is unresolved.
+    Unresolved,
 }
 
 /// Inputs for one short-message submission.
 #[derive(Debug, PartialEq, Eq)]
-pub struct ShortMessageRequest<E> {
+pub struct ShortMessageRequest<'a, E> {
     /// Raw selector. Only values 0 and 1 are covered by the observed path.
     pub selector: u16,
     pub lower_audio: LowerAudioState,
-    pub reentrancy: ReentrancyDecision,
-    pub status_effect: ShortMessageStatusEffect,
+    pub active_call_count: CurrentActiveCallCount,
+    /// Caller-supplied byte sequence in the order to model. This is not the packed Win16 layout.
+    pub message_bytes: &'a [u8],
     /// Caller-created opaque lower-service event. Its format is not modeled.
     pub lower_service_event: E,
 }
@@ -187,18 +175,21 @@ pub enum ShortMessageReply<E> {
         status: u16,
         status_before: StatusByteState,
         status_after: StatusByteState,
+        expected_data_count: ExpectedDataCount,
         lower_service_event: E,
     },
     Failed(u16),
-    /// Available inputs do not establish one outcome.
-    Indeterminate,
+    /// Available inputs do not establish a submission outcome; no lower-service event is returned.
+    Indeterminate {
+        expected_data_count: ExpectedDataCount,
+    },
 }
 
 impl<E> ShortMessageReply<E> {
     pub const fn status_code(&self) -> Option<u16> {
         match self {
             Self::Submitted { status, .. } | Self::Failed(status) => Some(*status),
-            Self::Indeterminate => None,
+            Self::Indeterminate { .. } => None,
         }
     }
 }
@@ -315,7 +306,7 @@ impl Win16MidiOutput {
     /// Submit one caller-interpreted short message and return its opaque lower-service event.
     pub fn submit_short_message<E>(
         &mut self,
-        request: ShortMessageRequest<E>,
+        request: ShortMessageRequest<'_, E>,
     ) -> ShortMessageReply<E> {
         let Some(index) = port_index(request.selector) else {
             return ShortMessageReply::Failed(MIDI_OUTPUT_STATUS_INVALID_PORT_OR_CONTEXT);
@@ -325,7 +316,11 @@ impl Win16MidiOutput {
             PortContext::Closed => {
                 return ShortMessageReply::Failed(MIDI_OUTPUT_STATUS_INVALID_PORT_OR_CONTEXT)
             }
-            PortContext::Unknown => return ShortMessageReply::Indeterminate,
+            PortContext::Unknown => {
+                return ShortMessageReply::Indeterminate {
+                    expected_data_count: ExpectedDataCount::NotObserved,
+                }
+            }
             PortContext::Active(active) => active,
         };
 
@@ -333,31 +328,46 @@ impl Win16MidiOutput {
             LowerAudioState::Unavailable => {
                 return ShortMessageReply::Failed(MIDI_OUTPUT_STATUS_LOWER_SERVICE_UNAVAILABLE)
             }
-            LowerAudioState::Unknown => return ShortMessageReply::Indeterminate,
+            LowerAudioState::Unknown => {
+                return ShortMessageReply::Indeterminate {
+                    expected_data_count: ExpectedDataCount::NotObserved,
+                }
+            }
             LowerAudioState::Available => {}
         }
 
-        match request.reentrancy {
-            ReentrancyDecision::Rejected => {
+        match request.active_call_count {
+            CurrentActiveCallCount::Known(1..) => {
                 return ShortMessageReply::Failed(MIDI_OUTPUT_STATUS_REENTRANCY_REJECTED)
             }
-            ReentrancyDecision::Unknown => return ShortMessageReply::Indeterminate,
-            ReentrancyDecision::Admitted => {}
+            CurrentActiveCallCount::Unknown => {
+                return ShortMessageReply::Indeterminate {
+                    expected_data_count: ExpectedDataCount::NotObserved,
+                }
+            }
+            CurrentActiveCallCount::Known(0) => {}
         }
 
         let status_before = active.status_byte;
-        let Some(status_after) = apply_status_effect(status_before, request.status_effect) else {
-            return ShortMessageReply::Indeterminate;
-        };
+        let (status_after, expected_data_count) =
+            apply_message_bytes(status_before, request.message_bytes);
         self.ports[index] = PortContext::Active(ActivePort {
             status_byte: status_after,
             ..active
         });
 
+        if request.message_bytes.is_empty() || expected_data_count != ExpectedDataCount::NotObserved
+        {
+            return ShortMessageReply::Indeterminate {
+                expected_data_count,
+            };
+        }
+
         ShortMessageReply::Submitted {
             status: MIDI_OUTPUT_STATUS_SUCCESS,
             status_before,
             status_after,
+            expected_data_count,
             lower_service_event: request.lower_service_event,
         }
     }
@@ -410,26 +420,33 @@ fn open_callback(target: CallbackTargetState) -> OpenCallback {
     }
 }
 
-fn apply_status_effect(
+fn apply_message_bytes(
     current: StatusByteState,
-    effect: ShortMessageStatusEffect,
-) -> Option<StatusByteState> {
-    match effect {
-        ShortMessageStatusEffect::ChannelStatus(status_byte) => {
-            Some(StatusByteState::Known(status_byte))
+    message_bytes: &[u8],
+) -> (StatusByteState, ExpectedDataCount) {
+    let mut status = current;
+    let mut expected_data_count = ExpectedDataCount::NotObserved;
+
+    for &byte in message_bytes {
+        match byte {
+            0x80..=0xEF => status = StatusByteState::Known(byte),
+            0xF0..=0xF7 => status = StatusByteState::Empty,
+            0xF8..=0xFF => {}
+            0x00..=0x7F => {
+                let observation = match status {
+                    StatusByteState::Empty => ExpectedDataCount::Zero,
+                    StatusByteState::Known(_) | StatusByteState::Unknown => {
+                        ExpectedDataCount::Unresolved
+                    }
+                };
+                if observation == ExpectedDataCount::Unresolved {
+                    expected_data_count = observation;
+                } else if expected_data_count == ExpectedDataCount::NotObserved {
+                    expected_data_count = observation;
+                }
+            }
         }
-        ShortMessageStatusEffect::SystemStatus {
-            status_byte: _,
-            effect,
-        } => match effect {
-            SystemStatusEffect::Clear => Some(StatusByteState::Empty),
-            SystemStatusEffect::Replace(replacement) => Some(StatusByteState::Known(replacement)),
-            SystemStatusEffect::Unknown => None,
-        },
-        ShortMessageStatusEffect::DataOnly => match current {
-            StatusByteState::Known(_) => Some(current),
-            StatusByteState::Empty | StatusByteState::Unknown => None,
-        },
-        ShortMessageStatusEffect::Unknown => None,
     }
+
+    (status, expected_data_count)
 }

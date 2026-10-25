@@ -32,17 +32,17 @@ pub use win16_aux::{
 };
 pub use win16_midi_output::{
     CallbackInfo as MidiOutputCallbackInfo, CallbackTargetState as MidiOutputCallbackTargetState,
+    CurrentActiveCallCount as MidiOutputCurrentActiveCallCount,
     DeviceContextState as MidiOutputDeviceContextState,
+    ExpectedDataCount as MidiOutputExpectedDataCount,
     FailedInitializationContext as MidiOutputFailedInitializationContext,
     LowerAudioState as MidiOutputLowerAudioState, MidiOutputOpenReply, MidiOutputOpenRequest,
     OpenCallback as MidiOutputOpenCallback, PortInitialization as MidiOutputPortInitialization,
-    PortStateAllocation as MidiOutputPortStateAllocation,
-    ReentrancyDecision as MidiOutputReentrancyDecision, ShortMessageReply, ShortMessageRequest,
-    ShortMessageStatusEffect, StatusByteState, SystemStatusEffect as MidiOutputSystemStatusEffect,
-    Win16MidiOutput, MIDI_OUTPUT_CALLBACK_VALUE_OPEN, MIDI_OUTPUT_STATUS_INITIALIZATION_FAILED,
-    MIDI_OUTPUT_STATUS_INVALID_PORT_OR_CONTEXT, MIDI_OUTPUT_STATUS_LOWER_SERVICE_UNAVAILABLE,
-    MIDI_OUTPUT_STATUS_REENTRANCY_REJECTED, MIDI_OUTPUT_STATUS_STATE_ALLOCATION_FAILED,
-    MIDI_OUTPUT_STATUS_SUCCESS,
+    PortStateAllocation as MidiOutputPortStateAllocation, ShortMessageReply, ShortMessageRequest,
+    StatusByteState, Win16MidiOutput, MIDI_OUTPUT_CALLBACK_VALUE_OPEN,
+    MIDI_OUTPUT_STATUS_INITIALIZATION_FAILED, MIDI_OUTPUT_STATUS_INVALID_PORT_OR_CONTEXT,
+    MIDI_OUTPUT_STATUS_LOWER_SERVICE_UNAVAILABLE, MIDI_OUTPUT_STATUS_REENTRANCY_REJECTED,
+    MIDI_OUTPUT_STATUS_STATE_ALLOCATION_FAILED, MIDI_OUTPUT_STATUS_SUCCESS,
 };
 pub use win16_wave::{
     open_wave_output, ActiveStreamState, CallbackDelivery, CallbackTargetState,
