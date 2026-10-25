@@ -29,10 +29,14 @@ pub use win16_aux::{
     AUX_VOLUME_UPDATE_MESSAGE,
 };
 pub use win16_wave::{
-    open_wave_output, DeviceContextState, FormatCheckResult, HeaderLinkState, LowerOpenResult,
-    LowerServiceDispatch, OpenPossibility, QueryOpenReply, StreamAllocationResult, WaveHeader,
-    WaveOpenFailure, WaveOpenReply, WaveOpenRequest, WaveOutputStream, WaveSubmissionFailure,
-    WaveSubmissionReply, WAVE_HEADER_DONE, WAVE_HEADER_IN_QUEUE, WAVE_HEADER_PREPARED,
+    open_wave_output, ActiveStreamState, CallbackDelivery, CallbackTargetState,
+    CompletionDrainOutcome, CompletionDrainReply, DeviceContextState, FormatCheckResult,
+    HeaderLinkState, LowerOpenResult, LowerServiceControlRequest, LowerServiceDispatch,
+    OpenPossibility, OutputPauseState, PlaybackPositionState, QueryOpenReply, QueueAdvanceReply,
+    QueueKnowledge, ResetQueueEffect, StreamAllocationResult, WaveCallbackEvent, WaveHeader,
+    WaveHeaderBufferInfo, WaveHeaderInfo, WaveOpenFailure, WaveOpenReply, WaveOpenRequest,
+    WaveOutputStream, WaveResetReply, WaveSubmissionFailure, WaveSubmissionReply,
+    WAVE_CALLBACK_BUFFER_DONE, WAVE_HEADER_DONE, WAVE_HEADER_IN_QUEUE, WAVE_HEADER_PREPARED,
     WAVE_OPEN_QUERY, WAVE_STATUS_HEADER_ALREADY_QUEUED, WAVE_STATUS_HEADER_NOT_PREPARED,
     WAVE_STATUS_OPEN_CONTEXT_OR_ALLOCATION, WAVE_STATUS_OPEN_UNMAPPED_3,
     WAVE_STATUS_OPEN_UNMAPPED_7, WAVE_STATUS_SUCCESS, WAVE_STATUS_UNSUPPORTED_FORMAT,
