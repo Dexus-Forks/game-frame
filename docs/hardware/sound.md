@@ -8,7 +8,7 @@ the sound exactly, you need to know which device the game wrote for and how it d
 | Device | Year | How games use it | Notes |
 |---|---|---|---|
 | PC speaker | 1981 | Tones from timer channel 2 (port `42h`), switched on through port `61h` | Some games played samples by switching the speaker very fast |
-| PCjr and Tandy 1000 | 1984 | SN76496/SN76489 tone and noise registers; later models add an 8-bit DAC | Common in early DOS games and ports |
+| IBM PCjr and Tandy 1000 | 1984 | TI SN76496 tone/noise registers; some Tandy models use NCR 8496 or PSSJ audio | Common in early DOS games and ports; later PSSJ adds an 8-bit DAC |
 | Covox Speech Thing and Disney Sound Source | 1987 | 8-bit samples written through an LPT port | The Disney device adds a FIFO; both can be driven by software timing |
 | Creative Music System / Game Blaster | 1987 | Two Philips SAA1099 chips | Square-wave voices, noise and stereo |
 | AdLib | 1987 | The Yamaha YM3812 (OPL2) FM chip at ports `388h` and `389h` | 9 voices of FM synthesis; music is a stream of register writes |
@@ -35,13 +35,16 @@ have software-only follow-up checks. See the [CMS/SAA1099 evidence and check pla
 
 ## PCjr and Tandy 1000 PSG
 
-The IBM PCjr and early Tandy 1000 use the TI SN76496 family for three tone channels and one noise
+The IBM PCjr and original Tandy 1000 use the TI SN76496 for three tone channels and one noise
 channel. The [`gameframe-sn76496` crate](../../crates/sn76496/README.md) models the serial register
-protocol and sample generation. The Tandy adapter maps writes at `C0h`–`C7h` and exposes the
-service manual's approximate 42 CPU wait states. Static traces of Sierra's original `JR.DRV` and
-`TANDY.DRV` confirm tone latch/data writes, attenuation writes and three-channel mute setup. Noise
-feedback details, period-zero behavior, board mixing and exact output parity remain open with
-software-only checks. See the [Tandy PSG findings and check plan](tandy-psg.md).
+protocol, input-clock advancement, sample generation and the PCjr four-source output mux selected
+by port `61h` bits 5–6. The Tandy adapter maps writes at `C0h`–`C7h`, routes PIT channel 2 to
+the chip's AUDIO IN pin and exposes the service manual's approximate 42 CPU wait states. Static
+traces of Sierra's original `JR.DRV` and `TANDY.DRV` confirm tone latch/data writes, attenuation
+writes, startup mutes and PSG-output selection. Tandy has a separate output mux whose full source
+table remains open. Tandy 1000 HX documentation identifies an NCR 8496, while later PSSJ machines
+add an 8-bit DAC. Those variants, noise feedback details, period-zero behavior and analog output
+still need software-only comparisons. See the [Tandy PSG findings and check plan](tandy-psg.md).
 
 ## FM synthesis (OPL2 and OPL3)
 

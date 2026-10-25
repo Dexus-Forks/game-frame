@@ -15,7 +15,8 @@ pub struct Sn76496Sample {
 /// A deterministic SN76496 tone/noise generator.
 ///
 /// `sample` advances one internal N/16 counter step. It produces samples at `clock_hz / 16`.
-/// The chip's external input can be supplied with `set_audio_input`. Noise feedback taps and the
+/// `advance_clock_cycles` advances chip and READY timing without producing host samples. The
+/// chip's external input can be supplied with `set_audio_input`. Noise feedback taps and the
 /// initial LFSR state are not specified by the TI and machine manuals; the current deterministic
 /// candidate is recorded as provisional in the crate README.
 #[derive(Clone, Debug)]
@@ -25,6 +26,7 @@ pub struct Sn76496 {
     selected_register: u8,
     tone_counter: [u16; 3],
     tone_output: [bool; 3],
+    clock_divider_phase: u8,
     noise_counter: u16,
     noise_lfsr: u16,
     noise_output: bool,
@@ -58,6 +60,7 @@ impl Sn76496 {
             selected_register: 0,
             tone_counter: [1; 3],
             tone_output: [true; 3],
+            clock_divider_phase: 0,
             noise_counter: 0,
             noise_lfsr: 0,
             noise_output: false,
@@ -93,14 +96,28 @@ impl Sn76496 {
         self.ready_clocks_remaining
     }
 
-    /// Supply the normalized SN76496 audio input. Tandy routes PIT channel 2 to this pin.
+    /// Supply the normalized signal presented to the SN76496 AUDIO IN pin.
     pub fn set_audio_input(&mut self, sample: i16) {
         self.audio_input = sample;
     }
 
+    /// Advance the PSG by input-clock cycles without generating host audio samples.
+    ///
+    /// This advances both the tone/noise counters and the READY interval. It lets a machine
+    /// model keep bus timing independent from its audio renderer.
+    pub fn advance_clock_cycles(&mut self, clock_cycles: u32) {
+        self.ready_clocks_remaining = self.ready_clocks_remaining.saturating_sub(clock_cycles);
+        let accumulated = u64::from(self.clock_divider_phase) + u64::from(clock_cycles);
+        let ticks = accumulated / u64::from(TONE_CLOCK_DIVIDER);
+        self.clock_divider_phase = (accumulated % u64::from(TONE_CLOCK_DIVIDER)) as u8;
+        for _ in 0..ticks {
+            self.advance_psg_tick();
+        }
+    }
+
     /// Write one serial register byte. A byte with bit 7 set selects a register and supplies its
     /// low data bits. A continuation byte updates the six high bits only when a tone frequency
-    /// register is selected. The 32-cycle READY interval is exposed to the host machine model.
+    /// register is selected. The 32-cycle READY interval advances with input-clock time.
     pub fn write_byte(&mut self, value: u8) {
         if value & 0x80 != 0 {
             self.selected_register = (value >> 4) & 7;
@@ -131,7 +148,32 @@ impl Sn76496 {
 
     /// Generate one normalized mono sample after advancing one N/16 tone-counter clock.
     pub fn sample(&mut self) -> Sn76496Sample {
+        self.advance_clock_cycles(TONE_CLOCK_DIVIDER);
+        self.samples_generated = self.samples_generated.wrapping_add(1);
+        self.current_sample()
+    }
+
+    /// Read the current normalized mono output without advancing the chip.
+    pub fn current_sample(&self) -> Sn76496Sample {
         let mut channel_high = [false; 4];
+        channel_high[..3].copy_from_slice(&self.tone_output);
+        channel_high[3] = self.noise_output;
+
+        let mut mixed = 0_i32;
+        for (channel, high) in channel_high.into_iter().enumerate() {
+            let attenuation = (self.registers[channel * 2 + 1] & 0x0f) as usize;
+            let amplitude = i32::from(ATTENUATION_Q15[attenuation]) / 4;
+            if amplitude != 0 {
+                mixed += if high { amplitude } else { -amplitude };
+            }
+        }
+        mixed += i32::from(self.audio_input);
+        Sn76496Sample {
+            mono: mixed.clamp(i16::MIN as i32, i16::MAX as i32) as i16,
+        }
+    }
+
+    fn advance_psg_tick(&mut self) {
         let mut tone_3_rising = false;
         for channel in 0..3 {
             let period = self.registers[channel * 2] & TONE_REGISTER_MASK;
@@ -146,29 +188,9 @@ impl Sn76496 {
             } else {
                 self.tone_counter[channel] -= 1;
             }
-            channel_high[channel] = self.tone_output[channel];
         }
 
         self.advance_noise(tone_3_rising);
-        channel_high[3] = self.noise_output;
-
-        let mut mixed = 0_i32;
-        for (channel, high) in channel_high.into_iter().enumerate() {
-            let attenuation = (self.registers[channel * 2 + 1] & 0x0f) as usize;
-            let amplitude = i32::from(ATTENUATION_Q15[attenuation]) / 4;
-            if amplitude != 0 {
-                mixed += if high { amplitude } else { -amplitude };
-            }
-        }
-        mixed += i32::from(self.audio_input);
-
-        self.ready_clocks_remaining = self
-            .ready_clocks_remaining
-            .saturating_sub(TONE_CLOCK_DIVIDER);
-        self.samples_generated = self.samples_generated.wrapping_add(1);
-        Sn76496Sample {
-            mono: mixed.clamp(i16::MIN as i32, i16::MAX as i32) as i16,
-        }
     }
 
     pub fn generate(&mut self, output: &mut [Sn76496Sample]) {

@@ -6,12 +6,13 @@ use crate::{PortReadBehavior, Sn76496, Sn76496Sample, TANDY_PSG_CLOCK_HZ};
 /// how those states map to its CPU clock and bus cycle.
 pub const TANDY_PSG_WRITE_WAIT_STATES: u8 = 42;
 
-/// Tandy 1000 SN76496 port adapter.
+/// Original Tandy 1000 SN76496 port adapter.
 ///
 /// The sound chip is decoded for writes at ports C0h through C7h. The adapter forwards all eight
 /// aliases to the same serial register interface. The service manual gives about 42 CPU wait
 /// states per write. Reads do not select the PSG; the host bus model supplies its open-bus value.
-/// PIT input and output-source selection remain host machine responsibilities.
+/// The host supplies normalized PIT channel 2 audio at the PSG AUDIO IN pin and applies the
+/// selected CPU's wait-state timing. Tandy's external-output mux remains a separate machine path.
 #[derive(Clone, Debug)]
 pub struct TandyPsgCard {
     chip: Sn76496,
@@ -123,6 +124,7 @@ impl TandyPsgCard {
         &mut self.chip
     }
 
+    /// Supply the normalized PIT channel 2 signal routed to the chip's AUDIO IN pin.
     pub fn set_timer2_audio_input(&mut self, sample: i16) {
         self.chip.set_audio_input(sample);
     }

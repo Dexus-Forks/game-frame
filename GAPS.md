@@ -108,12 +108,14 @@ proposed again.
   the original CMS driver through a software port harness for its detection sequence; and model
   DTACK timing with a cycle-counted fake bus. The original custom-chip state machine and analog
   output remain documented software-only work ([findings](docs/hardware/cms-saa1099.md)).
-- [x] Add an initial TI SN76496 model with PCjr and Tandy port adapters (`gameframe-sn76496`). The
-  original Sierra `JR.DRV` and `TANDY.DRV` binaries confirm the register write sequences and
-  startup mute pattern. Noise feedback, period zero, exact output parity, CPU wait mapping and
-  board mixing have software-only checks in [the Tandy PSG findings](docs/hardware/tandy-psg.md).
-  Physical testing is optional.
-- [ ] PC speaker/PIT audio and LPT DAC components; complete the Tandy PSG software comparisons
+- [x] Add the TI SN76496 model, PCjr and original Tandy port adapters, input-clock advancement and
+  PCjr port 61h output mux (`gameframe-sn76496`). Sierra's original `JR.DRV` and `TANDY.DRV`
+  binaries confirm register writes, startup mutes and PSG-source selection.
+- [ ] Compare the TI SN76496 against software-emulator captures and resolve its noise taps/seed,
+  period-zero behavior and sample parity. Record the NCR 8496 and PSSJ differences as separate
+  profiles when software references establish them; physical testing is not required
+  ([findings](docs/hardware/tandy-psg.md)).
+- [ ] PC speaker/PIT audio and LPT DAC components
 - [x] Add a reusable Sound Blaster DSP, mixer and SB16 MPU-401 UART model for Creative DSP
   generations 1.xx–4.xx (`gameframe-sound-blaster`); reuse the OPL2/OPL3 crates for card FM ports,
   including SB Pro 1's dual-OPL2 stereo routing. Software checks cover reset/version, MIDI
