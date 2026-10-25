@@ -12,6 +12,7 @@ mod mixer;
 mod mpu;
 pub mod win16_aux;
 pub mod win16_midi_output;
+pub mod win16_mixer_details;
 pub mod win16_wave;
 pub mod win16_wave_input;
 
@@ -43,6 +44,18 @@ pub use win16_midi_output::{
     MIDI_OUTPUT_STATUS_INITIALIZATION_FAILED, MIDI_OUTPUT_STATUS_INVALID_PORT_OR_CONTEXT,
     MIDI_OUTPUT_STATUS_LOWER_SERVICE_UNAVAILABLE, MIDI_OUTPUT_STATUS_REENTRANCY_REJECTED,
     MIDI_OUTPUT_STATUS_STATE_ALLOCATION_FAILED, MIDI_OUTPUT_STATUS_SUCCESS,
+};
+pub use win16_mixer_details::{
+    DescriptorApplyAction, DetailsContextState,
+    DeviceContextState as MixerDetailsDeviceContextState, LowerAudioState, MixerClientId,
+    MixerClientNotification, MixerControlDescriptor, MixerControlDetailsShape, MixerControlState,
+    MixerDetailsCategory, MixerDetailsContext, MixerDetailsOperation, MixerDetailsReply,
+    MixerDetailsRequest, Win16MixerDetails, MIXER_DETAILS_CALLBACK_VALUE,
+    MIXER_DETAILS_STATUS_DESCRIPTOR_MISMATCH, MIXER_DETAILS_STATUS_DEVICE_CONTEXT_UNRESOLVED,
+    MIXER_DETAILS_STATUS_INVALID_CONTROL_ID, MIXER_DETAILS_STATUS_INVALID_DETAILS_CONTEXT,
+    MIXER_DETAILS_STATUS_INVALID_SHAPE_OR_CATEGORY, MIXER_DETAILS_STATUS_LOWER_AUDIO_UNAVAILABLE,
+    MIXER_DETAILS_STATUS_SUCCESS, MIXER_DETAILS_STATUS_UNMAPPED_0B,
+    MIXER_DETAILS_STATUS_UNSUPPORTED_OPERATION,
 };
 pub use win16_wave::{
     open_wave_output, ActiveStreamState, CallbackDelivery, CallbackTargetState,
