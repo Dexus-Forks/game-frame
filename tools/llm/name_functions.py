@@ -131,10 +131,10 @@ def submit(binary, model, size):
         'messages': [{'role': 'user', 'content': r['text']}]}} for r in rows]
     # Small batches: one large batch can sit for most of the 24 hours the API allows, and
     # nothing in it can be fetched until it ends.
-    ids = []
+    ids, c = [], api()
     with open(os.path.join(out, 'batch.txt'), 'w') as f:
         for i in range(0, len(reqs), size):
-            batch = api().messages.batches.create(requests=reqs[i:i + size])
+            batch = c.messages.batches.create(requests=reqs[i:i + size])
             ids.append(batch.id)
             f.write(batch.id + '\n')
             f.flush()
@@ -151,10 +151,10 @@ def batch_ids(binary):
 
 def status(binary):
     total = {'processing': 0, 'succeeded': 0, 'errored': 0, 'expired': 0, 'canceled': 0}
-    ended = 0
+    ended, client = 0, api()
     ids = batch_ids(binary)
     for i in ids:
-        b = api().messages.batches.retrieve(i)
+        b = client.messages.batches.retrieve(i)
         c = b.request_counts
         for k in total:
             total[k] += getattr(c, k)
@@ -166,10 +166,11 @@ def status(binary):
 
 
 def cancel(binary):
+    c = api()
     for i in batch_ids(binary):
-        b = api().messages.batches.retrieve(i)
+        b = c.messages.batches.retrieve(i)
         if b.processing_status == 'in_progress':
-            b = api().messages.batches.cancel(i)
+            b = c.messages.batches.cancel(i)
         print(f'{b.id}: {b.processing_status}')
 
 
@@ -179,12 +180,14 @@ def clean(text):
 
 def fetch(binary):
     rows, failed, waiting = [], 0, 0
-    results = []
+    # One client for every call: a client dropped while its results still stream closes
+    # the connection under them.
+    results, c = [], api()
     for i in batch_ids(binary):
-        if api().messages.batches.retrieve(i).processing_status != 'ended':
+        if c.messages.batches.retrieve(i).processing_status != 'ended':
             waiting += 1
             continue
-        results.extend(api().messages.batches.results(i))
+        results.extend(c.messages.batches.results(i))
     for r in results:
         if r.result.type != 'succeeded':
             failed += 1
