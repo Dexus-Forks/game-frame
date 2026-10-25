@@ -19,7 +19,7 @@ must not be used as implementation input.
 
 [Unknown] The installer window was not accessible through the available UI connection, so its next prompt and subsequent file extraction could not be observed. No agreement was accepted. The DOS driver and diagnostic executable names remain unknown. No driver I/O or card-detection behavior was observed, and no functional behavior is inferred from the package inventory.
 
-The command used was:
+The command used for the interactive attempt was:
 
 ```sh
 dosbox-x -defaultconf -fastlaunch -noconfig -noautoexec \
@@ -30,6 +30,15 @@ dosbox-x -defaultconf -fastlaunch -noconfig -noautoexec \
 
 The paths above stand in for the unique `mktemp` directory used in the run. Create a writable
 `dosroot` and an `extracted` folder containing the verified ZIP's contents before running it.
+
+## Unattended extraction check
+
+[Observed] A second download of the extracted ZIP had the same verified SHA-256. The included
+README describes starting `INSTALL` and following on-screen instructions. It documents no
+unattended or extract-only command-line mode. A string search of `INSTALL.EXE` for silent,
+unattended, extract, help or usage terms and common slash-style switches found no matches.
+
+[Unknown] No unattended option was documented, so no speculative switches were run in DOSBox-X. The driver payloads were not inspected. The package still requires an accessible DOSBox-X window to complete its documented interactive installation into a temporary destination.
 
 ## Open
 
