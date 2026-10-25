@@ -77,6 +77,9 @@ does not carry a block length.
 - A logical Win16 SB16 wave-input open/query and prepared-header queue model. Callers supply
   capture byte counts; it reports recorded-byte progress and completion events without modeling
   captured samples, hardware capture, or callback timing.
+- A logical Win16 SB16 MIDI-port open and short-message state model for selectors 0 and 1. It keeps
+  per-port running status and returns caller-supplied lower-service events; packed message parsing,
+  the reentrancy threshold, long messages, and physical MIDI output are not modeled.
 - SB16 MPU-401 UART reset, UART-mode acknowledgement, readiness status, input/output and interrupt
   state. Its output-ready interval can be configured with `set_write_busy_ns`; the default is zero
   because the programming reference gives no byte duration.
