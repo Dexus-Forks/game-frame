@@ -27,10 +27,11 @@ the sound exactly, you need to know which device the game wrote for and how it d
 The CMS/Game Blaster uses two Philips SAA1099 chips. Each chip provides six square-wave channels,
 two noise generators, two envelope controllers and stereo amplitude registers. The
 [`gameframe-saa1099` crate](../../crates/saa1099/README.md) models the chip registers and the
-four-port card window. Its port map and default address come from static traces of `CMSDRV.COM`
-and Sierra's `CMS35.BIN`; the register behavior follows Philips's data handbook. The noise
-polynomial, combined tone/noise gate, card-detection read and analog output still need software
-comparisons or better documentation. See the [CMS/SAA1099 evidence and check plan](cms-saa1099.md).
+four-port card window. Its port map and default address come from static traces of `CMSDRV.COM` and
+Sierra's `CMS35.BIN`; register timing follows Philips's data handbook and its SAA1099 article. The
+model includes the common CMS detection-port response reported by a compatible-card manual. The
+noise seed, combined tone/noise gate, full custom-chip behavior, bus waits and analog output still
+have software-only follow-up checks. See the [CMS/SAA1099 evidence and check plan](cms-saa1099.md).
 
 ## FM synthesis (OPL2 and OPL3)
 

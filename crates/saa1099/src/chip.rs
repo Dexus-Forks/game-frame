@@ -22,6 +22,8 @@ pub struct Saa1099 {
     selected_register: u8,
     registers: [u8; 32],
     phase: [u32; 6],
+    active_tone: [u8; 6],
+    active_octave: [u8; 6],
     noise: [NoiseGenerator; 2],
     envelopes: [Envelope; 2],
     sound_enabled: bool,
@@ -47,6 +49,8 @@ impl Saa1099 {
             selected_register: 0,
             registers: [0; 32],
             phase: [0; 6],
+            active_tone: [0; 6],
+            active_octave: [0; 6],
             noise: [NoiseGenerator::new(); 2],
             envelopes: [Envelope::new(); 2],
             sound_enabled: false,
@@ -71,11 +75,13 @@ impl Saa1099 {
         self.samples_generated
     }
 
-    /// Load the SAA1099 address buffer. Only the low five bits select a register. This write
-    /// pulse also clocks envelopes configured for external control.
+    /// Load the SAA1099 address buffer. Only the low five bits select a register. An address
+    /// write to envelope register 18h or 19h also clocks that envelope when external clocking is
+    /// active. The data byte written afterward does not affect this pulse.
     pub fn write_address(&mut self, address: u8) {
         self.selected_register = address & 0x1f;
-        for envelope in &mut self.envelopes {
+        if let 0x18..=0x19 = self.selected_register {
+            let envelope = &mut self.envelopes[(self.selected_register - 0x18) as usize];
             if envelope.external_clock() {
                 envelope.clock();
             }
@@ -122,6 +128,12 @@ impl Saa1099 {
                 let previous = self.phase[channel];
                 self.phase[channel] = self.phase[channel].wrapping_add(phase_step[channel] as u32);
                 wrapped[channel] = self.phase[channel] < previous;
+                if (previous ^ self.phase[channel]) & 0x8000_0000 != 0 {
+                    // Philips buffers tone and octave writes until this generator changes state.
+                    // The sample clock limits this model's transition timing to one output step.
+                    self.active_tone[channel] = self.registers[0x08 + channel];
+                    self.active_octave[channel] = self.programmed_octave(channel);
+                }
             }
             if wrapped[1] {
                 self.envelopes[0].clock_generator_cycle();
@@ -192,15 +204,19 @@ impl Saa1099 {
     }
 
     fn frequency_phase_step(&self, channel: usize) -> u64 {
-        let tone = self.registers[0x08 + channel] as u64;
+        let tone = self.active_tone[channel] as u64;
+        let octave = self.active_octave[channel] as u32;
+        let numerator = PHASE_ONE * (1_u64 << octave);
+        numerator / (4 * (511 - tone))
+    }
+
+    fn programmed_octave(&self, channel: usize) -> u8 {
         let octave_register = self.registers[0x10 + channel / 2];
-        let octave = if channel & 1 == 0 {
+        if channel & 1 == 0 {
             octave_register & 7
         } else {
             (octave_register >> 4) & 7
-        } as u32;
-        let numerator = PHASE_ONE * (1_u64 << octave);
-        numerator / (4 * (511 - tone))
+        }
     }
 
     fn noise_control(&self, generator: usize) -> u8 {

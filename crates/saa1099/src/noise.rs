@@ -1,5 +1,6 @@
-/// A small deterministic noise source. Its polynomial and seed are provisional because the
-/// Philips data sheet does not give the internal shift-register taps or power-up state.
+/// A deterministic noise source. An external hardware-measured implementation reports this
+/// 18-bit polynomial; the Philips data sheet does not give the power-up state, so seed one is a
+/// repeatable choice rather than a confirmed silicon default.
 #[derive(Clone, Copy, Debug)]
 pub(super) struct NoiseGenerator {
     phase: u64,

@@ -2,8 +2,8 @@ use crate::{Saa1099, Saa1099Sample};
 
 /// CMS/Game Blaster default port base documented by Creative's CMS music driver notes.
 pub const CMS_DEFAULT_BASE_PORT: u16 = 0x220;
-/// Reported Game Blaster clock used by this card profile. The CMS driver does not establish the
-/// oscillator, so callers can override this for a board with a verified clock.
+/// Reported Game Blaster clock used by this card profile. A compatible-card manual reports the
+/// oscillator; callers can override it for a board with a different or verified clock.
 pub const CMS_DEFAULT_CLOCK_HZ: u32 = 7_159_090;
 
 /// Two SAA1099 chips behind the Creative Music System/Game Blaster port window.
@@ -14,6 +14,7 @@ pub const CMS_DEFAULT_CLOCK_HZ: u32 = 7_159_090;
 pub struct CmsCard {
     base_port: u16,
     chips: [Saa1099; 2],
+    detection_latches: [u8; 2],
 }
 
 impl Default for CmsCard {
@@ -31,6 +32,7 @@ impl CmsCard {
         Self {
             base_port: CMS_DEFAULT_BASE_PORT,
             chips: [Saa1099::with_clock(clock_hz), Saa1099::with_clock(clock_hz)],
+            detection_latches: [0; 2],
         }
     }
 
@@ -44,28 +46,41 @@ impl CmsCard {
         self.base_port
     }
 
-    /// Route a write in the four-port CMS window. Even ports write chip data; odd ports select
-    /// a register. Returns false for ports outside this card's window.
+    /// Route a write to the CMS chips or auxiliary detection latches. Even ports in the first
+    /// four-port window write chip data; odd ports select a register. Detection latches are at
+    /// offsets 6 and 7. Returns false for unmodeled ports.
     pub fn write_port(&mut self, port: u16, value: u8) -> bool {
         let Some(offset) = port.checked_sub(self.base_port) else {
             return false;
         };
-        if offset >= 4 {
-            return false;
+        match offset {
+            0..=3 => {
+                let chip = (offset / 2) as usize;
+                if offset & 1 == 0 {
+                    self.chips[chip].write_data(value);
+                } else {
+                    self.chips[chip].write_address(value);
+                }
+                true
+            }
+            6..=7 => {
+                self.detection_latches[(offset - 6) as usize] = value;
+                true
+            }
+            _ => false,
         }
-        let chip = (offset / 2) as usize;
-        if offset & 1 == 0 {
-            self.chips[chip].write_data(value);
-        } else {
-            self.chips[chip].write_address(value);
-        }
-        true
     }
 
-    /// The SAA1099 chip window is write-only. The separate CMS card-detection read at `base + 0Ah`
-    /// is not modeled because the driver's transceiver response remains unknown.
-    pub fn read_port(&self, _port: u16) -> Option<u8> {
-        None
+    /// Read the card's compatibility status port and auxiliary detection latches. The auxiliary
+    /// latch echo follows a modern Game Blaster-compatible card manual; the exact original custom
+    /// IC behavior is not fully documented.
+    pub fn read_port(&self, port: u16) -> Option<u8> {
+        let offset = port.checked_sub(self.base_port)?;
+        match offset {
+            4 => Some(0x7f),
+            10..=11 => Some(self.detection_latches[(offset - 10) as usize]),
+            _ => None,
+        }
     }
 
     pub fn chip(&self, index: usize) -> Option<&Saa1099> {
