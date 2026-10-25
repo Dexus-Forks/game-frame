@@ -23,6 +23,8 @@ does, so each claim about the port can cite a measurement. Read them after you h
 
 - [Running the original](running-the-original.md): where to run it, what to capture, how to
   drive it by script, how to compare.
+- [Using 86Box](86box.md): configure a full period PC and sound card, and record the machine
+  settings needed to repeat a run.
 - [Emulators as instruments](emulators.md): save states, input movies, RAM maps, comparing the
   port with the original frame by frame with `ramdiff.py`, and community records of games.
 - [Inputs](inputs.md): every kind of input from outside, where each is read, and how a port

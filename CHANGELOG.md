@@ -9,6 +9,10 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- The observation guidance now covers 86Box as a configurable full-PC reference for DOS and
+  Windows 3.x/9x games. It records sound-card resource settings, guest OS and machine details,
+  and labels captures as emulator measurements rather than physical-hardware evidence.
+
 - `gameframe-sn76496` adds a TI SN76496 tone/noise model, input-clock advancement, PCjr `C0h` and
   original Tandy `C0h`–`C7h` adapters, PCjr and Tandy `61h` output muxes and the Tandy PIT-2 input
   route. The Tandy adapter exposes the service manual's approximate 42 CPU wait states. Static

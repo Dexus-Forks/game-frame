@@ -9,7 +9,8 @@ and later compatible cards.
 This page covers common IBM PC audio from the PC speaker through the 1990s Windows cards. It
 tracks what GameFrame has, what an existing runtime can provide while observing a game, and the
 next reusable pieces to build. DOSBox-X's [sound card guide](https://dosbox-x.com/wiki/Guide%3ASound-card-support-in-DOSBox%E2%80%90X)
-has a broader device table and configuration details.
+has a broader device table and configuration details. Use [86Box](../observe/86box.md) when
+observations need a complete period PC and configurable card resources.
 
 ## Device families and GameFrame coverage
 
@@ -49,6 +50,7 @@ and behavior the game uses.
 | `gameframe-yac512` | In a port | YAC512 LSB-first serial input, FSEL decoding, falling-edge channel latches and held digital words. Floating DAC conversion and analog output remain open. |
 | `wrappers/maxi94` | Unchanged 32-bit Windows game under Wine | Six `94DLL32.dll` exports used by POD; hooks the game's WinMM wave and mixer imports. A recorded race verified that the game discovers both streams and writes non-silent samples. |
 | DOSBox-X harness module | Running and observing DOS games | Provides Sound Blaster, Gravis UltraSound, Miles and HMI SOS capabilities while the original runs. |
+| 86Box | Running and observing DOS and Windows 3.x/9x games | Provides a configurable full PC, including period systems and supported ISA/PCI sound cards with per-card resource settings. Use it as a versioned software reference, not as physical-hardware evidence; see the [86Box observation guide](../observe/86box.md). |
 | Wine/Windows audio APIs | Running Windows games | Supplies common WinMM and DirectSound paths. DSOAL is a separate DirectSound replacement that maps to OpenAL and supports EAX. |
 | Munt `libmt32emu` | Running MIDI through an external synthesizer | Emulates MT-32, CM-32L and LAPC-I. The library is LGPL-2.1-or-later and requires compatible ROM images supplied separately. |
 
@@ -124,6 +126,7 @@ output against the original hardware or an accepted reference capture.
 
 | Project | Reported coverage | Use in a clean-room comparison |
 |---|---|---|
+| [86Box](https://github.com/86Box/86Box) | Full PC emulation with supported period sound cards | Run a game's original driver against a recorded machine and card profile. Compare behavior as an emulated reference, not physical-hardware evidence; keep 86Box source outside a source-blind implementation task. |
 | [oplon](https://docs.rs/oplon/latest/oplon/) | Rust `no_std` OPL2/OPL3 core | Its docs describe a clean-room core and say its log-sine and exponent ROMs and envelope increments match canonical values within ±1 LSB. Compare a built binary's output and timer behavior against hardware or a measured reference. |
 | [nuked-opl3-rs](https://github.com/tgies/nuked-opl3-rs) | Rust OPL3 core based on Nuked-OPL3 | Its project reports bit-identical output to its C reference. Treat that as a project claim; compare binary output without using its code. |
 | [ymfm](https://github.com/aaronsgiles/ymfm) | Yamaha FM cores, including YMF262 | Its project states an audibly indistinguishable accuracy goal. A compiled build can provide a comparison signal; it is not GameFrame source. |

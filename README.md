@@ -4,9 +4,10 @@ GameFrame is an agentic framework for reverse engineering games. Its playbook of
 document its formats and rules, and reimplement it so it behaves exactly like the original.
 
 The toolkit works with [Ghidra](https://ghidra-sre.org), the
-[Unicorn](https://www.unicorn-engine.org) emulator, [REA](https://github.com/morluto/rea)
-(Reverse Engineer Anything) and, for DOS games, [DOSBox-X](https://dosbox-x.com) and its
-debugger. GameFrame grew out of [Un-Banished](https://github.com/tanepiper/unbanished), a 1:1
+[Unicorn](https://www.unicorn-engine.org) emulator and [REA](https://github.com/morluto/rea)
+(Reverse Engineer Anything). It uses [DOSBox-X](https://dosbox-x.com) and its debugger for DOS
+runs, and [86Box](https://github.com/86Box/86Box) when tests need a configurable period PC.
+GameFrame grew out of [Un-Banished](https://github.com/tanepiper/unbanished), a 1:1
 reimplementation of the game Banished built this way; see
 [the case studies](docs/case-studies/README.md).
 

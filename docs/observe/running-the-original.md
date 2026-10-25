@@ -11,7 +11,7 @@ runs.
 | GameFrame's emulators (`pe_emu.py`, `dos_emu`, `dos_env`) | One function or the whole program, headless, scripted, in tests | Registers, memory, calls, random draws, frames from video memory, every byte ([re-emulate](../../skills/re-emulate/SKILL.md)) |
 | DOSBox-X | DOS games with a window, a debugger and file logging | Breakpoints, memory dumps, file access logs, screenshots, audio and video recording ([DOS games](../DOS.md)) |
 | DOSBox Staging | DOS games, accurate and simple to configure | Screenshots, audio and video, raw OPL output |
-| 86Box, PCem | DOS and Windows 9x games that need exact period hardware | The full machine, slowly |
+| [86Box](86box.md), PCem | DOS and Windows 3.x/9x games that depend on a particular PC, BIOS, chipset or expansion card | The configured full machine and its available sound cards; emulation can run slowly |
 | Wine, CrossOver, Proton | Windows games on macOS and Linux | Debug channels (`WINEDEBUG=+relay` shows every API call), screenshots |
 | A Windows machine or virtual machine | Windows games as players run them | Debuggers (x64dbg, WinDbg), API monitors, frame capture (RenderDoc, PIX), Steam Remote Play to stream it to another machine |
 | A console emulator with a debugger (Mesen, bsnes, Dolphin, PCSX2, MAME) | Console and arcade games | Breakpoints, memory, input movies, frame advance |
@@ -19,6 +19,10 @@ runs.
 
 Prefer headless and scripted runs for evidence: they repeat exactly and run in tests. Use the
 windowed runs to see what happens and to find where to look.
+
+Use DOSBox-X for a quick DOS run with its debugger and file logging. Use 86Box when the question
+depends on a particular motherboard, BIOS, Windows version, expansion bus or card resource
+assignment. Record the full machine profile with each capture ([86Box guide](86box.md)).
 
 ### When Wine on the host fails
 
