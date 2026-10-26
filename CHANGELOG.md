@@ -9,6 +9,14 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `gameframe-d3d`: Direct3D 3 immediate mode in software. It writes and parses execute buffers
+  (`Builder`, `exec::parse`: `D3DTLVERTEX`, `PROCESSVERTICES`, `STATERENDER`, `TRIANGLE`) and runs
+  them (`Device::execute`) into an RGB565 target at any multiple of the game's resolution. It
+  follows Direct3D's fill rules (integer pixel centres, top-left) and covers flat and Gouraud
+  shading, perspective-correct textures in 565, 1555 and 4444, the texture blends, colour keys,
+  the alpha test, every blend factor, the stipple pattern and vertex fog, all from Microsoft's
+  public documentation. `docs/hardware/card-apis.md` has a new section on Direct3D 3 execute
+  buffers.
 - `gameframe-powervr`: a software model of PowerVR's PCX2 as SGL 3.1 drives it. `Sgl` has the
   calls by their names (lists, transforms, meshes, materials and texture effects, cameras,
   fog, ambient and point lights, translucent passes, `sgl_render`) and draws into an RGB565

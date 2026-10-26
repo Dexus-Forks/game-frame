@@ -1,4 +1,4 @@
-# The card makers' 3D APIs: Glide, ATI3DCIF, S3D, SGL
+# The card makers' 3D APIs: Glide, ATI3DCIF, S3D, SGL, and Direct3D 3
 
 In 1996 and 1997 each 3D chip had its own programming interface, and a game that wanted to run
 well on several cards shipped one renderer, often one whole executable, per card. This page
@@ -14,7 +14,8 @@ decoder they share in `gameframe-texel`. Each chip crate lists the texel layouts
 (`TEXTURE_FORMATS`), and each also draws: `gameframe-voodoo` runs the whole Voodoo pipeline,
 while `gameframe_rage::draw` and `gameframe_virge::draw` draw the untextured, blended faces
 the ATI and S3 builds of the period gave their chips. Those two crates share
-`gameframe-raster`.
+`gameframe-raster`. `gameframe-d3d` runs Direct3D 3 execute buffers the same way
+("Direct3D 3 execute buffers" below).
 
 ## Find the API
 
@@ -127,6 +128,44 @@ lighting of PowerVR's own driver (`SGLMID4.dll`: the texture effects, the spot l
 fall-off): `Sgl` has the calls by their names. `wrappers/sgl` keeps the same graph and draws it
 with OpenGL for the game's own build.
 
+### Direct3D 3 execute buffers
+
+Direct3D is not a card maker's API, but in 1997 a game's "Direct3D build" was written like
+the others: one renderer per interface. Direct3D 3 has no import of its own. The build imports
+only `DirectDrawCreate` (and often `DirectDrawEnumerateA`), and everything else goes through
+COM interfaces it gets with `QueryInterface`. That means `IDirect3D` from the `IDirectDraw`
+object, and the device itself (`IDirect3DDevice`) from the back-buffer surface, by the GUID
+that `IDirect3D::FindDevice` or `EnumDevices` chose. In the decompiler the calls show as
+indirect calls through a vtable: `(*(*p + 0x20))(p, …)`. Name them by their offsets in the
+SDK's header order: `IDirect3D` +0x20 is `FindDevice`, `IDirect3DDevice` +0x18
+`CreateExecuteBuffer`, +0x20 `Execute`, +0x38 `EnumTextureFormats`, +0x4c `BeginScene`, +0x50
+`EndScene`. Read the `dwSize` the game writes first into each structure. It tells you which
+SDK the game was built with (`D3DDEVICEDESC` was 0xac bytes in DirectX 3 and grew in 5).
+
+The drawing is in the execute buffer the game fills between `Lock` and `Unlock`. That buffer
+holds the vertices (`D3DTLVERTEX`, 32 bytes, when the game transforms and lights them itself)
+and a stream of `D3DINSTRUCTION` headers (`bOpcode`, `bSize`, `wCount`), each followed by
+its records: `D3DOP_PROCESSVERTICES` with `COPY`, `D3DOP_STATERENDER` pairs and
+`D3DOP_TRIANGLE` index triples. Find the code that writes opcode bytes (3 triangles, 8 render
+states, 9 process vertices, 11 exit) beside a moving write pointer: it is the game's whole
+renderer. The render states it writes are the table to document, by their
+`D3DRENDERSTATETYPE` numbers. Two things to check:
+
+- **The order the stream is written in.** A game can write its stream from the end of the
+  buffer backwards, so that a batch's states, which are written when the next batch starts,
+  land in front of it. The batches then run in the reverse of the order they were written in.
+- **The capability bits behind each state.** Games chose states by the device's
+  `D3DPRIMCAPS` (alpha compare, blend factors, texture caps such as `TRANSPARENCY`), so
+  every card gets its own variant of the stream. Pick one card and document the stream for
+  it.
+
+`gameframe-d3d` runs such buffers in software. `Builder` writes them, `exec::parse` reads
+them back (including a buffer dumped from the running game), and `Device::execute` draws them
+into an RGB565 target at any multiple of the game's resolution. It follows Direct3D's
+documented rasterisation rules: pixel centres at integer coordinates and the top-left fill
+convention. It also covers the texture blends, the alpha test, blending, the stipple
+pattern and vertex fog. Its rules come from Microsoft's public documentation, read as prose.
+
 ## One game, one build per card
 
 When a game ships a build per card, the builds share most of their code: the game logic, the
@@ -176,3 +215,6 @@ with the same name and exports: [Replacement libraries for a 1990s game](replace
 - VideoLogic, PowerVR driver package 3.10 (`sgl.h`, `sglwin32.h`, `SGLMID4.dll`), as shipped
   on POD Gold's disc (`POWERVR/310C3.ZIP`).
 - S3, S3D ToolKit SDK 2.6, `S3DTK.H` (published copy: https://github.com/kytulendu/S3DTK).
+- Microsoft, DirectX 3 and DirectX 5 SDK documentation, Direct3D Immediate Mode (execute
+  buffers, `D3DRENDERSTATETYPE`, `D3DTLVERTEX`); and the Direct3D 9 pages "Rasterization Rules"
+  and "Directly Mapping Texels to Pixels" for the fill convention and pixel centres.

@@ -1,0 +1,12 @@
+[package]
+name = "gameframe-d3d"
+description = "Direct3D 3 immediate mode as 1997 games drove it: execute buffers, render states, transformed and lit vertices, and a software rasteriser with Direct3D's fill rules, texture blending, alpha test, blending, stipple and vertex fog"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["direct3d", "d3d", "execute-buffer", "rasteriser", "reverse-engineering"]
+categories = ["emulators", "graphics"]
+
+[dependencies]
