@@ -50,6 +50,10 @@ Every release of GameFrame, newest first. The format follows
 
 ### Fixed
 
+- The library's browser store read none of its files back: `seal` gave the browser its
+  AES-GCM nonce as a view of a Rust value dropped before `encrypt` read it, so files were
+  encrypted under another nonce than the one kept with them. Both directions now pass the nonce
+  as a JavaScript array. Files kept before this fix do not decrypt; add them again.
 - `Process` reports a game program's end once, after its last lines, where it sent `stopped`
   again on every tick. A program that exits with an error is `failed`, with its exit status and
   its last line on standard error, so the launcher shows why and does not leave for the desktop.

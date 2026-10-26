@@ -187,7 +187,9 @@ impl IndexedDb {
             .map_err(js)?
             .get_random_values_with_u8_array(&mut iv)
             .map_err(js)?;
-        let params = AesGcmParams::new_with_u8_slice("AES-GCM", &mut iv.clone());
+        // The IV as a JavaScript array: a view of Rust memory could change before the
+        // browser reads it.
+        let params = AesGcmParams::new_with_u8_array("AES-GCM", &js_sys::Uint8Array::from(&iv[..]));
         let p = subtle()?.encrypt_with_object_and_u8_array(&params, key, bytes).map_err(js)?;
         let sealed = js_sys::Uint8Array::new(&JsFuture::from(p).await.map_err(js)?).to_vec();
         Ok([&iv[..], &sealed].concat())
@@ -198,8 +200,7 @@ impl IndexedDb {
         if bytes.len() < 28 {
             return Err(io::Error::new(io::ErrorKind::InvalidData, "a kept file is too short to be encrypted"));
         }
-        let mut iv = bytes[..12].to_vec();
-        let params = AesGcmParams::new_with_u8_slice("AES-GCM", &mut iv);
+        let params = AesGcmParams::new_with_u8_array("AES-GCM", &js_sys::Uint8Array::from(&bytes[..12]));
         let p = subtle()?.decrypt_with_object_and_u8_array(&params, key, &bytes[12..]).map_err(js)?;
         let plain = JsFuture::from(p)
             .await
