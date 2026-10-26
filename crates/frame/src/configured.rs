@@ -1,5 +1,5 @@
 //! A game set up from `frame.json` alone: a manifest and the command that starts the game, such
-//! as a Wine kernel or the original's own program.
+//! as a port's own program.
 //!
 //! On `game.start` [`Configured`] runs the command, with `{renderer}` and `{setting:KEY}` in the
 //! arguments replaced, and reports `running`, then `stopped` when the program ends (`failed` when
@@ -12,7 +12,7 @@
 //!   "manifest": { "contract": "1.0", "name": "Example", "capabilities": ["start", "settings"],
 //!     "settings": [{ "key": "race.track", "label": "Track", "type": "choice",
 //!                    "from": { "files": "DATA/TRACKS/*.TRK" }, "default": "" }] },
-//!   "start": { "command": "wine", "args": ["GAME.EXE", "-track", "{setting:race.track}"] },
+//!   "start": { "command": "./game", "args": ["--track", "{setting:race.track}"] },
 //!   "folder": "game"
 //! }
 //! ```

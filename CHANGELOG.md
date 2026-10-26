@@ -16,7 +16,7 @@ Every release of GameFrame, newest first. The format follows
 - The commit gate blocks a commit while `plugin.json` still names a release that has its tag,
   so every change after a release lands under the next version's Unreleased section.
 - `launcher/`, gameframe-launcher: the frame in front of a game that a `frame.json` describes,
-  such as a Wine kernel running the original. It hides while the game runs and comes back when
+  such as a port's own program. It hides while the game runs and comes back when
   the game ends, or exits to the desktop if the player chose that. `--no-frame` starts the game
   at once.
 - A choice setting can list what is on the disc. `"from": {"files": PATTERN}` lists the

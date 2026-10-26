@@ -1,5 +1,5 @@
 //! GameFrame's launcher: the frame in front of a game that `frame.json` describes, such as a
-//! Wine kernel running the original's program, or the original itself.
+//! port's own program.
 //!
 //! ```text
 //! gameframe-launcher [PATH] [--frame | --no-frame] [--data DIR] [--preset NAME]

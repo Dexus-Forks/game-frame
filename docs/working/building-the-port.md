@@ -70,7 +70,7 @@ the features it handles, and the frame shows only those. Its pieces are in GameF
 | [gameframe-frame](../../crates/frame/README.md) | The contract: events and their topics, the manifest, the session both sides share, and the adapters for games outside Rust. It has no user interface and builds for the browser |
 | [gameframe-frame-ui](../../crates/frame-ui/README.md) | The frame's views as Dioxus components, for the browser and the desktop |
 | [gameframe-library](../../crates/library/README.md) | The player's library: game data, saves and the sections a game opts into |
-| [gameframe-launcher](../../launcher/README.md) | The frame in front of a game that a `frame.json` describes, such as a Wine kernel running the original. No Rust code of the game's own |
+| [gameframe-launcher](../../launcher/README.md) | The frame in front of a game that a `frame.json` describes, such as a port's own program. No Rust code of the game's own |
 | [The library page](../../templates/library-page/README.md) | A plain HTML page for browser ports: the library, design tokens, panels and Markdown pages, set up from one `library.json` |
 
 ### What the player sees

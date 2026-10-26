@@ -1,7 +1,7 @@
 # gameframe-launcher
 
-The frame in front of a game that a `frame.json` file describes: the original's own program, a
-Wine kernel running it, or any other command. The player picks a renderer and the settings,
+The frame in front of a game that a `frame.json` file describes: a port's own program, or any
+other command. The player picks a renderer and the settings,
 starts the game, and comes back to the launcher when it ends. It is the general launcher on
 [gameframe-frame](../crates/frame/README.md) and
 [gameframe-frame-ui](../crates/frame-ui/README.md), for games that do not speak the contract
@@ -39,7 +39,7 @@ gameframe-launcher [PATH] [--frame | --no-frame] [--data DIR] [--preset NAME]
     "settings": [{ "key": "race.track", "label": "Track", "type": "choice",
                    "from": { "files": "TRACKS/*.TRK" }, "default": "" }]
   },
-  "start": { "command": "wine", "args": ["GAME.EXE", "-track", "{setting:race.track}"] },
+  "start": { "command": "./game", "args": ["--track", "{setting:race.track}"] },
   "folder": "game"
 }
 ```
