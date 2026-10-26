@@ -80,12 +80,41 @@ version or a local executable. The project commits only the provider choice and 
 | REA | `rea-agents` 6.7.0 | Node.js 22.23.4+, 24.22.1+, or 26.12.1+. `.env` can set `REA_MCP_VERSION`. |
 | DOSBox-X debugger | `dosbox-x-mcp-server` tag v0.1.2 | Install with the pinned Cargo command in [re-setup](../../skills/re-setup/SKILL.md). `.env` can set `DOSBOX_X_MCP_SERVER` to a local server. Set `DOSBOX_X_BINARY` to use a custom DOSBox-X build; `scripts/setup.sh` checks its version. |
 | MCPEmulate | PyPI 0.1.0 | Requires `uv`. Its launcher pins MCP SDK 1.30.0 because newer SDK 2.x releases removed the API this server uses. It defaults to Python 3.11 because its Keystone binding still imports `distutils`; `.env` can set `MCP_EMULATE_SDK_VERSION`, `MCP_EMULATE_PYTHON` and `MCP_EMULATE_VERSION`. On macOS, install the native Keystone library and set `DYLD_LIBRARY_PATH` to its library directory if the binding cannot load it. This GPL-2.0-only server complements `pe32_emu`; it is a CPU emulator, not a Windows system or GameFrame's PE call harness. |
-| 86Box | `86box-mcp` 0.1.0 at commit `9e6cdd02f6956e3ff32ec99c1dd4b0be7798d3ca` | No packaged release is published. Build 86Box at or after `1be46d317107f5219f160547d77614ff8e19a7c7` with `-D AUTOMATION=ON`. Set `BOX86_MCP_DIR`, `BOX86_MCP_REVISION`, `BOX86_MCP_SERVER` and `BOX86_BINARY` in `.env`. The server checks the selected source revision and binary path before starting. |
+| 86Box | `86box-mcp` 0.1.0 at commit `9e6cdd02f6956e3ff32ec99c1dd4b0be7798d3ca` | No packaged release is published. Build 86Box at or after `1be46d317107f5219f160547d77614ff8e19a7c7` with `-D AUTOMATION=ON`. Add `-D GDBSTUB=ON` when using its debugger tools. Set `BOX86_MCP_DIR`, `BOX86_MCP_REVISION`, `BOX86_MCP_SERVER` and `BOX86_BINARY` in `.env`. The launcher checks the selected source revision and executable path. |
 
 For 86Box, the upstream MCP source and server need a local checkout and venv. The server's
 automation socket is off in official 86Box builds. Build instructions and platform requirements
 are in the [86Box MCP guide](https://github.com/dafugg/86box-mcp/tree/9e6cdd02f6956e3ff32ec99c1dd4b0be7798d3ca).
-This provider controls a whole emulated PC. Its GDB stub is a separate feature.
+Build with both `AUTOMATION=ON` and `GDBSTUB=ON` to use its CPU debugger tools. In 86Box's CMake
+configuration, enabling `GDBSTUB` forces `DYNAREC=OFF`. From the MCP checkout, the Docker helper
+can build this variant with:
+
+```bash
+docker/build.sh -D GDBSTUB=ON
+```
+
+For a native build, add `-D GDBSTUB=ON` to the CMake command that enables `AUTOMATION`. The GameFrame
+launcher checks the pinned server revision and executable path. It cannot check CMake options when
+`BOX86_BINARY` is a wrapper. Inspect the build cache and confirm `AUTOMATION:BOOL=ON`,
+`GDBSTUB:BOOL=ON` and `DYNAREC:BOOL=OFF`. The Docker helper writes `.cache/build/CMakeCache.txt`;
+for a native build, use the cache under the folder passed to CMake with `-B`. Use
+`vm_start(debugger=true)` to attach the stub; ordinary automation runs do not need it. See
+[Using 86Box](../observe/86box.md) for scope and limits.
+
+The MCP catalog's minimum 86Box source revision already contains the GDB stub. The same source
+checkout can build the automation and debugger variant.
+
+Keep one shared `86box-mcp` checkout and server environment per host. Its nested `86box/` folder
+holds the emulator source, and its `.cache/build/` folder holds the Docker build. Reuse these
+paths in each project's ignored `.env`; do not clone the server and emulator source for each game.
+For the Docker build, set `BOX86_BINARY` to `docker/86box.sh`, which runs `.cache/build/src/86Box`.
+For a native build, point it to `86box/build-mcp/src/86Box`. The official 86Box app or release
+binary lacks the automation socket needed by this provider; use it for interactive runs. Keep VM
+profiles and disks separate from the shared executable, and copy a VM before changing it.
+
+Use one CMake build directory for one build configuration. `GDBSTUB=ON` turns off the dynamic
+recompiler. Keep a second, separately named build directory only when a faster non-debug build is
+needed, and point `BOX86_BINARY` at the intended variant.
 
 ## Checks when extending the server
 

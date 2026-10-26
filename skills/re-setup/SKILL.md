@@ -134,6 +134,16 @@ If REA tools do not appear: restart the agent (MCP servers start with the sessio
 
 For the opt-in CPU and whole-PC providers, follow [the MCP tool surface guide](../../docs/working/mcp-toolchain.md).
 
+For 86Box GDB debugging, the local build needs both `-D AUTOMATION=ON` and `-D GDBSTUB=ON`.
+Enable the separate server with `./gameframe mcp --enable 86box`, then restart the agent session.
+In the pinned MCP checkout, run `docker/build.sh -D GDBSTUB=ON`; it enables automation itself.
+For a native build, add that option to the CMake command with `AUTOMATION=ON`. Check the build
+cache for `AUTOMATION:BOOL=ON`, `GDBSTUB:BOOL=ON` and `DYNAREC:BOOL=OFF`. The provider's `vm_start`
+tool must use `debugger=true` to attach. The MCP tool surface guide has the pinned server, local
+settings and platform build instructions. Reuse one `86box-mcp` checkout per host. Put only VM
+profiles and disks in separate game projects. Make another build directory only when you need a
+different CMake configuration, such as a faster run without the GDB stub.
+
 ## Common problems
 
 - `dosbox-x not found` after `brew install --HEAD`: run `brew link dosbox-x`.

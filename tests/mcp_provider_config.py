@@ -33,6 +33,10 @@ def executable(path, text):
 
 
 def main():
+    assert 'AUTOMATION=ON' in CATALOG['86box']['install']
+    assert 'GDBSTUB=ON' in CATALOG['86box']['install']
+    assert 'optional GDB debugger tools' in CATALOG['86box']['description']
+    assert 'one shared checkout' in CATALOG['86box']['install'].lower()
     launcher = (ROOT / 'scripts/mcp-provider.sh').read_text()
     assert 'python_version="${MCP_EMULATE_PYTHON:-3.11}"' in launcher
     assert 'sdk_version="$(version "${MCP_EMULATE_SDK_VERSION:-1.30.0}" MCP_EMULATE_SDK_VERSION)"' in launcher

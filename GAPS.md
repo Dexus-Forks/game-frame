@@ -180,7 +180,8 @@ proposed again.
 - [x] 86Box control has an optional external provider, [`86box-mcp`](https://github.com/dafugg/86box-mcp).
   It uses 86Box's merged automation socket, which must be enabled in a custom build. GameFrame
   leaves it opt-in, checks its source revision and local emulator path, and does not proxy its
-  tools through the GameFrame MCP server.
+  tools through the GameFrame MCP server. The provider also exposes CPU debugger tools when the
+  local 86Box build enables `GDBSTUB=ON`; see `docs/working/mcp-toolchain.md`.
 
 - [x] `tools/pe/relocs.py`: pointers in data from base relocations
 - [x] `tools/pe/peinfo.py`: delay-loaded imports, relocation count

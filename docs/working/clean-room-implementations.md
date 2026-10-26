@@ -117,10 +117,8 @@ breakpoints and command execution. The current tools include commands for breaks
 debugger help, execution, snapshots and connectivity checks. See the
 [DOSBox-X command reference](https://dosbox-x.com/wiki/DOSBox%E2%80%90X%E2%80%99s-Supported-Commands).
 
-86Box's [advanced-build guide](https://86box.readthedocs.io/en/latest/dev/builds.html) covers
-source-built variants. A maintainer has described the optional GDB stub in a
-[project discussion](https://github.com/86Box/86Box/discussions/7090). Treat it as a candidate
-for software debugging, not as a ready GameFrame integration. The archived
+The [86Box MCP setup guide](mcp-toolchain.md) covers the optional GDB stub build and debugger
+tools. The stub reaches the emulated CPU; use a guest debugger for Win16 symbols. The archived
 [Windows 3.1 DDK guide](https://f6.erista.me/files/bitsavers/pdf/microsoft/windows_3.1/Microsoft_Windows_3.1_SDK_1992/PC29131-0392_Windows_3.1_Device_Driver_Kit_Installation_Mar92.pdf)
 lists CodeView for Windows and WDEB386. The archived
 [Windows Programming Tools guide](https://www.bitsavers.org/pdf/microsoft/windows_3.1/Windows_3.1_Programming_Tools_1992.pdf)
@@ -129,10 +127,11 @@ before investing in setup.
 
 The GameFrame MCP server exposes workflow discovery, knowledge, tool help and catalog-based
 execution for every runnable GameFrame program and script. It calls the existing CLI and keeps
-the tool implementation in small capability modules. REA and DOSBox-X remain independent
-configured providers. See the [MCP tool surface guide](mcp-toolchain.md) for the operation list
-and module boundaries. Import-only libraries still need dedicated operations where agents need
-their APIs, and 86Box control needs a stable, testable protocol before an adapter is added.
+the tool implementation in small capability modules. REA, DOSBox-X and 86Box remain independent
+configured providers. The 86Box provider uses the separate `86box-mcp` server for whole-PC
+control and optional GDB debugging. See the [MCP tool surface guide](mcp-toolchain.md) for the
+operation list and module boundaries. Import-only libraries still need dedicated operations when
+agents need their APIs.
 
 ## Lessons from the audio-driver work
 

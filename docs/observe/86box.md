@@ -40,11 +40,13 @@ driver kit notes that CVW needs debug symbols and may use a secondary display. W
 serial terminal. Confirm that the tool media and the VM's display or serial setup are available
 before depending on either debugger.
 
-86Box also has an optional GDB stub in source builds. A project maintainer described enabling it
-with the `GDBSTUB` build option and attaching a GDB-compatible debugger. This gives machine-level
-access such as stepping and port I/O, not the guest's Win16 source symbols. It is not integrated
-into GameFrame's MCP configuration today. See the [86Box discussion](https://github.com/86Box/86Box/discussions/7090)
-and the [debugger guide](debuggers.md) for the current scope.
+86Box has an optional GDB stub in source builds. The opt-in `86box-mcp` provider includes tools
+for breakpoints, instruction stepping, port I/O and PCI inspection. Build 86Box with both
+`-D AUTOMATION=ON` and `-D GDBSTUB=ON`, then start a VM with `vm_start(debugger=true)`. In the
+supported source version, `GDBSTUB=ON` forces `DYNAREC=OFF`. The stub reports machine state; it
+does not provide the guest's Win16 source symbols. See the
+[MCP setup guide](../working/mcp-toolchain.md) and [debugger guide](debuggers.md) for setup and
+scope.
 
 ## Record the setup
 
