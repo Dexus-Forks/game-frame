@@ -123,6 +123,65 @@ Rules for parallel sessions:
 - A brief for another session names the files, the addresses, what is already known and what
   "done" means. The other session does not share your context.
 
+### Coordinate independent tracks
+
+The stage teams in `docs/teams/` pass evidence from one step to the next, so their dependent
+steps stay in order. When the user chooses concurrent work, split only independent tracks and
+keep one session responsible for integration.
+
+1. Give each track its own worktree and branch from the same recorded base commit. Assign
+   non-overlapping subjects and file paths. Keep shared documents with one owner.
+2. Give each track a brief with the goal, owned paths, known evidence, what counts as done, the
+   exact checks to run, and any shared device or emulator it needs. Do not let a track start more
+   agents or expand its brief on its own.
+3. Have each track log meaningful milestones and long-running checks with
+   `./gameframe progress NAME --add "..."`. Its hand-off names the commit, changed files,
+   evidence, check results and counts, unverified work, decisions and open questions.
+4. For a risky or performance experiment, make the change easy to turn off when the project
+   allows it. Log a receipt that identifies the build, configuration, input or replay, observed
+   result and evidence path. For example:
+
+   ```text
+   Build:
+   Change and switch:
+   Configuration:
+   Input or replay:
+   Result:
+   Evidence:
+   ```
+
+   This makes it clear which change actually ran.
+5. Coordinate access to a shared emulator or VM with `./gameframe run emulock`. For example:
+
+   ```bash
+   ./gameframe run emulock take dosbox --who SESSION --why "recording input case 4"
+   ./gameframe run emulock free dosbox --who SESSION
+   ```
+
+   Every session must use the same lock directory. The default is `derived/locks`; separate
+   worktrees need a shared `--dir` path. The lock is a coordination note, so each session must
+   respect it. When only the user can operate the physical hardware or judge its display, give
+   them a short build-specific test plan and record what they observed.
+6. Before integration, check each track against its own brief and evidence. Then test the merged
+   result with the relevant combined settings or replay. A passing check on each branch does not
+   prove that their changes work together. The coordinator checks the merged diff for interactions.
+   Add an independent reviewer when it is part of the user's agreed scope, especially when tracks
+   touch shared state, configuration or measurements.
+7. Keep the final report tied to the integrated commit. Name the combined checks and their counts,
+   hardware results supplied by the user, remaining gaps and the next decision.
+
+Use this brief for each track:
+
+```text
+Goal and done:
+Base commit:
+Owns:
+Known evidence:
+Checks and expected results:
+Shared resources:
+Open questions:
+```
+
 ## What each agent may do
 
 GameFrame's agents each own one stage. Each is limited to what its stage needs, and each

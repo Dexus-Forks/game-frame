@@ -5,6 +5,11 @@ do one job each. A team is a set of agents that work on one piece of a game in a
 each one handing its results to the next. This section describes the teams, what each agent
 receives and produces, and what a team delivers at the end.
 
+These teams run in order when a later step depends on an earlier hand-off. Independent tracks
+may run at the same time only when the user chooses that approach. Follow [the parallel-work
+procedure](../working/agents.md#coordinate-independent-tracks) and keep one session responsible
+for integrating and checking the combined result.
+
 ## Ask your agent
 
 Run a team. Copy this prompt into your coding agent:

@@ -9,6 +9,8 @@ Every release of GameFrame, newest first. The format follows
 
 ### Changed
 
+- Agent guidance now explains how to coordinate user-approved independent tracks, lock shared
+  emulators, record experimental results and check interactions after integration.
 - The REA workflow documents Ghidra readiness checks, recovery from `provider_unavailable`,
   explicit provider selection, function and instruction inspection, evidence export, and session
   cleanup. The setup guide separates a missing MCP connection from provider configuration errors
