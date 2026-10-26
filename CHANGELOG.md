@@ -5,7 +5,7 @@ Every release of GameFrame, newest first. The format follows
 [Semantic Versioning](https://semver.org/). The newest version here is the one in
 `.claude-plugin/plugin.json`, and `tests/run.sh` checks that the two match.
 
-## [1.4.0-dev] - Unreleased
+## [1.4.0] - 2026-10-26
 
 ### Added
 
@@ -28,23 +28,23 @@ Every release of GameFrame, newest first. The format follows
   and the desktop. Its tabs are Play, Settings, Library, help pages and Console, styled by the
   library page's tokens. `examples/frame-demo` runs it with no game, in both targets.
 - Eleven ready-made themes in `templates/library-page/themes/`: Windows 98, XP and Vista,
-  System 7, Aqua, BeOS, NeXTSTEP, CDE, GNOME 2, Amiga Workbench and Atari ST GEM. `"preset"` in `library.json` picks one for the HTML page and the frame. `"presets"`
-  lets the player choose between them in the frame's Settings tab, saved as `frame.preset`.
+  System 7, Aqua, BeOS, NeXTSTEP, CDE, GNOME 2, Amiga Workbench and Atari ST GEM. `"preset"`
+  in `library.json` picks one for the HTML page and the frame. `"presets"` lets the player choose between them in the frame's Settings tab, saved as `frame.preset`.
 - `crates/disc-image` and `crates/game-source` move from POD into GameFrame. They read CD images
   in place, and give a game's files from a folder, a disc image or a URL, in ranges in the
   browser.
-
 - `tools/llm/decision.py` routes bounded choice, yes-or-no and score questions to a user-selected
   decision model through its native System One endpoint. `decision_feedback.py` stores explicit
   user corrections locally and exports training examples. Neither tool selects a paid service,
   changes model weights or uploads data.
-
 - The site diary is now written live and then put together by day. During the day, each
   milestone gets a live entry named `YYYY-MM-DD-HHMM-slug.md`, which the diary shows with its
   time. On the next run, `re-site` and `re-publisher` turn each past day's live entries into
   one post in the style of update notes: what is new, a little detail, and a short change list.
   The post drops the repeats. `tools/site/check.py` fails while a past day still has live
   entries. `--days` lists those days, and `--keep-live` turns the check off.
+- The plugin check in `tests/run.sh` ignores system files that sit on disk but not in git, and a
+  new check fails if git tracks a `.DS_Store`, `Thumbs.db`, `desktop.ini` or `__MACOSX` file.
 
 ### Changed
 
@@ -658,7 +658,7 @@ Copilot, Cursor and OpenCode can each use the skills, the agents, the gates and 
 - The Claude Code plugin now carries version `1.0.0`. Claude Code updates it when the version
   changes, so plugin projects move from release to release.
 
-[1.4.0-dev]: https://github.com/tanepiper/game-frame/compare/v1.3.0...HEAD
+[1.4.0]: https://github.com/tanepiper/game-frame/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/tanepiper/game-frame/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/tanepiper/game-frame/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/tanepiper/game-frame/compare/v1.0.1...v1.1.0

@@ -1,6 +1,6 @@
 {
   "name": "gameframe",
-  "version": "1.4.0-dev",
+  "version": "1.4.0",
   "description": "Reverse engineer games and rebuild them exactly: GameFrame's playbook as skills (re-start, re-inventory, re-trace, re-port, re-verify and more) and stage and task agents that hand off to each other. The toolkit comes from a clone of GameFrame or a project made with it.",
   "author": {
     "name": "Tane Piper",
