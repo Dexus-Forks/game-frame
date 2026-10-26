@@ -222,7 +222,8 @@ The rules for an entry:
   line after it with what it shows and where it comes from (`*Our viewer, CAR1.BIN: ...*`,
   `*Diagram: the layout of the pack, from FUN_00512198.*`). Put them in `public/` (WebP under
   1 MB, SVG) and link them as `/name.webp`. Adding figures to old entries later costs more
-  than drawing them as each entry is written. The game's files themselves stay out: no
+  than drawing them as each entry is written. Screenshots are always fine, of the original game
+  too: never leave one out for being game material. The game's files themselves stay out: no
   extracted textures, sounds or text in bulk, no archives, no downloads of its data.
 - **Length.** A day post is usually 300 to 1,500 words. Longer usually means reference material
   that belongs in `docs/`. A live entry can be short, since the day post gathers them.

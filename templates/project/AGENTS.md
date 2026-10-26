@@ -53,6 +53,8 @@ user may change any of them.
    `derived/`. All three are ignored by git; never force-add past `.gitignore`. Do not paste
    decompiled code, disassembly or data dumps into tracked files: describe findings in prose,
    tables, addresses (`FUN_1400be770`), field offsets (`+0x44`) and constants.
+   Screenshots are always fine, of the original game and of the port. Commit them and put them
+   on the site: copy each one out of `derived/`, compress it (WebP) and caption it.
    `target/` is your copy of the game, not build output: Cargo builds into `build/`
    (`.cargo/config.toml`). Git keeps no copy of it, so never delete, move or clean it, and
    never run `git clean -x` here. `target/GAME-FILES-NOT-BUILD-OUTPUT.txt` says so, and the

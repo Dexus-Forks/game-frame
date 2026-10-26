@@ -30,9 +30,9 @@ These rules are for changes to GameFrame itself, which is a public repository.
 1. **No game material, ever.** No game binaries, data, assets, saves, decompiled code or
    disassembly from any commercial game. The only binaries the tests use are built from
    `examples/sample-game/` and `examples/dos-sample/` (our own code) into their ignored
-   `build/` folders. The one exception is a few screenshots of the case-study
-   reimplementations in `docs/assets/case-studies/`: each port's own frames, compressed
-   WebP, small, added only where a case study needs them.
+   `build/` folders. Screenshots are the exception and are always fine: of the
+   original games and of the case-study ports, in `docs/assets/case-studies/`, compressed
+   WebP, where a page needs them.
 2. **Every tool is tested.** A new or changed tool gets a check in `tests/run.sh` against the
    sample game, and `tests/run.sh --ghidra` passes before you commit.
 3. **Every tool documents itself.** A module docstring or header comment with usage, inputs,

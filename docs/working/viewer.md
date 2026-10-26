@@ -101,5 +101,6 @@ the person who checks it.
   with the original's (`re-verify`).
 - **A viewer can hide a short read.** Show whether every byte of a file was consumed, as
   `validate.py` does. A picture can look right while the decoder skips a field.
-- **The output holds game material.** Keep the catalogue, extracted pictures and screenshots in
-  ignored folders (`derived/`). Never commit them.
+- **The output holds game material.** Keep the catalogue and extracted pictures in ignored
+  folders (`derived/`). Never commit them. Screenshots are always fine: copy the ones a document
+  or the site uses out of `derived/`, compress them (WebP) and commit them.

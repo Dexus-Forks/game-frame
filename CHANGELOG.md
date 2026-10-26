@@ -23,6 +23,9 @@ Every release of GameFrame, newest first. The format follows
 - A site's day post no longer replaces that day's live entries. The live entries stay, the day
   post ends with "The day's entries" linking each one, and the diary's list and sidebar show
   only the day post for a past day. `tools/site/check.py` fails when a day post misses a link.
+- Screenshots are always fine, of the original game and of the port. The project rules, the
+  viewer guide, `re-land`, `re-site` and `re-publisher` now say so, so agents commit them and
+  put them on the site instead of leaving them out as game material.
 
 ## [1.4.0] - 2026-10-26
 
