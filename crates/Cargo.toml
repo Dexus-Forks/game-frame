@@ -2,7 +2,7 @@
 # the case-study reimplementations and made generic. Each crate has its own README.
 [workspace]
 resolver = "2"
-members = ["opl2", "opl3", "saa1099", "sn76496", "yac512", "ymz263", "adlib-gold", "sound-blaster", "wma", "msvc-crt", "turbo-pascal", "mmx", "gpu-1997", "scale", "indeo", "disc-image", "game-source", "library", "frame", "frame-ui"]
+members = ["opl2", "opl3", "saa1099", "sn76496", "yac512", "ymz263", "adlib-gold", "sound-blaster", "wma", "msvc-crt", "turbo-pascal", "mmx", "gpu-1997", "voodoo", "scale", "indeo", "disc-image", "game-source", "library", "frame", "frame-ui"]
 
 [workspace.package]
 version = "0.1.0"

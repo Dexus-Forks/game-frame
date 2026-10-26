@@ -127,7 +127,9 @@ textures on a Voodoo, affine textures on a ViRGE, halved texture pages where mem
 A viewer or a port can offer the same choice as a setting: a "renderer profile" per card that
 uses the file variant, the texture formats and sizes, and the effects (reflections, fog)
 that card's build used. `gameframe-gpu-1997`'s `card` module lists what each chip accepts;
-the game's own differences come from tracing its builds. Record which profile is the
+the game's own differences come from tracing its builds. `gameframe-voodoo` draws a 3dfx
+profile in software: hand it the triangles and Glide states the game's 3dfx build sends and it
+gives the picture at any size, with no Glide library. Record which profile is the
 reference for exact comparisons ([3D accelerators](graphics-3d.md), "How to approach a game
 with several renderers").
 
