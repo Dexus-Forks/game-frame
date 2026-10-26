@@ -132,7 +132,7 @@ frame, in three layers that are the same for every game:
 | Layer | What | GameFrame piece |
 |---|---|---|
 | The dialog | The frame opens first. Play shows one slot per kind of hardware, with the devices the original supported and how complete each is in the port. Start sends `game.start` with `"devices": {"video": "glide", "sound": "directsound"}` | `gameframe-frame` (`device`, `Session::select_device`), `gameframe-frame-ui` (Play) |
-| The kernel | The port's own program, started for each game (`Respawn`), reads the launch with `Link::wait`. It checks each device with `Manifest::playable` and reports `failed` with the reason for one not ported yet. Then it builds its renderer and its sound from the chosen ids | `Link`, `Respawn`, `chosen` |
+| The kernel | The port's own program, started for each game (`Respawn`), reads the launch with `Link::wait`. It checks each device with `Manifest::playable`. A device not ported yet starts on its `stand_in` (`Manifest::stand_in`) and is reported. One with no stand-in, or an id the manifest lacks, makes the kernel report `failed` with the reason. Then it builds its renderer and its sound from the ids it uses | `Link`, `Respawn`, `chosen` |
 | The devices | The cards themselves, modelled once in GameFrame and shared by every game: Glide on `gameframe-voodoo`, the S3D Toolkit's formats in `gameframe-virge`, ATI3DCIF's in `gameframe-rage`, the Sound Blaster, OPL2 and OPL3, the AdLib Gold. For the original's own builds, the replacement libraries in `wrappers/` | `crates/`, `wrappers/` |
 
 The same card has the same id in every game (`gameframe_frame::device::ids`): `software`,
@@ -148,6 +148,30 @@ port has, such as `software`. The game then starts with it, and the kernel repor
 with `gameframe_report::unported!`. Every choice in the dialog runs the game end to end, and
 the reports say which devices players want first. Keep the original's own settings for a device (sample rate,
 colour depth) as ordinary settings in a group named after the slot.
+
+### One program or two, one build or many
+
+The originals often shipped one build per 3D card. POD Gold has 14 executables. They draw in six
+ways, each in a Pentium and an MMX build. Each card's SDK was linked in when the game was
+built, and each CPU path was compiled on its own. A port has no such limit. Each device is a
+module behind one interface, and a card's model is a crate (`gameframe-voodoo` for Glide). So
+make **one build that holds every device**, and let `game.start`'s `devices` choose one at the
+start. A build with one device left out is for a target that cannot take it, such as the
+browser, or a size limit. Leave the device out with a Cargo feature, and leave it out of the
+manifest too, or grade it `missing` with a stand-in.
+
+The frame and the game run as **two processes on the desktop**. Each wants the main thread
+for its event loop: the frame through tao and wry, the game through winit. On macOS only one
+can have it. A winit event loop can also be made only once in a process, so `Respawn` starts
+the kernel again for each game. Two processes do not need two files. The game's executable can
+hold both roles: with no arguments it opens the frame, and the frame starts the same file again
+with `--frame-io` (`std::env::current_exe()`) as the kernel. That needs the player as a library
+that the launcher's crate calls, and it brings Dioxus into the game's build. Until a game wants
+one file, keep the launcher in its own Cargo workspace beside the game's executable, as POD's
+and Hardwar's are.
+
+In the browser there are no processes. The kernel implements `Game` and runs in the frame's
+page, so the same type serves both: JSON lines on the desktop, calls in the browser.
 
 ### Three ways to join
 

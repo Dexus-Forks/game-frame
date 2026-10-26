@@ -45,6 +45,9 @@ Every release of GameFrame, newest first. The format follows
   game's own styles can apply to one theme only.
 - `gameframe-library`: `Folder::link_in`, which fills a section from the player's own folder
   by hard links.
+- Building the port: "One program or two, one build or many". One build holds every device, and
+  `devices` chooses at the start. The frame and the game are two processes on the desktop, and
+  one file can hold both roles.
 
 ### Removed
 
