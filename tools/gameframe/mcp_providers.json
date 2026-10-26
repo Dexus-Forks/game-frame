@@ -29,7 +29,7 @@
   "86box": {
     "version": "0.1.0 @ 9e6cdd02f6956e3ff32ec99c1dd4b0be7798d3ca",
     "description": "86Box whole-PC control with optional GDB debugger tools",
-    "install": "One shared checkout and server venv per host; build with AUTOMATION=ON. Add GDBSTUB=ON for debugger tools.",
+    "install": "One shared checkout and server venv per host; build with AUTOMATION=ON. Add GDBSTUB=ON for debugger tools. TCP transport is default; set GAMEFRAME_86BOX_TRANSPORT=unix when socket sharing works.",
     "source_revision": "9e6cdd02f6956e3ff32ec99c1dd4b0be7798d3ca",
     "minimum_emulator_revision": "1be46d317107f5219f160547d77614ff8e19a7c7",
     "server": {

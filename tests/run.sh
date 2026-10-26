@@ -1812,7 +1812,7 @@ PY
   llm tools/llm/locate.py "$L/shot.png" --ref "$L/shot.png" --save "$L/loc.json" >/dev/null
   expect "locate --ref saves a result align.py map reads" "0.0 0.0" "$PYTHON" tools/live/align.py map "$L/loc.json" 5 5
   printf 'GAMEFRAME_LOCAL_LLM_API_KEY="from-dotenv"\nGAMEFRAME_LLM_ENDPOINT=http://127.0.0.1:9\nGAMEFRAME_LLM_PROVIDER=local\nGAMEFRAME_LLM_PROTOCOL=anthropic\nGAMEFRAME_LOCAL_MODEL=local-profile-model\nGAMEFRAME_MODEL=legacy-model\n' > "$L/.env"
-  expect "client reads the selected profile model from the project's .env" "model: local-profile-model" env -u GAMEFRAME_LOCAL_LLM_API_KEY -u GAMEFRAME_ANTHROPIC_API_KEY -u GAMEFRAME_LLM_ENDPOINT -u GAMEFRAME_LLM_PROVIDER -u GAMEFRAME_LLM_PROTOCOL -u GAMEFRAME_LOCAL_MODEL -u GAMEFRAME_MODEL GAMEFRAME_PROJECT="$L" "$PYTHON" tools/llm/client.py
+  ( cd "$L" && expect "client reads the selected profile model from the project's .env" "model: local-profile-model" env -u GAMEFRAME_LOCAL_LLM_API_KEY -u GAMEFRAME_ANTHROPIC_API_KEY -u GAMEFRAME_LLM_ENDPOINT -u GAMEFRAME_LLM_PROVIDER -u GAMEFRAME_LLM_PROTOCOL -u GAMEFRAME_LOCAL_MODEL -u GAMEFRAME_MODEL GAMEFRAME_PROJECT="$L" "$PYTHON" "$ROOT/tools/llm/client.py" )
   mkdir -p "$L/here" && printf 'GHIDRA_INSTALL_DIR=/x\n' > "$L/here/.env"
   expect "client reads on past a .env without the key" "model: local-profile-model" bash -c "cd '$L/here' && env -u GAMEFRAME_LOCAL_LLM_API_KEY -u GAMEFRAME_ANTHROPIC_API_KEY -u GAMEFRAME_LLM_ENDPOINT -u GAMEFRAME_LLM_PROVIDER -u GAMEFRAME_LLM_PROTOCOL -u GAMEFRAME_LOCAL_MODEL -u GAMEFRAME_MODEL GAMEFRAME_PROJECT='$L' '$PYTHON' '$PWD/tools/llm/client.py'"
   kill $fake 2>/dev/null; rm -rf "$L"

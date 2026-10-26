@@ -78,7 +78,17 @@ case "$provider" in
       echo '86Box MCP needs BOX86_BINARY set to an executable local 86Box build with AUTOMATION=ON' >&2
       exit 2
     }
-    exec "$server"
+    # 86box-mcp passes this host path to the emulator. docker/86box.sh mounts HOME and the MCP
+    # checkout at the same paths, but macOS's default temp directory is under /var/folders.
+    # Use a home-mounted directory so the container can open the automation socket.
+    tmpdir="${GAMEFRAME_86BOX_TMPDIR:-${HOME:-$source}/.cache/gameframe/86box-tmp}"
+    mkdir -p "$tmpdir"
+    transport="${GAMEFRAME_86BOX_TRANSPORT:-tcp}"
+    [[ "$transport" == unix || "$transport" == tcp ]] || {
+      echo 'GAMEFRAME_86BOX_TRANSPORT must be unix or tcp' >&2
+      exit 2
+    }
+    TMPDIR="$tmpdir" BOX86_TRANSPORT="$transport" exec "$server"
     ;;
   *)
     echo "unknown MCP provider '$provider'; choose rea, dosbox, mcp-emulate or 86box" >&2

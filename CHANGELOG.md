@@ -26,7 +26,9 @@ Every release of GameFrame, newest first. The format follows
   close the temporary project. It separates focused REA analysis from whole-program Ghidra
   searches and emulator measurements.
 - 86Box setup guidance now covers the optional GDB build, its dynamic-recompiler tradeoff and
-  the debugger tools provided by the opt-in `86box-mcp` server.
+  the debugger tools provided by the opt-in `86box-mcp` server. The provider launcher places its
+  automation socket in a home-mounted temporary directory for Docker builds, and defaults to
+  token-protected TCP transport for container compatibility.
 
 ## [1.3.0] - 2026-10-25
 

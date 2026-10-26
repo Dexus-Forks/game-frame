@@ -21,8 +21,8 @@ GAMEFRAME = ROOT / 'gameframe'
 CATALOG = json.loads((ROOT / 'tools/gameframe/mcp_providers.json').read_text())
 
 
-def run(project, *args):
-    env = {**os.environ, 'GAMEFRAME_PROJECT': str(project)}
+def run(project, *args, extra_env=None):
+    env = {**os.environ, **(extra_env or {}), 'GAMEFRAME_PROJECT': str(project)}
     return subprocess.run([str(GAMEFRAME), *args], cwd=ROOT, env=env,
                           capture_output=True, text=True)
 
@@ -37,6 +37,8 @@ def main():
     assert 'GDBSTUB=ON' in CATALOG['86box']['install']
     assert 'optional GDB debugger tools' in CATALOG['86box']['description']
     assert 'one shared checkout' in CATALOG['86box']['install'].lower()
+    assert 'TCP transport is default' in CATALOG['86box']['install']
+    assert 'GAMEFRAME_86BOX_TRANSPORT' in CATALOG['86box']['install']
     launcher = (ROOT / 'scripts/mcp-provider.sh').read_text()
     assert 'python_version="${MCP_EMULATE_PYTHON:-3.11}"' in launcher
     assert 'sdk_version="$(version "${MCP_EMULATE_SDK_VERSION:-1.30.0}" MCP_EMULATE_SDK_VERSION)"' in launcher
@@ -165,15 +167,29 @@ def main():
         revision = subprocess.run(['git', '-C', str(source), 'rev-parse', 'HEAD'], check=True,
                                   capture_output=True, text=True).stdout.strip()
         fake_box_server = project / 'fake-86box-mcp'
-        executable(fake_box_server, '#!/bin/sh\nprintf "custom-86box:%s\\n" "$BOX86_BINARY"\n')
+        executable(fake_box_server,
+                   '#!/bin/sh\nprintf "custom-86box:%s:%s:%s\\n" "$BOX86_BINARY" "$TMPDIR" "$BOX86_TRANSPORT"\n')
         fake_box = project / '86Box'
         executable(fake_box, '#!/bin/sh\nexit 0\n')
         (project / '.env').write_text(
             f'BOX86_MCP_DIR={source}\nBOX86_MCP_REVISION={revision}\n'
             f'BOX86_MCP_SERVER={fake_box_server}\nBOX86_BINARY={fake_box}\n')
-        launched = run(project, 'mcp-provider', '86box', CATALOG['86box']['source_revision'])
+        home = project / 'home'
+        launched = run(project, 'mcp-provider', '86box', CATALOG['86box']['source_revision'],
+                       extra_env={'HOME': str(home)})
         assert launched.returncode == 0, launched.stderr
-        assert f'custom-86box:{fake_box}' in launched.stdout, launched.stdout
+        default_tmp = home / '.cache/gameframe/86box-tmp'
+        assert f'custom-86box:{fake_box}:{default_tmp}:tcp' in launched.stdout, launched.stdout
+        assert default_tmp.is_dir()
+
+        custom_tmp = home / 'custom-temp'
+        with (project / '.env').open('a') as env_file:
+            env_file.write(f'GAMEFRAME_86BOX_TMPDIR={custom_tmp}\n'
+                            'GAMEFRAME_86BOX_TRANSPORT=unix\n')
+        launched = run(project, 'mcp-provider', '86box', CATALOG['86box']['source_revision'],
+                       extra_env={'HOME': str(home)})
+        assert launched.returncode == 0, launched.stderr
+        assert f'custom-86box:{fake_box}:{custom_tmp}:unix' in launched.stdout, launched.stdout
 
     print('MCP providers: opt-in, generated clients, version pins, project .env and local builds')
 

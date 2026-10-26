@@ -116,6 +116,23 @@ Use one CMake build directory for one build configuration. `GDBSTUB=ON` turns of
 recompiler. Keep a second, separately named build directory only when a faster non-debug build is
 needed, and point `BOX86_BINARY` at the intended variant.
 
+The MCP server creates the automation socket under Python's temporary directory and passes that
+host path to 86Box. GameFrame sets `TMPDIR` to `$HOME/.cache/gameframe/86box-tmp` before launching
+the provider, where the Docker wrapper's home bind mount makes the same path visible in the
+container. Set `GAMEFRAME_86BOX_TMPDIR` in the project's ignored `.env` to choose a different
+directory under `$HOME` or the shared `86box-mcp` checkout. Restart the agent session after
+changing this setting so the provider starts with the new path. Do not use macOS's default
+`/var/folders/...` temporary path with the Docker build; that host path is not mounted in the
+container.
+
+GameFrame defaults the automation transport to loopback TCP with the provider's token. Set
+`GAMEFRAME_86BOX_TRANSPORT=unix` in `.env` only when the shared filesystem supports Unix sockets.
+The GDB stub uses a separate dynamic TCP port, so both the automation connection and debugger
+connection must reach the host. The Docker wrapper uses `--network host`. Docker Desktop supports
+host networking from version 4.34 when enabled under **Settings > Resources > Network**; see its
+[host networking guide](https://docs.docker.com/engine/network/drivers/host/). If the MCP start
+call reaches 86Box but stalls while attaching GDB, check host access to the port 86Box reported.
+
 ## Checks when extending the server
 
 Keep protocol messages on stdout and diagnostics off it. Preserve newline-delimited JSON-RPC and

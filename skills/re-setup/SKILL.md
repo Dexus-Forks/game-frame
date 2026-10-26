@@ -144,6 +144,18 @@ settings and platform build instructions. Reuse one `86box-mcp` checkout per hos
 profiles and disks in separate game projects. Make another build directory only when you need a
 different CMake configuration, such as a faster run without the GDB stub.
 
+The server creates its automation socket in the host's temporary directory. GameFrame sets
+`TMPDIR` to `$HOME/.cache/gameframe/86box-tmp`, a path the Docker wrapper mounts into the
+container. Set `GAMEFRAME_86BOX_TMPDIR` in the project's ignored `.env` to another directory under
+`$HOME` or the shared MCP checkout. Restart the agent session after changing it. This avoids the
+macOS default under `/var/folders`, which the container cannot see.
+
+GameFrame uses loopback TCP with the provider token by default. Set
+`GAMEFRAME_86BOX_TRANSPORT=unix` only when the shared filesystem passes Unix sockets. The GDB
+stub uses a separate dynamic TCP port. The Docker wrapper uses host networking; Docker Desktop
+needs host networking enabled in Settings > Resources > Network. Check that the port reported by
+86Box is reachable from the host if startup stalls at debugger attach.
+
 ## Common problems
 
 - `dosbox-x not found` after `brew install --HEAD`: run `brew link dosbox-x`.
