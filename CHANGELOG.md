@@ -42,6 +42,14 @@ Every release of GameFrame, newest first. The format follows
   viewer guide, `re-land`, `re-site` and `re-publisher` now say so, so agents commit them and
   put them on the site instead of leaving them out as game material.
 
+### Fixed
+
+- `Process` reports a game program's end once, after its last lines, where it sent `stopped`
+  again on every tick. A program that exits with an error is `failed`, with its exit status and
+  its last line on standard error, so the launcher shows why and does not leave for the desktop.
+  A program that said `stopped` or `failed` itself and then exited successfully gets no second
+  status. `Configured` reports a command that exits with an error as `failed` too.
+
 ## [1.4.0] - 2026-10-26
 
 ### Added

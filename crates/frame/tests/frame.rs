@@ -278,6 +278,63 @@ fn a_config_game_lists_files_and_runs_in_its_folder() {
     let _ = std::fs::remove_dir_all(&dir);
 }
 
+/// A JSON-lines game that prints its manifest, runs `then`, and exits; the session's `game.status`
+/// events once it has gone quiet.
+fn ended_program(then: &str) -> Vec<Event> {
+    let script = format!(r#"echo '{{"contract":"1.0","name":"sh","capabilities":["start"]}}'
+{then}"#);
+    let game = gameframe_frame::Process::spawn("sh", &["-c".into(), script]).unwrap();
+    let mut s = Session::new(Box::new(game), Settings::new()).unwrap();
+    for _ in 0..100 {
+        s.tick();
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    }
+    s.log().iter().filter(|e| e.topic == topics::GAME_STATUS).cloned().collect()
+}
+
+#[test]
+fn a_program_that_ends_is_reported_once() {
+    let ends = ended_program("exit 0");
+    assert_eq!(ends.len(), 1, "one end, not one each tick: {ends:?}");
+    assert_eq!(ends[0].str("state"), Some("stopped"));
+}
+
+#[test]
+fn a_program_that_fails_says_why() {
+    let ends = ended_program("echo 'no disc in the drive' >&2; exit 3");
+    assert_eq!(ends.len(), 1, "{ends:?}");
+    assert_eq!(ends[0].str("state"), Some("failed"));
+    assert!(ends[0].str("detail").unwrap().ends_with(": no disc in the drive"), "{ends:?}");
+}
+
+#[test]
+fn a_program_that_said_it_stopped_is_not_reported_again() {
+    let said = r#"echo '{"topic":"game.status","data":{"state":"stopped","detail":"the race ended"},"from":"game"}'; exit 0"#;
+    let ends = ended_program(said);
+    assert_eq!(ends.len(), 1, "{ends:?}");
+    assert_eq!(ends[0].str("detail"), Some("the race ended"));
+    // An error after its own `stopped` is still a failure.
+    let crashed = r#"echo '{"topic":"game.status","data":{"state":"stopped"},"from":"game"}'; exit 1"#;
+    let ends = ended_program(crashed);
+    assert_eq!(ends.iter().filter_map(|e| e.str("state")).collect::<Vec<_>>(), ["stopped", "failed"]);
+}
+
+#[test]
+fn a_config_game_that_fails_says_failed() {
+    let text = r#"{"manifest": {"contract": "1.0", "name": "x", "capabilities": ["start"]},
+                   "start": {"command": "false"}}"#;
+    let mut s = Session::new(Box::new(Configured::from_json(text).unwrap()), Settings::new()).unwrap();
+    s.start(vec![]);
+    for _ in 0..200 {
+        s.tick();
+        if s.state() == "failed" {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    }
+    assert_eq!(s.state(), "failed");
+}
+
 /// A game whose program ends at once, as if the player quit it from its own menu.
 fn ending_game(on_exit: &str) -> Session {
     let text = r#"{"manifest": {"contract": "1.0", "name": "x", "capabilities": ["start"]},

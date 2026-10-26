@@ -2,7 +2,8 @@
 //! as a Wine kernel or the original's own program.
 //!
 //! On `game.start` [`Configured`] runs the command, with `{renderer}` and `{setting:KEY}` in the
-//! arguments replaced, and reports `running`, then `stopped` when the program ends. A choice
+//! arguments replaced, and reports `running`, then `stopped` when the program ends (`failed` when
+//! it exits with an error). A choice
 //! whose manifest says `"from": {"files": "DATA/TRACKS/*.TRK"}` is filled from the game's folder
 //! when [`Configured::load`] reads the file.
 //!
@@ -158,7 +159,8 @@ impl Game for Configured {
         if let Some(c) = &mut self.child {
             if let Ok(Some(status)) = c.try_wait() {
                 self.child = None;
-                out.status("stopped", &format!("the game ended ({status})"));
+                let state = if status.success() { "stopped" } else { "failed" };
+                out.status(state, &format!("the game ended ({status})"));
             }
         }
     }
