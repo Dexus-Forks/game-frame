@@ -12,7 +12,8 @@
 //! - a [`Session`] keeps the state both sides agree on (settings, renderer, status, the log).
 //!
 //! A game joins in one of three ways: a Rust type that implements [`Game`]; a program in any
-//! language that speaks JSON lines ([`Process`]); or a `frame.json` with a manifest and a start
+//! language that speaks JSON lines ([`Process`], and [`Link`] for the program's own end; [`Respawn`]
+//! for a program that runs one game and ends); or a `frame.json` with a manifest and a start
 //! command ([`Configured`]). [`Demo`] stands in for a game, so the frame runs with none.
 //!
 //! The views are in `gameframe-frame-ui`. This crate has no UI and builds for the browser.
@@ -26,7 +27,11 @@ mod configured;
 #[cfg(not(target_arch = "wasm32"))]
 mod files;
 #[cfg(not(target_arch = "wasm32"))]
+mod link;
+#[cfg(not(target_arch = "wasm32"))]
 mod process;
+#[cfg(not(target_arch = "wasm32"))]
+pub mod respawn;
 mod session;
 mod settings;
 
@@ -40,6 +45,10 @@ pub use configured::{Configured, FrameFile, StartCommand};
 pub use files::{list_files, list_image_files};
 #[cfg(not(target_arch = "wasm32"))]
 pub use process::Process;
+#[cfg(not(target_arch = "wasm32"))]
+pub use link::Link;
+#[cfg(not(target_arch = "wasm32"))]
+pub use respawn::Respawn;
 pub use session::{Session, LOG_LENGTH};
 #[cfg(not(target_arch = "wasm32"))]
 pub use settings::file as settings_file;

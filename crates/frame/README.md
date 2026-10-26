@@ -103,6 +103,20 @@ first line on standard output is its manifest. Then the frame writes each event 
 input and reads its events from standard output, one object per line. Standard error goes to the
 console as log lines. A standard library is enough to write such a program.
 
+A Rust port's own program takes the other end with `Link::wait(&mut game, start)`. It prints
+the game's manifest, hands each event to the game's `Game` until `start` takes a launch from it
+(usually after `game.start`), and returns that launch with a `Link`. While the game runs, a
+thread reads the frame's events: `game.stop`, `frame.exit` or the frame closing its end sets
+`Link::stopping()`, which the game's loop checks as it checks its own quit. The game reports
+with `Link::status` and `Link::send`, and prints nothing else on standard output.
+
+A port that opens its own window with winit can make the window only once in a process, and on
+macOS the frame and the game each need the main thread. Such a port runs one game per program:
+`Respawn::spawn(program, args)` keeps one program answering the frame, gives it the first
+`game.start`, and starts a new program for each start after it, and for a start whose
+arguments changed (a disc added in the Library tab). `args` is a function, called again for
+each start. POD's and Hardwar's launchers run their games this way.
+
 **Config only.** `Configured::from_json` reads a `frame.json` with a manifest and the command that
 starts the game:
 

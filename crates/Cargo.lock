@@ -693,6 +693,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "gameframe-bitmap-font"
+version = "0.1.0"
+
+[[package]]
 name = "gameframe-disc-image"
 version = "0.1.0"
 

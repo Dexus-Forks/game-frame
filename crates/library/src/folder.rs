@@ -3,6 +3,7 @@
 //! `.library/state.json` and `.library/cards/NAME.json`; names that start with a dot are never
 //! listed.
 
+use crate::spec::Section;
 use crate::store::{check_name, Card, Entry, LocalFuture, State, Store};
 use std::fs;
 use std::io;
@@ -23,6 +24,44 @@ impl Folder {
     /// `game_source::Folder::new`.
     pub fn section_dir(&self, section: &str) -> PathBuf {
         self.root.join(section)
+    }
+
+    /// Fill a section from a folder the player already has, such as the game's own folder or
+    /// its saves, by hard links: nothing is copied, and the store counts a hard link as its own
+    /// file (a symbolic link it would not). Links each file the section accepts and `keep`
+    /// takes, unless the section has what it needs already: every required file, or with none
+    /// required, any file at all. Names already in the section are left alone. Returns how many
+    /// files were linked; a missing `from` links none. Both folders must be on one volume.
+    pub fn link_in(&self, section: &Section, from: &Path, keep: impl Fn(&str) -> bool) -> io::Result<usize> {
+        let have: Vec<String> = self.list_now(&section.id)?.into_iter().map(|e| e.name).collect();
+        let has = |name: &str| have.iter().any(|h| h.eq_ignore_ascii_case(name));
+        let ready = if section.required.is_empty() {
+            have.iter().any(|n| section.accepts(n))
+        } else {
+            section.required.iter().all(|r| has(&r.name))
+        };
+        if ready || !from.is_dir() {
+            return Ok(0);
+        }
+        let mut names: Vec<String> = Vec::new();
+        for item in fs::read_dir(from)? {
+            let item = item?;
+            let name = item.file_name().to_string_lossy().into_owned();
+            if !name.starts_with('.') && item.path().is_file() && section.accepts(&name) && keep(&name) {
+                names.push(name);
+            }
+        }
+        names.sort();
+        let dir = self.section_dir(&section.id);
+        fs::create_dir_all(&dir)?;
+        let mut linked = 0;
+        for name in names.iter().filter(|n| !has(n)) {
+            check_name(name)?;
+            fs::hard_link(from.join(name), dir.join(name))
+                .map_err(|e| io::Error::new(e.kind(), format!("{}: {e}", from.join(name).display())))?;
+            linked += 1;
+        }
+        Ok(linked)
     }
 
     fn hidden(&self, section: &str) -> PathBuf {

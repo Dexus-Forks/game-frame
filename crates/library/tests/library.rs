@@ -139,6 +139,31 @@ fn the_folder_store_keeps_files_where_the_player_can_see_them() {
 }
 
 #[test]
+fn a_section_is_linked_in_from_the_players_folder_once() {
+    let root = std::env::temp_dir().join(format!("gameframe-link-in-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&root);
+    let disc = root.join("disc");
+    std::fs::create_dir_all(&disc).unwrap();
+    for n in ["GAME.DAT", "LEVELS.PAK", "SETUP.EXE", "town.sav", ".hidden"] {
+        std::fs::write(disc.join(n), n).unwrap();
+    }
+    let s = spec();
+    let folder = Folder::new(root.join("library"));
+    let game = s.section("game").unwrap();
+    let all = |_: &str| true;
+    let linked = folder.link_in(game, &disc, |n| !n.ends_with(".bak")).unwrap();
+    assert_eq!(linked, 2, "the accepted files, not SETUP.EXE or the hidden one");
+    assert!(now(Library::new(spec(), Folder::new(root.join("library")), NoHooks).missing_game_data()).unwrap().is_empty());
+    assert_eq!(folder.link_in(game, &disc, all).unwrap(), 0, "a section with what it needs is left alone");
+    let saves = s.section("saves").unwrap();
+    assert_eq!(folder.link_in(saves, &disc, all).unwrap(), 1);
+    assert_eq!(std::fs::read(root.join("library/saves/town.sav")).unwrap(), b"town.sav");
+    assert_eq!(folder.link_in(saves, &disc, all).unwrap(), 0);
+    assert_eq!(folder.link_in(saves, &root.join("nowhere"), all).unwrap(), 0);
+    std::fs::remove_dir_all(&root).unwrap();
+}
+
+#[test]
 fn thumbnails_are_data_urls() {
     assert_eq!(data_url("image/png", b"Man"), "data:image/png;base64,TWFu");
     assert_eq!(data_url("a/b", b"Ma"), "data:a/b;base64,TWE=");
