@@ -82,45 +82,57 @@ For any function with arithmetic, random draws or many branches:
 This order is faster than porting first. A test against measured results shows the mistake in
 seconds. A difference that shows up later in a whole game run can take hours to trace back.
 
-## Optional local decision adviser
+## Choose a model provider
 
-`tools/llm/tev1.py` sends a bounded set of questions to a Tev1 model served by Ollama. Use it
-when an agent chooses to ask for a quick classification or evidence check. It supports a choice
-from options, a yes-or-no question, and a score against named levels. Install a model separately
-with `ollama pull tev1:4b`; the tool does not start Ollama or download a model.
+The model-powered tools use the shared `tools/llm/client.py` settings. They default to the local
+provider. Set `GAMEFRAME_LLM_ENDPOINT`, `GAMEFRAME_LLM_PROTOCOL` and the selected provider's
+model setting to choose a compatible endpoint, API and model. For a hosted handoff, set
+`GAMEFRAME_LLM_PROVIDER=anthropic` or `openai` and provide that provider's API key. Named
+providers use their standard endpoints and ignore `GAMEFRAME_LLM_ENDPOINT`, so a local endpoint
+can stay in `.env`. A saved API key alone does not switch the local default to a hosted API.
+Before running a hosted model or sending inference to a non-loopback endpoint, the tool requires
+a typed `yes`; it stops if no answer is available. Save provider models with `GAMEFRAME_LOCAL_MODEL`,
+`GAMEFRAME_ANTHROPIC_MODEL`, `GAMEFRAME_OPENAI_MODEL` or
+`GAMEFRAME_OPENAI_COMPATIBLE_MODEL`. `GAMEFRAME_MODEL` overrides the selected model for one run.
+See [model provider setup](api-credits.md#use-a-local-model).
 
-The default endpoint is `http://127.0.0.1:11434/v1/systemone`. The agent calls the tool only
-when useful, by passing a JSON request file to `./gameframe run tev1 REQUEST.json`. The
-request holds the state to judge and its questions. See the tool's `--help` for the full shape.
-Use a `none` option when no listed choice may fit. Keep state short because it is sent with
-every question.
+`ask.py`, `locate.py` and `name_functions.py` support both protocols. `locate.py` needs a vision
+model. `headless.py` and `skillcheck.py` run Claude Code's agent tool loop, so they need an
+Anthropic-compatible endpoint. The three local servers above provide that endpoint. OpenAI
+compatibility alone does not provide Claude Code's tool loop. See [model provider setup](api-credits.md#use-a-local-model).
 
-Tev1 is experimental and can be wrong. Its confidence measures how concentrated its answer
-probabilities are, not the chance that the answer is correct. Treat its output as advice. Check
-it against source evidence, emulator measurements and parity tests. See the
-[Ollama Tev1 model card](https://ollama.com/library/tev1) for API and model limits.
+## Generic decision tool
 
-### Keep corrections for this user
+`tools/llm/decision.py` sends bounded choice, yes-or-no and score questions to a user's selected
+decision model. It uses the server's native System One decision endpoint, which is separate from
+the chat API used by `ask.py`, `locate.py` and function naming. Configure
+`GAMEFRAME_DECISION_ENDPOINT` and `GAMEFRAME_DECISION_MODEL` for an independent route. If the
+endpoint is omitted in local mode, the tool derives `/v1/systemone` from `GAMEFRAME_LLM_ENDPOINT`.
+It does not pick a
+model, start a server, download one or switch to a paid service.
 
-When a person supplies a corrected answer, `tev1_feedback.py` can save it in that OS user's
+An agent may call it when a quick classification or evidence check is useful. The tool accepts a
+JSON request file and prints the server's answers. See `./gameframe tool decision` for the full
+request shape. Include a `none` choice when no option may fit. Keep state short because it is
+sent with every question. Treat answers as advice. Check them against source evidence, emulator
+measurements and parity tests. A model's confidence is not a measured chance that its answer is
+correct.
+
+### Keep this user's corrections
+
+When a person supplies a corrected answer, `decision_feedback.py` can save it in that OS user's
 private application-data folder. Corrections are never recorded automatically. The saved state
 can include project material, so only record an example the user wants to keep.
 
 ```bash
-./gameframe run tev1_feedback record request.json --question next_step --answer measure
-./gameframe run tev1_feedback export --output /path/to/tev1-training
+./gameframe run decision_feedback record request.json --question next_step --answer measure
+./gameframe run decision_feedback export --output /path/to/decision-training
 ```
 
-The export keeps the latest correction for an identical prompt. It groups repeated states
-together when it creates a validation split. Fewer than ten distinct states produce a training
-file without validation data. Exporting does not change model weights or upload data.
-
-The upstream [Tev1 training guide](https://github.com/togethercomputer/tev1/blob/main/docs/TRAINING.md)
-currently shows a billed Together job. We have not connected that cloud path. A local adapter
-needs a tested Qwen3.5 trainer and a serving path: Ollama's documented Safetensors adapter
-import does not list Qwen. See [Ollama's adapter support](https://docs.ollama.com/import). Until
-those pieces are verified, treat the exported examples as collected fine-tuning data, not as a
-fine-tuned model.
+The export keeps the latest correction for an identical prompt and groups repeated states when
+it creates a validation split. Fewer than ten distinct states produce a training file without
+validation data. Exporting prepares examples for a local trainer. It does not update model
+weights, upload data, install a trainer or start a paid training job.
 
 ## Work in subsystems
 

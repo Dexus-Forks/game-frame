@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Test per-user Tev1 corrections and the exported training set against sample-game evidence."""
+"""Test per-user decision corrections and the exported training set against sample-game evidence."""
 import json
 import os
 import subprocess
@@ -8,7 +8,7 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = ROOT / 'tools/llm/tev1_feedback.py'
+SCRIPT = ROOT / 'tools/llm/decision_feedback.py'
 
 
 def run(*args):
@@ -42,7 +42,7 @@ def main(sample_exe):
             },
         },
     }
-    with tempfile.TemporaryDirectory(prefix='gameframe-tev1-feedback-') as folder:
+    with tempfile.TemporaryDirectory(prefix='gameframe-decision-feedback-') as folder:
         root = Path(folder)
         ledger = root / 'user-profile'
         request_file = root / 'request.json'
@@ -51,7 +51,7 @@ def main(sample_exe):
         for question, answer in [('next_step', 'measure'), ('parity_proven', 'false'),
                                  ('evidence_level', '0'), ('next_step', 'trace')]:
             result = run('record', request_file, '--question', question, '--answer', answer,
-                         '--model', 'tev1:4b', *base)
+                         '--model', 'mock-decision-model', *base)
             assert result.returncode == 0, result.stderr
         if os.name != 'nt':
             assert (ledger / 'feedback.jsonl').stat().st_mode & 0o777 == 0o600
@@ -96,10 +96,10 @@ def main(sample_exe):
         assert invalid.returncode == 1 and 'answer must be one of' in invalid.stderr, invalid
         existing = run('export', '--output', full, *base)
         assert existing.returncode == 1 and 'already exists' in existing.stderr, existing
-    print('Tev1 feedback: explicit corrections, user-local file, dedupe, chat export, grouped holdout')
+    print('Decision feedback: explicit corrections, user-local file, dedupe, chat export, grouped holdout')
 
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        raise SystemExit('usage: tests/tev1_feedback.py SAMPLE_GAME_EXE')
+        raise SystemExit('usage: tests/decision_feedback.py SAMPLE_GAME_EXE')
     main(sys.argv[1])

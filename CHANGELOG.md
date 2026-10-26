@@ -9,14 +9,18 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
-- `tools/llm/tev1.py` optionally asks a local Ollama Tev1 model bounded choice, yes-or-no and
-  rubric questions. It defaults to localhost and is exposed through the existing tool catalog;
-  agents call it explicitly. Its answers are advisory and do not establish evidence or parity.
-- `tools/llm/tev1_feedback.py` stores a user's explicit Tev1 corrections in per-user local data
-  and exports chat-format training examples. It does not update weights or send data to a service.
+- `tools/llm/decision.py` routes bounded choice, yes-or-no and score questions to a user-selected
+  decision model through its native System One endpoint. `decision_feedback.py` stores explicit
+  user corrections locally and exports training examples. Neither tool selects a paid service,
+  changes model weights or uploads data.
 
 ### Changed
 
+- Model-powered tools now default to the local provider. `GAMEFRAME_LLM_ENDPOINT` can point to a
+  local or compatible endpoint; hosted services are selected by name with `GAMEFRAME_LLM_PROVIDER`
+  with provider-specific model and key settings. Hosted providers and remote endpoints require
+  confirmation before a request. Image location supports local vision models; function naming
+  uses synchronous calls where a server has no batch API.
 - The REA skill now documents how to check Ghidra provider readiness, open an explicit Ghidra
   session, inspect a native function and its raw instructions, retain the Evidence bundle, and
   close the temporary project. It separates focused REA analysis from whole-program Ghidra

@@ -10,11 +10,10 @@ Usage:
 
 It finds the entries with `gameframe advise`'s own search (tools/gameframe/advise.py: error
 signatures, facets, then words; GameFrame's entries and the project's), sends the best N
-whole, and asks Claude to answer from them alone, naming each entry it uses. When no entry
+whole, and asks the selected model to answer from them alone, naming each entry it uses. When no entry
 fits, the answer says so, and the question may be a new gap (re-land, "Know-how").
 
-One question costs one Messages API call with a few thousand tokens. It uses the API key
-(client.py).
+One question uses one call to the configured model API (client.py).
 
 What it does not do: search the web, the code or the docs outside docs/knowhow/. An answer
 is a pointer to entries: read the entry before you act on it.

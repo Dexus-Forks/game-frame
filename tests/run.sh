@@ -1633,14 +1633,14 @@ out="$("$PYTHON" tests/mcp_tool_coverage.py 2>&1)"
 [[ $? == 0 && "$out" == *"MCP coverage: 119 catalog entries, 97 runnable tools, progress/cancel/timeout"* ]] \
   && ok "the GameFrame MCP exposes every catalog entry and runs every program and script ($out)" \
   || bad "GameFrame MCP tool coverage" "$out"
-out="$("$PYTHON" tests/tev1_adapter.py "$B/game.exe" 2>&1)"
-[[ $? == 0 && "$out" == *"Tev1 adapter: sample PE evidence, choice/noul/score, input validation, mock Ollama"* ]] \
-  && ok "the optional Tev1 tool sends validated sample evidence to a local Ollama API ($out)" \
-  || bad "Tev1 adapter" "$out"
-out="$("$PYTHON" tests/tev1_feedback.py "$B/game.exe" 2>&1)"
-[[ $? == 0 && "$out" == *"Tev1 feedback: explicit corrections, user-local file, dedupe, chat export, grouped holdout"* ]] \
-  && ok "Tev1 keeps per-user corrections private and exports a grouped training set ($out)" \
-  || bad "Tev1 feedback export" "$out"
+out="$("$PYTHON" tests/decision_adapter.py "$B/game.exe" 2>&1)"
+[[ $? == 0 && "$out" == *"Decision adapter: bounded questions, explicit route/model/key, derived route, no paid fallback"* ]] \
+  && ok "the generic decision tool routes bounded questions to a selected local endpoint ($out)" \
+  || bad "decision model adapter" "$out"
+out="$("$PYTHON" tests/decision_feedback.py "$B/game.exe" 2>&1)"
+[[ $? == 0 && "$out" == *"Decision feedback: explicit corrections, user-local file, dedupe, chat export, grouped holdout"* ]] \
+  && ok "decision corrections stay per-user and export a grouped training set ($out)" \
+  || bad "decision feedback export" "$out"
 out="$("$PYTHON" - <<'PY' 2>&1
 import json, re, subprocess, tomllib
 src = json.load(open('.mcp.json'))['mcpServers']
@@ -1768,6 +1768,10 @@ else
 fi
 
 echo "API credit tools (tools/llm), against fake_api.py: nothing is sent"
+out="$("$PYTHON" tests/llm_protocols.py 2>&1)"
+[[ $? == 0 && "$out" == *"OpenAI-compatible calls: text, schema, images, synchronous naming, key isolation, hosted confirmation"* ]] \
+  && ok "model tools can route local and named hosted providers without sharing keys ($out)" \
+  || bad "OpenAI-compatible model client" "$out"
 if "$PYTHON" -c "import anthropic" 2>/dev/null; then
   L="$(mktemp -d)"
   "$PYTHON" tools/llm/fake_api.py serve "$L/port" & fake=$!
@@ -1776,7 +1780,7 @@ if "$PYTHON" -c "import anthropic" 2>/dev/null; then
   printf '401000\t40\tFUN_00401000\t\n401040\t60\tFUN_00401040\t\n401090\t8\tFUN_00401090\t\n' > "$L/analysis/export/demo.exe/functions.tsv"
   printf '// ==== 401000 FUN_00401000\nvoid FUN_00401000(void) { FUN_00401040("SAVE0001.DAT"); }\n// ==== 401040 FUN_00401040\nint FUN_00401040(char *p) { return fopen(p, "rb") != 0; }\n// ==== 401090 FUN_00401090\nvoid FUN_00401090(void) { }\n' > "$L/analysis/export/demo.exe/decomp.c"
   printf '402000\tSAVE0001.DAT\n' > "$L/analysis/export/demo.exe/strings.txt"
-  llm() { ANTHROPIC_BASE_URL="http://127.0.0.1:$(cat "$L/port")" ANTHROPIC_API_KEY=fake GAMEFRAME_NO_DOTENV=1 GAMEFRAME_PROJECT="$L" \
+  llm() { GAMEFRAME_LLM_ENDPOINT="http://127.0.0.1:$(cat "$L/port")" GAMEFRAME_LOCAL_LLM_API_KEY=fake GAMEFRAME_LLM_PROVIDER=local GAMEFRAME_LLM_PROTOCOL=anthropic GAMEFRAME_MODEL=claude-opus-5-5 GAMEFRAME_LLM_BATCHES=1 GAMEFRAME_NO_DOTENV=1 GAMEFRAME_PROJECT="$L" \
           GAMEFRAME_CLAUDE="$PYTHON $ROOT/tools/llm/fake_api.py claude" "$PYTHON" "$@"; }
   expect "name_functions prepare picks the unnamed functions above --min-size and sends nothing" "2 functions" llm tools/llm/name_functions.py prepare
   expect "name_functions puts a function's callers and strings in its request" 'Called by: FUN_00401000' grep -o 'Called by: FUN_00401000' "$L/analysis/llm/names/demo.exe/requests.jsonl"
@@ -1790,12 +1794,15 @@ if "$PYTHON" -c "import anthropic" 2>/dev/null; then
   expect "ask --show lists the entries and spends nothing" "wine-privileged-instruction" "$PYTHON" tools/llm/ask.py --show privileged instruction under wine
   expect "headless runs an agent and writes its report" "## re-decoder (done" env CLAUDECODE=1 CLAUDE_CODE_ENTRYPOINT=test bash -c "$(declare -f llm); L='$L' PYTHON='$PYTHON' ROOT='$ROOT'; llm tools/llm/headless.py re-decoder 'decode build/sample.dat' --dir '$L' >/dev/null; cat '$L'/analysis/llm/runs/*-re-decoder.md"
   expect "headless gives claude the prompt on stdin, without the calling session's CLAUDE* variables" "fake run: decode build/sample.dat; CLAUDE variables: 0" cat "$L"/analysis/llm/runs/*-re-decoder.md
+  expect "headless sends calls to the configured Anthropic-compatible endpoint" "Anthropic endpoint: http://127.0.0.1" cat "$L"/analysis/llm/runs/*-re-decoder.md
   expect "headless docs-check runs re-checker and re-editor" "## re-editor (done" bash -c "$(declare -f llm); L='$L' PYTHON='$PYTHON' ROOT='$ROOT'; llm tools/llm/headless.py docs-check docs/knowhow --report '$L/dc.md' >/dev/null; cat '$L/dc.md'"
   expect "skillcheck passes a skill whose answer holds the ground truth" "1 of 1 skills passed" env FAKE_ANSWER="1 0.5 oak
 2 1.25 birch
 3 2.0 pine" bash -c "$(declare -f llm); L='$L' PYTHON='$PYTHON' ROOT='$ROOT'; llm tools/llm/skillcheck.py --skill re-format"
   expect "skillcheck fails a skill whose answer misses it" "missing: 18467, 6334" env FAKE_ANSWER="41" bash -c "$(declare -f llm); L='$L' PYTHON='$PYTHON' ROOT='$ROOT'; llm tools/llm/skillcheck.py --skill re-emulate"
-  expect "the API tools refuse to run without a key" "ANTHROPIC_API_KEY is not set" env -u ANTHROPIC_API_KEY GAMEFRAME_NO_DOTENV=1 ANTHROPIC_BASE_URL=http://127.0.0.1:9 "$PYTHON" tools/llm/ask.py privileged instruction
+  expect "paid API use requires a key after choosing its provider" "Set GAMEFRAME_ANTHROPIC_API_KEY" env -u GAMEFRAME_ANTHROPIC_API_KEY -u GAMEFRAME_OPENAI_API_KEY -u GAMEFRAME_OPENAI_COMPATIBLE_API_KEY -u GAMEFRAME_LOCAL_LLM_API_KEY GAMEFRAME_LLM_PROVIDER=anthropic GAMEFRAME_NO_DOTENV=1 "$PYTHON" tools/llm/ask.py privileged instruction
+  expect "hosted providers require their named key; the generic key is not a fallback" "Set GAMEFRAME_ANTHROPIC_API_KEY" env -u GAMEFRAME_ANTHROPIC_API_KEY GAMEFRAME_LLM_API_KEY=legacy-key GAMEFRAME_LLM_PROVIDER=anthropic GAMEFRAME_NO_DOTENV=1 "$PYTHON" tools/llm/ask.py privileged instruction
+  expect "a saved hosted API key does not change the local provider" "Set GAMEFRAME_LLM_ENDPOINT to a model server" env -u GAMEFRAME_LLM_ENDPOINT GAMEFRAME_LLM_PROVIDER=local GAMEFRAME_ANTHROPIC_API_KEY=fake GAMEFRAME_NO_DOTENV=1 "$PYTHON" tools/llm/ask.py privileged instruction
   "$PYTHON" - "$L" <<'PY'
 import sys; sys.path.insert(0, 'tools/formats')
 from pngio import write_png
@@ -1804,10 +1811,10 @@ PY
   expect "locate --find gives an element's centre in the capture's pixels" "0 0   (fake_note)" llm tools/llm/locate.py "$L/shot.png" --find "the Exit button"
   llm tools/llm/locate.py "$L/shot.png" --ref "$L/shot.png" --save "$L/loc.json" >/dev/null
   expect "locate --ref saves a result align.py map reads" "0.0 0.0" "$PYTHON" tools/live/align.py map "$L/loc.json" 5 5
-  printf 'ANTHROPIC_API_KEY="from-dotenv"\n' > "$L/.env"
-  expect "client reads the key from the project's .env" "ANTHROPIC_API_KEY: set" env -u ANTHROPIC_API_KEY GAMEFRAME_PROJECT="$L" "$PYTHON" tools/llm/client.py
+  printf 'GAMEFRAME_LOCAL_LLM_API_KEY="from-dotenv"\nGAMEFRAME_LLM_ENDPOINT=http://127.0.0.1:9\nGAMEFRAME_LLM_PROVIDER=local\nGAMEFRAME_LLM_PROTOCOL=anthropic\nGAMEFRAME_LOCAL_MODEL=local-profile-model\nGAMEFRAME_MODEL=legacy-model\n' > "$L/.env"
+  expect "client reads the selected profile model from the project's .env" "model: local-profile-model" env -u GAMEFRAME_LOCAL_LLM_API_KEY -u GAMEFRAME_ANTHROPIC_API_KEY -u GAMEFRAME_LLM_ENDPOINT -u GAMEFRAME_LLM_PROVIDER -u GAMEFRAME_LLM_PROTOCOL -u GAMEFRAME_LOCAL_MODEL -u GAMEFRAME_MODEL GAMEFRAME_PROJECT="$L" "$PYTHON" tools/llm/client.py
   mkdir -p "$L/here" && printf 'GHIDRA_INSTALL_DIR=/x\n' > "$L/here/.env"
-  expect "client reads on past a .env without the key" "ANTHROPIC_API_KEY: set" bash -c "cd '$L/here' && env -u ANTHROPIC_API_KEY GAMEFRAME_PROJECT='$L' '$PYTHON' '$PWD/tools/llm/client.py'"
+  expect "client reads on past a .env without the key" "model: local-profile-model" bash -c "cd '$L/here' && env -u GAMEFRAME_LOCAL_LLM_API_KEY -u GAMEFRAME_ANTHROPIC_API_KEY -u GAMEFRAME_LLM_ENDPOINT -u GAMEFRAME_LLM_PROVIDER -u GAMEFRAME_LLM_PROTOCOL -u GAMEFRAME_LOCAL_MODEL -u GAMEFRAME_MODEL GAMEFRAME_PROJECT='$L' '$PYTHON' '$PWD/tools/llm/client.py'"
   kill $fake 2>/dev/null; rm -rf "$L"
 else
   echo "  skip  tools/llm (the anthropic package is missing: pip install -r requirements-llm.txt)"

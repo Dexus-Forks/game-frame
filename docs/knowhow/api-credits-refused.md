@@ -16,7 +16,7 @@ signatures:
   - 'Credit balance is too low'
   - 'does not support this model; version [0-9.]+ or newer is required'
   - 'must include the anthropic-workspace-id header'
-  - 'ANTHROPIC_API_KEY is not set'
+  - 'Set GAMEFRAME_ANTHROPIC_API_KEY'
 tools: [client, headless, skillcheck, name_functions, ask]
 skills: []
 docs: [docs/working/api-credits.md]
@@ -34,7 +34,7 @@ A tool in `tools/llm/` stops with one of these messages, and nothing is spent:
 - `Claude Code 2.1.190 does not support this model; version 2.1.280 or newer is required`.
 - `This API key is not scoped to a workspace, so this request must include the
   anthropic-workspace-id header`.
-- `ANTHROPIC_API_KEY is not set`.
+- `Set GAMEFRAME_ANTHROPIC_API_KEY for GAMEFRAME_LLM_PROVIDER=anthropic`.
 
 ## Cause
 
@@ -60,8 +60,9 @@ Pull GameFrame: since 2026-10-24, `client.py` leaves the `CLAUDE*` variables out
 it starts. Then fix whichever message remains.
 
 - An old `claude`: run `claude update`, or set `GAMEFRAME_CLAUDE` to a newer `claude`.
-- No workspace: create the key in a workspace, or put `ANTHROPIC_WORKSPACE_ID=...` in `.env`.
-- No key: put `ANTHROPIC_API_KEY=...` in the project's `.env`.
+- No workspace: create the key in a workspace, or put `GAMEFRAME_ANTHROPIC_WORKSPACE_ID=...` in `.env`.
+- No key: put `GAMEFRAME_ANTHROPIC_API_KEY=...` in the project's `.env`, then select the service with
+  `GAMEFRAME_LLM_PROVIDER=anthropic` for the task.
 - Check the setup with `./gameframe run tools/llm/client.py`.
 
 ## Tried
