@@ -39,9 +39,25 @@ Every release of GameFrame, newest first. The format follows
   `Store::write_file` take a `web_sys::File`; `Library::file` and `Store::file` give one back.
   The game's hooks see the first 1 MiB of a big file. The frame's Library tab adds files this
   way in the browser.
+- The GameFrame home, `~/gameframe` or `$GAMEFRAME_HOME`, outside every clone. It holds
+  `config.env` (machine-wide settings, read before a project's `.env`), the shared Python in
+  `python/`, `tools/`, `emulators/`, `machines/`, `drivers/`, `games/ID/`, `projects/ID/`,
+  `worktrees/`, `cache/` and `data/`. `gameframe home init` makes it, `gameframe home doctor`
+  checks it, and `gameframe home` lists it.
+- `gameframe game add ID FILE` keeps a disc image or installer in `games/ID/media/`, records
+  its SHA-256 in `game.json` and extracts it into `games/ID/game/`. `gameframe game link ID
+  PROJECT` links a project's `game`, `media`, `saves`, `analysis` and `derived` into the home.
+  `gameframe home adopt PROJECT --id ID` moves an older project's folders there and leaves a
+  link at each old name. It keeps a folder that git tracks files in.
+- The launcher reads a game from a disc image. `frame.json` takes `"image"`, file lists come
+  from the ISO 9660 volume (`list_image_files`), and `{image}` and `{folder}` in the arguments
+  become absolute paths.
 
 ### Changed
 
+- A project's game folder is `game/`, a link into the home. `target/` still works for older
+  projects, and the gates protect both. `scripts/new-project.sh NAME` with no slash makes the
+  project in `projects/NAME`, and `--local` keeps real folders in the project instead.
 - The README lists the tools most projects start with, by step of the method, and links to the
   site's tools page, which is built from each tool's own help. `./gameframe tools` lists them all.
 - A site's day post no longer replaces that day's live entries. The live entries stay, the day

@@ -22,7 +22,7 @@ and recharge under lights, so light is game logic; two factions hold water and f
 economy is the core; the altitude ceiling depends on the power cell; the plot seals tunnels,
 so the save holds them (`docs/working/lore.md`).
 
-- List the program's sentences: `./gameframe run sentences target/GAME.EXE > analysis/notes/sentences.txt`.
+- List the program's sentences: `./gameframe run sentences game/GAME.EXE > analysis/notes/sentences.txt`.
 - Write `docs/lore.md` from the project template, with the table "in the story → in the code →
   evidence" (`re-inventory`, "Read the story").
 - When a constant or a system has no reason, read the lore again before guessing.

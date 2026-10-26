@@ -62,7 +62,7 @@ finds them in the game and writes a labels file:
 
 ```bash
 python3 tools/dos/omf.py BC31/LIB/CL.LIB --sigs > derived/bc31-large.sigs
-python3 tools/triage/sigscan.py scan derived/bc31-large.sigs target/GAME.EXE --labels derived/runtime.tsv
+python3 tools/triage/sigscan.py scan derived/bc31-large.sigs game/GAME.EXE --labels derived/runtime.tsv
 scripts/ghidra-run.sh GAME.EXE labels analysis/notes/runtime.txt derived/runtime.tsv
 ```
 

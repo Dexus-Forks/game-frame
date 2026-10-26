@@ -1,12 +1,19 @@
 # Never commit the game, anything derived from it, or decompiled code.
-# The original game's binaries and data files (your own copy):
-/target/
-# Build output (Cargo builds here, see .cargo/config.toml; never in target/):
-/build/
+# game, media, saves, analysis and derived are links into the GameFrame home (games/ID/), or folders
+# in a --local project. No trailing slash: a link is not a folder to git.
+# The original game's files (your own copy), and the discs and installers they came from:
+/game
+/media
+# Save files:
+/saves
 # Ghidra projects, exports, decompiled code, one-off dumps:
-/analysis/
+/analysis
 # Emulator ground truth, extracted assets, captures:
-/derived/
+/derived
+# Build output (Cargo builds here, see .cargo/config.toml):
+/build/
+# The older name for the game folder:
+/target/
 *.sav
 .venv/
 .env

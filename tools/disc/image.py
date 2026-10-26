@@ -3,7 +3,7 @@
 BIN without a sheet, or a plain ISO.
 
     from image import open_image
-    disc = open_image('target/cd/GAME.CUE')
+    disc = open_image('media/GAME.CUE')
     for t in disc.tracks: print(t.number, t.mode, t.lba, t.frames)
     data = disc.tracks[0].read(16)            # 2048 bytes of user data from sector 16
 

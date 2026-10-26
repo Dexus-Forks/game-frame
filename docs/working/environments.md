@@ -66,15 +66,44 @@ one:
 source ~/code/game-frame/scripts/env.sh
 ```
 
-It sets `GAMEFRAME_ROOT`, loads `.env`, exports `GHIDRA_INSTALL_DIR` and `JAVA_HOME`, and puts
+It sets `GAMEFRAME_ROOT` and `GAMEFRAME_HOME`, loads the home's `config.env` and then `.env`, exports `GHIDRA_INSTALL_DIR` and `JAVA_HOME`, and puts
 `gameframe` and the `.venv` Python first on `PATH`. The scripts load `.env` themselves, so
 this matters for commands typed by hand and for agents.
+
+## The GameFrame home
+
+GameFrame keeps one folder per machine outside every clone: `~/gameframe`, or the folder in
+`GAMEFRAME_HOME`. `./gameframe home init` makes it, and `./gameframe home doctor` checks it.
+
+| Folder | What |
+|---|---|
+| `config.env` | Settings for every project: `GAMEFRAME_ROOT`, `GHIDRA_INSTALL_DIR`, `JAVA_HOME`, `DOSBOX_X_BINARY`, the LLM endpoints |
+| `python/` | The shared Python environment for the toolkit |
+| `tools/`, `emulators/`, `drivers/` | Programs, ROM sets and period drivers that every game shares |
+| `machines/` | Virtual machines, one folder each. `machines/os/` holds the operating system images |
+| `games/ID/` | One game's files: `media/` (the discs as they came), `game/` (extracted or installed), `saves/`, `analysis/`, `derived/`, and `game.json` with each image's SHA-256 |
+| `projects/ID/` | The game's git repository |
+| `worktrees/` | GameFrame worktrees made by hand |
+| `cache/` | Downloads and scratch files. Safe to delete |
+| `data/` | What tools keep between runs |
+
+Settings are read in this order: the home's `config.env`, then the project's `.env`. The later
+one wins, so a project's `.env` holds only what differs. Both replace a value inherited from the
+environment.
+
+A project's `game`, `media`, `saves`, `analysis` and `derived` are links into `games/ID/`, and
+its `.gitignore` names them. `./gameframe game link ID .` makes them, in a git worktree too.
+`./gameframe game add ID FILE` adds a disc image or installer and extracts it into `game/`. An
+older project with real `target/`, `game-data/`, `save-game/` or `truth/` folders moves them with
+`./gameframe home adopt PROJECT --id ID`. It leaves a link at each old name, so paths in the
+project's code and documents keep working, and it keeps any folder git tracks files in.
 
 ## One GameFrame checkout
 
 Keep one checkout of GameFrame on a machine: the clone of https://github.com/tanepiper/game-frame
 that you change, test and push. Every game project uses it. A project made by
-`scripts/new-project.sh` names it in its `.env` (git-ignored):
+`scripts/new-project.sh` finds it through `GAMEFRAME_ROOT` in the home's `config.env`, or in its
+own `.env` (git-ignored):
 
 ```bash
 GAMEFRAME_ROOT=~/code/game-frame
@@ -90,7 +119,7 @@ To change GameFrame from a game's session, work in a git worktree of that one ch
 there, and merge into its `main`:
 
 ```bash
-git -C "$(./gameframe root)" worktree add ../game-frame-NAME -b NAME
+git -C "$(./gameframe root)" worktree add ~/gameframe/worktrees/NAME -b NAME
 ```
 
 Do not make a second clone for a game. Its work and the main checkout drift apart, a project
@@ -133,7 +162,7 @@ licence and the provider's terms allow it.
 - Keep the game's files, extracted assets, decompiled code and analysis output outside every
   git checkout.
 - `scripts/new-project.sh DIR "Name"` without a game path creates the project and copies no
-  game files. Put the game's files in the project's ignored `target/` folder only where you are
+  game files. Put the game's files in the project's ignored `game/` folder only where you are
   allowed to.
 - Each cloud task usually runs in its own copy, so a git worktree is rarely needed.
 

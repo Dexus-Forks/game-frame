@@ -12,7 +12,7 @@
 <path d="M182.0 150.0L226.0 150.0" stroke="#8fa9a5" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
 <rect x="450.0" y="80.0" width="200.0" height="56.0" rx="6" fill="#f59e0b" stroke="none" fill-opacity="0.22"/>
 <text x="550.0" y="106.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#e2ece9" text-anchor="middle">game material?</text>
-<text x="550.0" y="123.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="middle">target/, derived/, saves</text>
+<text x="550.0" y="123.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="middle">game/, derived/, saves</text>
 <path d="M392.0 150.0L446.0 108.0" stroke="#8fa9a5" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
 <rect x="450.0" y="150.0" width="200.0" height="56.0" rx="6" fill="#f59e0b" stroke="none" fill-opacity="0.22"/>
 <text x="550.0" y="176.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#e2ece9" text-anchor="middle">decompiled code?</text>

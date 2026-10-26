@@ -36,9 +36,9 @@ the 3D model tables (`apps/viewer` in https://github.com/tanepiper/frontier-deco
 The catalogue needs no code beyond the decoders written for `validate.py`:
 
 ```bash
-python3 tools/formats/catalog.py target/game derived/catalog \
+python3 tools/formats/catalog.py game derived/catalog \
     --decoder '*.dat=decoders/units.py' --decoder '*.pic=decoders/picture.py' \
-    --palette target/game/GAME.PAL
+    --palette game/GAME.PAL
 open derived/catalog/index.html
 ```
 

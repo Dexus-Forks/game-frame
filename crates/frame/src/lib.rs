@@ -37,7 +37,7 @@ pub use manifest::{capabilities, Choice, Control, Grade, Kind, Manifest, Options
 #[cfg(not(target_arch = "wasm32"))]
 pub use configured::{Configured, FrameFile, StartCommand};
 #[cfg(not(target_arch = "wasm32"))]
-pub use files::list_files;
+pub use files::{list_files, list_image_files};
 #[cfg(not(target_arch = "wasm32"))]
 pub use process::Process;
 pub use session::{Session, LOG_LENGTH};

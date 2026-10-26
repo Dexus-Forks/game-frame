@@ -81,7 +81,7 @@ same pseudocode once addresses are removed, shared pieces of pseudocode, and the
 calls from matched functions. Then it writes your labels at the new addresses:
 
 ```bash
-scripts/ghidra-export.sh --out analysis/export-v12 target/v12/game.exe
+scripts/ghidra-export.sh --out analysis/export-v12 game/v12/game.exe
 python3 tools/triage/match_functions.py analysis/export/game.exe analysis/export-v12/game.exe \
     --labels labels/names.tsv --out labels/names-v12.tsv
 ```

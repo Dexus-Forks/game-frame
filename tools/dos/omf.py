@@ -15,7 +15,7 @@ bytes the linker changes when it places the code. The fixups mark exactly the by
 as wildcards, so a signature made from a library is precise.
 
     python3 tools/dos/omf.py BC31/LIB/CL.LIB --sigs > derived/borland-cl.sigs
-    python3 tools/triage/sigscan.py scan derived/borland-cl.sigs target/GAME.EXE --labels derived/runtime.tsv
+    python3 tools/triage/sigscan.py scan derived/borland-cl.sigs game/GAME.EXE --labels derived/runtime.tsv
 
 Use the library of the same compiler, version and memory model as the game (re-inventory,
 tools/dos/dosinfo.py, names the compiler). The libraries come with the compiler: use your own

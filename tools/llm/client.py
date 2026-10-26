@@ -53,12 +53,14 @@ KEYS = ('GAMEFRAME_LLM_ENDPOINT', 'GAMEFRAME_LLM_PROVIDER', 'GAMEFRAME_LLM_PROTO
 
 
 def load_env():
-    """Read model settings from current, project and GameFrame .env files when unset."""
+    """Read model settings from current, project and GameFrame .env files, then the GameFrame
+    home's config.env, when unset."""
     if os.environ.get('GAMEFRAME_NO_DOTENV'):
         return
     seen = set()
-    for folder in (os.getcwd(), PROJECT, ROOT):
-        path = os.path.join(folder, '.env')
+    home = os.path.expanduser(os.environ.get('GAMEFRAME_HOME') or '~/gameframe')
+    paths = [os.path.join(f, '.env') for f in (os.getcwd(), PROJECT, ROOT)] + [os.path.join(home, 'config.env')]
+    for path in paths:
         if os.path.realpath(path) in seen or not os.path.exists(path):
             continue
         seen.add(os.path.realpath(path))

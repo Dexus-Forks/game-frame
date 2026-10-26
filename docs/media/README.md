@@ -34,5 +34,5 @@ In my GameFrame project, find out what the game came on and what each of its fil
    and mark the ones that look compressed, encrypted or packed.
 4. Record the hashes of every file (tools/triage/compare_trees.py --hashes) and where the copy
    came from, as docs/working/evidence.md describes.
-5. Write it all in docs/FINDINGS.md. Commit nothing from target/, analysis/ or derived/.
+5. Write it all in docs/FINDINGS.md. Commit nothing from game/, analysis/ or derived/.
 ```

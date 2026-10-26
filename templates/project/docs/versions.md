@@ -3,7 +3,7 @@
 Every edition of the game known to this project, how they differ, and which one is the
 reference. List them before deep work: a newer edition found late costs the work again
 (GameFrame's `docs/working/versions.md`). Game files stay out of git: keep each edition in its
-own folder under `target/` (`target/first`, `target/gold`).
+own folder under `game/` (`game/first`, `game/gold`).
 
 ## Editions
 
@@ -23,7 +23,7 @@ own folder under `target/` (`target/first`, `target/gold`).
 ## Build identity
 
 What each copy says about its own version, written by
-`tools/triage/buildid.py target/EDITION --name EDITION --write docs/versions.md`: the disc's
+`tools/triage/buildid.py game/EDITION --name EDITION --write docs/versions.md`: the disc's
 mastering date, each executable's link date and VERSIONINFO, version strings in the code, and
 version lines in the readme and setup files.
 

@@ -7,6 +7,17 @@ scripts/setup.sh --install   # Ghidra, JDK 21, objdump, Node, Zig; .venv with un
 tests/run.sh --ghidra        # proves every tool against the sample game (~1½ min)
 ```
 
+Then make the GameFrame home, the folder outside this clone that holds the games, the
+projects, the machines and the shared Python:
+
+```bash
+./gameframe home init        # ~/gameframe, or $GAMEFRAME_HOME; writes config.env and python/
+./gameframe home doctor      # checks the folders, config.env, each game and each project
+```
+
+The folders and the order settings are read in are in
+[the GameFrame home](working/environments.md#the-gameframe-home).
+
 `scripts/setup.sh` without options only checks and prints a table. The details (sizes,
 Linux and Windows, REA registration for each agent, common problems) are in the `re-setup`
 skill: [skills/re-setup/SKILL.md](../skills/re-setup/SKILL.md).

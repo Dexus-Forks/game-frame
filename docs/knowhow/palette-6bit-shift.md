@@ -39,6 +39,6 @@ For a pixel-exact interface the port's palette code must use the original's rule
 the palette's format document.
 
 ```bash
-./gameframe run catalog target/game derived/catalog --palette PAL --palette-offset 4 --dac shift
+./gameframe run catalog game derived/catalog --palette PAL --palette-offset 4 --dac shift
 ./gameframe run rawimage dump.bin frame.png --mode linear8 --palette PAL --dac shift
 ```

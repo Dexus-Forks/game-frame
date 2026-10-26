@@ -8,8 +8,8 @@ page covers every DOS step. The skills link here. The tools are tested against
 ## 1. Which kind of DOS program is it?
 
 ```bash
-python3 tools/dos/dosinfo.py target/GAME.EXE              # format, segments, imports, fingerprints
-python3 tools/dos/dosinfo.py target/GAME.EXE --pstrings 6 # Pascal strings, with their addresses
+python3 tools/dos/dosinfo.py game/GAME.EXE              # format, segments, imports, fingerprints
+python3 tools/dos/dosinfo.py game/GAME.EXE --pstrings 6 # Pascal strings, with their addresses
 ```
 
 | dosinfo says | What it is | Ghidra | Emulate one function | Run it all |
@@ -76,11 +76,11 @@ and many shipped games kept them. They give the original names of every procedur
 the parameters and locals of each procedure, record layouts, and code-to-source-line maps.
 
 ```bash
-python3 tools/dos/tdinfo.py target/GAME.EXE summary          # units, counts
-python3 tools/dos/tdinfo.py target/GAME.EXE procs makeenemy  # address, size, parameters, locals
-python3 tools/dos/tdinfo.py target/GAME.EXE types enemy      # record fields with offsets
-python3 tools/dos/tdinfo.py target/GAME.EXE labels > analysis/td-labels.tsv
-scripts/ghidra-export.sh --labels analysis/td-labels.tsv target/GAME.EXE
+python3 tools/dos/tdinfo.py game/GAME.EXE summary          # units, counts
+python3 tools/dos/tdinfo.py game/GAME.EXE procs makeenemy  # address, size, parameters, locals
+python3 tools/dos/tdinfo.py game/GAME.EXE types enemy      # record fields with offsets
+python3 tools/dos/tdinfo.py game/GAME.EXE labels > analysis/td-labels.tsv
+scripts/ghidra-export.sh --labels analysis/td-labels.tsv game/GAME.EXE
 ```
 
 With `--labels`, Ghidra names every function and global, and creates the functions it missed.
@@ -191,7 +191,7 @@ up to its size (a variant record), so check one offset in the code before relyin
 ```python
 import sys; sys.path.insert(0, 'tools/emu')
 from dos_emu import DosEmu, Long, FarPtr
-emu = DosEmu('target/GAME.EXE')               # NE: protected mode with Ghidra's selectors
+emu = DosEmu('game/GAME.EXE')               # NE: protected mode with Ghidra's selectors
 emu.call('1000:873a', 5, Long(100000))         # Pascal order; returns AX (call_long: DX:AX)
 emu.u16(FarPtr(0x1048, 0x12de))                # read a global after the call
 emu.trace({'1040:0a12': 'Random'}, args=1)     # record calls (the random draws) with call sites
@@ -215,8 +215,8 @@ Pascal 7 DPMI16 program can start and run, with no DOSBox and no window:
 ```python
 from dos_emu import DosEmu, ProgramStopped
 from dos_env import DosEnv
-emu = DosEmu('target/game/GAME.EXE', max_steps=2_000_000_000)
-env = DosEnv(emu, root='target/game', overlay='derived/run', program='C:\\GAME\\GAME.EXE')
+emu = DosEmu('game/GAME.EXE', max_steps=2_000_000_000)
+env = DosEnv(emu, root='game', overlay='derived/run', program='C:\\GAME\\GAME.EXE')
 emu.run_range(emu.entry, '1000:ca59')            # start-up, until the main loop
 env.save_screen('derived/run/frame.png')         # VGA memory + the DAC palette
 emu.run_to('1000:ca59')                          # the next frame: carry on as it is
@@ -261,9 +261,9 @@ cask fails Gatekeeper). Homebrew's build has the heavy debugger (CPU logs, memor
 `SAVESTATE`).
 
 ```bash
-scripts/dosbox-run.sh target/game GAME.EXE                   # no window; prints the exit code
-scripts/dosbox-run.sh --fileio --time 20 target/game GAME.EXE
-python3 tools/dos/fileio_trace.py analysis/dosbox/dosbox.log --game target/game
+scripts/dosbox-run.sh game GAME.EXE                   # no window; prints the exit code
+scripts/dosbox-run.sh --fileio --time 20 game GAME.EXE
+python3 tools/dos/fileio_trace.py analysis/dosbox/dosbox.log --game game
 ```
 
 - The game runs on a fresh copy of its folder (`analysis/dosbox/drive`), so saves and settings

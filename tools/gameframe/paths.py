@@ -15,7 +15,8 @@ SCRIPTS = ROOT / 'scripts'
 
 
 def python():
-    """The Python that runs the tools: $PYTHON, else GameFrame's .venv, else this one.
+    """The Python that runs the tools: $PYTHON, else GameFrame's .venv, else the home's shared
+    python/, else this one.
 
     Returns (path, note). The note says why when the .venv is missing, or is ''.
     """
@@ -24,9 +25,12 @@ def python():
     venv = ROOT / '.venv' / 'bin' / 'python'
     if venv.exists():
         return str(venv), ''
+    shared = Path(os.environ.get('GAMEFRAME_HOME') or '~/gameframe').expanduser() / 'python' / 'bin' / 'python'
+    if shared.exists():
+        return str(shared), ''
     return sys.executable, (f'{NAME}: no .venv here; using {sys.executable}. '
                             'Tools that need unicorn, pefile or capstone will fail: '
-                            'run scripts/setup.sh --install.')
+                            'run scripts/setup.sh --install or gameframe home init.')
 
 
 def rel(path):

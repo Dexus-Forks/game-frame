@@ -1,12 +1,17 @@
 # Shared settings for the scripts: where Ghidra, Java and the Python environment are.
-# Override any of them in the environment, or in a `.env` file at the project's root.
+# They are read from the GameFrame home's config.env ($GAMEFRAME_HOME, ~/gameframe), then from
+# a `.env` file at the project's root, which wins. Both replace what the environment holds, so a
+# script that inherits GameFrame's own settings still gets the project's.
 # ROOT is GameFrame (a clone or the plugin's install). PROJECT is the game's project, where the
 # scripts write: the project's own `gameframe` launcher sets GAMEFRAME_PROJECT. In GameFrame
 # itself, or in a project that holds a copy of the toolkit, the two are the same folder.
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROJECT="${GAMEFRAME_PROJECT:-$ROOT}"
-if [[ -f "$PROJECT/.env" ]]; then set -a; . "$PROJECT/.env"; set +a
-elif [[ -f "$ROOT/.env" ]]; then set -a; . "$ROOT/.env"; set +a; fi
+GAMEFRAME_HOME="${GAMEFRAME_HOME:-$HOME/gameframe}"
+load_env() { set -a; . "$1"; set +a; }
+[[ -f "$GAMEFRAME_HOME/config.env" ]] && load_env "$GAMEFRAME_HOME/config.env"
+if [[ -f "$PROJECT/.env" ]]; then load_env "$PROJECT/.env"
+elif [[ -f "$ROOT/.env" ]]; then load_env "$ROOT/.env"; fi
 
 find_ghidra() {
   for d in "${GHIDRA_INSTALL_DIR:-}" /opt/homebrew/opt/ghidra/libexec /usr/local/opt/ghidra/libexec \
@@ -25,6 +30,7 @@ find_java21() {
 if [[ -z "${PYTHON:-}" ]]; then
   PYTHON="$PROJECT/.venv/bin/python"
   [[ -x "$PYTHON" ]] || PYTHON="$ROOT/.venv/bin/python"
+  [[ -x "$PYTHON" ]] || PYTHON="$GAMEFRAME_HOME/python/bin/python"
 fi
 
 # A folder path for a Ghidra project that Ghidra accepts. Ghidra refuses project paths with a

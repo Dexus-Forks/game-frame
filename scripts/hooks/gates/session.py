@@ -10,8 +10,12 @@ def context(root, gameframe):
     env = os.path.join(root, '.env')
     copy = os.path.exists(os.path.join(root, 'tools', 'pe', 'peinfo.py'))
     setup = 'scripts/setup.sh' if copy else './gameframe doctor'
-    facts.append('.env present' if os.path.exists(env) else f'no .env: run {setup}')
+    home = os.path.expanduser(os.environ.get('GAMEFRAME_HOME') or '~/gameframe')
+    config = os.path.join(home, 'config.env')
+    facts.append('.env present' if os.path.exists(env) else
+                 f'settings from {config}' if os.path.exists(config) else f'no .env: run {setup}')
     facts.append('.venv present' if os.path.isdir(os.path.join(root, '.venv')) else
+                 f'Python from {home}/python' if os.path.isdir(os.path.join(home, 'python')) else
                  f'no .venv: run {setup} --install')
     if os.path.isdir(os.path.join(root, 'analysis', 'export')):
         facts.append('Ghidra export present in analysis/export')

@@ -20,7 +20,7 @@ that possible. They cost little at the start of a project. They are hard to add 
 ## Keep the original unchanged
 
 - Keep the installer, the image or the downloaded files as they came, and work on a copy in
-  `target/`. Make the original read-only (`chmod -R a-w`).
+  `game/`. Make the original read-only (`chmod -R a-w`).
 - Never patch the copy you analyse. When a test needs a patched program, make a second copy,
   and record the patch and its reason.
 - Write everything the tools produce into ignored folders (`analysis/`, `derived/`). Then the game's own files stay as they were. A hash check shows it.

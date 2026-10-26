@@ -51,8 +51,9 @@ These rules are for changes to GameFrame itself, which is a public repository.
    (unicorn, pefile, capstone). Shell scripts use bash and the tools `scripts/setup.sh` installs.
 8. **Improve GameFrame from real games.** When a game project hits something generic (a
    tool crash, a missing format, a pitfall), fix it here with a test against our own samples. Keep the game-specific part in the game's repository.
-   This checkout is the only GameFrame on the machine. Every project pins it with
-   `GAMEFRAME_ROOT` in its `.env`, and a game's session changes GameFrame in a git worktree of
+   This checkout is the only GameFrame on the machine. The GameFrame home (`~/gameframe`, outside
+   this clone) names it with `GAMEFRAME_ROOT` in `config.env`, and a project's `.env` may pin
+   another, and a game's session changes GameFrame in a git worktree of
    it, never in a second clone ([docs/working/environments.md](docs/working/environments.md)).
 9. **Two licences.** Code is Apache 2.0 (`LICENSE-APACHE`); documentation, skills and other
    prose are CC0 1.0, dedicated to the public domain (`LICENSE-CC0-1.0`). A new file takes the licence of its kind; the
@@ -67,7 +68,7 @@ These rules are for changes to GameFrame itself, which is a public repository.
 | `agents/re-*.md` | One agent per stage and twelve task agents, which hand off to each other (`.claude/agents` links here). `gameframe agents --emit all` writes their copies for Codex, Gemini CLI, Copilot and OpenCode (`.codex/agents`, `.gemini/agents`, `.github/agents`, `.opencode/agents`); never edit those |
 | `.claude/settings.json`, `scripts/hooks/gate.py`, `scripts/hooks/gates/`, `scripts/hooks/git/pre-commit`, `hooks/hooks.json`, `.codex/hooks.json`, `.cursor/hooks.json`, `.github/hooks/gameframe.json`, `hooks/gemini-settings.json` | Permissions and the gates: the git pre-commit hook, and hooks for Claude Code, Codex, Gemini CLI, Cursor and Copilot: [docs/working/gates.md](docs/working/gates.md) |
 | `.claude-plugin/` | The Claude Code plugin and its marketplace: the skills and the agents |
-| `gameframe`, `tools/gameframe/` | The help and discovery command. It reads the skills and each tool's own help, so a new tool needs no entry there |
+| `gameframe`, `tools/gameframe/` | The help and discovery command. It reads the skills and each tool's own help, so a new tool needs no entry there. `home.py` and `games.py` are the GameFrame home (`gameframe home`, `gameframe game`) |
 | `scripts/` | setup, new-project, update-project, ghidra-export, ghidra-run, `clients.py` (the files each coding agent needs in a project), `release.py` (cut a release, then open the next `-dev` version), and `lib.sh` (paths and `.env`) |
 | `tools/disc`, `tools/pe`, `tools/dos`, `tools/triage`, `tools/emu`, `tools/formats`, `tools/verify`, `tools/ghidra` | The tools |
 | `templates/project/` | What `new-project.sh` writes into a game's repository |

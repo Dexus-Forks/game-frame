@@ -94,7 +94,7 @@ frame after frame. For a DOS program, `tools/emu/fragments.py` does it in one he
 (dos_emu + dos_env):
 
 ```bash
-.venv/bin/python tools/emu/fragments.py target/game/GAME.EXE derived/fragments 2000 \
+.venv/bin/python tools/emu/fragments.py game/GAME.EXE derived/fragments 2000 \
   'events=1000:2a14-1000:2a40,changed=0c20' 'draw=1000:2b00-1000:2b9e|1000:2bc4,every=5,max=200,heap=1' \
   --frame-top 1000:2a10 --screen 0a40 --display 0a42 --heap 0a50,0a54
 ```

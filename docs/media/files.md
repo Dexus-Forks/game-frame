@@ -52,8 +52,8 @@ size. `--colour entropy` colours by entropy instead. `--layout hilbert` keeps ne
 bytes together, so each region of the file is a patch.
 
 ```bash
-python3 tools/triage/binview.py target/data/level1.dat derived/level1.png --width 24
-python3 tools/triage/binview.py target/GAME.EXE derived/game.png --layout hilbert --colour entropy
+python3 tools/triage/binview.py game/data/level1.dat derived/level1.png --width 24
+python3 tools/triage/binview.py game/GAME.EXE derived/game.png --layout hilbert --colour entropy
 ```
 
 The [file explorer](https://tanepiper.github.io/game-frame/lab/files) does the same in the
@@ -71,7 +71,7 @@ straight. The [pixel explorer](https://tanepiper.github.io/game-frame/lab/pixels
 interactively.
 
 ```bash
-python3 tools/formats/rawimage.py target/data/TITLE.SCR derived/title.png --mode linear8 --palette target/data/GAME.PAL
+python3 tools/formats/rawimage.py game/data/TITLE.SCR derived/title.png --mode linear8 --palette game/data/GAME.PAL
 python3 tools/formats/rawimage.py derived/vga-planes.bin derived/frame.png --mode modex --palette derived/dac.bin
 ```
 
@@ -131,7 +131,7 @@ generator, the first entries of a CRC table, the start values of MD5, the 4078-b
 start of the common LZSS decompressor. `tools/triage/constants.py` searches for them:
 
 ```bash
-python3 tools/triage/constants.py target/GAME.EXE
+python3 tools/triage/constants.py game/GAME.EXE
 ```
 
 A hit names the algorithm and gives the address. `tools/triage/tables.py` finds the sine and
@@ -148,9 +148,9 @@ icons, bitmaps, and data the developer packed in as `RCDATA`. `tools/pe/peres.py
 prints the version information and the string tables, and extracts each one:
 
 ```bash
-python3 tools/pe/peres.py target/GAME.EXE                     # every resource, and the version
-python3 tools/pe/peres.py target/GAME.EXE --strings           # the string tables, with their ids
-python3 tools/pe/peres.py target/GAME.EXE --extract derived/resources
+python3 tools/pe/peres.py game/GAME.EXE                     # every resource, and the version
+python3 tools/pe/peres.py game/GAME.EXE --strings           # the string tables, with their ids
+python3 tools/pe/peres.py game/GAME.EXE --extract derived/resources
 ```
 
 The ids in a string table are the numbers the code passes to `LoadString`. Search the export
@@ -167,9 +167,9 @@ that shows no readable text is a candidate. So is a file whose bytes are full of
 value other than zero, because XOR turns zeros into the key.
 
 ```bash
-python3 tools/formats/xorscan.py target/data/script.dat
-python3 tools/formats/xorscan.py target/data/sound.dat --known 52494646@0     # "RIFF" at 0
-python3 tools/formats/xorscan.py target/data/script.dat --apply xor-key:1f2e3d -o derived/script.txt
+python3 tools/formats/xorscan.py game/data/script.dat
+python3 tools/formats/xorscan.py game/data/sound.dat --known 52494646@0     # "RIFF" at 0
+python3 tools/formats/xorscan.py game/data/script.dat --apply xor-key:1f2e3d -o derived/script.txt
 ```
 
 The tool scores each scheme by how much of the result is zeros or readable text, and shows a

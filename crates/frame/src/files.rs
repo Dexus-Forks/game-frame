@@ -1,4 +1,5 @@
-//! The file lists behind a choice such as `"from": {"files": "DATA/TRACKS/*.TRK"}`.
+//! The file lists behind a choice such as `"from": {"files": "DATA/TRACKS/*.TRK"}`, from a
+//! folder or from a disc image.
 
 use std::path::Path;
 
@@ -26,6 +27,28 @@ pub fn list_files(folder: &Path, pattern: &str) -> Vec<String> {
     names.sort();
     names.dedup();
     names
+}
+
+/// The same list from a disc image (`.iso`, `.cue`, `.bin`), read in place: the files of its
+/// ISO 9660 volume whose path matches `pattern`.
+pub fn list_image_files(image: &Path, pattern: &str) -> std::io::Result<Vec<String>> {
+    let volume = disc_image::Disc::open_path(image)?.volume()?;
+    let parts: Vec<&str> = pattern.split(['/', '\\']).filter(|p| !p.is_empty()).collect();
+    let Some((last, dirs)) = parts.split_last() else { return Ok(Vec::new()) };
+    let last = last.to_ascii_lowercase();
+    let mut names: Vec<String> = volume
+        .files()
+        .filter_map(|e| {
+            let path: Vec<&str> = e.path.split('/').collect();
+            let (name, folders) = path.split_last()?;
+            let same = folders.len() == dirs.len() && folders.iter().zip(dirs).all(|(a, b)| a.eq_ignore_ascii_case(b));
+            (same && wildcard(&last, &name.to_ascii_lowercase()))
+                .then(|| Path::new(name).file_stem().map(|s| s.to_string_lossy().into_owned()).unwrap_or_else(|| name.to_string()))
+        })
+        .collect();
+    names.sort();
+    names.dedup();
+    Ok(names)
 }
 
 fn entry(dir: &Path, want: impl Fn(&str) -> bool) -> Option<String> {

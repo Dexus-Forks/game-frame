@@ -700,6 +700,7 @@ version = "0.1.0"
 name = "gameframe-frame"
 version = "0.1.0"
 dependencies = [
+ "gameframe-disc-image",
  "serde",
  "serde_json",
 ]

@@ -18,7 +18,7 @@ can be checked again on a newer one, but a newer edition found late costs that m
 Start with this copy's own identity, then look for anything later:
 
 ```bash
-.venv/bin/python tools/triage/buildid.py target/GAME --name "This copy" --write docs/versions.md
+.venv/bin/python tools/triage/buildid.py game/GAME --name "This copy" --write docs/versions.md
 ```
 
 `buildid.py` reads the disc's mastering date, each executable's link date and VERSIONINFO,
@@ -37,7 +37,7 @@ with its source and checksums, its languages, content and builds, the data and c
 between editions, the extras, and which edition is the reference.
 
 ```bash
-.venv/bin/python tools/triage/versiondiff.py target/first/POD.CUE target/gold/POD.CUE > derived/versions-data.md
+.venv/bin/python tools/triage/versiondiff.py game/first/POD.CUE game/gold/POD.CUE > derived/versions-data.md
 ```
 
 `versiondiff.py` compares two editions, as folders or as disc images read in place: files

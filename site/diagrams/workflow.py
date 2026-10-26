@@ -339,7 +339,7 @@ def gate_flow():
     box(s, 30, 120, 150, 60, TEAL, 'a command', op='0.28', size=12)
     box(s, 230, 120, 160, 60, BLUE, 'permissions', 'allow, ask, deny', op='0.25', size=12)
     arrow(s, 182, 150, 226, 150)
-    gates = [('game material?', 'target/, derived/, saves'), ('decompiled code?', 'pseudocode in tracked files'),
+    gates = [('game material?', 'game/, derived/, saves'), ('decompiled code?', 'pseudocode in tracked files'),
              ('someone else\'s files?', 'staging only your own')]
     for k, (a, b) in enumerate(gates):
         box(s, 450, 80 + k * 70, 200, 56, AMBER, a, b, op='0.22', size=12)
@@ -457,7 +457,7 @@ def shared_kept():
         s.text(60, 140 + k * 26, '+ ' + t, 12, TEXT)
     s.rect(470, 84, 390, 200, RED, rx=8, extra=' fill-opacity="0.12"')
     s.text(490, 110, 'your machine only', 14, RED, weight='600')
-    for k, t in enumerate(['the game\'s files (target/)', 'captures and dumps (derived/)',
+    for k, t in enumerate(['the game\'s files (game/)', 'captures and dumps (derived/)',
                            'Ghidra projects and decompiled code (analysis/)', 'saves']):
         s.text(490, 140 + k * 26, '- ' + t, 12, TEXT)
     s.text(40, 306, 'The gates and the ignore file keep the right column out of git.', 12, DIM)
