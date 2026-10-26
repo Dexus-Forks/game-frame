@@ -9,8 +9,10 @@ The credits pay for the Claude API, the Message Batches API, the Agent SDK and `
 with an API key. They do not pay for interactive Claude Code in a terminal, an IDE, the
 desktop app or the web. They do not pay for the Claude Code GitHub Action either.
 
-The tools in `tools/llm/` use the credits for work that suits them: large batches, unattended
-runs and checks that repeat each month.
+The Claude API tools in `tools/llm/` use the credits for work that suits them: large batches,
+unattended runs and checks that repeat each month. `tev1.py` is a separate local Ollama tool;
+it does not use these credits. See [working with agents](agents.md#optional-local-decision-adviser)
+for its optional use.
 
 These tools are optional. A task being self-contained, suitable for automation or covered by
 available credits is not a request to run it. Continue in the current session by default. Ask the
@@ -41,7 +43,7 @@ started from inside a Claude Code session would inherit that session's `CLAUDE*`
 which mark it as part of that session; the credits would then refuse it with "Credit balance
 is too low". `client.py` leaves those variables out of every run it starts.
 
-These tools send the game's decompiled code and data to the Claude API, the same as an
+The Claude API tools can send the game's decompiled code and data to Claude, the same as an
 interactive session does. The [legal notes](../LEGAL.md) cover what that can mean for you.
 
 ## The tools

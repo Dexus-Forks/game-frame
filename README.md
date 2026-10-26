@@ -286,11 +286,13 @@ hand-offs, the data passed between agents, the outcome, and the failure path.
 | `tools/dos/fileio_trace.py` | From a DOSBox-X file log: every file's reads in order, with record patterns |
 | `tools/dos/dbx_control.py` | Drive DOSBox-X's debugger from a script: breakpoints, registers, memory |
 
-The tools in `tools/llm/` call Claude with an API key, so they spend Claude Platform credits,
-such as a Max or Team plan's monthly credits ([API credits](docs/working/api-credits.md)).
+The Claude API tools below need an API key and use Claude Platform credits, such as a Max or
+Team plan's monthly credits ([API credits](docs/working/api-credits.md)). `tev1.py` instead
+calls a Tev1 model served by local Ollama; it does not use Claude credits.
 
 | Tool | What it does |
 |---|---|
+| `tools/llm/tev1.py` | Optional local decision adviser for bounded choice, yes-or-no and rubric questions; answers are advisory, see [working with agents](docs/working/agents.md#optional-local-decision-adviser) |
 | `tools/llm/name_functions.py` | A suggested name, signature and summary for every unnamed function in a Ghidra export, in one Message Batch, written to `analysis/` for you to confirm |
 | `tools/llm/skillcheck.py` | Gives an agent one skill and a task on the sample game, and checks its answer against the ground truth: is each skill enough on its own? |
 | `tools/llm/headless.py` | Optional paid API run of one agent under a budget; requires the user's opt-in and saves its report; `docs-check` runs `re-checker` and `re-editor` over the documents |

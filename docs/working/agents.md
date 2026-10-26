@@ -82,6 +82,24 @@ For any function with arithmetic, random draws or many branches:
 This order is faster than porting first. A test against measured results shows the mistake in
 seconds. A difference that shows up later in a whole game run can take hours to trace back.
 
+## Optional local decision adviser
+
+`tools/llm/tev1.py` sends a bounded set of questions to a Tev1 model served by Ollama. Use it
+when an agent chooses to ask for a quick classification or evidence check. It supports a choice
+from options, a yes-or-no question, and a score against named levels. Install a model separately
+with `ollama pull tev1:4b`; the tool does not start Ollama or download a model.
+
+The default endpoint is `http://127.0.0.1:11434/v1/systemone`. The agent calls the tool only
+when useful, by passing a JSON request file to `./gameframe run tev1 REQUEST.json`. The
+request holds the state to judge and its questions. See the tool's `--help` for the full shape.
+Use a `none` option when no listed choice may fit. Keep state short because it is sent with
+every question.
+
+Tev1 is experimental and can be wrong. Its confidence measures how concentrated its answer
+probabilities are, not the chance that the answer is correct. Treat its output as advice. Check
+it against source evidence, emulator measurements and parity tests. See the
+[Ollama Tev1 model card](https://ollama.com/library/tev1) for API and model limits.
+
 ## Work in subsystems
 
 - Choose a subsystem (the player's movement, a menu, the level loader) and take it from

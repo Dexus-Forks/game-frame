@@ -7,6 +7,12 @@ Every release of GameFrame, newest first. The format follows
 
 ## [1.4.0-dev] - Unreleased
 
+### Added
+
+- `tools/llm/tev1.py` optionally asks a local Ollama Tev1 model bounded choice, yes-or-no and
+  rubric questions. It defaults to localhost and is exposed through the existing tool catalog;
+  agents call it explicitly. Its answers are advisory and do not establish evidence or parity.
+
 ### Changed
 
 - The REA skill now documents how to check Ghidra provider readiness, open an explicit Ghidra
