@@ -20,7 +20,10 @@ What the checks do (scripts/hooks/gates/checks.py):
 - commit: blocks a commit that stages game material (a file in target/, analysis/, derived/,
   game-data/ or save-game/, or a game binary or data file such as .exe, .dll, .pkg, .sav) or
   added lines that look like decompiled code. It also blocks a commit made by a GameFrame stage
-  or task agent other than re-lander, which is the only agent that commits.
+  or task agent other than re-lander, which is the only agent that commits. In a repository
+  that tags releases from .claude-plugin/plugin.json, it blocks a commit while that file still
+  names a tagged release (scripts/hooks/gates/version.py): scripts/release.py next opens the
+  next version.
 - push: blocks a push made by a GameFrame agent other than re-lander. The main session and
   people can push; the project's permissions ask the user first.
 - write: blocks writing decompiled code (Ghidra pseudocode) into a file outside analysis/,

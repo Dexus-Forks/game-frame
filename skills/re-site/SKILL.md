@@ -104,9 +104,10 @@ The diary has two kinds of entry.
 - **Live entries** are written during the day, one per milestone, so a reader can follow the
   work as it happens. Name each `diary/YYYY-MM-DD-HHMM-slug.md`, with the time it was written on
   a 24-hour clock (`2026-10-26-1430-fog-tables.md`). The diary shows the time beside the title.
-- **Day posts** replace a day's live entries once the day is over. Each past day ends up with
+- **Day posts** gather a day's live entries once the day is over. Each past day ends up with
   one post, named `diary/YYYY-MM-DD-slug.md`. Live entries on one day often repeat each other,
-  and the day post removes the repeats.
+  and the day post removes the repeats. The live entries stay on the site. The day post links
+  each of them, and the diary's list shows only the day post for that day.
 
 A milestone is something a reader would notice:
 
@@ -180,6 +181,11 @@ documents for the detail.
 ## Next
 
 - The open questions left at the end of the day.
+
+## The day's entries
+
+- [14:30 · Fog tables measured](./2026-10-25-1430-fog-tables)
+- [17:05 · Shadow volumes drawn](./2026-10-25-1705-shadow-volumes)
 ```
 
 Then:
@@ -187,12 +193,14 @@ Then:
 1. Keep every figure the live entries used, with its caption. Drop repeats.
 2. Keep each finding once, in its newest and most exact form.
 3. The change list says what changed for a reader in plain words. It is not a commit list.
-4. Delete the day's live entries (`git rm`). Git keeps them. Links to a live entry move to the
-   day post.
-5. Run the check again. It fails while a past day still has live entries.
+4. Keep the day's live entries. Never delete them. End the day post with "The day's entries",
+   a list that links each one by its file name, with its time and title, in time order.
+5. Run the check again. It fails while a past day has live entries and no day post, and while a
+   day post misses a link to one of its live entries.
 
-A project that wants to keep its live entries runs `check.py --keep-live`. It tells its agents
-to skip this step in its own `AGENTS.md`.
+The diary's list and sidebar hide a past day's live entries once its day post exists, so a
+reader finds them through that post. A project that writes no day posts runs
+`check.py --keep-live`, and says so in its own `AGENTS.md`.
 
 The rules for an entry:
 
@@ -228,7 +236,7 @@ The rules for an entry:
 
 At each milestone, in this order:
 
-1. Consolidate each past day that still has live entries (section 4).
+1. Write the day post for each past day that has live entries and no post yet (section 4).
 2. Update the documents in `docs/` (`re-land`). The included pages follow by themselves.
 3. Write the live entry.
 4. Update the front page's status line when the state has changed.
@@ -242,7 +250,8 @@ cd sites/NAME && npm run build
 ```
 
 `check.py` fails on game files, decompiled code (in a page or an included document), missing
-includes, diary entries without a title or summary, live entries from a past day, and leftover
+includes, diary entries without a title or summary, a past day's live entries with no day post,
+a day post that does not link each of its live entries, and leftover
 `TODO(site)` lines. It warns about entries that read like a commit log, day posts that are too
 short or too long, two posts for one day, and large pictures. Fix every error. Read every warning and fix it, or say in the hand-off why it stays.
 

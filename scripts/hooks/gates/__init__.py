@@ -5,6 +5,7 @@
   folders), and which GameFrame agent may commit or push.
 - adapters.py: turns one agent's hook event (Claude Code, Codex, Gemini CLI, Cursor, GitHub
   Copilot) into a list of Check records for the core.
+- version.py: no commit on top of a tagged release until the next -dev version is open.
 - session.py: the short note Claude Code adds at the start of a session.
 
 scripts/hooks/gate.py is the command line. Standard library only.

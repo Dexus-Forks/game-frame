@@ -22,7 +22,7 @@ show the reason. In every other case the gate exits 0 and changes nothing.
 
 | Check | It blocks |
 |---|---|
-| Commit | Staged files in `target/`, `analysis/`, `derived/`, `game-data/` or `save-game/`. Staged game binaries and data files (`.exe`, `.dll`, `.ovl`, `.pkg`, `.sav`, `.wad`, `.pak`, ROM images and others). Added lines that look like Ghidra's decompiled code. A commit made by a GameFrame agent other than `re-lander`. |
+| Commit | Staged files in `target/`, `analysis/`, `derived/`, `game-data/` or `save-game/`. Staged game binaries and data files (`.exe`, `.dll`, `.ovl`, `.pkg`, `.sav`, `.wad`, `.pak`, ROM images and others). Added lines that look like Ghidra's decompiled code. A commit made by a GameFrame agent other than `re-lander`. A commit while `.claude-plugin/plugin.json` still names a release that has its `vX.Y.Z` tag: `python3 scripts/release.py next` opens the next `-dev` version first. |
 | Push | A push made by a GameFrame agent other than `re-lander`. |
 | Write | Writing two or more lines of decompiled code into a file outside `analysis/`, `derived/` and `target/`. |
 | Delete | A shell command that would delete or move a project's game folder, `target/`: `rm`, `trash`, `mv` of it or into the Trash, `find -delete`, `git clean -x`, `cargo clean` into `target/`, build-folder cleaners (`kondo`, `cargo sweep`, `npkill`) and scripts that call `rmtree` or `send2trash` on it. A command that starts with `GAMEFRAME_DELETE_GAME=1` passes. |

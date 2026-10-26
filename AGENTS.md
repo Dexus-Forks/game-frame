@@ -68,7 +68,7 @@ These rules are for changes to GameFrame itself, which is a public repository.
 | `.claude/settings.json`, `scripts/hooks/gate.py`, `scripts/hooks/gates/`, `scripts/hooks/git/pre-commit`, `hooks/hooks.json`, `.codex/hooks.json`, `.cursor/hooks.json`, `.github/hooks/gameframe.json`, `hooks/gemini-settings.json` | Permissions and the gates: the git pre-commit hook, and hooks for Claude Code, Codex, Gemini CLI, Cursor and Copilot: [docs/working/gates.md](docs/working/gates.md) |
 | `.claude-plugin/` | The Claude Code plugin and its marketplace: the skills and the agents |
 | `gameframe`, `tools/gameframe/` | The help and discovery command. It reads the skills and each tool's own help, so a new tool needs no entry there |
-| `scripts/` | setup, new-project, update-project, ghidra-export, ghidra-run, `clients.py` (the files each coding agent needs in a project), and `lib.sh` (paths and `.env`) |
+| `scripts/` | setup, new-project, update-project, ghidra-export, ghidra-run, `clients.py` (the files each coding agent needs in a project), `release.py` (cut a release, then open the next `-dev` version), and `lib.sh` (paths and `.env`) |
 | `tools/disc`, `tools/pe`, `tools/dos`, `tools/triage`, `tools/emu`, `tools/formats`, `tools/verify`, `tools/ghidra` | The tools |
 | `templates/project/` | What `new-project.sh` writes into a game's repository |
 | `templates/library-page/` | The plain HTML library page for browser ports, which works with `crates/library`, and its ready-made themes (`themes/`) |
@@ -79,7 +79,7 @@ These rules are for changes to GameFrame itself, which is a public repository.
 | `docs/` | The taxonomy of games (`games/`), engines (Flash and Shockwave too), hardware, consoles, observing the original (`observe/`), media and files (`media/`), working as an agent (`working/`), case studies, ABI, DOS, game patterns, compiled code, legal notes, setup |
 | `crates/` | A Cargo workspace of clean implementations taken from the case studies (OPL2, WMA, MSVC CRT, Turbo Pascal); rules in `docs/crates/README.md`. `cargo test --release` in `crates/` |
 | `wrappers/` | A Cargo workspace of replacement DLLs for 1997 3D cards and DirectDraw (Glide 2, ATI3DCIF, S3D Toolkit, SGL's scene graph, DirectDraw), taken from the POD case study. Built for 32-bit Windows through `scripts/zcc.sh`; host tests in `tests/run.sh` |
-| `CHANGELOG.md` | Every release, newest first. Add each change under Unreleased. A release moves them under its version, sets the same version in `.claude-plugin/plugin.json` (the tests check the two match) and tags the commit `vX.Y.Z` |
+| `CHANGELOG.md` | Every release, newest first. Add each change under Unreleased. `python3 scripts/release.py X.Y.Z` makes a release: it moves them under its version, sets the same version in `.claude-plugin/plugin.json` (the tests check the two match), tags the commit `vX.Y.Z`, then opens the next minor version as `-dev` with an empty Unreleased section. The commit gate blocks other commits on a tagged release until that is done (`release.py next`) |
 | `GAPS.md` | Topics missing from the guides and tools, and where each is now covered. Tick an item when it is merged; add new gaps to it |
 | `site/` | The documentation website (VitePress). It builds from `docs/`, the skills and the examples where they are; it holds no copies of their content |
 | `.mcp.json` | The MCP servers (REA, DOSBox-X) for Claude Code. `gameframe mcp --emit all` writes them into `.codex/config.toml`, `.gemini/settings.json`, `.cursor/mcp.json`, `.vscode/mcp.json` and `opencode.json` |

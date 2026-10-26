@@ -7,6 +7,23 @@ Every release of GameFrame, newest first. The format follows
 
 ## [1.5.0-dev] - Unreleased
 
+### Added
+
+- `scripts/release.py X.Y.Z` cuts a release. It dates the changelog's Unreleased section, sets
+  the version in `.claude-plugin/plugin.json`, commits and tags `vX.Y.Z`, then opens the next
+  minor version as `-dev`. `--push` pushes the branch and tag, and `--publish` also makes the
+  GitHub release from the changelog. `release.py next` opens the next version on its own.
+- The commit gate blocks a commit while `plugin.json` still names a release that has its tag,
+  so every change after a release lands under the next version's Unreleased section.
+
+### Changed
+
+- The README lists the tools most projects start with, by step of the method, and links to the
+  site's tools page, which is built from each tool's own help. `./gameframe tools` lists them all.
+- A site's day post no longer replaces that day's live entries. The live entries stay, the day
+  post ends with "The day's entries" linking each one, and the diary's list and sidebar show
+  only the day post for a past day. `tools/site/check.py` fails when a day post misses a link.
+
 ## [1.4.0] - 2026-10-26
 
 ### Added

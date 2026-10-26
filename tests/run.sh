@@ -1144,14 +1144,25 @@ printf -- '---\ntitle: Shadows\nsummary: Shadows.\n---\n\nShadow volumes.\n' > "
 printf -- '---\ntitle: Today\nsummary: Today.\n---\n\nStill going.\n' > "$S/diary/2026-10-26-0900-today.md"
 out="$(python3 tools/site/check.py "$S" --today 2026-10-26 2>&1)"; days="$(python3 tools/site/check.py "$S" --today 2026-10-26 --days 2>&1)"
 keep="$(python3 tools/site/check.py "$S" --today 2026-10-26 --keep-live 2>&1)"
-[[ "$out" == *"2 live entries from 2026-10-25: consolidate"* && "$out" == *"1 errors, 0 warnings"* && "$days" == "2026-10-25: 2 live entries"* && "$keep" == *"0 errors, 0 warnings"* ]] \
-  && ok "check.py asks for each past day's live entries to become one post, lists those days, and lets today's stay short" || bad "check.py live entries" "$out $days $keep"
-rm "$S/diary/2026-10-25-0910-fog.md" "$S/diary/2026-10-25-1430-shadows.md" "$S/diary/2026-10-26-0900-today.md"
+[[ "$out" == *"2 live entries from 2026-10-25 and no day post"* && "$out" == *"1 errors, 0 warnings"* && "$days" == "2026-10-25: 2 live entries"* && "$keep" == *"0 errors, 0 warnings"* ]] \
+  && ok "check.py asks for a day post for each past day's live entries, lists those days, and lets today's stay short" || bad "check.py live entries" "$out $days $keep"
+{ printf -- '---\ntitle: Fog and shadows\nsummary: Fog and shadows as the card drew them.\n---\n\n'
+  for i in 1 2 3 4 5 6 7 8; do echo "$words"; done; printf '\n## The day'"'"'s entries\n\n- [09:10 · Fog](./2026-10-25-0910-fog)\n'; } > "$S/diary/2026-10-25-fog-and-shadows.md"
+part="$(python3 tools/site/check.py "$S" --today 2026-10-26 2>&1)"
+printf -- '- [14:30 · Shadows](./2026-10-25-1430-shadows)\n' >> "$S/diary/2026-10-25-fog-and-shadows.md"
+whole="$(python3 tools/site/check.py "$S" --today 2026-10-26 2>&1)"; days="$(python3 tools/site/check.py "$S" --today 2026-10-26 --days 2>&1)"
+[[ "$part" == *"does not link 1 of its live entries: 2026-10-25-1430-shadows"* && "$whole" == *"0 errors, 0 warnings"* && -z "$days" && -f "$S/diary/2026-10-25-0910-fog.md" ]] \
+  && ok "check.py keeps a past day's live entries and wants its day post to link each of them" || bad "check.py day post links" "$part $whole $days"
+rm "$S/diary/2026-10-25-0910-fog.md" "$S/diary/2026-10-25-1430-shadows.md" "$S/diary/2026-10-26-0900-today.md" "$S/diary/2026-10-25-fog-and-shadows.md"
 if [[ -x site/node_modules/.bin/vitepress ]]; then
   ln -s "$PWD/site/node_modules" "$S/node_modules"
+  printf -- '---\ntitle: Early note\nsummary: A live entry.\n---\n\nA note.\n' > "$S/diary/2026-10-22-0910-early.md"
+  printf -- '---\ntitle: The early day\nsummary: The day post.\n---\n\n- [09:10 · Early note](./2026-10-22-0910-early)\n' > "$S/diary/2026-10-22-early-day.md"
   out="$(cd "$S" && ./node_modules/.bin/vitepress build 2>&1)"
   [[ $? == 0 ]] && grep -q "The first format</a>" "$S/.vitepress/dist/diary/index.html" && grep -q "2026-10-23 · The first format" "$S/.vitepress/dist/index.html" \
-    && ok "the new site builds with VitePress, and the diary lists its entry" || bad "new site build" "$out"
+    && grep -q "The early day" "$S/.vitepress/dist/diary/index.html" && ! grep -q "Early note</a>" "$S/.vitepress/dist/diary/index.html" \
+    && ! grep -q "09:10 · Early note" "$S/.vitepress/dist/index.html" && [[ -f "$S/.vitepress/dist/diary/2026-10-22-0910-early.html" ]] \
+    && ok "the new site builds with VitePress; the diary lists the day posts and keeps a past day's live entry as a page its post links" || bad "new site build" "$out"
 else
   echo "  skip  the new site's VitePress build (run npm install in site/)"
 fi
@@ -1282,6 +1293,40 @@ print('commit, push, write and session gates; Codex, Gemini, Cursor and Copilot 
 PY
 )"
 [[ $? == 0 ]] && ok "the gates block game material, decompiled code and non-lander commits ($out)" || bad "gates" "$out"
+echo "Releases (scripts/release.py, scripts/hooks/gates/version.py)"
+out="$(python3 - <<'PY' 2>&1
+import json, os, subprocess, tempfile
+here = os.getcwd()
+d = tempfile.mkdtemp()
+git = lambda *a: subprocess.run(['git', *a], cwd=d, check=True, capture_output=True, text=True).stdout
+rel = lambda *a: subprocess.run(['python3', f'{here}/scripts/release.py', *a], cwd=d, capture_output=True, text=True)
+gate = lambda: subprocess.run(['python3', f'{here}/scripts/hooks/gate.py', 'staged'], cwd=d, capture_output=True, text=True).returncode
+git('init', '-q'); git('config', 'user.email', 't@example.org'); git('config', 'user.name', 'T')
+os.makedirs(f'{d}/.claude-plugin')
+plugin = lambda: json.load(open(f'{d}/.claude-plugin/plugin.json'))['version']
+json.dump({'name': 'x', 'version': '1.1.0-dev'}, open(f'{d}/.claude-plugin/plugin.json', 'w'))
+open(f'{d}/CHANGELOG.md', 'w').write('# Changelog\n\n## [1.1.0-dev] - Unreleased\n\n- A change.\n\n## [1.0.0] - 2026-01-01\n\n- First.\n\n'
+    '[1.1.0-dev]: https://example.org/r/compare/v1.0.0...HEAD\n[1.0.0]: https://example.org/r/releases/tag/v1.0.0\n')
+git('add', '.'); git('commit', '-qm', 'start'); git('tag', 'v1.0.0')
+r = rel('1.1.0', '--no-next'); assert r.returncode == 0, r.stderr
+assert plugin() == '1.1.0' and git('tag', '-l', 'v1.1.0').strip() == 'v1.1.0', 'released and tagged'
+log = open(f'{d}/CHANGELOG.md').read()
+assert '## [1.1.0] - ' in log and '[1.1.0]: https://example.org/r/compare/v1.0.0...v1.1.0' in log, log
+open(f'{d}/a.txt', 'w').write('a'); git('add', 'a.txt')
+assert gate() == 2, 'a commit on top of a tagged release is blocked'
+git('reset', '-q', 'a.txt')
+r = rel('next'); assert r.returncode == 0, r.stderr
+log = open(f'{d}/CHANGELOG.md').read()
+assert plugin() == '1.2.0-dev' and log.index('## [1.2.0-dev] - Unreleased') < log.index('## [1.1.0]'), log
+assert '[1.2.0-dev]: https://example.org/r/compare/v1.1.0...HEAD' in log, log
+git('add', 'a.txt'); assert gate() == 0, 'a commit on a -dev version passes'
+r = rel('next'); assert r.returncode == 2, 'next twice is refused'
+print('release 1.1.0, tag, the gate, next opens 1.2.0-dev')
+PY
+)"
+[[ $? == 0 ]] && ok "releases: $out" || bad "releases" "$out"
+expect "release.py prints its usage" "Cut a GameFrame release" python3 scripts/release.py --help
+
 echo "Game folder (scripts/hooks/gates/game_folder.py, deletes.py)"
 out="$("$PYTHON" - <<'PY' 2>&1
 import json, os, subprocess, tempfile

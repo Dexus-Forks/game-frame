@@ -29,8 +29,8 @@ reached none since the last entry, say so in the hand-off and write nothing.
    make it with `new-site`, as `re-site` says.
 2. Run `tools/site/check.py SITE --days`. For each past day it lists, gather that day's live
    entries into one day post, `diary/YYYY-MM-DD-slug.md`: what is new first, a little detail,
-   then a short change list. Keep every figure once, then delete the live entries
-   (`re-site`, "Consolidate each past day").
+   then a short change list. Keep every figure once. End with "The day's entries", a link to
+   each live entry. Never delete the live entries (`re-site`, "Consolidate each past day").
 3. Read the diary's newest entry, `docs/CHECKLIST.md` and `git log` since that entry's time.
    List the milestones reached since then.
 4. Write one live entry for each in `diary/YYYY-MM-DD-HHMM-slug.md`, as findings with their

@@ -10,9 +10,10 @@ import subprocess
 from dataclasses import dataclass
 
 try:
-    from . import deletes  # imported as gates.checks (tools/site/check.py)
+    from . import deletes, version  # imported as gates.checks (tools/site/check.py)
 except ImportError:
     import deletes
+    import version
 
 # Folders that hold the game, its derivatives or decompiled code. They are ignored by git; a
 # staged path there was force-added.
@@ -136,4 +137,4 @@ def reason(check):
     why = agent_reason(check.kind, check.agent)
     if why or check.kind == 'push':
         return why
-    return staged_reason(check.cwd, bool(COMMIT_ALL.search(check.command)))
+    return staged_reason(check.cwd, bool(COMMIT_ALL.search(check.command))) or version.reason(check.cwd)

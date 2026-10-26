@@ -4,14 +4,15 @@
 Usage:
     tools/site/check.py SITE_DIR [SITE_DIR ...]       for example sites/pod, or site
     tools/site/check.py SITE_DIR --json
-    tools/site/check.py SITE_DIR --days               list the past days whose live entries wait
+    tools/site/check.py SITE_DIR --days               list the past days that still need a day post
     options: --today YYYY-MM-DD (the default is the local date), --keep-live
 
 Inputs: one or more VitePress site folders made by scripts/new-site.sh (or written by hand in
 the same shape: Markdown pages, a diary/ folder of entries). The diary has two kinds of entry:
 live entries, written during the day and named YYYY-MM-DD-HHMM-slug.md (the time they were
-written), and one day post per past day, named YYYY-MM-DD-slug.md, which replaces that day's
-live entries (the re-site skill, "Consolidate each past day").
+written), and one day post per past day, named YYYY-MM-DD-slug.md, which gathers that day's
+live entries and links each of them. The live entries stay; the diary lists only the day post
+for a past day (the re-site skill, "Consolidate each past day").
 
 Errors (exit status 1):
 - a game file in the site (an .exe, .dll, .pak, ROM image and the other extensions the commit
@@ -20,8 +21,10 @@ Errors (exit status 1):
 - an <!--@include: PATH--> whose file does not exist;
 - a diary entry without a title or a summary in its front matter, or with a file name that is
   not YYYY-MM-DD-slug.md or YYYY-MM-DD-HHMM-slug.md;
-- live entries from a day before today: consolidate them into that day's post. --keep-live
-  turns this off, for a project that keeps its live entries;
+- live entries from a day before today with no day post: write that day's post. --keep-live
+  turns this off, for a project that writes no day posts;
+- a day post that does not link each of its day's live entries (by file name, such as
+  ./2026-10-25-1430-fog-tables);
 - a TODO(site) line left from the template.
 Warnings (printed, exit status 0):
 - a diary entry that reads like a commit log: three or more commit hashes, or more than half
@@ -78,7 +81,7 @@ def site_files(site):
 
 
 def diary_days(site, today):
-    """The past days that still have live entries: {date: [file, ...]}, and the day posts by date."""
+    """The live entries of past days, {date: [file, ...]}, and the day posts by date."""
     diary = os.path.join(site, 'diary')
     live, posts = {}, {}
     for name in sorted(os.listdir(diary)) if os.path.isdir(diary) else []:
@@ -122,10 +125,17 @@ def check(site, today=None, keep_live=False):
         if os.path.basename(os.path.dirname(path)) == 'diary' and os.path.basename(path) != 'index.md':
             problems += diary_entry(path, text, say)
     live, posts = diary_days(site, today or date.today().isoformat())
-    if not keep_live:
-        for day, files in live.items():
-            say('error', files[0], f'{len(files)} live entries from {day}: consolidate them into one post for that day, '
-                                   'YYYY-MM-DD-slug.md (re-site, "Consolidate each past day")')
+    for day, files in live.items():
+        if day not in posts:
+            if not keep_live:
+                say('error', files[0], f'{len(files)} live entries from {day} and no day post: write one post for that day, '
+                                       'YYYY-MM-DD-slug.md, that links each of them (re-site, "Consolidate each past day")')
+            continue
+        text = ''.join(open(p, encoding='utf-8', errors='replace').read() for p in posts[day])
+        missing = [os.path.basename(f)[:-3] for f in files if os.path.basename(f)[:-3] not in text]
+        if missing:
+            say('error', posts[day][0], f'the day post does not link {len(missing)} of its live entries: '
+                                        + ', '.join(missing[:5]) + ' (link each, such as ./' + missing[0] + ')')
     for day, files in posts.items():
         if len(files) > 1:
             say('warn', files[1], f'{len(files)} day posts for {day}: a day has one post')
@@ -172,8 +182,10 @@ def main(argv):
     sites = [a for a in argv if not a.startswith('--')]
     if '--days' in flags:
         for site in sites:
-            live, _ = diary_days(site, today or date.today().isoformat())
+            live, posts = diary_days(site, today or date.today().isoformat())
             for day, files in live.items():
+                if day in posts:
+                    continue
                 print(f'{day}: {len(files)} live entries to consolidate')
                 for f in files:
                     print(f'  {f}')
