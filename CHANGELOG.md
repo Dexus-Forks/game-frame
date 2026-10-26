@@ -9,6 +9,14 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `gameframe-d3d`: Direct3D 3 immediate mode in software. It writes and parses execute buffers
+  (`Builder`, `exec::parse`: `D3DTLVERTEX`, `PROCESSVERTICES`, `STATERENDER`, `TRIANGLE`) and runs
+  them (`Device::execute`) into an RGB565 target at any multiple of the game's resolution. It
+  follows Direct3D's fill rules (integer pixel centres, top-left) and covers flat and Gouraud
+  shading, perspective-correct textures in 565, 1555 and 4444, the texture blends, colour keys,
+  the alpha test, every blend factor, the stipple pattern and vertex fog, all from Microsoft's
+  public documentation. `docs/hardware/card-apis.md` has a new section on Direct3D 3 execute
+  buffers.
 - The ATI 3D Rage and S3 ViRGE draw in their own crates: `gameframe_rage::draw`
   (`Context`, `C3D_VTCF`, `render_prim_list`: triangles and quads, solid, flat or Gouraud,
   alpha blended) and `gameframe_virge::draw` (`State`, the 32-byte vertex, `triangle_set`:
