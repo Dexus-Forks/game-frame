@@ -28,7 +28,17 @@ Each source is cited where it is used. Where the specification leaves a detail o
 iterators' rounding, the bilinear weights' precision, how the dither is added) the code says
 so in a `Deviation:` comment. Nothing has been compared with a real card yet.
 
-What it does not model: two TMUs, mipmaps, the LFB, alpha and depth bias, stipple.
+- `grDrawPolygon`, `grDrawPoint` and `grDrawLine` through the triangle engine;
+- `grColorMask` and `grBufferClear` as the FASTFILL command (clip window and write masks);
+- `grLfbWriteRegion` with the pixel pipeline bypassed (565, 555, 1555, 888, 8888);
+- Glide's texture memory manager (`guTexAllocateMemory`, `guTexDownloadMipMapLevel`,
+  `guTexSource`, `guTexMemReset`, `guTexMemQueryAvail`) with a memory budget, so a game that
+  allocates until it fails sees the card fill up; `guFogGenerateLinear`;
+- the palette formats looked up as the TMU samples, so a new palette recolours `P_8` and
+  `AP_88` textures already downloaded.
+
+What it does not model: two TMUs, mipmaps, LFB reads and locks, the alpha planes, alpha and
+depth bias, stipple.
 
 The constants are the values of the Glide 2.x SDK's `glide.h`, as in GameFrame's
 `wrappers/glide`, whose OpenGL shader follows the same combine rules. Glide's texture formats
