@@ -276,7 +276,7 @@ a Cargo workspace, under Apache 2.0. See [docs/crates](docs/crates/README.md).
 | [gameframe-game-source](crates/game-source/README.md) | A game's files from a folder, a CD image or a URL, read in ranges in the browser |
 | [gameframe-library](crates/library/README.md) | The player's game data, saves and mods, kept on the desktop or encrypted in the browser, with an [HTML page](templates/library-page/README.md) to manage them |
 | [gameframe-frame](crates/frame/README.md) | The contract between a port and the frame: event topics, the manifest with capabilities, renderers and their grades, settings and controls, and adapters for games in other languages or set up from `frame.json` |
-| [gameframe-frame-ui](crates/frame-ui/README.md) | The frame's views as Dioxus components for the browser and the desktop: play, settings, library, help pages and console, with ready-made themes ([demo](examples/frame-demo/README.md)) |
+| [gameframe-frame-ui](crates/frame-ui/README.md) | The frame's views as Dioxus components for the browser and the desktop: play, settings, library, help pages and console, with ready-made themes ([demo](examples/frame-demo/README.md), and [gameframe-launcher](launcher/README.md) for a game described by `frame.json`) |
 
 ## Replacement libraries
 
@@ -359,7 +359,7 @@ GameFrame uses two licences, one for each kind of work.
 
 | What | Licence |
 |---|---|
-| **Code**: `tools/`, `scripts/`, `tests/`, `examples/`, `crates/`, `wrappers/`, `templates/`, `site/` (its configuration and code), `.claude-plugin/`, the Ghidra scripts | [Apache License 2.0](LICENSE-APACHE) |
+| **Code**: `tools/`, `scripts/`, `tests/`, `examples/`, `crates/`, `launcher/`, `wrappers/`, `templates/`, `site/` (its configuration and code), `.claude-plugin/`, the Ghidra scripts | [Apache License 2.0](LICENSE-APACHE) |
 | **Content**: the documentation (`docs/`), the skills (`skills/`), the agents (`agents/`, and their generated copies in `.codex/`, `.gemini/`, `.github/agents/` and `.opencode/`), the READMEs, `AGENTS.md` and `CHANGELOG.md`, and the website's text | [CC0 1.0](LICENSE-CC0-1.0), dedicated to the public domain |
 
 CC0 1.0 gives up all copyright in the content, as far as the law allows. Anyone may copy,

@@ -84,8 +84,14 @@ pub struct Renderer {
 pub enum Kind {
     /// On or off.
     Toggle,
-    /// One of the options.
-    Choice { options: Vec<Choice> },
+    /// One of the options. With `from`, the options are filled in later: from the game's
+    /// files, or by the game itself with `config.options`. They may then be empty here.
+    Choice {
+        #[serde(default)]
+        options: Vec<Choice>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        from: Option<OptionsFrom>,
+    },
     /// A number from `min` to `max`.
     Range { min: f64, max: f64, step: f64 },
     /// Free text.
@@ -93,10 +99,23 @@ pub enum Kind {
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
-
 pub struct Choice {
     pub value: String,
     pub label: String,
+}
+
+/// Where a choice's options come from when the manifest cannot list them, such as the tracks
+/// and cars on the game's disc.
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct OptionsFrom {
+    /// The files that match a pattern, from the game's folder: `DATA/TRACKS/*.TRK`. Each file
+    /// is one option: its name without the extension is the value and the label. Only the last
+    /// part of the path may hold `*` and `?`, and letter case does not matter. A `frame.json`
+    /// game fills these when it loads (`Configured::load`).
+    pub files: Option<String>,
+    /// The game sends the options itself, with `config.options`.
+    pub game: bool,
 }
 
 /// A setting. Its `type` (toggle, choice, range, text) and that type's fields sit beside the
@@ -166,7 +185,8 @@ impl Manifest {
             if s.key.is_empty() || !seen.insert(("setting", s.key.clone())) {
                 return Err(format!("manifest: setting key {:?} is empty or repeated", s.key));
             }
-            if !s.accepts(&s.default) {
+            let later = matches!(&s.kind, Kind::Choice { from: Some(_), .. });
+            if later && !s.default.is_string() || !later && !s.accepts(&s.default) {
                 return Err(format!("manifest: setting {} has a default its kind does not take", s.key));
             }
         }
@@ -175,12 +195,26 @@ impl Manifest {
 }
 
 impl Setting {
+    /// Fill a choice's options, as `config.options` and a `frame.json` game's file lists do.
+    /// False for a setting that is not a choice.
+    pub fn fill(&mut self, list: Vec<Choice>) -> bool {
+        match &mut self.kind {
+            Kind::Choice { options, .. } => {
+                *options = list;
+                true
+            }
+            _ => false,
+        }
+    }
+
     /// Whether a value fits the setting: a bool for a toggle, one of the options, a number in
     /// range, a string.
     pub fn accepts(&self, v: &Value) -> bool {
         match &self.kind {
             Kind::Toggle => v.is_boolean(),
-            Kind::Choice { options } => v.as_str().is_some_and(|s| options.iter().any(|o| o.value == s)),
+            // A list not filled in yet takes any text, so a saved choice waits for its list.
+            Kind::Choice { options, from: Some(_) } if options.is_empty() => v.is_string(),
+            Kind::Choice { options, .. } => v.as_str().is_some_and(|s| options.iter().any(|o| o.value == s)),
             Kind::Range { min, max, .. } => v.as_f64().is_some_and(|n| n >= *min && n <= *max),
             Kind::Text => v.is_string(),
         }

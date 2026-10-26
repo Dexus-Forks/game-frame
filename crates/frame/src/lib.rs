@@ -22,6 +22,10 @@ mod event;
 mod game;
 mod manifest;
 #[cfg(not(target_arch = "wasm32"))]
+mod configured;
+#[cfg(not(target_arch = "wasm32"))]
+mod files;
+#[cfg(not(target_arch = "wasm32"))]
 mod process;
 mod session;
 mod settings;
@@ -29,10 +33,14 @@ mod settings;
 pub use demo::{Demo, DEMO_PRESS_TICKS};
 pub use event::{matches, topics, valid_topic, Event, Origin};
 pub use game::{Game, Outbox};
-pub use manifest::{capabilities, Choice, Control, Grade, Kind, Manifest, Renderer, Setting, CONTRACT};
+pub use manifest::{capabilities, Choice, Control, Grade, Kind, Manifest, OptionsFrom, Renderer, Setting, CONTRACT};
 #[cfg(not(target_arch = "wasm32"))]
-pub use process::{Configured, FrameFile, Process, StartCommand};
+pub use configured::{Configured, FrameFile, StartCommand};
+#[cfg(not(target_arch = "wasm32"))]
+pub use files::list_files;
+#[cfg(not(target_arch = "wasm32"))]
+pub use process::Process;
 pub use session::{Session, LOG_LENGTH};
 #[cfg(not(target_arch = "wasm32"))]
 pub use settings::file as settings_file;
-pub use settings::{Settings, PRESET, SHOW_AT_START};
+pub use settings::{Settings, ON_EXIT, PRESET, SHOW_AT_START};

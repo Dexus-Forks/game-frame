@@ -1,7 +1,7 @@
 # The frame demo
 
 The frame with no game. The demo game from [gameframe-frame](../../crates/frame/README.md)
-stands in for a port: three renderers with different grades, four settings and a pad of
+stands in for a port: three renderers with different grades, five settings (a track list the game fills) and a pad of
 controls. It answers each event on the console and presses its own controls every two seconds,
 so the console shows traffic with no one at the keys. It uses the sections of the
 [library page](../../templates/library-page/README.md) template. It starts in the ready-made

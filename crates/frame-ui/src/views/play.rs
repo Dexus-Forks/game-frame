@@ -1,10 +1,10 @@
-//! Play: the renderer choice with how complete each one is, the start and stop button, the
-//! game's status, and whether the frame opens at start.
+//! Play: the renderer choice with how complete each one is, the start and stop buttons, "Back to
+//! the game" while it runs, the game's status, and whether the frame opens at start.
 
 use crate::state::use_frame;
 use crate::Icon;
 use dioxus::prelude::*;
-use gameframe_frame::{capabilities, topics, Grade, SHOW_AT_START};
+use gameframe_frame::{capabilities, topics, Grade, ON_EXIT, SHOW_AT_START};
 use serde_json::json;
 
 fn grade_label(g: Grade) -> &'static str {
@@ -31,6 +31,9 @@ pub fn Play() -> Element {
         (s.manifest().clone(), s.renderer().map(String::from), s.state().to_string(), detail)
     });
     let show_at_start = frame.setting(SHOW_AT_START).and_then(|v| v.as_bool()).unwrap_or(true);
+    let on_exit = frame.setting(ON_EXIT).and_then(|v| v.as_str().map(String::from)).unwrap_or_else(|| "launcher".into());
+    let can_exit = frame.has_exit();
+    let preference = move |key: &'static str, value: serde_json::Value| frame.update(|s| s.send(topics::FRAME_PREFERENCE, json!({ "key": key, "value": value })));
     let running = matches!(state.as_str(), "loading" | "running" | "paused");
     let missing = use_resource(move || async move {
         let _ = frame.revision();
@@ -94,9 +97,15 @@ pub fn Play() -> Element {
             }
             if manifest.can(capabilities::START) {
                 if running {
-                    button { r#type: "button", class: "lib-button lib-button--primary lib-start",
-                        onclick: move |_| frame.update(|s| s.stop()),
-                        Icon { name: "stop" } "Stop"
+                    div { class: "lib-actions",
+                        button { r#type: "button", class: "lib-button lib-button--primary lib-start",
+                            onclick: move |_| frame.update(|s| s.back_to_game()),
+                            Icon { name: "start" } "Back to the game"
+                        }
+                        button { r#type: "button", class: "lib-button lib-start",
+                            onclick: move |_| frame.update(|s| s.stop()),
+                            Icon { name: "stop" } "Stop"
+                        }
                     }
                 } else {
                     button { r#type: "button", class: "lib-button lib-button--primary lib-start",
@@ -117,10 +126,29 @@ pub fn Play() -> Element {
                 input {
                     r#type: "checkbox",
                     checked: show_at_start,
-                    onchange: move |e| frame.update(|s| s.send(topics::FRAME_PREFERENCE, json!({ "key": SHOW_AT_START, "value": e.checked() }))),
+                    onchange: move |e| preference(SHOW_AT_START, json!(e.checked())),
                 }
                 "Open this window when the game starts. "
                 span { class: "lib-row-meta", "Start the game with --frame to open it again." }
+            }
+            if can_exit {
+                div { class: "lib-row lib-setting",
+                    div { class: "lib-row-text",
+                        label { class: "lib-row-name", r#for: "set-frame-on-exit", "When the game ends" }
+                        span { class: "lib-row-meta", "Stopping it here always comes back to this window." }
+                    }
+                    div { class: "lib-setting-input",
+                        select { id: "set-frame-on-exit", class: "lib-input",
+                            onchange: move |e| preference(ON_EXIT, json!(e.value())),
+                            option { value: "launcher", selected: on_exit != "desktop", "Come back here" }
+                            option { value: "desktop", selected: on_exit == "desktop", "Exit to desktop" }
+                        }
+                    }
+                }
+                button { r#type: "button", class: "lib-button lib-exit",
+                    onclick: move |_| frame.update(|s| s.exit()),
+                    Icon { name: "stop" } "Exit to desktop"
+                }
             }
         }
     }

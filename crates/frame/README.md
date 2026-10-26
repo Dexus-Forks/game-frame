@@ -36,10 +36,13 @@ its console, including topics it does not know, so a game can add its own (`demo
 | Topic | Direction | Data |
 |---|---|---|
 | `frame.ready` | frame to game | `{"renderer", "settings"}`, once, after the manifest is read |
-| `frame.open`, `frame.close` | either way | the frame opened over a running game, or closed |
+| `frame.open` | either way | show the frame over a running game: the game's own menu asks for the launcher, or the frame opened |
+| `frame.close` | either way | hide the frame and go back to the game ("Back to the game") |
+| `frame.exit` | either way | leave the program for the desktop; the frame stops a running game first |
 | `frame.preference` | frame | `{"key": "frame.show-at-start", "value": false}` |
 | `config.set` | frame to game | `{"key", "value"}`: the player changed a setting |
 | `config.changed` | game to frame | `{"key", "value"}`: the game changed one; the frame saves it |
+| `config.options` | game to frame | `{"key", "options": [{"value", "label"}]}`: the list of a choice whose manifest has `from` |
 | `render.select` | frame to game | `{"renderer": "glide"}` |
 | `game.start` | frame to game | `{"renderer", "settings", "args"}` |
 | `game.stop` | frame to game | none: stop, as the game's own quit does |
@@ -81,6 +84,10 @@ names, so a game opts into each feature by listing it.
   `missing`, and may give `done` of `total` (calls, features, tests: the game says which) and
   notes. The player sees how complete each renderer is before choosing it.
 - **Settings.** `toggle`, `choice` (with `options`), `range` (`min`, `max`, `step`) and `text`.
+  A choice whose options come from the game's data, such as its tracks or cars, has `from`
+  instead of a fixed list: `{"files": "DATA/TRACKS/*.TRK"}` lists the matching files in the
+  game's folder (a config-only game), and `{"game": true}` waits for the game to send
+  `config.options`. A saved value that is no longer in the list moves to the first option.
   `group` puts settings under a heading. `restart: true` says the change waits for the next
   start. The frame refuses a value of the wrong kind.
 - **Versions.** `CONTRACT` is `1.0`. The frame refuses a larger major number. A minor version
@@ -107,12 +114,31 @@ starts the game:
 ```
 
 On `game.start` it runs the command with `{renderer}` and `{setting:KEY}` filled in. It reports
-`running`, then `stopped` when the program ends.
+`running`, then `stopped` when the program ends. `Configured::load(path)` reads the file from
+disk: `"folder"` names the game's folder relative to it, the command runs there, and each choice
+with `"from": {"files": PATTERN}` lists the matching files there. The pattern's folders match
+in any case, and its last part takes `*` and `?` (`list_files`). Such a game has no channel to
+the frame while it runs, so the frame comes back when the program ends.
+[`launcher/`](../../launcher/README.md) is a program that does all this from a `frame.json`.
+
+## Back to the launcher
+
+`Session::shown()` says whether the frame should be on screen. It starts shown. A frame whose
+game opens its own window calls `hide_while_running(true)`, and then a game that reports
+`running` hides it. `frame.close` hides it ("Back to the game", `back_to_game()`), and
+`frame.open` shows it: the game sends it from its own menu, or the frame from `open_frame()`.
+A game that stops or fails shows it again.
+
+When the game ends by itself, the saved `frame.on-exit` decides: `"launcher"`, the default,
+shows the frame, and `"desktop"` asks the program to leave (`wants_exit()`). A stop the player
+asked for in the frame, and a game that failed, always show the frame. The player's "Exit to
+desktop" is `exit()`: it stops a running game, so the game can save, then sends `frame.exit`.
 
 ## Settings and the first run
 
 `Settings` holds the saved values: the game's, keyed as its manifest says, and the frame's own,
-whose keys start with `frame.` (`frame.renderer`, `frame.show-at-start`, `frame.preset`). It saves to one JSON
+whose keys start with `frame.` (`frame.renderer`, `frame.show-at-start`, `frame.preset`,
+`frame.on-exit`). It saves to one JSON
 object (`settings_file::load` and `save` on the desktop). `show_at_start(args)` decides whether
 the frame opens: `--frame` or `--launcher` always opens it, `--no-frame` never does, and otherwise
 it opens until the player turns "Open this window when the game starts" off.
@@ -120,7 +146,8 @@ it opens until the player turns "Open this window when the game starts" off.
 ## The demo game
 
 `Demo` is the frame's stand-in when there is no port. It lists every capability, three
-renderers with different grades, four settings and six controls. It answers each event with a
+renderers with different grades, five settings and six controls. Its track list comes from
+the game: it sends `config.options` when the frame is ready. It answers each event with a
 console line, takes 30 ticks to "load", and presses its own controls every
 `DEMO_PRESS_TICKS` ticks as `demo.press` events, so the console shows traffic with no one at the
 keys.

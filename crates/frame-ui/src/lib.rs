@@ -27,7 +27,7 @@ mod views;
 pub use icon::Icon;
 pub use markdown::to_html as markdown_to_html;
 pub use shell::{Frame, FRAME_CSS, LIBRARY_CSS, TOKENS_CSS};
-pub use state::{use_frame, AnyLibrary, FrameContext, FrameSetup, SaveSettings};
+pub use state::{use_frame, AnyLibrary, FrameContext, FrameSetup, SaveSettings, ShowWindow};
 pub use themes::{active_theme, theme, theme_label, THEMES};
 pub use views::{Console, LibraryView, Page, Play, SettingsView};
 

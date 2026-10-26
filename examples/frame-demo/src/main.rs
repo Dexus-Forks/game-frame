@@ -1,5 +1,5 @@
 //! The frame with no game. The demo game from `gameframe-frame` stands in for a port: it has
-//! three renderers with different grades, four settings and a pad of controls, it answers each
+//! three renderers with different grades, five settings (a track list the game fills) and a pad of controls, it answers each
 //! event on the console, and it presses its own controls every two seconds.
 //!
 //! The sections come from `templates/library-page/library.json`. The look is the ready-made

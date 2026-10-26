@@ -15,6 +15,21 @@ Every release of GameFrame, newest first. The format follows
   GitHub release from the changelog. `release.py next` opens the next version on its own.
 - The commit gate blocks a commit while `plugin.json` still names a release that has its tag,
   so every change after a release lands under the next version's Unreleased section.
+- `launcher/`, gameframe-launcher: the frame in front of a game that a `frame.json` describes,
+  such as a Wine kernel running the original. It hides while the game runs and comes back when
+  the game ends, or exits to the desktop if the player chose that. `--no-frame` starts the game
+  at once.
+- A choice setting can list what is on the disc. `"from": {"files": PATTERN}` lists the
+  matching files in the game's folder (`Configured::load`, `list_files`), and `"from": {"game":
+  true}` waits for the game's `config.options`. `frame.json` takes a `folder`, where the command
+  runs.
+- A way back to the launcher. `frame.open` from a running game shows the frame, "Back to the
+  game" sends `frame.close`, and `Session::hide_while_running` hides it while the game runs.
+  `FrameSetup::with_window` shows and hides a desktop window. In a page the hidden frame leaves an
+  "Open the frame" button.
+- Game exit. `frame.on-exit` chooses what happens when the game ends by itself: the launcher
+  comes back, or the program exits to the desktop. "Exit to desktop" (`Session::exit`,
+  `frame.exit`, `FrameSetup::with_exit`) stops the game, then leaves.
 
 ### Changed
 

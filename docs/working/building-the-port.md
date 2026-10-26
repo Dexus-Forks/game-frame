@@ -70,6 +70,7 @@ the features it handles, and the frame shows only those. Its pieces are in GameF
 | [gameframe-frame](../../crates/frame/README.md) | The contract: events and their topics, the manifest, the session both sides share, and the adapters for games outside Rust. It has no user interface and builds for the browser |
 | [gameframe-frame-ui](../../crates/frame-ui/README.md) | The frame's views as Dioxus components, for the browser and the desktop |
 | [gameframe-library](../../crates/library/README.md) | The player's library: game data, saves and the sections a game opts into |
+| [gameframe-launcher](../../launcher/README.md) | The frame in front of a game that a `frame.json` describes, such as a Wine kernel running the original. No Rust code of the game's own |
 | [The library page](../../templates/library-page/README.md) | A plain HTML page for browser ports: the library, design tokens, panels and Markdown pages, set up from one `library.json` |
 
 ### What the player sees
@@ -77,9 +78,9 @@ the features it handles, and the frame shows only those. Its pieces are in GameF
 | Part | What it does |
 |---|---|
 | Launcher | Opens on the first run. A "show at start" setting keeps it or skips it later. `--frame` on the command line opens it again |
-| Play | The renderers with their grades, start and stop, and what the game reports it is doing |
+| Play | The renderers with their grades, start and stop, and what the game reports it is doing. While the game runs, "Back to the game" hides the frame, and the game can open it again from its own menu. When the game ends, the frame comes back, or the program exits to the desktop if the player chose that. "Exit to desktop" leaves at any time |
 | Library | The game data, the saves, and the sections the game opts into: mods, screenshots, recordings or its own |
-| Settings | One control for each setting in the game's manifest: a toggle, a choice, a range or text, in groups. A setting can say it needs a restart |
+| Settings | One control for each setting in the game's manifest: a toggle, a choice, a range or text, in groups. A setting can say it needs a restart. A choice can list what is on the disc, such as the tracks or the cars: the files that match a pattern, or a list the game sends |
 | Renderers | For a game with several 3D-card builds, such as Glide, PowerVR and software, one entry for each. Each carries a grade (exact, good, partial, experimental or missing), how much of its API is done, and its known gaps |
 | Help pages | Markdown pages listed in `library.json`. The HTML library page also has panels for news, a changelog, messages, a video and GitHub releases |
 | Console | Every event between the frame and the game, the game's controls as buttons, and a line to send any event |
@@ -98,7 +99,10 @@ as `game.start`.
 | Topic | Direction | Data |
 |---|---|---|
 | `frame.ready` | frame to game | The saved value of every setting |
+| `frame.open`, `frame.close` | either way | Show the frame over the running game, or go back to the game |
+| `frame.exit` | either way | Leave the program for the desktop, after stopping the game |
 | `config.set`, `config.changed` | frame to game, game to frame | A setting's key and its new value |
+| `config.options` | game to frame | The list for a choice whose options come from the game, such as its tracks |
 | `render.select` | frame to game | The renderer the player chose |
 | `game.start`, `game.stop` | frame to game | The renderer, the settings and the arguments |
 | `game.status` | game to frame | `loading`, `running`, `paused`, `stopped` or `failed`, with a detail line |
@@ -120,7 +124,7 @@ later major version.
 |---|---|---|
 | Rust | A port written in Rust | A type that implements the `Game` trait: `manifest`, `on_event` and `poll` |
 | JSON lines | A port in any other language | A program that prints its manifest as its first line. It then reads events on standard input and writes events on standard output, one JSON object per line. Its standard error goes to the console |
-| Config only | A game the frame starts as a separate program | A `frame.json` with the manifest and the start command. The frame fills `{renderer}` and `{setting:KEY}` in the command's arguments |
+| Config only | A game the frame starts as a separate program | A `frame.json` with the manifest, the start command and the game's folder. The frame fills `{renderer}` and `{setting:KEY}` in the command's arguments. [gameframe-launcher](../../launcher/README.md) runs it with no Rust code of the game's own. Such a game cannot open the frame while it runs: the frame comes back when it ends |
 
 `Demo` in gameframe-frame stands in for a game, so the frame runs with none.
 
@@ -142,9 +146,6 @@ on a modern machine.
 
 ### Planned
 
-- A launcher program that opens a `frame.json` game with no Rust code of its own. Today
-  [the frame demo](../../examples/frame-demo/README.md) opens the views in a browser or a desktop
-  window, with the demo game.
 - The project viewer (`re-browse`) as a tab of the frame.
 
 When a game needs something the frame lacks, such as a kind of setting, a topic or a panel, add

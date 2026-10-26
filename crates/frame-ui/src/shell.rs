@@ -34,7 +34,12 @@ pub fn Frame(setup: FrameSetup) -> Element {
             frame.tick();
         }
     });
-    use_hook(move || frame.update(|s| s.ready()));
+    use_hook(move || {
+        frame.update(|s| s.ready());
+        if frame.starts_at_once() {
+            frame.update(|s| s.start(Vec::new()));
+        }
+    });
 
     let spec = frame.spec();
     let manifest = frame.with(|s| s.manifest().clone());
@@ -56,6 +61,23 @@ pub fn Frame(setup: FrameSetup) -> Element {
     }
     tabs.push((Tab::Console, "Console".into(), "game"));
     let current = tab();
+    let shown = frame.with(|s| s.shown());
+
+    // Hidden with no window to hide (the browser): the game has the page, and one button
+    // brings the frame back.
+    if !shown && !frame.has_window() {
+        return rsx! {
+            style { "{TOKENS_CSS}" }
+            style { "{LIBRARY_CSS}" }
+            style { "{FRAME_CSS}" }
+            div { id: "library", class: "lib-frame-closed", "data-scheme": "{scheme}", style: "{theme}",
+                button { r#type: "button", class: "lib-button lib-frame-open",
+                    onclick: move |_| frame.update(|s| s.open_frame()),
+                    crate::Icon { name: "game" } "Open the frame"
+                }
+            }
+        };
+    }
 
     rsx! {
         style { "{TOKENS_CSS}" }

@@ -6,8 +6,8 @@
 
 use crate::event::{matches, topics, valid_topic, Event, Origin};
 use crate::game::{Game, Outbox};
-use crate::manifest::Manifest;
-use crate::settings::Settings;
+use crate::manifest::{Choice, Kind, Manifest};
+use crate::settings::{Settings, ON_EXIT};
 use serde_json::{json, Value};
 use std::collections::VecDeque;
 
@@ -25,6 +25,11 @@ pub struct Session {
     log: VecDeque<Event>,
     next_id: u64,
     listeners: Vec<(String, Listener)>,
+    shown: bool,
+    hide_while_running: bool,
+    /// The frame sent `game.stop`: the game did not end by itself.
+    stopping: bool,
+    exit: bool,
 }
 
 impl Session {
@@ -35,7 +40,12 @@ impl Session {
         manifest.check()?;
         for s in &manifest.settings {
             if !settings.get(&s.key).is_some_and(|v| s.accepts(v)) {
-                settings.set(&s.key, s.default.clone());
+                // A list filled from the game's files may not hold the default: take its first.
+                let first = match &s.kind {
+                    Kind::Choice { options, .. } if !s.accepts(&s.default) => options.first().map(|c| json!(c.value)),
+                    _ => None,
+                };
+                settings.set(&s.key, first.unwrap_or_else(|| s.default.clone()));
             }
         }
         let renderer = settings
@@ -53,7 +63,47 @@ impl Session {
             log: VecDeque::new(),
             next_id: 1,
             listeners: Vec::new(),
+            shown: true,
+            hide_while_running: false,
+            stopping: false,
+            exit: false,
         })
+    }
+
+    /// Whether the frame should be on screen. It starts shown. `frame.close` and, with
+    /// [`Session::hide_while_running`], a game that reports `running` hide it; `frame.open` and a
+    /// game that stops or fails show it again.
+    pub fn shown(&self) -> bool {
+        self.shown
+    }
+
+    /// Hide the frame while the game runs: for a launcher whose game opens its own window.
+    pub fn hide_while_running(&mut self, on: bool) {
+        self.hide_while_running = on;
+    }
+
+    /// Whether the program should end now: after `frame.exit`, from the player, the game, or a
+    /// game that ended by itself while `frame.on-exit` is `"desktop"`.
+    pub fn wants_exit(&self) -> bool {
+        self.exit
+    }
+
+    /// The player's "Exit to desktop": stop a running game, then send `frame.exit`.
+    pub fn exit(&mut self) {
+        if matches!(self.state.as_str(), "loading" | "running" | "paused") {
+            self.stop();
+        }
+        self.send(topics::FRAME_EXIT, Value::Null);
+    }
+
+    /// Show the frame over the running game, and tell the game (`frame.open`).
+    pub fn open_frame(&mut self) {
+        self.send(topics::FRAME_OPEN, Value::Null);
+    }
+
+    /// The player's "Back to the game": hide the frame (`frame.close`).
+    pub fn back_to_game(&mut self) {
+        self.send(topics::FRAME_CLOSE, Value::Null);
     }
 
     pub fn manifest(&self) -> &Manifest {
@@ -169,6 +219,25 @@ impl Session {
         Some(e)
     }
 
+    /// `config.options` from the game: fill the choice's list, and move a saved value that is
+    /// not in it to the first option.
+    fn fill_options(&mut self, e: &Event) {
+        let (Some(key), Some(list)) = (e.str("key"), e.data.get("options")) else { return };
+        let Ok(list) = serde_json::from_value::<Vec<Choice>>(list.clone()) else {
+            return self.note("warn", &format!("config.options for {key}: the options are not a list of value and label"));
+        };
+        let Some(s) = self.manifest.settings.iter_mut().find(|s| s.key == key) else { return };
+        if !matches!(&s.kind, Kind::Choice { from: Some(_), .. }) {
+            return self.note("warn", &format!("config.options for {key}: its manifest does not say the options come later"));
+        }
+        let first = list.first().map(|c| c.value.clone()).unwrap_or_default();
+        s.fill(list);
+        let fits = self.settings.get(key).is_some_and(|v| s.accepts(v));
+        if !fits {
+            self.settings.set(key, json!(first));
+        }
+    }
+
     fn apply(&mut self, e: &Event) {
         match e.topic.as_str() {
             topics::CONFIG_SET | topics::CONFIG_CHANGED => {
@@ -192,10 +261,29 @@ impl Session {
             topics::GAME_STATUS => {
                 if let Some(state) = e.str("state") {
                     self.state = state.to_string();
+                    match state {
+                        "running" if self.hide_while_running => self.shown = false,
+                        "stopped" if !self.stopping && self.exit_to_desktop() => self.exit = true,
+                        "stopped" | "failed" => self.shown = true,
+                        _ => {}
+                    }
+                    if matches!(state, "stopped" | "failed") {
+                        self.stopping = false;
+                    }
                 }
             }
+            topics::GAME_START => self.stopping = false,
+            topics::GAME_STOP => self.stopping = true,
+            topics::FRAME_EXIT => self.exit = true,
+            topics::FRAME_OPEN => self.shown = true,
+            topics::FRAME_CLOSE => self.shown = false,
+            topics::CONFIG_OPTIONS => self.fill_options(e),
             _ => {}
         }
+    }
+
+    fn exit_to_desktop(&self) -> bool {
+        self.settings.get(ON_EXIT).and_then(Value::as_str) == Some("desktop")
     }
 
     /// A line in the console from the frame itself.

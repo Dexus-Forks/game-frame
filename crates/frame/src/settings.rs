@@ -1,5 +1,5 @@
 //! The saved settings: the game's (keyed as its manifest says) and the frame's own, whose keys
-//! start with `frame.` (`frame.renderer`, `frame.show-at-start`). Saved as one JSON object.
+//! start with `frame.` (`frame.renderer`, `frame.show-at-start`, `frame.on-exit`). Saved as one JSON object.
 
 use serde_json::{Map, Value};
 
@@ -8,6 +8,11 @@ pub const SHOW_AT_START: &str = "frame.show-at-start";
 /// The ready-made theme the player chose, by name, or `"none"` for the frame's own look. The
 /// frame offers the choice only when `library.json` lists `presets`.
 pub const PRESET: &str = "frame.preset";
+
+/// What happens when the game ends by itself (the player quit it, or its program ended):
+/// `"launcher"`, the default, shows the frame again; `"desktop"` leaves the program. A stop the
+/// player asked for in the frame, and a game that failed, always show the frame.
+pub const ON_EXIT: &str = "frame.on-exit";
 
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct Settings {

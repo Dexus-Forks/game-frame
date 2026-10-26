@@ -54,7 +54,10 @@ fn Field(setting: Setting) -> Element {
             input { id: "{id}", r#type: "checkbox", checked: value.as_bool().unwrap_or(false),
                 onchange: move |e| set(json!(e.checked())) }
         },
-        Kind::Choice { options } => rsx! {
+        Kind::Choice { options, from: Some(_) } if options.is_empty() => rsx! {
+            span { class: "lib-row-meta", "The game lists these when it is ready." }
+        },
+        Kind::Choice { options, .. } => rsx! {
             select { id: "{id}", class: "lib-input", value: value.as_str().unwrap_or("").to_string(),
                 onchange: move |e| set(json!(e.value())),
                 for o in options.iter() {

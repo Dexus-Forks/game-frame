@@ -1,20 +1,14 @@
-//! Games outside Rust: another program that speaks the contract over JSON lines, and a game set
-//! up from `frame.json` alone.
+//! A game outside Rust: another program that speaks the contract over JSON lines.
 //!
-//! **JSON lines.** [`Process`] starts the game's program. The program's first line on standard
+//! [`Process`] starts the game's program. The program's first line on standard
 //! output is its manifest. After that, the frame writes each event to the program's standard
 //! input and reads the program's events from its standard output, one JSON object per line, as
 //! [`crate::Event`] serialises them. Anything the program writes to standard error goes to the
 //! console as a log line. A program in any language can do this with its standard library.
-//!
-//! **Config only.** [`Configured`] reads `frame.json`: a manifest and the command that starts
-//! the game. On `game.start` it runs the command, with `{renderer}` and `{setting:KEY}` in the
-//! arguments replaced, and reports `running` and then `stopped` when the program ends.
 
-use crate::event::{topics, Event, Origin};
+use crate::event::{Event, Origin};
 use crate::game::{Game, Outbox};
 use crate::manifest::Manifest;
-use serde::Deserialize;
 use std::io::{BufRead, BufReader, Write};
 use std::process::{Child, ChildStdin, Command, Stdio};
 use std::sync::mpsc::{channel, Receiver};
@@ -97,104 +91,5 @@ impl Game for Process {
 impl Drop for Process {
     fn drop(&mut self) {
         let _ = self.child.kill();
-    }
-}
-
-#[derive(Debug, Clone, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct FrameFile {
-    pub manifest: Manifest,
-    pub start: Option<StartCommand>,
-}
-
-#[derive(Debug, Clone, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct StartCommand {
-    pub command: String,
-    #[serde(default)]
-    pub args: Vec<String>,
-}
-
-pub struct Configured {
-    file: FrameFile,
-    child: Option<Child>,
-}
-
-impl Configured {
-    pub fn from_json(text: &str) -> Result<Configured, String> {
-        let file: FrameFile = serde_json::from_str(text).map_err(|e| format!("frame.json: {e}"))?;
-        file.manifest.check()?;
-        Ok(Configured { file, child: None })
-    }
-
-    /// The arguments with `{renderer}` and `{setting:KEY}` filled in from a `game.start`.
-    pub fn arguments(&self, start: &Event) -> Vec<String> {
-        let renderer = start.str("renderer").unwrap_or("");
-        let settings = &start.data["settings"];
-        let mut args: Vec<String> = self
-            .file
-            .start
-            .iter()
-            .flat_map(|s| s.args.iter())
-            .map(|a| {
-                let mut a = a.replace("{renderer}", renderer);
-                while let Some(i) = a.find("{setting:") {
-                    let Some(end) = a[i..].find('}') else { break };
-                    let key = &a[i + 9..i + end];
-                    let value = match &settings[key] {
-                        serde_json::Value::String(s) => s.clone(),
-                        serde_json::Value::Null => String::new(),
-                        v => v.to_string(),
-                    };
-                    a.replace_range(i..i + end + 1, &value);
-                }
-                a
-            })
-            .collect();
-        if let Some(extra) = start.data["args"].as_array() {
-            args.extend(extra.iter().filter_map(|v| v.as_str().map(String::from)));
-        }
-        args
-    }
-}
-
-impl Game for Configured {
-    fn manifest(&self) -> Manifest {
-        self.file.manifest.clone()
-    }
-
-    fn on_event(&mut self, e: &Event, out: &mut Outbox) {
-        match e.topic.as_str() {
-            topics::GAME_START => {
-                let Some(start) = &self.file.start else {
-                    return out.status("failed", "frame.json has no start command");
-                };
-                let args = self.arguments(e);
-                match Command::new(&start.command).args(&args).spawn() {
-                    Ok(child) => {
-                        self.child = Some(child);
-                        out.status("running", &format!("{} {}", start.command, args.join(" ")));
-                    }
-                    Err(err) => out.status("failed", &format!("{}: {err}", start.command)),
-                }
-            }
-            topics::GAME_STOP => {
-                if let Some(mut c) = self.child.take() {
-                    let _ = c.kill();
-                    let _ = c.wait();
-                }
-                out.status("stopped", "the player stopped the game");
-            }
-            _ => {}
-        }
-    }
-
-    fn poll(&mut self, out: &mut Outbox) {
-        if let Some(c) = &mut self.child {
-            if let Ok(Some(status)) = c.try_wait() {
-                self.child = None;
-                out.status("stopped", &format!("the game ended ({status})"));
-            }
-        }
     }
 }

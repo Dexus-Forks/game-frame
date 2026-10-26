@@ -78,9 +78,17 @@ pub mod topics {
     /// Frame to game, once, after the frame has read the manifest. Data: `{"settings": {...}}`,
     /// the saved values of every setting.
     pub const FRAME_READY: &str = "frame.ready";
-    /// Frame to game when the player opens the frame again over a running game, and back.
+    /// Either way: show the frame over a running game. The game sends it when the player asks
+    /// for the launcher (a key, a menu item); the frame sends it when it opens by itself, so the
+    /// game can pause. A game that stops or fails opens the frame too.
     pub const FRAME_OPEN: &str = "frame.open";
+    /// Either way: hide the frame and go back to the game. The player's "Back to the game" sends
+    /// it. A frame set to hide while the game runs also hides when the game reports `running`.
     pub const FRAME_CLOSE: &str = "frame.close";
+    /// Either way: leave the program for the desktop. The frame stops a running game first, so
+    /// the game can save. The player's "Exit to desktop" sends it, and so does a game that ended
+    /// by itself when `frame.on-exit` is `"desktop"`. A game may send it from its own Quit item.
+    pub const FRAME_EXIT: &str = "frame.exit";
 
     /// The frame's own preference changed, such as whether it opens at start. Data:
     /// `{"key": "frame.show-at-start", "value": false}`. Keys start with `frame.`; the game may
@@ -91,6 +99,12 @@ pub mod topics {
     pub const CONFIG_SET: &str = "config.set";
     /// Game to frame: the game changed a setting itself. Same data. The frame saves it.
     pub const CONFIG_CHANGED: &str = "config.changed";
+
+    /// Game to frame: the options of a choice setting whose manifest says `"from": {"game":
+    /// true}`, such as the tracks found on the disc. Data: `{"key": "race.track", "options":
+    /// [{"value": "CANYON", "label": "Canyon"}]}`. A saved value that is not in the list becomes
+    /// the first option.
+    pub const CONFIG_OPTIONS: &str = "config.options";
 
     /// Frame to game: the player chose a renderer. Data: `{"renderer": "glide"}`.
     pub const RENDER_SELECT: &str = "render.select";

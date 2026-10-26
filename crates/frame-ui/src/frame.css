@@ -58,3 +58,13 @@
   .lib-log-from { display: none; }
   .lib-log-data { grid-column: 1 / -1; }
 }
+
+/* Two buttons while the game runs: back to it, or stop it. */
+.lib-actions .lib-start { flex: 1 1 12rem; width: auto; }
+
+/* The frame closed over a game in the same page: one button to open it again. */
+#library.lib-frame-closed { position: fixed; inset: auto; min-height: 0; padding: 0; background: none; right: var(--lib-space-4); bottom: var(--lib-space-4); z-index: 10; }
+#library .lib-frame-open { background: var(--lib-surface); color: var(--lib-text); box-shadow: var(--lib-shadow); }
+
+/* Leaving the program: below the preferences, at the end of the row. */
+.lib-exit { display: flex; margin: var(--lib-space-4) 0 0 auto; gap: var(--lib-space-2); }

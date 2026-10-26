@@ -6,7 +6,7 @@
 
 use crate::event::{topics, Event};
 use crate::game::{Game, Outbox};
-use crate::manifest::{capabilities, Choice, Control, Grade, Kind, Manifest, Renderer, Setting, CONTRACT};
+use crate::manifest::{capabilities, Choice, Control, Grade, Kind, Manifest, OptionsFrom, Renderer, Setting, CONTRACT};
 use serde_json::json;
 
 #[derive(Default)]
@@ -58,8 +58,18 @@ impl Game for Demo {
                         options: [("nearest", "Sharp pixels"), ("scale2x", "Scale2x"), ("crt", "CRT")]
                             .map(|(v, l)| Choice { value: v.into(), label: l.into() })
                             .to_vec(),
+                        from: None,
                     },
                     default: json!("nearest"),
+                    restart: false,
+                },
+                Setting {
+                    key: "race.track".into(),
+                    label: "Track".into(),
+                    help: Some("The tracks the game found in its data. The demo sends three.".into()),
+                    group: Some("Race".into()),
+                    kind: Kind::Choice { options: Vec::new(), from: Some(OptionsFrom { files: None, game: true }) },
+                    default: json!(""),
                     restart: false,
                 },
                 Setting {
@@ -103,7 +113,12 @@ impl Game for Demo {
 
     fn on_event(&mut self, e: &Event, out: &mut Outbox) {
         match e.topic.as_str() {
-            topics::FRAME_READY => out.log("info", "the demo game is listening"),
+            topics::FRAME_READY => {
+                out.log("info", "the demo game is listening");
+                let tracks = [("CANYON", "Canyon"), ("HARBOUR", "Harbour"), ("SNOWLINE", "Snowline")];
+                let options: Vec<_> = tracks.iter().map(|(v, l)| json!({ "value": v, "label": l })).collect();
+                out.send(topics::CONFIG_OPTIONS, json!({ "key": "race.track", "options": options }));
+            }
             topics::GAME_START => {
                 let renderer = e.str("renderer").unwrap_or("none").to_string();
                 self.loading = 30;

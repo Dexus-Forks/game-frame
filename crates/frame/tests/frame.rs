@@ -171,3 +171,160 @@ done"#;
     assert_eq!(s.state(), "running");
     assert!(s.log().iter().any(|e| e.str("text") == Some("pressed")), "standard error goes to the console");
 }
+
+#[test]
+fn the_game_fills_a_choice_from_its_data() {
+    let s = demo();
+    let track = s.manifest().setting("race.track").unwrap();
+    let gameframe_frame::Kind::Choice { options, .. } = &track.kind else { panic!("a choice") };
+    assert_eq!(options.iter().map(|o| o.value.as_str()).collect::<Vec<_>>(), ["CANYON", "HARBOUR", "SNOWLINE"]);
+    assert_eq!(s.settings().get("race.track"), Some(&json!("CANYON")), "an empty saved value moves to the first track");
+
+    let mut saved = Settings::new();
+    saved.set("race.track", json!("SNOWLINE"));
+    let mut s = Session::new(Box::new(Demo::default()), saved).unwrap();
+    assert_eq!(s.settings().get("race.track"), Some(&json!("SNOWLINE")), "kept while the list is not filled");
+    s.ready();
+    assert_eq!(s.settings().get("race.track"), Some(&json!("SNOWLINE")), "kept, since it is in the list");
+    assert!(s.set("race.track", json!("MOON")).is_err());
+    assert!(s.set("race.track", json!("HARBOUR")).is_ok());
+}
+
+#[test]
+fn the_frame_hides_while_the_game_runs_and_comes_back() {
+    let mut s = demo();
+    s.hide_while_running(true);
+    assert!(s.shown());
+    s.start(vec![]);
+    for _ in 0..30 {
+        s.tick();
+    }
+    assert_eq!(s.state(), "running");
+    assert!(!s.shown(), "hidden once the game runs");
+    s.open_frame();
+    assert!(s.shown(), "the game or the player asked for the frame");
+    s.back_to_game();
+    assert!(!s.shown());
+    s.stop();
+    assert!(s.shown(), "a stopped game brings the frame back");
+}
+
+#[test]
+fn a_running_game_asks_for_the_frame() {
+    // The game's own menu has a "Launcher" item: it sends `frame.open`.
+    let script = r#"echo '{"contract":"1.0","name":"sh","capabilities":["start","input"]}'
+while read -r line; do
+  case "$line" in
+    *'"game.start"'*) echo '{"topic":"game.status","data":{"state":"running"},"from":"game"}' ;;
+    *'"input.press"'*) echo '{"topic":"frame.open","data":null,"from":"game"}' ;;
+  esac
+done"#;
+    let game = gameframe_frame::Process::spawn("sh", &["-c".into(), script.into()]).unwrap();
+    let mut s = Session::new(Box::new(game), Settings::new()).unwrap();
+    s.hide_while_running(true);
+    s.start(vec![]);
+    for _ in 0..200 {
+        s.tick();
+        if s.state() == "running" {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    }
+    assert!(!s.shown(), "the game has the screen");
+    s.press("menu", true);
+    for _ in 0..200 {
+        s.tick();
+        if s.shown() {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    }
+    assert!(s.shown(), "frame.open from the game shows the frame");
+}
+
+#[test]
+fn a_config_game_lists_files_and_runs_in_its_folder() {
+    let dir = std::env::temp_dir().join(format!("frame-load-{}", std::process::id()));
+    let tracks = dir.join("game/Data/TRACKS");
+    std::fs::create_dir_all(&tracks).unwrap();
+    for f in ["canyon.trk", "HARBOUR.TRK", "notes.txt"] {
+        std::fs::write(tracks.join(f), b"").unwrap();
+    }
+    std::fs::write(
+        dir.join("frame.json"),
+        r#"{
+        "manifest": {"contract": "1.0", "name": "x", "capabilities": ["start", "settings"],
+                     "settings": [{"key": "race.track", "label": "Track", "type": "choice",
+                                   "from": {"files": "DATA/tracks/*.TRK"}, "default": ""}]},
+        "start": {"command": "sh", "args": ["-c", "echo {setting:race.track} > chosen.txt"]},
+        "folder": "game"
+    }"#,
+    )
+    .unwrap();
+    let game = Configured::load(&dir.join("frame.json")).unwrap();
+    let mut s = Session::new(Box::new(game), Settings::new()).unwrap();
+    let gameframe_frame::Kind::Choice { options, .. } = &s.manifest().setting("race.track").unwrap().kind else { panic!() };
+    assert_eq!(options.iter().map(|o| o.value.as_str()).collect::<Vec<_>>(), ["HARBOUR", "canyon"]);
+    s.set("race.track", json!("canyon")).unwrap();
+    s.start(vec![]);
+    for _ in 0..200 {
+        s.tick();
+        if s.state() == "stopped" {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    }
+    assert_eq!(std::fs::read_to_string(dir.join("game/chosen.txt")).unwrap().trim(), "canyon");
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+/// A game whose program ends at once, as if the player quit it from its own menu.
+fn ending_game(on_exit: &str) -> Session {
+    let text = r#"{"manifest": {"contract": "1.0", "name": "x", "capabilities": ["start"]},
+                   "start": {"command": "true"}}"#;
+    let mut saved = Settings::new();
+    saved.set(gameframe_frame::ON_EXIT, json!(on_exit));
+    let mut s = Session::new(Box::new(Configured::from_json(text).unwrap()), saved).unwrap();
+    s.hide_while_running(true);
+    s.start(vec![]);
+    for _ in 0..200 {
+        s.tick();
+        if s.state() == "stopped" {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    }
+    assert_eq!(s.state(), "stopped");
+    s
+}
+
+#[test]
+fn a_game_that_ends_returns_to_the_launcher_or_the_desktop() {
+    let s = ending_game("launcher");
+    assert!(s.shown() && !s.wants_exit(), "the default brings the launcher back");
+    let s = ending_game("desktop");
+    assert!(s.wants_exit(), "frame.on-exit desktop leaves the program");
+}
+
+#[test]
+fn the_player_stops_or_exits() {
+    let mut s = demo();
+    s.send(topics::FRAME_PREFERENCE, json!({"key": "frame.on-exit", "value": "desktop"}));
+    s.start(vec![]);
+    for _ in 0..30 {
+        s.tick();
+    }
+    s.stop();
+    for _ in 0..30 {
+        s.tick();
+    }
+    assert_eq!(s.state(), "stopped");
+    assert!(!s.wants_exit(), "a stop the player asked for keeps the launcher");
+    s.start(vec![]);
+    for _ in 0..30 {
+        s.tick();
+    }
+    s.exit();
+    assert!(s.wants_exit());
+    assert!(s.log().iter().rev().any(|e| e.topic == topics::GAME_STOP), "the game is stopped first, so it can save");
+}
