@@ -16,6 +16,20 @@ pub fn index_to_w(i: usize) -> f32 {
     2f32.powi(3 + (i >> 2) as i32) / (8 - (i & 3)) as f32
 }
 
+/// `guFogGenerateLinear(table, nearW, farW)`: the Glide 2.x utility that fills the table with
+/// a fog that rises linearly from 0 at `near` to 255 at `far` (in w), each entry the value at
+/// its own w ([`index_to_w`]). *Inferred* from the Glide 2.x reference manual, which describes
+/// it as linear fog between the two w. Deviation: the clamp to 0–1 and the cut to an integer
+/// are this model's; whether Glide rounds instead is *unknown*.
+#[allow(non_snake_case)]
+pub fn guFogGenerateLinear(table: &mut [u8; 64], near: f32, far: f32) {
+    for (i, e) in table.iter_mut().enumerate() {
+        let w = index_to_w(i).min(65535.0);
+        let f = ((w - near) / (far - near)).clamp(0.0, 1.0);
+        *e = (f * 255.0) as u8;
+    }
+}
+
 /// The fog alpha (0–255) at W buffer value `w`.
 pub fn table_alpha(table: &[u8; 64], w: u16) -> u8 {
     let i = (w >> 10) as usize;
@@ -43,6 +57,18 @@ mod tests {
             let w = index_to_w(i) * 1.0001;
             assert_eq!(wfloat(1.0 / w) >> 10, i as u16, "entry {i}");
         }
+    }
+
+    #[test]
+    fn linear_fog_table() {
+        let mut t = [0u8; 64];
+        guFogGenerateLinear(&mut t, 100.0, 1000.0);
+        assert_eq!(t[0], 0);
+        assert_eq!(t[63], 255);
+        assert!(t.windows(2).all(|p| p[0] <= p[1]));
+        // Entry 28 is w = 2^10 / 8 = 128: (128 - 100) / 900 of the way.
+        assert_eq!(index_to_w(28), 128.0);
+        assert_eq!(t[28], (28.0f32 / 900.0 * 255.0) as u8);
     }
 
     #[test]

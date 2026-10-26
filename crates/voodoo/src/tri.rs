@@ -168,7 +168,9 @@ pub fn triangle(frame: &mut Frame, state: &State, texture: Option<&Texture>, v: 
                 let df = blend_factor(state.blend[1], src, dst, true);
                 std::array::from_fn(|k| ((src[k] * sf[k] + dst[k] * df[k]) * 255.0).round().clamp(0.0, 255.0) as u8)
             };
-            frame.colour[i] = to_565(colour, x as usize, y as usize, state.dither);
+            if state.colour_mask {
+                frame.colour[i] = to_565(colour, x as usize, y as usize, state.dither);
+            }
             if state.depth_mask && state.depth_mode != DEPTHBUFFER_DISABLE {
                 frame.depth[i] = depth;
             }

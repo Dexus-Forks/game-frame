@@ -82,6 +82,29 @@ impl Frame {
         self.depth.fill(depth);
     }
 
+    /// A FASTFILL of the rectangle `[x0, y0, x1, y1)` (right and bottom not filled): the
+    /// colour, written undithered, when given, and the depth when given (SST-1 specification
+    /// section 5.23, *observed*).
+    pub fn clear_rect(&mut self, rect: [i32; 4], colour: Option<u32>, depth: Option<u16>) {
+        let x0 = rect[0].clamp(0, self.width as i32) as usize;
+        let x1 = rect[2].clamp(0, self.width as i32) as usize;
+        let y0 = rect[1].clamp(0, self.height as i32) as usize;
+        let y1 = rect[3].clamp(0, self.height as i32) as usize;
+        let p = colour.map(|c| {
+            let c = crate::combine::argb(c);
+            to_565([c[0], c[1], c[2]], 0, 0, false)
+        });
+        for y in y0..y1 {
+            let row = y * self.width;
+            if let Some(p) = p {
+                self.colour[row + x0..row + x1.max(x0)].fill(p);
+            }
+            if let Some(d) = depth {
+                self.depth[row + x0..row + x1.max(x0)].fill(d);
+            }
+        }
+    }
+
     /// The picture as RGBA, 8 bits a channel, through `grGammaCorrectionValue`'s curve
     /// (`c^(1/gamma)`, the Glide 2.x reference manual).
     pub fn rgba(&self, gamma: f32) -> Vec<u8> {

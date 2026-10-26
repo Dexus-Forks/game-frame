@@ -70,6 +70,9 @@ pub struct State {
     pub depth_mode: u32,
     pub depth_function: u32,
     pub depth_mask: bool,
+    /// `grColorMask(rgb, alpha)`'s first argument: false keeps the colour buffer as it is
+    /// (`fbzMode` bit 9, SST-1 specification section 5.19).
+    pub colour_mask: bool,
     /// `grAlphaTestFunction` and its reference.
     pub alpha_test: (u32, u8),
     pub fog_mode: u32,
@@ -97,6 +100,7 @@ impl Default for State {
             depth_mode: DEPTHBUFFER_DISABLE,
             depth_function: CMP_LESS,
             depth_mask: false,
+            colour_mask: true,
             alpha_test: (CMP_ALWAYS, 0),
             fog_mode: FOG_DISABLE,
             fog_colour: 0,

@@ -40,9 +40,15 @@ pub struct Glide {
     pub scale: f32,
     /// `grGammaCorrectionValue`.
     pub gamma: f32,
-    textures: HashMap<u32, Texture>,
-    source: Option<u32>,
-    palette: Vec<[u8; 3]>,
+    pub(crate) textures: HashMap<u32, Texture>,
+    /// The texels as downloaded, for the palette formats: the TMU looks the palette up as it
+    /// samples ("four texels are looked up simultaneously, each an independent 8-bit address",
+    /// SST-1 specification section 5.56.2, *observed*), so a new palette recolours them.
+    pub(crate) raw: HashMap<u32, (Format, usize, usize, Vec<u8>)>,
+    pub(crate) source: Option<u32>,
+    pub(crate) palette: Vec<[u8; 3]>,
+    /// `guTexAllocateMemory`'s textures and the texture memory left (`gu`).
+    pub(crate) gu: crate::gu::TexMemory,
 }
 
 impl Glide {
@@ -60,8 +66,10 @@ impl Glide {
             scale,
             gamma: 1.0,
             textures: HashMap::new(),
+            raw: HashMap::new(),
             source: None,
             palette: vec![[0; 3]; 256],
+            gu: crate::gu::TexMemory::default(),
         }
     }
 
@@ -193,11 +201,22 @@ impl Glide {
         self.gamma = gamma;
     }
 
-    /// `grBufferClear(colour, alpha, depth)`, inside the clip window.
-    /// Deviation: the whole buffer is cleared; the clip window is not applied.
+    /// `grBufferClear(colour, alpha, depth)`: the FASTFILL command, which fills the clip
+    /// window and writes the colour and depth buffers only where `fbzMode`'s masks allow
+    /// (SST-1 specification sections 5.21 and 5.23, *observed*): so with `grColorMask(false,
+    /// …)` only the depth buffer is cleared.
     #[allow(non_snake_case)]
     pub fn grBufferClear(&mut self, argb: u32, _alpha: u8, depth: u16) {
-        self.frame.clear(argb, depth);
+        let [x0, y0, x1, y1] = self.state.clip;
+        let colour = self.state.colour_mask;
+        let depth_on = self.state.depth_mask;
+        self.frame.clear_rect([x0, y0, x1, y1], colour.then_some(argb), depth_on.then_some(depth));
+    }
+
+    /// `grColorMask(rgb, alpha)`. The alpha planes are not modelled.
+    #[allow(non_snake_case)]
+    pub fn grColorMask(&mut self, rgb: bool, _alpha: bool) {
+        self.state.colour_mask = rgb;
     }
 
     /// `grTexDownloadTable(tmu, GR_TEXTABLE_PALETTE, table)`: 256 words `0x00RRGGBB`, for the
@@ -205,6 +224,27 @@ impl Glide {
     #[allow(non_snake_case)]
     pub fn grTexDownloadTable(&mut self, _tmu: u32, _kind: u32, table: &[u32]) {
         self.palette = table.iter().map(|&w| [(w >> 16) as u8, (w >> 8) as u8, w as u8]).collect();
+        let keys: Vec<u32> = self.raw.keys().copied().collect();
+        for k in keys {
+            let (format, w, h, data) = self.raw[&k].clone();
+            if let Ok(t) = Texture::from_glide(format, w, h, &data, Some(&self.palette)) {
+                self.textures.insert(k, t);
+            }
+        }
+    }
+
+    /// A level downloaded at `start`: decoded, and kept as it is when it is a palette format.
+    pub(crate) fn download(&mut self, start: u32, format: Format, w: usize, h: usize, data: &[u8]) {
+        let paletted = format == Format::P8 || format == Format::Ap88;
+        let palette = paletted.then_some(self.palette.as_slice());
+        if let Ok(t) = Texture::from_glide(format, w, h, data, palette) {
+            self.textures.insert(start, t);
+            if paletted {
+                self.raw.insert(start, (format, w, h, data.to_vec()));
+            } else {
+                self.raw.remove(&start);
+            }
+        }
     }
 
     /// `grTexDownloadMipMap(tmu, start, evenOdd, &info)`: the largest level decoded and kept
@@ -214,10 +254,7 @@ impl Glide {
         let (Some(format), Some((w, h))) = (Format::from_u32(info.format), size(info.large_lod, info.aspect)) else {
             return;
         };
-        let palette = (format == Format::P8 || format == Format::Ap88).then_some(self.palette.as_slice());
-        if let Ok(t) = Texture::from_glide(format, w, h, info.data, palette) {
-            self.textures.insert(start, t);
-        }
+        self.download(start, format, w, h, info.data);
     }
 
     /// A decoded texture put at `start` directly, for ports whose pictures are already RGBA.
@@ -242,6 +279,15 @@ impl Glide {
         };
         let texture = self.source.and_then(|k| self.textures.get(&k));
         triangle(&mut self.frame, &self.state, texture, [&up(a), &up(b), &up(c)]);
+    }
+
+    /// `grDrawPolygon(n, ilist, vlist)`: a convex polygon of the vertices `vlist[ilist[i]]`,
+    /// drawn as a fan from the first (*inferred*: the Glide 2.x reference manual draws a
+    /// convex polygon; a fan gives the same pixels for a convex one).
+    #[allow(non_snake_case)]
+    pub fn grDrawPolygon(&mut self, ilist: &[usize], vlist: &[Vertex]) {
+        let verts: Vec<Vertex> = ilist.iter().filter_map(|&i| vlist.get(i).copied()).collect();
+        self.fan(&verts);
     }
 
     /// A polygon as a fan from its first vertex, as games draw them with `grDrawTriangle`.
