@@ -10,7 +10,7 @@ The project quick start is in `docs/GAME_PROFILE.md`.
 
 | File | Role | Architecture | Notes |
 |---|---|---|---|
-| | | | (fill from `./gameframe run peinfo target/...`) |
+| | | | (fill from `./gameframe run peinfo game/...`) |
 
 ## Engine and middleware
 

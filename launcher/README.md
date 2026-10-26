@@ -46,9 +46,13 @@ gameframe-launcher [PATH] [--frame | --no-frame] [--data DIR] [--preset NAME]
 
 - `manifest` is the frame's manifest, as in the frame's README.
 - `start` is the command. `{renderer}` and `{setting:KEY}` in its arguments are filled in.
-- `folder` is the game's folder, relative to `frame.json`. The command runs there.
+- `folder` is the game's folder, relative to `frame.json`. The command runs there. `{folder}`
+  in the arguments becomes its full path.
+- `image` names a disc image instead, such as `"image": "media/GAME.CUE"` in a GameFrame
+  project. File lists are read from inside the image, and `{image}` in the arguments becomes
+  its full path, for an emulator that mounts it (`imgmount d {image}` in DOSBox).
 - A choice with `"from": {"files": PATTERN}` lists the files that match in the game's folder,
-  by name without the extension: the tracks, the cars or the levels. The folders in the
+  or in the image, by name without the extension: the tracks, the cars or the levels. The folders in the
   pattern match in any case, and its last part takes `*` and `?`.
 
 `example/` has a `frame.json` whose game is a shell command that prints its arguments and

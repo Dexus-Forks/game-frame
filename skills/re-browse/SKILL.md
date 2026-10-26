@@ -15,7 +15,7 @@ Run it after `re-inventory`, before any decoder exists. It lists every file with
 its first bytes), its size, its entropy and a hex view.
 
 ```bash
-python3 tools/formats/catalog.py target/game derived/catalog
+python3 tools/formats/catalog.py game derived/catalog
 open derived/catalog/index.html          # for the person
 cat derived/catalog/catalog.json         # for the agent: one entry per file, and the summary
 ```
@@ -26,10 +26,10 @@ As decoders are written (`re-format`), pass each one with the files it reads. Th
 same `decode(reader)` module `validate.py` runs:
 
 ```bash
-python3 tools/formats/catalog.py target/game derived/catalog \
+python3 tools/formats/catalog.py game derived/catalog \
     --decoder '*.dat=decoders/units.py' \
     --decoder 'graphics/*.pic=decoders/picture.py' \
-    --palette target/game/GAME.PAL --palette-offset 0
+    --palette game/GAME.PAL --palette-offset 0
 ```
 
 To see pictures, add `images(result)` to the decoder. It returns a list of
@@ -94,7 +94,7 @@ different synthesiser) with `Deviation:` comments.
 ## 4. Native, browser and agents
 
 - Natively, read the game folder given on the command line, defaulting to the project's ignored
-  copy (`game-data/original` or `target/`).
+  copy (`game-data/original` or `game/`).
 - In the browser, read files from a file picker, or from a local development server that
   serves the ignored data folder on `127.0.0.1` only (the port's dev-server script with an
   `--app viewer` choice). Never bundle or upload the files.

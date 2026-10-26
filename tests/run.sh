@@ -13,6 +13,8 @@ set -uo pipefail
 cd "$ROOT"
 S=examples/sample-game; B=$S/build
 pass=0; fail=0
+# A home of its own, so the checks never touch the real ~/gameframe.
+export GAMEFRAME_HOME="$(mktemp -d)/home"
 ok() { echo "  ok    $1"; pass=$((pass + 1)); }
 bad() { echo "  FAIL  $1"; [[ -n "${2:-}" ]] && echo "$2" | sed 's/^/        /'; fail=$((fail + 1)); }
 expect() { # name expected-substring command...
@@ -1036,14 +1038,14 @@ rm -rf "$L"
 echo "Project scaffold"
 tmp="$(mktemp -d)/re-test"
 scripts/new-project.sh "$tmp" "Test Game" $B >/dev/null 2>&1
-[[ -f "$tmp/AGENTS.md" && -f "$tmp/docs/versions.md" && -f "$tmp/docs/GAME_PROFILE.md" && -f "$tmp/README.md" && -f "$tmp/LICENSE-APACHE" && -f "$tmp/LICENSE-CC0-1.0" && ! -e "$tmp/LICENSE-CC-BY-4.0" && ! -e "$tmp/LICENSE-MIT" && -f "$tmp/.cargo/config.toml" && -f "$tmp/.claude/settings.json" && -x "$tmp/gameframe" && -f "$tmp/target/game.exe" && -d "$tmp/.git" && ! -e "$tmp/tools" && ! -e "$tmp/scripts" && ! -e "$tmp/.claude/skills" && -f "$tmp/skills/re-start/SKILL.md" && -f "$tmp/skills/re-profile/SKILL.md" && -L "$tmp/.agents/skills" && ! -e "$tmp/docs/DOS.md" ]] \
+[[ -f "$tmp/AGENTS.md" && -f "$tmp/docs/versions.md" && -f "$tmp/docs/GAME_PROFILE.md" && -f "$tmp/README.md" && -f "$tmp/LICENSE-APACHE" && -f "$tmp/LICENSE-CC0-1.0" && ! -e "$tmp/LICENSE-CC-BY-4.0" && ! -e "$tmp/LICENSE-MIT" && -f "$tmp/.cargo/config.toml" && -f "$tmp/.claude/settings.json" && -x "$tmp/gameframe" && -f "$tmp/game/game.exe" && -L "$tmp/game" && -d "$tmp/.git" && ! -e "$tmp/tools" && ! -e "$tmp/scripts" && ! -e "$tmp/.claude/skills" && -f "$tmp/skills/re-start/SKILL.md" && -f "$tmp/skills/re-profile/SKILL.md" && -L "$tmp/.agents/skills" && ! -e "$tmp/docs/DOS.md" ]] \
   && grep -q "Test Game" "$tmp/AGENTS.md" && grep -q '^# Game profile: Test Game$' "$tmp/docs/GAME_PROFILE.md" && grep -q "In the story | In the code | Evidence" "$tmp/docs/lore.md" && grep -q '"gameframe@game-frame": true' "$tmp/.claude/settings.json" && ! grep -q "gate.py" "$tmp/.claude/settings.json" \
   && grep -q 'gameframe gate cursor' "$tmp/.cursor/hooks.json" && grep -q 'gameframe\\" gate codex' "$tmp/.codex/hooks.json" && grep -q '"AGENTS.md"' "$tmp/.gemini/settings.json" \
-  && ! (cd "$tmp" && git ls-files | grep -q '^target/') \
-  && ok "new-project makes a plugin project: docs/lore.md and GAME_PROFILE.md from their templates, settings enable the plugin, no copied toolkit, the other agents' skills and hooks through ./gameframe gate, target/ out of git" || bad "new-project scaffold" "$(ls -la "$tmp" 2>&1)"
-expect "the launcher finds GameFrame and runs its tools on the project" "EXE, x64 (64-bit)" sh -c "cd '$tmp' && GAMEFRAME_ROOT='$(pwd)' ./gameframe run peinfo target/game.exe"
+  && ! (cd "$tmp" && git ls-files | grep -qE '^(game|media|saves)(/|$)') \
+  && ok "new-project makes a plugin project: docs/lore.md and GAME_PROFILE.md from their templates, settings enable the plugin, no copied toolkit, the other agents' skills and hooks through ./gameframe gate, game/ a link into the home and out of git" || bad "new-project scaffold" "$(ls -la "$tmp" 2>&1)"
+expect "the launcher finds GameFrame and runs its tools on the project" "EXE, x64 (64-bit)" sh -c "cd '$tmp' && GAMEFRAME_ROOT='$(pwd)' ./gameframe run peinfo game/game.exe"
 expect "the launcher runs a project script with the toolkit on its path" "pe_emu ok" sh -c "cd '$tmp' && printf 'import pe_emu\\nprint(\"pe_emu ok\")\\n' > probe.py && GAMEFRAME_ROOT='$(pwd)' ./gameframe python probe.py"
-out="$(cd "$tmp" && git config core.hooksPath && git add -f target/game.exe && GAMEFRAME_ROOT="$OLDPWD" git commit -qm game 2>&1; git reset -q)"
+out="$(cd "$tmp" && git config core.hooksPath && git add -f game && GAMEFRAME_ROOT="$OLDPWD" git commit -qm game 2>&1; git reset -q)"
 [[ "$out" == *".githooks"*"stages game material"* ]] && ok "a plugin project's git pre-commit hook finds GameFrame and blocks game material" || bad "plugin project pre-commit hook" "$out"
 expect "the session hook says where GameFrame's guides are" "read docs/NAME.md as" sh -c "echo '{\"cwd\": \"$tmp\"}' | python3 scripts/hooks/gate.py session"
 out="$("$PWD/scripts/update-project.sh" "$tmp" 2>&1)"
@@ -1368,19 +1370,54 @@ PY
 [[ $? == 0 ]] && ok "$out" || bad "game folder" "$out"
 tmp="$(mktemp -d)/proj"
 scripts/new-project.sh "$tmp" "Test Game" --agent claude >/dev/null 2>&1
-if [[ -f "$tmp/target/GAME-FILES-NOT-BUILD-OUTPUT.txt" ]] && grep -q 'target-dir = "build"' "$tmp/.cargo/config.toml"; then
-  rm -rf "$tmp/target" "$tmp/.cargo"
+if [[ -f "$tmp/game/GAME-FILES-NOT-BUILD-OUTPUT.txt" ]] && grep -q 'target-dir = "build"' "$tmp/.cargo/config.toml"; then
+  rm "$tmp/game"; rm -rf "$tmp/.cargo"; mkdir "$tmp/target"
   out="$(scripts/update-project.sh "$tmp" 2>&1)"
-  [[ -f "$tmp/target/GAME-FILES-NOT-BUILD-OUTPUT.txt" ]] && grep -q 'target-dir = "build"' "$tmp/.cargo/config.toml" \
-    && ok "new-project marks target/ as the game; update-project adds the marker and .cargo/config.toml to an older project" \
+  [[ -f "$tmp/target/GAME-FILES-NOT-BUILD-OUTPUT.txt" ]] && grep -q 'target-dir = "build"' "$tmp/.cargo/config.toml" && [[ "$out" == *"home adopt"* ]] \
+    && ok "new-project marks game/ as the game; update-project marks an older project's target/, adds .cargo/config.toml and points to home adopt" \
     || bad "update-project game folder" "$out"
-else bad "new-project game folder marker" "$(ls -la "$tmp" "$tmp/target" 2>&1)"; fi
+else bad "new-project game folder marker" "$(ls -la "$tmp" "$tmp/game/" 2>&1)"; fi
 rm -rf "$(dirname "$tmp")"
 cfg=0
 for f in .codex/hooks.json .cursor/hooks.json .github/hooks/gameframe.json hooks/gemini-settings.json; do
   "$PYTHON" -m json.tool "$f" >/dev/null 2>&1 && grep -q "gate.py" "$f" || { bad "hook config $f is valid JSON and runs gate.py"; cfg=1; }
 done
 [[ $cfg == 0 ]] && ok "the hook configs for Codex, Cursor, Copilot and Gemini CLI are valid JSON and run gate.py"
+
+echo "GameFrame home (gameframe home, gameframe game)"
+HT="$(mktemp -d)"; hh="$HT/home"
+out="$(GAMEFRAME_HOME="$hh" ./gameframe home init --no-python 2>&1)"
+[[ -d "$hh/games" && -d "$hh/machines/os" && -f "$hh/README.md" ]] && grep -qx "GAMEFRAME_ROOT=$PWD" "$hh/config.env" \
+  && ok "home init makes the folders and writes GAMEFRAME_ROOT to config.env" || bad "home init" "$out"
+"$PYTHON" tests/make_disc.py "$HT" >/dev/null
+out="$(GAMEFRAME_HOME="$hh" ./gameframe game add demo "$HT/test.iso" 2>&1)"
+[[ -f "$hh/games/demo/media/test.iso" && -n "$(ls "$hh/games/demo/game")" ]] && grep -q '"sha256"' "$hh/games/demo/game.json" \
+  && ok "game add keeps the image in media/, records its SHA-256 and extracts it into game/" || bad "game add" "$out"
+po="$HT/old"; mkdir -p "$po/target" "$po/truth" "$po/save-game"; git -C "$po" init -q
+echo x > "$po/target/GAME.EXE"; echo s > "$po/save-game/S1.SAV"; echo 'print(1)' > "$po/truth/run.py"; git -C "$po" add truth/run.py
+out="$(GAMEFRAME_HOME="$hh" ./gameframe home adopt "$po" --id old 2>&1)"
+[[ -L "$po/game" && -L "$po/target" && -f "$po/target/GAME.EXE" && -f "$hh/games/old/game/GAME.EXE" && -f "$po/save-game/S1.SAV" \
+   && -f "$hh/games/old/saves/S1.SAV" && -d "$po/truth" && ! -L "$po/truth" && "$out" == *"kept truth/"* ]] && grep -qx /save-game "$po/.gitignore" \
+  && ! grep -qx /truth "$po/.gitignore" \
+  && ok "home adopt moves target/ and save-game/ into the home, leaves links at the old names, keeps a folder git tracks" || bad "home adopt" "$out"
+ln -s "$po" "$hh/projects/old"
+out="$(GAMEFRAME_HOME="$hh" ./gameframe home doctor 2>&1)"
+[[ "$out" == *"games/demo"*"1 media files"* && "$out" == *"projects/old"*"links in place"* ]] && ok "home doctor checks each game and each project's links" || bad "home doctor" "$out"
+out="$(HOME_DIR="$hh" PROJ="$po" "$PYTHON" - <<'PY' 2>&1
+import json, os, subprocess
+G = os.path.abspath('scripts/hooks/gate.py'); h = os.environ['HOME_DIR']; p = os.environ['PROJ']
+def run(cmd, cwd=p):
+    ev = {'cwd': cwd, 'tool_input': {'command': cmd}}
+    return subprocess.run(['python3', G, 'delete'], input=json.dumps(ev), capture_output=True, text=True).returncode
+blocked = ['rm -rf game/', 'rm -rf game/*', 'rm -rf media/', f'rm -rf {h}', f'rm -rf {h}/games/old/game', f'rm -rf {h}/games/demo/media']
+passed = ['rm game', 'rm -f media', 'ls game/', f'rm -rf {h}/cache']
+assert [c for c in blocked if run(c) != 2] == [], [c for c in blocked if run(c) != 2]
+assert [c for c in passed if run(c) != 0] == [], [c for c in passed if run(c) != 0]
+print('the delete gate lets a link go and blocks the game and media it points to, and the home')
+PY
+)"
+[[ $? == 0 ]] && ok "$out" || bad "home delete gate" "$out"
+rm -rf "$HT"
 
 echo "Agent Skills (agentskills.io): one copy in skills/, found by every agent"
 out="$("$PYTHON" - <<'PY' 2>&1

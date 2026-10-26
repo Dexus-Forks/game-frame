@@ -134,15 +134,15 @@ pressing. Record which kind you have.
 ## Using discinfo
 
 ```bash
-python3 tools/disc/discinfo.py target/cd/GAME.CUE                 # tracks, file systems, dates
-python3 tools/disc/discinfo.py target/cd/GAME.CUE --files          # every file with its sector and date
-python3 tools/disc/discinfo.py target/cd/GAME.CUE --extract target/cd/files --audio target/cd/audio
-python3 tools/disc/discinfo.py target/cd/GAME.CUE --map            # data in sectors no file uses
-python3 tools/disc/discinfo.py target/cd/GAME.CUE --json > derived/disc.json
+python3 tools/disc/discinfo.py media/GAME.CUE                 # tracks, file systems, dates
+python3 tools/disc/discinfo.py media/GAME.CUE --files          # every file with its sector and date
+python3 tools/disc/discinfo.py media/GAME.CUE --extract game --audio derived/audio
+python3 tools/disc/discinfo.py media/GAME.CUE --map            # data in sectors no file uses
+python3 tools/disc/discinfo.py media/GAME.CUE --json > derived/disc.json
 ```
 
 `scripts/extract-installer.sh` recognises CD images and calls `discinfo.py` with `--extract`
-and `--audio`. The files and the audio are game material. Keep them in `target/` or
+and `--audio`. The files and the audio are game material. Keep them in `game/` or
 `derived/`. The report itself (track lengths, dates, identifiers) can go in
 `docs/FINDINGS.md`.
 
@@ -157,13 +157,13 @@ and `--audio`. The files and the audio are game material. Keep them in `target/`
 ## Ask your agent
 
 ```text
-In my GameFrame project, look at the game's CD image in target/cd/.
+In my GameFrame project, look at the game's CD image in media/.
 
 1. Run tools/disc/discinfo.py on it, with --files, and read docs/media/discs.md.
 2. Record in docs/FINDINGS.md the tracks, the file systems, the volume identifiers and dates,
    and anything unusual: audio tracks, Form 2 sectors, hidden files, a Mac volume.
 3. If there are audio tracks, find the code that plays them (MSCDEX or MCI calls) and list the
    game's track table with its address.
-4. Extract the files into target/cd/files and the audio into target/cd/audio. Commit nothing
-   from target/.
+4. Extract the files into game/ and the audio into derived/audio. Commit nothing
+   from game/.
 ```

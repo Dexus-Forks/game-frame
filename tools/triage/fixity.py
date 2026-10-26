@@ -11,7 +11,7 @@ Usage: fixity.py bag SOURCE BAG [--info KEY=VALUE ...]   copy SOURCE into a new 
              Source-Organization=..., External-Description="GOG release 1.2, installer 5.1";
              tagmanifest-sha256.txt the checksums of those files in turn
   manifest   writes FOLDER/manifest-sha256.txt (or OUT) for files you keep where they are,
-             such as target/ in a project
+             such as game/ in a project
   verify     reports every file that changed, went missing or was added. Exit status 1 when
              anything differs
 

@@ -39,7 +39,7 @@ def overview():
         if k < 3:
             arrow(s, x + 202, 122, x + 214, 122)
     s.rect(24, 200, 852, 40, GREY, rx=5, extra=' fill-opacity="0.15"')
-    s.text(40, 225, 'Record the hash of every file and where the copy came from. Commit nothing from target/, analysis/ or derived/.',
+    s.text(40, 225, 'Record the hash of every file and where the copy came from. Commit nothing from game/, analysis/ or derived/.',
            11.5, TEXT)
     return s.render()
 

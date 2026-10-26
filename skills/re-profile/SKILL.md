@@ -16,7 +16,7 @@ The profile summarizes the findings. It does not replace `docs/FINDINGS.md`, `do
 
 1. Read the project's `AGENTS.md`, `docs/FINDINGS.md`, `docs/CHECKLIST.md` and `docs/versions.md`.
    Read `docs/lore.md` when it exists. Search the project docs and labels for earlier findings.
-2. Read the game's manual, readme, setup program text and configuration files in `target/`.
+2. Read the game's manual, readme, setup program text and configuration files in `game/`.
    Use the evidence already collected by `re-inventory`; inspect a binary or data file only when
    it can answer a question the profile needs.
 3. Classify the game with `docs/games/README.md`, its family page and

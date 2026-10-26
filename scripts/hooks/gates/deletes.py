@@ -1,8 +1,9 @@
 """The delete gate: a shell command that would delete or move a project's game folder.
 
 reason(cwd, command) returns why the command is blocked, or None. A game folder is a GameFrame
-project's target/ (game_folder.is_game_folder): the user's own copy of the game, which git does
-not keep. The gate blocks:
+project's game/ or older target/, or a game's game/ or media/ in the GameFrame home
+(game_folder.is_game_folder): the user's own copy of the game, which git does not keep. Removing
+a project's game link itself (rm game, without a slash) passes: the files stay in the home. The gate blocks:
 
 - rm, rmdir, unlink, trash, gio trash and srm of it or a folder above it;
 - mv of it, or of anything that holds it into a Trash folder (renaming a project passes);
@@ -148,7 +149,7 @@ def _segment_reason(cwd, env, words, text):
                 return hit
     if verb == 'find' and ('-delete' in words or any(
             w == '-exec' and i + 1 < len(words) and os.path.basename(words[i + 1]) in REMOVERS | {'mv'}
-            for i, w in enumerate(words))) and 'target' in text:
+            for i, w in enumerate(words))) and re.search(r'\b(target|game|media)\b', text):
         for w in words[1:]:
             if w.startswith('-'):
                 break
@@ -181,7 +182,7 @@ def reason(cwd, command):
         if hit:
             break
     if not hit and SCRIPTED.search(command):
-        for word in re.findall(r'[\w~$/.{}-]*target\b', command):
+        for word in re.findall(r'[\w~$/.{}-]*(?:target|game|media)\b', command):
             folder = _expand(word, cwd)
             if is_game_folder(folder):
                 hit = folder

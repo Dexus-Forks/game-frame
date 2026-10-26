@@ -34,7 +34,7 @@ porting it: the code may also compress, or change the key per file or per entry.
 
 If nothing scores well, the file may be compressed (filetypes.py shows its entropy) or use
 a real cipher. Then find the decoder in the code. Decoded files are game material: write
-them into target/ or another folder that git ignores. Standard library only.
+them into game/ or another folder that git ignores. Standard library only.
 """
 import os
 import sys

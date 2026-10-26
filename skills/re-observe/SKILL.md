@@ -41,8 +41,8 @@ Before the first run, list what the game needs and the modules that provide it
 (`docs/harness/README.md`):
 
 ```bash
-./gameframe run needs target/                  # cpu, os, api, lib, drm, media: each with its evidence
-./gameframe run harness plan target/ --script derived/harness.sh   # a runtime, the layers, the gaps
+./gameframe run needs game/                  # cpu, os, api, lib, drm, media: each with its evidence
+./gameframe run harness plan game/ --script derived/harness.sh   # a runtime, the layers, the gaps
 ```
 
 Read the script, set its variables, then run it. A need marked NO MODULE is a gap. When a

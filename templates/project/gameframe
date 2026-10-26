@@ -3,7 +3,7 @@
 # Claude Code plugin (.claude/settings.json). This command runs its toolkit on this project.
 #
 #   ./gameframe help                 GameFrame's commands: steps, skills, agents, tools, tool, run, find, doctor
-#   ./gameframe run NAME [ARGS]      run a tool or script, for example ./gameframe run peinfo target/GAME.EXE
+#   ./gameframe run NAME [ARGS]      run a tool or script, for example ./gameframe run peinfo game/GAME.EXE
 #   ./gameframe doctor [--install]   check and install the toolchain; makes .venv and .env here
 #   ./gameframe python FILE [ARGS]   run one of this project's Python scripts with GameFrame's tools
 #                                    on its path (import pe_emu, dos_emu, call_trace, reader ...)
@@ -13,7 +13,8 @@
 #   ./gameframe advise-hook AGENT    run GameFrame's know-how hook (scripts/hooks/advise.py) for
 #                                    the same agents' post-tool hooks
 #
-# GameFrame is found in $GAMEFRAME_ROOT (the environment, or the project's .env), then in
+# GameFrame is found in $GAMEFRAME_ROOT (the environment, the project's .env, or the GameFrame
+# home's config.env: $GAMEFRAME_HOME, ~/gameframe), then in
 # ~/code/game-frame or ~/code/reverse-engineer-games, then the plugin's newest install in
 # ~/.claude/plugins/cache. Keep one GameFrame checkout on the machine and pin every project to it
 # in .env; change GameFrame in a worktree of that checkout (docs/working/environments.md). It
@@ -25,7 +26,8 @@ here="$(cd "$(dirname "$0")" && pwd)"
 # and in the main checkout, so the project's git worktrees use the same one.
 main="$(git -C "$here" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)"
 main="${main%/.git}"
-for envf in "$here/.env" ${main:+"$main/.env"}; do
+home="${GAMEFRAME_HOME:-$HOME/gameframe}"
+for envf in "$here/.env" ${main:+"$main/.env"} "$home/config.env"; do
   if [[ -z "${GAMEFRAME_ROOT:-}" && -f "$envf" ]]; then
     v="$(sed -n 's/^GAMEFRAME_ROOT=//p' "$envf" | tail -1)"
     if [[ -n "$v" ]]; then GAMEFRAME_ROOT="${v/#\~/$HOME}"; fi
@@ -43,7 +45,8 @@ fi
 export GAMEFRAME_ROOT="$gf" GAMEFRAME_PROJECT="$here"
 if [[ -z "${PYTHON:-}" ]]; then
   if [[ -x "$here/.venv/bin/python" ]]; then export PYTHON="$here/.venv/bin/python"
-  elif [[ -x "$gf/.venv/bin/python" ]]; then export PYTHON="$gf/.venv/bin/python"; fi
+  elif [[ -x "$gf/.venv/bin/python" ]]; then export PYTHON="$gf/.venv/bin/python"
+  elif [[ -x "$home/python/bin/python" ]]; then export PYTHON="$home/python/bin/python"; fi
 fi
 case "${1:-help}" in
   root) echo "$gf" ;;

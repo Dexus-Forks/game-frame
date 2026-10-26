@@ -10,8 +10,8 @@ it states.
 
 | Source | Where | What it covers |
 |---|---|---|
-| The manual | `target/...` (for example `MANUAL/GAME.PDF` on disc 1) | |
-| The program's long strings | `analysis/notes/sentences.txt` (`./gameframe run sentences target/GAME.EXE`) | |
+| The manual | `game/...` (for example `MANUAL/GAME.PDF` on disc 1) | |
+| The program's long strings | `analysis/notes/sentences.txt` (`./gameframe run sentences game/GAME.EXE`) | |
 | README, setup program, box, guides | | |
 | Public accounts (wiki, forums, interviews) | URL | Unverified unless confirmed |
 

@@ -34,10 +34,12 @@ user may change any of them for their project.
 1. **The player's game stays on the player's computer.** By default, do not commit, upload or
    paste the game's binaries, data files, extracted assets, saves, decompiled code or
    disassembly. Keep
-   them in ignored folders (`target/`, `analysis/`, `derived/`). Publish findings as prose,
-   tables, addresses (`FUN_1400be770`), field offsets (`+0x44`) and constants.
-   `target/` is the user's copy of the game and git keeps none. It is not build output (Cargo
-   builds into `build/`), so never delete, move or `git clean -x` it.
+   them in ignored folders (`game/`, `media/`, `saves/`, `analysis/`, `derived/`). In a project
+   these are links into the GameFrame home (`~/gameframe/games/ID/`), outside every repository.
+   Publish findings as prose, tables, addresses (`FUN_1400be770`), field offsets (`+0x44`) and
+   constants.
+   `game/` is the user's copy of the game and git keeps none. Never delete, move or
+   `git clean -x` it. An older project calls it `target/`, which is not build output either.
 2. **Label every claim** with how you know it:
    - *observed*: read in the code or the data (name the function or file);
    - *measured*: produced by running original code (emulator or game), with the inputs;
@@ -159,7 +161,12 @@ a diagram of each team's hand-offs and the failure path.
    GameFrame first (`git clone https://github.com/tanepiper/game-frame ~/code/game-frame`) and run the steps
    below from there.
 1. `scripts/setup.sh` (and `--install` if anything is missing). See `re-setup`.
-2. If the project has no repository yet: `scripts/new-project.sh DIR "Game Name" PATH/TO/GAME`.
+2. If there is no GameFrame home yet (`./gameframe home` says it is missing), run
+   `./gameframe home init`. If the project has no repository yet:
+   `scripts/new-project.sh ID "Game Name" PATH/TO/GAME`. The game goes to
+   `~/gameframe/games/ID/` and the repository to `~/gameframe/projects/ID/`. A project that
+   still keeps its game inside (`target/`, `game-data/`) moves it with
+   `./gameframe home adopt . --id ID`.
    `./gameframe steps`, `./gameframe tools` and `./gameframe find WORD` show the method, the
    tools and where a subject is covered. `./gameframe tool NAME` prints a tool's usage.
 3. Read `AGENTS.md`, `docs/CHECKLIST.md` and `docs/FINDINGS.md` if they exist. Search `docs/` and
@@ -190,7 +197,7 @@ a diagram of each team's hand-offs and the failure path.
    engine, presentation, graphics, sound and input evidence. Distinguish official support,
    file/code evidence, measured behavior and community reports. Ask the human only about open
    choices that would change the goal or next route.
-8. `re-browse`: run the catalogue (`tools/formats/catalog.py target/game derived/catalog`)
+8. `re-browse`: run the catalogue (`tools/formats/catalog.py game derived/catalog`)
    so the person and you can see every file, and grow it into the project's viewer as the
    decoders come (`docs/working/viewer.md`).
 9. `re-observe`: get the original running where you can watch, drive and capture it.

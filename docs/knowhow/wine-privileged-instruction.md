@@ -44,7 +44,7 @@ Patch the probe in a copy of the program so it returns the answer a modern CPU w
 without running the port instruction. For a Cyrix probe that is "not a Cyrix" (POD's routine
 returns `0xff`).
 
-1. `./gameframe run insns target/GAME.EXE '^(in|out|ins|outs|cli|sti)' --functions analysis/export/functions.tsv`
+1. `./gameframe run insns game/GAME.EXE '^(in|out|ins|outs|cli|sti)' --functions analysis/export/functions.tsv`
    lists every such instruction and its function. Do this before the first run of any
    Windows 9x game, so every probe is known.
 2. Find what the function's callers expect, and return that from the function's start.

@@ -13,7 +13,7 @@ gets the name of the item declared after the comment, a function, a method (Type
 struct, an enum or a class, in Rust, C, C++, Python, JavaScript or TypeScript.
 
 - In a git repository only tracked files are read, so decompiled code and game files in ignored
-  folders (analysis/, derived/, target/) are never read. Elsewhere hidden and build folders are
+  folders (analysis/, derived/, game/) are never read. Elsewhere hidden and build folders are
   skipped.
 - When one item cites several functions, the first gets the item's name and the others get the
   name with _2, _3 and so on after it.

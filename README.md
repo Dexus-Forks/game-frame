@@ -36,9 +36,14 @@ Set up GameFrame on this computer for me.
 5. Run tests/run.sh --ghidra and report how many checks passed. If any failed, show the
    failures and fix the setup before going on.
 6. Run scripts/setup.sh --rea and help me register REA with this agent.
-7. Ask me for the name of the game and the folder of my own copy of it. Then run
-   scripts/new-project.sh ~/re/<short-name> "<Game Name>" "<path to the game>".
-8. Open the new project, read its AGENTS.md, and start with the re-start skill.
+7. Run ./gameframe home init. It makes the GameFrame home, ~/gameframe, where the games, the
+   projects, the virtual machines and the shared settings (config.env) live.
+8. Ask me for the name of the game and where my own copy of it is: a disc image, an installer
+   or a folder. Then run
+   scripts/new-project.sh <short-name> "<Game Name>" "<path to the game>".
+   It copies the game into ~/gameframe/games/<short-name>/ and makes the project in
+   ~/gameframe/projects/<short-name>/.
+9. Open the new project, read its AGENTS.md, and start with the re-start skill.
 
 Never copy the game's files, extracted assets or decompiled code into a git repository.
 ```
@@ -73,7 +78,8 @@ cd game-frame
 scripts/setup.sh --install          # Ghidra, JDK 21, objdump, Node, Zig, and .venv (unicorn, pefile, capstone)
 tests/run.sh --ghidra               # proves every tool on the sample game (about 1½ minutes)
 
-scripts/new-project.sh ~/re/mygame "My Game" "/path/to/My Game"   # a project for one game
+./gameframe home init               # ~/gameframe: games, projects, machines, config.env, shared Python
+scripts/new-project.sh mygame "My Game" "/path/to/disc.iso"   # the game in games/mygame, the repository in projects/mygame
 ```
 
 Then open the new project with your agent and ask it to start with the **re-start** skill.
@@ -115,7 +121,7 @@ project (`./gameframe run NAME`, `./gameframe python FILE`, `./gameframe root`).
 ./gameframe skill re-trace --sections  # a skill's headings; --section TITLE prints one part
 ./gameframe tools                      # every tool and script, with its first line of help
 ./gameframe tool decomp_query          # one tool's full help
-./gameframe run peinfo target/game.exe # run a tool with GameFrame's .venv
+./gameframe run peinfo game/game.exe # run a tool with GameFrame's .venv
 ./gameframe find vtable                # which skills and tools mention a word
 ./gameframe advise "<error text>"      # known failures, fixes and dead ends (docs/knowhow/)
 ./gameframe doctor                     # the toolchain check (scripts/setup.sh)
@@ -219,7 +225,7 @@ hand-offs, the data passed between agents, the outcome, and the failure path.
 |---|---|
 | `scripts/setup.sh [--install] [--rea]` | Checks every tool; installs what is missing; shows REA's registration plan |
 | `source scripts/env.sh` | Sets `GAMEFRAME_ROOT`, loads `.env`, puts `gameframe` and the `.venv` Python on `PATH`, for each shell or agent session |
-| `scripts/new-project.sh DIR "Name" [GAME] [--copy] [--agent LIST]` | Creates a project for one game: rules, the plugin enabled, the `./gameframe` launcher, ignored folders for the game and its derivatives. `--copy` copies the toolkit, skills and guides instead. `--agent` names the coding agents to set it up for (`claude,codex,gemini,copilot,cursor,opencode`, or `all`, the default): each gets its skill link, agents, gate hooks and MCP servers |
+| `scripts/new-project.sh DIR "Name" [GAME] [--id ID] [--local] [--copy] [--agent LIST]` | Creates a project for one game: rules, the plugin enabled, the `./gameframe` launcher, and links into the GameFrame home for the game and its derivatives. A `DIR` with no slash goes in the home's `projects/`. `--local` keeps real, ignored folders in the project instead. `--copy` copies the toolkit, skills and guides instead. `--agent` names the coding agents to set it up for (`claude,codex,gemini,copilot,cursor,opencode`, or `all`, the default): each gets its skill link, agents, gate hooks and MCP servers |
 | `scripts/update-project.sh DIR [--plugin] [--agent LIST] [--dry-run]` | Keeps a project current. For a plugin project, refreshes the launcher, settings and each agent's files. For a copied project, adds what is missing, replaces older copies and keeps the project's own edits; `--plugin` moves it to the plugin and removes only GameFrame's own files. `--agent` adds agents; without it, the agents the project already has are refreshed |
 | `scripts/new-site.sh NAME "Title" ["Description"] [--single] [--repo URL]` | Starts a project's website in `sites/NAME/` (or `site/`): the front page, the diary, the findings and status pages through `@include`, and a GitHub Pages workflow (`re-site`) |
 | `scripts/ghidra-export.sh [--labels FILE] BINARY...` | Headless Ghidra analysis and a text export: pseudocode, functions, strings, imports, exports; names applied from a labels file |

@@ -21,7 +21,7 @@ publish.
 
 1. Follow `re-land`: findings in `docs/` in the evidence style, labels in `labels/`,
    `docs/CHECKLIST.md` up to date.
-2. Check `git status`: nothing from `target/`, `analysis/` or `derived/`, no decompiled code
+2. Check `git status`: nothing from `game/`, `analysis/` or `derived/`, no decompiled code
    or dumps in tracked files.
 3. Stage only the slice's files by path, commit, pull with rebase and push, as `re-land` says.
 
@@ -32,7 +32,7 @@ agent that should take it.
 
 ## Before you start
 
-- Work in the game's project: the folder with `AGENTS.md`, `docs/FINDINGS.md` and `target/`.
+- Work in the game's project: the folder with `AGENTS.md`, `docs/FINDINGS.md` and `game/`.
   Paths in this file and in the skills are relative to it. If the brief names no project and you cannot find one,
   stop and say so in the hand-off.
 - Load the skills named above and follow them. They hold the exact
@@ -45,7 +45,7 @@ agent that should take it.
 
 ## Rules
 
-- Keep game material out of git: binaries and data in `target/`, Ghidra output and decompiled
+- Keep game material out of git: binaries and data in `game/`, Ghidra output and decompiled
   code in `analysis/`, emulator output and extracted assets in `derived/`. Never paste
   decompiled code, disassembly or data dumps into tracked files.
 - Every claim gets an evidence label from the project's `AGENTS.md`.

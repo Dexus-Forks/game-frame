@@ -385,3 +385,79 @@ fn the_player_stops_or_exits() {
     assert!(s.wants_exit());
     assert!(s.log().iter().rev().any(|e| e.topic == topics::GAME_STOP), "the game is stopped first, so it can save");
 }
+
+/// A tiny ISO 9660 image: TRACKS/CANYON.TRK, TRACKS/HARBOUR.TRK and README.TXT.
+fn tiny_iso() -> Vec<u8> {
+    const S: usize = 2048;
+    let record = |name: &[u8], lba: u32, size: u32, dir: bool| {
+        let len = 33 + name.len() + (name.len() + 1) % 2;
+        let mut r = vec![0u8; len];
+        r[0] = len as u8;
+        r[2..6].copy_from_slice(&lba.to_le_bytes());
+        r[6..10].copy_from_slice(&lba.to_be_bytes());
+        r[10..14].copy_from_slice(&size.to_le_bytes());
+        r[14..18].copy_from_slice(&size.to_be_bytes());
+        r[25] = if dir { 2 } else { 0 };
+        r[28] = 1;
+        r[32] = name.len() as u8;
+        r[33..33 + name.len()].copy_from_slice(name);
+        r
+    };
+    let dir = |me: u32, parent: u32, entries: Vec<Vec<u8>>| {
+        let mut d = record(&[0], me, S as u32, true);
+        d.extend(record(&[1], parent, S as u32, true));
+        entries.into_iter().for_each(|e| d.extend(e));
+        d.resize(S, 0);
+        d
+    };
+    let mut img = vec![0u8; 24 * S];
+    let mut pvd = vec![0u8; S];
+    pvd[0] = 1;
+    pvd[1..6].copy_from_slice(b"CD001");
+    pvd[6] = 1;
+    pvd[80..84].copy_from_slice(&24u32.to_le_bytes());
+    pvd[128..130].copy_from_slice(&(S as u16).to_le_bytes());
+    let root = record(&[0], 18, S as u32, true);
+    pvd[156..156 + root.len()].copy_from_slice(&root);
+    img[16 * S..17 * S].copy_from_slice(&pvd);
+    img[17 * S] = 255;
+    img[17 * S + 1..17 * S + 6].copy_from_slice(b"CD001");
+    let root = dir(18, 18, vec![record(b"README.TXT;1", 20, 2, false), record(b"TRACKS", 19, S as u32, true)]);
+    img[18 * S..19 * S].copy_from_slice(&root);
+    let tracks = dir(19, 18, vec![record(b"CANYON.TRK;1", 20, 2, false), record(b"HARBOUR.TRK;1", 20, 2, false)]);
+    img[19 * S..20 * S].copy_from_slice(&tracks);
+    img[20 * S..20 * S + 2].copy_from_slice(b"hi");
+    img
+}
+
+#[test]
+fn a_config_game_lists_files_from_its_disc_image() {
+    let dir = std::env::temp_dir().join(format!("frame-image-{}", std::process::id()));
+    std::fs::create_dir_all(dir.join("media")).unwrap();
+    std::fs::write(dir.join("media/GAME.ISO"), tiny_iso()).unwrap();
+    std::fs::write(
+        dir.join("frame.json"),
+        r#"{"manifest": {"contract": "1.0", "name": "x", "capabilities": ["start", "settings"],
+            "settings": [{"key": "race.track", "label": "Track", "type": "choice",
+                          "from": {"files": "tracks/*.trk"}, "default": ""}]},
+            "start": {"command": "sh", "args": ["-c", "echo {setting:race.track} {image} > chosen.txt"]},
+            "image": "media/GAME.ISO"}"#,
+    )
+    .unwrap();
+    let game = Configured::load(&dir.join("frame.json")).unwrap();
+    let track = game.manifest().settings[0].clone();
+    let gameframe_frame::Kind::Choice { options, .. } = &track.kind else { panic!("a choice") };
+    assert_eq!(options.iter().map(|o| o.value.as_str()).collect::<Vec<_>>(), ["CANYON", "HARBOUR"]);
+    let mut s = Session::new(Box::new(game), Settings::new()).unwrap();
+    s.start(vec![]);
+    for _ in 0..200 {
+        s.tick();
+        if s.state() == "stopped" {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    }
+    let chosen = std::fs::read_to_string(dir.join("chosen.txt")).unwrap();
+    assert!(chosen.starts_with("CANYON /") && chosen.trim_end().ends_with("media/GAME.ISO"), "{chosen}");
+    let _ = std::fs::remove_dir_all(&dir);
+}

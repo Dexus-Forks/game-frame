@@ -100,7 +100,7 @@ metering and floats switched off does all of this.
 `python3 tools/dos/tdinfo.py BINARY rust TYPE ...` writes Rust structs and readers for Pascal
 record types in the original's field order (with `rust-reader` for the `PascalReader` they
 use). Generate the code instead of copying it by hand. Keep the generated file unedited: regenerate it when the
-toolkit improves. Rust projects made by new-project.sh build into `build/`: `target/` holds the game. `cargo clean` would delete it.
+toolkit improves. Rust projects made by new-project.sh build into `build/`. The game is in `game/`, a link into the GameFrame home. An older project keeps the game in `target/`, where `cargo clean` would delete it.
 
 ## Exactness checklist
 

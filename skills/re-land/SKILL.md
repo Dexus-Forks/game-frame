@@ -66,7 +66,7 @@ git status --short
 git diff --stat
 ```
 
-Never stage anything from `target/`, `analysis/` or `derived/`, game files (`.exe .dll .pak
+Never stage anything from `game/`, `analysis/` or `derived/`, game files (`.exe .dll .pak
 .sav` and the game's own extensions), decompiled code, disassembly, emulator output or
 extracted assets. `.gitignore` covers the folders: never force-add. Screenshots are always
 fine, of the original game and of the port: copy each one out of `derived/`, compress it

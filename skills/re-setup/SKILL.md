@@ -176,6 +176,9 @@ needs host networking enabled in Settings > Resources > Network. Check that the 
 
 ## Working in a git worktree
 
-A worktree has no `target/`, `analysis/` or `.venv`. Symlink them from the main checkout and add
-them to `$(git rev-parse --git-common-dir)/info/exclude` (a symlink is not matched by a
-`/target/` rule in `.gitignore`).
+A worktree has no `game/`, `media/`, `saves/`, `analysis/` or `derived/`, since git keeps
+none of them. Run `./gameframe game link ID .` in the worktree: it makes the same links into the
+GameFrame home as the main checkout has, and `.gitignore` already ignores them. An older
+project with real folders links them from the main checkout and adds the links to
+`$(git rev-parse --git-common-dir)/info/exclude`. The shared Python is in the home's
+`python/`, so a worktree needs no `.venv` of its own.

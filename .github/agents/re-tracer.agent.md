@@ -31,7 +31,7 @@ must match bit for bit, or to `re-porter` when it is plain logic.
 
 ## Before you start
 
-- Work in the game's project: the folder with `AGENTS.md`, `docs/FINDINGS.md` and `target/`.
+- Work in the game's project: the folder with `AGENTS.md`, `docs/FINDINGS.md` and `game/`.
   Paths in this file and in the skills are relative to it. If the brief names no project and you cannot find one,
   stop and say so in the hand-off.
 - Load the skills named above and follow them. They hold the exact
@@ -44,7 +44,7 @@ must match bit for bit, or to `re-porter` when it is plain logic.
 
 ## Rules
 
-- Keep game material out of git: binaries and data in `target/`, Ghidra output and decompiled
+- Keep game material out of git: binaries and data in `game/`, Ghidra output and decompiled
   code in `analysis/`, emulator output and extracted assets in `derived/`. Never paste
   decompiled code, disassembly or data dumps into tracked files.
 - Every claim gets an evidence label from the project's `AGENTS.md`.

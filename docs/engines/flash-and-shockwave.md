@@ -33,9 +33,9 @@ the Flash Player program with the SWF appended at the end. The last 8 bytes hold
 `tools/formats/swfinfo.py` reads any of these:
 
 ```bash
-python3 tools/formats/swfinfo.py target/game.swf                     # version, stage, scripts, content
-python3 tools/formats/swfinfo.py target/game.exe --extract derived/game.swf   # the movie from a projector
-python3 tools/formats/swfinfo.py target/game.swf --decompress derived/game-fws.swf --tags
+python3 tools/formats/swfinfo.py game/game.swf                     # version, stage, scripts, content
+python3 tools/formats/swfinfo.py game/game.exe --extract derived/game.swf   # the movie from a projector
+python3 tools/formats/swfinfo.py game/game.swf --decompress derived/game-fws.swf --tags
 python3 tools/triage/filetypes.py target --summary                   # finds every SWF in a folder
 ```
 
@@ -44,7 +44,7 @@ python3 tools/triage/filetypes.py target --summary                   # finds eve
 [JPEXS Free Flash Decompiler](https://github.com/jindrapetrik/jpexs-decompiler) (FFDec) is
 the main tool. It is open source. It decompiles ActionScript 1, 2 and 3. It exports shapes as
 SVG, bitmaps as PNG, sounds, fonts, texts and the timeline. It also has a command line, which
-suits agents (`ffdec -export script,image,sound,shape derived/ffdec target/game.swf`). It can
+suits agents (`ffdec -export script,image,sound,shape derived/ffdec game/game.swf`). It can
 also debug a running movie.
 
 Things to look for in the code:
@@ -140,7 +140,7 @@ Unity asset bundle. [Engine-era PC games](../computers/modern-pc-engines.md) cov
 ## Ask your agent
 
 ```text
-In my GameFrame project, look at the Flash game in target/.
+In my GameFrame project, look at the Flash game in game/.
 
 1. Read docs/engines/flash-and-shockwave.md.
 2. Run tools/formats/swfinfo.py on each SWF or projector, and extract any movie from a
@@ -149,5 +149,5 @@ In my GameFrame project, look at the Flash game in target/.
    before installing it.
 4. Record in docs/FINDINGS.md the version, the ActionScript version, the frame rate, the main
    classes, every file or service the game loads, and any site lock.
-5. Suggest a route: Ruffle, a reimplementation, or both. Commit nothing from target/ or derived/.
+5. Suggest a route: Ruffle, a reimplementation, or both. Commit nothing from game/ or derived/.
 ```

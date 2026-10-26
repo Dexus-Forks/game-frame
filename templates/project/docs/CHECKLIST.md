@@ -16,7 +16,7 @@ ground truth). Keep it short; details belong in the topic documents.
 
 ## Viewer (before the game: every format becomes a reader, a document and a panel)
 
-- [ ] Catalogue of every file (`./gameframe run catalog target/ derived/catalog`)
+- [ ] Catalogue of every file (`./gameframe run catalog game/ derived/catalog`)
 - [ ] The project's viewer app, on the port's own readers
 - [ ] Pictures and palettes
 - [ ] Sounds and music

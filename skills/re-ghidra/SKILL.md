@@ -15,15 +15,15 @@ be wrong. Check anything exact against the disassembly or the emulator.
 Import the game's own binaries **together**, so calls between the EXE and its DLLs resolve:
 
 ```bash
-scripts/ghidra-export.sh target/Game.exe target/GameEngine.dll
+scripts/ghidra-export.sh game/Game.exe game/GameEngine.dll
 ```
 
 If you have names for functions and globals (debug symbols, a map file, earlier labels), give
 them to the export: Ghidra names everything and creates the functions it missed.
 
 ```bash
-python3 tools/dos/tdinfo.py target/GAME.EXE labels > analysis/td-labels.tsv   # DOS: Borland symbols
-scripts/ghidra-export.sh --labels analysis/td-labels.tsv target/GAME.EXE
+python3 tools/dos/tdinfo.py game/GAME.EXE labels > analysis/td-labels.tsv   # DOS: Borland symbols
+scripts/ghidra-export.sh --labels analysis/td-labels.tsv game/GAME.EXE
 scripts/ghidra-run.sh GAME.EXE labels analysis/notes/labels.txt labels/names.tsv  # an existing project
 ```
 
@@ -32,7 +32,7 @@ through pointers (handler tables, per-object step functions, callbacks), and the
 them:
 
 ```bash
-.venv/bin/python tools/triage/exportcov.py target/GAME.EXE analysis/export/GAME.EXE/functions.tsv \
+.venv/bin/python tools/triage/exportcov.py game/GAME.EXE analysis/export/GAME.EXE/functions.tsv \
   --starts analysis/notes/starts.txt
 scripts/ghidra-run.sh GAME.EXE decompile analysis/notes/missed.txt $(cat analysis/notes/starts.txt)
 ```
@@ -142,9 +142,9 @@ and processors Ghidra lacks.
 Pseudocode often shows a float constant as a global (`DAT_14016a2b0`). Read the real value:
 
 ```bash
-.venv/bin/python tools/pe/readdata.py target/Game.exe f32 DAT_14016a2b0
-.venv/bin/python tools/pe/readdata.py target/Game.exe f32 0x14016a2c0 --count 12   # a table
-.venv/bin/python tools/pe/readdata.py target/Game.exe cstr 0x140180010
+.venv/bin/python tools/pe/readdata.py game/Game.exe f32 DAT_14016a2b0
+.venv/bin/python tools/pe/readdata.py game/Game.exe f32 0x14016a2c0 --count 12   # a table
+.venv/bin/python tools/pe/readdata.py game/Game.exe cstr 0x140180010
 ```
 
 ## 5. Check against the disassembly
@@ -154,7 +154,7 @@ bounds, mis-types floats, merges stack slots and loses register arguments:
 
 ```bash
 objdump -d --no-show-raw-insn --start-address=0x1400be680 --stop-address=0x1400be770 \
-  target/Game.exe > analysis/notes/be680.s
+  game/Game.exe > analysis/notes/be680.s
 ```
 
 What to look for: `cvttss2si` (float to int, truncating) against `cvtss2si` (rounding by the

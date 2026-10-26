@@ -2,7 +2,8 @@
 #
 #   source scripts/env.sh        (bash or zsh, from any folder)
 #
-# It sets GAMEFRAME_ROOT, loads the ignored .env (GHIDRA_INSTALL_DIR, JAVA_HOME and other
+# It sets GAMEFRAME_ROOT, loads the GameFrame home's config.env ($GAMEFRAME_HOME, ~/gameframe),
+# then the ignored .env (GHIDRA_INSTALL_DIR, JAVA_HOME and other
 # paths that scripts/setup.sh wrote), exports the Ghidra and Java folders it finds, puts
 # GameFrame's `gameframe` command and the .venv's Python first on PATH, and prints one line
 # saying what it found. It changes nothing on disk. The scripts load .env on their own; this
@@ -10,6 +11,9 @@
 if [ -n "${BASH_SOURCE:-}" ]; then _gf_self="${BASH_SOURCE[0]}"; else _gf_self="${(%):-%x}"; fi
 GAMEFRAME_ROOT="$(cd "$(dirname "$_gf_self")/.." && pwd)"
 export GAMEFRAME_ROOT
+GAMEFRAME_HOME="${GAMEFRAME_HOME:-$HOME/gameframe}"
+export GAMEFRAME_HOME
+if [ -f "$GAMEFRAME_HOME/config.env" ]; then set -a; . "$GAMEFRAME_HOME/config.env"; set +a; fi
 if [ -f "$GAMEFRAME_ROOT/.env" ]; then set -a; . "$GAMEFRAME_ROOT/.env"; set +a; fi
 _gf_found() { for d in "$@"; do [ -n "$d" ] && [ -x "$d/$_gf_bin" ] && { echo "$d"; return; }; done; }
 _gf_bin=support/analyzeHeadless

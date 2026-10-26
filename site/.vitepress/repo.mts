@@ -25,7 +25,7 @@ export const GITHUB = 'https://github.com/tanepiper/game-frame'
 
 /** Repository paths (relative to ROOT) that are not pages, for VitePress's srcExclude. */
 export const EXCLUDE = [
-  '.git/**', '.venv/**', '**/node_modules/**', 'analysis/**', 'derived/**', 'target/**',
+  '.git/**', '.venv/**', '**/node_modules/**', 'analysis/**', 'derived/**', 'game/**',
   'templates/**', 'skills/**', 'tools/**', 'tests/**', 'scripts/**', 'labels/**',
   'AGENTS.md', 'CLAUDE.md', 'GAPS.md', 'agents/**', 'site/README.md', 'site/.vitepress/**',
   'examples/*/build/**', 'crates/target/**', 'crates/*/THIRD_PARTY.md',

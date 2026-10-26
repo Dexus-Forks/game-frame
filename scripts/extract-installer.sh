@@ -17,7 +17,7 @@
 #                                           for CD audio tracks; it also lists the tracks)
 #   macOS .app                              copied as it is; a tiny app is often only a web
 #                                           installer (GOG Galaxy's), with no game inside
-# It never runs the installer. Extract into an ignored folder (target/), never into git.
+# It never runs the installer. Extract into an ignored folder (game/), never into git.
 set -euo pipefail
 PY="$(command -v python3)"
 detect_only=0

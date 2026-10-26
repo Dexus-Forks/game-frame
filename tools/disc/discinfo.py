@@ -31,7 +31,7 @@ What it reports, and why it matters for a port:
 - the system area (sectors 0 to 15): empty on a PC disc, the licence and boot data on a console.
 - files that only one of the ISO 9660 and Joliet trees lists, and files dated after the volume.
 
-It reads the image only. The files it copies are game material: extract into target/ (or
+It reads the image only. The files it copies are game material: extract into game/ (or
 another folder git ignores). Standard library only.
 """
 import json

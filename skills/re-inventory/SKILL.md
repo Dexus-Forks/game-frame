@@ -15,14 +15,20 @@ A purchased game often arrives as an installer (GOG's Inno Setup `.exe`, a Steam
 NSIS or InstallShield setup, an `.msi`, a `.dmg` or `.pkg`, GOG's Linux `.sh`) or on a CD (an
 image as `.cue` and `.bin`, or `.iso`). Never run an installer: extract it.
 
+`./gameframe game add ID FILE...` does it for you. It copies each disc image or installer into
+the GameFrame home's `games/ID/media/`, records its size and SHA-256 in `games/ID/game.json`,
+and extracts the first one into `games/ID/game/`. The project's `media/` and `game/` are links
+to those folders. Give `--version NAME` for a second release or a patch, so each keeps its own
+folder in `media/`. The commands below do the same steps by hand.
+
 ```bash
 scripts/extract-installer.sh --detect "~/Downloads/setup_game.exe"     # what it is, which tool
-scripts/extract-installer.sh "~/Downloads/setup_game.exe" target/gog
-python3 tools/triage/compare_trees.py target/game target/gog         # same version?
-python3 tools/triage/compare_trees.py target/game /dev/null --hashes > docs/HASHES.txt
-python3 tools/triage/fixity.py bag target/game derived/bags/game-as-bought --info "External-Description=GOG 1.2"   # fixity
-python3 tools/disc/discinfo.py target/cd/GAME.CUE --files          # a CD: tracks, file systems, dates
-python3 tools/triage/similar.py target/game target/gog             # what changed between two releases
+scripts/extract-installer.sh "~/Downloads/setup_game.exe" derived/gog
+python3 tools/triage/compare_trees.py game derived/gog         # same version?
+python3 tools/triage/compare_trees.py game /dev/null --hashes > docs/HASHES.txt
+python3 tools/triage/fixity.py bag game derived/bags/game-as-bought --info "External-Description=GOG 1.2"   # fixity
+python3 tools/disc/discinfo.py media/GAME.CUE --files          # a CD: tracks, file systems, dates
+python3 tools/triage/similar.py game derived/gog             # what changed between two releases
 ```
 
 - A CD can hold more than its files. Audio tracks are often the game's music, which the port
@@ -56,7 +62,7 @@ with custom extensions: `.pak .pkg .dat .arc .bin .wad .pck .assets`), configura
 ## 2. Look at every binary
 
 ```bash
-for b in target/*.exe target/*.dll; do .venv/bin/python tools/pe/peinfo.py "$b"; echo; done
+for b in game/*.exe game/*.dll; do .venv/bin/python tools/pe/peinfo.py "$b"; echo; done
 ```
 
 For each, note: 32- or 64-bit, EXE or DLL, PDB path (a leaked build path names the engine and
@@ -69,11 +75,11 @@ runtime (`msvcp140.dll`, `vcruntime140.dll`), and known middleware (FMOD, Wwise,
 Havok, Steam/GOG SDKs): document what they are and move on.
 
 ```bash
-.venv/bin/python tools/pe/peres.py target/GAME.EXE            # version information, resources
-python3 tools/triage/constants.py target/GAME.EXE             # random generators, CRCs, hashes, LZSS
-.venv/bin/python tools/pe/stackstrings.py target/GAME.EXE     # text built on the stack
-python3 tools/formats/swfinfo.py target/game.exe              # a Flash projector, or an SWF
-python3 tools/triage/binview.py target/GAME.EXE derived/game.png --layout hilbert   # its layout, as a picture
+.venv/bin/python tools/pe/peres.py game/GAME.EXE            # version information, resources
+python3 tools/triage/constants.py game/GAME.EXE             # random generators, CRCs, hashes, LZSS
+.venv/bin/python tools/pe/stackstrings.py game/GAME.EXE     # text built on the stack
+python3 tools/formats/swfinfo.py game/game.exe              # a Flash projector, or an SWF
+python3 tools/triage/binview.py game/GAME.EXE derived/game.png --layout hilbert   # its layout, as a picture
 ```
 
 For a DOS game, name the compiler's runtime before reading any code: build signatures from the
@@ -93,7 +99,7 @@ exports are free, accurate names: decompile it together with the EXE.
 `file` saying "MS-DOS executable" (or peinfo refusing the file) means a DOS program. Use:
 
 ```bash
-for b in target/*.EXE target/*.exe target/*.OVL; do python3 tools/dos/dosinfo.py "$b"; echo; done
+for b in game/*.EXE game/*.exe game/*.OVL; do python3 tools/dos/dosinfo.py "$b"; echo; done
 ```
 
 It names the format (`MZ` real mode, `NE` 16-bit protected mode, `LE`/`LX` 32-bit extender),
@@ -135,8 +141,8 @@ REA's routing (`re-rea`): it has dedicated tools for each.
 For each large file type:
 
 ```bash
-xxd target/data.pak | head -8                          # magic number, header fields, offsets
-python3 tools/triage/filetypes.py target/data.pak --blocks 65536   # entropy, block by block
+xxd game/data.pak | head -8                          # magic number, header fields, offsets
+python3 tools/triage/filetypes.py game/data.pak --blocks 65536   # entropy, block by block
 ```
 
 Entropy near 8.0 means compressed or encrypted; 4 to 6 means plain structured data. Look for
@@ -156,7 +162,7 @@ Then run the catalogue, the first resource viewer (`re-browse`), and copy its su
 into `docs/CHECKLIST.md` as the starting format coverage:
 
 ```bash
-python3 tools/formats/catalog.py target/game derived/catalog
+python3 tools/formats/catalog.py game derived/catalog
 ```
 
 Also record the hardware the game was written for: the minimum CPU, the video modes, the 3D
@@ -173,7 +179,7 @@ project template; copy `templates/project/docs/versions.md` from GameFrame if th
 older):
 
 1. **Read this copy's identity** first:
-   `.venv/bin/python tools/triage/buildid.py target/GAME --name "First edition" --write docs/versions.md`.
+   `.venv/bin/python tools/triage/buildid.py game/GAME --name "First edition" --write docs/versions.md`.
    It reads the disc's mastering date, each executable's link date and VERSIONINFO, version
    strings in the code, and the version lines of the readme and setup files.
 2. **Is it the latest official version?** Search for later official releases: the
@@ -196,7 +202,7 @@ older):
 4. **Record each one**: its source, the checksums of its files or image, its languages, content
    and builds.
 5. **Measure the data delta** between each pair:
-   `.venv/bin/python tools/triage/versiondiff.py target/first/GAME.CUE target/latest/GAME.CUE`.
+   `.venv/bin/python tools/triage/versiondiff.py game/first/GAME.CUE game/latest/GAME.CUE`.
    It reads folders or disc images in place and prints the files added, removed and changed by
    folder, the PE link dates of the executables, and the languages. Paste it into the
    data-delta section.
@@ -229,7 +235,7 @@ starts:
 
 ```bash
 find target -iname '*.pdf' -o -iname '*.txt' -o -iname '*.doc' -o -iname '*.hlp' | head   # manual, README
-./gameframe run sentences target/GAME.EXE --min-words 6 > analysis/notes/sentences.txt    # the program's long strings
+./gameframe run sentences game/GAME.EXE --min-words 6 > analysis/notes/sentences.txt    # the program's long strings
 ./gameframe run sentences analysis/export/GAME.EXE/strings.txt --min-words 6              # the same from Ghidra's export
 ```
 

@@ -19,7 +19,7 @@
 #   Frida in .venv (~40 MB, optional)                    traces a running game (tools/live/frida_trace.py)
 # Nothing is installed without --install. On Linux, Ghidra is not in apt: the script prints the
 # download page instead of fetching a large archive itself.
-# In a game project (./gameframe doctor) it also checks target/, the copy of the game: missing or
+# In a game project (./gameframe doctor) it also checks game/, the copy of the game: missing or
 # empty counts as missing, and its note GAME-FILES-NOT-BUILD-OUTPUT.txt is written when absent.
 set -uo pipefail
 . "$(dirname "$0")/lib.sh"
@@ -108,13 +108,14 @@ if [[ -n "$hooks" ]] && git -C "$PROJECT" rev-parse --git-dir >/dev/null 2>&1; t
   else row "git hook" other "core.hooksPath is $current: call $hooks/pre-commit from there to check commits"; fi
 fi
 
-# A project's game folder, target/: the user's copy of the game, which git does not keep.
+# A project's game folder, game/: the user's copy of the game, which git does not keep.
 if [[ "$PROJECT" != "$ROOT" ]]; then
   python3 "$ROOT/scripts/hooks/gates/game_folder.py" check "$PROJECT" || missing=$((missing + 1))
 fi
 
 # The environment file the scripts and .mcp.json read.
-if [[ -n "$(find_ghidra)" && -n "$(find_java21)" && ! -f "$PROJECT/.env" ]]; then
+# With a GameFrame home, its config.env holds these for every project (gameframe home init).
+if [[ -n "$(find_ghidra)" && -n "$(find_java21)" && ! -f "$PROJECT/.env" && ! -f "$GAMEFRAME_HOME/config.env" ]]; then
   printf 'GHIDRA_INSTALL_DIR=%s\nJAVA_HOME=%s\n' "$(find_ghidra)" "$(find_java21)" > "$PROJECT/.env"
   echo "  wrote .env (GHIDRA_INSTALL_DIR, JAVA_HOME)"
 fi

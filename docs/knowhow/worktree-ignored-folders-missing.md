@@ -21,7 +21,7 @@ seen: ['Hardwar (1998), 2026-10-24']
 ## Symptoms
 
 An agent session started in a git worktree (a parallel session, or a tool that makes one for
-each task) cannot find `target/`, `analysis/export/`, `derived/`, `.venv` or `.env`. The
+each task) cannot find `game/`, `analysis/export/`, `derived/`, `.venv` or `.env`. The
 setup hook asks for `scripts/setup.sh`. A tool that worked in the main checkout fails with a
 missing file. When several sessions run `ghidra-run.sh` at once, all but one stop with
 Ghidra's `Unable to lock project` (a `LockException`).
@@ -35,8 +35,15 @@ headless job runs in it, and `ghidra-run.sh` uses one project, `analysis/ghidra-
 
 ## What to do
 
-Use the main checkout's ignored folders by their absolute paths, or link them into the
-worktree (the links are ignored too):
+A project whose folders live in the GameFrame home links them into the worktree with one
+command. The links are ignored, and the shared Python is in the home's `python/`:
+
+```bash
+./gameframe game link ID .
+```
+
+An older project with real folders in the main checkout links them by hand (the links are
+ignored too), or moves them into the home once with `./gameframe home adopt`:
 
 ```bash
 MAIN=$(git worktree list | head -1 | awk '{print $1}')
