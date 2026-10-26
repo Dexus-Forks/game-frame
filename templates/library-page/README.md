@@ -139,6 +139,31 @@ Saves are kept in this browser.
 `NAME`. The Markdown is built as page elements, never as HTML, so a file cannot run script in the
 page.
 
+## Links and reports
+
+`links` is a row of links, such as the guide, the source, and the project's GitHub and Mastodon
+pages. Each has `text`, `href`, an optional `icon` (any icon name, including `github`,
+`mastodon`, `home` and `link`, or a picture's URL) and an optional `place`. The frame draws a
+link at its place: `header` under the title, `play` under the start button, or `footer` (the
+default) under the panel. This page draws every link in the footer.
+
+```json
+"links": [
+  { "text": "Source", "href": "https://github.com/owner/game", "icon": "github" },
+  { "text": "Mastodon", "href": "https://mastodon.social/@game", "icon": "mastodon", "place": "header" }
+],
+"issues": [
+  { "text": "Report to the game", "repo": "owner/game" },
+  { "text": "Report to GameFrame", "repo": "tanepiper/game-frame", "kinds": ["panic"] }
+]
+```
+
+`issues` names where the frame may send a report from the running game
+([gameframe-report](../../crates/report/README.md)). In Production each report in Play gets one
+button per entry that takes its kind (`unported`, `panic`, `mismatch`; none listed takes every
+kind). Each button opens that repository's new-issue form, filled in. With no `issues`, the
+report's own repository is the one button.
+
 ## The game's side
 
 - `window.gameframeLibrary.ready` resolves once the page has opened the database. Open the Rust

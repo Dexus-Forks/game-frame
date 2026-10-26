@@ -104,6 +104,7 @@ pub fn Frame(setup: FrameSetup) -> Element {
                     if !spec.tagline.is_empty() {
                         p { class: "lib-tagline", "{spec.tagline}" }
                     }
+                    Ribbon { links: spec.links.iter().filter(|l| l.is_in("header")).cloned().collect::<Vec<_>>() }
                 }
                 nav { class: "lib-nav", "aria-label": "Frame",
                     for (t, label, icon) in tabs {
@@ -123,15 +124,28 @@ pub fn Frame(setup: FrameSetup) -> Element {
                     Tab::Console => rsx! { Console {} },
                     Tab::Page(path) => rsx! { Page { path } },
                 }
-                if !spec.links.is_empty() {
-                    nav { class: "lib-links",
-                        for l in spec.links.iter() {
-                            a { href: "{l.href}", target: "_blank", rel: "noopener", "{l.text}" }
-                        }
-                    }
-                }
+                Ribbon { links: spec.links.iter().filter(|l| l.is_in("footer")).cloned().collect::<Vec<_>>() }
                 if let Some(fine) = &spec.fine {
                     p { class: "lib-fine", "{fine}" }
+                }
+            }
+        }
+    }
+}
+
+/// A row of links from `library.json`, such as the project's GitHub and Mastodon pages, with
+/// their icons. Nothing when there are none.
+#[component]
+pub fn Ribbon(links: Vec<gameframe_library::Link>) -> Element {
+    if links.is_empty() {
+        return rsx! {};
+    }
+    rsx! {
+        nav { class: "lib-links",
+            for l in links.iter() {
+                a { href: "{l.href}", target: "_blank", rel: "noopener",
+                    if let Some(icon) = &l.icon { crate::Icon { name: icon.clone() } }
+                    "{l.text}"
                 }
             }
         }

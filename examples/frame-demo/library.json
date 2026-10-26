@@ -25,11 +25,35 @@
   "links": [
     {
       "text": "Setup guide",
-      "href": "https://example.org/guide"
+      "href": "https://example.org/guide",
+      "icon": "file"
     },
     {
       "text": "Source code",
-      "href": "https://example.org/source"
+      "href": "https://example.org/source",
+      "icon": "github"
+    },
+    {
+      "text": "Mastodon",
+      "href": "https://example.org/@game",
+      "icon": "mastodon",
+      "place": "header"
+    },
+    {
+      "text": "GameFrame",
+      "href": "https://github.com/tanepiper/game-frame",
+      "icon": "github",
+      "place": "play"
+    }
+  ],
+  "issues": [
+    {
+      "text": "Report to the game",
+      "repo": "example/game"
+    },
+    {
+      "text": "Report to GameFrame",
+      "repo": "tanepiper/game-frame"
     }
   ],
   "fine": "A copy of the original game is required. This demo has no game: the console shows its events.",

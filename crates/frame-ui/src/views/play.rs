@@ -6,7 +6,9 @@
 use crate::state::use_frame;
 use crate::Icon;
 use dioxus::prelude::*;
+use gameframe_frame::report::{Mode, Report};
 use gameframe_frame::{capabilities, device, topics, Grade, ON_EXIT, SHOW_AT_START};
+use gameframe_library::IssueTarget;
 use serde_json::json;
 
 fn grade_label(g: Grade) -> &'static str {
@@ -23,6 +25,9 @@ fn grade_label(g: Grade) -> &'static str {
 pub fn Play() -> Element {
     let frame = use_frame();
     let reports = frame.with(|s| s.reports().to_vec());
+    let spec = frame.spec();
+    let issues = spec.issues.clone();
+    let ribbon: Vec<_> = spec.links.iter().filter(|l| l.is_in("play")).cloned().collect();
     let (manifest, slots, chosen, state, detail) = frame.with(|s| {
         let detail = s
             .log()
@@ -135,6 +140,7 @@ pub fn Play() -> Element {
                     }
                 }
             }
+            crate::shell::Ribbon { links: ribbon }
             // A stopped game needs no line; the live region stays so a screen reader hears changes.
             div { class: "lib-status", role: "status", "aria-live": "polite",
                 if state != "stopped" {
@@ -159,9 +165,11 @@ pub fn Play() -> Element {
                                         "{r.kind.name()}, {r.count}×"
                                         if let Some(o) = &r.original { ", original " code { "{o}" } }
                                     }
-                                    if let Some(url) = &r.issue {
-                                        a { class: "lib-button lib-button--quiet", href: "{url}", target: "_blank", rel: "noopener",
-                                            "Open a GitHub issue"
+                                    if r.mode == Mode::Production {
+                                        div { class: "lib-actions",
+                                            for (text, url) in issue_buttons(r, &issues) {
+                                                a { class: "lib-button lib-button--quiet", href: "{url}", target: "_blank", rel: "noopener", "{text}" }
+                                            }
                                         }
                                     } else {
                                         span { class: "lib-row-meta", "Saved as " code { "{r.id}.md" } " in the reports folder." }
@@ -202,4 +210,17 @@ pub fn Play() -> Element {
             }
         }
     }
+}
+
+/// The report's GitHub buttons: one per repository `library.json`'s `issues` names that takes
+/// its kind, else the report's own link.
+fn issue_buttons(r: &Report, targets: &[IssueTarget]) -> Vec<(String, String)> {
+    if targets.is_empty() {
+        return r.issue.iter().map(|url| ("Open a GitHub issue".to_string(), url.clone())).collect();
+    }
+    targets
+        .iter()
+        .filter(|t| t.kinds.is_empty() || t.kinds.iter().any(|k| k == r.kind.name()))
+        .filter_map(|t| Some((t.text.clone(), r.issue_url_for(&t.repo)?)))
+        .collect()
 }

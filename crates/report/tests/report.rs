@@ -87,6 +87,8 @@ fn a_report_makes_an_issue() {
     assert!(url.starts_with("https://github.com/tanepiper/unpod/issues/new?title=%5Bunported%5D"));
     assert!(url.contains("labels=gameframe-report%2Cunported") && url.len() < 20_000, "{}", url.len());
     assert!(!url.contains("Stack"), "a long stack stays out of the link");
+    let other = r.issue_url_for("tanepiper/game-frame").unwrap();
+    assert!(other.starts_with("https://github.com/tanepiper/game-frame/issues/new?"));
     r.meta.issues = "not a repo".into();
     assert!(r.issue_url().is_none());
 }

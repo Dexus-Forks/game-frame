@@ -129,11 +129,18 @@ impl Report {
         let mut s = String::new();
         let game = if self.meta.game.is_empty() { "the game".to_string() } else { self.meta.game.clone() };
         s += &format!("<!-- gameframe-report: {} -->\n", self.id);
-        s += &format!("**{}** in {game} {}", self.kind.name(), self.meta.version);
+        s += &format!("**{}** in {game}", self.kind.name());
+        if !self.meta.version.is_empty() {
+            s += &format!(" {}", self.meta.version);
+        }
         if !self.meta.commit.is_empty() {
             s += &format!(" (`{}`)", self.meta.commit);
         }
-        s += &format!(", {} time{}, on {}.\n\n", self.count, if self.count == 1 { "" } else { "s" }, self.platform);
+        s += &format!(", {} time{}", self.count, if self.count == 1 { "" } else { "s" });
+        if !self.platform.is_empty() {
+            s += &format!(", on {}", self.platform);
+        }
+        s += ".\n\n";
         s += &format!("> {}\n\n", self.what.replace('\n', "\n> "));
         s += "| Where | |\n|---|---|\n";
         s += &format!("| Port | `{}:{}:{}` |\n", self.file, self.line, self.column);
@@ -215,7 +222,13 @@ impl Report {
     /// `gameframe-report` and the kind. `None` when the game names no repository. Long bodies
     /// lose the stack first; attach the JSON file then.
     pub fn issue_url(&self) -> Option<String> {
-        let repo = self.meta.issues.trim().trim_start_matches("https://github.com/").trim_end_matches('/');
+        self.issue_url_for(&self.meta.issues)
+    }
+
+    /// The same link for another repository, `owner/name` or its GitHub address: the game's
+    /// own, GameFrame's, a fork's. A frame offers one button per repository it names.
+    pub fn issue_url_for(&self, repo: &str) -> Option<String> {
+        let repo = repo.trim().trim_start_matches("https://github.com/").trim_end_matches('/');
         if repo.split('/').filter(|p| !p.is_empty()).count() != 2 {
             return None;
         }

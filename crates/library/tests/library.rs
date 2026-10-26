@@ -169,3 +169,15 @@ fn thumbnails_are_data_urls() {
     assert_eq!(data_url("a/b", b"Ma"), "data:a/b;base64,TWE=");
     assert_eq!(data_url("a/b", b"M"), "data:a/b;base64,TQ==");
 }
+
+#[test]
+fn links_have_places_and_issues_have_repositories() {
+    let s = Spec::from_json(r#"{"id": "game", "sections": [{"id": "g", "kind": "game-data"}],
+        "links": [{"text": "Mastodon", "href": "https://mastodon.social/@x", "icon": "mastodon", "place": "header"},
+                  {"text": "Source", "href": "https://github.com/x/y"}],
+        "issues": [{"text": "Report to the game", "repo": "x/y"},
+                   {"text": "Report to GameFrame", "repo": "tanepiper/game-frame", "kinds": ["panic"]}]}"#).unwrap();
+    assert!(s.links[0].is_in("header") && s.links[1].is_in("footer") && !s.links[1].is_in("play"));
+    assert_eq!(s.issues[1].kinds, ["panic"]);
+    assert!(Spec::from_json(r#"{"id": "g", "sections": [{"id": "g", "kind": "game-data"}], "issues": [{"text": "t"}]}"#).is_err(), "a target needs its repository");
+}

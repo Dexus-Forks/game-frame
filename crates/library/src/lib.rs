@@ -25,5 +25,5 @@ pub use game_source;
 pub use library::{data_url, Hooks, Library, Listed, Missing, NoHooks};
 pub use loaded::Loaded;
 pub use memory::Memory;
-pub use spec::{Kind, Link, Page, Panel, Required, Section, Spec};
+pub use spec::{IssueTarget, Kind, Link, Page, Panel, Required, Section, Spec};
 pub use store::{check_name, now, Card, Entry, LocalFuture, State, Store};

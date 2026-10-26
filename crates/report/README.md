@@ -51,8 +51,10 @@ stack is left out first, and the JSON file holds everything.
 ## With the frame
 
 `gameframe_frame::Link::send_reports(devices)` sends each new report to the frame as
-`report.new`. The frame's Play tab lists them, each with its GitHub link in Production or its
-file name in Dev.
+`report.new`. The frame's Play tab lists them. In Dev each shows its file name. In Production
+each gets one button per repository in `library.json`'s `issues`, such as the game's and
+GameFrame's ([the library page](../../templates/library-page/README.md#links-and-reports)), each
+opening that repository's form through `Report::issue_url_for`.
 
 ## Files
 
