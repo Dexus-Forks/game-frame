@@ -40,11 +40,15 @@ pub struct FrameSetup {
     /// Start the game as soon as the frame is ready: for a program whose frame is turned off
     /// at start, which opens its window hidden.
     pub start_at_once: bool,
+    /// The game's own themes: name, label and stylesheet. `"preset"` and `"presets"` in
+    /// `library.json` name them as they name the built-in ones, and a game theme of the same
+    /// name wins.
+    pub themes: Vec<(Rc<str>, Rc<str>, Rc<str>)>,
 }
 
 impl FrameSetup {
     pub fn new(session: Session, spec: Spec) -> FrameSetup {
-        FrameSetup { session: Rc::new(RefCell::new(session)), spec: Rc::new(spec), library: None, save_settings: None, tick_ms: 50, css: None, show_window: None, exit: None, start_at_once: false }
+        FrameSetup { session: Rc::new(RefCell::new(session)), spec: Rc::new(spec), library: None, save_settings: None, tick_ms: 50, css: None, show_window: None, exit: None, start_at_once: false, themes: Vec::new() }
     }
 
     pub fn with_library(mut self, library: AnyLibrary) -> FrameSetup {
@@ -54,6 +58,13 @@ impl FrameSetup {
 
     pub fn with_css(mut self, css: impl Into<Rc<str>>) -> FrameSetup {
         self.css = Some(css.into());
+        self
+    }
+
+    /// A theme of the game's own, drawn in place of a built-in one when `library.json`'s
+    /// `"preset"` or the player's choice names it, such as a look taken from the game's menus.
+    pub fn with_theme(mut self, name: &str, label: &str, css: impl Into<Rc<str>>) -> FrameSetup {
+        self.themes.push((name.into(), label.into(), css.into()));
         self
     }
 
@@ -174,6 +185,24 @@ impl FrameContext {
 
     pub(crate) fn css(&self) -> Option<Rc<str>> {
         self.setup.peek().css.clone()
+    }
+
+    /// A theme's stylesheet by name: the game's own first, then the built-in ones.
+    pub fn theme_css(&self, name: &str) -> Option<Rc<str>> {
+        let setup = self.setup.peek();
+        match setup.themes.iter().find(|(n, _, _)| &**n == name) {
+            Some((_, _, css)) => Some(css.clone()),
+            None => crate::theme(name).map(Rc::from),
+        }
+    }
+
+    /// A theme's label: the game's own first, then the built-in ones.
+    pub fn theme_label(&self, name: &str) -> String {
+        let setup = self.setup.peek();
+        match setup.themes.iter().find(|(n, _, _)| &**n == name) {
+            Some((_, label, _)) => label.to_string(),
+            None => crate::theme_label(name).to_string(),
+        }
     }
 
     /// Whether the program can leave for the desktop.

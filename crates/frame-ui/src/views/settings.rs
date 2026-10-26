@@ -117,7 +117,7 @@ fn ThemeChoice() -> Element {
                     select { id: "set-frame-preset", class: "lib-input",
                         onchange: move |e| frame.update(|s| s.send(topics::FRAME_PREFERENCE, json!({ "key": PRESET, "value": e.value() }))),
                         for name in spec.presets.iter() {
-                            option { value: "{name}", selected: *name == current, {crate::theme_label(name)} }
+                            option { value: "{name}", selected: *name == current, {frame.theme_label(name)} }
                         }
                     }
                 }

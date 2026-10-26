@@ -41,6 +41,9 @@ can lay out its own frame from them. Inside a view, `use_frame()` gives the `Fra
 - `.with_library(library)`: the player's library. Without it the Library tab is hidden.
 - `.with_save(|settings| ...)`: called when the settings change, to save them.
 - `.with_css(text)`: the game's own stylesheet, drawn last.
+- `.with_theme(name, label, css)`: a theme of the game's own, such as a look taken from its
+  menus. `"preset"` and `"presets"` in `library.json` name it like a ready-made one, and it
+  wins over a ready-made one of the same name.
 - `.with_window(|shown| ...)`: show or hide the program's window when the session says (see
   "Back to the launcher" in the frame's README). Without it, a hidden frame leaves one "Open the
   frame" button in the corner of the page, for a game in the same page.
@@ -57,7 +60,7 @@ The frame uses the [library page](../../templates/library-page/README.md)'s desi
 components, built in, so one `library.json` styles both. It draws these in order:
 
 1. `tokens.css` and `library.css` from the library page, then `frame.css`;
-2. the ready-made theme named by `"preset"` (the
+2. the theme named by `"preset"`, the game's own (`with_theme`) or ready-made (the
    [list](../../templates/library-page/README.md#the-design-system); `THEMES` has them all and
    `theme(name)` returns one). When `library.json` lists `"presets"`, the player's choice from
    the Settings tab replaces it (`active_theme`);

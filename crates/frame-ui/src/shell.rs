@@ -83,7 +83,7 @@ pub fn Frame(setup: FrameSetup) -> Element {
         style { "{TOKENS_CSS}" }
         style { "{LIBRARY_CSS}" }
         style { "{FRAME_CSS}" }
-        if let Some(css) = active.as_deref().and_then(crate::theme) {
+        if let Some(css) = active.as_deref().and_then(|n| frame.theme_css(n)) {
             style { "{css}" }
         }
         if let Some(css) = frame.css() {

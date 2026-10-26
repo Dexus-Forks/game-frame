@@ -9,6 +9,9 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- A game can give the frame a theme of its own: `FrameSetup::with_theme(name, label, css)`.
+  `"preset"` and `"presets"` in `library.json` name it as they name the ready-made themes, so
+  the player can still choose between them.
 - `scripts/release.py X.Y.Z` cuts a release. It dates the changelog's Unreleased section, sets
   the version in `.claude-plugin/plugin.json`, commits and tags `vX.Y.Z`, then opens the next
   minor version as `-dev`. `--push` pushes the branch and tag, and `--publish` also makes the
