@@ -60,6 +60,30 @@ pub trait Store {
     fn delete<'a>(&'a self, section: &'a str, name: &'a str) -> LocalFuture<'a, io::Result<()>>;
     fn state<'a>(&'a self, section: &'a str) -> LocalFuture<'a, io::Result<State>>;
     fn set_state<'a>(&'a self, section: &'a str, state: &'a State) -> LocalFuture<'a, io::Result<()>>;
+
+    /// Keep a file the player chose in the browser, replacing a file of that name. The default
+    /// reads it whole and calls [`Store::write`]; [`crate::web::IndexedDb`] streams a big one
+    /// into OPFS instead.
+    #[cfg(target_arch = "wasm32")]
+    fn write_file<'a>(
+        &'a self,
+        section: &'a str,
+        name: &'a str,
+        file: &'a web_sys::File,
+        card: Option<Card>,
+    ) -> LocalFuture<'a, io::Result<()>> {
+        Box::pin(async move {
+            let bytes = crate::web::blob_bytes(file, 0, file.size() as u64).await?;
+            self.write(section, name, &bytes, card).await
+        })
+    }
+
+    /// A kept file as a browser `File`, to read in slices. The default reads it whole and
+    /// wraps the bytes; [`crate::web::IndexedDb`] gives a big file straight from OPFS.
+    #[cfg(target_arch = "wasm32")]
+    fn file<'a>(&'a self, section: &'a str, name: &'a str) -> LocalFuture<'a, io::Result<web_sys::File>> {
+        Box::pin(async move { crate::web::file_of(name, &self.read(section, name).await?) })
+    }
 }
 
 /// Run a store or library call that answers at once (the folder and memory stores).
@@ -111,5 +135,19 @@ impl Store for Box<dyn Store> {
     }
     fn set_state<'a>(&'a self, section: &'a str, state: &'a State) -> LocalFuture<'a, io::Result<()>> {
         (**self).set_state(section, state)
+    }
+    #[cfg(target_arch = "wasm32")]
+    fn write_file<'a>(
+        &'a self,
+        section: &'a str,
+        name: &'a str,
+        file: &'a web_sys::File,
+        card: Option<Card>,
+    ) -> LocalFuture<'a, io::Result<()>> {
+        (**self).write_file(section, name, file, card)
+    }
+    #[cfg(target_arch = "wasm32")]
+    fn file<'a>(&'a self, section: &'a str, name: &'a str) -> LocalFuture<'a, io::Result<web_sys::File>> {
+        (**self).file(section, name)
     }
 }

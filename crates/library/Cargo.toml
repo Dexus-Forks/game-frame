@@ -23,4 +23,6 @@ web-sys = { version = "0.3", features = [
     "IdbFactory", "IdbDatabase", "IdbOpenDbRequest", "IdbRequest", "IdbTransaction",
     "IdbTransactionMode", "IdbObjectStore", "IdbObjectStoreParameters", "IdbKeyRange", "DomStringList",
     "Crypto", "SubtleCrypto", "CryptoKey", "AesGcmParams", "AesKeyGenParams",
+    "Navigator", "StorageManager", "Blob", "File", "FileSystemDirectoryHandle", "FileSystemFileHandle",
+    "FileSystemGetDirectoryOptions", "FileSystemGetFileOptions", "FileSystemWritableFileStream", "WritableStream",
 ] }

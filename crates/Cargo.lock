@@ -715,6 +715,7 @@ dependencies = [
  "pulldown-cmark",
  "serde_json",
  "tokio",
+ "web-sys",
 ]
 
 [[package]]

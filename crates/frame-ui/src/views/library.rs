@@ -1,8 +1,9 @@
 //! Library: the player's sections from `library.json`, with the same rules as the HTML page
 //! (accepted names, order, switches), through `gameframe-library`. Each change sends
-//! `library.changed`, so the game reads the section again.
+//! `library.changed`, so the game reads the section again. In the browser an added file goes to
+//! the library as a `File`, so a big one (a CD image) is streamed, never read whole.
 
-use crate::state::use_frame;
+use crate::state::{use_frame, AnyLibrary};
 use crate::Icon;
 use dioxus::prelude::*;
 use gameframe_frame::topics;
@@ -15,6 +16,17 @@ fn size(n: u64) -> String {
     } else {
         format!("{} KB", (n / 1000).max(1))
     }
+}
+
+/// Keep a file the player chose: in the browser as a `File`, which the store streams when it is
+/// big; on the desktop as its bytes.
+async fn add(lib: &AnyLibrary, section: &str, f: &dioxus::html::FileData) -> Result<(), String> {
+    #[cfg(target_arch = "wasm32")]
+    if let Some(file) = f.inner().downcast_ref::<web_sys::File>() {
+        return lib.add_file(section, &f.name(), file).await.map_err(|e| e.to_string());
+    }
+    let bytes = f.read_bytes().await.map_err(|e| e.to_string())?;
+    lib.add(section, &f.name(), &bytes).await.map_err(|e| e.to_string())
 }
 
 #[component]
@@ -140,10 +152,9 @@ fn Files(section: Section) -> Element {
                         spawn(async move {
                             let Some(lib) = frame.library() else { return };
                             for f in files {
-                                let bytes = match f.read_bytes().await { Ok(b) => b.to_vec(), Err(err) => { problem.set(err.to_string()); continue } };
-                                match lib.add(&s, &f.name(), &bytes).await {
+                                match add(&lib, &s, &f).await {
                                     Ok(()) => problem.set(String::new()),
-                                    Err(err) => problem.set(err.to_string()),
+                                    Err(err) => problem.set(err),
                                 }
                             }
                             changed(s);

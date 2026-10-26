@@ -12,12 +12,16 @@ use std::sync::Arc;
 pub trait Hooks {
     /// A card for a file the player adds or the game writes: a save's town and date, a mod's
     /// title. `None` shows the file name.
+    ///
+    /// For a file of at least `web::BIG` bytes (64 MiB) added in the browser
+    /// ([`Library::add_file`]), `bytes` is only its first 1 MiB.
     fn describe(&self, _section: &Section, _name: &str, _bytes: &[u8]) -> Option<Card> {
         None
     }
 
     /// Refuse a file the game cannot use, with a sentence the page shows. The section's
-    /// `accept` list is checked before this.
+    /// `accept` list is checked before this. For a big file added in the browser, `bytes` is
+    /// only its first 1 MiB, as for [`Hooks::describe`].
     fn accept(&self, _section: &Section, _name: &str, _bytes: &[u8]) -> Result<(), String> {
         Ok(())
     }
@@ -124,24 +128,60 @@ impl<S: Store, H: Hooks> Library<S, H> {
     /// game's. In a one-file section it replaces the file there. A new file of an ordered
     /// section goes last.
     pub async fn add(&self, section: &str, name: &str, bytes: &[u8]) -> io::Result<()> {
+        let (s, card) = self.check(section, name, bytes)?;
+        let old = self.store.list(section).await?;
+        self.store.write(section, name, bytes, card).await?;
+        self.added(s, name, &old).await
+    }
+
+    /// A file the player chose in the browser, kept as [`Library::add`] keeps bytes. A file of
+    /// at least [`crate::web::BIG`] bytes is never read whole: the hooks see its first 1 MiB,
+    /// and the store streams it ([`Store::write_file`]).
+    #[cfg(target_arch = "wasm32")]
+    pub async fn add_file(&self, section: &str, name: &str, file: &web_sys::File) -> io::Result<()> {
+        let size = file.size() as u64;
+        let head = crate::web::blob_bytes(file, 0, if size < crate::web::BIG { size } else { crate::web::HEAD }).await?;
+        if size < crate::web::BIG {
+            return self.add(section, name, &head).await;
+        }
+        let (s, card) = self.check(section, name, &head)?;
+        let old = self.store.list(section).await?;
+        self.store.write_file(section, name, file, card).await?;
+        self.added(s, name, &old).await
+    }
+
+    /// A kept file as a browser `File`, to read in slices (such as a CD image for
+    /// `game_source::web::open_files`).
+    #[cfg(target_arch = "wasm32")]
+    pub async fn file(&self, section: &str, name: &str) -> io::Result<web_sys::File> {
+        self.section(section)?;
+        self.store.file(section, name).await
+    }
+
+    /// The checks before a file is kept: the section, its accepted names, the game's own check;
+    /// then the game's card for it.
+    fn check(&self, section: &str, name: &str, bytes: &[u8]) -> io::Result<(&Section, Option<Card>)> {
         let s = self.section(section)?;
         if !s.accepts(name) {
             return Err(invalid(format!("{} takes {} files, not {name}", s.label, s.accept.join(", "))));
         }
         self.hooks.accept(s, name, bytes).map_err(invalid)?;
-        let card = self.hooks.describe(s, name, bytes);
-        let old = self.store.list(section).await?;
-        self.store.write(section, name, bytes, card).await?;
+        Ok((s, self.hooks.describe(s, name, bytes)))
+    }
+
+    /// After a file is kept: a one-file section drops the files it had (`old`, listed before
+    /// the write), and an ordered section puts a new file last.
+    async fn added(&self, s: &Section, name: &str, old: &[Entry]) -> io::Result<()> {
         if !s.many() {
             for e in old.iter().filter(|e| e.name != name) {
-                self.store.delete(section, &e.name).await?;
+                self.store.delete(&s.id, &e.name).await?;
             }
         }
         if s.ordered() {
-            let mut state = self.store.state(section).await?;
+            let mut state = self.store.state(&s.id).await?;
             if !state.order.iter().any(|n| n == name) {
                 state.order.push(name.to_string());
-                self.store.set_state(section, &state).await?;
+                self.store.set_state(&s.id, &state).await?;
             }
         }
         Ok(())

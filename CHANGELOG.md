@@ -30,6 +30,12 @@ Every release of GameFrame, newest first. The format follows
 - Game exit. `frame.on-exit` chooses what happens when the game ends by itself: the launcher
   comes back, or the program exits to the desktop. "Exit to desktop" (`Session::exit`,
   `frame.exit`, `FrameSetup::with_exit`) stops the game, then leaves.
+- Big files in the browser library. `gameframe-library`'s `IndexedDb` streams a file of at
+  least `web::BIG` bytes (64 MiB), such as a 700 MB CD image, into the origin private file
+  system 8 MiB at a time, kept plain so it can be read in slices. `Library::add_file` and
+  `Store::write_file` take a `web_sys::File`; `Library::file` and `Store::file` give one back.
+  The game's hooks see the first 1 MiB of a big file. The frame's Library tab adds files this
+  way in the browser.
 
 ### Changed
 

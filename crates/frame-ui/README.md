@@ -27,7 +27,7 @@ with the library in IndexedDB or a folder and the settings saved.
 |---|---|---|
 | Play | always | Missing game files, the renderers with their grade and a meter, Start, then "Back to the game" and Stop while it runs, the game's status, and "Open this window when the game starts". With `with_exit`, also "When the game ends" (come back here, or exit to desktop) and "Exit to desktop" |
 | Settings | the manifest lists `settings`, or `library.json` lists `presets` | The theme, when `presets` offers a choice, then every setting by group, with the input its kind needs |
-| Library | the setup has a library | The sections from `library.json`: add, delete, switch on and off, reorder. Each change sends `library.changed` |
+| Library | the setup has a library | The sections from `library.json`: add, delete, switch on and off, reorder. Each change sends `library.changed`. In the browser a big file (a CD image) is streamed into the store, never read whole |
 | A page per `pages` entry | always | The page's Markdown, with `::: tip`, `info`, `warning` and `danger` callouts |
 | Console | always | The game's controls as buttons (`input.press`), a form that sends any event, and the event log with a topic filter |
 

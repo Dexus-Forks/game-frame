@@ -97,6 +97,27 @@ fn a_one_file_section_replaces_its_file() {
 }
 
 #[test]
+fn a_refused_file_changes_nothing() {
+    // The checks run before the write, so a refused file neither replaces the one there nor
+    // joins the order.
+    struct NoJunk;
+    impl Hooks for NoJunk {
+        fn accept(&self, _: &Section, _: &str, bytes: &[u8]) -> Result<(), String> {
+            if bytes == b"junk" { Err("junk".into()) } else { Ok(()) }
+        }
+    }
+    let text = r#"{"id":"x","sections":[{"id":"g","kind":"game-data"},{"id":"cfg","label":"Settings","many":false},{"id":"mods","kind":"mods"}]}"#;
+    let lib = Library::new(Spec::from_json(text).unwrap(), Memory::new(), NoJunk);
+    now(lib.add("cfg", "one.ini", b"1")).unwrap();
+    assert!(now(lib.add("cfg", "two.ini", b"junk")).is_err());
+    assert!(now(lib.add("mods", "a.mod", b"junk")).is_err());
+    let names: Vec<_> = now(lib.entries("cfg")).unwrap().into_iter().map(|l| l.entry.name).collect();
+    assert_eq!(names, ["one.ini"]);
+    assert!(now(lib.entries("mods")).unwrap().is_empty());
+    assert!(now(lib.store().state("mods")).unwrap().order.is_empty());
+}
+
+#[test]
 fn the_folder_store_keeps_files_where_the_player_can_see_them() {
     let root = std::env::temp_dir().join(format!("gameframe-library-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&root);
