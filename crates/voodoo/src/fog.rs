@@ -1,51 +1,59 @@
-//! Table fog (`GR_FOG_WITH_TABLE`): 64 entries, entry *i* for *w* = 2^(3 + i/4) / (8 − i mod
-//! 4) (`guFogTableIndexToW`), and the Voodoo blends between neighbouring entries. The same
-//! lookup as the fragment shader of GameFrame's `wrappers/glide`.
+//! Fog. *Observed* in the SST-1 specification, section 5.17 (`fogMode` and the fog unit's
+//! diagram): the table is indexed by the top 6 bits of the W buffer's floating value (4 bits
+//! of exponent, 2 of mantissa, [`crate::frame::wfloat`]), and the next 8 bits blend to the
+//! next entry; the fog alpha, plus one, scales the fog colour minus the pixel's colour, and
+//! the product (its 8 low bits dropped) is added to the pixel's colour and clamped. With
+//! `FOG_WITH_ITERATED_ALPHA` the iterated alpha replaces the table's value.
+//!
+//! The entry *i* stands for *w* = 2^(3 + i/4) / (8 − i mod 4) (`guFogTableIndexToW`): those are
+//! the *w* where [`crate::frame::wfloat`]'s top 6 bits step.
+//!
+//! *Inferred*: the blend between entries is `table[i] + ((table[i+1] − table[i]) × frac) >> 8`
+//! (Glide downloads each entry with its difference to the next).
 
 /// The *w* of entry `i`.
 pub fn index_to_w(i: usize) -> f32 {
     2f32.powi(3 + (i >> 2) as i32) / (8 - (i & 3)) as f32
 }
 
-/// The fog amount (0–1) at `w`. Deviation: the chip's own interpolation weights (from the
-/// bits of its floating *w*) are *unknown*; this is linear in *w* between the entries.
-pub fn amount(table: &[u8; 64], w: f32) -> f32 {
-    if !(w > 1.0) {
-        return table[0] as f32 / 255.0;
-    }
-    let e = w.log2().floor();
-    let fr = w / e.exp2();
-    let (m, b0, b1) = if fr < 8.0 / 7.0 {
-        (0, 1.0, 8.0 / 7.0)
-    } else if fr < 4.0 / 3.0 {
-        (1, 8.0 / 7.0, 4.0 / 3.0)
-    } else if fr < 1.6 {
-        (2, 4.0 / 3.0, 1.6)
-    } else {
-        (3, 1.6, 2.0)
-    };
-    let i = e as usize * 4 + m;
-    if i >= 63 {
-        return table[63] as f32 / 255.0;
-    }
-    let (a, b) = (table[i] as f32, table[i + 1] as f32);
-    (a + (b - a) * (fr - b0) / (b1 - b0)) / 255.0
+/// The fog alpha (0–255) at W buffer value `w`.
+pub fn table_alpha(table: &[u8; 64], w: u16) -> u8 {
+    let i = (w >> 10) as usize;
+    let frac = ((w >> 2) & 0xff) as i32;
+    let a = table[i] as i32;
+    let next = table.get(i + 1).map_or(a, |&b| b as i32);
+    (a + (((next - a) * frac) >> 8)).clamp(0, 255) as u8
+}
+
+/// One channel fogged: `c + ((fog − c) × (alpha + 1)) >> 8`, clamped.
+pub fn apply(c: u8, fog: u8, alpha: u8) -> u8 {
+    let d = fog as i32 - c as i32;
+    (c as i32 + ((d * (alpha as i32 + 1)) >> 8)).clamp(0, 255) as u8
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::frame::wfloat;
 
     #[test]
-    fn entries_and_their_w() {
-        assert_eq!(index_to_w(0), 1.0);
-        assert_eq!(index_to_w(4), 2.0);
+    fn entries_meet_the_w_buffer_steps() {
+        // At each entry's w the W buffer's top 6 bits are the entry's index.
+        for i in 0..60 {
+            let w = index_to_w(i) * 1.0001;
+            assert_eq!(wfloat(1.0 / w) >> 10, i as u16, "entry {i}");
+        }
+    }
+
+    #[test]
+    fn lookup_and_blend() {
         let table: [u8; 64] = std::array::from_fn(|i| (i * 4) as u8);
-        assert_eq!(amount(&table, 1.0), 0.0);
-        assert_eq!(amount(&table, 2.0), 16.0 / 255.0);
-        assert_eq!(amount(&table, 1e9), 252.0 / 255.0);
-        // Halfway between entries 4 (w 2) and 5 (w 16/7).
-        let mid = (2.0 + 16.0 / 7.0) / 2.0;
-        assert!((amount(&table, mid) - 18.0 / 255.0).abs() < 1e-6);
+        assert_eq!(table_alpha(&table, 0), 0);
+        assert_eq!(table_alpha(&table, 5 << 10), 20);
+        assert_eq!(table_alpha(&table, 5 << 10 | 0x80 << 2), 22);
+        assert_eq!(table_alpha(&table, 0xffff), 252);
+        assert_eq!(apply(0, 255, 255), 255);
+        assert_eq!(apply(200, 0, 127), 100);
+        assert_eq!(apply(100, 200, 0), 100);
     }
 }

@@ -129,7 +129,11 @@ uses the file variant, the texture formats and sizes, and the effects (reflectio
 that card's build used. `gameframe-gpu-1997`'s `card` module lists what each chip accepts;
 the game's own differences come from tracing its builds. `gameframe-voodoo` draws a 3dfx
 profile in software: hand it the triangles and Glide states the game's 3dfx build sends and it
-gives the picture at any size, with no Glide library. Record which profile is the
+gives the picture at any size, with no Glide library. Its arithmetic follows 3dfx's register
+specifications (SST-1 / Voodoo Graphics revision 1.61, Voodoo2 revision 1.16; 3dfx allowed them
+to be copied whole and not for profit, so keep them beside the project, not in its
+repository): the combine units, the W buffer's floating format, fog and dither are drawn
+there as diagrams. Record which profile is the
 reference for exact comparisons ([3D accelerators](graphics-3d.md), "How to approach a game
 with several renderers").
 

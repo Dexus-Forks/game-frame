@@ -1,20 +1,25 @@
 //! `grDrawTriangle`: a triangle of `GrVertex` records through the pixel pipeline into a
 //! [`Frame`].
 //!
-//! Per pixel, in the order the Glide 2.x reference manual draws the pipeline: the texel
-//! (perspective-correct s/w, t/w over 1/w), the colour and alpha combine units, the chroma key
-//! (on the colour unit's `other` input), the alpha test, fog, the depth test, alpha blending
-//! with the pixel already there, the dither into 565, then the colour and depth writes.
+//! Per pixel, in the order of the SST-1 specification's pipeline (sections 5.16 to 5.19): the
+//! texel (s/w and t/w over 1/w), the chroma key on the colour unit's `other` input, the
+//! colour and alpha combine units, the alpha test, fog, the depth test, alpha blending with
+//! the pixel already there, the dither into 565, then the colour and depth writes.
+//!
+//! *Observed* (section 5.2 to 5.14): vertex x and y are 12.4 fixed point, so they are rounded
+//! to 1/16 pixel here; the colours are iterated as 12.12 and the combine units take their
+//! integer part, clamped to 0–255 (*inferred*); Z is 20.12 and the depth buffer takes its
+//! integer part, clamped; 1/W is iterated and turned into the W buffer's floating value
+//! ([`crate::frame::wfloat`]). All are interpolated linearly in screen space.
 //!
 //! Rules: a pixel is drawn when its centre (`x + 0.5`, `y + 0.5`) is inside the triangle, with
-//! top-left edges in and bottom-right edges out. Colours, alpha, `ooz` and `oow` are
-//! interpolated linearly in screen space, as the chip iterates them. Deviation: the Voodoo
-//! snaps vertices to 1/16 pixel and iterates in fixed point; floats are used here, so edges
-//! and gradients may differ by a fraction of a step (*unknown* how much).
+//! top-left edges in and bottom-right edges out. Deviation: the chip's own edge walk and its
+//! iterators' rounding are *unknown*; the iterators are evaluated in floats at each pixel
+//! centre, then cut to the chip's formats.
 
 use crate::combine::{Inputs, argb, combine};
 use crate::consts::*;
-use crate::frame::{Frame, from_565, to_565};
+use crate::frame::{Frame, from_565, to_565, wfloat};
 use crate::state::{State, compare};
 use crate::texture::Texture;
 
@@ -40,6 +45,8 @@ fn attrs(v: &Vertex) -> [f32; ATTRS] {
     [v.r, v.g, v.b, v.a, v.ooz, v.oow, v.sow, v.tow]
 }
 
+/// One alpha blending factor (section 5.18.2), 0–1. Deviation: the chip's blending precision
+/// is *unknown*; floats here, rounded to 8 bits.
 fn blend_factor(f: u32, src: [f32; 4], dst: [f32; 3], is_dst: bool) -> [f32; 3] {
     // Deviation: no alpha buffer is modelled; the destination's alpha reads as 1.
     let (sa, da) = (src[3], 1.0);
@@ -63,7 +70,8 @@ fn edge(a: (f32, f32), b: (f32, f32), p: (f32, f32)) -> f32 {
 
 /// Draw one triangle. Either winding is drawn (`grCullMode(GR_CULL_DISABLE)`, the default).
 pub fn triangle(frame: &mut Frame, state: &State, texture: Option<&Texture>, v: [&Vertex; 3]) {
-    let p = v.map(|v| (v.x, v.y));
+    let snap = |c: f32| (c * 16.0).round() / 16.0;
+    let p = v.map(|v| (snap(v.x), snap(v.y)));
     let area = edge(p[0], p[1], p[2]);
     if !area.is_finite() || area == 0.0 {
         return;
@@ -73,14 +81,12 @@ pub fn triangle(frame: &mut Frame, state: &State, texture: Option<&Texture>, v: 
     let area = area.abs();
     let at = v.map(attrs);
     let clip = state.clip;
-    let x0 = (p.iter().map(|q| q.0).fold(f32::INFINITY, f32::min).floor() as i32).max(clip[0]).max(0);
-    let y0 = (p.iter().map(|q| q.1).fold(f32::INFINITY, f32::min).floor() as i32).max(clip[1]).max(0);
-    let x1 = (p.iter().map(|q| q.0).fold(f32::NEG_INFINITY, f32::max).ceil() as i32)
-        .min(clip[2])
-        .min(frame.width as i32);
-    let y1 = (p.iter().map(|q| q.1).fold(f32::NEG_INFINITY, f32::max).ceil() as i32)
-        .min(clip[3])
-        .min(frame.height as i32);
+    let lo = |f: fn(&(f32, f32)) -> f32| p.iter().map(f).fold(f32::INFINITY, f32::min).floor() as i32;
+    let hi = |f: fn(&(f32, f32)) -> f32| p.iter().map(f).fold(f32::NEG_INFINITY, f32::max).ceil() as i32;
+    let x0 = lo(|q| q.0).max(clip[0]).max(0);
+    let y0 = lo(|q| q.1).max(clip[1]).max(0);
+    let x1 = hi(|q| q.0).min(clip[2]).min(frame.width as i32);
+    let y1 = hi(|q| q.1).min(clip[3]).min(frame.height as i32);
     // Top-left rule: with y down and positive area, an edge is a top or left edge when it
     // runs right to left along the top or downwards on the left.
     let owns = |a: (f32, f32), b: (f32, f32)| {
@@ -91,6 +97,7 @@ pub fn triangle(frame: &mut Frame, state: &State, texture: Option<&Texture>, v: 
     let own = edges.map(|(i, j)| owns(p[i], p[j]));
     let constant = argb(state.constant);
     let fog_colour = argb(state.fog_colour);
+    let key = argb(state.key);
     let w = frame.width;
     for y in y0..y1 {
         for x in x0..x1 {
@@ -110,61 +117,56 @@ pub fn triangle(frame: &mut Frame, state: &State, texture: Option<&Texture>, v: 
             }
             let a: [f32; ATTRS] = std::array::from_fn(|k| l[0] * at[0][k] + l[1] * at[1][k] + l[2] * at[2][k]);
             let (ooz, oow) = (a[4], a[5]);
-            let iterated = [a[0], a[1], a[2], a[3]].map(|c| (c / 255.0).clamp(0.0, 1.0));
+            let iterated = [a[0], a[1], a[2], a[3]].map(|c| c.floor().clamp(0.0, 255.0) as u8);
             let texel = match state.texture {
-                TEXTURECOMBINE_ZERO => [0.0; 4],
-                TEXTURECOMBINE_ONE => [1.0; 4],
+                TEXTURECOMBINE_ZERO => [0; 4],
+                TEXTURECOMBINE_ONE => [255; 4],
                 _ => match texture {
                     Some(t) if oow != 0.0 => t.sample(a[6] / oow, a[7] / oow, state.filter, state.clamp),
-                    _ => [1.0; 4],
+                    _ => [255; 4],
                 },
             };
-            let (mut out, other) = combine(
-                &state.colour,
-                &state.alpha,
-                &Inputs {
-                    iterated,
-                    texel,
-                    constant,
-                },
-            );
-            if state.chroma {
-                let key = argb(state.key);
-                let same = (0..3).all(|k| (other[k] * 255.0).round() == (key[k] * 255.0).round());
-                if same {
-                    continue;
-                }
-            }
-            if state.alpha_test.0 != CMP_ALWAYS
-                && !compare(state.alpha_test.0, (out[3] * 255.0).round() as u8, state.alpha_test.1)
-            {
+            let inputs = Inputs {
+                iterated,
+                texel,
+                constant,
+            };
+            let (out, other) = combine(&state.colour, &state.alpha, &inputs);
+            if state.chroma && other == [key[0], key[1], key[2]] {
                 continue;
             }
+            if !compare(state.alpha_test.0, out[3], state.alpha_test.1) {
+                continue;
+            }
+            let wf = wfloat(oow);
             let depth = match state.depth_mode {
-                DEPTHBUFFER_WBUFFER => {
-                    if oow > 0.0 { 1.0 / oow } else { f32::INFINITY }
-                }
-                _ => ooz,
+                DEPTHBUFFER_WBUFFER => wf,
+                _ => ooz.floor().clamp(0.0, 65535.0) as u16,
             };
             let i = y as usize * w + x as usize;
             if state.depth_mode != DEPTHBUFFER_DISABLE && !compare(state.depth_function, depth, frame.depth[i]) {
                 continue;
             }
             let fog = match state.fog_mode {
-                FOG_WITH_TABLE => crate::fog::amount(&state.fog_table, if oow > 0.0 { 1.0 / oow } else { f32::INFINITY }),
-                FOG_WITH_ITERATED_ALPHA => iterated[3],
-                _ => 0.0,
+                FOG_WITH_TABLE => Some(crate::fog::table_alpha(&state.fog_table, wf)),
+                FOG_WITH_ITERATED_ALPHA => Some(iterated[3]),
+                _ => None,
             };
-            for k in 0..3 {
-                out[k] += (fog_colour[k] - out[k]) * fog;
+            let mut rgb = [out[0], out[1], out[2]];
+            if let Some(f) = fog {
+                for k in 0..3 {
+                    rgb[k] = crate::fog::apply(rgb[k], fog_colour[k], f);
+                }
             }
             let colour = if state.blend[0] == BLEND_ONE && state.blend[1] == BLEND_ZERO {
-                [out[0], out[1], out[2]]
+                rgb
             } else {
-                let dst = from_565(frame.colour[i]);
-                let sf = blend_factor(state.blend[0], out, dst, false);
-                let df = blend_factor(state.blend[1], out, dst, true);
-                std::array::from_fn(|k| (out[k] * sf[k] + dst[k] * df[k]).clamp(0.0, 1.0))
+                let d8 = from_565(frame.colour[i]);
+                let dst = d8.map(|c| c as f32 / 255.0);
+                let src = [rgb[0], rgb[1], rgb[2], out[3]].map(|c| c as f32 / 255.0);
+                let sf = blend_factor(state.blend[0], src, dst, false);
+                let df = blend_factor(state.blend[1], src, dst, true);
+                std::array::from_fn(|k| ((src[k] * sf[k] + dst[k] * df[k]) * 255.0).round().clamp(0.0, 255.0) as u8)
             };
             frame.colour[i] = to_565(colour, x as usize, y as usize, state.dither);
             if state.depth_mask && state.depth_mode != DEPTHBUFFER_DISABLE {
@@ -225,7 +227,7 @@ mod tests {
         s.dither = false;
         s.depth_mode = DEPTHBUFFER_WBUFFER;
         s.depth_mask = true;
-        f.clear(0, 0xffff, s.depth_mode);
+        f.clear(0, 0xffff);
         let near = |mut q: Vertex| {
             q.r = 255.0;
             q.g = 0.0;
@@ -238,7 +240,7 @@ mod tests {
         triangle(&mut f, &s, None, [&close[0], &close[1], &close[2]]);
         triangle(&mut f, &s, None, [&quad[0], &quad[1], &quad[2]]);
         assert_eq!(f.colour[0], 0xf800);
-        assert_eq!(f.depth[0], 2.0);
+        assert_eq!(f.depth[0], wfloat(0.5));
     }
 
     #[test]
@@ -268,7 +270,7 @@ mod tests {
         let mut f = Frame::new(1, 1);
         let mut s = State::default();
         s.dither = false;
-        f.clear(0x00ffffff, 0xffff, 0);
+        f.clear(0x00ffffff, 0xffff);
         s.blend = [BLEND_SRC_ALPHA, BLEND_ONE_MINUS_SRC_ALPHA, BLEND_ZERO, BLEND_ZERO];
         let black = |mut q: Vertex| {
             q.r = 0.0;
@@ -302,7 +304,7 @@ mod tests {
         let mut c = v(0.0, 3.0, near);
         (a.sow, b.sow, c.sow) = (0.0, 256.0 * far, 0.0);
         triangle(&mut f, &s, Some(&t), [&a, &b, &c]);
-        let red = |x: usize| from_565(f.colour[x])[0];
+        let red = |x: usize| from_565(f.colour[x])[0] as f32 / 255.0;
         assert!((red(50) - 0.2).abs() < 0.03, "{}", red(50));
     }
 }

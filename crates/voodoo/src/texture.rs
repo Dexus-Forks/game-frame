@@ -34,15 +34,18 @@ impl Texture {
     fn texel(&self, x: i32, y: i32) -> [f32; 4] {
         let i = (y as usize * self.width + x as usize) * 4;
         let t = &self.texels[i..i + 4];
-        [t[0], t[1], t[2], t[3]].map(|v| v as f32 / 255.0)
+        [t[0], t[1], t[2], t[3]].map(|v| v as f32)
     }
 
     /// The texel at s, t (Glide's units: 256 across the larger side; a texel's centre is at
-    /// half a texel). Deviation: the TMU's own fixed-point s, t and its bilinear weights
-    /// (4 bits a side, *inferred* from the reference manual's description) are floats here.
-    pub fn sample(&self, s: f32, t: f32, filter: u32, clamp: [u32; 2]) -> [f32; 4] {
+    /// half a texel). Wrapping drops the high bits and clamping keeps s in [0, width) (SST-1
+    /// specification, section 5.50, `tclamps`, `tclampt`; *observed*). Bilinear filtering
+    /// blends "the four closest texels ... as a function of the fractional components of
+    /// <s,t>" (the same section). Deviation: the weights' precision is *unknown*; floats here,
+    /// rounded to 8 bits.
+    pub fn sample(&self, s: f32, t: f32, filter: u32, clamp: [u32; 2]) -> [u8; 4] {
         if self.width == 0 || self.height == 0 {
-            return [0.0; 4];
+            return [0; 4];
         }
         let scale = self.width.max(self.height) as f32 / 256.0;
         let (u, v) = (s * scale, t * scale);
@@ -55,7 +58,7 @@ impl Texture {
         };
         let at = |x: i32, y: i32| self.texel(wrap(x, self.width, clamp[0]), wrap(y, self.height, clamp[1]));
         if filter != TEXTUREFILTER_BILINEAR {
-            return at(u.floor() as i32, v.floor() as i32);
+            return at(u.floor() as i32, v.floor() as i32).map(|c| c as u8);
         }
         let (u, v) = (u - 0.5, v - 0.5);
         let (x0, y0) = (u.floor(), v.floor());
@@ -65,7 +68,7 @@ impl Texture {
         std::array::from_fn(|k| {
             let top = a[k] + (b[k] - a[k]) * fx;
             let bottom = c[k] + (d[k] - c[k]) * fx;
-            top + (bottom - top) * fy
+            (top + (bottom - top) * fy).round().clamp(0.0, 255.0) as u8
         })
     }
 }
@@ -88,10 +91,10 @@ mod tests {
     #[test]
     fn point_sampling_covers_the_texture_in_256() {
         let t = checker();
-        assert_eq!(t.sample(10.0, 10.0, TEXTUREFILTER_POINT_SAMPLED, [0, 0])[0], 1.0);
-        assert_eq!(t.sample(200.0, 10.0, TEXTUREFILTER_POINT_SAMPLED, [0, 0])[0], 0.0);
+        assert_eq!(t.sample(10.0, 10.0, TEXTUREFILTER_POINT_SAMPLED, [0, 0])[0], 255);
+        assert_eq!(t.sample(200.0, 10.0, TEXTUREFILTER_POINT_SAMPLED, [0, 0])[0], 0);
         // Wrapped: 256 + 10 is the first texel again.
-        assert_eq!(t.sample(266.0, 10.0, TEXTUREFILTER_POINT_SAMPLED, [0, 0])[0], 1.0);
+        assert_eq!(t.sample(266.0, 10.0, TEXTUREFILTER_POINT_SAMPLED, [0, 0])[0], 255);
     }
 
     #[test]
@@ -99,9 +102,9 @@ mod tests {
         let t = checker();
         // Halfway between the two centres of the top row (64 and 192): grey.
         let g = t.sample(128.0, 64.0, TEXTUREFILTER_BILINEAR, [1, 1]);
-        assert!((g[0] - 0.5).abs() < 1e-6);
+        assert_eq!(g[0], 128);
         // At a centre: the texel itself.
-        assert_eq!(t.sample(64.0, 64.0, TEXTUREFILTER_BILINEAR, [1, 1])[0], 1.0);
+        assert_eq!(t.sample(64.0, 64.0, TEXTUREFILTER_BILINEAR, [1, 1])[0], 255);
     }
 
     #[test]
