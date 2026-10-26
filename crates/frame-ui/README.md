@@ -43,7 +43,9 @@ can lay out its own frame from them. Inside a view, `use_frame()` gives the `Fra
 - `.with_css(text)`: the game's own stylesheet, drawn last.
 - `.with_theme(name, label, css)`: a theme of the game's own, such as a look taken from its
   menus. `"preset"` and `"presets"` in `library.json` name it like a ready-made one, and it
-  wins over a ready-made one of the same name.
+  wins over a ready-made one of the same name. The theme drawn is named on the page as
+  `#library[data-theme=NAME]`, so styles a game adds later (a font built from the player's
+  files once they are in the library) can apply to its own theme only.
 - `.with_window(|shown| ...)`: show or hide the program's window when the session says (see
   "Back to the launcher" in the frame's README). Without it, a hidden frame leaves one "Open the
   frame" button in the corner of the page, for a game in the same page.

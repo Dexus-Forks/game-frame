@@ -24,6 +24,8 @@ Every release of GameFrame, newest first. The format follows
 - `gameframe-bitmap-font`: an old game's bitmap font as a TrueType font, built in memory, and
   a CSS `@font-face` rule with a data URL, so a launcher's theme can use the game's own letters
   read from the player's files at run time. From Hardwar's launcher.
+- `gameframe-frame-ui`: the frame names the theme it draws as `data-theme` on `#library`, so a
+  game's own styles can apply to one theme only.
 - `gameframe-library`: `Folder::link_in`, which fills a section from the player's own folder
   by hard links.
 

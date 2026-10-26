@@ -47,6 +47,9 @@ pub fn Frame(setup: FrameSetup) -> Element {
     let active = crate::active_theme(&spec, chosen.as_ref().and_then(|v| v.as_str()));
     let theme: String = spec.theme.iter().map(|(k, v)| format!("--lib-{k}: {v};")).collect();
     let scheme = spec.scheme.clone().unwrap_or_else(|| "dark".into());
+    // The theme drawn, on the page as `data-theme`, so a game's own styles can apply to one
+    // theme only (a font built from the player's files for its own theme).
+    let theme_name = active.clone().unwrap_or_default();
     let backdrop = spec.backdrop.as_ref().map(|b| format!("--lib-backdrop: url(\"{b}\");")).unwrap_or_default();
 
     let mut tabs = vec![(Tab::Play, "Play".to_string(), "start")];
@@ -70,7 +73,7 @@ pub fn Frame(setup: FrameSetup) -> Element {
             style { "{TOKENS_CSS}" }
             style { "{LIBRARY_CSS}" }
             style { "{FRAME_CSS}" }
-            div { id: "library", class: "lib-frame-closed", "data-scheme": "{scheme}", style: "{theme}",
+            div { id: "library", class: "lib-frame-closed", "data-scheme": "{scheme}", "data-theme": "{theme_name}", style: "{theme}",
                 button { r#type: "button", class: "lib-button lib-frame-open",
                     onclick: move |_| frame.update(|s| s.open_frame()),
                     crate::Icon { name: "game" } "Open the frame"
@@ -89,7 +92,7 @@ pub fn Frame(setup: FrameSetup) -> Element {
         if let Some(css) = frame.css() {
             style { "{css}" }
         }
-        div { id: "library", class: "lib-frame", "data-scheme": "{scheme}", style: "{theme}{backdrop}",
+        div { id: "library", class: "lib-frame", "data-scheme": "{scheme}", "data-theme": "{theme_name}", style: "{theme}{backdrop}",
             div { class: "lib-backdrop" }
             main { class: "lib-card lib-frame-card",
                 header { class: "lib-header",
