@@ -283,6 +283,7 @@ a Cargo workspace, under Apache 2.0. See [docs/crates](docs/crates/README.md).
 | [gameframe-library](crates/library/README.md) | The player's game data, saves and mods, kept on the desktop or encrypted in the browser, with an [HTML page](templates/library-page/README.md) to manage them |
 | [gameframe-frame](crates/frame/README.md) | The contract between a port and the frame: event topics, the manifest with capabilities, renderers and their grades, settings and controls, adapters for games in other languages or set up from `frame.json`, and the port's own end of that link |
 | [gameframe-frame-ui](crates/frame-ui/README.md) | The frame's views as Dioxus components for the browser and the desktop: play, settings, library, help pages and console, with ready-made themes ([demo](examples/frame-demo/README.md), and [gameframe-launcher](launcher/README.md) for a game described by `frame.json`) |
+| [gameframe-report](crates/report/README.md) | Reports from a running port: each unported path the game reaches, and each crash, with its context, as a local file in Dev and a filled-in GitHub issue link in Production |
 | [gameframe-bitmap-font](crates/bitmap-font/README.md) | An old game's bitmap font as a TrueType font, built in memory, for a launcher's theme in the game's own letters |
 
 ## Replacement libraries

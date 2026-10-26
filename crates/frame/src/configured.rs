@@ -1,7 +1,7 @@
 //! A game set up from `frame.json` alone: a manifest and the command that starts the game, such
 //! as a port's own program.
 //!
-//! On `game.start` [`Configured`] runs the command, with `{renderer}` and `{setting:KEY}` in the
+//! On `game.start` [`Configured`] runs the command, with `{renderer}`, `{device:SLOT}` and `{setting:KEY}` in the
 //! arguments replaced, and reports `running`, then `stopped` when the program ends (`failed` when
 //! it exits with an error). A choice
 //! whose manifest says `"from": {"files": "DATA/TRACKS/*.TRK"}` is filled from the game's folder
@@ -106,7 +106,8 @@ impl Configured {
         self.folder.as_deref()
     }
 
-    /// The arguments with `{renderer}` and `{setting:KEY}` filled in from a `game.start`.
+    /// The arguments with `{renderer}`, `{device:SLOT}` and `{setting:KEY}` filled in from a
+    /// `game.start`.
     pub fn arguments(&self, start: &Event) -> Vec<String> {
         let renderer = start.str("renderer").unwrap_or("");
         let settings = &start.data["settings"];
@@ -117,6 +118,11 @@ impl Configured {
             .flat_map(|s| s.args.iter())
             .map(|a| {
                 let mut a = a.replace("{renderer}", renderer);
+                while let Some(i) = a.find("{device:") {
+                    let Some(end) = a[i..].find('}') else { break };
+                    let value = crate::device::chosen(&start.data, &a[i + 8..i + end]).unwrap_or("").to_string();
+                    a.replace_range(i..i + end + 1, &value);
+                }
                 if let Some(i) = &self.image {
                     a = a.replace("{image}", &absolute(i));
                 }

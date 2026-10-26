@@ -36,8 +36,12 @@ pub struct Spec {
     pub icons: BTreeMap<String, String>,
     /// The words on the start button.
     pub start: Option<String>,
-    /// Links under the panel: help, source, issues.
+    /// Links under the panel: help, source, issues, a Mastodon or GitHub page. Each may name
+    /// an icon and a place in the frame.
     pub links: Vec<Link>,
+    /// Where the frame offers to send a report from the running game (`gameframe-report`), one
+    /// button each: the game's repository, GameFrame's, a fork's. Empty: the report's own.
+    pub issues: Vec<IssueTarget>,
     /// The small print at the bottom: what the player needs, who made what.
     pub fine: Option<String>,
     /// Encrypt the kept files with a key this browser makes and never lets out (the
@@ -82,6 +86,33 @@ pub struct Panel {
 pub struct Link {
     pub text: String,
     pub href: String,
+    /// An icon by name, as in `icons` (`github`, `mastodon`, `home`), drawn before the text.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub icon: Option<String>,
+    /// Where the frame draws it: `footer` (the default, under the panel), `header` (under the
+    /// title) or `play` (under the start button). The HTML page draws every link in the footer.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub place: Option<String>,
+}
+
+impl Link {
+    /// Whether the link belongs in `place`; one with no place is the footer's.
+    pub fn is_in(&self, place: &str) -> bool {
+        self.place.as_deref().unwrap_or("footer") == place
+    }
+}
+
+/// A GitHub repository a report can go to, as one button.
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct IssueTarget {
+    /// The button's words, such as "Report to Hardwar".
+    pub text: String,
+    /// `owner/name` on GitHub.
+    pub repo: String,
+    /// The report kinds it takes (`unported`, `panic`, `mismatch`); empty takes every kind.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub kinds: Vec<String>,
 }
 
 /// What a section holds. The kind sets the defaults; any field in [`Section`] overrides them.

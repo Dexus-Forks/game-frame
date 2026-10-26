@@ -96,6 +96,14 @@ impl Link {
         write_event(&self.out, &Event::new(topic, Origin::Game, data));
     }
 
+    /// Send each new report (`gameframe_report`) to the frame as `report.new`, so Play lists it
+    /// with its GitHub link. Also gives the reports the launch's devices.
+    pub fn send_reports(&self, devices: Value) {
+        gameframe_report::set_devices(devices);
+        let link = self.clone();
+        gameframe_report::on_report(move |r| link.send(topics::REPORT_NEW, serde_json::to_value(r).unwrap_or(Value::Null)));
+    }
+
     /// `game.status`: `running`, `paused`, `stopped` or `failed`, with a line saying why.
     pub fn status(&self, state: &str, detail: &str) {
         self.send(topics::GAME_STATUS, json!({ "state": state, "detail": detail }));
@@ -198,5 +206,19 @@ mod tests {
         let exit = line(topics::FRAME_EXIT, Value::Null);
         assert!(Link::wait_on(&mut Kernel::default(), started, Cursor::new(exit), Shared::default()).is_none());
         assert!(Link::wait_on(&mut Kernel::default(), started, Cursor::new(""), Shared::default()).is_none());
+    }
+
+    #[test]
+    fn a_report_reaches_the_frame() {
+        let input = line(topics::GAME_START, json!({"renderer": "software", "settings": {}, "args": []}));
+        let out = Shared::default();
+        let mut game = Kernel::default();
+        let (launch, link) = Link::wait_on(&mut game, started, Cursor::new(input), out.clone()).unwrap();
+        gameframe_report::set_mode(gameframe_report::Mode::Dev);
+        link.send_reports(json!({"video": launch["renderer"]}));
+        gameframe_report::unported!("0x4315e8", "the weather's thunder");
+        let sent = out.lines().into_iter().find(|l| l.contains(topics::REPORT_NEW)).expect("report.new");
+        let e: Event = serde_json::from_str(&sent).unwrap();
+        assert_eq!((e.str("original"), e.data["devices"]["video"].as_str()), (Some("0x4315e8"), Some("software")));
     }
 }

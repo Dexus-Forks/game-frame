@@ -1,9 +1,11 @@
 //! A game that is not there: the frame's default, so the frame can be shown, styled and tested
-//! with no port. It lists every capability, three renderers with different grades, a few
+//! with no port. It lists every capability, three renderers and three sound cards with
+//! different grades, a few
 //! settings and a pad of controls, and answers each event with a console line. It also
 //! presses its own controls every two seconds and sends each as `demo.press`, a topic of its
 //! own, so the console shows traffic with no one at the keys.
 
+use crate::device::{chosen, ids, slots, Slot};
 use crate::event::{topics, Event};
 use crate::game::{Game, Outbox};
 use crate::manifest::{capabilities, Choice, Control, Grade, Kind, Manifest, OptionsFrom, Renderer, Setting, CONTRACT};
@@ -34,13 +36,14 @@ impl Game for Demo {
             total,
             notes: if grade == Grade::Partial { vec!["Fog is drawn without the card's table.".into()] } else { vec![] },
             default,
+            stand_in: None,
         };
         let control = |name: &str, label: &str, key: &str| Control { name: name.into(), label: label.into(), key: Some(key.into()) };
         Manifest {
             contract: CONTRACT.into(),
             name: "No game".into(),
             version: "demo".into(),
-            capabilities: [capabilities::START, capabilities::RENDERERS, capabilities::SETTINGS, capabilities::INPUT, capabilities::LIBRARY]
+            capabilities: [capabilities::START, capabilities::RENDERERS, capabilities::SETTINGS, capabilities::INPUT, capabilities::LIBRARY, capabilities::DEVICES]
                 .map(String::from)
                 .to_vec(),
             renderers: vec![
@@ -48,6 +51,15 @@ impl Game for Demo {
                 renderer("glide", "3dfx Glide", "Through GameFrame's Glide library", Grade::Partial, Some(131), Some(156), false),
                 renderer("powervr", "PowerVR", "Through GameFrame's SGL library", Grade::Experimental, Some(61), Some(134), false),
             ],
+            devices: vec![Slot {
+                slot: slots::SOUND.into(),
+                label: "Sound card".into(),
+                options: vec![
+                    renderer(ids::DIRECTSOUND, "DirectSound", "The original's own mixer", Grade::Exact, None, None, true),
+                    renderer(ids::SOUND_BLASTER, "Sound Blaster 16", "Through GameFrame's Sound Blaster model", Grade::Experimental, Some(9), Some(24), false),
+                    renderer(ids::NONE, "No sound", "Silent, as without a card", Grade::Exact, None, None, false),
+                ],
+            }],
             settings: vec![
                 Setting {
                     key: "video.scale".into(),
@@ -121,8 +133,9 @@ impl Game for Demo {
             }
             topics::GAME_START => {
                 let renderer = e.str("renderer").unwrap_or("none").to_string();
+                let sound = chosen(&e.data, slots::SOUND).unwrap_or("none").to_string();
                 self.loading = 30;
-                out.status("loading", &format!("starting with the {renderer} renderer"));
+                out.status("loading", &format!("starting with the {renderer} renderer and {sound} sound"));
             }
             topics::GAME_STOP => {
                 self.running = false;
@@ -135,6 +148,7 @@ impl Game for Demo {
                 out.log("info", &format!("pressed {control}: {note}"));
             }
             topics::CONFIG_SET => out.log("info", &format!("the game now uses {} = {}", e.str("key").unwrap_or("?"), e.data["value"])),
+            topics::DEVICE_SELECT => out.log("info", &format!("the next start uses {} for {}", e.str("device").unwrap_or("?"), e.str("slot").unwrap_or("?"))),
             topics::RENDER_SELECT => out.log("info", &format!("the next start uses {}", e.str("renderer").unwrap_or("?"))),
             topics::LIBRARY_CHANGED => out.log("info", &format!("reading the {} section again", e.str("section").unwrap_or("?"))),
             _ => {}

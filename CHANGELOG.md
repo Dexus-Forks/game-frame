@@ -9,6 +9,23 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `gameframe-report`: reports from a running port. `unported!` and `mismatch!` at the places
+  the port has not done, and panics, each written once per place with the original's address,
+  the values there, the game's state, the launch and the devices. Dev keeps them on the
+  machine; Production adds a link to a filled-in GitHub issue. The frame lists them
+  (`report.new`, `Link::send_reports`), and `tools/triage/report_issue.py` lists and files
+  them, once per place.
+- `library.json`: `issues`, one report button per repository (the game's, GameFrame's), and
+  `links` with an `icon` and a `place` (`header`, `play`, `footer`) for a row of links such as
+  GitHub and Mastodon. New icons `github`, `mastodon`, `home` and `link`.
+- The frame's setup dialog (contract 1.1): device slots beside the renderers, such as the
+  sound card and the music device, as a 1990s game's Manager or `SETUP.EXE` offered them.
+  `device.select`, `devices` in `frame.ready` and `game.start`, `Session::select_device`,
+  `Manifest::playable` and `chosen` for kernels, `{device:SLOT}` for `frame.json` games, and
+  one id per card for every game (`device::ids`, with the crate or wrapper that models each in
+  `device::known`). Play shows one drop-down per slot with a card for the chosen device. A
+  device not ported yet may name a `stand_in` that starts in its place
+  (`Manifest::stand_in`), and the kernel reports the gap.
 - `gameframe-voodoo`: a software 3dfx Voodoo Graphics pipeline driven by Glide 2.x (combine
   units, chroma key, alpha test, table fog, Z and W buffers, blending, the 565 buffer with its
   dither), after 3dfx's SST-1 specification, and a `Glide` context with the calls by their

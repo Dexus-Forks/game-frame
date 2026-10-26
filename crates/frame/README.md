@@ -35,7 +35,7 @@ its console, including topics it does not know, so a game can add its own (`demo
 
 | Topic | Direction | Data |
 |---|---|---|
-| `frame.ready` | frame to game | `{"renderer", "settings"}`, once, after the manifest is read |
+| `frame.ready` | frame to game | `{"renderer", "devices", "settings"}`, once, after the manifest is read |
 | `frame.open` | either way | show the frame over a running game: the game's own menu asks for the launcher, or the frame opened |
 | `frame.close` | either way | hide the frame and go back to the game ("Back to the game") |
 | `frame.exit` | either way | leave the program for the desktop; the frame stops a running game first |
@@ -44,11 +44,13 @@ its console, including topics it does not know, so a game can add its own (`demo
 | `config.changed` | game to frame | `{"key", "value"}`: the game changed one; the frame saves it |
 | `config.options` | game to frame | `{"key", "options": [{"value", "label"}]}`: the list of a choice whose manifest has `from` |
 | `render.select` | frame to game | `{"renderer": "glide"}` |
-| `game.start` | frame to game | `{"renderer", "settings", "args"}` |
+| `device.select` | frame to game | `{"slot": "sound", "device": "none"}`: a device in a slot other than graphics |
+| `game.start` | frame to game | `{"renderer", "devices", "settings", "args"}` |
 | `game.stop` | frame to game | none: stop, as the game's own quit does |
 | `game.status` | game to frame | `{"state": "loading" or "running" or "paused" or "stopped" or "failed", "detail"}` |
 | `input.press` | player to game | `{"control", "down"}`, with the control names from the manifest |
 | `library.changed` | frame to game | `{"section"}`: read that library section again |
+| `report.new` | game to frame | one `gameframe_report::Report`: a place the game reached that is not ported, or a crash; `Session::reports()` keeps one per place, and Play lists them with their GitHub link (`Link::send_reports`) |
 | `log.message` | either way | `{"level": "info" or "warn" or "error", "text"}` |
 
 The constants are in `gameframe_frame::topics`.
@@ -60,14 +62,19 @@ names, so a game opts into each feature by listing it.
 
 ```json
 {
-  "contract": "1.0",
+  "contract": "1.1",
   "name": "Example Port",
   "version": "0.3.0",
-  "capabilities": ["start", "renderers", "settings", "input", "library"],
+  "capabilities": ["start", "renderers", "devices", "settings", "input", "library"],
   "renderers": [
     {"id": "software", "label": "Software", "grade": "exact", "default": true},
     {"id": "glide", "label": "3dfx Glide", "grade": "partial", "done": 131, "total": 156,
      "notes": ["Fog is drawn without the card's table."]}
+  ],
+  "devices": [
+    {"slot": "sound", "label": "Sound card", "options": [
+      {"id": "directsound", "label": "DirectSound", "grade": "exact", "default": true},
+      {"id": "none", "label": "No sound", "grade": "exact"}]}
   ],
   "settings": [
     {"key": "video.scale", "label": "Scaling", "group": "Video", "type": "choice",
@@ -78,7 +85,7 @@ names, so a game opts into each feature by listing it.
 }
 ```
 
-- **Capabilities.** `start`, `renderers`, `settings`, `input` and `library`
+- **Capabilities.** `start`, `renderers`, `devices`, `settings`, `input` and `library`
   (`gameframe_frame::capabilities`). A frame hides what a game does not list.
 - **Grades.** Each renderer has a grade, `exact`, `good`, `partial`, `experimental` or
   `missing`, and may give `done` of `total` (calls, features, tests: the game says which) and
@@ -90,7 +97,21 @@ names, so a game opts into each feature by listing it.
   `config.options`. A saved value that is no longer in the list moves to the first option.
   `group` puts settings under a heading. `restart: true` says the change waits for the next
   start. The frame refuses a value of the wrong kind.
-- **Versions.** `CONTRACT` is `1.0`. The frame refuses a larger major number. A minor version
+- **Devices.** The renderers are the graphics slot. `devices` lists the other slots, as a
+  1990s setup program did: `{"slot": "sound", "label": "Sound card", "options": [...]}`, each
+  option a renderer's fields (id, label, detail, grade, done, total, notes, default). The slots
+  the frame knows are `video`, `sound`, `music` and `input` (`device::slots`). The same card has
+  the same id in every game (`device::ids`: `glide`, `powervr`, `directsound`, `sound-blaster`,
+  `adlib` and the rest), and `device::known(id)` names the GameFrame crate or wrapper that models
+  it. The frame saves each choice as `frame.device.SLOT` and sends both in `game.start` as
+  `"devices": {"video": "glide", "sound": "none"}`. A kernel reads one with
+  `chosen(&data, "sound")` and refuses one it does not have with `Manifest::playable(slot, id)`,
+  which also refuses a device graded `missing`. A device not ported yet may name a `stand_in`,
+  another device in its slot (`"stand_in": "software"`): the game then starts on that one, the
+  kernel reports the gap with `gameframe_report::unported!`, and `Manifest::stand_in(slot, id)`
+  says which to run. So every listed device starts end to end. Play shows one drop-down per
+  slot, and beside it a card for the chosen device: its grade, its meter, its notes.
+- **Versions.** `CONTRACT` is `1.1` (1.1 added `devices`). The frame refuses a larger major number. A minor version
   only adds fields, and a frame ignores fields it does not know.
 
 ## Three ways to join
@@ -127,7 +148,7 @@ starts the game:
 }
 ```
 
-On `game.start` it runs the command with `{renderer}` and `{setting:KEY}` filled in. It reports
+On `game.start` it runs the command with `{renderer}`, `{device:SLOT}` and `{setting:KEY}` filled in. It reports
 `running`, then `stopped` when the program ends. `Configured::load(path)` reads the file from
 disk: `"folder"` names the game's folder relative to it, the command runs there, and each choice
 with `"from": {"files": PATTERN}` lists the matching files there. The pattern's folders match

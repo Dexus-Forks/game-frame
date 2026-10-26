@@ -34,6 +34,10 @@
     mods: 'M12 3 3 8l9 5 9-5zM3 13l9 5 9-5M3 17.5l9 4.5 9-4.5',
     screenshots: 'M3 7h4l2-3h6l2 3h4v13H3zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
     recordings: 'M3 6h13v12H3zM16 10l5-3v10l-5-3',
+    link: 'M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1',
+    home: 'M3 11l9-8 9 8M5 10v11h14V10',
+    github: 'M9 19c-4 1.5-4-2-6-2.5M15 22v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12 12 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V22',
+    mastodon: 'M21 8.5C21 4 17.7 3 12 3S3 4 3 8.5v4C3 18 7 20 12 20c1.5 0 3-.3 4-.8l-.2-1.7c-1.2.4-2.6.5-3.8.5-2.4 0-4-1-4.2-3 4 .9 8.2.8 10.4-.2 1.7-.8 2.8-2.2 2.8-4.3zM8 14V9a2 2 0 0 1 4 0v3m0 0V9a2 2 0 0 1 4 0v5',
   };
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
   function icon(name) {
@@ -189,7 +193,7 @@
     card.append(header, home);
     if ((config.links || []).length) {
       const nav = el('nav', 'lib-links');
-      config.links.forEach((l) => { const a = el('a', null, l.text); a.href = l.href; a.target = '_blank'; a.rel = 'noopener'; nav.append(a); });
+      config.links.forEach((l) => { const a = el('a', null, l.text); a.href = l.href; a.target = '_blank'; a.rel = 'noopener'; if (l.icon) a.prepend(icon(l.icon)); nav.append(a); });
       card.append(nav);
     }
     if (config.fine) card.append(rich('p', config.fine, 'lib-fine'));

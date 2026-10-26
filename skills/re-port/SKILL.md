@@ -161,6 +161,17 @@ gets a comment containing `Deviation:` and the reason; a piece left out gets `no
 `--check` fails a test when the ledger is out of date. A deviation is a decision; an accidental
 difference is a bug.
 
+Where the game can reach a `not ported` piece while it runs, call GameFrame's
+`gameframe_report::unported!` there as well, with the original's address, one line, and the
+values at the place: `unported!("0x5898b4", "the hit's material", material = m)`. The game goes
+on as before. The first time it gets there, a report is written with the place, the values, the
+game's state and the launch, so the run can be repeated. A check against the original that can
+run in the game uses `mismatch!`. In `main`, call `report::install` with the game's name and
+its GitHub repository, `report::set_dir`, `report::set_launch`, and `report::flush` at the end;
+a kernel also calls `Link::send_reports`. Debug builds keep the reports on the machine (Dev).
+Release builds give each one a filled-in GitHub issue link that the frame shows (Production).
+Tests set `GAMEFRAME_STRICT=1` to fail at an unported path. The crate's README has the rest.
+
 `tools/triage/coverage.py SOURCE_DIR` reads the `Original:` citations and says how much of the
 original's code (by count and by size) the reimplementation has ported from, with the largest
 functions nobody cites yet.

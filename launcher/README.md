@@ -45,7 +45,8 @@ gameframe-launcher [PATH] [--frame | --no-frame] [--data DIR] [--preset NAME]
 ```
 
 - `manifest` is the frame's manifest, as in the frame's README.
-- `start` is the command. `{renderer}` and `{setting:KEY}` in its arguments are filled in.
+- `start` is the command. `{renderer}`, `{device:SLOT}` (the sound card the player chose is
+  `{device:sound}`) and `{setting:KEY}` in its arguments are filled in.
 - `folder` is the game's folder, relative to `frame.json`. The command runs there. `{folder}`
   in the arguments becomes its full path.
 - `image` names a disc image instead, such as `"image": "media/GAME.CUE"` in a GameFrame

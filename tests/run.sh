@@ -1016,6 +1016,23 @@ echo x >> "$W/bag/data/DATA/L1.DAT"
 expect "fixity finds a changed file" "changed  data/DATA/L1.DAT" "$PYTHON" tools/triage/fixity.py verify "$W/bag"
 rm -rf "$W"
 
+echo "Reports to issues"
+RT="$(pwd)"
+R="$(mktemp -d)"; mkdir -p "$R/reports" "$R/bin"
+printf '{"id": "unported-1a2b3c4d", "kind": "unported", "what": "the sky fog", "original": "0x4a5e00", "file": "src/sky.rs", "line": 88, "count": 3, "meta": {"issues": "owner/game"}}\n' > "$R/reports/unported-1a2b3c4d.json"
+printf '# [unported] the sky fog at src/sky.rs:88 (0x4a5e00)\n\n<!-- gameframe-report: unported-1a2b3c4d -->\nBODY\n' > "$R/reports/unported-1a2b3c4d.md"
+printf '{"id": "panic-00000001", "kind": "panic", "what": "boom", "file": "src/a.rs", "line": 1, "count": 1}\n' > "$R/reports/panic-00000001.json"
+# A stand-in gh: logs each call; `issue list` answers with $GH_FOUND.
+printf '#!/bin/sh\necho "$*" >> "%s/gh.log"\ncase "$1 $2" in "issue list") echo "$GH_FOUND";; "issue create") echo https://github.com/owner/game/issues/9;; esac\n' "$R" > "$R/bin/gh"; chmod +x "$R/bin/gh"
+expect "report_issue lists the reports, most frequent first" "3  unported-1a2b3c4d  [unported] the sky fog at src/sky.rs:88 (0x4a5e00)" sh -c "cd '$R' && '$PYTHON' '$RT/tools/triage/report_issue.py' list"
+expect "report_issue shows the body the crate wrote" "BODY" sh -c "cd '$R' && '$PYTHON' '$RT/tools/triage/report_issue.py' show unported-1a2b3c4d"
+out="$(cd "$R" && PATH="$R/bin:$PATH" GH_FOUND= "$PYTHON" "$RT/tools/triage/report_issue.py" file unported-1a2b3c4d)"
+out2="$(cd "$R" && PATH="$R/bin:$PATH" GH_FOUND=9 "$PYTHON" "$RT/tools/triage/report_issue.py" file unported-1a2b3c4d)"
+log="$(cat "$R/gh.log")"
+[[ "$out" == *"issues/9"* && "$out2" == *"issue #9: added the new count"* && "$log" == *"--repo owner/game"* && "$log" == *"--label gameframe-report,unported"* && "$log" == *"issue comment 9"* && "$log" == *"unported-1a2b3c4d in:body"* ]] \
+  && ok "report_issue files a report once, to the report's repository, then comments on that issue" || bad "report_issue file" "$out / $out2 / $log"
+rm -rf "$R"
+
 echo "Ledger and coverage"
 L="$(mktemp -d)"; mkdir -p "$L/src/build" "$L/export/game.exe"
 printf '/// Original: `FUN_140001090`\nfn grow() {}\n// Deviation: the time comes in as an argument,\n// so tests can fix it.\nfn tick() {}\n// Not ported: the debug overlay.\n' > "$L/src/world.rs"
@@ -1725,7 +1742,7 @@ out="$("$PYTHON" tests/mcp_provider_config.py 2>&1)"
   && ok "optional MCP providers use project-local settings and preserve client configuration ($out)" \
   || bad "MCP provider opt-in" "$out"
 out="$("$PYTHON" tests/mcp_tool_coverage.py 2>&1)"
-[[ $? == 0 && "$out" == *"MCP coverage: 119 catalog entries, 97 runnable tools, progress/cancel/timeout"* ]] \
+[[ $? == 0 && "$out" == *"MCP coverage: 120 catalog entries, 98 runnable tools, progress/cancel/timeout"* ]] \
   && ok "the GameFrame MCP exposes every catalog entry and runs every program and script ($out)" \
   || bad "GameFrame MCP tool coverage" "$out"
 out="$("$PYTHON" tests/decision_adapter.py "$B/game.exe" 2>&1)"

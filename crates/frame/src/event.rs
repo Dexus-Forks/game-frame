@@ -108,8 +108,13 @@ pub mod topics {
 
     /// Frame to game: the player chose a renderer. Data: `{"renderer": "glide"}`.
     pub const RENDER_SELECT: &str = "render.select";
+    /// Frame to game: the player chose a device in a slot other than graphics (contract 1.1).
+    /// Data: `{"slot": "sound", "device": "none"}`.
+    pub const DEVICE_SELECT: &str = "device.select";
 
-    /// Frame to game: start. Data: `{"renderer": "glide", "settings": {...}, "args": [...]}`.
+    /// Frame to game: start. Data: `{"renderer": "glide", "devices": {"video": "glide",
+    /// "sound": "directsound"}, "settings": {...}, "args": [...]}`. `frame.ready` carries
+    /// `devices` too.
     pub const GAME_START: &str = "game.start";
     /// Frame to game: stop, as the game's own quit does.
     pub const GAME_STOP: &str = "game.stop";
@@ -125,6 +130,11 @@ pub mod topics {
     /// Frame to game: the player added, removed or reordered files in a library section.
     /// Data: `{"section": "mods"}`. The game reads the library again.
     pub const LIBRARY_CHANGED: &str = "library.changed";
+
+    /// Game to frame: the game reached a place the port has not ported, or crashed: one
+    /// `gameframe_report::Report` as JSON, the first time at each place and again with a new
+    /// count. In Production it carries `issue`, a link to a filled-in GitHub issue.
+    pub const REPORT_NEW: &str = "report.new";
 
     /// Either way: a line for the console. Data: `{"level": "info" | "warn" | "error",
     /// "text": "..."}`.
