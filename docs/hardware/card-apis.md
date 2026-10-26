@@ -1,13 +1,15 @@
-# The card makers' 3D APIs: Glide, ATI3DCIF, S3D, and Direct3D 3
+# The card makers' 3D APIs: Glide, ATI3DCIF, S3D, SGL, and Direct3D 3
 
 In 1996 and 1997 each 3D chip had its own programming interface, and a game that wanted to run
 well on several cards shipped one renderer, often one whole executable, per card. This page
 covers the three most common of them in detail: 3dfx Glide 2.x, ATI's ATI3DCIF for the
-3D Rage, and S3's S3D Toolkit for the ViRGE. It says how to find each in a game, how to read
+3D Rage, and S3's S3D Toolkit for the ViRGE, with VideoLogic's SGL for the PowerVR in less
+detail. It says how to find each in a game, how to read
 the calls, how textures reach the card, and what the per-card builds tend to differ in.
 [3D accelerators](graphics-3d.md) has the overview of the cards and of Direct3D and OpenGL.
 One crate per chip holds the formats and constants named here ([crates](../crates/README.md)):
-`gameframe-voodoo` for 3dfx, `gameframe-rage` for ATI, `gameframe-virge` for S3, with the texel
+`gameframe-voodoo` for 3dfx, `gameframe-rage` for ATI, `gameframe-virge` for S3,
+`gameframe-powervr` for PowerVR, with the texel
 decoder they share in `gameframe-texel`. Each chip crate lists the texel layouts its API takes
 (`TEXTURE_FORMATS`), and each also draws: `gameframe-voodoo` runs the whole Voodoo pipeline,
 while `gameframe_rage::draw` and `gameframe_virge::draw` draw the untextured, blended faces
@@ -24,6 +26,7 @@ List the imports (`tools/pe/peinfo.py GAME.EXE`):
 | `glide.dll`, `glide2x.dll` | Glide 2.x | Many decorated names: `_grSstOpen@24`, `_grTexDownloadMipMap@16`, `_grDrawTriangle@12` |
 | `glide3x.dll` | Glide 3 (1998 on) | `grSstWinOpen`, `grDrawVertexArray`: a different API from Glide 2 |
 | `ati3dcif.dll` | ATI3DCIF | A few functions: `ATI3DCIF_Init`, `ContextCreate`, `ContextSetState`, `TextureReg`, `RenderBegin`, `RenderPrimList`, `RenderEnd` |
+| `sgl.dll` | PowerVR SGL | Undecorated `__cdecl` names: `sgl_create_list`, `sgl_add_vertices`, `sgl_set_texture_effect`, `sgl_render` |
 | `S3DTKW.dll` | S3D Toolkit (Windows) | Four functions: `S3DTK_InitLib`, `S3DTK_CreateRenderer`, `S3DTK_DestroyRenderer`, `S3DTK_LinearToPhysical`; the rest come through a function table |
 
 Games linked these at load time, or loaded them with `LoadLibrary` and `GetProcAddress` so one
@@ -105,6 +108,25 @@ video memory. `sfFormat` holds `S3DTK_TEXARGB8888`, `TEXARGB4444`, `TEXARGB1555`
 linear DirectDraw addresses into the chip's offsets with `S3DTK_LinearToPhysical`. Selecting a
 texture is `SetState(S3DTK_TEXTUREACTIVE, &surface)`; the drawing kind is
 `SetState(S3DTK_RENDERINGTYPE, …)`.
+
+### PowerVR SGL
+
+VideoLogic's SGL (`sgl.dll`, version 3.1 in 1997) is a scene graph, not a triangle API. The
+game builds display lists of transforms, materials, meshes, lights and cameras once
+(`sgl_create_list`, `sgl_create_mesh`, `sgl_add_vertices`, `sgl_set_texture_map`), and each
+frame only edits a few of them (`sgl_modify_transform`, `sgl_set_ignore_list`,
+`sgl_set_point_light`) and calls `sgl_render(viewport, camera, swap)`. A texture is made from
+an "intermediate map" of RGBA bytes, alpha 0 for opaque, by `sgl_preprocess_texture` and
+`sgl_create_texture` (`sgl_map_16bit`, `sgl_map_trans16`, sizes 32 to 256). The finished
+picture goes back to the game through an address callback (`sgl_use_address_mode`), which
+hands over the DirectDraw surface's memory. Find the game's scene builder from the first
+`sgl_modify_list(SGL_DEFAULT_LIST, clear)`: what follows is the scene, in order.
+
+`gameframe-powervr` keeps the same graph and draws it in software, with the PCX2's per-pixel
+rules (the nearest opaque surface per pixel, fog, translucent passes, light volumes) and the
+lighting of PowerVR's own driver (`SGLMID4.dll`: the texture effects, the spot light's
+fall-off): `Sgl` has the calls by their names. `wrappers/sgl` keeps the same graph and draws it
+with OpenGL for the game's own build.
 
 ### Direct3D 3 execute buffers
 
@@ -190,6 +212,8 @@ with the same name and exports: [Replacement libraries for a 1990s game](replace
 
 - 3dfx, Glide 2.x SDK and `glide.h`.
 - ATI Technologies, *3D RAGE Windows 95 Programmer's Guide*, SDK-C02700 rev. 1.30, 1997.
+- VideoLogic, PowerVR driver package 3.10 (`sgl.h`, `sglwin32.h`, `SGLMID4.dll`), as shipped
+  on POD Gold's disc (`POWERVR/310C3.ZIP`).
 - S3, S3D ToolKit SDK 2.6, `S3DTK.H` (published copy: https://github.com/kytulendu/S3DTK).
 - Microsoft, DirectX 3 and DirectX 5 SDK documentation, Direct3D Immediate Mode (execute
   buffers, `D3DRENDERSTATETYPE`, `D3DTLVERTEX`); and the Direct3D 9 pages "Rasterization Rules"

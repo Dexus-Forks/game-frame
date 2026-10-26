@@ -17,6 +17,12 @@ Every release of GameFrame, newest first. The format follows
   the alpha test, every blend factor, the stipple pattern and vertex fog, all from Microsoft's
   public documentation. `docs/hardware/card-apis.md` has a new section on Direct3D 3 execute
   buffers.
+- `gameframe-powervr`: a software model of PowerVR's PCX2 as SGL 3.1 drives it. `Sgl` has the
+  calls by their names (lists, transforms, meshes, materials and texture effects, cameras,
+  fog, ambient and point lights, translucent passes, `sgl_render`) and draws into an RGB565
+  buffer at any multiple of the device's size, with the driver's lighting (`SGLMID4.dll`) and
+  the chip's per-pixel depth sort. The scene graph moved here from `wrappers/sgl`, which now
+  uses it.
 - The ATI 3D Rage and S3 ViRGE draw in their own crates: `gameframe_rage::draw`
   (`Context`, `C3D_VTCF`, `render_prim_list`: triangles and quads, solid, flat or Gouraud,
   alpha blended) and `gameframe_virge::draw` (`State`, the 32-byte vertex, `triangle_set`:

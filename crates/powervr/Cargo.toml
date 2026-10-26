@@ -1,0 +1,12 @@
+[package]
+name = "gameframe-powervr"
+description = "A software model of PowerVR's PCX2 as VideoLogic's SGL 3.1 drives it: the scene graph of lists, transforms, meshes, materials, lights and cameras, and the per-pixel rules (deferred depth, texture effects, fog, translucent passes, light volumes) into an RGB565 buffer"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["sgl", "powervr", "pcx2", "rasteriser", "reverse-engineering"]
+categories = ["emulators", "graphics"]
+
+[dependencies]

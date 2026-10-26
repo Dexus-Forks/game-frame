@@ -777,6 +777,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "gameframe-powervr"
+version = "0.1.0"
+
+[[package]]
 name = "gameframe-rage"
 version = "0.1.0"
 dependencies = [
