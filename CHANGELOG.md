@@ -23,7 +23,9 @@ Every release of GameFrame, newest first. The format follows
   `device.select`, `devices` in `frame.ready` and `game.start`, `Session::select_device`,
   `Manifest::playable` and `chosen` for kernels, `{device:SLOT}` for `frame.json` games, and
   one id per card for every game (`device::ids`, with the crate or wrapper that models each in
-  `device::known`). Play shows one choice per slot.
+  `device::known`). Play shows one drop-down per slot with a card for the chosen device. A
+  device not ported yet may name a `stand_in` that starts in its place
+  (`Manifest::stand_in`), and the kernel reports the gap.
 - `gameframe-voodoo`: a software 3dfx Voodoo Graphics pipeline driven by Glide 2.x (combine
   units, chroma key, alpha test, table fog, Z and W buffers, blending, the 565 buffer with its
   dither), after 3dfx's SST-1 specification, and a `Glide` context with the calls by their

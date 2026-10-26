@@ -81,7 +81,7 @@ the features it handles, and the frame shows only those. Its pieces are in GameF
 | Play | The renderers with their grades, start and stop, and what the game reports it is doing. While the game runs, "Back to the game" hides the frame, and the game can open it again from its own menu. When the game ends, the frame comes back, or the program exits to the desktop if the player chose that. "Exit to desktop" leaves at any time |
 | Library | The game data, the saves, and the sections the game opts into: mods, screenshots, recordings or its own |
 | Settings | One control for each setting in the game's manifest: a toggle, a choice, a range or text, in groups. A setting can say it needs a restart. A choice can list what is on the disc, such as the tracks or the cars: the files that match a pattern, or a list the game sends |
-| Setup | The game's hardware, one slot at a time, as the original's Manager or `SETUP.EXE` asked for it: Graphics, then the sound card, the music device or the controller. Each device carries a grade (exact, good, partial, experimental or missing), how much of its API is done, and its known gaps |
+| Setup | The game's hardware, one slot at a time, as the original's Manager or `SETUP.EXE` asked for it: a drop-down for Graphics, then the sound card, the music device or the controller, each with a card beside it for the chosen device. The card shows a grade (exact, good, partial, experimental or missing), how much of its API is done, and its known gaps |
 | Renderers | The Graphics slot. For a game with several 3D-card builds, such as Glide, PowerVR and software, one entry for each |
 | Help pages | Markdown pages listed in `library.json`. The HTML library page also has panels for news, a changelog, messages, a video and GitHub releases |
 | Console | Every event between the frame and the game, the game's controls as buttons, and a line to send any event |
@@ -143,7 +143,10 @@ crate or wrapper that models each. A game's own device, one GameFrame does not k
 id of its own.
 
 List every device the original supported, even the ones the port lacks: a `missing` device
-tells the player it is planned. Keep the original's own settings for a device (sample rate,
+tells the player it is planned. Give such a device a `stand_in`, a device of the same slot the
+port has, such as `software`. The game then starts with it, and the kernel reports the gap
+with `gameframe_report::unported!`. Every choice in the dialog runs the game end to end, and
+the reports say which devices players want first. Keep the original's own settings for a device (sample rate,
 colour depth) as ordinary settings in a group named after the slot.
 
 ### Three ways to join

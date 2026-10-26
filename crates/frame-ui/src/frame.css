@@ -8,6 +8,11 @@
 
 /* Renderers: one card each, with a grade and a meter of how much is done. */
 .lib-report { display: grid; gap: var(--lib-space-1); justify-items: start; }
+.lib-setup { display: grid; gap: var(--lib-space-3); margin-bottom: var(--lib-space-3); }
+.lib-setup-row { display: grid; grid-template-columns: minmax(160px, 1fr) 2fr; gap: var(--lib-space-3); align-items: start; }
+.lib-setup-choice { display: grid; gap: var(--lib-space-1); }
+.lib-device-card { cursor: default; }
+@media (max-width: 560px) { .lib-setup-row { grid-template-columns: 1fr; } }
 .lib-slot { margin: var(--lib-space-3) 0 var(--lib-space-1); font-size: 1em; }
 .lib-renderers { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--lib-space-3); margin-bottom: var(--lib-space-3); }
 .lib-renderer { display: grid; gap: var(--lib-space-1); text-align: left; padding: var(--lib-space-3); cursor: pointer; color: var(--lib-text);

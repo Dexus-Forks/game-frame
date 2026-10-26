@@ -528,3 +528,18 @@ fn the_session_keeps_one_report_per_place() {
     assert_eq!(s.reports().len(), 1);
     assert_eq!(s.reports()[0].count, 4);
 }
+
+#[test]
+fn a_device_not_ported_starts_on_its_stand_in() {
+    let text = |stand_in: &str| format!(r#"{{"contract": "1.1", "name": "Game", "renderers": [
+        {{"id": "software", "label": "Software", "default": true}},
+        {{"id": "glide", "label": "3dfx Glide", "grade": "missing", "stand_in": "{stand_in}"}},
+        {{"id": "powervr", "label": "PowerVR", "grade": "missing"}}]}}"#);
+    let m = Manifest::from_json(&text("software")).unwrap();
+    assert!(m.playable("video", "glide").is_ok(), "a stand-in makes it startable");
+    assert_eq!(m.stand_in("video", "glide").as_deref(), Some("software"));
+    assert_eq!(m.stand_in("video", "software"), None);
+    assert!(m.playable("video", "powervr").is_err(), "no stand-in, no start");
+    assert!(Manifest::from_json(&text("voodoo")).is_err(), "the stand-in must be in the slot");
+    assert!(Manifest::from_json(&text("glide")).is_err(), "not itself");
+}

@@ -84,6 +84,11 @@ pub struct Renderer {
     pub notes: Vec<String>,
     /// The renderer the frame selects first.
     pub default: bool,
+    /// For a device not ported yet: the id of the device in the same slot that stands in for
+    /// it, so the game still starts. The kernel runs that one and reports the gap
+    /// (`gameframe_report::unported!`), so a start on any listed device works end to end.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stand_in: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -193,7 +198,7 @@ impl Manifest {
         let s = self.slot(slot).ok_or_else(|| format!("{} has no {slot} slot", self.name))?;
         match s.options.iter().find(|d| d.id == id) {
             None => Err(format!("{} has no {} called {id}", self.name, s.label.to_lowercase())),
-            Some(d) if d.grade == Grade::Missing => Err(format!(
+            Some(d) if d.grade == Grade::Missing && d.stand_in.is_none() => Err(format!(
                 "{}{} is not ported yet; choose another in {}",
                 d.label,
                 d.detail.as_ref().map(|t| format!(" ({t})")).unwrap_or_default(),
@@ -201,6 +206,12 @@ impl Manifest {
             )),
             Some(_) => Ok(()),
         }
+    }
+
+    /// The device a kernel runs for `id` in `slot`: `id` itself, or the device standing in for
+    /// it. `Some` only for a stand-in; report the gap then.
+    pub fn stand_in(&self, slot: &str, id: &str) -> Option<String> {
+        self.slot(slot)?.options.into_iter().find(|d| d.id == id)?.stand_in
     }
 
     pub fn setting(&self, key: &str) -> Option<&Setting> {
@@ -228,6 +239,14 @@ impl Manifest {
             let mut ids = std::collections::HashSet::new();
             if slot.options.iter().any(|d| d.id.is_empty() || !ids.insert(d.id.clone())) {
                 return Err(format!("manifest: a device id in the {} slot is empty or repeated", slot.slot));
+            }
+        }
+        for slot in self.slots() {
+            for d in &slot.options {
+                let stand_in = d.stand_in.as_deref().and_then(|s| slot.options.iter().find(|o| o.id == s));
+                if d.stand_in.is_some() && !stand_in.is_some_and(|o| o.stand_in.is_none() && o.id != d.id) {
+                    return Err(format!("manifest: {} stands in with a device its slot lacks", d.id));
+                }
             }
         }
         for s in &self.settings {

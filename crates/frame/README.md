@@ -106,7 +106,11 @@ names, so a game opts into each feature by listing it.
   it. The frame saves each choice as `frame.device.SLOT` and sends both in `game.start` as
   `"devices": {"video": "glide", "sound": "none"}`. A kernel reads one with
   `chosen(&data, "sound")` and refuses one it does not have with `Manifest::playable(slot, id)`,
-  which also refuses a device graded `missing`.
+  which also refuses a device graded `missing`. A device not ported yet may name a `stand_in`,
+  another device in its slot (`"stand_in": "software"`): the game then starts on that one, the
+  kernel reports the gap with `gameframe_report::unported!`, and `Manifest::stand_in(slot, id)`
+  says which to run. So every listed device starts end to end. Play shows one drop-down per
+  slot, and beside it a card for the chosen device: its grade, its meter, its notes.
 - **Versions.** `CONTRACT` is `1.1` (1.1 added `devices`). The frame refuses a larger major number. A minor version
   only adds fields, and a frame ignores fields it does not know.
 

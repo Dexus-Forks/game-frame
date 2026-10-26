@@ -36,6 +36,7 @@ impl Game for Demo {
             total,
             notes: if grade == Grade::Partial { vec!["Fog is drawn without the card's table.".into()] } else { vec![] },
             default,
+            stand_in: None,
         };
         let control = |name: &str, label: &str, key: &str| Control { name: name.into(), label: label.into(), key: Some(key.into()) };
         Manifest {

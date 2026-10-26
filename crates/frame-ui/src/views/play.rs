@@ -1,4 +1,4 @@
-//! Play: the game's setup, as the Manager or SETUP.EXE of a 1990s game showed it: one choice
+//! Play: the game's setup, as the Manager or SETUP.EXE of a 1990s game showed it: one drop-down
 //! per hardware slot (graphics, sound card, music) with how complete each device is. Then the
 //! start and stop buttons, "Back to the game" while it runs, the game's status, and whether the
 //! frame opens at start.
@@ -71,48 +71,32 @@ pub fn Play() -> Element {
                     }
                 }
             }
-            for slot in slots.iter().cloned() {
-                {
-                    let chosen = chosen.iter().find(|(k, _)| *k == slot.slot).and_then(|(_, v)| v.clone());
-                    let prompt = if slot.slot == device::slots::VIDEO { "Choose how the game draws.".to_string() } else { format!("Choose the {}.", slot.label.to_lowercase()) };
-                    rsx! {
-                        h3 { class: "lib-slot", "{slot.label}" }
-                        p { "{prompt}" }
-                        div { class: "lib-renderers", role: "radiogroup", "aria-label": "{slot.label}",
-                            for r in slot.options.iter().cloned() {
-                                {
-                                    let selected = chosen.as_deref() == Some(r.id.as_str());
-                                    let id = r.id.clone();
-                                    let which = slot.slot.clone();
-                                    let share = match (r.done, r.total) {
-                                        (Some(d), Some(t)) if t > 0 => Some((d, t, d as f64 * 100.0 / t as f64)),
-                                        _ => None,
-                                    };
-                                    rsx! {
-                                        button {
-                                            r#type: "button",
-                                            class: "lib-renderer",
-                                            role: "radio",
-                                            "aria-checked": "{selected}",
-                                            disabled: running,
-                                            onclick: move |_| { let _ = frame.update(|s| s.select_device(&which, &id)); },
-                                            div { class: "lib-renderer-head",
-                                                span { class: "lib-row-name", "{r.label}" }
-                                                span { class: "lib-grade is-{grade_label(r.grade).to_lowercase().replace(' ', \"-\")}", "{grade_label(r.grade)}" }
-                                            }
-                                            if let Some(detail) = &r.detail {
-                                                span { class: "lib-row-meta", "{detail}" }
-                                            }
-                                            if let Some((d, t, pct)) = share {
-                                                div { class: "lib-meter", title: "{d} of {t}",
-                                                    div { class: "lib-meter-fill", style: "width: {pct:.0}%" }
-                                                }
-                                                span { class: "lib-row-meta", "{d} of {t} calls" }
-                                            }
-                                            for n in r.notes.iter() {
-                                                span { class: "lib-row-meta", "{n}" }
+            // One row per slot, as a 1990s setup dialog had it: a drop-down the theme draws as its
+            // own control, and beside it a card for the chosen device that changes with it.
+            div { class: "lib-setup",
+                for slot in slots.iter().cloned() {
+                    {
+                        let chosen = chosen.iter().find(|(k, _)| *k == slot.slot).and_then(|(_, v)| v.clone());
+                        let current = slot.options.iter().find(|d| Some(d.id.as_str()) == chosen.as_deref()).cloned();
+                        let which = slot.slot.clone();
+                        let field = format!("set-device-{}", slot.slot);
+                        rsx! {
+                            div { class: "lib-setup-row",
+                                div { class: "lib-setup-choice",
+                                    label { class: "lib-row-name", r#for: "{field}", "{slot.label}" }
+                                    select { id: "{field}", class: "lib-input", disabled: running,
+                                        onchange: move |e| { let _ = frame.update(|s| s.select_device(&which, &e.value())); },
+                                        for d in slot.options.iter() {
+                                            option { value: "{d.id}", selected: Some(d.id.as_str()) == chosen.as_deref(),
+                                                if d.stand_in.is_some() { "{d.label} (stand-in)" } else if d.grade == Grade::Missing { "{d.label} (not started)" } else { "{d.label}" }
                                             }
                                         }
+                                    }
+                                }
+                                if let Some(r) = current {
+                                    DeviceCard {
+                                        stand_in: r.stand_in.as_ref().and_then(|id| slot.options.iter().find(|o| &o.id == id)).map(|o| o.label.clone()),
+                                        device: r,
                                     }
                                 }
                             }
@@ -223,4 +207,39 @@ fn issue_buttons(r: &Report, targets: &[IssueTarget]) -> Vec<(String, String)> {
         .filter(|t| t.kinds.is_empty() || t.kinds.iter().any(|k| k == r.kind.name()))
         .filter_map(|t| Some((t.text.clone(), r.issue_url_for(&t.repo)?)))
         .collect()
+}
+
+/// What the chosen device is and how complete: its grade, what it stands for, how many of its
+/// calls are done, and its known gaps.
+#[component]
+fn DeviceCard(device: gameframe_frame::Device, stand_in: Option<String>) -> Element {
+    let r = device;
+    let share = match (r.done, r.total) {
+        (Some(d), Some(t)) if t > 0 => Some((d, t, d as f64 * 100.0 / t as f64)),
+        _ => None,
+    };
+    let grade = grade_label(r.grade);
+    rsx! {
+        div { class: "lib-renderer lib-device-card", role: "status", "aria-live": "polite",
+            div { class: "lib-renderer-head",
+                span { class: "lib-row-name", "{r.label}" }
+                span { class: "lib-grade is-{grade.to_lowercase().replace(' ', \"-\")}", "{grade}" }
+            }
+            if let Some(detail) = &r.detail {
+                span { class: "lib-row-meta", "{detail}" }
+            }
+            if let Some((d, t, pct)) = share {
+                div { class: "lib-meter", title: "{d} of {t}",
+                    div { class: "lib-meter-fill", style: "width: {pct:.0}%" }
+                }
+                span { class: "lib-row-meta", "{d} of {t} calls" }
+            }
+            if let Some(other) = stand_in {
+                span { class: "lib-row-meta", "Starts on {other} until it is ported, and reports the gap." }
+            }
+            for n in r.notes.iter() {
+                span { class: "lib-row-meta", "{n}" }
+            }
+        }
+    }
 }
