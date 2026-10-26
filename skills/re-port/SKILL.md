@@ -63,7 +63,13 @@ after a year.
   times do not.
 
 The platform layer around the core (time, input, drawing, sound, the player's files, the
-browser build) is in `docs/working/building-the-port.md`. Shaders and fixed-function state are
+browser build) is in `docs/working/building-the-port.md`. For the player's files (game data,
+saves, mods) use GameFrame's `gameframe-library` crate and its HTML page in
+`templates/library-page/`, set up from one `library.json`. A disc image read in place goes
+through `gameframe-game-source`. The launcher, settings, renderer choice and console around the
+core are GameFrame's frame: implement `gameframe_frame::Game` (or speak its JSON lines, or
+write a `frame.json`) and give each renderer an honest grade (`crates/frame/README.md`). The
+frame is an addition, so it never changes what the core computes. Shaders and fixed-function state are
 part of what the player sees: port them exactly (`docs/hardware/shaders.md`).
 
 ## Additions the original does not have

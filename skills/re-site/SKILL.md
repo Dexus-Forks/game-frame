@@ -1,6 +1,6 @@
 ---
 name: re-site
-description: Build and keep a project's website - a VitePress site in sites/NAME/ (or one site/) that logs the work in dated diary entries, one per milestone, and shows the project's own documents (findings, formats, status) through @include, so they have one copy. Readable for players, modders and other researchers, never a dump of commits or tool output, and never game material. Use when a project starts publishing, after a milestone or a release, and when the documents change shape.
+description: Build and keep a project's website - a VitePress site in sites/NAME/ (or one site/) that logs the work in live diary entries during the day, one per milestone, consolidated into one update-notes post per past day, and shows the project's own documents (findings, formats, status) through @include, so they have one copy. Readable for players, modders and other researchers, never a dump of commits or tool output, and never game material. Use when a project starts publishing, after a milestone or a release, and when the documents change shape.
 ---
 
 # Build the project's website
@@ -97,10 +97,18 @@ The path is relative to the page. Then add the page to `nav` or `sidebar` in
 `.vitepress/config.mts`. Run `npm run build`: it fails on a dead link, including a link inside
 an included document. Fix the link in the document in `docs/`, never in a copy.
 
-## 4. Write a diary entry
+## 4. Write the diary: live entries, then one post per day
 
-Write one entry per milestone, not per session or per commit. A milestone is something a reader
-would notice:
+The diary has two kinds of entry.
+
+- **Live entries** are written during the day, one per milestone, so a reader can follow the
+  work as it happens. Name each `diary/YYYY-MM-DD-HHMM-slug.md`, with the time it was written on
+  a 24-hour clock (`2026-10-26-1430-fog-tables.md`). The diary shows the time beside the title.
+- **Day posts** replace a day's live entries once the day is over. Each past day ends up with
+  one post, named `diary/YYYY-MM-DD-slug.md`. Live entries on one day often repeat each other,
+  and the day post removes the repeats.
+
+A milestone is something a reader would notice:
 
 - a format decoded on every file of its kind;
 - a system ported and verified against the original;
@@ -110,7 +118,7 @@ would notice:
 If nothing a reader would notice has changed, write no entry. Short findings wait for the next
 one.
 
-Name the file `diary/YYYY-MM-DD-slug.md`, dated the day the milestone landed:
+A live entry:
 
 ```markdown
 ---
@@ -120,7 +128,7 @@ summary: One or two sentences for the diary index - what was found, not what was
 
 # A disc, a bad block and the first key
 
-*2026-10-23. Tools: GameFrame, Ghidra 12.1, Python 3.13.*
+*2026-10-23 14:30. Tools: GameFrame, Ghidra 12.1, Python 3.13.*
 
 What the goal was, in one paragraph. Then the story: what was tried, what the evidence showed,
 how it was checked (with the numbers: "98 files decode, every checksum matches, every file
@@ -130,6 +138,61 @@ writes back byte for byte"), and what it means for a reader (a modder can now ..
 
 - Two or three open questions, the same ones as in docs/CHECKLIST.md.
 ```
+
+### Consolidate each past day
+
+Before you write anything else, look for live entries from a day before today:
+
+```bash
+./gameframe run check sites/NAME --days     # or tools/site/check.py sites/NAME --days
+```
+
+For each day it lists, read that day's live entries and write one day post. Write it like a
+game's update notes: what is new for a reader first, then a little detail, then a short change
+list.
+
+```markdown
+---
+title: Fog, shadows and the first full race
+summary: The renderer now draws fog and shadow volumes as the 3D card did, and a whole race runs from the menu.
+---
+
+# Fog, shadows and the first full race
+
+*2026-10-25. Tools: GameFrame, Ghidra 12.1.*
+
+## What is new
+
+- **Fog as the card drew it.** One or two sentences each: what a reader can now see or do, and
+  how it is known (measured against the original, 500 frames match).
+- **Shadow volumes.** ...
+
+## How it works
+
+A few paragraphs on the one or two findings that matter most, with their figures. Link the
+documents for the detail.
+
+## Changes
+
+- The texture loader reads the 16-bit formats.
+- The menu starts a race.
+
+## Next
+
+- The open questions left at the end of the day.
+```
+
+Then:
+
+1. Keep every figure the live entries used, with its caption. Drop repeats.
+2. Keep each finding once, in its newest and most exact form.
+3. The change list says what changed for a reader in plain words. It is not a commit list.
+4. Delete the day's live entries (`git rm`). Git keeps them. Links to a live entry move to the
+   day post.
+5. Run the check again. It fails while a past day still has live entries.
+
+A project that wants to keep its live entries runs `check.py --keep-live`. It tells its agents
+to skip this step in its own `AGENTS.md`.
 
 The rules for an entry:
 
@@ -153,23 +216,25 @@ The rules for an entry:
   1 MB, SVG) and link them as `/name.webp`. Adding figures to old entries later costs more
   than drawing them as each entry is written. The game's files themselves stay out: no
   extracted textures, sounds or text in bulk, no archives, no downloads of its data.
-- **Length.** Usually 300 to 1,500 words. Shorter is a note: fold it into the next entry.
-  Longer usually means reference material that belongs in `docs/`.
+- **Length.** A day post is usually 300 to 1,500 words. Longer usually means reference material
+  that belongs in `docs/`. A live entry can be short, since the day post gathers them.
 - **Plain English.** One idea per sentence, no rhetorical patterns (`docs/working/writing.md`).
   Send long entries to `re-editor` and `re-checker` before they land.
-- **Entries are history.** Do not rewrite old entries when a finding changes. Add a line at the
-  top, "Later: ...", with a link to the entry or the document that has the new answer.
+- **Day posts are history.** Consolidating a past day is the one rewrite. After that, do not
+  rewrite a day post when a finding changes. Add a line at the top, "Later: ...", with a link to
+  the post or the document that has the new answer.
 
 ## 5. Keep it current
 
 At each milestone, in this order:
 
-1. Update the documents in `docs/` (`re-land`). The included pages follow by themselves.
-2. Write the diary entry.
-3. Update the front page's status line when the state has changed.
-4. Add a page for any new document a reader would look for, and remove pages whose document is
+1. Consolidate each past day that still has live entries (section 4).
+2. Update the documents in `docs/` (`re-land`). The included pages follow by themselves.
+3. Write the live entry.
+4. Update the front page's status line when the state has changed.
+5. Add a page for any new document a reader would look for, and remove pages whose document is
    gone.
-5. Check and build:
+6. Check and build:
 
 ```bash
 ./gameframe run check sites/NAME        # or tools/site/check.py sites/NAME
@@ -177,11 +242,11 @@ cd sites/NAME && npm run build
 ```
 
 `check.py` fails on game files, decompiled code (in a page or an included document), missing
-includes, diary entries without a title or summary, and leftover `TODO(site)` lines. It warns
-about entries that read like a commit log, entries that are too short or too long, and large
-pictures. Fix every error. Read every warning and fix it, or say in the hand-off why it stays.
+includes, diary entries without a title or summary, live entries from a past day, and leftover
+`TODO(site)` lines. It warns about entries that read like a commit log, day posts that are too
+short or too long, two posts for one day, and large pictures. Fix every error. Read every warning and fix it, or say in the hand-off why it stays.
 
-6. Land it with `re-land`: stage the site's files by name. The workflow publishes on the next
+7. Land it with `re-land`: stage the site's files by name. The workflow publishes on the next
    push to `main`, or when the user starts it, if it is manual.
 
 ## Publishing

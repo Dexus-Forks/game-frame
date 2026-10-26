@@ -1,0 +1,15 @@
+[package]
+name = "gameframe-disc-image"
+description = "Read CD images in place: CUE sheets, raw BIN (Mode 1, Mode 2), plain ISO, ISO 9660 and Joliet, random access to a file's bytes"
+version.workspace = true
+edition = "2024"
+license.workspace = true
+repository.workspace = true
+rust-version = "1.85"
+keywords = ["cd", "iso9660", "cue", "bin", "wasm"]
+categories = ["filesystem", "parser-implementations"]
+
+[lib]
+name = "disc_image"
+
+# No dependencies: the same code runs natively and in the browser (wasm32).

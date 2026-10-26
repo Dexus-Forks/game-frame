@@ -3,6 +3,12 @@
 GameFrame is an agentic framework for reverse engineering games. Its playbook of skills and agents runs inside your coding agent. Its toolkit of tested tools checks every result against the original. AI agents and people use it to study a game from its shipped files. They
 document its formats and rules, and reimplement it so it behaves exactly like the original.
 
+Each reimplementation is an exact core with a frame around it. The core is the game, ported
+from the original and checked against it. The frame is GameFrame's launcher, the player's
+library of game files and saves, the settings, the renderer choice, help pages and an event
+console. Every port gets the same frame. The core and the frame talk only through a versioned
+contract of events ([Building the port](docs/working/building-the-port.md#the-frame)).
+
 The toolkit works with [Ghidra](https://ghidra-sre.org), the
 [Unicorn](https://www.unicorn-engine.org) emulator and [REA](https://github.com/morluto/rea)
 (Reverse Engineer Anything). It uses [DOSBox-X](https://dosbox-x.com) and its debugger for DOS
@@ -124,6 +130,31 @@ scripts.
 
 Write each claim with its evidence (an address, a value, a measurement) and one label:
 *observed*, *measured*, *inferred* or *unknown*. Measure each number the reimplementation must match by running the original function under the emulator. The reimplementation must give the same result bit for bit.
+
+## How a port is built
+
+A port has three layers.
+
+- **The core** is the game: its rules, formats and simulation. It matches the original bit
+  for bit, and has no platform code. Reusable libraries plug into it: the chip and runtime
+  [crates](#crates) and the [replacement 3D-card libraries](#replacement-libraries).
+- **The platform layer** gives the core a window, drawing, sound, input, time and files. It
+  behaves like the original wherever the player can see the difference.
+- **The frame** is GameFrame's program around the game. It opens on the first run, and
+  `--frame` opens it again. It holds the player's library, the settings from the game's
+  manifest, a choice of renderer with a coverage grade for each (exact, good, partial,
+  experimental or missing), help pages and a console of every event.
+
+The game opts into each part of the frame by naming a capability in its manifest. It can add
+event topics of its own. A Rust port implements the `Game` trait. A port in any other language
+speaks JSON lines on standard input and output. A game the frame only starts needs a
+`frame.json` and no code. The frame takes its look from design tokens in one `library.json`.
+[Building the port](docs/working/building-the-port.md) has the contract, and
+[the library page](templates/library-page/README.md) has the tokens. A ready-made desktop
+launcher and the viewer as a tab of the frame are planned.
+
+When a game needs something the frame lacks, it adds it to GameFrame with a pull request, or
+opens an issue.
 
 ## Skills
 
@@ -307,8 +338,9 @@ GameFrame's decision tool has its own `GAMEFRAME_DECISION_ENDPOINT`. See
 ## Crates
 
 Clean Rust implementations of chips and runtimes that many old games need, each checked against
-an original program in one of the case studies. They live in `crates/`, a Cargo workspace,
-under Apache 2.0. See [docs/crates](docs/crates/README.md).
+an original program in one of the case studies. The same workspace holds the pieces every port
+shares: reading the player's files, the player's library and the frame. They live in `crates/`,
+a Cargo workspace, under Apache 2.0. See [docs/crates](docs/crates/README.md).
 
 | Crate | What it is |
 |---|---|
@@ -317,6 +349,11 @@ under Apache 2.0. See [docs/crates](docs/crates/README.md).
 | [gameframe-msvc-crt](crates/msvc-crt/README.md) | MSVC's `sinf`, `cosf`, `acosf`, `atan2f`, `qsort` order and `rand`, bit for bit |
 | [gameframe-turbo-pascal](crates/turbo-pascal/README.md) | Turbo Pascal's 6-byte `Real`, `Random` and Pascal data layouts |
 | [gameframe-indeo](crates/indeo/README.md) | An Indeo Video Interactive 4.1 (`IV41`) decoder, picture for picture as Intel's own codec (clean room) |
+| [gameframe-disc-image](crates/disc-image/README.md) | Reads CD images in place (CUE/BIN, ISO, ISO 9660 and Joliet), with no dependencies |
+| [gameframe-game-source](crates/game-source/README.md) | A game's files from a folder, a CD image or a URL, read in ranges in the browser |
+| [gameframe-library](crates/library/README.md) | The player's game data, saves and mods, kept on the desktop or encrypted in the browser, with an [HTML page](templates/library-page/README.md) to manage them |
+| [gameframe-frame](crates/frame/README.md) | The contract between a port and the frame: event topics, the manifest with capabilities, renderers and their grades, settings and controls, and adapters for games in other languages or set up from `frame.json` |
+| [gameframe-frame-ui](crates/frame-ui/README.md) | The frame's views as Dioxus components for the browser and the desktop: play, settings, library, help pages and console, with ready-made themes ([demo](examples/frame-demo/README.md)) |
 
 ## Replacement libraries
 

@@ -1,0 +1,188 @@
+//! What a game tells the frame about itself: its name, what it can do, its renderers with how
+//! complete each is, its settings and its controls. The frame draws only what the manifest
+//! names, so a game opts into each feature by listing it.
+//!
+//! A game written in Rust returns a [`Manifest`] from [`crate::Game::manifest`]. A game in
+//! another language prints it as JSON, and a game with no code gives it in `frame.json`.
+
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+
+/// The version of the contract in this crate. The frame refuses a manifest with a larger
+/// major number and accepts a smaller one. A minor version only adds fields, and a frame
+/// ignores fields it does not know, so a 1.1 game still opens in a 1.0 frame.
+pub const CONTRACT: &str = "1.0";
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct Manifest {
+    /// The contract version the game was written for, such as "1.0".
+    pub contract: String,
+    pub name: String,
+    pub version: String,
+    /// What the game handles. The well-known ones are in [`capabilities`]; a game can name its
+    /// own. The frame shows a feature only when its capability is listed.
+    pub capabilities: Vec<String>,
+    /// The ways the game can draw, such as one per 3D card the original supported.
+    pub renderers: Vec<Renderer>,
+    /// Settings the player can change in the frame.
+    pub settings: Vec<Setting>,
+    /// Controls the console can press, by the game's own names ("start", "fire", "left").
+    pub controls: Vec<Control>,
+}
+
+/// The capabilities the frame knows.
+pub mod capabilities {
+    /// The game starts and stops on `game.start` and `game.stop`.
+    pub const START: &str = "start";
+    /// The game has more than one renderer and takes `render.select`.
+    pub const RENDERERS: &str = "renderers";
+    /// The game reads its settings from `frame.ready` and `config.set`.
+    pub const SETTINGS: &str = "settings";
+    /// The game takes `input.press` from the frame's console.
+    pub const INPUT: &str = "input";
+    /// The game reads the player's library and takes `library.changed`.
+    pub const LIBRARY: &str = "library";
+}
+
+/// How complete a renderer is, for the player choosing one.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Grade {
+    /// Not started: listed so the player knows it is planned.
+    Missing,
+    /// Draws something; expect gaps.
+    Experimental,
+    /// Most of the game draws; known gaps are listed.
+    Partial,
+    /// Everything the game uses draws; some details differ.
+    #[default]
+    Good,
+    /// Checked against the original, frame for frame.
+    Exact,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct Renderer {
+    pub id: String,
+    pub label: String,
+    /// One line for the player: the card or API it stands for.
+    pub detail: Option<String>,
+    pub grade: Grade,
+    /// How much of the API is done, such as 131 of 156 Glide calls.
+    pub done: Option<u32>,
+    pub total: Option<u32>,
+    /// Known gaps, one sentence each.
+    pub notes: Vec<String>,
+    /// The renderer the frame selects first.
+    pub default: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "lowercase")]
+pub enum Kind {
+    /// On or off.
+    Toggle,
+    /// One of the options.
+    Choice { options: Vec<Choice> },
+    /// A number from `min` to `max`.
+    Range { min: f64, max: f64, step: f64 },
+    /// Free text.
+    Text,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+
+pub struct Choice {
+    pub value: String,
+    pub label: String,
+}
+
+/// A setting. Its `type` (toggle, choice, range, text) and that type's fields sit beside the
+/// others in JSON. Unknown fields are ignored here, since serde cannot refuse them beside a
+/// flattened type.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Setting {
+    /// The key in `config.set` and the saved settings, such as "fog" or "video.scale".
+    pub key: String,
+    pub label: String,
+    #[serde(default)]
+    pub help: Option<String>,
+    /// A group heading, such as "Video" or "Sound".
+    #[serde(default)]
+    pub group: Option<String>,
+    #[serde(flatten)]
+    pub kind: Kind,
+    pub default: Value,
+    /// The setting takes effect only when the game starts again.
+    #[serde(default)]
+    pub restart: bool,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct Control {
+    pub name: String,
+    pub label: String,
+    /// The key the console shows for it, such as "Enter".
+    pub key: Option<String>,
+}
+
+impl Manifest {
+    pub fn from_json(text: &str) -> Result<Manifest, String> {
+        let m: Manifest = serde_json::from_str(text).map_err(|e| format!("manifest: {e}"))?;
+        m.check()?;
+        Ok(m)
+    }
+
+    pub fn can(&self, capability: &str) -> bool {
+        self.capabilities.iter().any(|c| c == capability)
+    }
+
+    /// The renderer to select first: the one marked default, else the best graded.
+    pub fn default_renderer(&self) -> Option<&Renderer> {
+        self.renderers.iter().find(|r| r.default).or_else(|| self.renderers.iter().max_by_key(|r| r.grade))
+    }
+
+    pub fn setting(&self, key: &str) -> Option<&Setting> {
+        self.settings.iter().find(|s| s.key == key)
+    }
+
+    /// The contract version, the ids and the settings' defaults.
+    pub fn check(&self) -> Result<(), String> {
+        let major = |v: &str| v.split('.').next().and_then(|m| m.parse::<u32>().ok());
+        match (major(&self.contract), major(CONTRACT)) {
+            (Some(theirs), Some(ours)) if theirs <= ours => {}
+            _ => return Err(format!("manifest: contract {:?} is not one this frame ({CONTRACT}) reads", self.contract)),
+        }
+        let mut seen = std::collections::HashSet::new();
+        for r in &self.renderers {
+            if r.id.is_empty() || !seen.insert(("renderer", r.id.clone())) {
+                return Err(format!("manifest: renderer id {:?} is empty or repeated", r.id));
+            }
+        }
+        for s in &self.settings {
+            if s.key.is_empty() || !seen.insert(("setting", s.key.clone())) {
+                return Err(format!("manifest: setting key {:?} is empty or repeated", s.key));
+            }
+            if !s.accepts(&s.default) {
+                return Err(format!("manifest: setting {} has a default its kind does not take", s.key));
+            }
+        }
+        Ok(())
+    }
+}
+
+impl Setting {
+    /// Whether a value fits the setting: a bool for a toggle, one of the options, a number in
+    /// range, a string.
+    pub fn accepts(&self, v: &Value) -> bool {
+        match &self.kind {
+            Kind::Toggle => v.is_boolean(),
+            Kind::Choice { options } => v.as_str().is_some_and(|s| options.iter().any(|o| o.value == s)),
+            Kind::Range { min, max, .. } => v.as_f64().is_some_and(|n| n >= *min && n <= *max),
+            Kind::Text => v.is_string(),
+        }
+    }
+}

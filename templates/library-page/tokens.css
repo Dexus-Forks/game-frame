@@ -1,0 +1,87 @@
+/* The library page's design tokens (GameFrame templates/library-page). Every component in
+   library.css is drawn from these and nothing else. Change them three ways, from least to
+   most work:
+   1. library.json "theme": {"accent": "#4fb3ff", "radius-m": "4px"} sets --lib-accent and
+      --lib-radius-m on the page;
+   2. a theme.css after library.css that sets the same variables on #library;
+   3. your own CSS for any component (every class starts with lib-).
+   "scheme" in library.json picks the dark set (the default), the light set, or "auto". */
+#library {
+  /* Colour */
+  --lib-bg: #0f1115;
+  --lib-surface: rgb(22 25 31 / 0.92);
+  --lib-surface-2: rgb(255 255 255 / 0.04);
+  --lib-line: rgb(255 255 255 / 0.12);
+  --lib-text: #e8e6e1;
+  --lib-muted: #a3a19b;
+  --lib-accent: #e0a84a;
+  --lib-accent-text: #15120c;
+  --lib-danger: #ff8a7a;
+  --lib-ok: #7fd49a;
+  --lib-scrim: rgb(0 0 0 / 0.55);
+
+  /* Type */
+  --lib-font: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --lib-font-display: var(--lib-font);
+  --lib-font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --lib-text-s: 12px;
+  --lib-text-m: 14px;
+  --lib-text-l: 15px;
+  --lib-text-xl: 18px;
+  --lib-text-title: 30px;
+  --lib-weight-strong: 600;
+
+  /* Space, shape, depth */
+  --lib-space-1: 4px;
+  --lib-space-2: 8px;
+  --lib-space-3: 12px;
+  --lib-space-4: 16px;
+  --lib-space-5: 24px;
+  --lib-space-6: 32px;
+  --lib-radius-s: 6px;
+  --lib-radius-m: 10px;
+  --lib-radius-l: 16px;
+  --lib-radius-pill: 999px;
+  --lib-shadow: 0 30px 80px rgb(0 0 0 / 0.5);
+  --lib-blur: 6px;
+  --lib-width: 640px;
+
+  /* Pictures and icons */
+  --lib-backdrop: none;
+  --lib-backdrop-opacity: 0.35;
+  --lib-logo-width: 360px;
+  --lib-icon-size: 16px;
+  --lib-thumb-width: 56px;
+  --lib-thumb-height: 36px;
+}
+
+#library[data-scheme=light] {
+  --lib-bg: #f4f2ee;
+  --lib-surface: rgb(255 255 255 / 0.94);
+  --lib-surface-2: rgb(0 0 0 / 0.03);
+  --lib-line: rgb(0 0 0 / 0.12);
+  --lib-text: #1d1c1a;
+  --lib-muted: #625f58;
+  --lib-accent: #a8610f;
+  --lib-accent-text: #ffffff;
+  --lib-danger: #b3261e;
+  --lib-ok: #1e7a3c;
+  --lib-scrim: rgb(255 255 255 / 0.4);
+  --lib-shadow: 0 20px 60px rgb(0 0 0 / 0.15);
+}
+@media (prefers-color-scheme: light) {
+  #library[data-scheme=auto] {
+    --lib-bg: #f4f2ee;
+    --lib-surface: rgb(255 255 255 / 0.94);
+    --lib-surface-2: rgb(0 0 0 / 0.03);
+    --lib-line: rgb(0 0 0 / 0.12);
+    --lib-text: #1d1c1a;
+    --lib-muted: #625f58;
+    --lib-accent: #a8610f;
+    --lib-accent-text: #ffffff;
+    --lib-danger: #b3261e;
+    --lib-ok: #1e7a3c;
+    --lib-scrim: rgb(255 255 255 / 0.4);
+    --lib-shadow: 0 20px 60px rgb(0 0 0 / 0.15);
+  }
+}

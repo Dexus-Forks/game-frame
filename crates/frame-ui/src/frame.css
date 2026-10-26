@@ -1,0 +1,60 @@
+/* The frame's own components (gameframe-frame-ui), on top of the HTML library page's tokens
+   and components. They use only --lib-* tokens, so library.json's "theme" restyles them too. */
+#library.lib-frame { align-items: flex-start; }
+.lib-frame-card { max-width: calc(var(--lib-width) + 120px); }
+.lib-nav a { cursor: pointer; }
+.lib-nav a[aria-current=false] { background: none; box-shadow: none; }
+.lib-nav a[aria-current=page] { color: var(--lib-text); background: var(--lib-surface-2); box-shadow: inset 0 0 0 1px var(--lib-line); }
+
+/* Renderers: one card each, with a grade and a meter of how much is done. */
+.lib-renderers { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--lib-space-3); margin-bottom: var(--lib-space-3); }
+.lib-renderer { display: grid; gap: var(--lib-space-1); text-align: left; padding: var(--lib-space-3); cursor: pointer; color: var(--lib-text);
+                border-radius: var(--lib-radius-m); border: 1px solid var(--lib-line); background: var(--lib-surface-2); font: inherit; }
+.lib-renderer[aria-checked=true] { border-color: var(--lib-accent); box-shadow: inset 0 0 0 1px var(--lib-accent); }
+.lib-renderer:disabled { cursor: not-allowed; opacity: 0.6; }
+.lib-renderer-head { display: flex; justify-content: space-between; gap: var(--lib-space-2); align-items: center; }
+.lib-grade { font-size: var(--lib-text-s); padding: 2px var(--lib-space-2); border-radius: var(--lib-radius-pill); border: 1px solid currentColor; }
+.lib-grade.is-exact, .lib-grade.is-good { color: var(--lib-ok); }
+.lib-grade.is-partial { color: var(--lib-accent); }
+.lib-grade.is-experimental, .lib-grade.is-not-started { color: var(--lib-danger); }
+.lib-meter { height: 6px; border-radius: var(--lib-radius-pill); background: var(--lib-line); overflow: hidden; }
+.lib-meter-fill { height: 100%; background: var(--lib-accent); }
+.lib-check { display: flex; gap: var(--lib-space-2); align-items: baseline; flex-wrap: wrap; margin-top: var(--lib-space-4); font-size: var(--lib-text-m); color: var(--lib-muted); }
+.lib-check input { accent-color: var(--lib-accent); }
+
+/* Settings. */
+.lib-settings h2 { margin-top: var(--lib-space-4); }
+.lib-setting-input { display: flex; align-items: center; gap: var(--lib-space-2); flex: none; }
+.lib-input { font: var(--lib-text-m)/1.3 var(--lib-font); color: var(--lib-text); background: var(--lib-surface-2); padding: 7px var(--lib-space-3);
+             border: 1px solid var(--lib-line); border-radius: var(--lib-radius-s); min-width: 0; }
+.lib-mono { font-family: var(--lib-font-mono); }
+.lib-range { accent-color: var(--lib-accent); width: 140px; }
+.lib-range-value { min-width: 3ch; text-align: right; }
+.lib-setting input[type=checkbox] { accent-color: var(--lib-accent); width: 18px; height: 18px; }
+
+/* Console. */
+.lib-pad { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: var(--lib-space-2); margin-bottom: var(--lib-space-4); }
+.lib-pad-key { flex-direction: column; gap: 2px; padding: var(--lib-space-3) var(--lib-space-2); border-radius: var(--lib-radius-m); color: var(--lib-text); }
+.lib-pad-key:active { background: var(--lib-accent); color: var(--lib-accent-text); }
+.lib-send { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto; gap: var(--lib-space-2); margin-bottom: var(--lib-space-4); }
+.lib-console-head { display: flex; justify-content: space-between; align-items: center; gap: var(--lib-space-3); }
+.lib-console-head h2 { margin: 0; }
+.lib-console-head .lib-input { width: 12rem; }
+.lib-log { list-style: none; margin: var(--lib-space-2) 0 0; padding: 0; max-height: 22rem; overflow-y: auto; font: var(--lib-text-s)/1.5 var(--lib-font-mono);
+           border: 1px solid var(--lib-line); border-radius: var(--lib-radius-m); background: var(--lib-surface-2); }
+.lib-log-line { display: grid; grid-template-columns: 3.5ch 6ch minmax(9rem, auto) 1fr; gap: var(--lib-space-2); padding: 3px var(--lib-space-3);
+                border-bottom: 1px solid var(--lib-line); align-items: baseline; }
+.lib-log-line:last-child { border-bottom: 0; }
+.lib-log-id { color: var(--lib-muted); text-align: right; }
+.lib-log-from { color: var(--lib-muted); }
+.lib-log-line.is-game .lib-log-from { color: var(--lib-ok); }
+.lib-log-line.is-player .lib-log-from { color: var(--lib-accent); }
+.lib-log-topic { color: var(--lib-text); }
+.lib-log-data { color: var(--lib-muted); overflow-wrap: anywhere; }
+
+@media (max-width: 560px) {
+  .lib-send { grid-template-columns: 1fr; }
+  .lib-log-line { grid-template-columns: 3.5ch 1fr; }
+  .lib-log-from { display: none; }
+  .lib-log-data { grid-column: 1 / -1; }
+}

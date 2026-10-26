@@ -4,7 +4,7 @@ title: GameFrame
 hero:
   name: GameFrame
   text: An agentic framework for reverse engineering games
-  tagline: Understand a game from the copy you own, and rebuild it exactly. Its playbook of skills and agents runs inside your coding agent. Its toolkit of tested tools, around Ghidra, Unicorn and REA, checks every result against the original.
+  tagline: Understand a game from the copy you own, and rebuild it exactly. Its playbook of skills and agents runs inside your coding agent. Its toolkit of tested tools, around Ghidra, Unicorn and REA, checks every result against the original. Every port it builds ships inside the same frame of launcher, library and settings.
   actions:
     - theme: brand
       text: Start here
@@ -36,6 +36,10 @@ features:
     title: Measured against the original
     details: Original functions run under emulation for ground truth, and the reimplementation must match their results bit for bit.
     link: /skills/re-emulate
+  - icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><rect x="7" y="8" width="10" height="8" rx="1"/><path d="M2 7h20"/></svg>'
+    title: An exact core in a shared frame
+    details: The port is the game, checked against the original. Around it, every port gets the same launcher, library of game files and saves, settings, renderer choice, help pages and console, joined to the core by a contract of events.
+    link: /working/building-the-port#the-frame
   - icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h6a4 4 0 0 1 4 4v11a3 3 0 0 0-3-3H2z"/><path d="M22 5h-6a4 4 0 0 0-4 4v11a3 3 0 0 1 3-3h7z"/></svg>'
     title: Case studies
     details: Un-Banished, Tyrian 2000 and Frontier Elite II, and the tooling each built to capture its game.
@@ -64,6 +68,27 @@ Agents can also read this site as plain text. [llms.txt](/llms.txt) lists every
 page with a short description, and [llms-full.txt](/llms-full.txt) holds all
 of them in one file. Each page has a Markdown copy at the same address with `.md` at the end,
 such as [/games/interaction.md](/games/interaction.md).
+
+## A core and a frame
+
+A port has an exact core: the game's rules, formats and simulation, ported from the original
+and checked against it. GameFrame puts a frame around that core. The frame is the launcher,
+the player's library of game files and saves, the settings from the game's manifest, a choice
+of renderer, help pages and an event console. It opens on the first run, and `--frame` opens
+it again.
+
+The core and the frame exchange events and nothing else. The game lists the capabilities it
+handles in a manifest, and the frame shows only those. A game can add event topics of its own.
+A Rust port implements one trait. A port in another language speaks JSON lines over standard
+input and output. A game the frame only starts needs a config file and no code.
+
+A game with several 3D-card builds lists one renderer for each, such as Glide, PowerVR and
+software. Each renderer carries a grade the player sees: exact, good, partial, experimental or
+missing. The frame takes its look from design tokens, so each game sets its own colours, fonts
+and pictures, or starts from a ready-made theme: Windows 98, XP or Vista, System 7, Aqua, BeOS, NeXTSTEP,
+CDE, GNOME 2, Amiga Workbench or Atari ST GEM. [Building the port](../docs/working/building-the-port.md#the-frame) describes the
+contract. A demo runs the frame with no game, in a browser or a desktop window. A launcher for games
+set up from `frame.json` alone and the resource viewer as a tab of the frame are planned.
 
 ## The 3D-card builds, on today's machines
 

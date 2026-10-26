@@ -1,0 +1,60 @@
+/* Atari ST GEM: a green desktop, white windows with black lines, a dotted title bar with the
+   close box on the left and the full box on the right, and the ST's 8x16 system font when the
+   player has it. A ready-made theme for the library page and the frame: "preset": "atari". */
+
+#library[data-scheme] {
+  --lib-bg: repeating-conic-gradient(#00a000 0 25%, #008000 0 50%) 0 0 / 2px 2px;
+  --lib-surface: #fff; --lib-surface-2: #fff; --lib-line: #000; --lib-text: #000; --lib-muted: #000;
+  --lib-accent: #000; --lib-accent-text: #fff; --lib-danger: #d00000; --lib-ok: #008000; --lib-scrim: transparent;
+  --lib-font: "Atari ST 8x16 System Font", "Atari Classic", "Courier New", monospace; --lib-font-mono: var(--lib-font);
+  --lib-text-s: 13px; --lib-text-m: 13px; --lib-text-l: 13px; --lib-text-xl: 14px; --lib-text-title: 13px;
+  --lib-weight-strong: 400; --lib-radius-s: 0; --lib-radius-m: 0; --lib-radius-l: 0; --lib-radius-pill: 0;
+  --lib-shadow: none; --lib-blur: 0; --lib-width: 600px;
+  color-scheme: light;
+}
+#library[data-scheme] { background: var(--lib-bg); }
+
+/* The window: a black line, a dotted title bar, the name on white in the middle. */
+#library .lib-card { padding: 0 0 12px; border: 1px solid #000; }
+#library .lib-card > :not(.lib-header) { margin-left: 12px; margin-right: 12px; }
+#library .lib-header { position: relative; display: flex; justify-content: center; margin: 0 0 10px; padding: 0 24px; height: 20px;
+  border-bottom: 1px solid #000; background: repeating-conic-gradient(#000 0 25%, #fff 0 50%) 0 0 / 2px 2px; }
+#library .lib-header::before, #library .lib-header::after { position: absolute; top: 0; width: 20px; height: 19px;
+  display: grid; place-items: center; background: #fff; font: 13px/1 var(--lib-font); }
+#library .lib-header::before { content: "✕"; left: 0; border-right: 1px solid #000; }
+#library .lib-header::after { content: "◇"; right: 0; border-left: 1px solid #000; }
+#library .lib-title { padding: 0 8px; background: #fff; font: 13px/20px var(--lib-font); }
+#library .lib-tagline { display: none; }
+
+/* Tabs as GEM menu titles: the chosen one is inverted. */
+#library .lib-nav, #library .lib-tabs { justify-content: flex-start; gap: 0; margin-top: 0; padding: 0 0 2px; border: 0; border-bottom: 1px solid #000; }
+#library .lib-nav a, #library .lib-tabs button { padding: 1px 10px; border: 0; border-radius: 0; background: #fff; color: #000;
+  font: 13px var(--lib-font); text-decoration: none; }
+#library .lib-nav a[aria-current=page], #library .lib-tabs button[aria-selected=true], #library .lib-nav a:hover { background: #000; color: #fff; }
+#library .lib-nav .lib-icon { display: none; }
+
+/* Buttons: a black box; the default one has a thick line; a pressed one is inverted. */
+#library .lib-button, #library .lib-pad-key { min-height: 22px; padding: 2px 14px; border: 1px solid #000; border-radius: 0;
+  background: #fff; color: #000; font: 13px var(--lib-font); }
+#library .lib-button:hover:not(:disabled) { background: #fff; }
+#library .lib-button:active:not(:disabled), #library .lib-pad-key:active { background: #000; color: #fff; }
+#library .lib-button--primary { border-width: 3px; }
+#library .lib-button:disabled { color: #888; border-color: #888; }
+
+/* Fields and lists. */
+#library .lib-input { border: 0; border-bottom: 1px solid #000; border-radius: 0; background: #fff; color: #000; font: 13px var(--lib-font); }
+#library .lib-log, #library .lib-rows .lib-row { border: 1px solid #000; border-radius: 0; background: #fff; }
+#library .lib-notice { border: 1px solid #000; border-radius: 0; background: #fff; box-shadow: 3px 3px 0 #000; }
+#library .lib-notice .lib-icon { color: #000; }
+#library .lib-renderer { border: 1px solid #000; border-radius: 0; background: #fff; color: #000; }
+#library .lib-renderer[aria-checked=true] { background: #000; color: #fff; }
+#library .lib-renderer[aria-checked=true] * { color: #fff; }
+#library .lib-grade { border: 1px solid #000; border-radius: 0; background: #fff; color: #000; }
+
+#library .lib-meter { height: 12px; border: 1px solid #000; border-radius: 0; background: #fff; }
+#library .lib-meter-fill { border-radius: 0; background: repeating-conic-gradient(#000 0 25%, #fff 0 50%) 0 0 / 2px 2px; }
+#library .lib-steps li::before { border-radius: 0; background: #000; color: #fff; }
+#library .lib-check input, #library .lib-row input[type=checkbox] { accent-color: #000; }
+#library a { color: #000; }
+#library .lib-fine { color: #000; }
+#library .lib-renderer[aria-checked=true] .lib-grade { background: #000; border-color: #fff; }

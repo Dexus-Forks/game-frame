@@ -1,0 +1,58 @@
+/* BeOS: a yellow tab that holds only the window's name, light grey faces with soft bevels, and
+   a blue desktop. A ready-made theme for the library page and the frame: "preset": "beos". */
+
+#library[data-scheme] {
+  --lib-bg: #336698; --lib-surface: #d8d8d8; --lib-surface-2: #e8e8e8; --lib-line: #989898;
+  --lib-text: #000; --lib-muted: #3c3c3c; --lib-accent: #3366bb; --lib-accent-text: #fff;
+  --lib-danger: #b00000; --lib-ok: #007000; --lib-scrim: transparent;
+  --lib-font: "Swis721 BT", "Noto Sans", Verdana, sans-serif; --lib-font-mono: "Courier10 BT", "Courier New", monospace;
+  --lib-text-s: 11px; --lib-text-m: 12px; --lib-text-l: 12px; --lib-text-xl: 13px; --lib-text-title: 12px;
+  --lib-weight-strong: 700; --lib-radius-s: 2px; --lib-radius-m: 3px; --lib-radius-l: 0; --lib-radius-pill: 3px;
+  --lib-shadow: 3px 3px 0 rgb(0 0 0 / 0.35); --lib-blur: 0; --lib-width: 560px;
+  --be-raised: inset 1px 1px #fff, inset -1px -1px #989898;
+  --be-sunken: inset 1px 1px #989898, inset -1px -1px #fff;
+  color-scheme: light;
+}
+
+/* The window: the yellow tab sits above the frame and is only as wide as the name. */
+#library .lib-card { margin-top: 22px; padding: 0 0 10px; border: 1px solid #585858; box-shadow: var(--lib-shadow), var(--be-raised); }
+#library .lib-card > :not(.lib-header) { margin-left: 10px; margin-right: 10px; }
+#library .lib-header { position: absolute; left: -1px; bottom: 100%; display: flex; align-items: center; gap: 8px;
+  margin: 0; padding: 3px 14px 3px 26px; text-align: left; border: 1px solid #585858; border-bottom: 0;
+  background: linear-gradient(#ffeb7a, #ffcb00 60%, #f0b800); box-shadow: inset 1px 1px #fff3b0; }
+#library .lib-header::before { content: ""; position: absolute; left: 7px; top: 5px; width: 11px; height: 11px;
+  border: 1px solid #806000; background: linear-gradient(135deg, #fff6c0, #e0b000); }
+#library .lib-title { font: bold 12px var(--lib-font); }
+#library .lib-tagline { display: none; }
+
+/* Tabs. */
+#library .lib-nav, #library .lib-tabs { justify-content: flex-start; gap: 2px; margin: 10px 10px 0; padding: 0; border: 0; }
+#library .lib-nav a, #library .lib-tabs button { padding: 3px 12px; border: 1px solid #989898; border-bottom: 0; border-radius: 4px 4px 0 0;
+  background: #c8c8c8; color: #000; text-decoration: none; box-shadow: inset 1px 1px #fff; }
+#library .lib-nav a[aria-current=page], #library .lib-tabs button[aria-selected=true], #library .lib-nav a:hover { background: #d8d8d8; color: #000; }
+#library .lib-section { margin-top: 0; padding: 12px; border: 1px solid #989898; box-shadow: var(--be-raised); }
+
+/* Buttons: soft bevels and a blue ring on the default one. */
+#library .lib-button, #library .lib-pad-key { min-height: 22px; padding: 3px 14px; border: 1px solid #707070; border-radius: 3px;
+  background: linear-gradient(#f4f4f4, #d8d8d8); color: #000; font: 12px var(--lib-font); box-shadow: var(--be-raised); }
+#library .lib-button:hover:not(:disabled) { background: linear-gradient(#fff, #e2e2e2); }
+#library .lib-button:active:not(:disabled), #library .lib-pad-key:active { background: linear-gradient(#bcbcbc, #d0d0d0); box-shadow: var(--be-sunken); }
+#library .lib-button--primary { box-shadow: 0 0 0 2px #d8d8d8, 0 0 0 3px #3366bb, var(--be-raised); }
+#library .lib-button:disabled { color: #989898; }
+
+/* Fields and lists. */
+#library .lib-input { border: 1px solid #989898; border-radius: 0; background: #fff; color: #000; font: 12px var(--lib-font); box-shadow: var(--be-sunken); }
+#library .lib-input:focus { outline: 1px solid #3366bb; }
+#library .lib-log, #library .lib-rows .lib-row { border: 1px solid #989898; border-radius: 0; background: #fff; box-shadow: var(--be-sunken); }
+#library .lib-notice { border: 1px solid #b09000; border-radius: 0; background: #fff3b0; }
+#library .lib-notice .lib-icon { color: #806000; }
+#library .lib-renderer { border: 1px solid #989898; border-radius: 3px; background: #e8e8e8; box-shadow: var(--be-raised); }
+#library .lib-renderer[aria-checked=true] { border-color: #3366bb; box-shadow: inset 0 0 0 1px #3366bb; background: #dce4f2; }
+#library .lib-grade { border-radius: 2px; }
+
+/* The status bar: blue in a sunken well. */
+#library .lib-meter { height: 12px; border: 1px solid #989898; border-radius: 0; background: #fff; box-shadow: var(--be-sunken); }
+#library .lib-meter-fill { border-radius: 0; background: linear-gradient(#8fb0e8, #3366bb 60%, #2a55a0); }
+#library .lib-steps li::before { background: #ffcb00; color: #000; border: 1px solid #806000; }
+#library .lib-check input, #library .lib-row input[type=checkbox] { accent-color: #3366bb; }
+#library a { color: #2a4fa0; }

@@ -71,6 +71,8 @@ These rules are for changes to GameFrame itself, which is a public repository.
 | `scripts/` | setup, new-project, update-project, ghidra-export, ghidra-run, `clients.py` (the files each coding agent needs in a project), and `lib.sh` (paths and `.env`) |
 | `tools/disc`, `tools/pe`, `tools/dos`, `tools/triage`, `tools/emu`, `tools/formats`, `tools/verify`, `tools/ghidra` | The tools |
 | `templates/project/` | What `new-project.sh` writes into a game's repository |
+| `templates/library-page/` | The plain HTML library page for browser ports, which works with `crates/library`, and its ready-made themes (`themes/`) |
+| `examples/frame-demo/` | The frame with no game, for the browser and the desktop: its own Cargo workspace, not built by the tests |
 | `examples/sample-game/` | The test target: C sources, build script, ground truth, a port, a decoder |
 | `examples/dos-sample/` | The 16-bit test target: assembly, our own NE/MZ linker, Borland-style debug symbols |
 | `tests/run.sh` | The checks |

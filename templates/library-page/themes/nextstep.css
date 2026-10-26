@@ -1,0 +1,59 @@
+/* NeXTSTEP: four greys, a black title bar with white centred text, square bevels and a dark
+   desktop. A ready-made theme for the library page and the frame: "preset": "nextstep". */
+
+#library[data-scheme] {
+  --lib-bg: #4a4a4a; --lib-surface: #aaaaaa; --lib-surface-2: #aaaaaa; --lib-line: #555;
+  --lib-text: #000; --lib-muted: #222; --lib-accent: #000; --lib-accent-text: #fff;
+  --lib-danger: #000; --lib-ok: #000; --lib-scrim: transparent;
+  --lib-font: Helvetica, "Helvetica Neue", Arial, sans-serif; --lib-font-mono: Ohlfs, Courier, monospace;
+  --lib-text-s: 11px; --lib-text-m: 12px; --lib-text-l: 12px; --lib-text-xl: 13px; --lib-text-title: 12px;
+  --lib-weight-strong: 700; --lib-radius-s: 0; --lib-radius-m: 0; --lib-radius-l: 0; --lib-radius-pill: 0;
+  --lib-shadow: none; --lib-blur: 0; --lib-width: 560px;
+  --nx-raised: inset 1px 1px #fff, inset -1px -1px #000, inset -2px -2px #555;
+  --nx-sunken: inset 1px 1px #555, inset -1px -1px #fff, inset 2px 2px #000;
+  color-scheme: light;
+}
+
+/* The window and its black title bar, with the close box on the right. */
+#library .lib-card { padding: 0 0 10px; border: 1px solid #000; box-shadow: var(--nx-raised); }
+#library .lib-card > :not(.lib-header) { margin-left: 10px; margin-right: 10px; }
+#library .lib-header { position: relative; display: block; margin: 0 0 10px; padding: 3px 26px; text-align: center;
+  background: #000; color: #fff; border-bottom: 1px solid #555; }
+#library .lib-header::after { content: "×"; position: absolute; right: 4px; top: 3px; width: 14px; height: 14px;
+  display: grid; place-items: center; font: 12px/1 var(--lib-font); color: #000; background: #aaa; box-shadow: var(--nx-raised); }
+#library .lib-title { font: bold 12px var(--lib-font); }
+#library .lib-tagline { display: none; }
+
+/* Tabs and buttons share one square bevel; the chosen tab is the light grey of a pressed key. */
+#library .lib-nav, #library .lib-tabs { justify-content: flex-start; gap: 0; margin-top: 0; margin-bottom: 0; padding: 0; border: 0; }
+#library .lib-nav a, #library .lib-tabs button { padding: 3px 12px; border: 0; border-radius: 0; background: #aaa; color: #000;
+  text-decoration: none; box-shadow: var(--nx-raised); }
+#library .lib-nav a[aria-current=page], #library .lib-tabs button[aria-selected=true] { background: #fff; color: #000; box-shadow: var(--nx-sunken); }
+#library .lib-nav a:hover { background: #aaa; color: #000; }
+#library .lib-nav .lib-icon { display: none; }
+#library .lib-section { margin-top: 0; padding: 12px; box-shadow: var(--nx-raised); }
+
+#library .lib-button, #library .lib-pad-key { min-height: 22px; padding: 3px 14px; border: 0; border-radius: 0; background: #aaa;
+  color: #000; font: 12px var(--lib-font); box-shadow: var(--nx-raised); }
+#library .lib-button:hover:not(:disabled) { background: #aaa; }
+#library .lib-button:active:not(:disabled), #library .lib-pad-key:active { background: #fff; box-shadow: var(--nx-sunken); }
+#library .lib-button--primary::after { content: " ↵"; }
+#library .lib-button:disabled { color: #555; }
+
+/* Fields are white wells; the console is a dark terminal. */
+#library .lib-input { border: 0; border-radius: 0; padding: 3px 4px; background: #fff; color: #000; font: 12px var(--lib-font); box-shadow: var(--nx-sunken); }
+#library .lib-rows .lib-row { border: 0; border-radius: 0; background: #fff; box-shadow: var(--nx-sunken); }
+#library .lib-log { border: 0; border-radius: 0; background: #000; color: #fff; box-shadow: var(--nx-sunken); }
+#library .lib-log * { color: #fff; }
+#library .lib-notice { border: 0; border-radius: 0; background: #ccc; box-shadow: var(--nx-raised); }
+#library .lib-notice .lib-icon { color: #000; }
+#library .lib-renderer { border: 0; border-radius: 0; background: #aaa; color: #000; box-shadow: var(--nx-raised); }
+#library .lib-renderer[aria-checked=true] { background: #fff; box-shadow: var(--nx-sunken); }
+#library .lib-grade { border: 1px solid #000; border-radius: 0; background: #ccc; color: #000; }
+
+#library .lib-meter { height: 12px; border: 0; border-radius: 0; background: #fff; box-shadow: var(--nx-sunken); padding: 2px; }
+#library .lib-meter-fill { height: 100%; border-radius: 0; background: #555; }
+#library .lib-steps li::before { border-radius: 0; background: #000; color: #fff; }
+#library .lib-check input, #library .lib-row input[type=checkbox] { accent-color: #000; }
+#library a { color: #000; }
+#library .lib-fine { color: #000; }

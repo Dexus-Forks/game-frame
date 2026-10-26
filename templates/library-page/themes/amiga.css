@@ -1,0 +1,59 @@
+/* Amiga Workbench 1.3: white, black and orange on blue, a striped drag bar and the Topaz font
+   when the player has it. A ready-made theme for the library page and the frame: "preset": "amiga". */
+
+#library[data-scheme] {
+  --lib-bg: #0055aa; --lib-surface: #0055aa; --lib-surface-2: #0055aa; --lib-line: #fff;
+  --lib-text: #fff; --lib-muted: #fff; --lib-accent: #ff8800; --lib-accent-text: #000;
+  --lib-danger: #ff8800; --lib-ok: #fff; --lib-scrim: transparent;
+  --lib-font: "Topaz a500", "Topaz Plus", Topaz, "Courier New", monospace; --lib-font-mono: var(--lib-font);
+  --lib-text-s: 13px; --lib-text-m: 13px; --lib-text-l: 13px; --lib-text-xl: 14px; --lib-text-title: 13px;
+  --lib-weight-strong: 400; --lib-radius-s: 0; --lib-radius-m: 0; --lib-radius-l: 0; --lib-radius-pill: 0;
+  --lib-shadow: none; --lib-blur: 0; --lib-width: 600px;
+  color-scheme: dark;
+}
+
+/* The window: a white line, and a drag bar of stripes with the name on the blue. */
+#library .lib-card { padding: 0 0 12px; border: 2px solid #fff; }
+#library .lib-card > :not(.lib-header) { margin-left: 12px; margin-right: 12px; }
+#library .lib-header { position: relative; display: flex; align-items: center; gap: 0; margin: 0 0 10px; padding: 0 30px 0 26px;
+  border-bottom: 2px solid #fff; text-align: left; height: 20px;
+  background: repeating-linear-gradient(#fff 0 2px, #0055aa 2px 4px) 0 4px / 100% 12px no-repeat, #0055aa; }
+#library .lib-header::before { content: ""; position: absolute; left: 0; top: 0; width: 22px; height: 20px;
+  border-right: 2px solid #fff; background: linear-gradient(#fff, #fff) center / 8px 8px no-repeat, #0055aa;
+  box-shadow: inset 0 0 0 7px #0055aa; }
+#library .lib-title { padding: 0 8px; background: #0055aa; color: #fff; font: 13px/20px var(--lib-font); }
+#library .lib-tagline { display: none; }
+
+/* Tabs and buttons: white boxes with black shadows; pressed ones turn orange. */
+#library .lib-nav, #library .lib-tabs { justify-content: flex-start; gap: 6px; margin-top: 0; padding: 0; border: 0; }
+#library .lib-nav a, #library .lib-tabs button, #library .lib-button, #library .lib-pad-key {
+  padding: 2px 10px; border: 2px solid #fff; border-radius: 0; background: #0055aa; color: #fff;
+  font: 13px var(--lib-font); text-decoration: none; box-shadow: 2px 2px 0 #000; }
+#library .lib-nav a[aria-current=page], #library .lib-tabs button[aria-selected=true],
+#library .lib-button:active:not(:disabled), #library .lib-pad-key:active { background: #ff8800; color: #000; }
+#library .lib-nav a:hover, #library .lib-button:hover:not(:disabled) { background: #0055aa; color: #fff; }
+#library .lib-nav .lib-icon { display: none; }
+#library .lib-button--primary { border-width: 3px; }
+#library .lib-button:disabled { color: #7fa9d4; border-color: #7fa9d4; box-shadow: none; }
+#library .lib-section { padding: 10px; border: 2px solid #fff; }
+
+/* Fields and lists. */
+#library .lib-input { border: 2px solid #fff; border-radius: 0; background: #0055aa; color: #fff; font: 13px var(--lib-font); }
+#library .lib-input:focus { outline: 2px solid #ff8800; }
+#library .lib-log, #library .lib-rows .lib-row { border: 2px solid #fff; border-radius: 0; background: #0055aa; }
+#library .lib-log-line.is-game .lib-log-from, #library .lib-log-line.is-player .lib-log-from { color: #ff8800; }
+#library .lib-notice { border: 2px solid #ff8800; border-radius: 0; background: #0055aa; }
+#library .lib-notice .lib-icon { color: #ff8800; }
+#library .lib-notice code, #library code { background: #000; color: #fff; }
+#library .lib-renderer { border: 2px solid #fff; border-radius: 0; background: #0055aa; color: #fff; }
+#library .lib-renderer[aria-checked=true] { border-color: #ff8800; box-shadow: 2px 2px 0 #000; }
+#library .lib-grade { border: 2px solid #fff; border-radius: 0; background: #000; color: #fff; }
+#library .lib-grade.is-exact { background: #fff; color: #0055aa; }
+#library .lib-grade.is-partial, #library .lib-grade.is-experimental { color: #ff8800; }
+
+#library .lib-meter { height: 12px; border: 2px solid #fff; border-radius: 0; background: #0055aa; }
+#library .lib-meter-fill { border-radius: 0; background: #ff8800; }
+#library .lib-steps li::before { border-radius: 0; background: #ff8800; color: #000; }
+#library .lib-check input, #library .lib-row input[type=checkbox] { accent-color: #ff8800; }
+#library a { color: #ff8800; }
+#library .lib-fine { color: #fff; }

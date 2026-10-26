@@ -1,0 +1,118 @@
+//! Events: everything that crosses between the frame, the game and the player.
+//!
+//! An event has a topic, `area.action` in lower case (`game.start`, `config.set`), and a JSON
+//! value of data. Topics are plain strings, so a game can add its own (`pod.ghost.load`) and the
+//! frame passes them on without knowing them. The well-known topics are in [`topics`], each
+//! with the data it carries.
+//!
+//! On the wire (to a game in another language, or to a page's script) an event is one JSON
+//! object: `{"topic": "game.start", "data": {...}, "from": "frame", "id": 7}`.
+
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+
+/// Who sent an event.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Origin {
+    /// The frame: the launcher, the library, the settings.
+    Frame,
+    /// The game, through its adapter.
+    Game,
+    /// The player's input that the frame passes on (a key, a button on the console).
+    Player,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Event {
+    pub topic: String,
+    #[serde(default, skip_serializing_if = "Value::is_null")]
+    pub data: Value,
+    #[serde(rename = "from")]
+    pub origin: Origin,
+    /// Set by the bus: one more than the event before. A reply carries the id it answers in
+    /// `data.re`.
+    #[serde(default)]
+    pub id: u64,
+}
+
+impl Event {
+    pub fn new(topic: impl Into<String>, origin: Origin, data: Value) -> Event {
+        Event { topic: topic.into(), data, origin, id: 0 }
+    }
+
+    /// Whether the topic matches a pattern: the whole topic (`game.start`), a prefix ending in
+    /// `.*` (`game.*` takes `game.start` and `game.status`), or `*` for every event.
+    pub fn matches(&self, pattern: &str) -> bool {
+        matches(&self.topic, pattern)
+    }
+
+    /// A string field of the data.
+    pub fn str(&self, key: &str) -> Option<&str> {
+        self.data.get(key).and_then(Value::as_str)
+    }
+}
+
+pub fn matches(topic: &str, pattern: &str) -> bool {
+    match pattern.strip_suffix(".*") {
+        _ if pattern == "*" => true,
+        Some(prefix) => topic.strip_prefix(prefix).is_some_and(|rest| rest.starts_with('.')),
+        None => topic == pattern,
+    }
+}
+
+/// Whether a topic is well formed: two or more lower-case words of letters, digits and `-`,
+/// joined by dots.
+pub fn valid_topic(topic: &str) -> bool {
+    let parts: Vec<&str> = topic.split('.').collect();
+    parts.len() >= 2
+        && parts.iter().all(|p| {
+            !p.is_empty() && p.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
+        })
+}
+
+/// The topics the frame knows, with their data. A game handles the ones its manifest's
+/// capabilities name and may send any of them; the frame ignores none, it shows unknown
+/// topics in the console.
+pub mod topics {
+    /// Frame to game, once, after the frame has read the manifest. Data: `{"settings": {...}}`,
+    /// the saved values of every setting.
+    pub const FRAME_READY: &str = "frame.ready";
+    /// Frame to game when the player opens the frame again over a running game, and back.
+    pub const FRAME_OPEN: &str = "frame.open";
+    pub const FRAME_CLOSE: &str = "frame.close";
+
+    /// The frame's own preference changed, such as whether it opens at start. Data:
+    /// `{"key": "frame.show-at-start", "value": false}`. Keys start with `frame.`; the game may
+    /// ignore it.
+    pub const FRAME_PREFERENCE: &str = "frame.preference";
+
+    /// Frame to game: a setting changed. Data: `{"key": "fog", "value": true}`.
+    pub const CONFIG_SET: &str = "config.set";
+    /// Game to frame: the game changed a setting itself. Same data. The frame saves it.
+    pub const CONFIG_CHANGED: &str = "config.changed";
+
+    /// Frame to game: the player chose a renderer. Data: `{"renderer": "glide"}`.
+    pub const RENDER_SELECT: &str = "render.select";
+
+    /// Frame to game: start. Data: `{"renderer": "glide", "settings": {...}, "args": [...]}`.
+    pub const GAME_START: &str = "game.start";
+    /// Frame to game: stop, as the game's own quit does.
+    pub const GAME_STOP: &str = "game.stop";
+    /// Game to frame: what the game is doing. Data: `{"state": "loading" | "running" |
+    /// "paused" | "stopped" | "failed", "detail": "..."}`.
+    pub const GAME_STATUS: &str = "game.status";
+
+    /// Frame to game: a control pressed or released on the frame's console or a test.
+    /// Data: `{"control": "start", "down": true}`. Control names are the game's, listed in its
+    /// manifest's `controls`.
+    pub const INPUT_PRESS: &str = "input.press";
+
+    /// Frame to game: the player added, removed or reordered files in a library section.
+    /// Data: `{"section": "mods"}`. The game reads the library again.
+    pub const LIBRARY_CHANGED: &str = "library.changed";
+
+    /// Either way: a line for the console. Data: `{"level": "info" | "warn" | "error",
+    /// "text": "..."}`.
+    pub const LOG: &str = "log.message";
+}

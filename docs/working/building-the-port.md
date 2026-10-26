@@ -1,11 +1,18 @@
 # Building the port
 
-A reimplementation has two halves. The core is the game: its rules, its data formats and its
-simulation, ported exactly. The platform layer is everything the original got from the
-machine and the operating system: a window, drawing, sound, input, time, files. The core must
-match the original bit for bit. The platform layer must behave the same as the original where
-the player can see it, and can otherwise be built in any good modern way. This page covers that
-split, each part of the platform layer, browser builds, and the player's data.
+A port has three layers. The core is the game: its rules, its data formats and its simulation,
+ported exactly. The platform layer is everything the original got from the machine and the
+operating system: a window, drawing, sound, input, time, files. The frame is what the player
+sees around the game: a launcher, the library of game files and saves, the settings, a choice
+of renderer, help pages and a console.
+
+The core must match the original bit for bit. The platform layer must behave the same as the
+original where the player can see it, and can otherwise be built in any good modern way. The
+original had no frame. GameFrame provides it, so every port gets the same one, and the core
+talks to it only through a versioned contract of events.
+
+This page covers the split, each part of the platform layer, the player's data, the frame,
+browser builds and writers for the original's formats.
 [re-port](../../skills/re-port/SKILL.md) covers porting the core, and [What a project
 can ship](../OUTPUTS.md) the releases.
 
@@ -23,6 +30,8 @@ can ship](../OUTPUTS.md) the releases.
   harness are three platform layers around one core.
 - **Additions sit outside the core.** New features talk to the core through a few documented
   entry points, so the core stays a faithful copy ([re-port](../../skills/re-port/SKILL.md)).
+  The frame is one such addition. It reaches the core only through events
+  ([The frame](#the-frame)).
 
 ## The parts of the platform layer
 
@@ -50,6 +59,98 @@ A reimplementation ships no game data. It reads the player's own copy:
 - **Never commit it.** Tests that need game data skip when it is missing. The repository's
   ignore file covers every folder that can hold it ([Legal](../LEGAL.md)).
 
+## The frame
+
+The frame is GameFrame's program around a port. It is the same for every game. The game names
+the features it handles, and the frame shows only those. Its pieces are in GameFrame's
+`crates/` and `templates/`:
+
+| Piece | What it is |
+|---|---|
+| [gameframe-frame](../../crates/frame/README.md) | The contract: events and their topics, the manifest, the session both sides share, and the adapters for games outside Rust. It has no user interface and builds for the browser |
+| [gameframe-frame-ui](../../crates/frame-ui/README.md) | The frame's views as Dioxus components, for the browser and the desktop |
+| [gameframe-library](../../crates/library/README.md) | The player's library: game data, saves and the sections a game opts into |
+| [The library page](../../templates/library-page/README.md) | A plain HTML page for browser ports: the library, design tokens, panels and Markdown pages, set up from one `library.json` |
+
+### What the player sees
+
+| Part | What it does |
+|---|---|
+| Launcher | Opens on the first run. A "show at start" setting keeps it or skips it later. `--frame` on the command line opens it again |
+| Play | The renderers with their grades, start and stop, and what the game reports it is doing |
+| Library | The game data, the saves, and the sections the game opts into: mods, screenshots, recordings or its own |
+| Settings | One control for each setting in the game's manifest: a toggle, a choice, a range or text, in groups. A setting can say it needs a restart |
+| Renderers | For a game with several 3D-card builds, such as Glide, PowerVR and software, one entry for each. Each carries a grade (exact, good, partial, experimental or missing), how much of its API is done, and its known gaps |
+| Help pages | Markdown pages listed in `library.json`. The HTML library page also has panels for news, a changelog, messages, a video and GitHub releases |
+| Console | Every event between the frame and the game, the game's controls as buttons, and a line to send any event |
+
+*Exact* is checked against the original, frame for frame. *Good* draws
+everything the game uses, with some details different. *Partial* draws most of the game, with
+the gaps listed. *Experimental* draws something. *Missing* is listed so the player knows it is
+planned.
+
+### The contract
+
+The core and the frame exchange events and nothing else. An event has a topic, a JSON value of
+data, and the side that sent it. A topic is two or more lower-case words joined by dots, such
+as `game.start`.
+
+| Topic | Direction | Data |
+|---|---|---|
+| `frame.ready` | frame to game | The saved value of every setting |
+| `config.set`, `config.changed` | frame to game, game to frame | A setting's key and its new value |
+| `render.select` | frame to game | The renderer the player chose |
+| `game.start`, `game.stop` | frame to game | The renderer, the settings and the arguments |
+| `game.status` | game to frame | `loading`, `running`, `paused`, `stopped` or `failed`, with a detail line |
+| `input.press` | frame to game | One of the game's controls, pressed or released |
+| `library.changed` | frame to game | The library section the player changed |
+| `log.message` | either way | A line for the console |
+
+The game describes itself once, in a manifest. The manifest gives the contract version, the
+game's name and version, its capabilities, its renderers, its settings and its controls. The
+known capabilities are `start`, `renderers`, `settings`, `input` and `library`. The frame draws
+a feature only when the manifest lists its capability. A game can list capabilities of its own
+and send topics of its own, such as `mygame.ghost.load`. The frame passes those on and shows
+them in the console. The contract is version `1.0`. The frame refuses a manifest written for a
+later major version.
+
+### Three ways to join
+
+| Way | For | What the game provides |
+|---|---|---|
+| Rust | A port written in Rust | A type that implements the `Game` trait: `manifest`, `on_event` and `poll` |
+| JSON lines | A port in any other language | A program that prints its manifest as its first line. It then reads events on standard input and writes events on standard output, one JSON object per line. Its standard error goes to the console |
+| Config only | A game the frame starts as a separate program | A `frame.json` with the manifest and the start command. The frame fills `{renderer}` and `{setting:KEY}` in the command's arguments |
+
+`Demo` in gameframe-frame stands in for a game, so the frame runs with none.
+
+### The frame's look
+
+The frame takes its look from the library page's design tokens. One `library.json` sets the
+colours, fonts, pictures and icons of the HTML page and of the Dioxus views. Every class starts
+with `lib-`. The [library page's README](../../templates/library-page/README.md#the-design-system)
+lists the tokens and the components.
+
+### Libraries below the contract
+
+Reusable libraries plug into the core. The frame never sees them. The
+[crates](../crates/README.md) give the core a chip or a runtime exactly as the original had it:
+OPL2 music, MSVC's maths, Turbo Pascal's `Real`. `gameframe-game-source` and
+`gameframe-disc-image` read the player's files from a folder or a CD image. The
+[replacement 3D-card libraries](../hardware/wrappers.md) run the original's own per-card builds
+on a modern machine.
+
+### Planned
+
+- A launcher program that opens a `frame.json` game with no Rust code of its own. Today
+  [the frame demo](../../examples/frame-demo/README.md) opens the views in a browser or a desktop
+  window, with the demo game.
+- The project viewer (`re-browse`) as a tab of the frame.
+
+When a game needs something the frame lacks, such as a kind of setting, a topic or a panel, add
+it to GameFrame with a pull request and a test, or open an issue. Keep the game's own part in
+the game's repository.
+
 ## Browser builds
 
 ![The player's files go to the browser's storage and never to a server](../assets/diagrams/browser-files.svg)
@@ -59,7 +160,13 @@ player's files. Points to plan for:
 
 - **Files.** The page asks for the game's folder or files (a file picker, a dropped folder, or
   the File System Access API where the browser has it), and keeps them in the browser's own
-  storage (IndexedDB or the origin private file system). Nothing is uploaded.
+  storage (IndexedDB or the origin private file system). Nothing is uploaded. GameFrame's
+  [library page](../../templates/library-page/README.md) does this with no edits to its code. It
+  is a plain HTML page set up from one `library.json` with the game data, the saves, opt-in mods
+  and other sections, design tokens, news panels and help pages. The
+  [gameframe-library](../../crates/library/README.md) crate reads the same files from the game,
+  in the browser and on the desktop. A disc image read in place goes through
+  [gameframe-game-source](../../crates/game-source/README.md).
 - **The main loop.** The browser calls the page once per display frame (`requestAnimationFrame`).
   The port cannot block or wait, so loading and long jobs must be split into steps or moved to
   a worker.

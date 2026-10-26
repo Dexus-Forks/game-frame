@@ -21,6 +21,11 @@ original and what remains open. Its tests use no game's files. All crates are Ap
 | [gameframe-scale](../../crates/scale/README.md) | Whole-multiple scaling of a finished frame: nearest, Scale2x (EPX) and a CRT-style look, for any pixel type | POD: Planet of Death (1997), whose replacement Glide and DirectDraw libraries show the game's frame scaled this way |
 | [gameframe-turbo-pascal](../../crates/turbo-pascal/README.md) | Turbo Pascal's 6-byte `Real` with its exact arithmetic, `Random`, and Pascal data layouts | Tyrian 2026, matching the original runtime on 40,000 operands per routine |
 | [gameframe-indeo](../../crates/indeo/README.md) | An Intel Indeo Video Interactive 4.1 (`IV41`) decoder, clean room, with Intel's tables read from the player's own `IR41_32.DLL` | POD: Planet of Death (1997), whose 13,663 video pictures it decodes byte for byte as Intel's codec does under the emulator |
+| [gameframe-disc-image](../../crates/disc-image/README.md) | Reads CD images in place: CUE sheets, raw BIN (Mode 1, Mode 2 Form 1), cooked ISO, ISO 9660 with Joliet names, any range of a file | POD: Planet of Death (1997), whose port runs from the player's own disc image natively and in the browser; tests build their own images |
+| [gameframe-game-source](../../crates/game-source/README.md) | One `Source` trait over a folder, a CD image, layers of patches and a URL: downloaded with resume and an MD5 check, or read in 1 MiB ranges in the browser and kept in OPFS or IndexedDB | POD: Planet of Death (1997); tests run a local HTTP server |
+| [gameframe-library](../../crates/library/README.md) | The player's library: game data, saves and opt-in sections declared in one `library.json`, kept in folders or encrypted in IndexedDB, shared with the [library page](../../templates/library-page/README.md) | Un-Banished's browser start page and save store, POD's sources and Hardwar's file and save crates; the browser store was checked against the page by hand |
+| [gameframe-frame](../../crates/frame/README.md) | The contract between a port's core and the frame: event topics, a manifest of capabilities, renderers with grades, settings and controls, a session, and adapters for games in other languages (JSON lines) or set up from `frame.json` | Written for Un-Banished, POD and Hardwar; tested against the demo game and a shell-script game |
+| [gameframe-frame-ui](../../crates/frame-ui/README.md) | The frame's views as Dioxus components for the browser and the desktop, styled by the library page's tokens and eleven ready-made themes | Checked by hand in [the frame demo](../../examples/frame-demo/README.md), in a browser and on a macOS desktop |
 
 ## Ask your agent
 
@@ -67,7 +72,9 @@ If they match, use the crate. If they differ, trace your game's version and port
 
 ## Rules for adding a crate
 
-- It comes from a reimplementation where it was checked against the original program. Its README says how it was checked.
+- It comes from a reimplementation where it was checked against the original program, or, for
+  a platform piece such as the library, from a port where it was used. Its README says how it
+  was checked.
 - It is generic: no game's names, formats or rules in its code.
 - Its tests run without any game's files. Tests that need a tool (such as FFmpeg) skip when the
   tool is missing.

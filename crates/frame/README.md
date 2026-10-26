@@ -1,0 +1,132 @@
+# gameframe-frame
+
+The contract between a port's core and the frame around it. The core is the exact
+reimplementation of the game. The frame is everything the player sees before and around it: the
+launcher, the settings, the renderer choice, the library of game files and saves, help pages
+and an event console. This crate has no UI. It defines the events, the manifest and the session
+that connects the two. [gameframe-frame-ui](../frame-ui/README.md) draws the frame, and
+[examples/frame-demo](../../examples/frame-demo/README.md) runs it with no game.
+
+```rust
+use gameframe_frame::{Demo, Session, Settings};
+
+let mut session = Session::new(Box::new(Demo::default()), Settings::new())?;
+session.on("game.*", |e| println!("{} {}", e.topic, e.data));
+session.ready();
+session.select_renderer("glide")?;
+session.set("video.fog", serde_json::json!(false))?;
+session.start(Vec::new());
+loop { session.tick(); /* every 50 ms */ }
+```
+
+## Events
+
+Every message is an `Event`: a `topic`, JSON `data`, who sent it (`from`: `frame`, `game` or
+`player`) and a sequential `id`. On the wire it is one JSON object:
+
+```json
+{"topic": "config.set", "data": {"key": "video.fog", "value": false}, "from": "frame", "id": 7}
+```
+
+A topic is two or more lower-case words joined by dots, `area.action`. A listener's pattern is
+an exact topic, a prefix such as `game.*`, or `*` for every event. The frame shows every event in
+its console, including topics it does not know, so a game can add its own (`demo.press`,
+`pod.track.loaded`) without a change here.
+
+| Topic | Direction | Data |
+|---|---|---|
+| `frame.ready` | frame to game | `{"renderer", "settings"}`, once, after the manifest is read |
+| `frame.open`, `frame.close` | either way | the frame opened over a running game, or closed |
+| `frame.preference` | frame | `{"key": "frame.show-at-start", "value": false}` |
+| `config.set` | frame to game | `{"key", "value"}`: the player changed a setting |
+| `config.changed` | game to frame | `{"key", "value"}`: the game changed one; the frame saves it |
+| `render.select` | frame to game | `{"renderer": "glide"}` |
+| `game.start` | frame to game | `{"renderer", "settings", "args"}` |
+| `game.stop` | frame to game | none: stop, as the game's own quit does |
+| `game.status` | game to frame | `{"state": "loading" or "running" or "paused" or "stopped" or "failed", "detail"}` |
+| `input.press` | player to game | `{"control", "down"}`, with the control names from the manifest |
+| `library.changed` | frame to game | `{"section"}`: read that library section again |
+| `log.message` | either way | `{"level": "info" or "warn" or "error", "text"}` |
+
+The constants are in `gameframe_frame::topics`.
+
+## The manifest
+
+The game describes itself once, when the frame starts. The frame draws only what the manifest
+names, so a game opts into each feature by listing it.
+
+```json
+{
+  "contract": "1.0",
+  "name": "Example Port",
+  "version": "0.3.0",
+  "capabilities": ["start", "renderers", "settings", "input", "library"],
+  "renderers": [
+    {"id": "software", "label": "Software", "grade": "exact", "default": true},
+    {"id": "glide", "label": "3dfx Glide", "grade": "partial", "done": 131, "total": 156,
+     "notes": ["Fog is drawn without the card's table."]}
+  ],
+  "settings": [
+    {"key": "video.scale", "label": "Scaling", "group": "Video", "type": "choice",
+     "options": [{"value": "nearest", "label": "Sharp pixels"}], "default": "nearest"},
+    {"key": "sound.volume", "label": "Volume", "type": "range", "min": 0, "max": 100, "step": 5, "default": 80}
+  ],
+  "controls": [{"name": "fire", "label": "Fire", "key": "Space"}]
+}
+```
+
+- **Capabilities.** `start`, `renderers`, `settings`, `input` and `library`
+  (`gameframe_frame::capabilities`). A frame hides what a game does not list.
+- **Grades.** Each renderer has a grade, `exact`, `good`, `partial`, `experimental` or
+  `missing`, and may give `done` of `total` (calls, features, tests: the game says which) and
+  notes. The player sees how complete each renderer is before choosing it.
+- **Settings.** `toggle`, `choice` (with `options`), `range` (`min`, `max`, `step`) and `text`.
+  `group` puts settings under a heading. `restart: true` says the change waits for the next
+  start. The frame refuses a value of the wrong kind.
+- **Versions.** `CONTRACT` is `1.0`. The frame refuses a larger major number. A minor version
+  only adds fields, and a frame ignores fields it does not know.
+
+## Three ways to join
+
+**Rust.** Implement `Game`: `manifest()`, `on_event(&Event, &mut Outbox)` and, if the game sends
+events no one asked for, `poll(&mut Outbox)`. `Outbox` has `send`, `status` and `log`.
+
+**Any language.** `Process::spawn(program, args)` starts a program that speaks JSON lines. Its
+first line on standard output is its manifest. Then the frame writes each event to its standard
+input and reads its events from standard output, one object per line. Standard error goes to the
+console as log lines. A standard library is enough to write such a program.
+
+**Config only.** `Configured::from_json` reads a `frame.json` with a manifest and the command that
+starts the game:
+
+```json
+{
+  "manifest": { "contract": "1.0", "name": "Example", "capabilities": ["start", "renderers", "settings"], "...": "..." },
+  "start": { "command": "./example", "args": ["--renderer", "{renderer}", "--scale", "{setting:video.scale}"] }
+}
+```
+
+On `game.start` it runs the command with `{renderer}` and `{setting:KEY}` filled in. It reports
+`running`, then `stopped` when the program ends.
+
+## Settings and the first run
+
+`Settings` holds the saved values: the game's, keyed as its manifest says, and the frame's own,
+whose keys start with `frame.` (`frame.renderer`, `frame.show-at-start`, `frame.preset`). It saves to one JSON
+object (`settings_file::load` and `save` on the desktop). `show_at_start(args)` decides whether
+the frame opens: `--frame` or `--launcher` always opens it, `--no-frame` never does, and otherwise
+it opens until the player turns "Open this window when the game starts" off.
+
+## The demo game
+
+`Demo` is the frame's stand-in when there is no port. It lists every capability, three
+renderers with different grades, four settings and six controls. It answers each event with a
+console line, takes 30 ticks to "load", and presses its own controls every
+`DEMO_PRESS_TICKS` ticks as `demo.press` events, so the console shows traffic with no one at the
+keys.
+
+## What it does not do
+
+It draws nothing, runs no game loop and reads no game files. The game owns its loop and its
+window, and the frame only sends and receives events. The library of files is
+[gameframe-library](../library/README.md).

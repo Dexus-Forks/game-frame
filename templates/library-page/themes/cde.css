@@ -1,0 +1,64 @@
+/* CDE, the Common Desktop Environment of Sun Solaris, HP-UX and AIX: lavender-grey panels, thick
+   Motif bevels, a maroon title bar and slate-blue selections.
+   A ready-made theme for the library page and the frame: "preset": "cde". */
+
+#library[data-scheme] {
+  --lib-bg: #5e6f8f; --lib-surface: #aeb2c3; --lib-surface-2: #aeb2c3; --lib-line: #5d6069;
+  --lib-text: #000; --lib-muted: #1d1d2a; --lib-accent: #6f7a9e; --lib-accent-text: #fff;
+  --lib-danger: #8b0000; --lib-ok: #005a00; --lib-scrim: transparent;
+  --lib-font: "Adobe Helvetica", Helvetica, Arial, sans-serif; --lib-font-mono: "Lucida Typewriter", Courier, monospace;
+  --lib-text-s: 11px; --lib-text-m: 12px; --lib-text-l: 12px; --lib-text-xl: 13px; --lib-text-title: 12px;
+  --lib-weight-strong: 700; --lib-radius-s: 0; --lib-radius-m: 0; --lib-radius-l: 0; --lib-radius-pill: 0;
+  --lib-shadow: none; --lib-blur: 0; --lib-width: 560px;
+  --cde-raised: inset 2px 2px #dbdee6, inset -2px -2px #5d6069;
+  --cde-sunken: inset 2px 2px #5d6069, inset -2px -2px #dbdee6;
+  color-scheme: light;
+}
+
+/* The window: a thick frame, a title bar with the menu box and the two boxes on the right. */
+#library .lib-card { padding: 4px 4px 12px; border: 1px solid #000; box-shadow: var(--cde-raised); }
+#library .lib-card > :not(.lib-header) { margin-left: 8px; margin-right: 8px; }
+#library .lib-header { position: relative; display: block; margin: 0 0 10px; padding: 3px 60px 3px 26px; text-align: center;
+  background: #b24d7a; color: #fff; box-shadow: var(--cde-raised); }
+#library .lib-header::before, #library .lib-header::after { content: ""; position: absolute; top: 3px; height: 14px;
+  box-shadow: inset 1px 1px #e7a6c4, inset -1px -1px #5a1a37; }
+#library .lib-header::before { left: 3px; width: 18px; background: linear-gradient(#fff, #fff) center / 10px 3px no-repeat, #b24d7a; }
+#library .lib-header::after { right: 3px; width: 40px;
+  background: linear-gradient(#fff, #fff) 4px center / 4px 4px no-repeat, linear-gradient(#5a1a37, #5a1a37) 20px center / 1px 14px no-repeat,
+              linear-gradient(transparent, transparent) , #b24d7a; }
+#library .lib-title { font: bold 12px var(--lib-font); }
+#library .lib-tagline { display: none; }
+
+/* Tabs. */
+#library .lib-nav, #library .lib-tabs { justify-content: flex-start; gap: 0; margin-top: 0; margin-bottom: 0; padding: 0; border: 0; }
+#library .lib-nav a, #library .lib-tabs button { padding: 4px 12px; border: 0; border-radius: 0; background: #aeb2c3; color: #000;
+  text-decoration: none; box-shadow: var(--cde-raised); }
+#library .lib-nav a[aria-current=page], #library .lib-tabs button[aria-selected=true] { background: #6f7a9e; color: #fff; box-shadow: var(--cde-sunken); }
+#library .lib-nav a:hover { background: #bfc3d2; color: #000; }
+#library .lib-nav .lib-icon { display: none; }
+#library .lib-section { margin-top: 0; padding: 12px; box-shadow: var(--cde-raised); }
+
+/* Motif buttons: two-pixel bevels; the default one has a sunken ring. */
+#library .lib-button, #library .lib-pad-key { min-height: 24px; padding: 4px 14px; border: 0; border-radius: 0; background: #aeb2c3;
+  color: #000; font: 12px var(--lib-font); box-shadow: var(--cde-raised); }
+#library .lib-button:hover:not(:disabled) { background: #aeb2c3; }
+#library .lib-button:active:not(:disabled), #library .lib-pad-key:active { background: #969bb0; box-shadow: var(--cde-sunken); }
+#library .lib-button--primary { outline: 2px solid #5d6069; outline-offset: 2px; }
+#library .lib-button:disabled { color: #6a6d78; }
+
+/* Fields and lists: sunken wells in a lighter grey. */
+#library .lib-input { border: 0; border-radius: 0; padding: 4px; background: #c8cbd8; color: #000; font: 12px var(--lib-font); box-shadow: var(--cde-sunken); }
+#library .lib-input:focus { outline: 1px solid #000; }
+#library .lib-log, #library .lib-rows .lib-row { border: 0; border-radius: 0; background: #c8cbd8; box-shadow: var(--cde-sunken); }
+#library .lib-notice { border: 0; border-radius: 0; background: #c8cbd8; box-shadow: var(--cde-raised); }
+#library .lib-notice .lib-icon { color: #8b0000; }
+#library .lib-renderer { border: 0; border-radius: 0; background: #aeb2c3; color: #000; box-shadow: var(--cde-raised); }
+#library .lib-renderer[aria-checked=true] { background: #969bb0; box-shadow: var(--cde-sunken); }
+#library .lib-grade { border: 0; border-radius: 0; background: #c8cbd8; color: #000; box-shadow: var(--cde-sunken); }
+
+#library .lib-meter { height: 14px; border: 0; border-radius: 0; background: #c8cbd8; box-shadow: var(--cde-sunken); padding: 2px; }
+#library .lib-meter-fill { height: 100%; border-radius: 0; background: #6f7a9e; }
+#library .lib-steps li::before { border-radius: 0; background: #6f7a9e; color: #fff; box-shadow: var(--cde-raised); }
+#library .lib-check input, #library .lib-row input[type=checkbox] { accent-color: #6f7a9e; }
+#library a { color: #1d2a6e; }
+#library .lib-fine { color: #000; }

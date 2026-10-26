@@ -10,7 +10,8 @@ import { defineConfig } from 'vitepress'
 const diaryDir = join(__dirname, '..', 'diary')
 const repo = "REPO_URL"
 
-// Newest first, from the file names (YYYY-MM-DD-slug.md) and each entry's title.
+// Newest first, from the file names (YYYY-MM-DD-slug.md, or YYYY-MM-DD-HHMM-slug.md for a live
+// entry) and each entry's title.
 function diaryEntries() {
   return readdirSync(diaryDir)
     .filter((f) => /^\d{4}-\d{2}-\d{2}-.+\.md$/.test(f))
@@ -19,7 +20,10 @@ function diaryEntries() {
     .map((f) => {
       const text = readFileSync(join(diaryDir, f), 'utf8')
       const title = /^title:\s*(.+)$/m.exec(text)?.[1].replace(/^["']|["']$/g, '') ?? f
-      return { text: `${f.slice(0, 10)} · ${title}`, link: `/diary/${f.replace(/\.md$/, '')}` }
+      // A live entry (YYYY-MM-DD-HHMM-slug) shows its time; a day post shows its date.
+      const live = /^\d{4}-\d{2}-\d{2}-([01]\d|2[0-3])([0-5]\d)-/.exec(f)
+      const when = live ? `${f.slice(0, 10)} ${live[1]}:${live[2]}` : f.slice(0, 10)
+      return { text: `${when} · ${title}`, link: `/diary/${f.replace(/\.md$/, '')}` }
     })
 }
 

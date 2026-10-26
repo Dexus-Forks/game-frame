@@ -1139,6 +1139,14 @@ out="$(python3 tools/site/check.py "$S" 2>&1)"
   && ok "check.py finds commit logs, missing summaries, game files, missing includes and decompiled code in an included document" || bad "check.py problems" "$out"
 rm "$S/diary/2026-10-24-work.md" "$S/diary/2026-10-25-x.md" "$S/public.exe" "$S/missing.md"
 git -C "$sp" checkout -q docs/FINDINGS.md
+printf -- '---\ntitle: Fog\nsummary: Fog.\n---\n\nFog tables.\n' > "$S/diary/2026-10-25-0910-fog.md"
+printf -- '---\ntitle: Shadows\nsummary: Shadows.\n---\n\nShadow volumes.\n' > "$S/diary/2026-10-25-1430-shadows.md"
+printf -- '---\ntitle: Today\nsummary: Today.\n---\n\nStill going.\n' > "$S/diary/2026-10-26-0900-today.md"
+out="$(python3 tools/site/check.py "$S" --today 2026-10-26 2>&1)"; days="$(python3 tools/site/check.py "$S" --today 2026-10-26 --days 2>&1)"
+keep="$(python3 tools/site/check.py "$S" --today 2026-10-26 --keep-live 2>&1)"
+[[ "$out" == *"2 live entries from 2026-10-25: consolidate"* && "$out" == *"1 errors, 0 warnings"* && "$days" == "2026-10-25: 2 live entries"* && "$keep" == *"0 errors, 0 warnings"* ]] \
+  && ok "check.py asks for each past day's live entries to become one post, lists those days, and lets today's stay short" || bad "check.py live entries" "$out $days $keep"
+rm "$S/diary/2026-10-25-0910-fog.md" "$S/diary/2026-10-25-1430-shadows.md" "$S/diary/2026-10-26-0900-today.md"
 if [[ -x site/node_modules/.bin/vitepress ]]; then
   ln -s "$PWD/site/node_modules" "$S/node_modules"
   out="$(cd "$S" && ./node_modules/.bin/vitepress build 2>&1)"
@@ -1449,12 +1457,17 @@ if command -v claude >/dev/null; then
   # plugin.json carries the release's version: Claude Code updates the plugin when it changes.
   # The one warning allowed: this repository is both the plugin and GameFrame's own working copy,
   # whose CLAUDE.md is for developing GameFrame, never plugin context. Count the validator's own
-  # "Found N warning" lines: its output also has informational lines that start with ❯.
+  # "Found N warning" lines: its output also has informational lines that start with ❯. Its
+  # "plugin directory" warnings read the folder on disk, where an ignored .DS_Store may sit, and
+  # do not change the result; the next check covers what git would submit.
   out="$(claude plugin validate . 2>&1)"
-  warnings="$(echo "$out" | sed -n 's/.*Found \([0-9][0-9]*\) .*warning.*/\1/p' | awk '{s += $1} END {print s + 0}')"
+  warnings="$(echo "$out" | sed -n 's/.*Found \([0-9][0-9]*\) warnings*:.*/\1/p' | awk '{s += $1} END {print s + 0}')"
   claude_md="$(echo "$out" | grep -c 'CLAUDE.md at the plugin root' || true)"
   [[ "$out" == *"Validation passed"* && $((warnings - claude_md)) == 0 ]] \
     && ok "claude plugin validate passes; the only warning allowed is GameFrame's own CLAUDE.md ($warnings)" || bad "claude plugin validate" "$out"
+  tracked="$(git ls-files | grep -iE '(^|/)(\.DS_Store|Thumbs\.db|desktop\.ini)$|(^|/)__MACOSX/' || true)"
+  [[ -z "$tracked" ]] && ok "git tracks no macOS or Windows system file, so the plugin directory can list the plugin" \
+    || bad "system files in git" "$tracked"
 else
   echo "  skip  claude plugin validate (no claude command)"
 fi
@@ -1684,6 +1697,24 @@ if command -v cargo >/dev/null; then
 else
   echo "  skip  the crates (cargo is not installed)"
 fi
+
+echo "Library page"
+if command -v node >/dev/null; then
+  out="$(for f in templates/library-page/*.js; do node --check "$f" 2>&1 || echo "FAIL $f"; done; python3 -c "import json; json.load(open('templates/library-page/library.json')); json.load(open('examples/frame-demo/library.json'))" 2>&1)"
+  [[ -z "$out" ]] && ok "the library page's scripts parse and its library.json reads (the crates' tests check it against the spec)" \
+    || bad "library page" "$out"
+else
+  echo "  skip  the library page's scripts (node is not installed)"
+fi
+# Every theme file is built into the frame, and the frame builds in no theme that is missing.
+out=""
+for f in templates/library-page/themes/*.css; do
+  n="$(basename "$f" .css)"
+  grep -q "(\"$n\", \"[^\"]*\", include_str!(\"../../../templates/library-page/themes/$n.css\"))" crates/frame-ui/src/themes.rs || out+="$n is not in frame-ui's THEMES; "
+  grep -q "\`$n\`" templates/library-page/README.md || out+="$n is not in the page's README; "
+done
+[[ -z "$out" ]] && ok "the ready-made themes ($(ls templates/library-page/themes/*.css | wc -l | tr -d ' ')) are built into the frame and listed in the README" \
+  || bad "themes" "$out"
 
 echo "Wrappers"
 if command -v cargo >/dev/null; then

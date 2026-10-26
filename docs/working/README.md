@@ -25,8 +25,9 @@ work that spans several steps and several sessions.
   example, and the lore step of the method.
 - [A resource viewer from the first day](viewer.md): the catalogue of every file, then the
   project's own viewer on the port's readers, so people and agents can check decoded content.
-- [Building the port](building-the-port.md): the core and the platform layer, time, input,
-  drawing, sound, the player's data, browser builds and round trips of the original's formats.
+- [Building the port](building-the-port.md): the core, the platform layer and the frame;
+  time, input, drawing, sound, the player's data, the event contract between the core and the
+  frame, browser builds and round trips of the original's formats.
 - [Replacing the original one routine at a time](hybrid-port.md): running the original inside
   the port, the port contract, instruction counts, declining, shadow verification.
 - [Practising on games with source](practice.md): practice targets, a ladder of exercises,

@@ -31,3 +31,8 @@ desktop.ini
 site/.vitepress/*.timestamp-*.mjs
 # Tool output in a checkout (projects keep theirs in their own derived/)
 /derived/
+# The frame demo build (examples/frame-demo/README.md)
+/examples/frame-demo/target/
+/examples/frame-demo/dist/
+/examples/frame-demo/Cargo.lock
+/examples/frame-demo/frame-demo-data/

@@ -1,0 +1,31 @@
+[package]
+name = "gameframe-game-source"
+description = "Where a game's files come from: a folder, a CD image, a URL the user gives (downloaded with resume and an MD5 check, or fetched in ranges in the browser)"
+version.workspace = true
+edition = "2024"
+license.workspace = true
+repository.workspace = true
+rust-version = "1.85"
+keywords = ["game", "cd", "download", "opfs", "wasm"]
+categories = ["filesystem", "wasm"]
+
+[lib]
+name = "game_source"
+
+[dependencies]
+disc-image = { package = "gameframe-disc-image", path = "../disc-image" }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+ureq = "3.4"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+js-sys = "0.3"
+web-sys = { version = "0.3", features = [
+    "Window", "Navigator", "Headers", "Request", "RequestInit", "Response", "Blob", "File",
+    "StorageManager", "FileSystemDirectoryHandle", "FileSystemFileHandle", "FileSystemGetFileOptions",
+    "FileSystemWritableFileStream", "FileSystemGetDirectoryOptions", "Event", "console",
+    "IdbFactory", "IdbDatabase", "IdbOpenDbRequest", "IdbRequest", "IdbTransaction", "IdbTransactionMode",
+    "IdbObjectStore", "IdbVersionChangeEvent",
+] }

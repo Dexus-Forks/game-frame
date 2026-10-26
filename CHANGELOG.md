@@ -9,10 +9,42 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `crates/library` (`gameframe-library`) keeps a port's game data, saves and opt-in sections
+  (mods, screenshots, recordings, custom). The game declares them in one `library.json`, with
+  hooks for save cards and file checks. It has folder, memory and browser stores. In the browser,
+  files are encrypted with a non-extractable WebCrypto key.
+- `templates/library-page/` is a plain HTML page for browser ports that works with the crate.
+  It has a design system of `--lib-*` tokens, replaceable icons and named components. Panels
+  show Markdown, a changelog, messages, a click-to-load YouTube video and GitHub releases, and
+  ports can add their own. Markdown help pages sit at hash routes, with `::: tip` boxes and
+  `::: panel` slots.
+- `crates/frame` (`gameframe-frame`) is the contract between a port's core and the frame
+  around it. It has event topics, a manifest of capabilities, renderers with coverage grades,
+  settings and controls, and a session with listeners. A game joins in Rust, in any language
+  over JSON lines, or with a `frame.json` alone. A demo game stands in when there is no port and
+  presses its own controls. A minor contract version only adds fields, and older frames ignore
+  them.
+- `crates/frame-ui` (`gameframe-frame-ui`) draws the frame as Dioxus components for the browser
+  and the desktop. Its tabs are Play, Settings, Library, help pages and Console, styled by the
+  library page's tokens. `examples/frame-demo` runs it with no game, in both targets.
+- Eleven ready-made themes in `templates/library-page/themes/`: Windows 98, XP and Vista,
+  System 7, Aqua, BeOS, NeXTSTEP, CDE, GNOME 2, Amiga Workbench and Atari ST GEM. `"preset"` in `library.json` picks one for the HTML page and the frame. `"presets"`
+  lets the player choose between them in the frame's Settings tab, saved as `frame.preset`.
+- `crates/disc-image` and `crates/game-source` move from POD into GameFrame. They read CD images
+  in place, and give a game's files from a folder, a disc image or a URL, in ranges in the
+  browser.
+
 - `tools/llm/decision.py` routes bounded choice, yes-or-no and score questions to a user-selected
   decision model through its native System One endpoint. `decision_feedback.py` stores explicit
   user corrections locally and exports training examples. Neither tool selects a paid service,
   changes model weights or uploads data.
+
+- The site diary is now written live and then put together by day. During the day, each
+  milestone gets a live entry named `YYYY-MM-DD-HHMM-slug.md`, which the diary shows with its
+  time. On the next run, `re-site` and `re-publisher` turn each past day's live entries into
+  one post in the style of update notes: what is new, a little detail, and a short change list.
+  The post drops the repeats. `tools/site/check.py` fails while a past day still has live
+  entries. `--days` lists those days, and `--keep-live` turns the check off.
 
 ### Changed
 
