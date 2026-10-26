@@ -11,5 +11,4 @@ crate-type = ["cdylib"]
 [dependencies]
 rage = { package = "gameframe-rage", path = "../../crates/rage" }
 pixels = { path = "../pixels" }
-raster = { path = "../raster" }
 shim = { path = "../shim" }

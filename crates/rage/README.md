@@ -8,8 +8,13 @@ Texel decoding is `gameframe-texel`'s.
 Source: ATI Technologies, *3D RAGE Windows 95 Programmer's Guide*, SDK-C02700 rev. 1.30, 1997:
 `C3D_ERSID` (p. 5-34), `C3D_EPIXFMT` (p. 5-31), `C3D_ETEXFMT` (p. 5-39).
 
-Not here yet: the chip's pixel pipeline (GameFrame's `wrappers/raster` draws for the
-ATI3DCIF stand-in), YUV 4:2:2 textures and ATI's VQ compression.
+`draw` is the chip's drawing as ATI3DCIF drives it: a `Context` holding the render state,
+`C3D_VTCF` vertices, and `render_prim_list` drawing triangles or quads (solid, flat or
+smooth shaded, alpha blended) into a 16-bit surface through `gameframe-raster`. The
+`wrappers/ati3dcif` DLL and Un-POD's ATI renderer both draw with it.
+
+Not here yet: texturing, fog, dithering, the Z buffer, YUV 4:2:2 textures and ATI's VQ
+compression.
 
 ```rust
 assert_eq!(gameframe_rage::render_state_name(14), Some("SURF_DRAW_PITCH"));

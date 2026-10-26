@@ -11,5 +11,4 @@ crate-type = ["cdylib"]
 [dependencies]
 virge = { package = "gameframe-virge", path = "../../crates/virge" }
 pixels = { path = "../pixels" }
-raster = { path = "../raster" }
 shim = { path = "../shim" }

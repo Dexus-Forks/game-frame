@@ -2,8 +2,13 @@
 #![doc = ""]
 //! ATI 3D Rage, ATI3DCIF: texture formats (`C3D_ETEXFMT`), drawing-surface formats
 //! (`C3D_EPIXFMT`) and render-state ids (`C3D_ERSID`), from ATI's *3D RAGE Windows 95
-//! Programmer's Guide* (SDK-C02700 rev. 1.30, 1997).
+//! Programmer's Guide* (SDK-C02700 rev. 1.30, 1997), and the chip's drawing as ATI3DCIF
+//! drives it ([`draw`]).
 
+pub mod draw;
+
+pub use draw::{Context, Vtcf, render_prim_list};
+pub use gameframe_raster::{Format, Target};
 use gameframe_texel::TexelFormat;
 
 /// `C3D_ETF_*`.

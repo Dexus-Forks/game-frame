@@ -1,8 +1,13 @@
 #![doc = include_str!("../README.md")]
 #![doc = ""]
 //! S3 ViRGE, S3D Toolkit: texture and video formats, rendering types and state keys, from
-//! `S3DTK.H` of the S3D ToolKit SDK 2.6.
+//! `S3DTK.H` of the S3D ToolKit SDK 2.6, and the chip's drawing as the toolkit drives it
+//! ([`draw`]).
 
+pub mod draw;
+
+pub use draw::{State, Vertex32, triangle_set};
+pub use gameframe_raster::{Format, Target};
 use gameframe_texel::TexelFormat;
 
 /// Surface format bits (`sfFormat`) for textures.

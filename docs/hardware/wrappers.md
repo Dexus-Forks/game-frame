@@ -63,12 +63,11 @@ The Maxi Sound row is a Windows library bridge. DOS chip and card models need re
 DMA, interrupts or MIDI event handling. The [PC audio coverage map](audio-coverage.md) tracks
 those layers and the engines that can be reused.
 
-The libraries share four crates:
+The libraries share three crates, and draw for the ATI and S3 chips with GameFrame's chip
+crates (`gameframe-rage` and `gameframe-virge`, on `gameframe-raster`):
 
 - [`shim`](../../wrappers/shim/README.md): the shared settings, port I/O as Windows 95
   allowed it, patches to the game's code in memory, and the log with its stubs.
-- [`raster`](../../wrappers/raster/README.md): a small software triangle rasteriser for 8-,
-  15- and 16-bit frame buffers.
 - [`scalers`](../../wrappers/scalers/README.md): whole-multiple, Scale2x and CRT-style
   scalers for a finished frame.
 - [`pixels`](../../wrappers/pixels/README.md): RGB555 and RGB565 to 8-bit colour.
@@ -282,7 +281,7 @@ gives a function that name only when it takes exactly 8 bytes of arguments. To r
 tests alone:
 
 ```bash
-cd wrappers && cargo test --release --target "$(rustc -vV | sed -n 's/^host: //p')" -p raster -p scalers -p pixels -p shim -p sgl -p glide
+cd wrappers && cargo test --release --target "$(rustc -vV | sed -n 's/^host: //p')" -p scalers -p pixels -p shim -p sgl -p glide
 ```
 
 ![sgltest.exe drawn by sgl.dll at 1280 × 960: a lit, textured cube under a 2D bar](../assets/case-studies/sgltest-scene.webp)

@@ -1,6 +1,6 @@
 [package]
 name = "gameframe-virge"
-description = "S3 ViRGE through the S3D Toolkit: texture and video formats, rendering types and state keys"
+description = "S3 ViRGE through the S3D Toolkit: texture and video formats, rendering types, state keys and the chip's Gouraud and blended drawing"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -10,4 +10,5 @@ keywords = ["s3", "virge", "s3d", "reverse-engineering"]
 categories = ["emulators", "graphics"]
 
 [dependencies]
+gameframe-raster = { path = "../raster" }
 gameframe-texel = { path = "../texel" }

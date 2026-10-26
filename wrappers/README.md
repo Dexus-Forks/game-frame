@@ -24,7 +24,6 @@ The shared crates:
 | Crate | Does | Tested on the host |
 |---|---|---|
 | [shim](shim/README.md) | The shared settings (`WRAPPER_*`), Windows 95 port I/O emulated, in-memory patches from a file, the log of what is not implemented | the settings' parsers and the log's counts |
-| [raster](raster/README.md) | A small software triangle rasteriser into 8-, 15- and 16-bit frame buffers | yes |
 | [scalers](scalers/README.md) | Whole-multiple, Scale2x and CRT-style scalers for a finished frame | yes |
 | [pixels](pixels/README.md) | RGB555 and RGB565 to 8-bit colour | yes |
 
@@ -91,7 +90,7 @@ each DLL's exports from its crate's `.def` file (`glide/glide2x.def`, `sgl/sgl.d
 tests:
 
 ```bash
-cd wrappers && cargo test --release --target "$(rustc -vV | sed -n 's/^host: //p')" -p raster -p scalers -p pixels -p shim -p sgl -p maxi94
+cd wrappers && cargo test --release --target "$(rustc -vV | sed -n 's/^host: //p')" -p scalers -p pixels -p shim -p sgl -p maxi94
 ```
 
 `tests/run.sh` runs them, builds both kinds of DLL, checks each export table against its `.def`

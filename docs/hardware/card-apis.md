@@ -9,7 +9,10 @@ the calls, how textures reach the card, and what the per-card builds tend to dif
 One crate per chip holds the formats and constants named here ([crates](../crates/README.md)):
 `gameframe-voodoo` for 3dfx, `gameframe-rage` for ATI, `gameframe-virge` for S3, with the texel
 decoder they share in `gameframe-texel`. Each chip crate lists the texel layouts its API takes
-(`TEXTURE_FORMATS`).
+(`TEXTURE_FORMATS`), and each also draws: `gameframe-voodoo` runs the whole Voodoo pipeline,
+while `gameframe_rage::draw` and `gameframe_virge::draw` draw the untextured, blended faces
+the ATI and S3 builds of the period gave their chips. Those two crates share
+`gameframe-raster`.
 
 ## Find the API
 

@@ -9,6 +9,12 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- The ATI 3D Rage and S3 ViRGE draw in their own crates: `gameframe_rage::draw`
+  (`Context`, `C3D_VTCF`, `render_prim_list`: triangles and quads, solid, flat or Gouraud,
+  alpha blended) and `gameframe_virge::draw` (`State`, the 32-byte vertex, `triangle_set`:
+  lists, strips and fans, Gouraud, source-alpha blended), both on `gameframe-raster`, the
+  triangle walker moved out of `wrappers/raster`. The `ati3dcif` and `s3dtkw` DLLs draw with
+  them, and so can a port.
 - `gameframe-report`: reports from a running port. `unported!` and `mismatch!` at the places
   the port has not done, and panics, each written once per place with the original's address,
   the values there, the game's state, the launch and the devices. Dev keeps them on the

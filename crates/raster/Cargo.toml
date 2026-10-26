@@ -1,0 +1,12 @@
+[package]
+name = "gameframe-raster"
+description = "A small software triangle rasteriser into 8-, 15- and 16-bit frame buffers, shared by the models of 1997 3D chips (ATI 3D Rage, S3 ViRGE)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["rasteriser", "retro", "graphics", "reverse-engineering"]
+categories = ["emulators", "graphics"]
+
+[dependencies]

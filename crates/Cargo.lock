@@ -776,8 +776,13 @@ dependencies = [
 name = "gameframe-rage"
 version = "0.1.0"
 dependencies = [
+ "gameframe-raster",
  "gameframe-texel",
 ]
+
+[[package]]
+name = "gameframe-raster"
+version = "0.1.0"
 
 [[package]]
 name = "gameframe-report"
@@ -819,6 +824,7 @@ version = "0.1.0"
 name = "gameframe-virge"
 version = "0.1.0"
 dependencies = [
+ "gameframe-raster",
  "gameframe-texel",
 ]
 

@@ -50,8 +50,8 @@ pub fn triangle(t: &mut Target, v: [Vertex; 3], shade: &mut impl FnMut(&[f32; 8]
                 continue;
             }
             let (la, lb, lc) = (wa / area, wb / area, wc / area);
-            for i in 0..8 {
-                at[i] = la * a.a[i] + lb * b.a[i] + lc * c.a[i];
+            for (i, at) in at.iter_mut().enumerate() {
+                *at = la * a.a[i] + lb * b.a[i] + lc * c.a[i];
             }
             let (ux, uy) = (x as usize, y as usize);
             if let Some(p) = shade(&at, t.get(ux, uy)) {
@@ -73,8 +73,12 @@ mod tests {
     use super::*;
     use crate::pixel::Format;
 
-    fn target(buf: &mut [u16], w: usize, h: usize) -> Target {
-        Target { ptr: buf.as_mut_ptr().cast(), pitch: w * 2, w, h, format: Format::Rgb565 }
+    fn target(buf: &mut [u8], w: usize, h: usize) -> Target<'_> {
+        Target::new(buf, w * 2, w, h, Format::Rgb565)
+    }
+
+    fn pixels(t: &Target) -> Vec<u32> {
+        (0..t.h).flat_map(|y| (0..t.w).map(move |x| (x, y))).map(|(x, y)| t.get(x, y)).collect()
     }
 
     fn v(x: f32, y: f32) -> Vertex {
@@ -83,30 +87,31 @@ mod tests {
 
     #[test]
     fn shared_edges_draw_each_pixel_once() {
-        let mut buf = vec![0u16; 16 * 16];
+        let mut buf = vec![0u8; 16 * 16 * 2];
         let mut t = target(&mut buf, 16, 16);
         let quad = [v(1.0, 1.0), v(13.0, 2.0), v(14.0, 14.0), v(2.0, 12.0)];
         let mut add = |_: &[f32; 8], old: u32| Some(old + 1);
         polygon(&mut t, &quad, &mut add);
-        assert!(buf.iter().all(|p| *p <= 1), "a pixel drawn twice");
-        assert!(buf.iter().filter(|p| **p == 1).count() > 100);
+        let px = pixels(&t);
+        assert!(px.iter().all(|p| *p <= 1), "a pixel drawn twice");
+        assert!(px.iter().filter(|p| **p == 1).count() > 100);
     }
 
     #[test]
     fn a_square_covers_its_pixels() {
-        let mut buf = vec![0u16; 8 * 8];
+        let mut buf = vec![0u8; 8 * 8 * 2];
         let mut t = target(&mut buf, 8, 8);
         let sq = [v(2.0, 2.0), v(6.0, 2.0), v(6.0, 6.0), v(2.0, 6.0)];
         polygon(&mut t, &sq, &mut |_, _| Some(1));
-        let n: usize = buf.iter().map(|p| *p as usize).sum();
+        let n: u32 = pixels(&t).iter().sum();
         assert_eq!(n, 16);
-        assert_eq!(buf[2 * 8 + 2], 1);
-        assert_eq!(buf[6 * 8 + 6], 0);
+        assert_eq!(t.get(2, 2), 1);
+        assert_eq!(t.get(6, 6), 0);
     }
 
     #[test]
     fn colours_interpolate() {
-        let mut buf = vec![0u16; 4];
+        let mut buf = vec![0u8; 4 * 2];
         let mut t = target(&mut buf, 4, 1);
         let mut a = v(0.0, 0.0);
         let mut b = v(4.0, 0.0);
