@@ -17,6 +17,15 @@ Every release of GameFrame, newest first. The format follows
   `gameframe-rage` (ATI3DCIF), `gameframe-virge` (S3D Toolkit), and `gameframe-texel` for the
   texel layouts and the 2:1 reduction they share. Each lists the layouts its API takes
   (`TEXTURE_FORMATS`).
+- `gameframe-frame`: `Link`, the program's end of `Process` for a Rust port (the manifest, the
+  events until a start, then `stopping()` and `status()` while the game runs), and `Respawn`,
+  a `Game` that starts the program again for each start, for ports whose winit window can be
+  made only once per process. Both come from POD's and Hardwar's launchers.
+- `gameframe-bitmap-font`: an old game's bitmap font as a TrueType font, built in memory, and
+  a CSS `@font-face` rule with a data URL, so a launcher's theme can use the game's own letters
+  read from the player's files at run time. From Hardwar's launcher.
+- `gameframe-library`: `Folder::link_in`, which fills a section from the player's own folder
+  by hard links.
 
 ### Removed
 

@@ -38,6 +38,10 @@ let saves = lib.entries("saves").await?;
   thumbnail made with `data_url`. `Hooks::accept` refuses a file with a sentence the player sees.
   In the browser, `web::register_hooks` hands both to the page.
 - **Stores.** `Folder` keeps `ROOT/SECTION/NAME`, so players can copy saves by hand.
+  `Folder::link_in(section, from, keep)` fills a section from a folder the player already has,
+  such as the game's install folder, by hard links (nothing is copied; the folder must be on
+  the same volume). It links the files the section accepts and `keep` takes, and leaves a
+  section alone once it holds every required file, or with none required, any file.
   `web::IndexedDb` uses the page's own layout. `Memory` is for tests. A game can write its own
   `Store`.
 - **Big files in the browser.** `Library::add_file` keeps a `web_sys::File` the player chose.
