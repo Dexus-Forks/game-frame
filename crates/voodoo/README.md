@@ -15,7 +15,10 @@ What it models, in the order of the Glide 2.x reference manual's pipeline:
   depth mask;
 - alpha blending against the pixel already in the buffer;
 - the 16-bit RGB565 frame buffer with its 4 × 4 ordered dither, and the gamma curve on the
-  way out.
+  way out;
+- `Glide`, a software Glide 2.x context: the calls by their Glide names (`grColorCombine`,
+  `guColorCombineFunction`, `grTexDownloadMipMap`, `grTexSource`, `grFogTable`,
+  `grDrawTriangle` and the rest), drawn at any multiple of the game's resolution.
 
 It follows 3dfx's own SST-1 (Voodoo Graphics) specification, revision 1.61: the combine
 units' integer arithmetic (a 0–256 factor, a truncating product, a clamp), the 12.4 vertex

@@ -8,6 +8,7 @@
 //! - [`fog`]: table fog.
 //! - [`frame`]: the 565 colour buffer with its dither, the depth buffer, gamma.
 //! - [`tri`]: `grDrawTriangle` through all of it.
+//! - [`glide`]: a software Glide 2.x context, the calls by their names, at any output scale.
 //!
 //! For ports of games whose 3dfx build should be drawn the way the card drew it, at any
 //! size, with no Glide library and no GPU. Every place the model is not known to be exact
@@ -17,11 +18,13 @@ pub mod combine;
 pub mod consts;
 pub mod fog;
 pub mod frame;
+pub mod glide;
 pub mod state;
 pub mod texture;
 pub mod tri;
 
 pub use frame::Frame;
+pub use glide::{Glide, TexInfo};
 pub use state::{Combine, State};
 pub use texture::Texture;
 pub use tri::{Vertex, triangle};
