@@ -109,6 +109,8 @@ pub struct View {
     pub camera: Camera,
     pub batches: Vec<Batch>,
     pub volumes: Vec<Volume>,
+    /// Convex objects that are not light volumes, which are not drawn (see `convex`).
+    pub skipped: u32,
 }
 
 #[derive(Clone, Copy)]
@@ -140,6 +142,7 @@ struct Walk<'a> {
     volumes: Vec<(Vec<HalfSpace>, Mat, Colour)>,
     /// Where the camera is: point lights are placed from it.
     eye: Mat,
+    skipped: u32,
 }
 
 /// The camera's placement: the transforms down to it, as the traversal would apply them.
@@ -211,7 +214,7 @@ fn end_transform(scene: &Scene, id: u32, m: Mat, depth: u32) -> Mat {
 /// ignored list).
 pub fn view(scene: &Scene, camera: u32) -> Option<View> {
     let eye = find_camera(scene, scene.root, Mat::IDENTITY, camera, 0)?;
-    let mut w = Walk { scene, camera, found: None, pass: 0, batches: Vec::new(), index: HashMap::new(), volumes: Vec::new(), eye };
+    let mut w = Walk { scene, camera, found: None, pass: 0, batches: Vec::new(), index: HashMap::new(), volumes: Vec::new(), eye, skipped: 0 };
     let mut st = State { m: Mat::IDENTITY, mat: Material::default(), lights: Vec::new(), fog: true };
     w.list(scene.root, &mut st, 0);
     let (cam, place) = w.found?;
@@ -238,7 +241,7 @@ pub fn view(scene: &Scene, camera: u32) -> Option<View> {
             .collect();
         volumes.push(Volume { planes, colour, kind: VolumeKind::Light });
     }
-    Some(View { camera: cam, batches, volumes })
+    Some(View { camera: cam, batches, volumes, skipped: w.skipped })
 }
 
 impl Walk<'_> {
@@ -361,7 +364,7 @@ impl Walk<'_> {
     fn convex(&mut self, id: u32, st: &State) {
         let Some(Obj::Convex(c)) = self.scene.objs.get(&id) else { return };
         if !c.light_volume {
-            shim::gap!("sgl convex object", "a convex object that is not a light volume is not drawn");
+            self.skipped += 1;
             return;
         }
         if c.planes.len() < 4 {
