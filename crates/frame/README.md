@@ -47,7 +47,7 @@ its console, including topics it does not know, so a game can add its own (`demo
 | `device.select` | frame to game | `{"slot": "sound", "device": "none"}`: a device in a slot other than graphics |
 | `game.start` | frame to game | `{"renderer", "devices", "settings", "args"}` |
 | `game.stop` | frame to game | none: stop, as the game's own quit does |
-| `game.status` | game to frame | `{"state": "loading" or "running" or "paused" or "stopped" or "failed", "detail"}` |
+| `game.status` | game to frame | `{"state": "loading" or "running" or "paused" or "stopped" or "failed", "detail"}`. `Session::state()` is `idle` before the first start and `starting` from `game.start` until the game answers |
 | `input.press` | player to game | `{"control", "down"}`, with the control names from the manifest |
 | `library.changed` | frame to game | `{"section"}`: read that library section again |
 | `report.new` | game to frame | one `gameframe_report::Report`: a place the game reached that is not ported, or a crash; `Session::reports()` keeps one per place, and Play lists them with their GitHub link (`Link::send_reports`) |
@@ -104,12 +104,16 @@ names, so a game opts into each feature by listing it.
   the same id in every game (`device::ids`: `glide`, `powervr`, `directsound`, `sound-blaster`,
   `adlib` and the rest), and `device::known(id)` names the GameFrame crate or wrapper that models
   it. The frame saves each choice as `frame.device.SLOT` and sends both in `game.start` as
-  `"devices": {"video": "glide", "sound": "none"}`. A kernel reads one with
-  `chosen(&data, "sound")` and refuses one it does not have with `Manifest::playable(slot, id)`,
-  which also refuses a device graded `missing`. A device not ported yet may name a `stand_in`,
-  another device in its slot (`"stand_in": "software"`): the game then starts on that one, the
-  kernel reports the gap with `gameframe_report::unported!`, and `Manifest::stand_in(slot, id)`
-  says which to run. So every listed device starts end to end. Play shows one drop-down per
+  `"devices": {"video": "glide", "sound": "none"}`. A device not ported yet may name a
+  `stand_in`, another device in its slot (`"stand_in": "software"`). The game then starts on
+  that one and reports the gap, so every listed device starts end to end. A kernel keeps a
+  `Held` and passes it every event (`held.note(&e)`), so it knows the frame's latest picks. On
+  `game.start` it calls `manifest.resolve(&data, &held)`. That gives a `Setup`: per slot the
+  device asked for and the device to run (`setup.used("video")`), and the gaps. `Err` is the
+  reason for `failed`: an id the manifest lacks, or a `missing` device with no stand-in. Then
+  `link.send_reports(setup.asked_json())` and `setup.report_gaps(&manifest)`, which writes one
+  `unported` report per gap at the kernel's own place. `chosen`, `Manifest::playable` and
+  `Manifest::stand_in` are the parts it is made of. Play shows one drop-down per
   slot, and beside it a card for the chosen device: its grade, its meter, its notes.
 - **Versions.** `CONTRACT` is `1.1` (1.1 added `devices`). The frame refuses a larger major number. A minor version
   only adds fields, and a frame ignores fields it does not know.

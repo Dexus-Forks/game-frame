@@ -18,8 +18,8 @@
 //!
 //! The frame sends `device.select` `{"slot", "device"}` when the player picks one, and puts the
 //! choices in `frame.ready` and `game.start` as `"devices": {"video": "glide", "sound": "none"}`.
-//! A kernel reads them with [`chosen`] and refuses a device it does not have with
-//! [`Manifest::playable`](crate::Manifest::playable).
+//! A kernel works out the devices of a start with [`Manifest::resolve`](crate::Manifest::resolve)
+//! ([`crate::setup`]): the pick, a stand-in for one not ported yet, and the gaps to report.
 
 use crate::manifest::Renderer;
 use serde::{Deserialize, Serialize};
