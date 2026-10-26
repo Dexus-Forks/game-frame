@@ -1,10 +1,12 @@
-//! Play: the renderer choice with how complete each one is, the start and stop buttons, "Back to
-//! the game" while it runs, the game's status, and whether the frame opens at start.
+//! Play: the game's setup, as the Manager or SETUP.EXE of a 1990s game showed it: one choice
+//! per hardware slot (graphics, sound card, music) with how complete each device is. Then the
+//! start and stop buttons, "Back to the game" while it runs, the game's status, and whether the
+//! frame opens at start.
 
 use crate::state::use_frame;
 use crate::Icon;
 use dioxus::prelude::*;
-use gameframe_frame::{capabilities, topics, Grade, ON_EXIT, SHOW_AT_START};
+use gameframe_frame::{capabilities, device, topics, Grade, ON_EXIT, SHOW_AT_START};
 use serde_json::json;
 
 fn grade_label(g: Grade) -> &'static str {
@@ -20,7 +22,7 @@ fn grade_label(g: Grade) -> &'static str {
 #[component]
 pub fn Play() -> Element {
     let frame = use_frame();
-    let (manifest, chosen, state, detail) = frame.with(|s| {
+    let (manifest, slots, chosen, state, detail) = frame.with(|s| {
         let detail = s
             .log()
             .iter()
@@ -28,7 +30,16 @@ pub fn Play() -> Element {
             .find(|e| e.topic == "game.status")
             .and_then(|e| e.str("detail").map(String::from))
             .unwrap_or_default();
-        (s.manifest().clone(), s.renderer().map(String::from), s.state().to_string(), detail)
+        // The slots the manifest opts into: graphics with `renderers`, the rest with `devices`.
+        let m = s.manifest();
+        let slots: Vec<_> = m
+            .slots()
+            .into_iter()
+            .filter(|slot| !slot.options.is_empty())
+            .filter(|slot| m.can(if slot.slot == device::slots::VIDEO { capabilities::RENDERERS } else { capabilities::DEVICES }))
+            .collect();
+        let chosen: Vec<_> = slots.iter().map(|slot| (slot.slot.clone(), s.device(&slot.slot).map(String::from))).collect();
+        (m.clone(), slots, chosen, s.state().to_string(), detail)
     });
     let show_at_start = frame.setting(SHOW_AT_START).and_then(|v| v.as_bool()).unwrap_or(true);
     let on_exit = frame.setting(ON_EXIT).and_then(|v| v.as_str().map(String::from)).unwrap_or_else(|| "launcher".into());
@@ -54,40 +65,48 @@ pub fn Play() -> Element {
                     }
                 }
             }
-            if manifest.can(capabilities::RENDERERS) && !manifest.renderers.is_empty() {
-                p { "Choose how the game draws." }
-                div { class: "lib-renderers", role: "radiogroup", "aria-label": "Renderer",
-                    for r in manifest.renderers.iter().cloned() {
-                        {
-                            let selected = chosen.as_deref() == Some(r.id.as_str());
-                            let id = r.id.clone();
-                            let share = match (r.done, r.total) {
-                                (Some(d), Some(t)) if t > 0 => Some((d, t, d as f64 * 100.0 / t as f64)),
-                                _ => None,
-                            };
-                            rsx! {
-                                button {
-                                    r#type: "button",
-                                    class: "lib-renderer",
-                                    role: "radio",
-                                    "aria-checked": "{selected}",
-                                    disabled: running,
-                                    onclick: move |_| { let _ = frame.update(|s| s.select_renderer(&id)); },
-                                    div { class: "lib-renderer-head",
-                                        span { class: "lib-row-name", "{r.label}" }
-                                        span { class: "lib-grade is-{grade_label(r.grade).to_lowercase().replace(' ', \"-\")}", "{grade_label(r.grade)}" }
-                                    }
-                                    if let Some(detail) = &r.detail {
-                                        span { class: "lib-row-meta", "{detail}" }
-                                    }
-                                    if let Some((d, t, pct)) = share {
-                                        div { class: "lib-meter", title: "{d} of {t}",
-                                            div { class: "lib-meter-fill", style: "width: {pct:.0}%" }
+            for slot in slots.iter().cloned() {
+                {
+                    let chosen = chosen.iter().find(|(k, _)| *k == slot.slot).and_then(|(_, v)| v.clone());
+                    let prompt = if slot.slot == device::slots::VIDEO { "Choose how the game draws.".to_string() } else { format!("Choose the {}.", slot.label.to_lowercase()) };
+                    rsx! {
+                        h3 { class: "lib-slot", "{slot.label}" }
+                        p { "{prompt}" }
+                        div { class: "lib-renderers", role: "radiogroup", "aria-label": "{slot.label}",
+                            for r in slot.options.iter().cloned() {
+                                {
+                                    let selected = chosen.as_deref() == Some(r.id.as_str());
+                                    let id = r.id.clone();
+                                    let which = slot.slot.clone();
+                                    let share = match (r.done, r.total) {
+                                        (Some(d), Some(t)) if t > 0 => Some((d, t, d as f64 * 100.0 / t as f64)),
+                                        _ => None,
+                                    };
+                                    rsx! {
+                                        button {
+                                            r#type: "button",
+                                            class: "lib-renderer",
+                                            role: "radio",
+                                            "aria-checked": "{selected}",
+                                            disabled: running,
+                                            onclick: move |_| { let _ = frame.update(|s| s.select_device(&which, &id)); },
+                                            div { class: "lib-renderer-head",
+                                                span { class: "lib-row-name", "{r.label}" }
+                                                span { class: "lib-grade is-{grade_label(r.grade).to_lowercase().replace(' ', \"-\")}", "{grade_label(r.grade)}" }
+                                            }
+                                            if let Some(detail) = &r.detail {
+                                                span { class: "lib-row-meta", "{detail}" }
+                                            }
+                                            if let Some((d, t, pct)) = share {
+                                                div { class: "lib-meter", title: "{d} of {t}",
+                                                    div { class: "lib-meter-fill", style: "width: {pct:.0}%" }
+                                                }
+                                                span { class: "lib-row-meta", "{d} of {t} calls" }
+                                            }
+                                            for n in r.notes.iter() {
+                                                span { class: "lib-row-meta", "{n}" }
+                                            }
                                         }
-                                        span { class: "lib-row-meta", "{d} of {t} calls" }
-                                    }
-                                    for n in r.notes.iter() {
-                                        span { class: "lib-row-meta", "{n}" }
                                     }
                                 }
                             }

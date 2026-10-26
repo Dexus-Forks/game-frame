@@ -9,6 +9,12 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- The frame's setup dialog (contract 1.1): device slots beside the renderers, such as the
+  sound card and the music device, as a 1990s game's Manager or `SETUP.EXE` offered them.
+  `device.select`, `devices` in `frame.ready` and `game.start`, `Session::select_device`,
+  `Manifest::playable` and `chosen` for kernels, `{device:SLOT}` for `frame.json` games, and
+  one id per card for every game (`device::ids`, with the crate or wrapper that models each in
+  `device::known`). Play shows one choice per slot.
 - `gameframe-voodoo`: a software 3dfx Voodoo Graphics pipeline driven by Glide 2.x (combine
   units, chroma key, alpha test, table fog, Z and W buffers, blending, the 565 buffer with its
   dither), after 3dfx's SST-1 specification, and a `Glide` context with the calls by their

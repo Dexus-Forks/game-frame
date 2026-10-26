@@ -8,8 +8,8 @@ use crate::event::{matches, topics, valid_topic, Event, Origin};
 use crate::game::{Game, Outbox};
 use crate::manifest::{Choice, Kind, Manifest};
 use crate::settings::{Settings, ON_EXIT};
-use serde_json::{json, Value};
-use std::collections::VecDeque;
+use serde_json::{json, Map, Value};
+use std::collections::{BTreeMap, VecDeque};
 
 /// How many events the log keeps for the console.
 pub const LOG_LENGTH: usize = 500;
@@ -21,6 +21,8 @@ pub struct Session {
     manifest: Manifest,
     settings: Settings,
     renderer: Option<String>,
+    /// The device chosen in each slot besides graphics, saved as `frame.device.SLOT`.
+    devices: BTreeMap<String, String>,
     state: String,
     log: VecDeque<Event>,
     next_id: u64,
@@ -54,11 +56,23 @@ impl Session {
             .filter(|id| manifest.renderers.iter().any(|r| r.id == *id))
             .map(str::to_string)
             .or_else(|| manifest.default_renderer().map(|r| r.id.clone()));
+        let mut devices = BTreeMap::new();
+        for slot in &manifest.devices {
+            let saved = settings
+                .get(&device_key(&slot.slot))
+                .and_then(Value::as_str)
+                .filter(|id| slot.options.iter().any(|d| d.id == *id))
+                .map(str::to_string);
+            if let Some(id) = saved.or_else(|| slot.default_device().map(|d| d.id.clone())) {
+                devices.insert(slot.slot.clone(), id);
+            }
+        }
         Ok(Session {
             game,
             manifest,
             settings,
             renderer,
+            devices,
             state: "stopped".into(),
             log: VecDeque::new(),
             next_id: 1,
@@ -119,6 +133,24 @@ impl Session {
     pub fn renderer(&self) -> Option<&str> {
         self.renderer.as_deref()
     }
+    /// The device chosen in `slot`; the graphics slot is the renderer.
+    pub fn device(&self, slot: &str) -> Option<&str> {
+        if slot == crate::device::slots::VIDEO {
+            return self.renderer();
+        }
+        self.devices.get(slot).map(String::as_str)
+    }
+    /// The chosen device of every slot, as `frame.ready` and `game.start` carry it.
+    pub fn devices(&self) -> Value {
+        let mut all = Map::new();
+        if let Some(r) = &self.renderer {
+            all.insert(crate::device::slots::VIDEO.into(), json!(r));
+        }
+        for (slot, id) in &self.devices {
+            all.insert(slot.clone(), json!(id));
+        }
+        Value::Object(all)
+    }
     /// The game's last `game.status` state.
     pub fn state(&self) -> &str {
         &self.state
@@ -140,7 +172,8 @@ impl Session {
 
     pub fn ready(&mut self) {
         let settings = self.settings.to_json();
-        self.send(topics::FRAME_READY, json!({ "settings": settings, "renderer": self.renderer }));
+        let devices = self.devices();
+        self.send(topics::FRAME_READY, json!({ "settings": settings, "renderer": self.renderer, "devices": devices }));
     }
 
     /// A control on the console: `input.press`, from the player.
@@ -166,8 +199,22 @@ impl Session {
         Ok(())
     }
 
+    /// Choose a device in a slot. The graphics slot is the renderer (`render.select`); any
+    /// other sends `device.select`.
+    pub fn select_device(&mut self, slot: &str, id: &str) -> Result<(), String> {
+        if slot == crate::device::slots::VIDEO {
+            return self.select_renderer(id);
+        }
+        let s = self.manifest.devices.iter().find(|s| s.slot == slot).ok_or_else(|| format!("no slot {slot}"))?;
+        if !s.options.iter().any(|d| d.id == id) {
+            return Err(format!("no {slot} device {id}"));
+        }
+        self.send(topics::DEVICE_SELECT, json!({ "slot": slot, "device": id }));
+        Ok(())
+    }
+
     pub fn start(&mut self, args: Vec<String>) {
-        let data = json!({ "renderer": self.renderer, "settings": self.settings.to_json(), "args": args });
+        let data = json!({ "renderer": self.renderer, "devices": self.devices(), "settings": self.settings.to_json(), "args": args });
         self.send(topics::GAME_START, data);
     }
 
@@ -258,6 +305,14 @@ impl Session {
                     self.settings.set("frame.renderer", json!(id));
                 }
             }
+            topics::DEVICE_SELECT => {
+                if let (Some(slot), Some(id)) = (e.str("slot"), e.str("device")) {
+                    if self.manifest.devices.iter().any(|s| s.slot == slot) {
+                        self.devices.insert(slot.to_string(), id.to_string());
+                        self.settings.set(&device_key(slot), json!(id));
+                    }
+                }
+            }
             topics::GAME_STATUS => {
                 if let Some(state) = e.str("state") {
                     self.state = state.to_string();
@@ -291,4 +346,9 @@ impl Session {
         let e = Event::new(topics::LOG, Origin::Frame, json!({ "level": level, "text": text }));
         let _ = self.record(e);
     }
+}
+
+/// The saved setting that holds a slot's device.
+fn device_key(slot: &str) -> String {
+    format!("frame.device.{slot}")
 }

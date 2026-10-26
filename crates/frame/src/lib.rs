@@ -5,8 +5,9 @@
 //! choice, help pages, a console. The two talk only through [`Event`]s, so either side can grow
 //! without the other changing:
 //!
-//! - the game says what it supports in a [`Manifest`]: capabilities, renderers with a
-//!   [`Grade`] of how complete each is, settings, controls;
+//! - the game says what it supports in a [`Manifest`]: capabilities, renderers and the other
+//!   hardware slots ([`device`]: sound card, music) with a [`Grade`] of how complete each
+//!   device is, settings, controls;
 //! - the frame sends [`topics`] such as `game.start` and `config.set`, and the game answers with
 //!   `game.status`, `config.changed` and log lines, or topics of its own;
 //! - a [`Session`] keeps the state both sides agree on (settings, renderer, status, the log).
@@ -18,6 +19,7 @@
 //!
 //! The views are in `gameframe-frame-ui`. This crate has no UI and builds for the browser.
 
+pub mod device;
 mod demo;
 mod event;
 mod game;
@@ -35,6 +37,7 @@ pub mod respawn;
 mod session;
 mod settings;
 
+pub use device::{chosen, Device, Slot};
 pub use demo::{Demo, DEMO_PRESS_TICKS};
 pub use event::{matches, topics, valid_topic, Event, Origin};
 pub use game::{Game, Outbox};

@@ -7,6 +7,7 @@
 .lib-nav a[aria-current=page] { color: var(--lib-text); background: var(--lib-surface-2); box-shadow: inset 0 0 0 1px var(--lib-line); }
 
 /* Renderers: one card each, with a grade and a meter of how much is done. */
+.lib-slot { margin: var(--lib-space-3) 0 var(--lib-space-1); font-size: 1em; }
 .lib-renderers { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--lib-space-3); margin-bottom: var(--lib-space-3); }
 .lib-renderer { display: grid; gap: var(--lib-space-1); text-align: left; padding: var(--lib-space-3); cursor: pointer; color: var(--lib-text);
                 border-radius: var(--lib-radius-m); border: 1px solid var(--lib-line); background: var(--lib-surface-2); font: inherit; }

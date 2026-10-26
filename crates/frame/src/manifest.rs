@@ -1,17 +1,18 @@
-//! What a game tells the frame about itself: its name, what it can do, its renderers with how
-//! complete each is, its settings and its controls. The frame draws only what the manifest
+//! What a game tells the frame about itself: its name, what it can do, its renderers and other
+//! devices with how complete each is, its settings and its controls. The frame draws only what the manifest
 //! names, so a game opts into each feature by listing it.
 //!
 //! A game written in Rust returns a [`Manifest`] from [`crate::Game::manifest`]. A game in
 //! another language prints it as JSON, and a game with no code gives it in `frame.json`.
 
 use serde::{Deserialize, Serialize};
+use crate::device::{slots, Slot};
 use serde_json::Value;
 
 /// The version of the contract in this crate. The frame refuses a manifest with a larger
 /// major number and accepts a smaller one. A minor version only adds fields, and a frame
 /// ignores fields it does not know, so a 1.1 game still opens in a 1.0 frame.
-pub const CONTRACT: &str = "1.0";
+pub const CONTRACT: &str = "1.1";
 
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
@@ -23,8 +24,12 @@ pub struct Manifest {
     /// What the game handles. The well-known ones are in [`capabilities`]; a game can name its
     /// own. The frame shows a feature only when its capability is listed.
     pub capabilities: Vec<String>,
-    /// The ways the game can draw, such as one per 3D card the original supported.
+    /// The ways the game can draw, such as one per 3D card the original supported: the
+    /// graphics slot ([`crate::device`]).
     pub renderers: Vec<Renderer>,
+    /// The other hardware slots, such as the sound card, each with its devices (contract 1.1).
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub devices: Vec<Slot>,
     /// Settings the player can change in the frame.
     pub settings: Vec<Setting>,
     /// Controls the console can press, by the game's own names ("start", "fire", "left").
@@ -43,6 +48,8 @@ pub mod capabilities {
     pub const INPUT: &str = "input";
     /// The game reads the player's library and takes `library.changed`.
     pub const LIBRARY: &str = "library";
+    /// The game has slots besides the renderer (`devices`) and takes `device.select`.
+    pub const DEVICES: &str = "devices";
 }
 
 /// How complete a renderer is, for the player choosing one.
@@ -164,6 +171,38 @@ impl Manifest {
         self.renderers.iter().find(|r| r.default).or_else(|| self.renderers.iter().max_by_key(|r| r.grade))
     }
 
+    /// Every slot in the order the frame shows them: the graphics slot from `renderers` first,
+    /// when it has any, then `devices`.
+    pub fn slots(&self) -> Vec<Slot> {
+        let video = (!self.renderers.is_empty()).then(|| Slot {
+            slot: slots::VIDEO.into(),
+            label: "Graphics".into(),
+            options: self.renderers.clone(),
+        });
+        video.into_iter().chain(self.devices.iter().cloned()).collect()
+    }
+
+    /// The slot `slot`, the graphics slot included.
+    pub fn slot(&self, slot: &str) -> Option<Slot> {
+        self.slots().into_iter().find(|s| s.slot == slot)
+    }
+
+    /// Whether the game can start with `id` in `slot`: it is listed there and not graded
+    /// `missing`. The error is a sentence for the player, for `game.status` `failed`.
+    pub fn playable(&self, slot: &str, id: &str) -> Result<(), String> {
+        let s = self.slot(slot).ok_or_else(|| format!("{} has no {slot} slot", self.name))?;
+        match s.options.iter().find(|d| d.id == id) {
+            None => Err(format!("{} has no {} called {id}", self.name, s.label.to_lowercase())),
+            Some(d) if d.grade == Grade::Missing => Err(format!(
+                "{}{} is not ported yet; choose another in {}",
+                d.label,
+                d.detail.as_ref().map(|t| format!(" ({t})")).unwrap_or_default(),
+                s.label
+            )),
+            Some(_) => Ok(()),
+        }
+    }
+
     pub fn setting(&self, key: &str) -> Option<&Setting> {
         self.settings.iter().find(|s| s.key == key)
     }
@@ -179,6 +218,16 @@ impl Manifest {
         for r in &self.renderers {
             if r.id.is_empty() || !seen.insert(("renderer", r.id.clone())) {
                 return Err(format!("manifest: renderer id {:?} is empty or repeated", r.id));
+            }
+        }
+        for slot in &self.devices {
+            let video = slot.slot == slots::VIDEO && !self.renderers.is_empty();
+            if slot.slot.is_empty() || video || !seen.insert(("slot", slot.slot.clone())) {
+                return Err(format!("manifest: device slot {:?} is empty, repeated or the renderers'", slot.slot));
+            }
+            let mut ids = std::collections::HashSet::new();
+            if slot.options.iter().any(|d| d.id.is_empty() || !ids.insert(d.id.clone())) {
+                return Err(format!("manifest: a device id in the {} slot is empty or repeated", slot.slot));
             }
         }
         for s in &self.settings {

@@ -108,8 +108,13 @@ pub mod topics {
 
     /// Frame to game: the player chose a renderer. Data: `{"renderer": "glide"}`.
     pub const RENDER_SELECT: &str = "render.select";
+    /// Frame to game: the player chose a device in a slot other than graphics (contract 1.1).
+    /// Data: `{"slot": "sound", "device": "none"}`.
+    pub const DEVICE_SELECT: &str = "device.select";
 
-    /// Frame to game: start. Data: `{"renderer": "glide", "settings": {...}, "args": [...]}`.
+    /// Frame to game: start. Data: `{"renderer": "glide", "devices": {"video": "glide",
+    /// "sound": "directsound"}, "settings": {...}, "args": [...]}`. `frame.ready` carries
+    /// `devices` too.
     pub const GAME_START: &str = "game.start";
     /// Frame to game: stop, as the game's own quit does.
     pub const GAME_STOP: &str = "game.stop";

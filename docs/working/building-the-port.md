@@ -81,7 +81,8 @@ the features it handles, and the frame shows only those. Its pieces are in GameF
 | Play | The renderers with their grades, start and stop, and what the game reports it is doing. While the game runs, "Back to the game" hides the frame, and the game can open it again from its own menu. When the game ends, the frame comes back, or the program exits to the desktop if the player chose that. "Exit to desktop" leaves at any time |
 | Library | The game data, the saves, and the sections the game opts into: mods, screenshots, recordings or its own |
 | Settings | One control for each setting in the game's manifest: a toggle, a choice, a range or text, in groups. A setting can say it needs a restart. A choice can list what is on the disc, such as the tracks or the cars: the files that match a pattern, or a list the game sends |
-| Renderers | For a game with several 3D-card builds, such as Glide, PowerVR and software, one entry for each. Each carries a grade (exact, good, partial, experimental or missing), how much of its API is done, and its known gaps |
+| Setup | The game's hardware, one slot at a time, as the original's Manager or `SETUP.EXE` asked for it: Graphics, then the sound card, the music device or the controller. Each device carries a grade (exact, good, partial, experimental or missing), how much of its API is done, and its known gaps |
+| Renderers | The Graphics slot. For a game with several 3D-card builds, such as Glide, PowerVR and software, one entry for each |
 | Help pages | Markdown pages listed in `library.json`. The HTML library page also has panels for news, a changelog, messages, a video and GitHub releases |
 | Console | Every event between the frame and the game, the game's controls as buttons, and a line to send any event |
 
@@ -104,19 +105,45 @@ as `game.start`.
 | `config.set`, `config.changed` | frame to game, game to frame | A setting's key and its new value |
 | `config.options` | game to frame | The list for a choice whose options come from the game, such as its tracks |
 | `render.select` | frame to game | The renderer the player chose |
-| `game.start`, `game.stop` | frame to game | The renderer, the settings and the arguments |
+| `device.select` | frame to game | The device the player chose in another slot, such as the sound card |
+| `game.start`, `game.stop` | frame to game | The renderer, the device of every slot, the settings and the arguments |
 | `game.status` | game to frame | `loading`, `running`, `paused`, `stopped` or `failed`, with a detail line |
 | `input.press` | frame to game | One of the game's controls, pressed or released |
 | `library.changed` | frame to game | The library section the player changed |
 | `log.message` | either way | A line for the console |
 
 The game describes itself once, in a manifest. The manifest gives the contract version, the
-game's name and version, its capabilities, its renderers, its settings and its controls. The
-known capabilities are `start`, `renderers`, `settings`, `input` and `library`. The frame draws
+game's name and version, its capabilities, its renderers, its other device slots, its settings
+and its controls. The known capabilities are `start`, `renderers`, `devices`, `settings`,
+`input` and `library`. The frame draws
 a feature only when the manifest lists its capability. A game can list capabilities of its own
 and send topics of its own, such as `mygame.ghost.load`. The frame passes those on and shows
-them in the console. The contract is version `1.0`. The frame refuses a manifest written for a
-later major version.
+them in the console. The contract is version `1.1`, which added the device slots. The frame
+refuses a manifest written for a later major version.
+
+### The setup dialog: one pipeline for every game
+
+Games of the 1990s opened a dialog before the game: the Hardwar Manager, POD's set-up, a DOS
+game's `SETUP.EXE`. The player chose the 3D card, the sound card and the music device there, and
+the dialog started the build or the driver for that hardware. A port does the same through the
+frame, in three layers that are the same for every game:
+
+| Layer | What | GameFrame piece |
+|---|---|---|
+| The dialog | The frame opens first. Play shows one slot per kind of hardware, with the devices the original supported and how complete each is in the port. Start sends `game.start` with `"devices": {"video": "glide", "sound": "directsound"}` | `gameframe-frame` (`device`, `Session::select_device`), `gameframe-frame-ui` (Play) |
+| The kernel | The port's own program, started for each game (`Respawn`), reads the launch with `Link::wait`. It checks each device with `Manifest::playable` and reports `failed` with the reason for one not ported yet. Then it builds its renderer and its sound from the chosen ids | `Link`, `Respawn`, `chosen` |
+| The devices | The cards themselves, modelled once in GameFrame and shared by every game: Glide on `gameframe-voodoo`, the S3D Toolkit's formats in `gameframe-virge`, ATI3DCIF's in `gameframe-rage`, the Sound Blaster, OPL2 and OPL3, the AdLib Gold. For the original's own builds, the replacement libraries in `wrappers/` | `crates/`, `wrappers/` |
+
+The same card has the same id in every game (`gameframe_frame::device::ids`): `software`,
+`mmx`, `glide`, `direct3d`, `powervr`, `ati-rage`, `s3-virge` for graphics; `none`,
+`directsound`, `maxi-sound-64`, `sound-blaster`, `pc-speaker` for sound; `adlib`, `opl3`,
+`adlib-gold`, `game-blaster`, `tandy`, `general-midi` for music. `device::known(id)` names the
+crate or wrapper that models each. A game's own device, one GameFrame does not know, takes an
+id of its own.
+
+List every device the original supported, even the ones the port lacks: a `missing` device
+tells the player it is planned. Keep the original's own settings for a device (sample rate,
+colour depth) as ordinary settings in a group named after the slot.
 
 ### Three ways to join
 
@@ -124,7 +151,7 @@ later major version.
 |---|---|---|
 | Rust | A port written in Rust | A type that implements the `Game` trait: `manifest`, `on_event` and `poll` |
 | JSON lines | A port in any other language | A program that prints its manifest as its first line. It then reads events on standard input and writes events on standard output, one JSON object per line. Its standard error goes to the console |
-| Config only | A game the frame starts as a separate program | A `frame.json` with the manifest, the start command and the game's folder. The frame fills `{renderer}` and `{setting:KEY}` in the command's arguments. [gameframe-launcher](../../launcher/README.md) runs it with no Rust code of the game's own. Such a game cannot open the frame while it runs: the frame comes back when it ends |
+| Config only | A game the frame starts as a separate program | A `frame.json` with the manifest, the start command and the game's folder. The frame fills `{renderer}`, `{device:SLOT}` and `{setting:KEY}` in the command's arguments. [gameframe-launcher](../../launcher/README.md) runs it with no Rust code of the game's own. Such a game cannot open the frame while it runs: the frame comes back when it ends |
 
 `Demo` in gameframe-frame stands in for a game, so the frame runs with none.
 

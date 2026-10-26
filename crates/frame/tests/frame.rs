@@ -461,3 +461,55 @@ fn a_config_game_lists_files_from_its_disc_image() {
     assert!(chosen.starts_with("CANYON /") && chosen.trim_end().ends_with("media/GAME.ISO"), "{chosen}");
     let _ = std::fs::remove_dir_all(&dir);
 }
+
+#[test]
+fn a_session_keeps_a_device_per_slot() {
+    use gameframe_frame::device::{ids, slots};
+    let mut s = demo();
+    assert_eq!(s.device(slots::VIDEO), Some("software"));
+    assert_eq!(s.device(slots::SOUND), Some(ids::DIRECTSOUND), "the default sound card");
+    let ready = s.log().iter().find(|e| e.topic == topics::FRAME_READY).unwrap().clone();
+    assert_eq!(gameframe_frame::chosen(&ready.data, slots::SOUND), Some(ids::DIRECTSOUND));
+    s.select_device(slots::SOUND, ids::NONE).unwrap();
+    s.select_device(slots::VIDEO, "glide").unwrap();
+    assert!(s.select_device(slots::SOUND, "glide").is_err() && s.select_device("music", "adlib").is_err());
+    assert_eq!(s.settings().get("frame.device.sound"), Some(&json!("none")));
+    assert_eq!(s.settings().get("frame.renderer"), Some(&json!("glide")));
+    s.start(vec![]);
+    let start = s.log().iter().rev().find(|e| e.topic == topics::GAME_START).unwrap();
+    assert_eq!(start.data["devices"], json!({"video": "glide", "sound": "none"}));
+    // The choice is saved: a new session over the same settings starts with it.
+    let again = Session::new(Box::new(Demo::default()), s.settings().clone()).unwrap();
+    assert_eq!(again.device(slots::SOUND), Some(ids::NONE));
+}
+
+#[test]
+fn the_graphics_slot_comes_first_and_missing_devices_are_refused() {
+    let m = Manifest::from_json(r#"{"contract": "1.1", "name": "Game", "renderers": [{"id": "software", "label": "Software"}],
+        "devices": [{"slot": "sound", "label": "Sound card", "options": [
+            {"id": "directsound", "label": "DirectSound", "default": true},
+            {"id": "maxi-sound-64", "label": "Maxi Sound 64", "detail": "PODMAX64.EXE", "grade": "missing"}]}]}"#).unwrap();
+    let order: Vec<_> = m.slots().into_iter().map(|s| s.slot).collect();
+    assert_eq!(order, ["video", "sound"]);
+    assert!(m.playable("sound", "directsound").is_ok() && m.playable("video", "software").is_ok());
+    let why = m.playable("sound", "maxi-sound-64").unwrap_err();
+    assert!(why.contains("Maxi Sound 64 (PODMAX64.EXE) is not ported yet") && why.contains("Sound card"), "{why}");
+    assert!(m.playable("sound", "adlib").is_err() && m.playable("music", "adlib").is_err());
+    // A repeated slot, a second graphics slot, or a repeated device is refused.
+    let bad = |devices: &str| Manifest::from_json(&format!(r#"{{"contract": "1.1", "name": "x", "renderers": [{{"id": "s", "label": "S"}}], "devices": {devices}}}"#)).is_err();
+    assert!(bad(r#"[{"slot": "sound", "options": []}, {"slot": "sound", "options": []}]"#));
+    assert!(bad(r#"[{"slot": "video", "options": []}]"#));
+    assert!(bad(r#"[{"slot": "sound", "options": [{"id": "a"}, {"id": "a"}]}]"#));
+}
+
+#[test]
+fn a_config_game_fills_in_its_devices() {
+    let text = r#"{
+        "manifest": {"contract": "1.1", "name": "x", "capabilities": ["start", "devices"],
+                     "devices": [{"slot": "sound", "label": "Sound", "options": [{"id": "sound-blaster", "label": "SB"}]}]},
+        "start": {"command": "true", "args": ["--sound={device:sound}", "--video={device:video}"]}
+    }"#;
+    let game = Configured::from_json(text).unwrap();
+    let start = Event::new(topics::GAME_START, Origin::Frame, json!({"renderer": "glide", "devices": {"sound": "sound-blaster"}, "settings": {}}));
+    assert_eq!(game.arguments(&start), ["--sound=sound-blaster", "--video=glide"]);
+}
