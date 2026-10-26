@@ -12,6 +12,8 @@ Every release of GameFrame, newest first. The format follows
 - `tools/llm/tev1.py` optionally asks a local Ollama Tev1 model bounded choice, yes-or-no and
   rubric questions. It defaults to localhost and is exposed through the existing tool catalog;
   agents call it explicitly. Its answers are advisory and do not establish evidence or parity.
+- `tools/llm/tev1_feedback.py` stores a user's explicit Tev1 corrections in per-user local data
+  and exports chat-format training examples. It does not update weights or send data to a service.
 
 ### Changed
 

@@ -1630,13 +1630,17 @@ out="$("$PYTHON" tests/mcp_provider_config.py 2>&1)"
   && ok "optional MCP providers use project-local settings and preserve client configuration ($out)" \
   || bad "MCP provider opt-in" "$out"
 out="$("$PYTHON" tests/mcp_tool_coverage.py 2>&1)"
-[[ $? == 0 && "$out" == *"MCP coverage: 118 catalog entries, 96 runnable tools, progress/cancel/timeout"* ]] \
+[[ $? == 0 && "$out" == *"MCP coverage: 119 catalog entries, 97 runnable tools, progress/cancel/timeout"* ]] \
   && ok "the GameFrame MCP exposes every catalog entry and runs every program and script ($out)" \
   || bad "GameFrame MCP tool coverage" "$out"
 out="$("$PYTHON" tests/tev1_adapter.py "$B/game.exe" 2>&1)"
 [[ $? == 0 && "$out" == *"Tev1 adapter: sample PE evidence, choice/noul/score, input validation, mock Ollama"* ]] \
   && ok "the optional Tev1 tool sends validated sample evidence to a local Ollama API ($out)" \
   || bad "Tev1 adapter" "$out"
+out="$("$PYTHON" tests/tev1_feedback.py "$B/game.exe" 2>&1)"
+[[ $? == 0 && "$out" == *"Tev1 feedback: explicit corrections, user-local file, dedupe, chat export, grouped holdout"* ]] \
+  && ok "Tev1 keeps per-user corrections private and exports a grouped training set ($out)" \
+  || bad "Tev1 feedback export" "$out"
 out="$("$PYTHON" - <<'PY' 2>&1
 import json, re, subprocess, tomllib
 src = json.load(open('.mcp.json'))['mcpServers']

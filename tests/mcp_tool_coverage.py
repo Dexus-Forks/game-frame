@@ -82,8 +82,8 @@ def test_catalog_and_runner():
     expected = [item.as_dict() for item in items]
     runnable = [item for item in items if item.runs]
     nonrunnable = [item for item in items if not item.runs]
-    assert len(items) == 118, f'catalog has {len(items)} items; update the expected count'
-    assert len(runnable) == 96, f'catalog has {len(runnable)} runnable items; update the expected count'
+    assert len(items) == 119, f'catalog has {len(items)} items; update the expected count'
+    assert len(runnable) == 97, f'catalog has {len(runnable)} runnable items; update the expected count'
     assert len([item for item in items if item.kind == 'library']) == 13
     assert len([item for item in items if item.kind == 'ghidra']) == 9
 
@@ -197,7 +197,7 @@ def test_progress_cancellation_and_timeout():
 def main():
     test_catalog_and_runner()
     test_progress_cancellation_and_timeout()
-    print('MCP coverage: 118 catalog entries, 96 runnable tools, progress/cancel/timeout')
+    print('MCP coverage: 119 catalog entries, 97 runnable tools, progress/cancel/timeout')
 
 
 if __name__ == '__main__':

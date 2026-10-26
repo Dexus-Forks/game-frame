@@ -100,6 +100,28 @@ probabilities are, not the chance that the answer is correct. Treat its output a
 it against source evidence, emulator measurements and parity tests. See the
 [Ollama Tev1 model card](https://ollama.com/library/tev1) for API and model limits.
 
+### Keep corrections for this user
+
+When a person supplies a corrected answer, `tev1_feedback.py` can save it in that OS user's
+private application-data folder. Corrections are never recorded automatically. The saved state
+can include project material, so only record an example the user wants to keep.
+
+```bash
+./gameframe run tev1_feedback record request.json --question next_step --answer measure
+./gameframe run tev1_feedback export --output /path/to/tev1-training
+```
+
+The export keeps the latest correction for an identical prompt. It groups repeated states
+together when it creates a validation split. Fewer than ten distinct states produce a training
+file without validation data. Exporting does not change model weights or upload data.
+
+The upstream [Tev1 training guide](https://github.com/togethercomputer/tev1/blob/main/docs/TRAINING.md)
+currently shows a billed Together job. We have not connected that cloud path. A local adapter
+needs a tested Qwen3.5 trainer and a serving path: Ollama's documented Safetensors adapter
+import does not list Qwen. See [Ollama's adapter support](https://docs.ollama.com/import). Until
+those pieces are verified, treat the exported examples as collected fine-tuning data, not as a
+fine-tuned model.
+
 ## Work in subsystems
 
 - Choose a subsystem (the player's movement, a menu, the level loader) and take it from

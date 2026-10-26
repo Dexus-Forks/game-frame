@@ -293,6 +293,7 @@ calls a Tev1 model served by local Ollama; it does not use Claude credits.
 | Tool | What it does |
 |---|---|
 | `tools/llm/tev1.py` | Optional local decision adviser for bounded choice, yes-or-no and rubric questions; answers are advisory, see [working with agents](docs/working/agents.md#optional-local-decision-adviser) |
+| `tools/llm/tev1_feedback.py` | Saves explicit Tev1 corrections in per-user local storage and exports a chat-format training dataset; it does not train or upload the model |
 | `tools/llm/name_functions.py` | A suggested name, signature and summary for every unnamed function in a Ghidra export, in one Message Batch, written to `analysis/` for you to confirm |
 | `tools/llm/skillcheck.py` | Gives an agent one skill and a task on the sample game, and checks its answer against the ground truth: is each skill enough on its own? |
 | `tools/llm/headless.py` | Optional paid API run of one agent under a budget; requires the user's opt-in and saves its report; `docs-check` runs `re-checker` and `re-editor` over the documents |
