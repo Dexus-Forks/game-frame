@@ -8,28 +8,16 @@
 //! - `walk`: the traversal, from the root list to triangles in camera space.
 //! - `tri`: immediate mode (`sgltri_*`), faces already on the screen, as batches like `walk`'s.
 //! - `shadow`: immediate mode's shadow and light volumes (`sgltri_shadow`), as planes.
-//! - `convex`: a convex object's solid from its planes (light volumes).
+//! - `convex`: a convex object's planes (light volumes).
 //! - `texmem`: free texture memory, as the driver counts it.
 //! - `math`: affine matrices.
 //! - `dump`: the graph as text, for debugging.
 
-pub mod convex;
 pub mod dump;
-pub mod graph;
-pub mod math;
 pub mod shadow;
 pub mod texmem;
 pub mod tri;
-pub mod walk;
 
-pub use graph::Scene;
-
-/// An SGL colour, each part 0 to 1.
-pub type Colour = [f32; 3];
-
-/// SGL's error codes (sgl.h, `sgl_err_*`), as the game reads them: below zero is an error.
-pub const ERR_BAD_NAME: i32 = -253;
-pub const ERR_BAD_PARAMETER: i32 = -252;
-
-/// `SGL_DEFAULT_LIST`: the root list.
-pub const DEFAULT_LIST: i32 = -1;
+// The graph, its traversal, the planes and the matrices are GameFrame's `gameframe-powervr`,
+// which also draws them in software.
+pub use powervr::scene::{Colour, DEFAULT_LIST, ERR_BAD_NAME, ERR_BAD_PARAMETER, Scene, convex, graph, math, walk};

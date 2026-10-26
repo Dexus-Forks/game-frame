@@ -140,6 +140,9 @@ pub fn render(viewport: i32, camera: i32, swap: bool) {
         if view.is_none() {
             shim::log_once!("sgl_render: camera {camera} not in the scene");
         }
+        if view.as_ref().is_some_and(|v| v.skipped > 0) {
+            shim::gap!("sgl convex object", "a convex object that is not a light volume is not drawn");
+        }
         (view.map(|v| ViewDraw { device: dev, cam: vp.cam, visible: rects.clone(), view: v }), rects)
     };
     let need = PENDING.lock().unwrap_or_else(|e| e.into_inner()).need_address;

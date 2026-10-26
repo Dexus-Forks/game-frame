@@ -304,7 +304,7 @@ impl Frame {
         // The render thread's fog is SGL's scene-graph density: what is lost per unit of `w`.
         let lost = -(-(rate(register) as f64)).exp_m1() as f32;
         let camera = Camera { zoom: 1.0, foreground: near, inv_background: 0.0, fog: Some((fog_colour, lost)), background: self.background };
-        View { camera, batches, volumes: self.volumes() }
+        View { camera, batches, volumes: self.volumes(), skipped: 0 }
     }
 }
 
