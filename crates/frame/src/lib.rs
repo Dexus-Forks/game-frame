@@ -35,9 +35,11 @@ mod process;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod respawn;
 mod session;
+pub mod setup;
 mod settings;
 
 pub use device::{chosen, Device, Slot};
+pub use setup::{Gap, Held, Setup};
 pub use gameframe_report as report;
 pub use demo::{Demo, DEMO_PRESS_TICKS};
 pub use event::{matches, topics, valid_topic, Event, Origin};

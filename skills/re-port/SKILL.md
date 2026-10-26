@@ -168,7 +168,8 @@ on as before. The first time it gets there, a report is written with the place, 
 game's state and the launch, so the run can be repeated. A check against the original that can
 run in the game uses `mismatch!`. In `main`, call `report::install` with the game's name and
 its GitHub repository, `report::set_dir`, `report::set_launch`, and `report::flush` at the end;
-a kernel also calls `Link::send_reports`. Debug builds keep the reports on the machine (Dev).
+a kernel also calls `Link::send_reports`, and `Setup::report_gaps` for the devices running on a
+stand-in (`gameframe-frame`'s README, "Devices"). Debug builds keep the reports on the machine (Dev).
 Release builds give each one a filled-in GitHub issue link that the frame shows (Production).
 Tests set `GAMEFRAME_STRICT=1` to fail at an unported path. The crate's README has the rest.
 

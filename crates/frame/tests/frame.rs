@@ -543,3 +543,67 @@ fn a_device_not_ported_starts_on_its_stand_in() {
     assert!(Manifest::from_json(&text("voodoo")).is_err(), "the stand-in must be in the slot");
     assert!(Manifest::from_json(&text("glide")).is_err(), "not itself");
 }
+
+fn setup_manifest() -> Manifest {
+    Manifest::from_json(
+        r#"{"contract": "1.1", "name": "Game", "renderers": [
+        {"id": "software", "label": "Software", "grade": "good", "default": true},
+        {"id": "glide", "label": "3dfx Glide", "grade": "missing", "detail": "GAME3DFX.EXE", "stand_in": "software"},
+        {"id": "powervr", "label": "PowerVR", "grade": "missing"}],
+        "devices": [{"slot": "sound", "label": "Sound card", "options": [
+        {"id": "directsound", "label": "DirectSound", "grade": "good", "default": true},
+        {"id": "none", "label": "No sound", "grade": "exact"}]}]}"#,
+    )
+    .unwrap()
+}
+
+#[test]
+fn a_start_resolves_its_devices_and_their_gaps() {
+    use gameframe_frame::{Gap, Held};
+    let m = setup_manifest();
+    let mut held = Held::default();
+    let defaults = m.resolve(&json!({}), &held).unwrap();
+    assert_eq!((defaults.used("video"), defaults.used("sound")), (Some("software"), Some("directsound")));
+    assert!(defaults.gaps.is_empty());
+
+    held.note(&Event::new(topics::FRAME_READY, Origin::Frame, json!({"renderer": "glide", "devices": {"sound": "none"}})));
+    let s = m.resolve(&json!({}), &held).unwrap();
+    assert_eq!(s.asked_json(), json!({"video": "glide", "sound": "none"}));
+    assert_eq!((s.used("video"), s.used("sound")), (Some("software"), Some("none")));
+    assert_eq!(s.gaps, [Gap { slot: "video".into(), asked: "glide".into(), used: "software".into() }]);
+
+    // `game.start`'s pick wins over the held one; a select changes the held one.
+    held.note(&Event::new(topics::DEVICE_SELECT, Origin::Frame, json!({"slot": "sound", "device": "directsound"})));
+    let s = m.resolve(&json!({"devices": {"video": "software"}}), &held).unwrap();
+    assert_eq!(s.asked_json(), json!({"video": "software", "sound": "directsound"}));
+    assert!(m.resolve(&json!({"devices": {"video": "powervr"}}), &held).is_err(), "no stand-in, no start");
+    assert!(m.resolve(&json!({"devices": {"sound": "gravis"}}), &held).is_err(), "an unknown id");
+}
+
+#[test]
+fn each_gap_is_one_report_at_the_kernels_place() {
+    use gameframe_frame::report;
+    let m = setup_manifest();
+    let s = m.resolve(&json!({"devices": {"video": "glide"}}), &Default::default()).unwrap();
+    report::set_mode(report::Mode::Dev);
+    s.report_gaps(&m);
+    let r = report::reports().into_iter().find(|r| r.original.as_deref() == Some("GAME3DFX.EXE")).expect("a report");
+    assert_eq!((r.context["asked"].as_str(), r.context["used"].as_str()), (Some("glide"), Some("software")));
+    assert!(r.file.ends_with("tests/frame.rs"), "the caller's place: {}", r.file);
+}
+
+#[test]
+fn a_session_is_idle_then_starting_until_the_game_answers() {
+    /// A game that never answers.
+    struct Mute(Manifest);
+    impl Game for Mute {
+        fn manifest(&self) -> Manifest {
+            self.0.clone()
+        }
+        fn on_event(&mut self, _: &Event, _: &mut Outbox) {}
+    }
+    let mut s = Session::new(Box::new(Mute(setup_manifest())), Settings::new()).unwrap();
+    assert_eq!(s.state(), "idle");
+    s.start(vec![]);
+    assert_eq!(s.state(), "starting", "a wait for `stopped` must not end before the game says so");
+}

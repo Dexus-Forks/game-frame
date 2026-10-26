@@ -127,7 +127,7 @@ pub fn Play() -> Element {
             crate::shell::Ribbon { links: ribbon }
             // A stopped game needs no line; the live region stays so a screen reader hears changes.
             div { class: "lib-status", role: "status", "aria-live": "polite",
-                if state != "stopped" {
+                if !matches!(state.as_str(), "idle" | "stopped") {
                     "The game is {state}."
                     if !detail.is_empty() { " {detail}" }
                 }

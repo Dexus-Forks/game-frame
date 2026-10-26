@@ -75,7 +75,7 @@ impl Session {
             settings,
             renderer,
             devices,
-            state: "stopped".into(),
+            state: "idle".into(),
             reports: Vec::new(),
             log: VecDeque::new(),
             next_id: 1,
@@ -334,7 +334,11 @@ impl Session {
                     }
                 }
             }
-            topics::GAME_START => self.stopping = false,
+            // Until the game answers, it is starting: a wait for `stopped` waits for the game.
+            topics::GAME_START => {
+                self.stopping = false;
+                self.state = "starting".into();
+            }
             topics::GAME_STOP => self.stopping = true,
             topics::FRAME_EXIT => self.exit = true,
             topics::FRAME_OPEN => self.shown = true,

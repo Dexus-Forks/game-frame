@@ -45,6 +45,9 @@ Every release of GameFrame, newest first. The format follows
   game's own styles can apply to one theme only.
 - `gameframe-library`: `Folder::link_in`, which fills a section from the player's own folder
   by hard links.
+- `gameframe-frame`: `Manifest::resolve`, `Held` and `Setup` (`setup`). A kernel works out the
+  devices of a start in one call: the pick per slot, the stand-ins and the gaps.
+  `Setup::report_gaps` writes one report per gap at the kernel's place.
 - Building the port: "One program or two, one build or many". One build holds every device, and
   `devices` chooses at the start. The frame and the game are two processes on the desktop, and
   one file can hold both roles.
@@ -101,6 +104,9 @@ Every release of GameFrame, newest first. The format follows
   become absolute paths.
 
 ### Changed
+
+- `Session::state()` is `idle` before the first start and `starting` from `game.start` until the
+  game answers. It was `stopped`, so a test that waited for `stopped` ended before the game ran.
 
 - A project's game folder is `game/`, a link into the home. `target/` still works for older
   projects, and the gates protect both. `scripts/new-project.sh NAME` with no slash makes the
