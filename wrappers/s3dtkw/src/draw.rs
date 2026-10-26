@@ -11,7 +11,7 @@
 //! renderer. Texturing is left out: a textured call is logged and drawn Gouraud.
 
 use crate::table::State;
-use gpu_1997::s3;
+use virge as s3;
 use raster::{Format, Target, Vertex, polygon, triangle};
 
 /// `S3DTK_TRILIST`, `S3DTK_TRISTRIP`, `S3DTK_TRIFAN` (POD uses the fan).

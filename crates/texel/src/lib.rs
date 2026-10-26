@@ -1,7 +1,15 @@
+#![doc = include_str!("../README.md")]
+#![doc = ""]
 //! Texel layouts and their decoding to 8-bit RGBA. Multi-byte texels are little-endian, and
 //! bit fields are named from the top bit down (`ARGB1555`: alpha in bit 15).
 
-use crate::ncc::NccTable;
+pub mod resample;
+
+/// A table that turns an 8-bit YIQ texel into RGB: a chip's own compression, such as 3dfx's
+/// NCC (`gameframe_voodoo::ncc::NccTable`).
+pub trait Yiq {
+    fn decode(&self, texel: u8) -> [u8; 3];
+}
 
 /// A picture in 8-bit RGBA, rows top to bottom.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -65,12 +73,12 @@ impl TexelFormat {
 }
 
 /// What a decode may need besides the texels.
-#[derive(Clone, Copy, Debug, Default)]
+#[derive(Clone, Copy, Default)]
 pub struct Tables<'a> {
     /// RGB triplets for the palettised formats (16 or 256 used).
     pub palette: Option<&'a [[u8; 3]]>,
-    /// The table for the NCC formats.
-    pub ncc: Option<&'a NccTable>,
+    /// The table for the YIQ formats (3dfx's NCC).
+    pub ncc: Option<&'a dyn Yiq>,
 }
 
 fn rep(v: u32, bits: u32) -> u8 {

@@ -31,8 +31,8 @@ so in a `Deviation:` comment. Nothing has been compared with a real card yet.
 What it does not model: two TMUs, mipmaps, the LFB, alpha and depth bias, stipple.
 
 The constants are the values of the Glide 2.x SDK's `glide.h`, as in GameFrame's
-`wrappers/glide`, whose OpenGL shader follows the same combine rules. Texel formats come from
-`gameframe-gpu-1997`.
+`wrappers/glide`, whose OpenGL shader follows the same combine rules. Glide's texture formats
+(`formats`) and NCC tables (`ncc`) are here too; texel decoding is `gameframe-texel`'s.
 
 It comes from the POD: Planet of Death (1997) project, whose 3dfx build (`WPOD3DFX.EXE`)
 Un-POD draws with it.

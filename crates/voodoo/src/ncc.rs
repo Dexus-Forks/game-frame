@@ -33,6 +33,12 @@ impl NccTable {
 
     /// One texel to RGB.
     pub fn decode(&self, texel: u8) -> [u8; 3] {
+        gameframe_texel::Yiq::decode(self, texel)
+    }
+}
+
+impl gameframe_texel::Yiq for NccTable {
+    fn decode(&self, texel: u8) -> [u8; 3] {
         let (y, i, q) = ((texel >> 4) as usize, ((texel >> 2) & 3) as usize, (texel & 3) as usize);
         [0, 1, 2].map(|c| (self.y[y] as i32 + self.i[i][c] as i32 + self.q[q][c] as i32).clamp(0, 255) as u8)
     }

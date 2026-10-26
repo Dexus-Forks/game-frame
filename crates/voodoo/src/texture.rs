@@ -2,9 +2,8 @@
 //! side), point or bilinear, wrapped or clamped.
 
 use crate::consts::*;
-use gameframe_gpu_1997::glide::Format;
-use gameframe_gpu_1997::Rgba;
-use gameframe_gpu_1997::texel::Tables;
+use crate::formats::Format;
+use gameframe_texel::{Rgba, Tables};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Texture {
@@ -27,7 +26,7 @@ impl Texture {
     /// palette `grTexDownloadTable(GR_TEXTABLE_PALETTE)` gave for `GR_TEXFMT_P_8` (RGB).
     pub fn from_glide(format: Format, width: usize, height: usize, data: &[u8], palette: Option<&[[u8; 3]]>) -> Result<Texture, String> {
         let tables = Tables { palette, ncc: None };
-        let p = gameframe_gpu_1997::texel::decode(format.texel(), width, height, data, tables)?;
+        let p = gameframe_texel::decode(format.texel(), width, height, data, tables)?;
         Ok(Texture::from_rgba(&p))
     }
 

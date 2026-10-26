@@ -58,7 +58,7 @@ proposed again.
 - [x] Antialiased lines
 - [x] Polygons that are not convex: even-odd and non-zero rules
 - [x] Hidden surfaces: z-buffer compare, sorted spans, BSP, portals, PVS
-- [x] The card makers' 3D APIs in detail: Glide 2.x, ATI3DCIF, S3D Toolkit; one build per card ([card-apis.md](docs/hardware/card-apis.md), `gameframe-gpu-1997`, `re-accelerator`)
+- [x] The card makers' 3D APIs in detail: Glide 2.x, ATI3DCIF, S3D Toolkit; one build per card ([card-apis.md](docs/hardware/card-apis.md), `gameframe-voodoo`, `gameframe-rage`, `gameframe-virge`, `gameframe-texel`, `re-accelerator`)
 - [x] Hand-written MMX code: finding it, matching it to the plain build, measuring, porting ([simd.md](docs/hardware/simd.md), `gameframe-mmx`, `re-vectoriser`)
 - [x] PowerVR SGL's scene-graph half: the 46 calls of POD's PowerVR build, a stand-in `sgl.dll` on OpenGL ([wrappers/sgl](wrappers/sgl/README.md))
 - [x] PowerVR SGL's immediate-mode half (`sgltri_*`), which Hardwar's PowerVR mode uses. The 13 calls it lacked, and `sgltri_rerender`, are in `wrappers/sgl` ([sgl](wrappers/sgl/README.md), `test/sgltritest.c`). `sgltri_shadow` draws shadow volumes; Hardwar has not been run against it

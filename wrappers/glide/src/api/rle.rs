@@ -4,7 +4,7 @@
 use crate::cmd::{Cmd, push};
 use crate::layout;
 use crate::rle;
-use gpu_1997::glide::{Format, size};
+use voodoo::formats::{Format, size};
 
 /// Code `width × height` RGB565 pixels from `src` as runs (`rle::encode`). With `dst` null,
 /// only count. Returns the size of the code in bytes.

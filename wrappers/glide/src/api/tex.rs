@@ -7,7 +7,7 @@
 use super::shadow::{self, send};
 use crate::cmd::{Cmd, TexInfo, push};
 use crate::layout;
-use gpu_1997::glide::{Format, TEXTABLE_PALETTE, size};
+use voodoo::formats::{Format, TEXTABLE_PALETTE, size};
 
 /// The TMU's memory as `grSstQueryHardware` reports it: 4 MB.
 pub const TMU_MEMORY: u32 = 4 << 20;

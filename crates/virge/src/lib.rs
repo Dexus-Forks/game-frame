@@ -1,7 +1,9 @@
+#![doc = include_str!("../README.md")]
+#![doc = ""]
 //! S3 ViRGE, S3D Toolkit: texture and video formats, rendering types and state keys, from
 //! `S3DTK.H` of the S3D ToolKit SDK 2.6.
 
-use crate::texel::TexelFormat;
+use gameframe_texel::TexelFormat;
 
 /// Surface format bits (`sfFormat`) for textures.
 pub const TEXARGB8888: u32 = 0x00;
@@ -62,3 +64,9 @@ pub fn texel(sf_format: u32) -> Option<TexelFormat> {
 pub fn state_name(key: u32) -> Option<&'static str> {
     STATE_KEYS.get(key as usize).copied()
 }
+
+/// The texel layouts the S3D Toolkit takes.
+pub const TEXTURE_FORMATS: &[TexelFormat] = {
+    use TexelFormat::*;
+    &[Argb8888, Argb4444, Argb1555, Palette8]
+};

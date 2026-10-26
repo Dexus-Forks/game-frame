@@ -6,7 +6,7 @@ use super::tex::{GrTexInfo, TMU_MEMORY, download_chain, grTexClampMode, grTexFil
 use crate::cmd::{Cmd, push};
 use crate::layout;
 use crate::tdf;
-use gpu_1997::glide::{Format, size};
+use voodoo::formats::{Format, size};
 use std::ffi::{CStr, c_char};
 use std::sync::Mutex;
 

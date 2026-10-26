@@ -1,6 +1,6 @@
 //! The Glide 2.x constants the pipeline reads, with the values of the Glide 2.x SDK's
 //! `glide.h` (the same as GameFrame's `wrappers/glide/src/consts.rs`). Texture formats and
-//! sizes are `gameframe_gpu_1997::glide`.
+//! sizes are `crate::formats`.
 
 // GrCombineFunction_t
 pub const FUNC_ZERO: u32 = 0x0;

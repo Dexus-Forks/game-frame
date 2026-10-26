@@ -1,5 +1,5 @@
 //! The context's render state, as `ATI3DCIF_ContextSetState` sets it (`C3D_ERSID` values,
-//! `gpu_1997::ati::RENDER_STATES`).
+//! `rage::RENDER_STATES`).
 
 pub const PRIM_TYPE: u32 = 2;
 pub const SOLID_CLR: u32 = 3;

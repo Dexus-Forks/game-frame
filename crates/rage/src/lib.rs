@@ -1,8 +1,10 @@
+#![doc = include_str!("../README.md")]
+#![doc = ""]
 //! ATI 3D Rage, ATI3DCIF: texture formats (`C3D_ETEXFMT`), drawing-surface formats
 //! (`C3D_EPIXFMT`) and render-state ids (`C3D_ERSID`), from ATI's *3D RAGE Windows 95
 //! Programmer's Guide* (SDK-C02700 rev. 1.30, 1997).
 
-use crate::texel::TexelFormat;
+use gameframe_texel::TexelFormat;
 
 /// `C3D_ETF_*`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -66,3 +68,9 @@ pub fn render_state_name(id: u32) -> Option<&'static str> {
 
 /// `C3D_EPRIM_*`: line, triangle, quad, rectangle, point.
 pub const PRIM_TYPES: [&str; 5] = ["LINE", "TRI", "QUAD", "RECT", "POINT"];
+
+/// The texel layouts ATI3DCIF takes (`C3D_ETEXFMT`, less YUV and VQ).
+pub const TEXTURE_FORMATS: &[TexelFormat] = {
+    use TexelFormat::*;
+    &[Palette4, Palette8, Argb1555, Rgb565, Argb8888, Rgb332, Intensity8, Argb4444]
+};

@@ -9,6 +9,22 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `gameframe-voodoo`: a software 3dfx Voodoo Graphics pipeline driven by Glide 2.x (combine
+  units, chroma key, alpha test, table fog, Z and W buffers, blending, the 565 buffer with its
+  dither), after 3dfx's SST-1 specification, and a `Glide` context with the calls by their
+  names, drawn at any multiple of the game's resolution.
+- One crate per 3D chip: `gameframe-voodoo` (Glide's formats and NCC tables),
+  `gameframe-rage` (ATI3DCIF), `gameframe-virge` (S3D Toolkit), and `gameframe-texel` for the
+  texel layouts and the 2:1 reduction they share. Each lists the layouts its API takes
+  (`TEXTURE_FORMATS`).
+
+### Removed
+
+- `gameframe-gpu-1997`: its pieces are in the per-chip crates above. `glide` is now
+  `gameframe_voodoo::formats`, `ncc` is `gameframe_voodoo::ncc`, `ati` is `gameframe_rage`,
+  `s3` is `gameframe_virge`, and `texel` and `resample` are `gameframe_texel`. The `card`
+  table became each crate's `TEXTURE_FORMATS`.
+
 - A game can give the frame a theme of its own: `FrameSetup::with_theme(name, label, css)`.
   `"preset"` and `"presets"` in `library.json` name it as they name the ready-made themes, so
   the player can still choose between them.

@@ -1,7 +1,7 @@
 //! The six exported calls.
 
 use crate::{OK, context, state};
-use gpu_1997::ati::render_state_name;
+use rage::render_state_name;
 use shim::{log, log_once};
 use std::sync::atomic::{AtomicU32, Ordering};
 

@@ -732,10 +732,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "gameframe-gpu-1997"
-version = "0.1.0"
-
-[[package]]
 name = "gameframe-indeo"
 version = "0.1.0"
 
@@ -772,6 +768,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "gameframe-rage"
+version = "0.1.0"
+dependencies = [
+ "gameframe-texel",
+]
+
+[[package]]
 name = "gameframe-saa1099"
 version = "0.1.0"
 
@@ -792,14 +795,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "gameframe-texel"
+version = "0.1.0"
+
+[[package]]
 name = "gameframe-turbo-pascal"
 version = "0.1.0"
+
+[[package]]
+name = "gameframe-virge"
+version = "0.1.0"
+dependencies = [
+ "gameframe-texel",
+]
 
 [[package]]
 name = "gameframe-voodoo"
 version = "0.1.0"
 dependencies = [
- "gameframe-gpu-1997",
+ "gameframe-texel",
 ]
 
 [[package]]

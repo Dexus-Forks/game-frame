@@ -2,6 +2,8 @@
 #![doc = ""]
 //! A software model of the 3dfx Voodoo Graphics pixel pipeline, driven by Glide 2.x state.
 //!
+//! - [`formats`]: Glide's texture formats (`GR_TEXFMT_*`), levels (`GR_LOD_*`) and aspect
+//!   ratios (`GR_ASPECT_*`); [`ncc`]: 3dfx's YIQ compression tables.
 //! - [`state`]: the render state Glide's calls set, with `grSstOpen`'s defaults.
 //! - [`combine`]: the colour and alpha combine units.
 //! - [`texture`]: one TMU's texture sampling (point or bilinear, wrap or clamp).
@@ -17,8 +19,10 @@
 pub mod combine;
 pub mod consts;
 pub mod fog;
+pub mod formats;
 pub mod frame;
 pub mod glide;
+pub mod ncc;
 pub mod state;
 pub mod texture;
 pub mod tri;

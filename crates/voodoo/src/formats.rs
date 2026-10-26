@@ -1,7 +1,7 @@
 //! 3dfx Glide 2.x: texture formats (`GrTextureFormat_t`), mip levels (`GrLOD_t`) and aspect
 //! ratios (`GrAspectRatio_t`), with the values of the Glide 2.x SDK's `glide.h`.
 
-use crate::texel::TexelFormat;
+use gameframe_texel::TexelFormat;
 
 /// `GR_TEXFMT_*`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -80,3 +80,13 @@ pub const TEXTABLE_PALETTE: u32 = 2;
 pub fn palette_entry([r, g, b]: [u8; 3]) -> u32 {
     (r as u32) << 16 | (g as u32) << 8 | b as u32
 }
+
+/// The texel layouts Glide 2.x takes (`GR_TEXFMT_*`), for tools that show a scene the way the
+/// card would have.
+pub const TEXTURE_FORMATS: &[TexelFormat] = {
+    use TexelFormat::*;
+    &[Rgb332, Yiq422, Alpha8, Intensity8, AlphaIntensity44, Palette8, Argb8332, Ayiq8422, Rgb565, Argb1555, Argb4444, AlphaIntensity88, AlphaPalette88]
+};
+
+/// The largest texture side Glide 2.x accepts (`GR_LOD_256`).
+pub const MAX_TEXTURE_SIDE: usize = 256;

@@ -17,7 +17,7 @@ use crate::frame::Frame;
 use crate::state::{Combine, State};
 use crate::texture::Texture;
 use crate::tri::{Vertex, triangle};
-use gameframe_gpu_1997::glide::{Format, size};
+use crate::formats::{Format, size};
 use std::collections::HashMap;
 
 /// `GrTexInfo`: the levels, the aspect ratio, the format and the texels of the largest level

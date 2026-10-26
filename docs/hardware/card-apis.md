@@ -6,8 +6,10 @@ covers the three most common of them in detail: 3dfx Glide 2.x, ATI's ATI3DCIF f
 3D Rage, and S3's S3D Toolkit for the ViRGE. It says how to find each in a game, how to read
 the calls, how textures reach the card, and what the per-card builds tend to differ in.
 [3D accelerators](graphics-3d.md) has the overview of the cards and of Direct3D and OpenGL.
-The crate `gameframe-gpu-1997` ([crates](../crates/README.md)) holds the formats and
-constants named here.
+One crate per chip holds the formats and constants named here ([crates](../crates/README.md)):
+`gameframe-voodoo` for 3dfx, `gameframe-rage` for ATI, `gameframe-virge` for S3, with the texel
+decoder they share in `gameframe-texel`. Each chip crate lists the texel layouts its API takes
+(`TEXTURE_FORMATS`).
 
 ## Find the API
 
@@ -126,7 +128,7 @@ The player saw a different picture on each card: 8-bit software textures, 16-bit
 textures on a Voodoo, affine textures on a ViRGE, halved texture pages where memory was short.
 A viewer or a port can offer the same choice as a setting: a "renderer profile" per card that
 uses the file variant, the texture formats and sizes, and the effects (reflections, fog)
-that card's build used. `gameframe-gpu-1997`'s `card` module lists what each chip accepts;
+that card's build used. each chip crate's `TEXTURE_FORMATS` lists what that chip accepts;
 the game's own differences come from tracing its builds. `gameframe-voodoo` draws a 3dfx
 profile in software: hand it the triangles and Glide states the game's 3dfx build sends and it
 gives the picture at any size, with no Glide library. Its arithmetic follows 3dfx's register

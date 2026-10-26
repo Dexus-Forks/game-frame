@@ -2,7 +2,7 @@
 //! table itself. POD calls slots 0 (`SetState`), 1 (`GetState`) and 2 (`TriangleSet`). Each
 //! returns 1 on success: the game stops with "S3DTK Error : SetState" on anything else.
 
-use gpu_1997::s3::state_name;
+use virge::state_name;
 use shim::log;
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicU32, Ordering};

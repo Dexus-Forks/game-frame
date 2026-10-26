@@ -1,0 +1,13 @@
+[package]
+name = "gameframe-rage"
+description = "ATI 3D Rage through ATI3DCIF: texture formats (C3D_ETEXFMT), surface formats (C3D_EPIXFMT) and render-state ids (C3D_ERSID)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["ati", "rage", "ati3dcif", "reverse-engineering"]
+categories = ["emulators", "graphics"]
+
+[dependencies]
+gameframe-texel = { path = "../texel" }

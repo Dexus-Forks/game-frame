@@ -1,5 +1,5 @@
 //! The Glide 2.x constants this library interprets, with the values of the Glide 2.x SDK's
-//! `glide.h`. Texture formats and sizes are `gpu_1997::glide`.
+//! `glide.h`. Texture formats and sizes are `voodoo::formats`.
 
 #![allow(dead_code)]
 
