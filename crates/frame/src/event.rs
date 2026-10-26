@@ -131,6 +131,11 @@ pub mod topics {
     /// Data: `{"section": "mods"}`. The game reads the library again.
     pub const LIBRARY_CHANGED: &str = "library.changed";
 
+    /// Game to frame: the game reached a place the port has not ported, or crashed: one
+    /// `gameframe_report::Report` as JSON, the first time at each place and again with a new
+    /// count. In Production it carries `issue`, a link to a filled-in GitHub issue.
+    pub const REPORT_NEW: &str = "report.new";
+
     /// Either way: a line for the console. Data: `{"level": "info" | "warn" | "error",
     /// "text": "..."}`.
     pub const LOG: &str = "log.message";

@@ -513,3 +513,18 @@ fn a_config_game_fills_in_its_devices() {
     let start = Event::new(topics::GAME_START, Origin::Frame, json!({"renderer": "glide", "devices": {"sound": "sound-blaster"}, "settings": {}}));
     assert_eq!(game.arguments(&start), ["--sound=sound-blaster", "--video=glide"]);
 }
+
+#[test]
+fn the_session_keeps_one_report_per_place() {
+    let mut s = demo();
+    let mut r = gameframe_frame::report::Report { id: "unported-1".into(), what: "fog".into(), count: 1, ..Default::default() };
+    let send = |s: &mut Session, r: &gameframe_frame::report::Report| {
+        let e = Event::new(topics::REPORT_NEW, Origin::Game, serde_json::to_value(r).unwrap());
+        s.send(&e.topic, e.data); // as the game's event would arrive
+    };
+    send(&mut s, &r);
+    r.count = 4;
+    send(&mut s, &r);
+    assert_eq!(s.reports().len(), 1);
+    assert_eq!(s.reports()[0].count, 4);
+}

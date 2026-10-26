@@ -110,6 +110,7 @@ as `game.start`.
 | `game.status` | game to frame | `loading`, `running`, `paused`, `stopped` or `failed`, with a detail line |
 | `input.press` | frame to game | One of the game's controls, pressed or released |
 | `library.changed` | frame to game | The library section the player changed |
+| `report.new` | game to frame | A place the game reached that the port has not ported, or a crash, from `gameframe-report` |
 | `log.message` | either way | A line for the console |
 
 The game describes itself once, in a manifest. The manifest gives the contract version, the
@@ -154,6 +155,16 @@ colour depth) as ordinary settings in a group named after the slot.
 | Config only | A game the frame starts as a separate program | A `frame.json` with the manifest, the start command and the game's folder. The frame fills `{renderer}`, `{device:SLOT}` and `{setting:KEY}` in the command's arguments. [gameframe-launcher](../../launcher/README.md) runs it with no Rust code of the game's own. Such a game cannot open the frame while it runs: the frame comes back when it ends |
 
 `Demo` in gameframe-frame stands in for a game, so the frame runs with none.
+
+### Reports from the running game
+
+A port names each path it has not ported with `gameframe_report::unported!`. The first time the
+game reaches one, or crashes, [gameframe-report](../../crates/report/README.md) writes a report:
+the place in the port, the original's address, the values there, the game's state, the launch
+and the devices. A debug build keeps the reports on the machine for an agent to read (Dev). A
+release build gives each one a link to a filled-in GitHub issue, which the frame lists in Play
+(Production). `tools/triage/report_issue.py` lists the local reports and files one, once per
+place. Each issue's body tells an agent where to start.
 
 ### The frame's look
 

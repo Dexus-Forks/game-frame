@@ -24,6 +24,8 @@ pub struct Session {
     /// The device chosen in each slot besides graphics, saved as `frame.device.SLOT`.
     devices: BTreeMap<String, String>,
     state: String,
+    /// The game's reports (`report.new`), one per place, in the order they came.
+    reports: Vec<gameframe_report::Report>,
     log: VecDeque<Event>,
     next_id: u64,
     listeners: Vec<(String, Listener)>,
@@ -74,6 +76,7 @@ impl Session {
             renderer,
             devices,
             state: "stopped".into(),
+            reports: Vec::new(),
             log: VecDeque::new(),
             next_id: 1,
             listeners: Vec::new(),
@@ -150,6 +153,10 @@ impl Session {
             all.insert(slot.clone(), json!(id));
         }
         Value::Object(all)
+    }
+    /// The reports the game sent: places it reached that the port has not ported, and crashes.
+    pub fn reports(&self) -> &[gameframe_report::Report] {
+        &self.reports
     }
     /// The game's last `game.status` state.
     pub fn state(&self) -> &str {
@@ -333,6 +340,14 @@ impl Session {
             topics::FRAME_OPEN => self.shown = true,
             topics::FRAME_CLOSE => self.shown = false,
             topics::CONFIG_OPTIONS => self.fill_options(e),
+            topics::REPORT_NEW => {
+                if let Ok(r) = serde_json::from_value::<gameframe_report::Report>(e.data.clone()) {
+                    match self.reports.iter_mut().find(|old| old.id == r.id) {
+                        Some(old) => *old = r,
+                        None => self.reports.push(r),
+                    }
+                }
+            }
             _ => {}
         }
     }

@@ -22,6 +22,7 @@ fn grade_label(g: Grade) -> &'static str {
 #[component]
 pub fn Play() -> Element {
     let frame = use_frame();
+    let reports = frame.with(|s| s.reports().to_vec());
     let (manifest, slots, chosen, state, detail) = frame.with(|s| {
         let detail = s
             .log()
@@ -139,6 +140,36 @@ pub fn Play() -> Element {
                 if state != "stopped" {
                     "The game is {state}."
                     if !detail.is_empty() { " {detail}" }
+                }
+            }
+            // What the game reached that the port has not done, and its crashes (`report.new`).
+            if !reports.is_empty() {
+                div { class: "lib-reports", role: "region", "aria-label": "Reports",
+                    h3 { class: "lib-slot", "Reports" }
+                    p { class: "lib-row-meta",
+                        "The game reached places this port has not done yet. Each is written down with what the game was doing."
+                    }
+                    ul { class: "lib-notice",
+                        for r in reports.iter() {
+                            li {
+                                Icon { name: "missing" }
+                                span { class: "lib-report",
+                                    span { class: "lib-row-name", "{r.what}" }
+                                    span { class: "lib-row-meta",
+                                        "{r.kind.name()}, {r.count}×"
+                                        if let Some(o) = &r.original { ", original " code { "{o}" } }
+                                    }
+                                    if let Some(url) = &r.issue {
+                                        a { class: "lib-button lib-button--quiet", href: "{url}", target: "_blank", rel: "noopener",
+                                            "Open a GitHub issue"
+                                        }
+                                    } else {
+                                        span { class: "lib-row-meta", "Saved as " code { "{r.id}.md" } " in the reports folder." }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
             label { class: "lib-check",

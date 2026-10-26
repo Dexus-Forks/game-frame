@@ -262,6 +262,14 @@ turns to a new era, platform, runtime or kind of hardware, run `./gameframe advi
 with their fixes, dead ends with what was tried, and the context for that era. A hook does the
 same after each shell command in Claude Code. Read `docs/working/knowhow.md` for how it works.
 
+A report from the running port (an issue labelled `gameframe-report`, or a file in the
+port's `reports/` folder) names a place the game reached that is not ported, or a crash. Its
+body gives the port's file and line, the original's address, the values there, the game's
+state and the launch to start it again. Work it as a normal slice: `re-trace` the address,
+`re-emulate` with the values, `re-port`, `re-verify`, then `re-land` with the issue's number.
+`tools/triage/report_issue.py list` shows the local reports, most frequent first, and
+`report_issue.py file ID` files one, once per place.
+
 Read `docs/working/agents.md` once per project. It covers writing everything down in the
 repository, measuring before porting, splitting work between sessions, and what to do when stuck. Write every document by
 `docs/working/writing.md`.

@@ -705,6 +705,7 @@ name = "gameframe-frame"
 version = "0.1.0"
 dependencies = [
  "gameframe-disc-image",
+ "gameframe-report",
  "serde",
  "serde_json",
 ]
@@ -776,6 +777,14 @@ name = "gameframe-rage"
 version = "0.1.0"
 dependencies = [
  "gameframe-texel",
+]
+
+[[package]]
+name = "gameframe-report"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

@@ -9,6 +9,12 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `gameframe-report`: reports from a running port. `unported!` and `mismatch!` at the places
+  the port has not done, and panics, each written once per place with the original's address,
+  the values there, the game's state, the launch and the devices. Dev keeps them on the
+  machine; Production adds a link to a filled-in GitHub issue. The frame lists them
+  (`report.new`, `Link::send_reports`), and `tools/triage/report_issue.py` lists and files
+  them, once per place.
 - The frame's setup dialog (contract 1.1): device slots beside the renderers, such as the
   sound card and the music device, as a 1990s game's Manager or `SETUP.EXE` offered them.
   `device.select`, `devices` in `frame.ready` and `game.start`, `Session::select_device`,

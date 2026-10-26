@@ -50,6 +50,7 @@ its console, including topics it does not know, so a game can add its own (`demo
 | `game.status` | game to frame | `{"state": "loading" or "running" or "paused" or "stopped" or "failed", "detail"}` |
 | `input.press` | player to game | `{"control", "down"}`, with the control names from the manifest |
 | `library.changed` | frame to game | `{"section"}`: read that library section again |
+| `report.new` | game to frame | one `gameframe_report::Report`: a place the game reached that is not ported, or a crash; `Session::reports()` keeps one per place, and Play lists them with their GitHub link (`Link::send_reports`) |
 | `log.message` | either way | `{"level": "info" or "warn" or "error", "text"}` |
 
 The constants are in `gameframe_frame::topics`.
