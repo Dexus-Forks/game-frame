@@ -11,7 +11,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import type { DefaultTheme } from 'vitepress'
 import { ROOT, pageUrl, skills, title } from './repo.mts'
-import { GROUP_TITLES, agents, tools } from './catalog.mts'
+import { agents, toolGroups, tools } from './catalog.mts'
 
 type Item = DefaultTheme.SidebarItem
 
@@ -59,7 +59,7 @@ export function sidebar(): Item[] {
   groups.push({
     text: 'Tools',
     collapsed: true,
-    items: [{ text: 'All tools', link: '/tools/' }, ...Object.entries(GROUP_TITLES).map(([group, text]) => ({
+    items: [{ text: 'All tools', link: '/tools/' }, ...toolGroups().map(([group, text]) => ({
       text, collapsed: true,
       items: tools().filter(t => t.group === group).map(t => ({ text: t.name, link: `/tools/${t.name}` })),
     })).filter(g => g.items.length)],

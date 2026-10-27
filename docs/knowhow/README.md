@@ -87,6 +87,7 @@ An entry has one of five statuses.
 | [A value that comes from a register nobody set there: read the disassembly](registers-left-by-callees.md) | context |
 | [A wait loop with `pgrep -f` never ends after the process has finished](pgrep-wait-matches-itself.md) | solved |
 | [A Windows ISO times out at "Press any key to boot from CD" in VMware Fusion](fusion-boot-prompt-keys.md) | workaround |
+| [A wrapper DLL draws nothing under Wine on macOS, and its log says "version '130' is not supported"](wine-macos-opengl-2-1.md) | solved |
 | [Almost every function differs between two builds, though the game behaves the same](rebuilt-build-every-function-differs.md) | solved |
 | [An editor's save changes bytes nobody edited (fixed point through floats)](editor-float-view-changes-bytes.md) | solved |
 | [An emulated function calls a Windows import that has no handler](emu-import-no-handler.md) | solved |

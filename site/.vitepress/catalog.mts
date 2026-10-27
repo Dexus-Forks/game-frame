@@ -18,10 +18,20 @@ import { ROOT, githubUrl, skills } from './repo.mts'
 export type Agent = { name: string, description: string, skills: string[], file: string, body: string }
 export type Tool = { name: string, path: string, kind: string, group: string, summary: string, runs: boolean, doc: string }
 
-// The folders of the toolkit, in the order of the method, as ./gameframe names them.
+// The folders of the toolkit, in the order of the method, as ./gameframe names them. A folder
+// missing here still gets a group, after these, under its own name (toolGroups()).
 const GROUPS: Record<string, string> = {
   disc: 'Discs and disk images', pe: 'Windows PE', dos: '16-bit DOS', triage: 'Triage',
-  emu: 'Emulators', formats: 'Formats', verify: 'Verify', ghidra: 'Ghidra scripts', scripts: 'Scripts',
+  emu: 'Emulators', formats: 'Formats', live: 'The running game', verify: 'Verify',
+  ghidra: 'Ghidra scripts', rea: 'REA', llm: 'Models', site: 'Sites', install: 'Installing builds',
+  scripts: 'Scripts',
+}
+
+/** Every group that has tools, as [folder, title]: the known ones in order, then any other. */
+export function toolGroups(): [string, string][] {
+  const seen = new Set(tools().map(t => t.group))
+  const known = Object.entries(GROUPS).filter(([g]) => seen.has(g))
+  return [...known, ...[...seen].filter(g => !(g in GROUPS)).sort().map(g => [g, g] as [string, string])]
 }
 
 function stripFrontMatter(text: string): string {
@@ -166,7 +176,7 @@ export function indexPage(section: string): string {
   const lines = ['# Tools', '',
     'Every tool and script in GameFrame, with its own help. The same list is in the terminal with'
     + ' `./gameframe tools`, and one tool\'s help with `./gameframe tool NAME`.', '']
-  for (const [group, title] of Object.entries(GROUPS)) {
+  for (const [group, title] of toolGroups()) {
     const list = tools().filter(t => t.group === group)
     if (!list.length) continue
     lines.push(`## ${title}`, '', '| Tool | Kind | What it does |', '|---|---|---|')
@@ -188,4 +198,3 @@ function cell(text: string): string {
 }
 
 export const SECTIONS = ['skills', 'agents', 'tools']
-export const GROUP_TITLES = GROUPS

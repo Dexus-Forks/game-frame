@@ -22,6 +22,20 @@ and exits, as a port would start its game. `cargo run -- --frame` opens the fram
 [the list](../../templates/library-page/README.md#the-design-system), or `none` for the frame's
 own look. A theme chosen in Settings is saved and wins over it.
 
+## Install it as an application
+
+From GameFrame's folder:
+
+```bash
+./gameframe install
+```
+
+This builds the release program from GameFrame's `install.json` and installs it as
+`/Applications/GameFrame/GameFrame Demo.app` on macOS. Windows and Linux get their own
+GameFrame folder. It keeps its settings and library in `~/Library/Application Support/GameFrame/GameFrame Demo`. A port
+installs the same way from its own `install.json`
+([Installing a build](../../docs/working/building-the-port.md#installing-a-build-on-this-computer)).
+
 ## Browser
 
 With [Trunk](https://trunkrs.dev) and the `wasm32-unknown-unknown` target:

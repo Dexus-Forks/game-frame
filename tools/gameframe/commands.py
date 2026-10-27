@@ -21,8 +21,8 @@ from paths import NAME, ROOT, SCRIPTS, TOOLS, python, rel
 from search import search
 
 GROUPS = {'disc': 'Discs and disk images', 'pe': 'Windows PE', 'dos': '16-bit DOS', 'emu': 'Emulators', 'triage': 'Triage',
-          'formats': 'Formats', 'verify': 'Verify', 'ghidra': 'Ghidra scripts',
-          'site': 'Sites', 'install': 'Installing builds', 'scripts': 'Scripts'}
+          'formats': 'Formats', 'live': 'The running game', 'verify': 'Verify', 'ghidra': 'Ghidra scripts',
+          'rea': 'REA', 'llm': 'Models', 'site': 'Sites', 'install': 'Installing builds', 'scripts': 'Scripts'}
 
 
 def _width():
