@@ -16,6 +16,7 @@ of game, and how to connect Ghidra's debugger to an emulator.
 | DOS, early PC, booters | Bochs | A built-in debugger. Bochs can also be built with a GDB stub |
 | Any PC, raw machine | QEMU | `-s -S` waits for a GDB connection on port 1234 before it starts |
 | Windows | x64dbg, WinDbg | On Windows itself. Under Wine, `winedbg --gdb game.exe` serves the process to GDB |
+| Windows, under Wine or CrossOver | `tools/live/winegdb.py` | Attaches winedbg's GDB server to a running game: registers, memory, breakpoints that are always removed. On Apple silicon only int3 breakpoints work ([winedbg's GDB server](../knowhow/winedbg-gdb-server.md)) |
 | Arcade and many consoles and computers | MAME | A built-in debugger with memory views and watchpoints. `-debugger gdbstub` serves GDB for some CPUs |
 | Game Boy Advance | mGBA | `-g` starts a GDB stub |
 | Nintendo DS | DeSmuME | `--arm9gdb=PORT` and `--arm7gdb=PORT` start GDB stubs for the two CPUs |
