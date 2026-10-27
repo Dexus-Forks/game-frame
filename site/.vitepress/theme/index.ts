@@ -11,6 +11,8 @@ import HomeSetupPrompt from './HomeSetupPrompt.vue'
 import HomeStage from './HomeStage.vue'
 import MarkdownLink from './MarkdownLink.vue'
 import FileExplorer from './lab/FileExplorer.vue'
+import PipelineDemo from './lab/PipelineDemo.vue'
+import PipelineExplorer from './lab/PipelineExplorer.vue'
 import PixelExplorer from './lab/PixelExplorer.vue'
 import RecordsExplorer from './lab/RecordsExplorer.vue'
 import './custom.css'
@@ -20,6 +22,8 @@ export default {
   enhanceApp({ app }) {
     // The browser tools of /lab/, used in its pages.
     app.component('FileExplorer', FileExplorer)
+    app.component('PipelineDemo', PipelineDemo)
+    app.component('PipelineExplorer', PipelineExplorer)
     app.component('PixelExplorer', PixelExplorer)
     app.component('RecordsExplorer', RecordsExplorer)
   },

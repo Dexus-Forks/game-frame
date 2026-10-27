@@ -63,6 +63,8 @@ proposed again.
 - [x] PowerVR SGL's scene-graph half: the 46 calls of POD's PowerVR build, a stand-in `sgl.dll` on OpenGL ([wrappers/sgl](wrappers/sgl/README.md))
 - [x] PowerVR SGL's immediate-mode half (`sgltri_*`), which Hardwar's PowerVR mode uses. The 13 calls it lacked, and `sgltri_rerender`, are in `wrappers/sgl` ([sgl](wrappers/sgl/README.md), `test/sgltritest.c`). `sgltri_shadow` draws shadow volumes; Hardwar has not been run against it
 - [ ] Rendition RRedline and Matrox MSI in the same detail
+- [x] The rendering pipeline: the five stages of a frame, where each ran on each card, what each seam lets a port check, and the port built as a virtual card with devices ([rendering-pipeline.md](docs/hardware/rendering-pipeline.md), the lab page `site/lab/pipeline.md`, `re-port`, `re-verify`)
+- [ ] A call-stream log in the replacement libraries: each call and its arguments, one a line, in the format `seqdiff.py` reads, so the original's seam can be compared with the port's device interface
 
 ## Sound ([sound.md](docs/hardware/sound.md), [audio coverage](docs/hardware/audio-coverage.md))
 

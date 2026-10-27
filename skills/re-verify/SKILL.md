@@ -224,6 +224,24 @@ Make the reimplementation's pictures with its headless runner (a save, scripted 
 times, a capture at a fixed time), never by hand, so the same picture can be made again after
 every change. The same runner makes the screenshots and short videos for documentation.
 
+### Check the renderer at its seams, earliest first
+
+A frame passes three places where the port can be compared with the original
+(`docs/hardware/rendering-pipeline.md`):
+
+1. **The numbers after geometry**: projected vertices, `1/w`, matrices, the sort order. Run the
+   original's transform under the emulator and compare bit for bit with `bitcompare.py`.
+2. **The call stream at the seam**: every state, texture upload and draw call, in order, with
+   its arguments. Record it from the original (apitrace for OpenGL and Direct3D,
+   `tools/live/frida_trace.py --hook` on the card library's exports, or a log written by a
+   stand-in library) and from the port's device interface, one call a line. Compare the two
+   with `seqdiff.py`. The first different call names the bug.
+3. **The pixels.** Exact against a software renderer. Exact against a chip model such as
+   `gameframe-voodoo`. Within a tolerance against a modern GPU, with a difference image.
+
+A wrong number at 1 shows up as wrong calls at 2 and wrong pixels at 3. Fix the earliest seam
+that differs first.
+
 ### Memory frame by frame (console and computer games)
 
 Run the same input movie in the emulator and in the port. Dump the game's memory after each

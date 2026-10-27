@@ -7,7 +7,8 @@ decides which pixels on a boundary to fill. A port that must match the original 
 those decisions. This page lists the decisions that change pixels, and how to measure each
 one in the original. The video modes themselves are on [2D graphics](graphics-2d.md). Michael
 Abrash's *Graphics Programming Black Book* (1997, free from the author) explains many of these
-techniques as the programmers of the time used them.
+techniques as the programmers of the time used them. [The rendering pipeline](rendering-pipeline.md)
+shows where a software renderer sits among the others, and why it makes the best reference.
 
 ## Where pixels differ
 

@@ -188,6 +188,8 @@ file loaders, the sound. Compare them before you trace each:
 
 ## Show what each card drew
 
+In a port, each card is a device behind one interface, and the game's calls stay the same
+([The rendering pipeline](rendering-pipeline.md), "The port as a virtual graphics card").
 The player saw a different picture on each card: 8-bit software textures, 16-bit filtered
 textures on a Voodoo, affine textures on a ViRGE, halved texture pages where memory was short.
 A viewer or a port can offer the same choice as a setting: a "renderer profile" per card that

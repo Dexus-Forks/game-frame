@@ -9,6 +9,13 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- The rendering pipeline (`docs/hardware/rendering-pipeline.md`): the five stages of a frame,
+  where each ran on the CPU or the card machine by machine, what a port can check at each seam,
+  and the port built as a virtual graphics card with swappable devices, which fits the vanilla
+  and extra builds. Five new diagrams, and an interactive lab page on the site
+  (`/lab/pipeline`) that takes one frame through every stage and draws it with a software
+  renderer, a 16-bit card and a modern device side by side. `re-port` gains the device
+  interface; `re-verify` checks the renderer at its seams, earliest first.
 - `gameframe install` (`tools/install/install_app.py`): build a project's release programs from
   its `install.json` and install them as an application in the GameFrame folder:
   `/Applications/GameFrame/NAME.app` on macOS, `%LOCALAPPDATA%\Programs\GameFrame` on Windows,

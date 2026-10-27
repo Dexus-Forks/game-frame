@@ -57,6 +57,18 @@ after a year.
 - **A headless runner.** A command-line mode that loads a save or starts a seeded game, runs a
   fixed number of updates or seconds with scripted input at fixed times, then prints digests or
   writes a save and a picture. Every whole-system check in `re-verify` is built on it.
+- **A device interface at the renderer's seam.** Find where the original hands a frame over to
+  its renderer or card library: a table of renderer functions, a renderer DLL's exports, or the
+  calls into Glide, ATI3DCIF, the S3D Toolkit, SGL or Direct3D. Port everything before that
+  point into the core: game state, geometry, the order of the calls. Make the calls themselves
+  one interface (set state, upload a texture, draw triangles, lock the frame buffer, swap)
+  named after the original's calls. Put each way of drawing behind it as a device: the game's
+  own software rasteriser ported exactly, a card profile from the chip crates
+  (`gameframe-voodoo`, `-rage`, `-virge`, `-powervr`), and a modern renderer. The core never
+  asks a device how it drew. A pixel the original read back (`grLfbReadRegion`) is an input of
+  the core. Hooks for the extra build (record the calls, replace textures, add draws) sit on
+  the interface. `docs/hardware/rendering-pipeline.md` explains the stages, where each ran on
+  each card, and what to check at each seam.
 - **A query layer for tests.** A way to ask the running program what it shows (interface
   elements by name or text, the world's counts) and to press things by name. Tests that find a
   button by its name survive layout changes; tests that click pixel positions or wait fixed

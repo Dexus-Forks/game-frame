@@ -49,7 +49,8 @@ export function sidebar(): Item[] {
     text: 'In your browser',
     collapsed: true,
     items: [{ text: 'Overview', link: '/lab/' }, { text: 'File explorer', link: '/lab/files' },
-      { text: 'Pixel explorer', link: '/lab/pixels' }, { text: 'Records explorer', link: '/lab/records' }],
+      { text: 'Pixel explorer', link: '/lab/pixels' }, { text: 'Records explorer', link: '/lab/records' },
+      { text: 'Rendering pipeline', link: '/lab/pipeline' }],
   })
   groups.push({
     text: 'Agents',
