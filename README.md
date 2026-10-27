@@ -260,6 +260,7 @@ projects start with, in the order of the method.
 | Observe | `tools/live/memrec.py`, `tools/triage/memscan.py` | Where a running game keeps a value, and recordings of named values |
 | Verify | `tools/verify/bitcompare.py`, `seqdiff.py` | Ground truth against the port, bit for bit, and the first random draw that differs |
 | Verify | `tools/triage/coverage.py`, `deviations.py` | How much of the original the port cites, and every marked deviation |
+| Ship | `tools/install/install_app.py` (`gameframe install`) | The port's release build, vanilla and extra, installed as an application in the GameFrame folder |
 
 Model-powered tools in `tools/llm/` use a local model by default. A hosted provider is chosen by
 name and asks before each request ([model providers](docs/working/api-credits.md)).

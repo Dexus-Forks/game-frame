@@ -262,5 +262,42 @@ rounded on the way). Then load the written files in the original, where that is 
   run the tests that need no game data there.
 - Version the port separately from the game it copies, and show both where players look
   ([What a project can ship](../OUTPUTS.md)).
+- Install a release build on this computer with `./gameframe install` (below).
 - Measure performance on the slowest system you support. Profile before changing anything,
   and check that an optimisation leaves the game's results unchanged.
+
+### Installing a build on this computer
+
+`./gameframe install` builds the port's release programs and installs them as an application
+the player can open from the Finder, the Start menu or the desktop's menu. It reads
+`install.json` at the project's root (`gameframe tool install_app` lists every key):
+
+```json
+{"name": "Un-POD", "id": "dev.gameframe.unpod", "version": "0.1.0", "icon": "apps/icon.png",
+ "vanilla": {"build": [["cargo", "build", "--release", "-p", "unpod", "-p", "pod-frame"]],
+             "programs": ["target/release/unpod", "target/release/pod-frame"],
+             "start": "pod-frame", "args": ["--data", "{data}"]},
+ "extra":   {"build": [["cargo", "build", "--release", "-p", "unpod", "-p", "pod-frame",
+                        "--features", "extras"]]}}
+```
+
+- **Vanilla** is the game with the frame only. The frame's `--no-frame` and `--frame` turn its
+  window off and on again, and the port's `--vanilla` switch still applies.
+- **Extra** is the same programs built with the additions on (hooks, capture, input, renderers,
+  mods). `./gameframe install extra` installs both, the second as "NAME Extra", each with its
+  own data folder.
+
+| System | Programs | Data |
+|---|---|---|
+| macOS | `/Applications/GameFrame/NAME.app` (`~/Applications/GameFrame` when `/Applications` is not writable) | `~/Library/Application Support/GameFrame/NAME` |
+| Windows | `%LOCALAPPDATA%\Programs\GameFrame\NAME`, with a Start menu shortcut | `%APPDATA%\GameFrame\NAME` |
+| Linux | `~/.local/share/GameFrame/NAME`, with a menu entry | `~/.config/GameFrame/NAME` |
+
+The GameFrame folder is made when it is missing. The program starts in its data folder, so a
+port that keeps its files in the current folder keeps them there, and `{data}` in `args` names
+it. A new install replaces the programs and never touches the data. `--list` shows what is
+installed, and `--dry-run` shows what would happen.
+
+Build each system's install on that system. The macOS bundle is signed ad hoc, which is enough
+on the Mac that built it. Another Mac asks before it opens it, because it has no Developer ID
+signature. For players on other computers, make a release with continuous integration.

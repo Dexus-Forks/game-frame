@@ -17,12 +17,12 @@ import catalog
 import knowhow
 import clients
 import skills
-from paths import NAME, ROOT, SCRIPTS, python, rel
+from paths import NAME, ROOT, SCRIPTS, TOOLS, python, rel
 from search import search
 
 GROUPS = {'disc': 'Discs and disk images', 'pe': 'Windows PE', 'dos': '16-bit DOS', 'emu': 'Emulators', 'triage': 'Triage',
           'formats': 'Formats', 'verify': 'Verify', 'ghidra': 'Ghidra scripts',
-          'site': 'Sites', 'scripts': 'Scripts'}
+          'site': 'Sites', 'install': 'Installing builds', 'scripts': 'Scripts'}
 
 
 def _width():
@@ -189,6 +189,11 @@ def find(args):
 
 def doctor(rest):
     return subprocess.call(['bash', str(SCRIPTS / 'setup.sh'), *rest])
+
+
+def install(rest):
+    """tools/install/install_app.py on the project: $GAMEFRAME_PROJECT, else this folder."""
+    return subprocess.call([sys.executable, str(TOOLS / 'install' / 'install_app.py'), *(rest or ['vanilla'])])
 
 
 def advise(args):

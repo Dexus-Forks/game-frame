@@ -230,6 +230,32 @@ with Remote.connect('127.0.0.1', $port, hw_per_thread=True) as r:
     r.set_breakpoint(0x140001000, kind=1)
 " && [[ $(grep -c '^Z1,140001000' "$T3/s4.log") == 2 && $(grep -c '^z1,140001000' "$T3/s4.log") == 2 ]] && grep -qx 'Hg02' "$T3/s4.log" \
   && ok "gdbremote sets and clears a hardware breakpoint in every thread for winedbg" || bad "gdbremote per-thread breakpoints" "$(cat "$T3/s4.log")"
+
+echo "Installing builds"
+TI="$(cd "$(mktemp -d)" && pwd -P)"; cp -R tests/fixtures/install-project "$TI/p"
+inst() { python3 tools/install/install_app.py --project "$TI/p" --data-root "$TI/data" --no-menu "$@"; }
+inst extra --dest "$TI/mac" --system macos >/dev/null 2>&1
+[[ "$(python3 -c 'import plistlib,sys;d=plistlib.load(open(sys.argv[1],"rb"));print(d["CFBundleExecutable"],d["CFBundleShortVersionString"])' "$TI/mac/Fixture Game.app/Contents/Info.plist")" == "gameframe-start 1.2.3" \
+   && -x "$TI/mac/Fixture Game.app/Contents/MacOS/helper" && -f "$TI/mac/Fixture Game Extra.app/Contents/Resources/library.json" ]] \
+  && ok "install writes NAME.app and NAME Extra.app with the programs, resources and Info.plist" || bad "install's macOS bundles" "$(ls -R "$TI/mac")"
+expect "install's start script runs the program in its data folder with {data}, {resources} and the player's arguments" \
+  "vanilla cwd=$TI/data/Fixture Game args=--data $TI/data/Fixture Game --look $TI/mac/Fixture Game.app/Contents/Resources/library.json --frame" \
+  "$TI/mac/Fixture Game.app/Contents/MacOS/gameframe-start" --frame
+expect "install's extra build is the extra program, with its own data folder" "extra cwd=$TI/data/Fixture Game Extra" "$TI/mac/Fixture Game Extra.app/Contents/MacOS/gameframe-start"
+echo keep > "$TI/data/Fixture Game/save.dat"
+inst --dest "$TI/mac" --system macos >/dev/null 2>&1 && [[ -f "$TI/data/Fixture Game/save.dat" && ! -e "$TI/mac/.Fixture Game.app.new" ]] \
+  && ok "install replaces its own build and keeps the data" || bad "install over its own build"
+mkdir -p "$TI/other/Fixture Game.app"
+expect "install refuses to replace a folder it did not install" "was not installed by this command" inst --dest "$TI/other" --system macos --no-build
+expect "install --list names the installed builds" "extra    Fixture Game Extra" python3 tools/install/install_app.py --list --dest "$TI/mac"
+inst --dest "$TI/lin" --system linux >/dev/null 2>&1
+expect "install writes a Linux folder with a start script and a .desktop entry" "vanilla cwd=$TI/data/Fixture Game args=--data $TI/data/Fixture Game --look $TI/lin/Fixture Game/library.json" "$TI/lin/Fixture Game/start"
+grep -qx "Exec=\"$TI/lin/Fixture Game/start\"" "$TI/lin/Fixture Game/fixture-game.desktop" && ok "install's .desktop entry starts the start script" || bad "install's .desktop entry" "$(cat "$TI/lin/Fixture Game/fixture-game.desktop")"
+inst --dest "$TI/win" --system windows --no-build >/dev/null 2>&1
+expect "install writes a Windows batch file that starts the program in its data folder" '"%~dp0game" "--data" "%data%" "--look" "%~dp0./library.json" %*' cat "$TI/win/Fixture Game/Fixture Game.cmd"
+expect "install --dry-run prints the build commands and changes nothing" "would install vanilla" inst --dest "$TI/dry" --system macos --dry-run
+[[ ! -e "$TI/dry" ]] || bad "install --dry-run made $TI/dry"
+rm -rf "$TI"
 rm -rf "$T3"
 
 T4="$(mktemp -d)"
@@ -1780,7 +1806,7 @@ out="$("$PYTHON" tests/mcp_provider_config.py 2>&1)"
   && ok "optional MCP providers use project-local settings and preserve client configuration ($out)" \
   || bad "MCP provider opt-in" "$out"
 out="$("$PYTHON" tests/mcp_tool_coverage.py 2>&1)"
-[[ $? == 0 && "$out" == *"MCP coverage: 124 catalog entries, 100 runnable tools, progress/cancel/timeout"* ]] \
+[[ $? == 0 && "$out" == *"MCP coverage: 129 catalog entries, 101 runnable tools, progress/cancel/timeout"* ]] \
   && ok "the GameFrame MCP exposes every catalog entry and runs every program and script ($out)" \
   || bad "GameFrame MCP tool coverage" "$out"
 out="$("$PYTHON" tests/decision_adapter.py "$B/game.exe" 2>&1)"

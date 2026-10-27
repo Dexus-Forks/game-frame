@@ -1,0 +1,15 @@
+{
+  "name": "Fixture Game",
+  "id": "dev.gameframe.fixture",
+  "version": "1.2.3",
+  "resources": ["res/library.json"],
+  "vanilla": {
+    "build": [["sh", "build.sh", "vanilla"]],
+    "programs": ["out/game", "out/helper"],
+    "start": "game",
+    "args": ["--data", "{data}", "--look", "{resources}/library.json"]
+  },
+  "extra": {
+    "build": [["sh", "build.sh", "extra"]]
+  }
+}

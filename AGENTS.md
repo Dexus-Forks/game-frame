@@ -70,7 +70,7 @@ These rules are for changes to GameFrame itself, which is a public repository.
 | `.claude-plugin/` | The Claude Code plugin and its marketplace: the skills and the agents |
 | `gameframe`, `tools/gameframe/` | The help and discovery command. It reads the skills and each tool's own help, so a new tool needs no entry there. `home.py` and `games.py` are the GameFrame home (`gameframe home`, `gameframe game`) |
 | `scripts/` | setup, new-project, update-project, ghidra-export, ghidra-run, `clients.py` (the files each coding agent needs in a project), `release.py` (cut a release, then open the next `-dev` version), and `lib.sh` (paths and `.env`) |
-| `tools/disc`, `tools/pe`, `tools/dos`, `tools/triage`, `tools/emu`, `tools/formats`, `tools/verify`, `tools/ghidra` | The tools |
+| `tools/disc`, `tools/pe`, `tools/dos`, `tools/triage`, `tools/emu`, `tools/formats`, `tools/verify`, `tools/ghidra`, `tools/install` | The tools. `tools/install` is `gameframe install`, which installs a project's release build from its `install.json` |
 | `templates/project/` | What `new-project.sh` writes into a game's repository |
 | `templates/library-page/` | The plain HTML library page for browser ports, which works with `crates/library`, and its ready-made themes (`themes/`) |
 | `launcher/` | gameframe-launcher: the frame in front of a game described by `frame.json` (a Wine kernel, the original's program). Its own Cargo workspace, not built by the tests |

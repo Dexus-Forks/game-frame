@@ -38,6 +38,9 @@ Commands:
   game list             every game in the home
   game link ID PROJECT  make a project's game, media, saves, analysis and derived links
   doctor [ARGS]         check the toolchain (scripts/setup.sh; ARGS such as --install pass on)
+  install [extra]       build the project's release programs from install.json and install them
+                        in the GameFrame folder as applications (tools/install/install_app.py;
+                        its options pass on: --dest, --no-build, --dry-run, --list)
   mcp --list            show providers enabled in this project and their pinned versions
   mcp --enable NAME     opt this project into external provider(s); refresh client settings
   mcp --disable NAME    remove external provider(s) from this project
@@ -61,10 +64,10 @@ Inputs: the skills (skills/re-*/SKILL.md), the tools (tools/, scripts/) and thei
 help, and the know-how entries (docs/knowhow/, GameFrame's and the project's), read from the files. The same command works in GameFrame and in a project made by
 scripts/new-project.sh. Standard library only; it needs no .venv itself.
 
-It does not install anything or keep its own copy of the skills or the help: `run` and
-`doctor` start the tool or script, which does its own work. The one command that writes files
-is `agents --emit`. It writes .codex/agents/*.toml, .gemini/agents/*.md,
-.github/agents/*.agent.md and .opencode/agents/*.md from agents/re-*.md
+It keeps no copy of the skills or the help: `run`, `doctor` and `install` start the tool or
+script, which does its own work. `install` builds and installs the project's own programs.
+The other command that writes files is `agents --emit`. It writes .codex/agents/*.toml,
+.gemini/agents/*.md, .github/agents/*.agent.md and .opencode/agents/*.md from agents/re-*.md
 (docs/working/agents.md, "Agents in every client").
 """
 import argparse
@@ -81,7 +84,7 @@ import progress  # noqa: E402
 import serve  # noqa: E402
 from paths import NAME  # noqa: E402
 
-PASS_ON = {'run', 'doctor'}      # commands whose arguments belong to the tool they start
+PASS_ON = {'run', 'doctor', 'install'}      # commands whose arguments belong to the tool they start
 
 
 def parser():
@@ -175,6 +178,8 @@ def main(argv):
         return commands.run(argv[1], argv[2:])
     if argv[0] == 'doctor':
         return commands.doctor(argv[1:])
+    if argv[0] == 'install':
+        return commands.install(argv[1:])
     p, sub = parser()
     args = p.parse_args(argv)
     if args.command == 'help':

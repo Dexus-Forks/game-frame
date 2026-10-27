@@ -9,6 +9,12 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `gameframe install` (`tools/install/install_app.py`): build a project's release programs from
+  its `install.json` and install them as an application in the GameFrame folder:
+  `/Applications/GameFrame/NAME.app` on macOS, `%LOCALAPPDATA%\Programs\GameFrame` on Windows,
+  `~/.local/share/GameFrame` on Linux, with the player's data kept apart. `install extra`
+  installs the vanilla build and the extra build with the additions on, side by side. GameFrame's
+  own `install.json` installs the frame demo.
 - `tools/live/winegdb.py`: attach to a game under Wine or CrossOver through `winedbg --gdb`,
   read its registers and memory, wait at breakpoints with dumps of memory, and always detach with
   the original code back in place. `tools/live/gdbremote.py` is its GDB remote protocol client,

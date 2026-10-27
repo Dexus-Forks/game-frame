@@ -106,7 +106,7 @@ user may change any of them.
 | `docs/lore.md` | The game's world from its manual and its own text, and what it says each system is for ("in the story → in the code → evidence"). Read it again when a system's purpose is unclear |
 | `labels/names.tsv`, `labels/fields.tsv` | Names for original functions and struct fields, read by the tools |
 | `labels/dictionary.tsv` | The data dictionary: the meaning, unit, range and evidence of each value the rules use |
-| `./gameframe` | Runs GameFrame's toolkit here: `run NAME ARGS`, `python FILE`, `doctor`, and help on the method: `steps`, `skills`, `agents`, `tools`, `tool NAME`, `find WORD`. `root` prints where GameFrame is |
+| `./gameframe` | Runs GameFrame's toolkit here: `run NAME ARGS`, `python FILE`, `doctor`, and help on the method: `steps`, `skills`, `agents`, `tools`, `tool NAME`, `find WORD`. `root` prints where GameFrame is. `install [extra]` builds the port's release programs from `install.json` and installs them in the GameFrame folder (GameFrame's `docs/working/building-the-port.md`) |
 | `.claude/settings.json` | Enables GameFrame's plugin: the skills, the agents, the gates, and the MCP servers (REA, and `dosbox` for DOS games) |
 | `skills/`, `.agents/skills` | The skills, for the coding agents other than Claude Code |
 | `.codex/`, `.gemini/`, `.github/agents/`, `.github/hooks/`, `.cursor/`, `.vscode/mcp.json`, `.opencode/`, `opencode.json` | Each other agent's agents, gate hooks (through `./gameframe gate`) and MCP servers, for the agents the project was set up for |
