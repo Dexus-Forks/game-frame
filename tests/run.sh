@@ -1223,6 +1223,11 @@ expect "cite_labels --any takes the first address above an item" $'1000:f789\tdr
 expect "cite_labels gives the file alone with --no-lines" $'1400c9560\ttick\tlib.rs\n' "$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --no-lines
 out="$("$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --existing tests/fixtures/cite/names.tsv 2>/dev/null)"
 [[ "$out" != *1400ca100* && "$out" != *1400c9460* ]] && ok "cite_labels keeps a hand-made label, and skips a module note" || bad "cite_labels existing and module notes" "$out"
+expect "cite_labels follows an Original list onto the next line" $'1400cb100\thire_2' "$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite
+expect "cite_labels --notes names a module's note after its module" $'1400c9460\tcite' "$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --notes
+expect "cite_labels --any --prefix takes a FUN_ address above a function" $'1400cc000\tdraw_town' "$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --any --prefix FUN_
+out="$("$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --any --prefix FUN_ 2>/dev/null)"
+[[ "$out" != *1400cc100* && "$out" != *1400cc200* && "$out" != *1400cc300* && "$out" != *Some* ]] && ok "cite_labels --any skips body notes, instruction addresses and fields" || bad "cite_labels --any limits" "$out"
 expect "dictionary checks a data dictionary against fields.tsv" "4 rows, 0 errors, 0 warnings; 2 of 3 fields" "$PYTHON" tools/triage/dictionary.py tests/fixtures/dictionary/dictionary.tsv --fields tests/fixtures/dictionary/fields.tsv
 out="$("$PYTHON" tools/triage/dictionary.py tests/fixtures/dictionary/bad.tsv --fields tests/fixtures/dictionary/fields.tsv 2>&1)"; code=$?
 [[ $code == 1 && "$out" == *"already on line 2"* && "$out" == *"not a kind of value"* && "$out" == *"not a known form of place"* && "$out" == *"2 columns"* && "$out" == *"int16 here and int32"* ]] && ok "dictionary reports bad rows and fails" || bad "dictionary bad rows" "$out"

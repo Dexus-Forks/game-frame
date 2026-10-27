@@ -31,3 +31,24 @@ pub fn divide() {}
 
 /// `starcon.DrawBackground3` (1000:f789, near): scroll layer 3, then draw it (1000:f789 to 1000:f800).
 pub fn draw_background3() {}
+
+/// Hires the workers.
+/// Original: `FUN_1400cb000`,
+/// `FUN_1400cb100`.
+pub fn hire() {}
+
+/// `FUN_1400cc000`: draws the town (jbe at 0x1400cc010 keeps a NaN).
+pub fn draw_town() {
+    // `FUN_1400cc100`: a note in the body, not a label.
+    let Some(x) = pick(
+        1,
+    ) else { return };
+}
+
+// jbe at 0x1400cc200: an instruction address, not a function.
+fn cap() {}
+
+pub struct Grid {
+    // +0x2c; zero in `FUN_1400cc300`'s constructor.
+    pub bytes: u32,
+}
