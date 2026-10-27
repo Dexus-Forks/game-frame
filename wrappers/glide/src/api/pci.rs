@@ -74,24 +74,28 @@ fn span(at: u32, size: u32) -> std::ops::Range<usize> {
 
 #[unsafe(no_mangle)]
 pub extern "system" fn pciOpen() -> u32 {
+    shim::call!("pciOpen");
     OPEN.store(true, Ordering::Relaxed);
     1
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn pciClose() -> u32 {
+    shim::call!("pciClose");
     OPEN.store(false, Ordering::Relaxed);
     1
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn pciDeviceExists(dev: u32) -> u32 {
+    shim::call!("pciDeviceExists", dev);
     usable(dev) as u32
 }
 
 /// Read 1, 2 or 4 bytes of the configuration space into `*data`.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn pciGetConfigData(at: u32, size: u32, rw: u32, dev: u32, data: *mut u32) -> u32 {
+    shim::call!("pciGetConfigData", at, size, rw, dev, data);
     if !usable(dev) || rw == WRITE_ONLY || data.is_null() {
         return 0;
     }
@@ -105,6 +109,7 @@ pub unsafe extern "system" fn pciGetConfigData(at: u32, size: u32, rw: u32, dev:
 /// back as written. Deviation: a real card ignores writes to its read-only registers.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn pciSetConfigData(at: u32, size: u32, rw: u32, dev: u32, data: *const u32) -> u32 {
+    shim::call!("pciSetConfigData", at, size, rw, dev, data);
     if !usable(dev) || rw == READ_ONLY || data.is_null() {
         return 0;
     }
@@ -119,6 +124,7 @@ pub unsafe extern "system" fn pciSetConfigData(at: u32, size: u32, rw: u32, dev:
 /// Card `card` (counting from 0) with these IDs. Only the one Voodoo Graphics is there.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn pciFindCardMulti(vendor: u32, device: u32, dev: *mut u32, card: u32) -> u32 {
+    shim::call!("pciFindCardMulti", vendor, device, dev, card);
     pciOpen();
     if vendor != VENDOR || device != DEVICE || card != 0 {
         return 0;
@@ -131,6 +137,7 @@ pub unsafe extern "system" fn pciFindCardMulti(vendor: u32, device: u32, dev: *m
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn pciFindCard(vendor: u32, device: u32, dev: *mut u32) -> u32 {
+    shim::call!("pciFindCard", vendor, device, dev);
     unsafe { pciFindCardMulti(vendor, device, dev, 0) }
 }
 
@@ -138,6 +145,7 @@ pub unsafe extern "system" fn pciFindCard(vendor: u32, device: u32, dev: *mut u3
 /// zeroed 16 MB block. Null when the card is not found.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn pciMapCardMulti(vendor: u32, device: u32, _length: i32, dev: *mut u32, card: u32, _bar: u32) -> *mut u8 {
+    shim::call!("pciMapCardMulti", vendor, device, _length, dev, card, _bar);
     if unsafe { pciFindCardMulti(vendor, device, dev, card) } == 0 {
         return std::ptr::null_mut();
     }
@@ -146,6 +154,7 @@ pub unsafe extern "system" fn pciMapCardMulti(vendor: u32, device: u32, _length:
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn pciMapCard(vendor: u32, device: u32, length: i32, dev: *mut u32, bar: u32) -> *mut u8 {
+    shim::call!("pciMapCard", vendor, device, length, dev, bar);
     unsafe { pciMapCardMulti(vendor, device, length, dev, 0, bar) }
 }
 
@@ -153,6 +162,7 @@ pub unsafe extern "system" fn pciMapCard(vendor: u32, device: u32, length: i32, 
 /// address. `*length` is left as asked, and capped at the block's size.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn pciMapPhysicalToLinear(linear: *mut u32, _physical: u32, length: *mut u32) -> u32 {
+    shim::call!("pciMapPhysicalToLinear", linear, _physical, length);
     let Some(linear) = (unsafe { linear.as_mut() }) else { return 0 };
     pciOpen();
     *linear = block() as usize as u32;
@@ -164,12 +174,15 @@ pub unsafe extern "system" fn pciMapPhysicalToLinear(linear: *mut u32, _physical
 
 /// The block stays: every map shares it.
 #[unsafe(no_mangle)]
-pub extern "system" fn pciUnmapPhysical(_linear: u32, _length: u32) {}
+pub extern "system" fn pciUnmapPhysical(_linear: u32, _length: u32) {
+    shim::call!("pciUnmapPhysical", _linear, _length);
+}
 
 /// The MTRR calls succeed and change nothing: Windows owns the CPU's memory types. A free
 /// register is number 0.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn pciFindFreeMTRR(mtrr: *mut u32) -> u32 {
+    shim::call!("pciFindFreeMTRR", mtrr);
     if let Some(m) = unsafe { mtrr.as_mut() } {
         *m = 0;
     }
@@ -178,10 +191,12 @@ pub unsafe extern "system" fn pciFindFreeMTRR(mtrr: *mut u32) -> u32 {
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn pciFindMTRRMatch(_base: u32, _size: u32, _kind: u32, mtrr: *mut u32) -> u32 {
+    shim::call!("pciFindMTRRMatch", _base, _size, _kind, mtrr);
     unsafe { pciFindFreeMTRR(mtrr) }
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn pciSetMTRR(_mtrr: u32, _base: u32, _size: u32, _kind: u32) -> u32 {
+    shim::call!("pciSetMTRR", _mtrr, _base, _size, _kind);
     1
 }

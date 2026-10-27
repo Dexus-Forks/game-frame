@@ -36,6 +36,47 @@ unsafe fn vertices<const N: usize>(fs: &[[u32; N]], pv: *const u8) -> Vec<Vertex
     vb.chunks_exact(VERTEX_SIZE).map(Vertex::read).collect()
 }
 
+/// For the call log (`WRAPPER_CALLS`): an `SGLCONTEXT` as the fields this library reads.
+struct Ctx(*const u8);
+impl shim::calls::Arg for Ctx {
+    fn put(&self, out: &mut String) {
+        match unsafe { context(self.0) } {
+            Some(c) => out.push_str(&format!("{c:?}")),
+            None => out.push_str("null"),
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
+/// For the call log: `n` faces of `N` vertices, each written as its vertices' values.
+struct Faces<const N: usize>(*const u8, i32, *const u8, *const u8);
+impl<const N: usize> shim::calls::Arg for Faces<N> {
+    fn put(&self, out: &mut String) {
+        let Faces(ctx, n, pf, pv) = *self;
+        let Some(c) = (unsafe { context(ctx) }) else { return out.push_str("null") };
+        if pf.is_null() || pv.is_null() || n <= 0 {
+            return out.push_str("[]");
+        }
+        let fs = unsafe { faces::<N>(pf, n as usize, N == 3 && c.flags & FACESIND3DFORMAT != 0) };
+        let vs = unsafe { vertices(&fs, pv) };
+        out.push('[');
+        for (k, f) in fs.iter().enumerate() {
+            out.push_str(if k == 0 { "[" } else { " [" });
+            for (j, i) in f.iter().enumerate() {
+                if j > 0 {
+                    out.push(' ');
+                }
+                match vs.get(*i as usize) {
+                    Some(v) => out.push_str(&format!("{v:?}")),
+                    None => out.push_str(&format!("#{i}")),
+                }
+            }
+            out.push(']');
+        }
+        out.push(']');
+    }
+}
+
 /// Add `n` faces of `N` vertices, as `sgltri_triangles` and `sgltri_quads` do.
 unsafe fn add<const N: usize>(name: &str, ctx: *const u8, n: i32, pf: *const u8, pv: *const u8) {
     if n == 0 {
@@ -59,6 +100,7 @@ unsafe fn add<const N: usize>(name: &str, ctx: *const u8, n: i32, pf: *const u8,
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sgltri_startofframe(ctx: *mut u8) {
+    shim::call!("sgltri_startofframe", ctx);
     trace!("sgltri_startofframe", "{ctx:?}");
     let Some(c) = (unsafe { context(ctx) }) else { return error(ERR_BAD_PARAMETER) };
     let mut s = sgl();
@@ -75,12 +117,14 @@ pub unsafe extern "C" fn sgltri_startofframe(ctx: *mut u8) {
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sgltri_triangles(ctx: *const u8, n: i32, faces: *const u8, verts: *const u8) {
+    shim::call!("sgltri_triangles", Ctx(ctx), n, Faces::<3>(ctx, n, faces, verts));
     trace!("sgltri_triangles", "{ctx:?} {n} {faces:?} {verts:?}");
     unsafe { add::<3>("sgltri_triangles", ctx, n, faces, verts) };
 }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sgltri_quads(ctx: *const u8, n: i32, faces: *const u8, verts: *const u8) {
+    shim::call!("sgltri_quads", Ctx(ctx), n, Faces::<4>(ctx, n, faces, verts));
     trace!("sgltri_quads", "{ctx:?} {n} {faces:?} {verts:?}");
     unsafe { add::<4>("sgltri_quads", ctx, n, faces, verts) };
 }
@@ -93,6 +137,7 @@ pub unsafe extern "C" fn sgltri_quads(ctx: *const u8, n: i32, faces: *const u8, 
 /// shadows was not traced. The bounding box is not used (`Frame::shadow`).
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sgltri_shadow(ctx: *const u8, n: i32, faces: *const u8, verts: *const u8, _bbox: *const f32) {
+    shim::call!("sgltri_shadow", Ctx(ctx), n, Faces::<3>(ctx, n, faces, verts), _bbox);
     trace!("sgltri_shadow", "{ctx:?} {n} {faces:?} {verts:?}");
     let c = unsafe { context(ctx) };
     if let Some(e) = shadow_args(n, c.map(|c| c.shadow_mode), !faces.is_null() && !verts.is_null()) {
@@ -114,6 +159,7 @@ fn show(view: View) {
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sgltri_render(ctx: *const u8) {
+    shim::call!("sgltri_render", Ctx(ctx));
     trace!("sgltri_render", "{ctx:?}");
     let Some(c) = (unsafe { context(ctx) }) else { return error(ERR_BAD_PARAMETER) };
     let view = {
@@ -127,6 +173,7 @@ pub unsafe extern "C" fn sgltri_render(ctx: *const u8) {
         view
     };
     show(view);
+    shim::calls::end_frame();
 }
 
 /// Draw the last frame again. The driver ignores the context and restarts the chip on the
@@ -134,6 +181,7 @@ pub unsafe extern "C" fn sgltri_render(ctx: *const u8) {
 /// error 0 (Original: `sgltri_rerender` at `10032430`).
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sgltri_rerender(ctx: *const u8) {
+    shim::call!("sgltri_rerender", ctx);
     trace!("sgltri_rerender", "{ctx:?}");
     let view = sgl().last_tri.clone();
     match view {
@@ -145,6 +193,7 @@ pub unsafe extern "C" fn sgltri_rerender(ctx: *const u8) {
 /// 0, `IRC_RENDER_COMPLETE`: the frame went to the render thread when `sgltri_render` returned.
 #[unsafe(no_mangle)]
 pub extern "C" fn sgltri_isrendercomplete(ctx: *const u8, timeout: u32) -> i32 {
+    shim::call!("sgltri_isrendercomplete", ctx, timeout);
     trace!("sgltri_isrendercomplete", "{ctx:?} {timeout}");
     0
 }

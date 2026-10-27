@@ -77,6 +77,7 @@ unsafe fn indexed(n: i32, ilist: *const i32, vlist: *const Vertex) -> Vec<Vertex
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grDrawTriangle(a: *const Vertex, b: *const Vertex, c: *const Vertex) {
+    shim::call!("grDrawTriangle", crate::callargs::V(a), crate::callargs::V(b), crate::callargs::V(c));
     let (Some(a), Some(b), Some(c)) = (unsafe { read(a) }, unsafe { read(b) }, unsafe { read(c) }) else { return };
     super::lfb::finish_write();
     triangle([a, b, c], &shadow::get());
@@ -84,6 +85,7 @@ pub unsafe extern "system" fn grDrawTriangle(a: *const Vertex, b: *const Vertex,
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grDrawLine(a: *const Vertex, b: *const Vertex) {
+    shim::call!("grDrawLine", crate::callargs::V(a), crate::callargs::V(b));
     let (Some(a), Some(b)) = (unsafe { read(a) }, unsafe { read(b) }) else { return };
     super::lfb::finish_write();
     let s = shadow::get();
@@ -93,6 +95,7 @@ pub unsafe extern "system" fn grDrawLine(a: *const Vertex, b: *const Vertex) {
 /// One pixel: the one that holds `(x, y)`.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grDrawPoint(p: *const Vertex) {
+    shim::call!("grDrawPoint", crate::callargs::V(p));
     let Some(mut p) = (unsafe { read(p) }) else { return };
     super::lfb::finish_write();
     let s = shadow::get();
@@ -104,11 +107,13 @@ pub unsafe extern "system" fn grDrawPoint(p: *const Vertex) {
 /// A convex polygon of `n` vertices picked from `vlist` by `ilist`.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grDrawPolygon(n: i32, ilist: *const i32, vlist: *const Vertex) {
+    shim::call!("grDrawPolygon", n, crate::callargs::Vs(unsafe { indexed(n, ilist, vlist) }));
     polygon(&unsafe { indexed(n, ilist, vlist) }, &shadow::get());
 }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grDrawPolygonVertexList(n: i32, vlist: *const Vertex) {
+    shim::call!("grDrawPolygonVertexList", n, crate::callargs::Vs(unsafe { list(n, vlist) }));
     polygon(&unsafe { list(n, vlist) }, &shadow::get());
 }
 
@@ -117,52 +122,62 @@ pub unsafe extern "system" fn grDrawPolygonVertexList(n: i32, vlist: *const Vert
 /// do lie in one plane.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grDrawPlanarPolygon(n: i32, ilist: *const i32, vlist: *const Vertex) {
+    shim::call!("grDrawPlanarPolygon", n, crate::callargs::Vs(unsafe { indexed(n, ilist, vlist) }));
     unsafe { grDrawPolygon(n, ilist, vlist) };
 }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grDrawPlanarPolygonVertexList(n: i32, vlist: *const Vertex) {
+    shim::call!("grDrawPlanarPolygonVertexList", n, crate::callargs::Vs(unsafe { list(n, vlist) }));
     unsafe { grDrawPolygonVertexList(n, vlist) };
 }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grAADrawPoint(p: *const Vertex) {
+    shim::call!("grAADrawPoint", crate::callargs::V(p));
     unsafe { grDrawPoint(p) };
 }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grAADrawLine(a: *const Vertex, b: *const Vertex) {
+    shim::call!("grAADrawLine", crate::callargs::V(a), crate::callargs::V(b));
     unsafe { grDrawLine(a, b) };
 }
 
 /// The three flags say which edges to antialias.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grAADrawTriangle(a: *const Vertex, b: *const Vertex, c: *const Vertex, _ab: u32, _bc: u32, _ca: u32) {
+    shim::call!("grAADrawTriangle", crate::callargs::V(a), crate::callargs::V(b), crate::callargs::V(c), _ab, _bc, _ca);
     unsafe { grDrawTriangle(a, b, c) };
 }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grAADrawPolygon(n: i32, ilist: *const i32, vlist: *const Vertex) {
+    shim::call!("grAADrawPolygon", n, crate::callargs::Vs(unsafe { indexed(n, ilist, vlist) }));
     unsafe { grDrawPolygon(n, ilist, vlist) };
 }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grAADrawPolygonVertexList(n: i32, vlist: *const Vertex) {
+    shim::call!("grAADrawPolygonVertexList", n, crate::callargs::Vs(unsafe { list(n, vlist) }));
     unsafe { grDrawPolygonVertexList(n, vlist) };
 }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn guDrawTriangleWithClip(a: *const Vertex, b: *const Vertex, c: *const Vertex) {
+    shim::call!("guDrawTriangleWithClip", crate::callargs::V(a), crate::callargs::V(b), crate::callargs::V(c));
     let (Some(a), Some(b), Some(c)) = (unsafe { read(a) }, unsafe { read(b) }, unsafe { read(c) }) else { return };
     clipped(&[a, b, c], &shadow::get());
 }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn guAADrawTriangleWithClip(a: *const Vertex, b: *const Vertex, c: *const Vertex) {
+    shim::call!("guAADrawTriangleWithClip", crate::callargs::V(a), crate::callargs::V(b), crate::callargs::V(c));
     unsafe { guDrawTriangleWithClip(a, b, c) };
 }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn guDrawPolygonVertexListWithClip(n: i32, vlist: *const Vertex) {
+    shim::call!("guDrawPolygonVertexListWithClip", n, crate::callargs::Vs(unsafe { list(n, vlist) }));
     clipped(&unsafe { list(n, vlist) }, &shadow::get());
 }

@@ -232,10 +232,13 @@ A frame passes three places where the port can be compared with the original
 1. **The numbers after geometry**: projected vertices, `1/w`, matrices, the sort order. Run the
    original's transform under the emulator and compare bit for bit with `bitcompare.py`.
 2. **The call stream at the seam**: every state, texture upload and draw call, in order, with
-   its arguments. Record it from the original (apitrace for OpenGL and Direct3D,
-   `tools/live/frida_trace.py --hook` on the card library's exports, or a log written by a
-   stand-in library) and from the port's device interface, one call a line. Compare the two
-   with `seqdiff.py`. The first different call names the bug.
+   its arguments. Record it from the original: for Glide, SGL, ATI3DCIF and the S3D Toolkit,
+   run the game on GameFrame's stand-in libraries with `WRAPPER_CALLS=FILE` (and
+   `WRAPPER_CALLS_FRAMES=A-B` to keep a few frames). Each line is `name(args)<TAB>frame N`, with
+   vertices as their floats and texture data as a size and hash
+   (`docs/hardware/wrappers.md`, "The call log"). Use apitrace for OpenGL and Direct3D. Make
+   the port's device interface write the same lines. Compare the two with `seqdiff.py`. The
+   first different call names the bug.
 3. **The pixels.** Exact against a software renderer. Exact against a chip model such as
    `gameframe-voodoo`. Within a tolerance against a modern GPU, with a difference image.
 

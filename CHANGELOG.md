@@ -9,6 +9,11 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- The call log in the replacement libraries: `WRAPPER_CALLS=FILE` writes every call the game
+  makes into Glide, SGL, ATI3DCIF or the S3D Toolkit, one line each, in the format
+  `tools/verify/seqdiff.py` compares. Vertices are written as their values, texture data and
+  frame-buffer writes as a size and hash. `WRAPPER_CALLS_FRAMES` keeps a range of frames.
+  `shim::call!` and `shim::calls` hold it, and the tests check that every export writes itself.
 - The rendering pipeline (`docs/hardware/rendering-pipeline.md`): the five stages of a frame,
   where each ran on the CPU or the card machine by machine, what a port can check at each seam,
   and the port built as a virtual graphics card with swappable devices, which fits the vanilla

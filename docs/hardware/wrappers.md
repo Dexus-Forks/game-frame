@@ -152,6 +152,8 @@ Every DLL reads these shared variables through `shim`.
 | `WRAPPER_WINDOW_CLASS` | The class name of the game's main window. `glide2x.dll` and `sgl.dll` draw into it. Look for it near `RegisterClassA` in the game's strings, or in its `CreateWindowExA` call. POD's is `Fenetre Pod` | the first visible top-level window of the process |
 | `WRAPPER_MARKER` | The RGB565 colour that means "not drawn" in a 2D picture laid over the 3D frame, in hex (`0x0821`) or decimal. Choose another if the game draws this exact colour | `0x0821`, almost black |
 | `WRAPPER_PATCHES` | A file of patches to the game's code, applied in memory at load | none |
+| `WRAPPER_CALLS` | A file to write every call the game makes to, one line each, with the values its pointers point to ([The call log](#the-call-log)). `{dll}` in the name is replaced by the library's name | none |
+| `WRAPPER_CALLS_FRAMES` | Only these frames: `100-102`, or `100` for frame 100 on | every frame |
 
 Each library also reads its own variables.
 
@@ -230,6 +232,54 @@ game sets. The S3 library logs each call to a slot of its function table that it
 `SGL_TRACE=N` logs the first N calls of each SGL function. The applied patches are logged with
 their reasons. `glide2x.dll` also logs frames per second, and `sgl.dll` pictures a second. That
 shows whether the output size is too large for the machine.
+
+### The call log
+
+`WRAPPER_CALLS` writes every call the game makes into a library, one line each. It is the
+game's side of the seam between the game and its renderer
+([The rendering pipeline](rendering-pipeline.md)). Record it from the original, write the same
+lines from the port's device interface, and compare the two with `tools/verify/seqdiff.py`.
+The first line that differs names the call where the port went wrong.
+
+```bash
+WRAPPER_CALLS='Z:/tmp/calls.txt' WRAPPER_CALLS_FRAMES=100-101 wine GAME3DFX.EXE
+python3 tools/verify/seqdiff.py original-calls.txt port-calls.txt
+```
+
+```text
+grBufferClear(0x204080, 0x0, 0xffff)	frame 100
+grTexDownloadMipMap(0x0, 0x100000, 0x3, {lods 0x4-0x4 aspect 0x3 format 0x1 data [256 bytes 0x1afdd9ce7ef1b725]})	frame 100
+grDrawTriangle({x 40.0 y 40.0 z 0.0 rgba 255.0 0.0 0.0 255.0 ooz 0.0 oow 1.0 tmu0 0.0 0.0 1.0 tmu1 0.0 0.0 0.0}, ...)	frame 100
+lfb_pixels(0x0, 0x0, 0x280, 0x8, [20480 bytes 0x42c5e1cf5e7b4325])	frame 100
+grBufferSwap(0x1)	frame 100
+```
+
+- Each line is `name(arguments)`, a tab, and the frame. `seqdiff.py` compares the part
+  before the tab.
+- Unsigned numbers are in hex and signed numbers in decimal. Floats are printed in the
+  shortest form that reads back as the same bits, so equal floats always print the same.
+- An address differs between two runs, so a pointer is written as `null` or `ptr`. Where the
+  library knows what it points to, it writes the values. Glide's vertices are written as
+  their 15 floats. SGL's immediate-mode faces are written as their vertices, and the ATI and S3
+  primitives the same way. Texture data, palettes and NCC tables are written as their size and
+  a 64-bit FNV-1a hash.
+- `lfb_pixels` is not a Glide call. It holds the pixels the CPU wrote while the frame buffer
+  was locked, as a rectangle and a hash. It is written when the library takes them: at the next
+  call that draws, or at the swap.
+- Only the game's own calls are written. When one export calls another inside the library
+  (`guColorCombineFunction` calls `grColorCombine`), only the outer one is written.
+- Stubs are written too, so the log holds every call.
+- Each library counts its own frames: Glide at `grBufferSwap`, SGL at `sgl_render` and
+  `sgltri_render`, the ATI library at `ATI3DCIF_RenderEnd`. The S3D Toolkit has no
+  end-of-frame call, so its lines stay at frame 0 and `WRAPPER_CALLS_FRAMES` cannot pick its
+  frames. `ddraw.dll`, `maxi94` and `ir41` do not write the log yet.
+- Two libraries in one process can share the file. Each line is one write in append mode, so
+  lines stay whole.
+- SGL's scene-graph calls write their pointer arguments as `ptr` for now. The arrays they
+  point to (vertices, transforms, materials) are not written yet.
+
+A long run makes a large file, so pick the frames to write. Without `WRAPPER_CALLS` each
+call costs one atomic load. The code is [`shim/src/calls.rs`](../../wrappers/shim/src/calls.rs).
 
 ## Add a game
 

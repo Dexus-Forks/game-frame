@@ -29,6 +29,7 @@ fn with<R>(f: impl FnOnce(&mut Movie) -> R) -> R {
 /// The start of each file's name, a path the game gives. The default is `movie`.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn guMovieSetName(name: *const c_char) {
+    shim::call!("guMovieSetName", name);
     if name.is_null() {
         return;
     }
@@ -39,6 +40,7 @@ pub unsafe extern "system" fn guMovieSetName(name: *const c_char) {
 /// Start recording. The frame count starts again at 0.
 #[unsafe(no_mangle)]
 pub extern "system" fn guMovieStart() {
+    shim::call!("guMovieStart");
     with(|m| {
         if m.name.is_empty() {
             m.name = "movie".into();
@@ -51,6 +53,7 @@ pub extern "system" fn guMovieStart() {
 
 #[unsafe(no_mangle)]
 pub extern "system" fn guMovieStop() {
+    shim::call!("guMovieStop");
     with(|m| m.recording = false);
 }
 

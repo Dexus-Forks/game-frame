@@ -7,7 +7,9 @@
 //! - `vertex`, `layout`, `fog`, `tdf`, `rle`: vertices (culling, fans, clipping), where mip
 //!   levels lie in texture memory, the fog tables, 3DF files and `guEncodeRLE16`'s code;
 //!   plain Rust, tested on the host.
-//! - `api`: the exported calls. They record commands (`cmd`) and answer queries.
+//! - `api`: the exported calls. They record commands (`cmd`) and answer queries. Each first
+//!   writes itself to the call log when `WRAPPER_CALLS` is set (`callargs`: the values its
+//!   pointers point to).
 //! - `render`: the thread that owns the OpenGL context and replays the commands.
 //! - `window`: the game's window, made the drawing surface.
 //! - `shim` (a crate shared with the other replacement DLLs): settings, a CPU check's port
@@ -24,6 +26,8 @@ pub mod vertex;
 
 #[cfg(windows)]
 mod api;
+#[cfg(windows)]
+mod callargs;
 #[cfg(windows)]
 mod cmd;
 #[cfg(windows)]

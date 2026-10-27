@@ -118,6 +118,8 @@ file, and runs `python3 wrappers/stubgen.py --check`.
    | `WRAPPER_WINDOW_CLASS` | The class name of the game's main window. `glide` and `sgl` draw into that window. Find it with `./gameframe run strings GAME.EXE` near `RegisterClassA`, or in the game's `CreateWindowExA` call | the first visible top-level window of the process |
    | `WRAPPER_MARKER` | The RGB565 colour that means "not drawn" in a 2D picture laid over the 3D frame (hex `0x0821` or decimal). Choose another when the game draws this exact colour | `0x0821`, almost black |
    | `WRAPPER_PATCHES` | A file of patches to the game's code, applied in memory at load ([shim](shim/README.md)) | none |
+   | `WRAPPER_CALLS` | A file to write every call the game makes to, one line each, for `tools/verify/seqdiff.py` ([shim](shim/README.md)) | none |
+   | `WRAPPER_CALLS_FRAMES` | Only these frames of the call log: `100-102`, or `100` for frame 100 on | every frame |
 
    Each library's own variables are in its README: `GLIDE_*`, `DDRAW_*`, `SGL_*`, and the log
    files `GLIDE_LOG`, `DDRAW_LOG`, `ATI3DCIF_LOG`, `S3DTK_LOG`, `SGL_LOG` and `MAXI94_LOG`.

@@ -12,6 +12,7 @@ use voodoo::formats::{Format, size};
 /// Original: `guEncodeRLE16` (glide2x.dll 2.43, 0x10003210).
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn guEncodeRLE16(dst: *mut u32, src: *const u16, width: u32, height: u32) -> u32 {
+    shim::call!("guEncodeRLE16", dst, src, width, height);
     let count = width.wrapping_mul(height);
     if src.is_null() || count == 0 {
         return 0;
@@ -56,6 +57,7 @@ pub unsafe extern "system" fn ConvertAndDownloadRle(
     tmu: u32, start: u32, lod: u32, large_lod: u32, aspect: u32, format: u32, even_odd: u32, _bm_data: *const u8,
     _bm_h: i32, _u0: u32, _v0: u32, _width: u32, height: u32, dest_width: u32, dest_height: u32, _tlut: *const u16,
 ) {
+    shim::call!("ConvertAndDownloadRle", tmu, start, lod, large_lod, aspect, format, even_odd, _bm_data, _bm_h, _u0, _v0, _width, height, dest_width, dest_height, _tlut);
     let (Some(f), Some((w, h))) = (Format::from_u32(format), size(lod, aspect)) else { return };
     let need = layout::mem_required(lod, lod, aspect, f);
     if start < BANK && start.saturating_add(need) > BANK {

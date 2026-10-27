@@ -119,11 +119,14 @@ at C, and it is easiest to find at A.
 To record the call stream of the original:
 
 - For OpenGL and Direct3D, apitrace records every call ([Capturing what the game draws](../observe/drawing.md)).
-- For a card library, `tools/live/frida_trace.py --hook glide2x.dll!_grDrawTriangle@12=tri`
-  logs each call while the game runs. Its `--args` option adds the arguments. For Glide those
-  are pointers to the vertices, so log the values from a stand-in library when you need them.
-- GameFrame's [replacement libraries](wrappers.md) receive every call the game makes. They are
-  the natural place to write the stream to a file.
+- For Glide, SGL, ATI3DCIF and the S3D Toolkit, run the game on GameFrame's
+  [replacement libraries](wrappers.md) with `WRAPPER_CALLS` set to a file. Every call is
+  written, one a line, with the vertices' values and the textures' hashes
+  ([The call log](wrappers.md#the-call-log)). Make the port's device interface write the
+  same lines, and compare them with `tools/verify/seqdiff.py`.
+- For any other library, `tools/live/frida_trace.py --hook` logs each call to an export while
+  the game runs. Its `--args` option adds the arguments, but only as numbers, so a pointer to
+  a vertex shows as an address.
 
 ## The port as a virtual graphics card
 

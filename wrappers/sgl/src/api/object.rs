@@ -7,6 +7,7 @@ use crate::scene::graph::{Plane, Vertex};
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_create_mesh(generate_name: i32) -> i32 {
+    shim::call!("sgl_create_mesh", generate_name);
     trace!("sgl_create_mesh", "{generate_name}");
     sgl().scene.create_mesh(generate_name != 0)
 }
@@ -14,6 +15,7 @@ pub extern "C" fn sgl_create_mesh(generate_name: i32) -> i32 {
 /// `num_to_add` vertices; the normal and texture coordinate arrays may be null.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sgl_add_vertices(num_to_add: i32, vertices: *const f32, normals: *const f32, uvs: *const f32) {
+    shim::call!("sgl_add_vertices", num_to_add, vertices, normals, uvs);
     let n = num_to_add.max(0) as usize;
     if vertices.is_null() {
         return;
@@ -33,6 +35,7 @@ pub unsafe extern "C" fn sgl_add_vertices(num_to_add: i32, vertices: *const f32,
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sgl_add_face(num_face_points: i32, vertex_ids: *const i32) {
+    shim::call!("sgl_add_face", num_face_points, vertex_ids);
     if vertex_ids.is_null() || !(3..=4).contains(&num_face_points) {
         return;
     }
@@ -43,12 +46,14 @@ pub unsafe extern "C" fn sgl_add_face(num_face_points: i32, vertex_ids: *const i
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_create_light_volume(generate_name: i32, light_volume: i32, light_name: i32) -> i32 {
+    shim::call!("sgl_create_light_volume", generate_name, light_volume, light_name);
     trace!("sgl_create_light_volume", "{generate_name} {light_volume} {light_name}");
     sgl().scene.create_light_volume(generate_name != 0, light_volume != 0, light_name)
 }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sgl_add_simple_plane(surface_point: *const f32, normal: *const f32, invisible: i32) {
+    shim::call!("sgl_add_simple_plane", surface_point, normal, invisible);
     let (p, n) = unsafe { (v3(surface_point), v3(normal)) };
     trace!("sgl_add_simple_plane", "{p:?} {n:?} {invisible}");
     sgl().scene.add_plane(Plane { p, n, invisible: invisible != 0 });
@@ -61,6 +66,7 @@ pub unsafe extern "C" fn sgl_add_plane(
     surface_point: *const f32, point2: *const f32, point3: *const f32, invisible: i32, normal1: *const f32,
     normal2: *const f32, normal3: *const f32, uv1: *const f32, uv2: *const f32, uv3: *const f32,
 ) {
+    shim::call!("sgl_add_plane", surface_point, point2, point3, invisible, normal1, normal2, normal3, uv1, uv2, uv3);
     let (p, p2, p3, n1) = unsafe { (v3(surface_point), v3(point2), v3(point3), v3(normal1)) };
     let _ = (normal2, normal3, uv1, uv2, uv3);
     trace!("sgl_add_plane", "{p:?} {p2:?} {p3:?} {invisible} {n1:?}");

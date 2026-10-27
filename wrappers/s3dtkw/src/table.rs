@@ -23,6 +23,7 @@ pub struct State {
 pub static STATE: Mutex<State> = Mutex::new(State { values: [0; 32], sets: [0; 32] });
 
 unsafe extern "C" fn set_state(_t: *mut Table, key: u32, value: u32, _: u32) -> i32 {
+    shim::call!("S3DTK_SetState", key, value);
     let mut s = STATE.lock().unwrap_or_else(|e| e.into_inner());
     if let Some(v) = s.values.get_mut(key as usize) {
         *v = value;
@@ -38,6 +39,7 @@ unsafe extern "C" fn set_state(_t: *mut Table, key: u32, value: u32, _: u32) -> 
 /// (`0x4a5fb1`). Video memory is said to start at 0, so the offsets the game derives from
 /// linear addresses (`sfOffset`) are the linear addresses themselves.
 unsafe extern "C" fn get_state(_t: *mut Table, key: u32, out: u32, _: u32) -> i32 {
+    shim::call!("S3DTK_GetState", key);
     log!("GetState {} ({key})", state_name(key).unwrap_or("?"));
     if out != 0 {
         unsafe { (out as *mut u32).write_unaligned(0) };
@@ -45,10 +47,29 @@ unsafe extern "C" fn get_state(_t: *mut Table, key: u32, out: u32, _: u32) -> i3
     1
 }
 
+/// For the call log (`WRAPPER_CALLS`): each `S3DTK_VERTEX_TEX` of a `TriangleSet` list, as
+/// `gameframe-virge` reads it.
+struct Vertices(u32, u32);
+impl shim::calls::Arg for Vertices {
+    fn put(&self, out: &mut String) {
+        if self.0 == 0 {
+            return out.push_str("null");
+        }
+        out.push('[');
+        for i in 0..self.1 as usize {
+            let v = unsafe { (self.0 as *const u32).add(i).read_unaligned() } as *const [u8; 32];
+            let v = virge::draw::Vertex32::from_bytes(&unsafe { v.read_unaligned() });
+            out.push_str(&format!("{}{v:?}", if i == 0 { "" } else { " " }));
+        }
+        out.push(']');
+    }
+}
+
 /// Calls by rendering type (0 Gouraud, 1 lit texture, 2 unlit texture, 3 other), for the log.
 static COUNTS: [AtomicU32; 4] = [AtomicU32::new(0), AtomicU32::new(0), AtomicU32::new(0), AtomicU32::new(0)];
 
 unsafe extern "C" fn triangle_set(_t: *mut Table, list: u32, n: u32, kind: u32) -> i32 {
+    shim::call!("S3DTK_TriangleSet", Vertices(list, n), n, kind);
     let rtype = STATE.lock().unwrap_or_else(|e| e.into_inner()).values[10];
     let k = match rtype { 0 => 0, 0x0800_0000 => 1, 0x1000_0000 => 2, _ => 3 };
     let seen = COUNTS[k].fetch_add(1, Ordering::Relaxed);
@@ -74,6 +95,7 @@ unsafe extern "C" fn triangle_set(_t: *mut Table, list: u32, n: u32, kind: u32) 
 }
 
 unsafe extern "C" fn other(_t: *mut Table, a: u32, b: u32, c: u32) -> i32 {
+    shim::call!("S3DTK_table_other", a, b, c);
     log!("unexpected S3DTK table call ({a:#x}, {b:#x}, {c:#x})");
     0
 }

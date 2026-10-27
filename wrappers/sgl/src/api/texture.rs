@@ -43,6 +43,7 @@ pub unsafe extern "C" fn sgl_preprocess_texture(
     map_type: i32, map_size: i32, generate_mipmap: i32, dither: i32, src: *const IntermediateMap, _filtered: *const *const IntermediateMap,
     processed: *mut IntermediateMap,
 ) -> i32 {
+    shim::call!("sgl_preprocess_texture", map_type, map_size, generate_mipmap, dither, src, _filtered, processed);
     trace!("sgl_preprocess_texture", "{map_type} {map_size} {generate_mipmap} {dither} {src:?} -> {processed:?}");
     if src.is_null() || processed.is_null() {
         return crate::scene::ERR_BAD_PARAMETER;
@@ -60,6 +61,7 @@ pub unsafe extern "C" fn sgl_preprocess_texture(
 pub unsafe extern "C" fn sgl_create_texture(
     map_type: i32, map_size: i32, generate_mipmap: i32, dither: i32, pixel_data: *const IntermediateMap, _filtered: *const *const IntermediateMap,
 ) -> i32 {
+    shim::call!("sgl_create_texture", map_type, map_size, generate_mipmap, dither, pixel_data, _filtered);
     if pixel_data.is_null() {
         return crate::scene::ERR_BAD_PARAMETER;
     }
@@ -84,6 +86,7 @@ pub unsafe extern "C" fn sgl_create_texture(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_delete_texture(texture_name: i32) {
+    shim::call!("sgl_delete_texture", texture_name);
     trace!("sgl_delete_texture", "{texture_name}");
     let deleted = {
         let mut s = sgl();
@@ -98,5 +101,6 @@ pub extern "C" fn sgl_delete_texture(texture_name: i32) {
 /// For textures loaded from BMP files with `LoadBMPTexture`, which POD does not import: none.
 #[unsafe(no_mangle)]
 pub extern "C" fn FreeAllBMPTextures() {
+    shim::call!("FreeAllBMPTextures");
     trace!("FreeAllBMPTextures");
 }

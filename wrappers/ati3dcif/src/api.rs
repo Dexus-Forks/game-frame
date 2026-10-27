@@ -7,6 +7,7 @@ use std::sync::atomic::{AtomicU32, Ordering};
 
 #[unsafe(no_mangle)]
 pub extern "system" fn ATI3DCIF_Init() -> u32 {
+    shim::call!("ATI3DCIF_Init");
     log!("ATI3DCIF_Init");
     OK
 }
@@ -14,12 +15,14 @@ pub extern "system" fn ATI3DCIF_Init() -> u32 {
 /// One context: the handle is never looked at again by the game except to pass it back.
 #[unsafe(no_mangle)]
 pub extern "system" fn ATI3DCIF_ContextCreate() -> u32 {
+    shim::call!("ATI3DCIF_ContextCreate");
     log!("ATI3DCIF_ContextCreate");
     1
 }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn ATI3DCIF_ContextSetState(_ctx: u32, id: u32, data: *const u32) -> u32 {
+    shim::call!("ATI3DCIF_ContextSetState", _ctx, id, Word(data));
     let v = if data.is_null() { 0 } else { unsafe { data.read_unaligned() } };
     let mut c = context();
     if let Some(slot) = c.values.get_mut(id as usize) {
@@ -34,19 +37,52 @@ pub unsafe extern "system" fn ATI3DCIF_ContextSetState(_ctx: u32, id: u32, data:
 
 #[unsafe(no_mangle)]
 pub extern "system" fn ATI3DCIF_RenderBegin(_ctx: u32) -> u32 {
+    shim::call!("ATI3DCIF_RenderBegin", _ctx);
     OK
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn ATI3DCIF_RenderEnd() -> u32 {
+    shim::call!("ATI3DCIF_RenderEnd");
+    shim::calls::end_frame();
     OK
 }
 
 static DUMPS: AtomicU32 = AtomicU32::new(0);
 
+/// For the call log (`WRAPPER_CALLS`): the word a state's pointer points to.
+struct Word(*const u32);
+impl shim::calls::Arg for Word {
+    fn put(&self, out: &mut String) {
+        match self.0.is_null() {
+            true => out.push_str("null"),
+            false => unsafe { self.0.read_unaligned() }.put(out),
+        }
+    }
+}
+
+/// For the call log: each `C3D_VTCF` of a primitive list as its ten floats
+/// (x, y, z, s, t, w, r, g, b, a).
+struct Vtcf(*const *const u32, u32);
+impl shim::calls::Arg for Vtcf {
+    fn put(&self, out: &mut String) {
+        if self.0.is_null() {
+            return out.push_str("null");
+        }
+        out.push('[');
+        for i in 0..self.1 as usize {
+            let v = unsafe { self.0.add(i).read_unaligned() };
+            let fs: Vec<String> = (0..10).map(|j| format!("{:?}", f32::from_bits(unsafe { v.add(j).read_unaligned() }))).collect();
+            out.push_str(&format!("{}{{{}}}", if i == 0 { "" } else { " " }, fs.join(" ")));
+        }
+        out.push(']');
+    }
+}
+
 /// `vlist`: `n` pointers to vertices.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn ATI3DCIF_RenderPrimList(vlist: *const *const u32, n: u32) -> u32 {
+    shim::call!("ATI3DCIF_RenderPrimList", Vtcf(vlist, n), n);
     if vlist.is_null() || n == 0 {
         return OK;
     }

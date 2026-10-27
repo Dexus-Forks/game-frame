@@ -67,6 +67,13 @@ fn map(m: &Manager, id: i32) -> Option<GrMipMapInfo> {
     m.maps.get(usize::try_from(id).ok()?).map(|b| **b).filter(|i| i.valid != 0)
 }
 
+/// The bytes of a mip map's whole chain in the game's packed data, for the call log.
+fn chain_bytes(id: i32) -> usize {
+    with(|m| map(m, id))
+        .and_then(|i| Format::from_u32(i.format).and_then(|f| layout::host_offset(i.lod_max, i.lod_min + 1, i.aspect, f)))
+        .unwrap_or(0)
+}
+
 fn tex_info(i: &GrMipMapInfo) -> GrTexInfo {
     GrTexInfo { small_lod: i.lod_min, large_lod: i.lod_max, aspect: i.aspect, format: i.format, data: i.data }
 }
@@ -90,6 +97,7 @@ pub extern "system" fn guTexAllocateMemory(
     tmu: i32, odd_even: u32, width: u32, height: u32, format: u32, mode: u32, small: u32, large: u32, aspect: u32,
     s_clamp: u32, t_clamp: u32, min_filter: u32, mag_filter: u32, lod_bias: f32, trilinear: u32,
 ) -> i32 {
+    shim::call!("guTexAllocateMemory", tmu, odd_even, width, height, format, mode, small, large, aspect, s_clamp, t_clamp, min_filter, mag_filter, lod_bias, trilinear);
     let a = [width, height, format, mode, small, large, aspect, s_clamp, t_clamp, min_filter, mag_filter];
     let need = required(&a);
     with(|m| {
@@ -134,6 +142,7 @@ pub extern "system" fn guTexChangeAttributes(
     id: i32, width: u32, height: u32, format: u32, mode: u32, small: u32, large: u32, aspect: u32, s_clamp: u32, t_clamp: u32,
     min_filter: u32, mag_filter: u32,
 ) -> u32 {
+    shim::call!("guTexChangeAttributes", id, width, height, format, mode, small, large, aspect, s_clamp, t_clamp, min_filter, mag_filter);
     let a = [width, height, format, mode, small, large, aspect, s_clamp, t_clamp, min_filter, mag_filter];
     with(|m| {
         let Some(k) = usize::try_from(id).ok().filter(|k| map(m, id).is_some() && required(&a) <= m.sizes[*k]) else {
@@ -147,6 +156,7 @@ pub extern "system" fn guTexChangeAttributes(
 /// The whole chain from `src`, and the NCC table for an NCC format.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn guTexDownloadMipMap(id: i32, src: *const u8, ncc: *const u8) {
+    shim::call!("guTexDownloadMipMap", id, crate::callargs::Data(src, chain_bytes(id)), crate::callargs::Data(ncc, NCC_BYTES));
     let Some(i) = with(|m| {
         let k = usize::try_from(id).ok()?;
         map(m, id)?;
@@ -165,6 +175,7 @@ pub unsafe extern "system" fn guTexDownloadMipMap(id: i32, src: *const u8, ncc: 
 /// One level from `*src`, which then points past it.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn guTexDownloadMipMapLevel(id: i32, lod: u32, src: *mut *const u8) {
+    shim::call!("guTexDownloadMipMapLevel", id, lod, src);
     let Some(i) = with(|m| map(m, id)) else { return };
     let (Some(f), Some((w, h))) = (Format::from_u32(i.format), size(lod, i.aspect)) else { return };
     if src.is_null() || lod < i.lod_max || lod > i.lod_min {
@@ -181,6 +192,7 @@ pub unsafe extern "system" fn guTexDownloadMipMapLevel(id: i32, lod: u32, src: *
 /// its NCC table (loaded as table 0).
 #[unsafe(no_mangle)]
 pub extern "system" fn guTexSource(id: i32) {
+    shim::call!("guTexSource", id);
     let Some(i) = with(|m| {
         let i = map(m, id)?;
         m.current = id;
@@ -202,11 +214,13 @@ pub extern "system" fn guTexSource(id: i32) {
 
 #[unsafe(no_mangle)]
 pub extern "system" fn guTexGetCurrentMipMap(_tmu: u32) -> i32 {
+    shim::call!("guTexGetCurrentMipMap", _tmu);
     with(|m| m.current)
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn guTexGetMipMapInfo(id: i32) -> *const GrMipMapInfo {
+    shim::call!("guTexGetMipMapInfo", id);
     with(|m| match usize::try_from(id).ok().and_then(|k| m.maps.get(k)) {
         Some(b) => &**b as *const GrMipMapInfo,
         None => std::ptr::null(),
@@ -215,6 +229,7 @@ pub extern "system" fn guTexGetMipMapInfo(id: i32) -> *const GrMipMapInfo {
 
 #[unsafe(no_mangle)]
 pub extern "system" fn guTexMemQueryAvail(_tmu: u32) -> u32 {
+    shim::call!("guTexMemQueryAvail", _tmu);
     with(|m| TMU_MEMORY - m.next)
 }
 
@@ -222,6 +237,7 @@ pub extern "system" fn guTexMemQueryAvail(_tmu: u32) -> u32 {
 /// valid) instead of being freed, in case the game still holds one.
 #[unsafe(no_mangle)]
 pub extern "system" fn guTexMemReset() {
+    shim::call!("guTexMemReset");
     with(|m| {
         for i in m.maps.iter_mut() {
             i.valid = 0;
@@ -237,6 +253,7 @@ pub extern "system" fn guTexMemReset() {
 /// draws where. Deviation: the colours are this library's own.
 #[unsafe(no_mangle)]
 pub extern "system" fn guTexCreateColorMipMap() -> i32 {
+    shim::call!("guTexCreateColorMipMap");
     const COLOURS: [u16; 9] = [0xf800, 0x07e0, 0x001f, 0xffe0, 0xf81f, 0x07ff, 0xffff, 0x8410, 0x0000];
     let id = guTexAllocateMemory(0, 3, 256, 256, Format::Rgb565 as u32, 1, 8, 0, 3, 0, 0, 1, 1, 0.0, 0);
     if id == NULL_MIPMAP {
@@ -276,6 +293,7 @@ unsafe fn read_header(name: *const c_char) -> Option<(Vec<u8>, tdf::Header)> {
 /// to allocate for its data.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn gu3dfGetInfo(name: *const c_char, info: *mut Gu3dfInfo) -> u32 {
+    shim::call!("gu3dfGetInfo", name, info);
     let (Some((_, h)), Some(info)) = (unsafe { read_header(name) }, unsafe { info.as_mut() }) else { return 0 };
     info.header = [h.width, h.height, h.small_lod, h.large_lod, h.aspect, h.format as u32];
     info.mem_required = layout::mem_required(h.small_lod, h.large_lod, h.aspect, h.format);
@@ -286,6 +304,7 @@ pub unsafe extern "system" fn gu3dfGetInfo(name: *const c_char, info: *mut Gu3df
 /// allocated with `mem_required` bytes.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn gu3dfLoad(name: *const c_char, info: *mut Gu3dfInfo) -> u32 {
+    shim::call!("gu3dfLoad", name, info);
     let (Some((file, h)), Some(info)) = (unsafe { read_header(name) }, unsafe { info.as_mut() }) else { return 0 };
     let Some((table, data)) = tdf::load(&file, &h) else { return 0 };
     if info.data.is_null() {

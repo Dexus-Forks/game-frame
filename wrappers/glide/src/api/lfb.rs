@@ -196,20 +196,32 @@ pub fn finish_write() {
         img.map(|i| flip(i, l.lower_left))
     });
     if let Some(img) = img {
+        // The pixels the CPU wrote while the frame buffer was locked: not a Glide call, so it has
+        // its own name, `lfb_pixels(x, y, w, h, [bytes hash])`. It is written when the library
+        // takes the pixels: at the next call that draws, or at the swap.
+        if shim::calls::on() {
+            let mut args = format!("{:#x}, {:#x}, {:#x}, {:#x}, ", img.x, img.y, img.w, img.h);
+            shim::calls::Arg::put(&shim::calls::Bytes(&img.rgba), &mut args);
+            shim::calls::write("lfb_pixels", &args);
+        }
         push(Cmd::Lfb(img));
     }
 }
 
 #[unsafe(no_mangle)]
-pub extern "system" fn grLfbBegin() {}
+pub extern "system" fn grLfbBegin() {
+    shim::call!("grLfbBegin");
+}
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grLfbEnd() {
+    shim::call!("grLfbEnd");
     finish_write();
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grLfbGetWritePtr(buffer: u32) -> *mut u32 {
+    shim::call!("grLfbGetWritePtr", buffer);
     finish_write();
     if buffer != BUFFER_BACK {
         shim::gap!("grLfbGetWritePtr buffer", "buffer {buffer}: only the back buffer is handled");
@@ -220,6 +232,7 @@ pub extern "system" fn grLfbGetWritePtr(buffer: u32) -> *mut u32 {
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grLfbWriteMode(mode: u32) {
+    shim::call!("grLfbWriteMode", mode);
     with(|l| l.mode = mode);
     if !matches!(mode, LFB_565 | LFB_555 | LFB_1555 | LFB_888 | LFB_8888) {
         shim::gap!("grLfbWriteMode", "mode {mode} is not handled");
@@ -228,27 +241,32 @@ pub extern "system" fn grLfbWriteMode(mode: u32) {
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grLfbBypassMode(mode: u32) {
+    shim::call!("grLfbBypassMode", mode);
     with(|l| l.bypass = mode == LFBBYPASS_ENABLE);
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grLfbConstantAlpha(alpha: u32) {
+    shim::call!("grLfbConstantAlpha", alpha);
     with(|l| l.constant_alpha = alpha as u8);
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grLfbConstantDepth(depth: u32) {
+    shim::call!("grLfbConstantDepth", depth);
     with(|l| l.constant_depth = depth as u16);
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grLfbWriteColorFormat(format: u32) {
+    shim::call!("grLfbWriteColorFormat", format);
     finish_write();
     with(|l| l.format = format & 3);
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grLfbWriteColorSwizzle(bytes: u32, words: u32) {
+    shim::call!("grLfbWriteColorSwizzle", bytes, words);
     finish_write();
     with(|l| l.swizzle = (bytes != 0, words != 0));
 }
@@ -256,6 +274,7 @@ pub extern "system" fn grLfbWriteColorSwizzle(bytes: u32, words: u32) {
 /// The early Glide 2 call that says where row 0 of the frame buffer is.
 #[unsafe(no_mangle)]
 pub extern "system" fn grLfbOrigin(origin: u32) {
+    shim::call!("grLfbOrigin", origin);
     finish_write();
     with(|l| l.lower_left = origin == ORIGIN_LOWER_LEFT);
 }
@@ -264,6 +283,7 @@ pub extern "system" fn grLfbOrigin(origin: u32) {
 /// per row, to `(x, y)` of the back buffer (POD: the loading picture in strips of 640 × 30).
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn guFbWriteRegion(x: u32, y: u32, w: u32, h: u32, src: *const u8, stride: i32) {
+    shim::call!("guFbWriteRegion", x, y, w, h, crate::callargs::Region(src, w, h, stride, with(|l| if wide(l.mode) { 4 } else { 2 })), stride);
     finish_write();
     if src.is_null() || w == 0 || h == 0 {
         return;
@@ -293,6 +313,7 @@ const LFBWRITEMODE_ANY: u32 = 0xff;
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grLfbLock(kind: u32, buffer: u32, mode: u32, origin: u32, pipeline: u32, info: *mut u32) -> u32 {
+    shim::call!("grLfbLock", kind, buffer, mode, origin, pipeline, info);
     if info.is_null() {
         return 0;
     }
@@ -319,6 +340,7 @@ pub unsafe extern "system" fn grLfbLock(kind: u32, buffer: u32, mode: u32, origi
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grLfbUnlock(kind: u32, _buffer: u32) -> u32 {
+    shim::call!("grLfbUnlock", kind, _buffer);
     if kind & 1 != LFB_READ_ONLY {
         finish_write();
     }
@@ -329,6 +351,7 @@ pub extern "system" fn grLfbUnlock(kind: u32, _buffer: u32) -> u32 {
 /// `(x, y)` of the buffer, bypassing the pixel pipeline.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grLfbWriteRegion(_buffer: u32, x: u32, y: u32, format: u32, w: u32, h: u32, stride: i32, data: *const u8) -> u32 {
+    shim::call!("grLfbWriteRegion", _buffer, x, y, format, w, h, stride, crate::callargs::Region(data, w, h, stride, if wide(format) { 4 } else { 2 }));
     let (mode, bypass) = with(|l| (l.mode, l.bypass));
     with(|l| {
         l.mode = format;

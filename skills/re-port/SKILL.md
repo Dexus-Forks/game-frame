@@ -67,7 +67,9 @@ after a year.
   (`gameframe-voodoo`, `-rage`, `-virge`, `-powervr`), and a modern renderer. The core never
   asks a device how it drew. A pixel the original read back (`grLfbReadRegion`) is an input of
   the core. Hooks for the extra build (record the calls, replace textures, add draws) sit on
-  the interface. `docs/hardware/rendering-pipeline.md` explains the stages, where each ran on
+  the interface. Make one hook write each call in the format of GameFrame's call log
+  (`WRAPPER_CALLS`, `docs/hardware/wrappers.md`), so the port's calls compare line for line
+  with the original's. `docs/hardware/rendering-pipeline.md` explains the stages, where each ran on
   each card, and what to check at each seam.
 - **A query layer for tests.** A way to ask the running program what it shows (interface
   elements by name or text, the world's counts) and to press things by name. Tests that find a

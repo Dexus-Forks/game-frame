@@ -43,6 +43,7 @@ pub fn install_ini() {
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_create_screen_device(device_number: i32, x: i32, y: i32, mode: i32, double_buffer: i32) -> i32 {
+    shim::call!("sgl_create_screen_device", device_number, x, y, mode, double_buffer);
     let mut s = sgl();
     s.device = Some((x.clamp(1, 4096), y.clamp(1, 4096)));
     let h = s.handle();
@@ -52,6 +53,7 @@ pub extern "C" fn sgl_create_screen_device(device_number: i32, x: i32, y: i32, m
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sgl_get_device(name: i32, device_number: *mut i32, x: *mut i32, y: *mut i32, mode: *mut i32, double_buffer: *mut i32) -> i32 {
+    shim::call!("sgl_get_device", name, device_number, x, y, mode, double_buffer);
     let (w, h) = sgl().device.unwrap_or((640, 480));
     trace!("sgl_get_device", "{name} -> {w}x{h}");
     unsafe {
@@ -66,11 +68,13 @@ pub unsafe extern "C" fn sgl_get_device(name: i32, device_number: *mut i32, x: *
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_delete_device(name: i32) {
+    shim::call!("sgl_delete_device", name);
     trace!("sgl_delete_device", "{name}");
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_create_viewport(parent_device: i32, left: i32, top: i32, right: i32, bottom: i32, cl: f32, ct: f32, cr: f32, cb: f32) -> i32 {
+    shim::call!("sgl_create_viewport", parent_device, left, top, right, bottom, cl, ct, cr, cb);
     let mut s = sgl();
     let h = s.handle();
     s.viewports.insert(h, Viewport { rect: [left, top, right, bottom], cam: [cl, ct, cr, cb], subtract: Vec::new() });
@@ -80,6 +84,7 @@ pub extern "C" fn sgl_create_viewport(parent_device: i32, left: i32, top: i32, r
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_set_viewport(viewport: i32, left: i32, top: i32, right: i32, bottom: i32, cl: f32, ct: f32, cr: f32, cb: f32) -> i32 {
+    shim::call!("sgl_set_viewport", viewport, left, top, right, bottom, cl, ct, cr, cb);
     trace!("sgl_set_viewport", "{viewport} ({left},{top})-({right},{bottom}) camera ({cl},{ct})-({cr},{cb})");
     match sgl().viewports.get_mut(&viewport) {
         Some(v) => {
@@ -93,6 +98,7 @@ pub extern "C" fn sgl_set_viewport(viewport: i32, left: i32, top: i32, right: i3
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_subtract_viewport(viewport: i32, removed_viewport: i32) {
+    shim::call!("sgl_subtract_viewport", viewport, removed_viewport);
     trace!("sgl_subtract_viewport", "{viewport} {removed_viewport}");
     if let Some(v) = sgl().viewports.get_mut(&viewport) {
         if !v.subtract.contains(&removed_viewport) {
@@ -103,6 +109,7 @@ pub extern "C" fn sgl_subtract_viewport(viewport: i32, removed_viewport: i32) {
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_delete_viewport(viewport: i32) {
+    shim::call!("sgl_delete_viewport", viewport);
     trace!("sgl_delete_viewport", "{viewport}");
     let mut s = sgl();
     s.viewports.remove(&viewport);
@@ -115,6 +122,7 @@ pub extern "C" fn sgl_delete_viewport(viewport: i32) {
 /// it points `status` at says whether a render is busy (never, here).
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sgl_use_address_mode(next_address: usize, status: *mut *const u32) -> i32 {
+    shim::call!("sgl_use_address_mode", next_address, status);
     shim::log!("sgl_use_address_mode callback {next_address:#x} status {status:?}");
     crate::frame::set_callback(next_address);
     if !status.is_null() {
@@ -125,6 +133,8 @@ pub unsafe extern "C" fn sgl_use_address_mode(next_address: usize, status: *mut 
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_render(viewport_or_device: i32, camera_or_list: i32, swap_buffers: i32) {
+    shim::call!("sgl_render", viewport_or_device, camera_or_list, swap_buffers);
     trace!("sgl_render", "{viewport_or_device} {camera_or_list} {swap_buffers}");
     crate::frame::render(viewport_or_device, camera_or_list, swap_buffers != 0);
+    shim::calls::end_frame();
 }

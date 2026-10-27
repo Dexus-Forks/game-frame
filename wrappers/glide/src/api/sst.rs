@@ -33,11 +33,13 @@ pub fn screen() -> (u32, u32) {
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grGlideInit() {
+    shim::call!("grGlideInit");
     log!("grGlideInit (output scale {}, size {:?})", crate::config::get().scale, crate::config::get().size);
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grGlideShutdown() {
+    shim::call!("grGlideShutdown");
     flush();
 }
 
@@ -45,6 +47,7 @@ pub extern "system" fn grGlideShutdown() {
 /// 4 MB. POD stops unless `num_sst` > 0 and the board type is 0 (`FUN_0049f3a0`).
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grSstQueryHardware(hw: *mut u32) -> i32 {
+    shim::call!("grSstQueryHardware", hw);
     if hw.is_null() {
         return 0;
     }
@@ -61,10 +64,13 @@ pub unsafe extern "system" fn grSstQueryHardware(hw: *mut u32) -> i32 {
 }
 
 #[unsafe(no_mangle)]
-pub extern "system" fn grSstSelect(_board: u32) {}
+pub extern "system" fn grSstSelect(_board: u32) {
+    shim::call!("grSstSelect", _board);
+}
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grSstOpen(res: u32, refresh: u32, format: u32, origin: u32, smoothing: u32, buffers: u32) -> i32 {
+    shim::call!("grSstOpen", res, refresh, format, origin, smoothing, buffers);
     let (w, h) = consts::resolution(res).unwrap_or((640, 480));
     log!("grSstOpen {w}x{h} (res {res}, refresh {refresh}, format {format}, origin {origin}, smoothing {smoothing}, {buffers} buffers)");
     let (ow, oh) = crate::config::get().output(w, h);
@@ -78,6 +84,7 @@ pub extern "system" fn grSstOpen(res: u32, refresh: u32, format: u32, origin: u3
 /// The later Glide 2.x open (POD Gold's 3dfx build): the game names its window.
 #[unsafe(no_mangle)]
 pub extern "system" fn grSstWinOpen(hwnd: usize, res: u32, refresh: u32, format: u32, origin: u32, colour: u32, aux: u32) -> u32 {
+    shim::call!("grSstWinOpen", hwnd, res, refresh, format, origin, colour, aux);
     let (w, h) = consts::resolution(res).unwrap_or((640, 480));
     log!("grSstWinOpen {w}x{h} (window {hwnd:#x}, res {res}, refresh {refresh}, format {format}, origin {origin}, {colour} colour and {aux} aux buffers)");
     let (ow, oh) = crate::config::get().output(w, h);
@@ -90,6 +97,7 @@ pub extern "system" fn grSstWinOpen(hwnd: usize, res: u32, refresh: u32, format:
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grSstWinClose() -> u32 {
+    shim::call!("grSstWinClose");
     flush();
     1
 }
@@ -98,12 +106,14 @@ pub extern "system" fn grSstWinClose() -> u32 {
 /// keep the size of, so nothing to do.
 #[unsafe(no_mangle)]
 pub extern "system" fn grSstControl(code: u32) -> u32 {
+    shim::call!("grSstControl", code);
     log!("grSstControl {code}");
     1
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grSstOrigin(origin: u32) {
+    shim::call!("grSstOrigin", origin);
     super::shadow::origin(origin & 1);
 }
 
@@ -114,6 +124,7 @@ pub extern "system" fn grSstOrigin(origin: u32) {
 /// `param` of that chip (*measured*).
 #[unsafe(no_mangle)]
 pub extern "system" fn grSstConfigPipeline(which: u32, param: u32, value: u32) {
+    shim::call!("grSstConfigPipeline", which, param, value);
     log!("grSstConfigPipeline {which} {param} {value:#x}: ignored");
 }
 
@@ -124,6 +135,7 @@ pub extern "system" fn grSstConfigPipeline(which: u32, param: u32, value: u32) {
 /// board's settings (*measured*).
 #[unsafe(no_mangle)]
 pub extern "system" fn grSstVidMode(which: u32, _timing: *const u8) {
+    shim::call!("grSstVidMode", which, _timing);
     log!("grSstVidMode {which}: ignored");
 }
 
@@ -131,28 +143,34 @@ pub extern "system" fn grSstVidMode(which: u32, _timing: *const u8) {
 /// window stays; nothing to do.
 #[unsafe(no_mangle)]
 pub extern "system" fn grSstPassthruMode(mode: u32) {
+    shim::call!("grSstPassthruMode", mode);
     log!("grSstPassthruMode {mode}");
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grBufferSwap(_interval: u32) {
+    shim::call!("grBufferSwap", _interval);
     super::lfb::finish_write();
     push(Cmd::Swap);
     flush();
     super::movie::frame();
+    shim::calls::end_frame();
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grBufferClear(color: u32, alpha: u32, depth: u32) {
+    shim::call!("grBufferClear", color, alpha, depth);
     push(Cmd::Clear { color: argb(color), alpha: alpha & 0xff, depth: depth & 0xffff });
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grClipWindow(minx: u32, miny: u32, maxx: u32, maxy: u32) {
+    shim::call!("grClipWindow", minx, miny, maxx, maxy);
     super::shadow::clip([minx, miny, maxx, maxy]);
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grGammaCorrectionValue(gamma: f32) {
+    shim::call!("grGammaCorrectionValue", gamma);
     push(Cmd::Gamma(gamma));
 }

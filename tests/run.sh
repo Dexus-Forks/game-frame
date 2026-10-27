@@ -1887,6 +1887,24 @@ if command -v cargo >/dev/null; then
   [[ $? == 0 && "$out" == *"s3dtkw: 6 of 6 calls implemented"* ]] \
     && ok "stubgen: each wrapper's .def and stubs match its API table, every call with the original's convention ($(echo "$out" | grep -o '[0-9]* of [0-9]*' | paste -sd, - | sed 's/,/, /g'))" \
     || bad "stubgen --check" "$out"
+  expect "every export of glide, sgl, ati3dcif and s3dtkw writes itself to the call log first (shim::call!, WRAPPER_CALLS)" "missing: none" "$PYTHON" -c "
+import glob, re
+missing, n = [], 0
+for f in sorted(glob.glob('wrappers/glide/src/api/*.rs') + glob.glob('wrappers/sgl/src/api/*.rs') + ['wrappers/ati3dcif/src/api.rs', 'wrappers/s3dtkw/src/api.rs']):
+    lines = open(f).read().split(chr(10))
+    for i, line in enumerate(lines):
+        if line.strip() != '#[unsafe(no_mangle)]':
+            continue
+        j = i + 1
+        while not lines[j].rstrip().endswith('{'):
+            j += 1
+        name = re.search(r'fn (\\w+)', ' '.join(lines[i + 1:j + 1])).group(1)
+        if name == 'DllMain' or name.startswith('sgl_wrapper_'):
+            continue
+        n += 1
+        if 'shim::call!(\\\"' + name + '\\\"' not in lines[j + 1]:
+            missing.append(name)
+print('missing: ' + (', '.join(missing) or 'none'))"
   out="$(cd wrappers && cargo test --release --target "$host" --target-dir "$WT" -p scalers -p pixels -p shim -p sgl -p maxi94 -p glide 2>&1)"
   [[ $? == 0 ]] && ok "the wrappers' host tests pass: scalers, pixels, settings, SGL scene graph and immediate mode, Maxi Sound 64 streams and mixer, Glide clipping, mip layout, fog tables and 3DF files ($(echo "$out" | grep -o '[0-9]* passed' | awk '{s+=$1} END {print s}') tests)" \
     || bad "wrappers host tests" "$(echo "$out" | grep -E 'FAILED|panicked|error' | head -8)"

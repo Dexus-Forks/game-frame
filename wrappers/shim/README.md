@@ -15,6 +15,15 @@
 - `iat`: one of the game's imports replaced by the wrapper's own function, which calls on to
   the original. `maxi94` hooks POD's `waveOutOpen` and `waveOutClose` this way, to know which
   wave streams are open when the game asks the card.
+- `calls`: the call log. With `WRAPPER_CALLS` set to a file, every call the game makes is
+  written there, one line each: `name(arguments)`, a tab, and `frame N`, the format
+  `tools/verify/seqdiff.py` compares. `call!("grBufferClear", color, alpha, depth)` as the
+  first statement of an export writes it. Arguments implement `calls::Arg`. Integers and
+  floats print exactly, pointers print as `null` or `ptr`, and `Bytes` prints a size and a
+  hash. A library adds its own `Arg` types for what its pointers point to. Only the outermost
+  call on a thread is written. `end_frame` counts frames, and `WRAPPER_CALLS_FRAMES` (`A-B`
+  or `A`) picks them. `stub!` writes its calls too. `tests/run.sh` checks that every export
+  of every library writes itself.
 - `log`: one log per DLL, to the file its variable names, or to standard error. Its first
   line names the build (debug or release). `stub!` makes a stub for a call of the original
   library (`wrappers/stubgen.py` writes them). `gap!` marks a mode that a call does not
