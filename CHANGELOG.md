@@ -9,6 +9,13 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `tools/rea/rea_session.py`: REA on a game's binary from a script. `fn` gives REA the project's
+  labels and prints a summary of each function's dossier (size, references, callees, memory
+  effects), `snapshot` saves REA's answers to reuse, and `labels` writes
+  `set_addresses_names` input. `tools/rea/mcp_client.py` is the small stdio MCP client under
+  it, which starts a provider from the project's `.mcp.json`. The know-how entry
+  `context-rea-sessions-and-snapshots` has what a session costs and what a snapshot keeps,
+  measured on Banished.
 - `gameframe-d3d`: Direct3D 3 immediate mode in software. It writes and parses execute buffers
   (`Builder`, `exec::parse`: `D3DTLVERTEX`, `PROCESSVERTICES`, `STATERENDER`, `TRIANGLE`) and runs
   them (`Device::execute`) into an RGB565 target at any multiple of the game's resolution. It

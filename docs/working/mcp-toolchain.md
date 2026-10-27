@@ -21,7 +21,7 @@ returns the tool name and path, arguments, working directory, exit status, durat
 output. It caps output size, reports progress for long calls and stops a child process when the
 client cancels the request or the timeout expires. A tool's own output names files it created.
 
-The catalog currently has 117 entries. The runner can call all 95 programs and shell scripts.
+The catalog currently has 122 entries. The runner can call all 99 programs and shell scripts.
 `tests/mcp_tool_coverage.py` checks the catalog and help for every entry, and runs each command's
 help path through MCP in a temporary project. It also checks a sample PE analysis and runner
 progress, cancellation and timeout handling.
@@ -31,6 +31,13 @@ modules. They are shared Python APIs, not standalone commands. Use the documente
 scripts that call them. Add a purpose-built MCP operation when an agent needs a library API
 directly; the generic runner must not execute arbitrary Python. Ghidra scripts run through the
 catalog's `ghidra-run` and `ghidra-export` scripts.
+
+## Providers from a script
+
+An agent's provider servers live inside the agent. `tools/rea/mcp_client.py` lets a script start
+its own copy from the project's `.mcp.json` (`provider_command(NAME)`) and call its tools.
+`tools/rea/rea_session.py` uses it for REA: function dossiers with the project's labels, and a
+saved analysis snapshot ([re-rea](../../skills/re-rea/SKILL.md)).
 
 ## Modules
 

@@ -127,6 +127,7 @@ An entry has one of five statuses.
 | [Porting more of the original made a replay agree less with the recording](replay-stand-in-for-unported-logic.md) | solved |
 | [Porting routines that build records in their stack frame: keep the frame as an array](frames-as-arrays.md) | context |
 | [ptrace breakpoints in a Wine game leave every thread stopped](ptrace-breakpoints-wine.md) | solved |
+| [REA through Ghidra: what a session costs, what a snapshot keeps and how labels interact](context-rea-sessions-and-snapshots.md) | context |
 | [Record a whole run of the original from its memory as the reference for a port](record-a-run-from-memory.md) | context |
 | [Record a Windows game's sound in a VM that has no sound card](record-sound-without-a-sound-card.md) | context |
 | [Run the original's per-object step under the emulator on states from the running game](emulate-step-from-step-log.md) | context |

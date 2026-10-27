@@ -37,6 +37,18 @@ vz="$(mktemp -d)"; "$PYTHON" -c "import pefile,sys;p=pefile.PE(sys.argv[1]);[set
 expect "vtable reads a PE whose sections have a VirtualSize of 0, as Watcom writes" "+0x008" "$PYTHON" tools/pe/vtable.py "$vz/game.exe" "$vt"
 expect "peinfo shows the raw size of a section with a VirtualSize of 0" "(raw size: VirtualSize 0)" "$PYTHON" tools/pe/peinfo.py "$vz/game.exe"
 rm -rf "$vz"
+RS="$(mktemp -d)"; RF=tests/fixtures/rea; RSRV="$PYTHON $RF/fake_rea.py"
+expect "rea_session labels keeps the binary's addresses, the first file winning, :: as __" '"0x140001100": "Thing__tick"' sh -c "\"$PYTHON\" tools/rea/rea_session.py labels $B/game.exe --labels $RF/names.tsv --labels $RF/more.tsv --out $RS 2>&1 && cat $RS/game.exe-names-1.json"
+expect "rea_session labels leaves out another binary's address" "4 labels in 1 files" "$PYTHON" tools/rea/rea_session.py labels $B/game.exe --labels $RF/names.tsv --labels $RF/more.tsv --out $RS
+expect "rea_session labels gives a name used twice its address" '"0x140001300": "other_140001300"' cat $RS/game.exe-names-1.json
+expect "rea_session snapshot saves dossiers through an MCP server" "wrote $RS/game.exe.snapshot.json (1 new dossiers)" "$PYTHON" tools/rea/rea_session.py snapshot $B/game.exe 0x140001000 --out $RS --server "$RSRV"
+expect "rea_session fn applies the labels and names the callee" "calls: Thing__tick" "$PYTHON" tools/rea/rea_session.py fn $B/game.exe FUN_140001000 --labels $RF/names.tsv --out $RS --server "$RSRV"
+expect "rea_session fn prints the evidence and the memory effects" "memory effects: memory_read 1, memory_write 1" "$PYTHON" tools/rea/rea_session.py fn $B/game.exe 0x140001000 --snapshot-only --labels $RF/names.tsv --out $RS --server "$RSRV"
+expect "rea_session fn writes the dossier under OUT/fn" "sample_fn" sh -c "\"$PYTHON\" tools/rea/rea_session.py fn $B/game.exe 140001000 --json --labels $RF/names.tsv --out $RS --server '$RSRV' 2>/dev/null; ls $RS/fn/game.exe/"
+expect "mcp_client says how to enable a missing provider" "run ./gameframe mcp --enable rea" "$PYTHON" -c "import sys;sys.path.insert(0,'tools/rea');import mcp_client as m
+try: m.provider_command('rea', project='$RS')
+except m.McpError as e: print(e)"
+rm -rf "$RS"
 expect "peinfo counts the base relocations" "base relocations: " "$PYTHON" tools/pe/peinfo.py $B/game.exe
 expect "dates finds a FILETIME and a DOS date" "0x00000b  filetime   2026-10-22 14:30:00" "$PYTHON" - <<'PY'
 import struct, datetime as dt, subprocess, sys, tempfile
@@ -1742,7 +1754,7 @@ out="$("$PYTHON" tests/mcp_provider_config.py 2>&1)"
   && ok "optional MCP providers use project-local settings and preserve client configuration ($out)" \
   || bad "MCP provider opt-in" "$out"
 out="$("$PYTHON" tests/mcp_tool_coverage.py 2>&1)"
-[[ $? == 0 && "$out" == *"MCP coverage: 120 catalog entries, 98 runnable tools, progress/cancel/timeout"* ]] \
+[[ $? == 0 && "$out" == *"MCP coverage: 122 catalog entries, 99 runnable tools, progress/cancel/timeout"* ]] \
   && ok "the GameFrame MCP exposes every catalog entry and runs every program and script ($out)" \
   || bad "GameFrame MCP tool coverage" "$out"
 out="$("$PYTHON" tests/decision_adapter.py "$B/game.exe" 2>&1)"

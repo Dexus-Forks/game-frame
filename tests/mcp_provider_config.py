@@ -100,6 +100,14 @@ def main():
         assert '<!-- project customization -->' in customized.read_text()
         assert 'rea/*' not in customized.read_text()
 
+        before = (project / '.mcp.json').read_text()
+        shown = run(project, 'mcp', '--disable', 'rea', '--stdout')
+        assert shown.returncode == 0 and '"mcp-emulate"' in shown.stdout, shown.stderr
+        assert (project / '.mcp.json').read_text() == before, '--stdout must write nothing'
+        checked = run(project, 'mcp', '--disable', 'rea', '--check')
+        assert checked.returncode == 1 and 'would change: rea' in checked.stderr, checked.stderr
+        assert (project / '.mcp.json').read_text() == before, '--check must write nothing'
+
         disabled = run(project, 'mcp', '--disable', 'rea')
         assert disabled.returncode == 0, disabled.stderr
         assert 'rea' not in json.loads((project / '.mcp.json').read_text())['mcpServers']
@@ -108,6 +116,16 @@ def main():
         refreshed_tools = (copilot / 're-accelerator.agent.md').read_text()
         assert '"mcp-emulate/*"' in refreshed_tools and '"86box/*"' in refreshed_tools
         assert '"rea/*"' not in refreshed_tools
+
+        own = json.loads((project / '.mcp.json').read_text())
+        own['mcpServers']['rea'] = {'command': 'npx', 'args': ['-y', 'rea-agents@6.4.0', 'mcp']}
+        (project / '.mcp.json').write_text(json.dumps(own))
+        listed = run(project, 'mcp', '--list')
+        assert 'own command in .mcp.json, not this pin' in listed.stdout, listed.stdout
+        refused = run(project, 'mcp', '--enable', 'rea')
+        assert refused.returncode == 2 and '--disable rea' in refused.stderr, refused.stderr
+        del own['mcpServers']['rea']
+        (project / '.mcp.json').write_text(json.dumps(own))
 
         # Adding a client after provider opt-in generates both its server config and Copilot allowlist.
         late = project / 'late-copilot'
