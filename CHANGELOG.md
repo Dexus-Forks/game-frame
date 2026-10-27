@@ -149,6 +149,9 @@ Every release of GameFrame, newest first. The format follows
 
 ### Fixed
 
+- `tests/run.sh` no longer asks the wrappers workspace for `raster`, which moved to
+  `crates/raster` (`gameframe-raster`), where the crates check tests it. The wrappers check
+  failed on every run since the move.
 - The library's browser store read none of its files back: `seal` gave the browser its
   AES-GCM nonce as a view of a Rust value dropped before `encrypt` read it, so files were
   encrypted under another nonce than the one kept with them. Both directions now pass the nonce

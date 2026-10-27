@@ -1835,8 +1835,8 @@ if command -v cargo >/dev/null; then
   [[ $? == 0 && "$out" == *"s3dtkw: 6 of 6 calls implemented"* ]] \
     && ok "stubgen: each wrapper's .def and stubs match its API table, every call with the original's convention ($(echo "$out" | grep -o '[0-9]* of [0-9]*' | paste -sd, - | sed 's/,/, /g'))" \
     || bad "stubgen --check" "$out"
-  out="$(cd wrappers && cargo test --release --target "$host" --target-dir "$WT" -p raster -p scalers -p pixels -p shim -p sgl -p maxi94 -p glide 2>&1)"
-  [[ $? == 0 ]] && ok "the wrappers' host tests pass: rasteriser, scalers, pixels, settings, SGL scene graph and immediate mode, Maxi Sound 64 streams and mixer, Glide clipping, mip layout, fog tables and 3DF files ($(echo "$out" | grep -o '[0-9]* passed' | awk '{s+=$1} END {print s}') tests)" \
+  out="$(cd wrappers && cargo test --release --target "$host" --target-dir "$WT" -p scalers -p pixels -p shim -p sgl -p maxi94 -p glide 2>&1)"
+  [[ $? == 0 ]] && ok "the wrappers' host tests pass: scalers, pixels, settings, SGL scene graph and immediate mode, Maxi Sound 64 streams and mixer, Glide clipping, mip layout, fog tables and 3DF files ($(echo "$out" | grep -o '[0-9]* passed' | awk '{s+=$1} END {print s}') tests)" \
     || bad "wrappers host tests" "$(echo "$out" | grep -E 'FAILED|panicked|error' | head -8)"
   if rustup target list --installed 2>/dev/null | grep -q i686-pc-windows-gnu && command -v zig >/dev/null; then
     out="$(cd wrappers && cargo build -q --release --target-dir "$WT" 2>&1)"
