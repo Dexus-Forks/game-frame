@@ -173,7 +173,7 @@ pub fn hit(kind: Kind, what: &str, original: Option<&str>, at: (&str, u32, u32),
 }
 
 fn record(s: &mut State, kind: Kind, what: &str, original: Option<&str>, at: (&str, u32, u32), context: BTreeMap<String, Value>) {
-    let now = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_or(0, |d| d.as_secs());
+    let now = web_time::SystemTime::now().duration_since(web_time::UNIX_EPOCH).map_or(0, |d| d.as_secs());
     let id = Report::id_for(kind, at.0, at.1, original);
     if let Some(r) = s.seen.get_mut(&id) {
         r.count += 1;

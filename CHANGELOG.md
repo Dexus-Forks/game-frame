@@ -154,6 +154,9 @@ Every release of GameFrame, newest first. The format follows
 
 ### Fixed
 
+- `gameframe-report` panicked in the browser on its first report ("time not implemented on
+  this platform"): it stamped reports with `std::time::SystemTime`, which wasm32 lacks. It
+  uses `web-time` now, the same clock natively.
 - `tests/run.sh` no longer asks the wrappers workspace for `raster`, which moved to
   `crates/raster` (`gameframe-raster`), where the crates check tests it. The wrappers check
   failed on every run since the move.
