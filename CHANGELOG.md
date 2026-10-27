@@ -9,6 +9,11 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- Know-how on Windows machines for an Apple-silicon Mac: which emulator or VM suits each era
+  (86Box, QEMU with TCG, VMware Fusion and Parallels with Windows 11 Arm, Wine, a real PC), with
+  three failures met on the way: Windows Setup in QEMU stopped mid-install, Fusion's "Press any
+  key to boot from CD" prompt, and Windows 11 Arm Setup stopping on the logo in a VM made with
+  `vmcli` (open). The know-how taxonomy gains the `2010s` era.
 - `tools/rea/rea_session.py`: REA on a game's binary from a script. `fn` gives REA the project's
   labels and prints a summary of each function's dossier (size, references, callees, memory
   effects), `snapshot` saves REA's answers to reuse, and `labels` writes
