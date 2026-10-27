@@ -9,6 +9,11 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `tools/live/winegdb.py`: attach to a game under Wine or CrossOver through `winedbg --gdb`,
+  read its registers and memory, wait at breakpoints with dumps of memory, and always detach with
+  the original code back in place. `tools/live/gdbremote.py` is its GDB remote protocol client,
+  for any GDB stub. Know-how entry `winedbg-gdb-server`: winedbg's bare `c` resumes one thread,
+  it refuses software breakpoints, and hardware breakpoints never fire under Rosetta.
 - Know-how on Windows machines for an Apple-silicon Mac: which emulator or VM suits each era
   (86Box, QEMU with TCG, VMware Fusion and Parallels with Windows 11 Arm, Wine, a real PC), with
   three failures met on the way: Windows Setup in QEMU stopped mid-install, Fusion's "Press any

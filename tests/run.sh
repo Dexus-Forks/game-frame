@@ -209,6 +209,27 @@ expect "emulock refuses a second holder and names the first" 'held by a since' "
 "$PYTHON" tools/live/emulock.py free gf-vm --who a --dir "$T3/L" >/dev/null
 [[ $rc == 1 ]] && "$PYTHON" tools/live/emulock.py take gf-vm --who b --why mods --dir "$T3/L" >/dev/null \
   && ok "emulock lets only the holder free a lock, then the next one take it" || bad "emulock free and take"
+fakestub() { # LOG [flags]: start the fake GDB stub in the background, print its port
+  mkfifo "$T3/port.$$"; "$PYTHON" tests/fixtures/gdbstub_fake.py "$@" > "$T3/port.$$" & read -r port < "$T3/port.$$"; rm "$T3/port.$$"; echo "$port"
+}
+port=$(fakestub "$T3/s1.log")
+expect "winegdb reads memory through a GDB stub" "4d 5a 90 00" "$PYTHON" tools/live/winegdb.py read --connect "127.0.0.1:$port" 0x140000000 4
+port=$(fakestub "$T3/s2.log" --hit --no-z0)
+expect "winegdb waits at an int3 it writes itself when Z0 is refused, with rip moved back" "hit=1 pc=0x140001000" "$PYTHON" tools/live/winegdb.py break --connect "127.0.0.1:$port" 0x140001000 --timeout 5
+grep -qx 'M140001000,1:cc' "$T3/s2.log" && [[ $(grep -c '^G' "$T3/s2.log") == 1 && $(tail -2 "$T3/s2.log" | head -1) == M140001000,1:48 && $(tail -1 "$T3/s2.log") == D ]] \
+  && ok "winegdb puts the original byte back and detaches after a hit" || bad "winegdb after a hit" "$(cat "$T3/s2.log")"
+port=$(fakestub "$T3/s3.log")
+expect "winegdb gives up on a breakpoint that is never hit" "no hit within 1.0 s" "$PYTHON" tools/live/winegdb.py break --connect "127.0.0.1:$port" 0x140001000 --timeout 1
+grep -qxF '^C' "$T3/s3.log" && grep -qx 'z0,140001000,1' "$T3/s3.log" && [[ $(tail -1 "$T3/s3.log") == D ]] \
+  && ok "winegdb stops the program, removes the breakpoint and detaches after a timeout" || bad "winegdb after a timeout" "$(cat "$T3/s3.log")"
+port=$(fakestub "$T3/s4.log")
+"$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/live')
+from gdbremote import Remote
+with Remote.connect('127.0.0.1', $port, hw_per_thread=True) as r:
+    r.set_breakpoint(0x140001000, kind=1)
+" && [[ $(grep -c '^Z1,140001000' "$T3/s4.log") == 2 && $(grep -c '^z1,140001000' "$T3/s4.log") == 2 ]] && grep -qx 'Hg02' "$T3/s4.log" \
+  && ok "gdbremote sets and clears a hardware breakpoint in every thread for winedbg" || bad "gdbremote per-thread breakpoints" "$(cat "$T3/s4.log")"
 rm -rf "$T3"
 
 T4="$(mktemp -d)"
@@ -1759,7 +1780,7 @@ out="$("$PYTHON" tests/mcp_provider_config.py 2>&1)"
   && ok "optional MCP providers use project-local settings and preserve client configuration ($out)" \
   || bad "MCP provider opt-in" "$out"
 out="$("$PYTHON" tests/mcp_tool_coverage.py 2>&1)"
-[[ $? == 0 && "$out" == *"MCP coverage: 122 catalog entries, 99 runnable tools, progress/cancel/timeout"* ]] \
+[[ $? == 0 && "$out" == *"MCP coverage: 124 catalog entries, 100 runnable tools, progress/cancel/timeout"* ]] \
   && ok "the GameFrame MCP exposes every catalog entry and runs every program and script ($out)" \
   || bad "GameFrame MCP tool coverage" "$out"
 out="$("$PYTHON" tests/decision_adapter.py "$B/game.exe" 2>&1)"

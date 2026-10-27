@@ -98,6 +98,7 @@ An entry has one of five statuses.
 | [CD-ROM data, disc checks and audio](cd-rom.md) | context |
 | [Choosing a Windows machine for a game on an Apple-silicon Mac](context-windows-machines-apple-silicon.md) | context |
 | [Clicks and keys from the agent do not reach a Wine window on macOS](wine-input-without-accessibility.md) | workaround |
+| [Debugging a game under Wine or CrossOver through winedbg's GDB server: what works on Apple silicon](winedbg-gdb-server.md) | workaround |
 | [DirectInput ignores keys, because a window that is not foreground cannot acquire the device](directinput-not-foreground.md) | workaround |
 | [Display modes, surfaces and palettes](display.md) | context |
 | [DOS games in DOSBox-X: what to know before the first run](context-dos-dosbox.md) | context |
