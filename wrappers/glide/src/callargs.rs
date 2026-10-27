@@ -1,28 +1,39 @@
 //! What Glide's pointers point to, as the call log (`shim::calls`, `WRAPPER_CALLS`) writes it.
 //! An address differs between the original and the port, so the log writes the values:
-//! a vertex as its fifteen floats, a polygon as its vertices, a `GrTexInfo` as its fields,
-//! and texture data, palettes and frame-buffer pixels as their size and hash.
+//! a vertex as the fields the state reads (`used`), a polygon as its vertices, a `GrTexInfo`
+//! as its fields, and texture data, palettes, fog tables and frame-buffer pixels as their size
+//! and hash.
 
+use crate::api::shadow;
 use crate::api::tex::GrTexInfo;
 use crate::layout;
+use crate::used::{self, Fields};
 use crate::vertex::Vertex;
 use shim::calls::{Arg, Bytes};
 use std::fmt::Write as _;
 use voodoo::formats::{Format, TEXTABLE_PALETTE, size};
 
-fn vertex(v: &Vertex, out: &mut String) {
-    let [t0, t1] = v.tmu;
-    let _ = write!(out, "{{x {:?} y {:?} z {:?} rgba {:?} {:?} {:?} {:?} ooz {:?} oow {:?} tmu0 {:?} {:?} {:?} tmu1 {:?} {:?} {:?}}}",
-                   v.x, v.y, v.z, v.r, v.g, v.b, v.a, v.ooz, v.oow, t0[0], t0[1], t0[2], t1[0], t1[1], t1[2]);
+/// The fields of a vertex the Voodoo reads under the state the game has set (`used`).
+fn fields() -> Fields {
+    let s = shadow::get();
+    used::used(&used::State {
+        cc: s.cc,
+        ac: s.ac,
+        chroma: s.chroma != 0,
+        delta0: s.delta0 != 0,
+        depth_mode: s.depth_mode,
+        fog_mode: s.fog_mode,
+        stw_hint: s.stw_hint,
+    })
 }
 
-/// The vertex a `*const GrVertex` points to.
+/// The vertex a `*const GrVertex` points to: the fields the state reads.
 pub struct V(pub *const Vertex);
 impl Arg for V {
     fn put(&self, out: &mut String) {
         match self.0.is_null() {
             true => out.push_str("null"),
-            false => vertex(&unsafe { self.0.read_unaligned() }, out),
+            false => used::write(&unsafe { self.0.read_unaligned() }, fields(), out),
         }
     }
 }
@@ -31,12 +42,13 @@ impl Arg for V {
 pub struct Vs(pub Vec<Vertex>);
 impl Arg for Vs {
     fn put(&self, out: &mut String) {
+        let f = fields();
         out.push('[');
         for (k, v) in self.0.iter().enumerate() {
             if k > 0 {
                 out.push(' ');
             }
-            vertex(v, out);
+            used::write(v, f, out);
         }
         out.push(']');
     }

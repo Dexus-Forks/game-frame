@@ -69,8 +69,9 @@ after a year.
   the core. Hooks for the extra build (record the calls, replace textures, add draws) sit on
   the interface. Make one hook write each call in the format of GameFrame's call log
   (`WRAPPER_CALLS`, `docs/hardware/wrappers.md`), so the port's calls compare line for line
-  with the original's. `docs/hardware/rendering-pipeline.md` explains the stages, where each ran on
-  each card, and what to check at each seam.
+  with the original's. Write a Glide vertex by the same rules as the library: only the fields
+  the current state reads (`wrappers/glide/src/used.rs`). `docs/hardware/rendering-pipeline.md`
+  explains the stages, where each ran on each card, and what to check at each seam.
 - **A query layer for tests.** A way to ask the running program what it shows (interface
   elements by name or text, the world's counts) and to press things by name. Tests that find a
   button by its name survive layout changes; tests that click pixel positions or wait fixed

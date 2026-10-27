@@ -249,7 +249,7 @@ python3 tools/verify/seqdiff.py original-calls.txt port-calls.txt
 ```text
 grBufferClear(0x204080, 0x0, 0xffff)	frame 100
 grTexDownloadMipMap(0x0, 0x100000, 0x3, {lods 0x4-0x4 aspect 0x3 format 0x1 data [256 bytes 0x1afdd9ce7ef1b725]})	frame 100
-grDrawTriangle({x 40.0 y 40.0 z 0.0 rgba 255.0 0.0 0.0 255.0 ooz 0.0 oow 1.0 tmu0 0.0 0.0 1.0 tmu1 0.0 0.0 0.0}, ...)	frame 100
+grDrawTriangle({x 40.0 y 40.0 rgb 255.0 0.0 0.0 a 255.0 oow 1.0 tmu0 s 0.0 t 0.0}, ...)	frame 100
 lfb_pixels(0x0, 0x0, 0x280, 0x8, [20480 bytes 0x42c5e1cf5e7b4325])	frame 100
 grBufferSwap(0x1)	frame 100
 ```
@@ -259,10 +259,17 @@ grBufferSwap(0x1)	frame 100
 - Unsigned numbers are in hex and signed numbers in decimal. Floats are printed in the
   shortest form that reads back as the same bits, so equal floats always print the same.
 - An address differs between two runs, so a pointer is written as `null` or `ptr`. Where the
-  library knows what it points to, it writes the values. Glide's vertices are written as
-  their 15 floats. SGL's immediate-mode faces are written as their vertices, and the ATI and S3
-  primitives the same way. Texture data, palettes and NCC tables are written as their size and
-  a 64-bit FNV-1a hash.
+  library knows what it points to, it writes the values. SGL's immediate-mode faces are written as their vertices, and the ATI and S3
+  primitives the same way. Texture data, palettes, NCC tables and fog tables are written as
+  their size and a 64-bit FNV-1a hash.
+- Glide's vertices are written as the fields the card reads under the current state, by
+  name. `x` and `y` are always written and `z` never, since Glide 2 ignores it. The colour,
+  alpha, `ooz`, `oow` and each TMU's `s`, `t` and `w` are written when the combine units, the
+  depth buffer, fog or the `GR_HINT_STWHINT` hint read them. A game leaves the other fields as
+  they were: POD's race leaves old values in `z`, `ooz` and TMU 1 (*measured*). A port's log
+  would hold different leftovers there, and two equal frames would then differ. The rules are
+  in [`glide/src/used.rs`](../../wrappers/glide/src/used.rs). A port that writes this log
+  writes its vertices by the same rules.
 - `lfb_pixels` is not a Glide call. It holds the pixels the CPU wrote while the frame buffer
   was locked, as a rectangle and a hash. It is written when the library takes them: at the next
   call that draws, or at the swap.

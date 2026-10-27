@@ -4,9 +4,9 @@
 //! (`glide2x.def`, written with `stubs` from `api.tsv`); how the game uses each is in POD's
 //! `docs/hardware/3d-cards.md`.
 //!
-//! - `vertex`, `layout`, `fog`, `tdf`, `rle`: vertices (culling, fans, clipping), where mip
-//!   levels lie in texture memory, the fog tables, 3DF files and `guEncodeRLE16`'s code;
-//!   plain Rust, tested on the host.
+//! - `vertex`, `used`, `layout`, `fog`, `tdf`, `rle`: vertices (culling, fans, clipping, the
+//!   fields the state reads), where mip levels lie in texture memory, the fog tables, 3DF files
+//!   and `guEncodeRLE16`'s code; plain Rust, tested on the host.
 //! - `api`: the exported calls. They record commands (`cmd`) and answer queries. Each first
 //!   writes itself to the call log when `WRAPPER_CALLS` is set (`callargs`: the values its
 //!   pointers point to).
@@ -22,6 +22,7 @@ pub mod fog;
 pub mod layout;
 pub mod rle;
 pub mod tdf;
+pub mod used;
 pub mod vertex;
 
 #[cfg(windows)]

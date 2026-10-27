@@ -143,7 +143,7 @@ pub extern "system" fn grFogColorValue(c: u32) {
 /// `GR_FOG_TABLE_SIZE` (64) bytes.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grFogTable(table: *const u8) {
-    shim::call!("grFogTable", table);
+    shim::call!("grFogTable", crate::callargs::Data(table, 64));
     if table.is_null() {
         return;
     }

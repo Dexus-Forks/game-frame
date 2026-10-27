@@ -13,6 +13,9 @@ Every release of GameFrame, newest first. The format follows
   makes into Glide, SGL, ATI3DCIF or the S3D Toolkit, one line each, in the format
   `tools/verify/seqdiff.py` compares. Vertices are written as their values, texture data and
   frame-buffer writes as a size and hash. `WRAPPER_CALLS_FRAMES` keeps a range of frames.
+  A Glide vertex is written as the fields the card reads under the current state
+  (`wrappers/glide/src/used.rs`), so leftover values in unread fields do not make two logs
+  differ. `grFogTable` writes its table as a size and hash.
   `shim::call!` and `shim::calls` hold it, and the tests check that every export writes itself.
 - The rendering pipeline (`docs/hardware/rendering-pipeline.md`): the five stages of a frame,
   where each ran on the CPU or the card machine by machine, what a port can check at each seam,
