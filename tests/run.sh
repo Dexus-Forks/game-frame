@@ -1987,15 +1987,21 @@ if [[ "${1:-}" == --ghidra ]]; then
      && "$far" == *"FUNCTION $(at after_retf_n) "* ]] \
     && ok "ghidra-run decompile starts a 16-bit function after a far return, not after an iret" || bad "far returns" "$far"
   # exportcov finds far_caller and far_only, which Ghidra missed; fill-gaps reads seg:off starts,
-  # makes the functions and exports the program again.
+  # makes the functions and exports the program again. after_iret, added by hand, is refused
+  # (FUNCTION <none>): it is counted and named apart, not as made.
   "$PYTHON" tools/triage/exportcov.py $D/sample-td.exe analysis/export-dos/sample-td.exe/functions.tsv --min 0 \
     --starts analysis/notes/dos-gaps.starts >/dev/null 2>&1
+  at after_iret >> analysis/notes/dos-gaps.starts; echo >> analysis/notes/dos-gaps.starts
+  n="$(grep -c . analysis/notes/dos-gaps.starts)"
   out="$(scripts/ghidra-run.sh --project analysis/ghidra-dos sample-td.exe fill-gaps analysis/notes/dos-fill.txt \
     analysis/notes/dos-gaps.starts analysis/export-dos 2>&1)"
   grep -q "^$(at far_caller)"$'\t' analysis/export-dos/sample-td.exe/functions.tsv \
     && grep -q "^$(at far_only)"$'\t' analysis/export-dos/sample-td.exe/functions.tsv \
     && ok "exportcov finds the 16-bit functions Ghidra missed; ghidra-run fill-gaps makes them from seg:off starts" \
     || bad "fill-gaps (16-bit)" "$out $(cat analysis/notes/dos-gaps.starts 2>&1)"
+  [[ "$out" == *"$((n - 1)) of $n starts decompiled, 0 failed, 1 refused"* && "$out" == *"refused ("*"): $(at after_iret)"* ]] \
+    && ok "ghidra-run fill-gaps counts a refused start apart from the ones it made, and names it" \
+    || bad "fill-gaps refused start" "$out"
 fi
 
 echo
