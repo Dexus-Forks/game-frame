@@ -23,7 +23,9 @@ cat derived/catalog/catalog.json         # for the agent: one entry per file, an
 `derived/` is ignored by git. The catalogue holds game material: never commit it.
 
 As decoders are written (`re-format`), pass each one with the files it reads. The decoder is the
-same `decode(reader)` module `validate.py` runs:
+same `decode(reader)` module `validate.py` runs. The standard formats already have one in
+`tools/decoders/` (BMP, WAV, MIDI and RIFF MIDI, AVI): pass them on day one, so the catalogue's
+coverage line counts only the game's own formats as missing.
 
 ```bash
 python3 tools/formats/catalog.py target/game derived/catalog \

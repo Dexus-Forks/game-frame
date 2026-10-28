@@ -258,6 +258,7 @@ hand-offs, the data passed between agents, the outcome, and the failure path.
 | `tools/emu/pe32_emu.py` | Call a routine of a 32-bit (x86) Windows EXE or DLL, with arguments on the stack or inputs in registers, MMX and x87 included; each import stops the run with its name |
 | `tools/emu/call_trace.py` | The calls an emulated function makes (random draws), in order, with call sites |
 | `tools/formats/reader.py`, `validate.py` | Prototype a format decoder; prove it consumes every byte of every file, and with `--write` that every file writes back identical |
+| `tools/decoders/` | Ready decoders for the standard formats many games ship: `bmp` (every Windows and OS/2 variant, RLE8, RLE4, bit fields), `wav`, `midi` (also RIFF `.rmi`), `avi` (headers and streams), for `validate.py` and the catalogue |
 | `tools/formats/derived.py` | Which unexplained fields next to geometry are computed from it: bounds, centres, Newell and cross-product normals, plane distances |
 | `tools/formats/xorscan.py` | The key of a simply obfuscated file: XOR, add, stepping and chained keys; a key XORed into one field of every directory record, from the names' zero padding, found again in the executable |
 | `tools/formats/rawimage.py` | Raw pixels to PNG: VGA 13h, Mode X, EGA planes, CGA, packed and 16-bit, with palettes (6-bit values scaled or shifted, `--dac`) |
@@ -338,6 +339,8 @@ and a deliberately naive reimplementation (doubles instead of floats) that the c
 [examples/dos-sample](examples/dos-sample) does the same for DOS: 16-bit Pascal-style code
 assembled with Zig and linked by our own script into an NE program (with Borland debug
 symbols), and a real-mode MZ program, checked under the emulator and under DOSBox-X.
+[examples/media-sample](examples/media-sample) builds tiny BMP, WAV, MIDI and AVI files, byte by
+byte from the published layouts, for the tests of `tools/decoders/`.
 
 ## Documents
 

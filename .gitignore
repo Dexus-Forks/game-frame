@@ -7,8 +7,9 @@
 # Codex-generated local cloud environment metadata
 /.codex/environments/environment.toml
 __pycache__/
-# The DOS sample build
+# The DOS and media samples' builds
 /examples/dos-sample/build/
+/examples/media-sample/build/
 # The documentation site (site/README.md)
 /site/node_modules/
 /site/.vitepress/dist/

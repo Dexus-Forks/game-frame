@@ -33,7 +33,8 @@ the 3D model tables (`apps/viewer` in https://github.com/tanepiper/frontier-deco
 | Catalogue | Day one, after `re-inventory` | A static HTML page and a JSON manifest: every file, its kind and entropy, a hex view, the result of every Python decoder, and the pictures a decoder returns | `tools/formats/catalog.py` |
 | Project viewer | When the port has its first reader, usually within the first week | An app in the port's language that uses the port's own readers: pictures, sound, 3D, text, hex, natively and in the browser | the `re-browse` skill |
 
-The catalogue needs no code beyond the decoders written for `validate.py`:
+The catalogue needs no code beyond the decoders written for `validate.py`, and the standard
+formats have theirs in `tools/decoders/` (`bmp.py`, `wav.py`, `midi.py`, `avi.py`):
 
 ```bash
 python3 tools/formats/catalog.py target/game derived/catalog \
