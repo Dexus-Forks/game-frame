@@ -270,6 +270,7 @@ Proposed by POD, now built:
 
 - [x] Export coverage and the likely starts in its gaps (`tools/triage/exportcov.py`), for the
   batch decompile
+- [x] `ExportAddressBatch` starts a function after a far return too (`retf`, `retf N`)
 - [x] Per-address errors in `ExportAddressBatch`, and no new function at an address that
   nothing refers to unless it follows a `ret` or padding
 - [x] An x87 control word in `pe32_emu` (`fpu_cw=`), and `fpu_modes`, which lists the cases

@@ -1894,6 +1894,15 @@ if [[ "${1:-}" == --ghidra ]]; then
   expect "ApplyLabels creates a function Ghidra missed" "1000:0092	5	dos_version" cat analysis/export-dos/sample-td.exe/functions.tsv
   expect "decomp_query reads seg:off exports with labels" "RandSeed" "$PYTHON" tools/triage/decomp_query.py --export analysis/export-dos --binary sample-td.exe fn 1000:0028
   expect "decomp_query lists callees by seg:off" "1000:0028" "$PYTHON" tools/triage/decomp_query.py --export analysis/export-dos --binary sample-td.exe callees sum_draws
+  # Three routines nothing calls: decompile by address makes one after a far return (retf CB,
+  # retf N CA nn nn) and none after an iret.
+  at() { printf '1000:%04x' "$(awk -v n="$1" '$1 == n { print $3 }' $D/symbols.tsv)"; }
+  scripts/ghidra-run.sh --project analysis/ghidra-dos sample-td.exe decompile analysis/notes/far.txt \
+    "$(at after_iret)" "$(at after_retf)" "$(at after_retf_n)" >/dev/null 2>&1
+  far="$(cat analysis/notes/far.txt 2>&1)"
+  [[ "$far" == *"ADDRESS $(at after_iret) FUNCTION <none>"* && "$far" == *"FUNCTION $(at after_retf) "* \
+     && "$far" == *"FUNCTION $(at after_retf_n) "* ]] \
+    && ok "ghidra-run decompile starts a 16-bit function after a far return, not after an iret" || bad "far returns" "$far"
 fi
 
 echo

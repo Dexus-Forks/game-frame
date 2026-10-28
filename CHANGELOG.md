@@ -7,6 +7,13 @@ Every release of GameFrame, newest first. The format follows
 
 ## [1.4.0-dev] - Unreleased
 
+### Fixed
+
+- `ghidra-run.sh decompile` (and `fill-gaps`) now makes a function at an address that follows a
+  far return of 16-bit code (`retf`, `retf N`), as it already did after a near return. Before,
+  every unreferenced routine after a far procedure in an NE or MZ program was reported as
+  `FUNCTION <none>`. The DOS sample has three routines nothing calls, to test it.
+
 ### Changed
 
 - The REA skill now documents how to check Ghidra provider readiness, open an explicit Ghidra

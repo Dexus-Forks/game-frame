@@ -301,3 +301,16 @@ key_handler:
 	popw %ax
 	popw %ds
 	iret
+
+# Three routines nothing calls, at the end so no other offset moves: Ghidra finds none of them.
+# ghidra-run.sh's decompile by address makes a function only where one may start: after a far
+# return (retf CB, retf N CA nn nn), not after an iret (tests/run.sh --ghidra).
+after_iret:
+	movw $7, %ax
+	lretw
+after_retf:
+	movw $8, %ax
+	lretw $2
+after_retf_n:
+	movw $9, %ax
+	lretw
