@@ -24,7 +24,8 @@ Each condition matters:
   changing it (no `-ffast-math`, no `/fp:fast`).
 - **The same precision.** A `float` sum that the original stored after each step must be
   rounded to `float` after each step in the port. x87 code that kept 80 bits between steps
-  needs the extra precision at the same places.
+  needs the extra precision at the same places: [gameframe-x87](../../crates/x87/README.md)
+  rounds each step as the x87 does, and each store as the original stores.
 - **The same rounding mode.** Round to nearest, ties to even, unless the original changed the
   mode. A game that sets the mode for a fast float-to-integer conversion changes it for every
   other operation too.

@@ -79,6 +79,7 @@ it by mistake.
 | The C++ standard library | `std::` names in RTTI, `basic_string` | Label, do not trace |
 | zlib | `deflate 1.1.3 Copyright` and similar strings; the CRC table `0x77073096` | Label; use zlib in the port |
 | Middleware | see [Middleware](middleware.md) | Label; replace in the port |
+| Delphi's VCL and runtime | `TPF0` form resources; class names such as `TForm` and `TApplication` as Pascal strings | Read the forms, name the classes and handlers ([Delphi programs](delphi.md)) |
 | Compiler helpers | `__allmul`, `__aullrem`, `_chkstk`, Watcom's register-call helpers | Label; they implement plain arithmetic |
 
 Once these are labelled, the remaining unlabelled code is the game and its engine.

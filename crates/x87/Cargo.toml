@@ -1,0 +1,12 @@
+[package]
+name = "gameframe-x87"
+description = "The x87 FPU's 80-bit extended arithmetic in integers, bit for bit: precision and rounding control, Double and Single stores, fist and frndint"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["x87", "fpu", "extended-precision", "borland", "reverse-engineering"]
+categories = ["emulators", "mathematics", "no-std"]
+
+[dependencies]

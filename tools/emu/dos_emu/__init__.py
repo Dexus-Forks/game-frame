@@ -37,8 +37,11 @@ bytes to remove (a Pascal callee's `retf N`). An import or interrupt with no han
 run with its name and the caller's address, so you know exactly what to stub next.
 
 What it does not do: run DOS, load overlays or DLLs, emulate DPMI services, timers, VGA or sound
-hardware, or the x87 (Borland's floating-point emulator fixups are left as they are). Use DOSBox-X
-(scripts/dosbox-run.sh) when you need the whole program running. Needs `unicorn`.
+hardware, or the x87 emulator's interrupts (INT 34h-3Dh). Real x87 instructions run on Unicorn's
+FPU: a Windows program's, whose OS fixups are left as they are. It does not set the x87 control
+word: Unicorn reports 0 but computes at 64 bits until an fldcw loads one, so load the program's
+own word first (docs/engines/delphi.md). Use DOSBox-X (scripts/dosbox-run.sh) when you need the
+whole program running. Needs `unicorn`.
 """
 import struct
 

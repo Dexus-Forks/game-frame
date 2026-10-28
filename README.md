@@ -271,6 +271,7 @@ hand-offs, the data passed between agents, the outcome, and the failure path.
 | `tools/formats/shaders.py` | Shaders inside a file: Direct3D 9 bytecode, DXBC, DXIL, SPIR-V, GLSL, HLSL and ARB, with their names |
 | `tools/formats/swfinfo.py` | A Flash game: SWF version, compression, ActionScript version, classes, content; the movie inside a projector |
 | `tools/formats/timestamps.py` | A number read as every common timestamp; timestamps found inside a file |
+| `tools/formats/dfm.py` | Delphi and C++Builder forms (`TPF0`) from a program or a file, as text, with every event and its handler's name |
 | `tools/verify/bitcompare.py` | Ground truth against reimplementation, bit for bit, with ULP distance |
 | `tools/verify/ramdiff.py` | Memory frame by frame from the original and the port: the first frame and address that differ, named from a RAM map |
 | `tools/verify/seqdiff.py` | The first random draw (or any event) where two traces differ |
@@ -281,6 +282,7 @@ hand-offs, the data passed between agents, the outcome, and the failure path.
 | `tools/dos/tdinfo.py` | Borland Turbo Debugger symbols: original procedure, global and type names, parameters, record layouts, source lines, labels for Ghidra, Rust readers for records |
 | `tools/dos/nedis.py` | 16-bit disassembly with relocations applied: far calls and DS globals by name |
 | `tools/dos/readseg.py` | Typed values at `seg:off`, including Turbo Pascal `Real` and Pascal strings |
+| `tools/dos/delphi1.py` | A Delphi 1 program's class tables: classes, published methods and fields, labels for Ghidra, each form's events mapped to code |
 | `tools/emu/dos_emu/` | Call any function of a 16-bit NE (protected mode) or MZ (real mode) program, at Ghidra's addresses |
 | `tools/emu/dos_env/` | A small DOS, BIOS, DPMI host and PC for dos_emu: run a whole DOS program headless, with files, timer interrupts, keys, and screenshots |
 | `tools/emu/fragments.py` | Capture fragments of a DOS program's main loop from one headless run: DS, stack, screens, open files and heap blocks before and after each fragment, for the port's tests |
@@ -311,6 +313,7 @@ under Apache 2.0. See [docs/crates](docs/crates/README.md).
 | [gameframe-wma](crates/wma/README.md) | A WMA v2 decoder for xWMA and ASF streams, building for WebAssembly |
 | [gameframe-msvc-crt](crates/msvc-crt/README.md) | MSVC's `sinf`, `cosf`, `acosf`, `atan2f`, `qsort` order and `rand`, bit for bit |
 | [gameframe-turbo-pascal](crates/turbo-pascal/README.md) | Turbo Pascal's 6-byte `Real`, `Random` and Pascal data layouts |
+| [gameframe-x87](crates/x87/README.md) | The x87 FPU's 80-bit arithmetic, rounding and stores in integers, bit for bit |
 | [gameframe-indeo](crates/indeo/README.md) | An Indeo Video Interactive 4.1 (`IV41`) decoder, picture for picture as Intel's own codec (clean room) |
 
 ## Replacement libraries
@@ -351,7 +354,8 @@ The documentation is in [docs/](docs/README.md). It is also built as a website
   every game sits on, ten families from arcade action to online games, each with a rule set,
   reference games and projects to learn from, and the systems they share.
 - **[Software engines and middleware](docs/engines/README.md)**: how to recognise an engine,
-  the id, Build and Unreal engines, other licensed and studio engines, and middleware.
+  the id, Build and Unreal engines, other licensed and studio engines, Delphi programs, and
+  middleware.
 - **[Hardware of the era](docs/hardware/README.md)**: CPUs from the 8086 to SSE2, fixed point
   and the x87 FPU, VGA and Mode X, 3dfx and the other 3D cards, sound cards and FM synthesis.
 - **[Console games](docs/consoles/README.md)**: the platforms from the NES to the sixth

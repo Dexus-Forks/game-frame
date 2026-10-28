@@ -31,6 +31,7 @@ An entry has one of five statuses.
 | Entry | Status |
 |---|---|
 | [A game's sound effects play at volume 0 under Wine, because it reads its volume from the mixer](wine-mixer-wave-volume-zero.md) | solved |
+| [A port's floating-point result differs in the last bit from the original's x87 code](x87-f64-last-bit.md) | solved |
 | [A stand-in sound-card library starts the game, but the game turns its own sound off](sound-card-library-empty-answer-silences.md) | solved |
 | ["S3DTK Error : SetState" from a stand-in S3D Toolkit](s3dtk-error-setstate.md) | solved |
 | [16-bit Windows (Windows 3.x) programs: what to know before the first run](context-windows-3x.md) | context |
@@ -96,6 +97,7 @@ An entry has one of five statuses.
 | [CD-era games often look in their install folder before the CD: a mod can be a file, with no patch](context-mods-install-folder-first.md) | context |
 | [CD-ROM data, disc checks and audio](cd-rom.md) | context |
 | [Clicks and keys from the agent do not reach a Wine window on macOS](wine-input-without-accessibility.md) | workaround |
+| [Delphi programs: forms, class tables and event handlers](delphi.md) | context |
 | [DirectInput ignores keys, because a window that is not foreground cannot acquire the device](directinput-not-foreground.md) | workaround |
 | [Display modes, surfaces and palettes](display.md) | context |
 | [DOS games in DOSBox-X: what to know before the first run](context-dos-dosbox.md) | context |

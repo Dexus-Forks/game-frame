@@ -40,6 +40,8 @@ Knowing the engine helps in several ways.
   RenderWare.
 - [Studio engines for 2D and isometric games](studio-2d.md): Westwood, Blizzard, the Infinity
   Engine, the Fallout engine, the adventure engines.
+- [Delphi programs](delphi.md): forms (`TPF0`), Delphi 1's class tables and published methods,
+  event handlers Ghidra misses, the runtime, and `{$N+}` floating point.
 
 ## Inside an engine
 

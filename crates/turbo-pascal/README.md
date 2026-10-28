@@ -45,7 +45,7 @@ Turbo Pascal 5.5, 6.0 and 7.0 and Borland Pascal 7 share these algorithms, but c
 3. Compare with this crate bit for bit.
 
 Programs compiled with `{$N+}` use the 8087 (or its emulator) for `Single`, `Double` and
-`Extended`. Those types follow the x87 FPU. This crate does not cover them.
+`Extended`. Those types follow the x87 FPU: use [gameframe-x87](../x87/README.md) for them.
 
 ## Tests
 
