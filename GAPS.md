@@ -188,6 +188,8 @@ proposed again.
 - [x] `tools/triage/hashnames.py`: ROR-13
 - [x] `tools/formats/catalog.py`: a first resource viewer (every file, decoder results,
   pictures, format coverage), with the `re-browse` skill and [the guide](docs/working/viewer.md)
+- [x] Decoders for the standard formats in the catalogue (`tools/decoders/`: BMP, WAV, MIDI and
+  RIFF MIDI, AVI), tested on `examples/media-sample`
 - [x] `tools/triage/coverage.py --module`: coverage of one overlay or module whose code is numbered from a shared base
 - [x] `ExportDisasm.java` (`ghidra-run.sh disasm`): straight-line disassembly of code Ghidra did not make a function
 - [x] Ports that run inside the original, with instruction counts and declines ([the guide](docs/working/hybrid-port.md))

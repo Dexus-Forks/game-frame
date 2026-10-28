@@ -559,6 +559,60 @@ expect "catalog decodes, counts coverage and draws a picture" "2 of 3 files deco
 [[ -f "$C/out/index.html" && "$(head -c 8 "$C/out/f0-0.png" | xxd -p)" == 89504e470d0a1a0a ]] && ok "catalog writes the page and the decoder's picture" || bad "catalog page or picture missing"
 rm -rf "$C"
 
+echo "Decoders for common formats (tools/decoders, examples/media-sample)"
+M="$(mktemp -d)"
+python3 examples/media-sample/make_media.py "$M" >/dev/null 2>&1 && ok "the media sample builds (BMP, WAV, MIDI, AVI)" || bad "media sample builds"
+expect "bmp reads every BMP variant of the sample" "9 of 9 files decode completely" "$PYTHON" tools/formats/validate.py tools/decoders/bmp.py "$M/*.bmp"
+expect "wav reads PCM and a data chunk cut short" "2 of 2 files decode completely" "$PYTHON" tools/formats/validate.py tools/decoders/wav.py "$M/*.wav"
+expect "midi reads a MIDI file and the same song in RIFF" "2 of 2 files decode completely" "$PYTHON" tools/formats/validate.py tools/decoders/midi.py "$M/*.mid" "$M/*.rmi"
+expect "avi reads a film's headers" "1 of 1 files decode completely" "$PYTHON" tools/formats/validate.py tools/decoders/avi.py "$M/*.avi"
+out="$("$PYTHON" - "$M" <<'PY' 2>&1
+import os, struct, sys
+sys.path[:0] = ['tools/formats', 'tools/decoders', 'examples/media-sample']
+from reader import Reader
+import avi, bmp, make_media as mm, midi, wav
+M = sys.argv[1]
+read = lambda mod, name: mod.decode(Reader(open(os.path.join(M, name), 'rb').read()))
+rgb = lambda rows, colour: b''.join(bytes(colour(v)) for row in rows for v in row)
+picture = rgb(mm.PICTURE, lambda i: mm.PALETTE[i])
+want = {'mono.bmp': rgb(mm.MONO, lambda v: (255, 255, 255) if v else (0, 0, 0)),
+        'short.bmp': bytes(3 * mm.W * 2) + rgb(mm.PICTURE[2:], lambda i: mm.PALETTE[i])}
+for name in sorted(f for f in os.listdir(M) if f.endswith('.bmp')):
+    result = read(bmp, name)
+    assert bmp.images(result)[0][3] == want.get(name, picture), name
+assert read(bmp, 'short.bmp')['missing_rows'] == 2 and read(bmp, 'top24.bmp')['top_down']
+jpeg = bytearray(open(os.path.join(M, 'pal8.bmp'), 'rb').read()); struct.pack_into('<I', jpeg, 30, 4)
+try:
+    bmp.decode(Reader(bytes(jpeg)))
+    raise AssertionError('a JPEG inside a BMP was read')
+except ValueError:
+    pass
+w = read(wav, 'pcm16.wav'); cut = read(wav, 'short.wav')
+assert (w['format'], w['channels'], w['rate'], w['frames']) == ('PCM', 2, mm.RATE, mm.SAMPLES), w
+assert cut['frames'] == mm.SAMPLES and cut['problems']['short_chunks'] == [('data', 32)], cut
+for name in ('song.mid', 'song.rmi'):
+    m = read(midi, name)
+    melody = m['tracks'][1]
+    assert (m['format'], m['ticks_per_quarter'], m['tempo_us_per_quarter']) == (1, mm.DIVISION, 500000), m
+    assert (melody['name'], melody['notes'], melody['ticks']) == ('Melody', 3, sum(n for _, n in mm.NOTES)), m
+bad = bytearray(open(os.path.join(M, 'song.mid'), 'rb').read()); bad[11] = 3
+try:
+    midi.decode(Reader(bytes(bad)))
+    raise AssertionError('a wrong track count was accepted')
+except ValueError:
+    pass
+a = read(avi, 'film.avi')
+assert (a['frames'], a['fps'], a['movi_chunks']) == (2, 15.0, {'00db': 2, '01wb': 1}), a
+assert [(s['type'], s.get('compression'), s.get('rate')) for s in a['streams']] == [('vids', 'RGB', None), ('auds', None, mm.RATE)], a
+print('every picture equals the sample; sound, songs and film read as built; bad files refused')
+PY
+)"
+[[ $? == 0 ]] && ok "the decoders read what make_media.py wrote: 9 BMP variants pixel for pixel, WAV, MIDI, RMID, AVI" || bad "decoders' values" "$out"
+expect "catalog decodes the whole media sample with the decoders" "14 of 14 files decode completely" "$PYTHON" tools/formats/catalog.py "$M" "$M.catalog" \
+  --decoder "*.bmp=tools/decoders/bmp.py" --decoder "*.wav=tools/decoders/wav.py" --decoder "*.mid=tools/decoders/midi.py" \
+  --decoder "*.rmi=tools/decoders/midi.py" --decoder "*.avi=tools/decoders/avi.py"
+rm -rf "$M" "$M.catalog"
+
 echo "16-bit DOS tools (examples/dos-sample)"
 D=examples/dos-sample/build
 python3 examples/dos-sample/make_exe.py $D >/dev/null 2>&1 && ok "DOS sample builds (zig, .code16; our own NE and MZ linker)" || bad "DOS sample builds"
@@ -1641,7 +1695,7 @@ out="$("$PYTHON" tests/mcp_provider_config.py 2>&1)"
   && ok "optional MCP providers use project-local settings and preserve client configuration ($out)" \
   || bad "MCP provider opt-in" "$out"
 out="$("$PYTHON" tests/mcp_tool_coverage.py 2>&1)"
-[[ $? == 0 && "$out" == *"MCP coverage: 118 catalog entries, 95 runnable tools, progress/cancel/timeout"* ]] \
+[[ $? == 0 && "$out" == *"MCP coverage: 122 catalog entries, 95 runnable tools, progress/cancel/timeout"* ]] \
   && ok "the GameFrame MCP exposes every catalog entry and runs every program and script ($out)" \
   || bad "GameFrame MCP tool coverage" "$out"
 out="$("$PYTHON" - <<'PY' 2>&1

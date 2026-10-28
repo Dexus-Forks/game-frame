@@ -9,6 +9,13 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `tools/decoders/`: decoders for the catalogue and `validate.py` for the standard formats many
+  games ship. `bmp` reads every Windows and OS/2 header, 1 to 32 bits a pixel, bit fields, RLE8
+  and RLE4, and keeps the rows of a file cut short; `wav` names the format and counts the
+  samples that are there; `midi` reads Standard MIDI and RIFF MIDI files, with each track's
+  notes and length; `avi` reads the headers and each stream's format. From Holiday Island's
+  decoders, made general. `examples/media-sample/make_media.py` builds the tiny files their
+  tests read.
 - `tools/triage/exportcov.py` reads 16-bit NE programs (Windows 3.x, OS/2 1.x): coverage and
   gaps per code segment in `seg:off`, and the likely starts of missed functions from the far
   calls and far pointers in the relocation chains and from `ENTER` and `push bp` prologues

@@ -85,6 +85,10 @@ Extract entries into `derived/extracted/` (ignored by git), never into tracked f
 
 ## 4. Prototype the decoder in Python
 
+Standard formats need no new decoder: `tools/decoders/` reads BMP, WAV, MIDI (and `.rmi`) and
+AVI headers. Run `validate.py` with one of them first; write your own only for what fails or for
+the game's own formats.
+
 ```python
 # decoders/units.py
 def decode(r):                       # r is a tools/formats/reader.py Reader
