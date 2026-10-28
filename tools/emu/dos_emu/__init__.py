@@ -38,16 +38,21 @@ run with its name and the caller's address, so you know exactly what to stub nex
 
 What it does not do: run DOS, load overlays or DLLs, emulate DPMI services, timers, VGA or sound
 hardware, or the x87 emulator's interrupts (INT 34h-3Dh). Real x87 instructions run on Unicorn's
-FPU: a Windows program's, whose OS fixups are left as they are. It does not set the x87 control
-word: Unicorn reports 0 but computes at 64 bits until an fldcw loads one, so load the program's
-own word first (docs/engines/delphi.md). Use DOSBox-X (scripts/dosbox-run.sh) when you need the
+FPU: a Windows program's, whose OS fixups are left as they are. The x87 starts with the control
+word 0x037f (`FPU_CW`: 64-bit precision, round to nearest, every exception masked), what
+`fninit` leaves and what the 32-bit emulator uses; Unicorn's own start, 0, would hand a routine
+that saves the word, changes its rounding and loads it back a precision of 24 bits from then
+on. Pass `fpu_cw=` for another (docs/engines/delphi.md). Use DOSBox-X (scripts/dosbox-run.sh) when you need the
 whole program running. Needs `unicorn`.
 """
 import struct
 
 from unicorn import UC_HOOK_CODE, UC_HOOK_INTR, UC_HOOK_MEM_INVALID
+from unicorn.x86_const import UC_X86_REG_FPCW
 
 from .loader import Loader
+
+FPU_CW = 0x037f   # the x87 control word after fninit: 64-bit precision, nearest, all masked
 from .memory import Memory
 from .run import Runner
 from .trace import Tracer
@@ -56,7 +61,8 @@ from .types import (CONSTANT_IMPORTS, FIRST_SELECTOR, GDT_BASE, MZ_LOAD, TRAP, F
 
 
 class DosEmu(Loader, Memory, Runner, Tracer):
-    def __init__(self, path, stubs=None, interrupts=None, max_steps=50_000_000, verbose=False):
+    def __init__(self, path, stubs=None, interrupts=None, max_steps=50_000_000, verbose=False,
+                 fpu_cw=None):
         self.data = open(path, 'rb').read()
         self.path = path
         self.stubs = dict(stubs or {})
@@ -81,6 +87,7 @@ class DosEmu(Loader, Memory, Runner, Tracer):
             self._load_mz()
         else:
             raise ValueError(f'{path}: not an MZ or NE program')
+        self.uc.reg_write(UC_X86_REG_FPCW, FPU_CW if fpu_cw is None else fpu_cw & 0xFFFF)
         self.uc.hook_add(UC_HOOK_CODE, self._on_stub, begin=self.linear(self.stub_seg, 0),
                          end=self.linear(self.stub_seg, 0xFFFF))
         self.uc.hook_add(UC_HOOK_INTR, self._on_interrupt)
