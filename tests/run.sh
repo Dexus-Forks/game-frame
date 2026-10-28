@@ -562,6 +562,17 @@ rm -rf "$C"
 echo "16-bit DOS tools (examples/dos-sample)"
 D=examples/dos-sample/build
 python3 examples/dos-sample/make_exe.py $D >/dev/null 2>&1 && ok "DOS sample builds (zig, .code16; our own NE and MZ linker)" || bad "DOS sample builds"
+at() { printf '1000:%04x' "$(awk -v n="$1" '$1 == n { print $3 }' $D/symbols.tsv)"; }   # a sample routine's seg:off
+# exportcov on an NE: one function over the sample up to after_iret. Past it, far_caller opens with
+# a prologue after a far return and far_only is a far call target from a relocation chain;
+# after_retf and after_retf_n have no prologue and nothing calls them, so they are no start.
+C="$(mktemp -d)"
+printf '1000:0000\t%d\tcovered\t\n' "$(( $(awk '$1 == "after_iret" { print $3 }' $D/symbols.tsv) ))" > "$C/functions.tsv"
+out="$("$PYTHON" tools/triage/exportcov.py $D/sample.exe "$C/functions.tsv" --min 0 --starts "$C/starts" 2>&1)"
+[[ "$(cat "$C/starts" 2>&1)" == "$(at far_caller)"$'\n'"$(at far_only)" && "$out" == *"$(at far_only)  far call target"* ]] \
+  && ok "exportcov reads a 16-bit NE: seg:off coverage, a prologue after a far return, a far call target from a relocation chain" \
+  || bad "exportcov (NE)" "$out"
+rm -rf "$C"
 expect "dosinfo reads the NE header" "NE: module 'DOSSAMPL'" "$PYTHON" tools/dos/dosinfo.py $D/sample.exe
 expect "dosinfo gives Ghidra's selector per segment" "2  1008  file" "$PYTHON" tools/dos/dosinfo.py $D/sample.exe
 expect "dosinfo lists imports by ordinal" "KERNEL.3" "$PYTHON" tools/dos/dosinfo.py $D/sample.exe --imports
@@ -1630,7 +1641,7 @@ out="$("$PYTHON" tests/mcp_provider_config.py 2>&1)"
   && ok "optional MCP providers use project-local settings and preserve client configuration ($out)" \
   || bad "MCP provider opt-in" "$out"
 out="$("$PYTHON" tests/mcp_tool_coverage.py 2>&1)"
-[[ $? == 0 && "$out" == *"MCP coverage: 117 catalog entries, 95 runnable tools, progress/cancel/timeout"* ]] \
+[[ $? == 0 && "$out" == *"MCP coverage: 118 catalog entries, 95 runnable tools, progress/cancel/timeout"* ]] \
   && ok "the GameFrame MCP exposes every catalog entry and runs every program and script ($out)" \
   || bad "GameFrame MCP tool coverage" "$out"
 out="$("$PYTHON" - <<'PY' 2>&1
@@ -1896,13 +1907,22 @@ if [[ "${1:-}" == --ghidra ]]; then
   expect "decomp_query lists callees by seg:off" "1000:0028" "$PYTHON" tools/triage/decomp_query.py --export analysis/export-dos --binary sample-td.exe callees sum_draws
   # Three routines nothing calls: decompile by address makes one after a far return (retf CB,
   # retf N CA nn nn) and none after an iret.
-  at() { printf '1000:%04x' "$(awk -v n="$1" '$1 == n { print $3 }' $D/symbols.tsv)"; }
   scripts/ghidra-run.sh --project analysis/ghidra-dos sample-td.exe decompile analysis/notes/far.txt \
     "$(at after_iret)" "$(at after_retf)" "$(at after_retf_n)" >/dev/null 2>&1
   far="$(cat analysis/notes/far.txt 2>&1)"
   [[ "$far" == *"ADDRESS $(at after_iret) FUNCTION <none>"* && "$far" == *"FUNCTION $(at after_retf) "* \
      && "$far" == *"FUNCTION $(at after_retf_n) "* ]] \
     && ok "ghidra-run decompile starts a 16-bit function after a far return, not after an iret" || bad "far returns" "$far"
+  # exportcov finds far_caller and far_only, which Ghidra missed; fill-gaps reads seg:off starts,
+  # makes the functions and exports the program again.
+  "$PYTHON" tools/triage/exportcov.py $D/sample-td.exe analysis/export-dos/sample-td.exe/functions.tsv --min 0 \
+    --starts analysis/notes/dos-gaps.starts >/dev/null 2>&1
+  out="$(scripts/ghidra-run.sh --project analysis/ghidra-dos sample-td.exe fill-gaps analysis/notes/dos-fill.txt \
+    analysis/notes/dos-gaps.starts analysis/export-dos 2>&1)"
+  grep -q "^$(at far_caller)"$'\t' analysis/export-dos/sample-td.exe/functions.tsv \
+    && grep -q "^$(at far_only)"$'\t' analysis/export-dos/sample-td.exe/functions.tsv \
+    && ok "exportcov finds the 16-bit functions Ghidra missed; ghidra-run fill-gaps makes them from seg:off starts" \
+    || bad "fill-gaps (16-bit)" "$out $(cat analysis/notes/dos-gaps.starts 2>&1)"
 fi
 
 echo

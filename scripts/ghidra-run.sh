@@ -26,7 +26,7 @@
 # analyse again) or disasm (ExportDisasm: the instructions of the functions containing the
 # addresses, of START-END ranges decoded in order, or of every function with no addresses) or
 # fill-gaps (the likely starts that tools/triage/exportcov.py --starts wrote, one address a
-# line: makes a function at each, as decompile does, writes the report to OUTPUT, then exports
+# line, 0x... or seg:off for 16-bit code: makes a function at each, as decompile does, writes the report to OUTPUT, then exports
 # the binary again into EXPORT_DIR, default analysis/export, so decomp.c, functions.tsv and
 # bodies.tsv hold the new functions; a start that fails is reported and the rest go on; run
 # exportcov again after it to see what is left). Use --project DIR for another project. Ghidra locks a project: run one job
@@ -55,7 +55,7 @@ mkdir -p "$(dirname "$output")"
 output="$(cd "$(dirname "$output")" && pwd)/$(basename "$output")"
 if [[ "$script" == fill-gaps ]]; then
   [[ $# -ge 1 && -f "$1" ]] || { echo "fill-gaps needs the starts file exportcov --starts wrote" >&2; exit 2; }
-  starts=($(grep -oE '^\s*0x[0-9a-fA-F]+' "$1" | tr -d ' \t' || true))
+  starts=($(grep -oE '^\s*(0x[0-9a-fA-F]+|[0-9a-fA-F]{4}:[0-9a-fA-F]{4})' "$1" | tr -d ' \t' || true))
   export_dir="${2:-$PROJECT/analysis/export}"
   [[ ${#starts[@]} -gt 0 ]] || { echo "no addresses in $1: nothing to fill" >&2; exit 1; }
   set -- "${starts[@]}"

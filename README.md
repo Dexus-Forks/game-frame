@@ -212,7 +212,7 @@ hand-offs, the data passed between agents, the outcome, and the failure path.
 | `tools/triage/insns.py` | Every instruction of a kind: port access, interrupts, timers, divisions |
 | `tools/triage/buildid.py` | Which build a copy is: the disc's mastering date, each executable's link date and VERSIONINFO, version strings, readme and setup version lines; written into `docs/versions.md` |
 | `tools/triage/versiondiff.py` | Two editions compared, as folders or disc images read in place: files added, removed and changed by folder, the executables' link dates, the languages; Markdown for `docs/versions.md` |
-| `tools/triage/exportcov.py` | How much code a Ghidra export covers, its largest gaps, and the likely starts of the functions it missed, for a batch decompile |
+| `tools/triage/exportcov.py` | How much code a Ghidra export covers, its largest gaps, and the likely starts of the functions it missed, for a batch decompile; for a PE and for a 16-bit NE (`seg:off`, far targets from the relocation tables) |
 | `tools/triage/refs.py` | Every instruction that refers to an address, found in the raw code bytes (32-bit and RIP-relative), read, write or value, with hits in no function marked |
 | `tools/triage/pointerpaths.py` | A chain of pointers from a global to a value that moves between runs |
 | `tools/triage/coverdiff.py` | The code that ran only with an action: two coverage logs (drcov or address lists) compared, by function |
