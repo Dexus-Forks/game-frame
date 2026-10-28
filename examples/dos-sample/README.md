@@ -11,6 +11,9 @@ involved.
 - `wait_keys`: installs a keyboard handler on INT 9 that reads port `0x60` into a key table
   and a log and acknowledges the PIC, as a game's handler does, then waits for scan codes
   (dos_env's keyboard test).
+- Three routines at the end that nothing calls (`after_iret`, `after_retf`, `after_retf_n`):
+  Ghidra finds none of them, and `ghidra-run.sh decompile` makes a function only at the two
+  that follow a far return.
 - `make_exe.py OUT`: assembles it with `zig cc` (LLVM, `.code16`) and links it with Python into
   `sample.exe` (NE, 16-bit protected mode), `sample-td.exe` (the same with Turbo Debugger
   symbols appended) and `sample-mz.exe` (real-mode MZ). The data segment holds Pascal strings,

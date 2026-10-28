@@ -32,6 +32,9 @@ EXPORTS = ['rng_seed', 'rng_next', 'sum_draws', 'checksum', 'get_data_seg', 'ask
            'read_file', 'wait_ticks', 'get_key', 'write_file', 'wait_keys']
 # Labels inside main_loop, written to symbols.tsv for the fragments.py test
 LABELS = ['main_loop', 'frame_top', 'draw', 'draw_even_end', 'draw_odd_end', 'event', 'event_end']
+# Routines nothing calls, after an iret and after the two far returns, written to symbols.tsv
+# for the test of ghidra-run.sh's decompile by address
+UNREACHED = ['after_iret', 'after_retf', 'after_retf_n']
 DESCRIPTION = b'DOS sample for GameFrame'
 MESSAGE = b'\x0cDOS SAMPLE 1'   # a Pascal string: length byte first
 # Two Pascal strings back to back; the second's length byte (0x2a) is a printable '*'
@@ -252,7 +255,7 @@ def main(out_dir):
     open(os.path.join(out_dir, 'sample-td.exe'), 'wb').write(with_tdinfo(ne, tdinfo(syms, len(code))))
     open(os.path.join(out_dir, 'sample-mz.exe'), 'wb').write(build_mz(code, syms, data))
     with open(os.path.join(out_dir, 'symbols.tsv'), 'w') as f:
-        for name in ['entry'] + EXPORTS + LABELS:
+        for name in ['entry'] + EXPORTS + LABELS + UNREACHED:
             f.write(f'{name}\t1\t{syms[name]:#06x}\n')
     print(f'built {out_dir}/sample.exe (NE), sample-td.exe (NE + TD symbols), sample-mz.exe (MZ), symbols.tsv')
 

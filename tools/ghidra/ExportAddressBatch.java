@@ -1,6 +1,7 @@
 // Decompile selected code addresses in an already analyzed Ghidra project. An address inside no
-// function becomes a new function only when something refers to it or it follows a ret or
-// padding, so a call site is never made into a function that splits the real one. An address
+// function becomes a new function only when something refers to it or it follows a ret (near
+// or far, with or without a byte count) or padding, so a call site is never made into a
+// function that splits the real one. An address
 // that fails is reported in the output and the batch goes on.
 // Usage: analyzeHeadless PROJECT NAME -process PROGRAM -noanalysis -scriptPath tools/ghidra \
 //   -postScript ExportAddressBatch.java OUTPUT.txt 0xADDRESS [0xADDRESS ...]
@@ -61,11 +62,12 @@ public class ExportAddressBatch extends GhidraScript {
   }
 
   // A function may start here: something refers to the address (a call or a pointer in data),
-  // or the bytes before it end another routine (ret, ret N) or pad (int3, nop).
+  // or the bytes before it end another routine (ret C3, ret N C2 nn nn, and the far returns of
+  // 16-bit code, retf CB and retf N CA nn nn) or pad (int3, nop).
   private boolean looksLikeStart(Address a) throws Exception {
     if (currentProgram.getReferenceManager().getReferenceCountTo(a) > 0) return true;
     int b1 = getByte(a.subtract(1)) & 0xff;
     int b3 = getByte(a.subtract(3)) & 0xff;
-    return b1 == 0xc3 || b1 == 0xcc || b1 == 0x90 || b3 == 0xc2;
+    return b1 == 0xc3 || b1 == 0xcb || b1 == 0xcc || b1 == 0x90 || b3 == 0xc2 || b3 == 0xca;
   }
 }
