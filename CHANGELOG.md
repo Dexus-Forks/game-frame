@@ -9,6 +9,12 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- `crates/x87` (`gameframe-x87`): the x87 FPU's 80-bit arithmetic in integers. `fadd`, `fsub`,
+  `fmul`, `fdiv` and `fsqrt` under every precision and rounding control, exact loads, `Double`
+  and `Single` stores with denormals and overflow, `fist` with the integer indefinite, and
+  `frndint`. From Holiday Island's port (Delphi 1, `{$N+}`), made general. It equals real x87
+  instructions run under `pe32_emu` on every value of its `tests/vectors.txt` and of a 72,000-case
+  file; `tests/make_vectors.py` makes them from a hand-assembled routine.
 - `tools/decoders/`: decoders for the catalogue and `validate.py` for the standard formats many
   games ship. `bmp` reads every Windows and OS/2 header, 1 to 32 bits a pixel, bit fields, RLE8
   and RLE4, and keeps the rows of a file cut short; `wav` names the format and counts the

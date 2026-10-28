@@ -66,6 +66,10 @@ name = "gameframe-wma"
 version = "0.1.0"
 
 [[package]]
+name = "gameframe-x87"
+version = "0.1.0"
+
+[[package]]
 name = "gameframe-yac512"
 version = "0.1.0"
 
