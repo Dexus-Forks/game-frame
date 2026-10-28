@@ -18,7 +18,9 @@ The 16-bit counterpart of tools/pe/peinfo.py. It prints:
     text). Ghidra does not find Pascal strings by itself, so this is how to see a Pascal
     program's messages and file names with their addresses. The address printed is the length
     byte's, which is the address the code uses. Strings that follow each other are all found,
-    even when a length byte is a printable character.
+    even when a length byte is a printable character. A segment stored as iterated records
+    (flag 0x0008, Borland's packed data segments) is searched as it is in memory, after the
+    rest of the file, so its strings come out whole and at their real addresses.
 
   - debug symbols: Borland Turbo Debugger symbols (read them with tdinfo.py) or a CodeView trailer.
 
@@ -97,6 +99,14 @@ def pascal_strings(data, minimum):
         i += 1
 
 
+def iterated_size(exe, s):
+    """How many bytes an iterated segment's records give in memory, or why they cannot."""
+    try:
+        return f'{len(exe.image(s.selector)):#x} bytes'
+    except ValueError as e:
+        return str(e)
+
+
 def where(exe, file_off):
     """The Ghidra address of a file offset, or the bare file offset."""
     if exe.kind == 'NE':
@@ -109,6 +119,21 @@ def where(exe, file_off):
             seg = MZ_LOAD + (linear >> 4)
             return f'{seg:04x}:{linear & 15:04x}'
     return f'file+{file_off:#x}'
+
+
+def text_areas(exe):
+    """(bytes, address of an offset) to search for text and fingerprints: the file, with the
+    records of iterated NE segments blanked, then each iterated segment as it is in memory."""
+    iterated = [s for s in exe.segments if s.iterated and s.offset] if exe.kind == 'NE' else []
+    data = bytearray(exe.data)
+    for s in iterated:
+        data[s.offset:s.offset + s.length] = bytes(s.length)
+    yield bytes(data), lambda off: where(exe, off)
+    for s in iterated:
+        try:
+            yield exe.image(s.selector), lambda off, sel=s.selector: f'{sel:04x}:{off:04x}'
+        except ValueError as e:
+            print(f'  segment {s.number}: {e}')
 
 
 def main(path, *flags):
@@ -138,7 +163,8 @@ def main(path, *flags):
               f'Ghidra selector, file offset, size in file, size in memory, kind, relocations:')
         for s in exe.segments:
             print(f'    {s.number:3d}  {s.selector:04x}  file {s.offset:#8x}  {s.length:#7x}  {s.minalloc:#7x}  '
-                  f'{s.describe():<26} {s.relocs} relocs' + ('  (uninitialised)' if not s.offset else ''))
+                  f'{s.describe():<26} {s.relocs} relocs' + ('  (uninitialised)' if not s.offset else '')
+                  + (f'  (records: {iterated_size(exe, s)} in memory)' if s.iterated and s.offset else ''))
         print(f'  imported modules: {", ".join(exe.modules) or "none"}')
         for mod in dict.fromkeys(exe.modules):   # a module can be listed twice
             used = {k: n for k, n in exe.import_refs.items() if k.startswith(mod + '.')}
@@ -156,14 +182,17 @@ def main(path, *flags):
               f'globals and types. Run tools/dos/tdinfo.py {path} summary')
     elif data[-8:-6] == b'NB':
         print(f'  debug symbols: a CodeView {data[-8:-4].decode()} trailer (not read by these tools)')
-    found = [name for name, keys in FINGERPRINTS.items() if any(fingerprint(k, data) for k in keys)]
+    areas = list(text_areas(exe))
+    found = [name for name, keys in FINGERPRINTS.items()
+             if any(fingerprint(k, area) for k in keys for area, _ in areas)]
     print('  fingerprints: ' + (', '.join(found) if found else 'none'))
-    if '--strings' in flags:
-        for off, text in strings(data, int(flags[flags.index('--strings') + 1])):
-            print(f'    {where(exe, off)}  {text}')
-    if '--pstrings' in flags:
-        for off, text in pascal_strings(data, int(flags[flags.index('--pstrings') + 1])):
-            print(f'    {where(exe, off)}  [{len(text)}] {text!r}')
+    for area, at in areas:
+        if '--strings' in flags:
+            for off, text in strings(area, int(flags[flags.index('--strings') + 1])):
+                print(f'    {at(off)}  {text}')
+        if '--pstrings' in flags:
+            for off, text in pascal_strings(area, int(flags[flags.index('--pstrings') + 1])):
+                print(f'    {at(off)}  [{len(text)}] {text!r}')
 
 
 if __name__ == '__main__':

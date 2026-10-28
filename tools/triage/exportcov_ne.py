@@ -16,6 +16,9 @@ starts:
   they follow a return (C3, CB, C2 nn nn, CA nn nn), a covered byte, the segment start, or two
   printable bytes (Borland puts a procedure's string constants just before its code).
 
+Segments stored as iterated records (flag 0x0008) are read expanded, as the loader does, so the
+relocation chains through a packed data segment (far pointers to methods) count too.
+
 The rest of a gap is usually data kept in code segments: jump tables, and in Delphi programs
 the class tables (VMTs, RTTI, class names). Standard library only, with tools/dos/ne.py.
 """
@@ -62,9 +65,14 @@ def pieces(functions, bodies):
     return out
 
 
+def image(exe, s):
+    """A segment's bytes as they are in memory (an iterated segment's records expanded)."""
+    return exe.image(s.selector) or b''
+
+
 def coverage(exe, rows):
     """{selector: bytearray}, 1 for each byte of a code segment some function covers."""
-    marks = {s.selector: bytearray(s.length) for s in exe.segments if not s.is_data and s.offset}
+    marks = {s.selector: bytearray(len(image(exe, s))) for s in exe.segments if not s.is_data and s.offset}
     for (sel, lo), (end_sel, hi) in rows:
         m = marks.get(sel)
         if m is None:
@@ -82,7 +90,7 @@ def gaps_of(exe, marks):
         m = marks.get(s.selector)
         if m is None:
             continue
-        code, i = exe.data[s.offset:s.offset + s.length], 0
+        code, i = image(exe, s), 0
         while i < len(m):
             if m[i]:
                 i += 1
@@ -119,14 +127,14 @@ def relocations(exe, seg):
 
 def far_targets(exe):
     """{(selector, offset): kind} of every far call or far pointer into a code segment."""
-    found, segs, d = {}, exe.segments, exe.data
+    found, segs = {}, exe.segments
     for seg in segs:
-        code = d[seg.offset:seg.offset + seg.length]
+        code = image(exe, seg)
         for src, flags, site, tseg, toff in relocations(exe, seg):
             if not 0 < tseg <= len(segs) or segs[tseg - 1].is_data or not segs[tseg - 1].offset:
                 continue
             target = segs[tseg - 1]
-            tcode = d[target.offset:target.offset + target.length]
+            tcode = image(exe, target)
             if src == 3:                                # a far pointer with its offset in the record
                 if toff < len(tcode) and opens_like_code(tcode, toff):
                     found.setdefault((target.selector, toff), 'far pointer target')
@@ -151,7 +159,7 @@ def prologue_starts(exe, marks):
         m = marks.get(s.selector)
         if m is None:
             continue
-        code = exe.data[s.offset:s.offset + s.length]
+        code = image(exe, s)
         for hit in ENTER_OR_BP.finditer(code):
             k = hit.start()
             if m[k]:

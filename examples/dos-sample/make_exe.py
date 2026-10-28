@@ -11,6 +11,9 @@ so GameFrame needs no 16-bit compiler or linker:
                        exports, a selector relocation and an import from KERNEL (ordinal 3)
   OUT_DIR/sample-mz.exe  plain real-mode MZ: the same code and data in one load image, with an
                        MZ relocation for the data segment's paragraph
+  OUT_DIR/sample-it.exe  sample.exe with its data segment stored as iterated records (NE flag
+                       0x0008: runs of zeros packed, as Borland's linkers do); in memory it is
+                       the same program
   OUT_DIR/symbols.tsv  name, segment, offset of every routine and of main_loop's labels (the
                        "map file")
   OUT_DIR/sample-td.exe  sample.exe with Turbo Debugger symbols (TDINFO 3.0) appended inside a
@@ -22,6 +25,7 @@ Pascal 7 program); it proves the reader keeps working, not that the layout is Bo
 specification. It writes no other format (no LE/LX, no overlays) and does not run anything.
 """
 import os
+import re
 import struct
 import subprocess
 import sys
@@ -88,7 +92,22 @@ def pstr(s):
     return bytes([len(s)]) + s
 
 
-def build_ne(code, syms, data):
+def iterated_records(data):
+    """The data segment as NE iterated records (u16 count, u16 length, bytes), as Borland's
+    linkers pack it: each run of eight or more zeros is one record of a zero byte repeated,
+    the bytes between runs are records of count 1."""
+    out, i = b'', 0
+    for m in re.finditer(rb'\0{8,}', data):
+        if m.start() > i:
+            out += struct.pack('<HH', 1, m.start() - i) + data[i:m.start()]
+        out += struct.pack('<HH', m.end() - m.start(), 1) + b'\0'
+        i = m.end()
+    if i < len(data):
+        out += struct.pack('<HH', 1, len(data) - i) + data[i:]
+    return out
+
+
+def build_ne(code, syms, data, iterated=False):
     code = bytearray(code)
     align = 4  # segment data aligned to 16 bytes
     # Relocations of segment 1 (8 bytes each). The word at each location is 0xffff (end of chain).
@@ -125,7 +144,9 @@ def build_ne(code, syms, data):
     for off in (syms['fix_entry_ds'] + 1, syms['fix_dataseg'] + 1, syms['fix_import'], syms['fix_tick_ds']):
         code[off:off + 2] = b'\xff\xff'
     segtab = struct.pack('<HHHH', seg1_file >> align, len(code), 0x0100 | 0x0c00, len(code))
-    segtab += struct.pack('<HHHH', seg2_file >> align, len(data), 0x0001 | 0x0c00, 0x4000)
+    if iterated:
+        data = iterated_records(data)
+    segtab += struct.pack('<HHHH', seg2_file >> align, len(data), 0x0001 | 0x0c00 | (0x0008 if iterated else 0), 0x4000)
     hdr = bytearray(0x40)
     struct.pack_into('<2sBBHH', hdr, 0, b'NE', 5, 10, entry_off, len(entry))
     struct.pack_into('<HH', hdr, 0x0c, 0x0302, 2)      # flags: one data segment per instance, PM app; autodata = 2
@@ -255,10 +276,11 @@ def main(out_dir):
     open(os.path.join(out_dir, 'sample.exe'), 'wb').write(ne)
     open(os.path.join(out_dir, 'sample-td.exe'), 'wb').write(with_tdinfo(ne, tdinfo(syms, len(code))))
     open(os.path.join(out_dir, 'sample-mz.exe'), 'wb').write(build_mz(code, syms, data))
+    open(os.path.join(out_dir, 'sample-it.exe'), 'wb').write(build_ne(code, syms, data, iterated=True))
     with open(os.path.join(out_dir, 'symbols.tsv'), 'w') as f:
         for name in ['entry'] + EXPORTS + LABELS + UNREACHED:
             f.write(f'{name}\t1\t{syms[name]:#06x}\n')
-    print(f'built {out_dir}/sample.exe (NE), sample-td.exe (NE + TD symbols), sample-mz.exe (MZ), symbols.tsv')
+    print(f'built {out_dir}/sample.exe (NE), sample-td.exe (NE + TD symbols), sample-mz.exe (MZ), sample-it.exe (NE, iterated data), symbols.tsv')
 
 
 if __name__ == '__main__':
