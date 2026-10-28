@@ -18,7 +18,9 @@ involved.
   `exportcov.py` must find in a 16-bit program.
 - `make_exe.py OUT`: assembles it with `zig cc` (LLVM, `.code16`) and links it with Python into
   `sample.exe` (NE, 16-bit protected mode), `sample-td.exe` (the same with Turbo Debugger
-  symbols appended) and `sample-mz.exe` (real-mode MZ). The data segment holds Pascal strings,
+  symbols appended), `sample-mz.exe` (real-mode MZ) and `sample-it.exe` (`sample.exe` with its
+  data segment stored as iterated records, flag `0x0008`, as Borland's linkers pack it: the
+  same program in memory). The data segment holds Pascal strings,
   two of them back to back. The symbols include a variable and a type with anonymous records
   inside, and an imported procedure (`host_call`) whose segment number is past the program's.
 

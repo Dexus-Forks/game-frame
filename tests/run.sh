@@ -638,6 +638,21 @@ expect "dosinfo finds Turbo Debugger symbols" "debug symbols: Turbo Debugger" "$
 expect "readseg reads a typed constant" "1008:0000  4660" "$PYTHON" tools/dos/readseg.py $D/sample.exe u32 DAT_1008_0000
 expect "readseg says where a count goes" "a count goes after --count" bash -c "\"$PYTHON\" tools/dos/readseg.py $D/sample.exe hex 1008:0000 2 2>&1; true"
 expect "readseg reads a Pascal string" "'DOS SAMPLE 1'" "$PYTHON" tools/dos/readseg.py $D/sample.exe pstr 1008:0010
+# sample-it.exe stores the same data segment as iterated records (NE flag 0x0008): the readers
+# expand them, so every value reads as in sample.exe, also past the first record.
+expect "dosinfo marks an iterated segment and gives its size in memory" "DATA iterated" "$PYTHON" tools/dos/dosinfo.py $D/sample-it.exe
+[[ "$("$PYTHON" tools/dos/readseg.py $D/sample-it.exe u32 1008:0000 2>&1; "$PYTHON" tools/dos/readseg.py $D/sample-it.exe cstr 1008:0080 2>&1)" \
+   == "$("$PYTHON" tools/dos/readseg.py $D/sample.exe u32 1008:0000 2>&1; "$PYTHON" tools/dos/readseg.py $D/sample.exe cstr 1008:0080 2>&1)" \
+   && "$("$PYTHON" tools/dos/readseg.py $D/sample-it.exe cstr 1008:0080 2>&1)" == *"'sample.txt'"* ]] \
+  && ok "readseg expands an iterated data segment: the seed and a file name past the zero runs read as in sample.exe" \
+  || bad "readseg (iterated)" "$("$PYTHON" tools/dos/readseg.py $D/sample-it.exe cstr 1008:0080 2>&1)"
+expect "dosinfo finds the Pascal strings of an iterated segment at their addresses" "1008:003d  [42] 'SECOND STRING" "$PYTHON" tools/dos/dosinfo.py $D/sample-it.exe --pstrings 5
+expect "ne.py refuses broken iterated records" "runs past the segment | iterated records expand past 64 KB" "$PYTHON" -c "
+import struct, sys; sys.path.insert(0, 'tools/dos'); from ne import expand_iterated
+def why(raw):
+    try: return expand_iterated(raw).hex()
+    except ValueError as e: return str(e)
+print(why(struct.pack('<HH', 1, 9) + b'abc'), '|', why(struct.pack('<HH', 0xffff, 2) + b'ab'))"
 expect "readseg decodes a Turbo Pascal Real" "[1.0, -2.5, 0.0]" "$PYTHON" - <<'PY'
 import sys; sys.path.insert(0, 'tools/dos')
 from readseg import real48
@@ -679,6 +694,10 @@ emu.call('RNG_SEED', Long(1234))
 got = [emu.call('1000:0028', 1000) for _ in range(5)]
 print(got == ref, got)
 PY
+expect "dos_emu expands an iterated data segment: the same draws and file name as sample.exe" "True b'sample.txt'" "$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu
+run = lambda f: (lambda e: ([e.call('1000:0028', 1000) for _ in range(3)], e.read((0x1008, 0x80), 10)))(DosEmu(f))
+plain, it = run('$D/sample.exe'), run('$D/sample-it.exe'); print(plain == it, it[1])"
 expect "dos_emu applies selector relocations (Ghidra's numbering)" "0x1008" "$PYTHON" -c "
 import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu
 print(hex(DosEmu('$D/sample.exe').call('GET_DATA_SEG')))"
@@ -1908,7 +1927,7 @@ expect "align map gives a point back in REF with --inverse" "50.0 30.0" "$PYTHON
 expect "align map divides by --units for a Retina capture" "$("$PYTHON" -c "print(f'{$px/2:.1f}')")" "$PYTHON" tools/live/align.py map "$A/a.json" 50 30 --units 2
 expect "needs reads a 64-bit PE's needs" "cpu:x64" "$PYTHON" tools/triage/needs.py $B
 expect "needs reads the CRT a PE imports" "lib:vc-runtime" "$PYTHON" tools/triage/needs.py $B --no-cpu
-expect "needs reads an NE's target OS and Windows version" "os:windows-3x                sample-td.exe is a 16-bit NE for target OS 2, version 3.10" "$PYTHON" tools/triage/needs.py $D --no-cpu
+expect "needs reads an NE's target OS and Windows version" "is a 16-bit NE for target OS 2, version 3.10" "$PYTHON" tools/triage/needs.py $D --no-cpu
 mkdir -p "$A/game" && touch "$A/game/steam_api64.dll" && echo 480 > "$A/game/steam_appid.txt"
 expect "needs reads Steam from the files in a game's folder" "drm:steam" "$PYTHON" tools/triage/needs.py "$A/game"
 expect "harness check finds no problem in the modules" "0 problems" "$PYTHON" tools/live/harness.py check

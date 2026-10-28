@@ -5,6 +5,14 @@ behind dosinfo.py and readseg.py. Standard library only.
     exe = load('game.exe')      # an MZ or NE object; exe.kind is 'MZ', 'NE', 'LE', 'LX' or 'PE'
     exe.segments                # NE: list of Segment (number, selector, file offset, length, flags)
     exe.file_offset(0x1008, 4)  # file offset of selector:offset (NE) or segment:offset (MZ)
+    exe.image(0x1008)           # NE: a segment's initialised bytes as they are in memory
+    exe.view(0x1008, 4)         # (buffer, index) of the byte at an address, in memory order
+
+An NE segment with flag 0x0008 ("iterated") holds records in the file, not its bytes: each is
+a u16 repeat count, a u16 length and that many bytes, repeated `count` times in memory. Borland's
+linkers store data segments this way to pack runs of zeros. Read such a segment through
+`image` or `view`, never through the file: past the first record every byte is elsewhere.
+`file_offset` returns None in it.
 
 Addresses follow Ghidra: NE segment N has selector 0x1000 + 8 * (N - 1); an MZ image is loaded
 at segment 0x1000. It does not parse resources, LE/LX internals or overlays (it only reports
@@ -14,6 +22,26 @@ import struct
 
 FIRST_SELECTOR = 0x1000
 MZ_LOAD = 0x1000
+ITERATED = 0x0008
+SEGMENT_MAX = 0x10000
+
+
+def expand_iterated(raw):
+    """The bytes an iterated segment's records give in memory. A record that runs past the
+    segment, bytes left after the last record, or more than 64 KB expanded are errors."""
+    out, pos = bytearray(), 0
+    while pos + 4 <= len(raw):
+        count, length = struct.unpack_from('<HH', raw, pos)
+        pos += 4
+        if pos + length > len(raw):
+            raise ValueError(f'iterated record at {pos - 4:#x} runs past the segment')
+        if len(out) + count * length > SEGMENT_MAX:
+            raise ValueError(f'iterated records expand past 64 KB at {pos - 4:#x}')
+        out += raw[pos:pos + length] * count
+        pos += length
+    if pos != len(raw):
+        raise ValueError(f'{len(raw) - pos} bytes after the last iterated record')
+    return bytes(out)
 
 
 class Segment:
@@ -22,10 +50,11 @@ class Segment:
         self.flags, self.minalloc, self.relocs = flags, minalloc, relocs
         self.selector = FIRST_SELECTOR + 8 * (number - 1)
         self.is_data = bool(flags & 1)
+        self.iterated = bool(flags & ITERATED)
 
     def describe(self):
         bits = ['DATA' if self.is_data else 'CODE']
-        bits += [name for bit, name in ((0x10, 'movable'), (0x20, 'shared'), (0x40, 'preload'),
+        bits += [name for bit, name in ((ITERATED, 'iterated'), (0x10, 'movable'), (0x20, 'shared'), (0x40, 'preload'),
                                         (0x1000, 'discardable')) if self.flags & bit]
         return ' '.join(bits)
 
@@ -114,13 +143,39 @@ class Executable:
                     key = f'{mod}.{b}' if flags & 3 == 1 else f'{mod}.{self._pstr(ne + imptab + b)}'
                     self.import_refs[key] = self.import_refs.get(key, 0) + 1
 
-    def file_offset(self, seg, off):
-        """The file offset holding seg:off, as Ghidra addresses it, or None."""
-        if self.kind == 'NE':
-            for s in self.segments:
-                if s.selector == seg:
-                    return s.offset + off if s.offset and off < s.length else None
+    def segment(self, seg):
+        """The NE segment with this selector, or None."""
+        return next((s for s in self.segments if s.selector == seg), None)
+
+    def image(self, seg):
+        """An NE segment's initialised bytes as the loader puts them in memory (iterated records
+        expanded; the rest of the segment, up to its size in memory, is zeros): b'' when the
+        file holds none, None for no such selector. Raises ValueError on broken records."""
+        s = self.segment(seg)
+        if s is None:
             return None
+        if not s.offset:
+            return b''
+        raw = self.data[s.offset:s.offset + s.length]
+        return expand_iterated(raw) if s.iterated else raw
+
+    def view(self, seg, off):
+        """(buffer, index) holding seg:off, in memory order: an NE segment's image, or an MZ
+        program's file. None when the byte is not initialised in the file."""
+        if self.kind == 'NE':
+            img = self.image(seg)
+            return (img, off) if img and off < len(img) else None
+        at = self.file_offset(seg, off)
+        return None if at is None else (self.data, at)
+
+    def file_offset(self, seg, off):
+        """The file offset holding seg:off, as Ghidra addresses it, or None (also inside an
+        iterated NE segment, whose bytes are not in the file in order: use `view`)."""
+        if self.kind == 'NE':
+            s = self.segment(seg)
+            if s is None or s.iterated:
+                return None
+            return s.offset + off if s.offset and off < s.length else None
         linear = (seg - MZ_LOAD) * 16 + off
         at = self.hdr_paras * 16 + linear
         return at if 0 <= linear and at < self.image_end else None

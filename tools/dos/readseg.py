@@ -18,6 +18,7 @@ ADDRESS is as Ghidra prints it: 1008:0004, DAT_1008_0004 or FUN_1000_0028 (NE se
 0x1000 + 8 * (segment - 1); MZ images are loaded at segment 0x1000). `--count N` reads N
 consecutive values (a table). Values are as stored in the file, before the program runs:
 relocated words (selectors, far pointers to segments) still hold the file's placeholder.
+A segment stored as iterated records (NE flag 0x0008) is expanded first, as the loader does.
 It does not read memory the program fills at run time (use dos_emu or DOSBox-X for that).
 """
 import os
@@ -65,12 +66,16 @@ def main(argv):
             hint = ' (a count goes after --count)' if a.isdigit() else ''
             print(f'{a}: not an address{hint}', file=sys.stderr)
             sys.exit(2)
-        at = exe.file_offset(seg, off)
-        if at is None:
+        try:
+            found = exe.view(seg, off)
+        except ValueError as e:                     # an iterated segment whose records are broken
+            print(f'{seg:04x}:{off:04x}  {e}', file=sys.stderr)
+            sys.exit(1)
+        if found is None:
             print(f'{seg:04x}:{off:04x}  not initialised in the file (a variable set at run time, or an '
                   f'address outside every segment)')
             continue
-        d = exe.data
+        d, at = found
         if kind in ('pstr', 'cstr'):
             values = []
             for _ in range(count):

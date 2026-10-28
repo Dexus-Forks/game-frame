@@ -1,12 +1,18 @@
-"""Loading NE (16-bit protected mode) and MZ (real mode) programs: segments, selectors as
-Ghidra numbers them, relocations, imports as stubs, constant imports.
+"""Loading NE (16-bit protected mode) and MZ (real mode) programs: segments (iterated ones
+expanded, as Windows' loader does), selectors as Ghidra numbers them, relocations, imports as
+stubs, constant imports.
 Part of DosEmu (see __init__.py); the methods use its state."""
+import os
 import struct
+import sys
 
 from unicorn import UC_ARCH_X86, UC_MODE_16, UC_MODE_32, Uc
 from unicorn.x86_const import UC_X86_REG_GDTR
 
 from .types import CONSTANT_IMPORTS, FIRST_SELECTOR, FarPtr, GDT_BASE, MZ_HEAP, MZ_LOAD, MZ_STUBS, TRAP
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'dos'))
+from ne import ITERATED, expand_iterated  # noqa: E402
 
 
 class Loader:
@@ -33,7 +39,8 @@ class Loader:
             self.segments.append((off << align, length or (0x10000 if off else 0), flags, minalloc or 0x10000))
             sel = self._new_selector(0x92 if flags & 1 else 0x9A)
             if off:
-                self.uc.mem_write(self.linear(sel), d[(off << align):(off << align) + (length or 0x10000)])
+                raw = d[(off << align):(off << align) + (length or 0x10000)]
+                self.uc.mem_write(self.linear(sel), expand_iterated(raw) if flags & ITERATED else raw)
         self.stub_seg = self._new_selector(0x9A)
         self.uc.mem_write(self.linear(self.stub_seg, TRAP), b'\xf4')
         self.next_stub = 0

@@ -24,6 +24,13 @@ Every release of GameFrame, newest first. The format follows
 
 ### Fixed
 
+- NE segments stored as iterated records (flag `0x0008`, Borland's packed data segments) are
+  expanded as the loader does by `ne.py` (`image`, `view`, `expand_iterated`), `readseg.py`,
+  `dosinfo.py` (strings, Pascal strings and fingerprints, and the segment's size in memory),
+  `dos_emu` and `exportcov.py`. Before, every value past the first record read wrong, and
+  `dos_emu` ran such a program on the packed bytes. The DOS sample has `sample-it.exe`, the
+  same program with its data segment iterated. Ghidra's NE import still does not expand them
+  (docs/DOS.md, "Iterated segments").
 - `ghidra-run.sh decompile` (and `fill-gaps`) now makes a function at an address that follows a
   far return of 16-bit code (`retf`, `retf N`), as it already did after a near return. Before,
   every unreferenced routine after a far procedure in an NE or MZ program was reported as

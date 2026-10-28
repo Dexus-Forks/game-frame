@@ -69,6 +69,19 @@ Write every address as `seg:off` the way Ghidra prints it, in docs, labels and t
 uses other numbers: real-mode segments where DOS loaded it, or the DPMI host's selectors.
 Only the DOSBox-X debugger shows those (section 7).
 
+### Iterated segments
+
+An NE segment with flag `0x0008` is stored as *iterated* records: a u16 repeat count, a u16
+length and that many bytes, repeated in memory. Borland's linkers pack data segments this
+way (runs of zeros become one record). `dosinfo.py` marks such a segment `iterated` and gives
+its size in memory. `ne.py`'s `image` and `view`, `readseg.py`, `dosinfo.py --strings` and
+`--pstrings`, `dos_emu` and `exportcov.py` expand the records as the loader does. Ghidra's NE
+import does not: in Ghidra, every initialised value past the first record of such a segment
+reads wrong, and so do `strings.txt` and the constants in `decomp.c`. Read typed constants with
+`readseg.py`, not from the listing. Relocation chains that run through the segment (far
+pointers to methods in a Delphi program's data segment) are walked in the expanded bytes;
+in a game made with Delphi 1 that found nine event handlers that Ghidra's export had missed.
+
 ## 3. Debug symbols: check before anything else
 
 Borland compilers wrote Turbo Debugger symbols into the program (TPC/BPC `/V`, TLINK `/v`),
