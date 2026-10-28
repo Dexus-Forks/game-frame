@@ -714,6 +714,10 @@ expect "dos_emu expands an iterated data segment: the same draws and file name a
 import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu
 run = lambda f: (lambda e: ([e.call('1000:0028', 1000) for _ in range(3)], e.read((0x1008, 0x80), 10)))(DosEmu(f))
 plain, it = run('$D/sample.exe'), run('$D/sample-it.exe'); print(plain == it, it[1])"
+expect "dos_emu starts the x87 as fninit leaves it, or with the word given" "0x37f 0xf7f" "$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu
+from unicorn.x86_const import UC_X86_REG_FPCW
+print(*(hex(DosEmu('$D/sample.exe', **k).uc.reg_read(UC_X86_REG_FPCW)) for k in ({}, {'fpu_cw': 0x0f7f})))"
 expect "dos_emu applies selector relocations (Ghidra's numbering)" "0x1008" "$PYTHON" -c "
 import sys; sys.path.insert(0, 'tools/emu'); from dos_emu import DosEmu
 print(hex(DosEmu('$D/sample.exe').call('GET_DATA_SEG')))"

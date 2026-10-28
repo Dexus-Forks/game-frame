@@ -222,9 +222,9 @@ emu.trace({'1040:0a12': 'Random'}, args=1)     # record calls (the random draws)
   address. Add `stubs={'KERNEL.3': fn}` or `interrupts={0x21: fn}`; a handler reads and sets registers (`emu.reg('ax')`, `emu.set(ax=...)`). An import handler returns the number of argument bytes to remove.
 - Not emulated: DOS itself, DPMI services, timers, VGA, sound, and the x87 emulator interrupts
   (`INT 34h`-`3Dh`). Real x87 instructions run on Unicorn's FPU, as in a Windows program whose
-  OS fixups are left alone. `dos_emu` does not set the control word: Unicorn reports 0 but
-  computes at 64 bits until an `fldcw` loads a word, so set the program's own word first
-  (`fninit` gives `0x037f`). Code that needs the rest runs in DOSBox-X instead.
+  OS fixups are left alone. `dos_emu` starts the x87 with the control word `0x037f`, what
+  `fninit` leaves (Unicorn's own start is 0); pass `fpu_cw=` when the program's start-up sets
+  another. Code that needs the rest runs in DOSBox-X instead.
 
 ## 5b. Running the whole program headless: dos_env
 

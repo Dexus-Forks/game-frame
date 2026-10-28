@@ -170,10 +170,11 @@ Delphi 1 has `Integer` (16 bits), `LongInt` (32 bits), the 6-byte `Real`, and, w
 - **`Round` rounds a half to the even neighbour.** It is `frndint` (or `fistp`) under the
   default control word. The software `Round` of the 6-byte `Real` rounds halves away from zero.
   The two give different results for 2.5.
-- **The emulator's control word.** `dos_emu` does not set one. Unicorn then reports a control
-  word of 0 but computes at 64 bits until an `fldcw` loads a word. A `Trunc` that stores the
-  control word, sets the chop bits and loads it back would then switch to 24 bits (*measured*
-  under Unicorn). Set the control word the program's start-up sets before you measure such code.
+- **The emulator's control word.** `dos_emu` starts the x87 with `0x037f`, what `fninit`
+  leaves. Unicorn's own start is a control word of 0, which computes at 64 bits until an
+  `fldcw` loads a word: a `Trunc` that stores the control word, sets the chop bits and loads it
+  back would then switch to 24 bits (*measured* under Unicorn). When the program's start-up
+  sets another word, pass it as `DosEmu(..., fpu_cw=...)` before you measure such code.
 
 ## Strings and data
 
