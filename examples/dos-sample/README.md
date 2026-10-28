@@ -13,7 +13,9 @@ involved.
   (dos_env's keyboard test).
 - Three routines at the end that nothing calls (`after_iret`, `after_retf`, `after_retf_n`):
   Ghidra finds none of them, and `ghidra-run.sh decompile` makes a function only at the two
-  that follow a far return.
+  that follow a far return. Two more, `far_caller` (a prologue after a far return) and
+  `far_only` (reached only by a far call whose selector is an NE relocation), are the starts
+  `exportcov.py` must find in a 16-bit program.
 - `make_exe.py OUT`: assembles it with `zig cc` (LLVM, `.code16`) and links it with Python into
   `sample.exe` (NE, 16-bit protected mode), `sample-td.exe` (the same with Turbo Debugger
   symbols appended) and `sample-mz.exe` (real-mode MZ). The data segment holds Pascal strings,

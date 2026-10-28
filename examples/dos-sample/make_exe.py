@@ -32,9 +32,9 @@ EXPORTS = ['rng_seed', 'rng_next', 'sum_draws', 'checksum', 'get_data_seg', 'ask
            'read_file', 'wait_ticks', 'get_key', 'write_file', 'wait_keys']
 # Labels inside main_loop, written to symbols.tsv for the fragments.py test
 LABELS = ['main_loop', 'frame_top', 'draw', 'draw_even_end', 'draw_odd_end', 'event', 'event_end']
-# Routines nothing calls, after an iret and after the two far returns, written to symbols.tsv
-# for the test of ghidra-run.sh's decompile by address
-UNREACHED = ['after_iret', 'after_retf', 'after_retf_n']
+# Routines nothing calls, written to symbols.tsv for the tests of ghidra-run.sh's decompile by
+# address and of exportcov on an NE
+UNREACHED = ['after_iret', 'after_retf', 'after_retf_n', 'far_caller', 'far_only']
 DESCRIPTION = b'DOS sample for GameFrame'
 MESSAGE = b'\x0cDOS SAMPLE 1'   # a Pascal string: length byte first
 # Two Pascal strings back to back; the second's length byte (0x2a) is a printable '*'
@@ -97,6 +97,7 @@ def build_ne(code, syms, data):
         struct.pack('<BBHBBH', 2, 0, syms['fix_entry_ds'] + 1, 2, 0, 0),   # selector of segment 2
         struct.pack('<BBHBBH', 2, 0, syms['fix_dataseg'] + 1, 2, 0, 0),    # selector of segment 2
         struct.pack('<BBHHH', 3, 1, syms['fix_import'], 1, 3),            # far pointer: KERNEL.3
+        struct.pack('<BBHBBH', 2, 0, syms['fix_far_only'], 1, 0, 0),       # selector of segment 1
     ]
     stub = mz_stub()
     ne_off = len(stub)

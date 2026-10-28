@@ -4,7 +4,10 @@ functions it missed probably start.
 
 Usage: exportcov.py BINARY functions.tsv [--bodies FILE] [--gaps N] [--starts FILE] [--min PERCENT]
 
-  BINARY         the Windows PE that was exported (32-bit or 64-bit)
+  BINARY         the Windows PE that was exported (32-bit or 64-bit), or a 16-bit NE (Windows
+                 3.x, OS/2 1.x): its addresses are seg:off as Ghidra numbers the segments, and
+                 its starts are far call and far pointer targets from the relocation tables and
+                 ENTER or push bp prologues (tools/triage/exportcov_ne.py)
   functions.tsv  the export's function list (address, size, name), from scripts/ghidra-export.sh
   --bodies FILE  each piece of each function (start, end, entry; bodies.tsv from the same
                  export, read by default when it sits beside functions.tsv). Without it, each
@@ -12,7 +15,7 @@ Usage: exportcov.py BINARY functions.tsv [--bodies FILE] [--gaps N] [--starts FI
                  function whose body is in several pieces
   --gaps N       list the N largest gaps (default 10)
   --starts FILE  write the likely function starts in the gaps, one address a line, ready for
-                 `scripts/ghidra-run.sh BINARY decompile OUT.txt $(cat FILE)`
+                 `scripts/ghidra-run.sh BINARY fill-gaps OUT.txt FILE`
   --min PERCENT  exit 1 when the coverage is below PERCENT (default 90)
 
 It prints the bytes of the executable sections that lie in some function, as a share of all
@@ -48,6 +51,7 @@ import capstone
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from sigscan import Image  # noqa: E402
+import exportcov_ne  # noqa: E402
 
 PROLOGUES = (b'\x55\x8b\xec', b'\x55\x89\xe5', b'\x53\x56', b'\x56\x57', b'\x83\xec', b'\x81\xec',
              b'\x48\x83\xec', b'\x48\x81\xec', b'\x48\x89\x5c\x24', b'\x40\x53', b'\x48\x89\x4c\x24')
@@ -156,6 +160,8 @@ def main(argv):
         print(__doc__.rstrip())
         return 0 if argv and argv[0] in ('-h', '--help') else 2
     opt = lambda k, d=None: argv[argv.index(k) + 1] if k in argv else d
+    if exportcov_ne.is_ne(argv[0]):
+        return exportcov_ne.main(argv, opt)
     img = Image(argv[0], 0)
     funcs = load_functions(argv[1])
     bodies = opt('--bodies', os.path.join(os.path.dirname(os.path.abspath(argv[1])), 'bodies.tsv'))

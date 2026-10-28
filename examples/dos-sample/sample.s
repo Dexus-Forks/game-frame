@@ -314,3 +314,20 @@ after_retf:
 after_retf_n:
 	movw $9, %ax
 	lretw
+
+# Two more that Ghidra misses, for exportcov's 16-bit starts (tests/run.sh): far_caller opens
+# with push bp / mov bp, sp right after a far return, and far_only is reached only by its far
+# call. The call holds the offset; the selector is 0xffff until the loader fills it from an NE
+# relocation (make_exe.py). Neither runs.
+far_caller:
+	pushw %bp
+	movw %sp, %bp
+	.byte 0x9a              # call far far_only
+	.word far_only - entry
+fix_far_only:
+	.word 0xffff
+	popw %bp
+	lretw
+far_only:
+	movw $10, %ax
+	lretw

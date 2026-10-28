@@ -85,6 +85,8 @@ Then make functions at those starts and export again, in one step:
 ```
 
 A start that fails (data that looked like code) is reported in the report and the rest go on.
+For a 16-bit NE program the addresses are `seg:off`, and the starts are the far call and far
+pointer targets in its relocation tables and the `ENTER` or `push bp` prologues in the gaps.
 Repeat until `exportcov` finds no more starts. Recover the gaps before tracing anything that
 might live in them.
 

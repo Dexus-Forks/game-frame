@@ -7,6 +7,14 @@ Every release of GameFrame, newest first. The format follows
 
 ## [1.4.0-dev] - Unreleased
 
+### Added
+
+- `tools/triage/exportcov.py` reads 16-bit NE programs (Windows 3.x, OS/2 1.x): coverage and
+  gaps per code segment in `seg:off`, and the likely starts of missed functions from the far
+  calls and far pointers in the relocation chains and from `ENTER` and `push bp` prologues
+  (`tools/triage/exportcov_ne.py`). `ghidra-run.sh fill-gaps` reads `seg:off` starts. The DOS
+  sample has a routine reached only by a far call through a relocation, to test both.
+
 ### Fixed
 
 - `ghidra-run.sh decompile` (and `fill-gaps`) now makes a function at an address that follows a

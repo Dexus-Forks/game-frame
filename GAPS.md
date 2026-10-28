@@ -271,6 +271,9 @@ Proposed by POD, now built:
 - [x] Export coverage and the likely starts in its gaps (`tools/triage/exportcov.py`), for the
   batch decompile
 - [x] `ExportAddressBatch` starts a function after a far return too (`retf`, `retf N`)
+- [x] The same for 16-bit NE programs, and `seg:off` starts in `fill-gaps`: far call and far
+  pointer targets from the relocation chains, `ENTER` and `push bp` prologues
+  (`tools/triage/exportcov_ne.py`, from Holiday Island's `necov.py`)
 - [x] Per-address errors in `ExportAddressBatch`, and no new function at an address that
   nothing refers to unless it follows a `ret` or padding
 - [x] An x87 control word in `pe32_emu` (`fpu_cw=`), and `fpu_modes`, which lists the cases
