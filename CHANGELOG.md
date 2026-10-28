@@ -15,6 +15,14 @@ Every release of GameFrame, newest first. The format follows
   `frndint`. From Holiday Island's port (Delphi 1, `{$N+}`), made general. It equals real x87
   instructions run under `pe32_emu` on every value of its `tests/vectors.txt` and of a 72,000-case
   file; `tests/make_vectors.py` makes them from a hand-assembled routine.
+- Delphi: [docs/engines/delphi.md](docs/engines/delphi.md) on recognising a Delphi program, its
+  forms, Delphi 1's class tables, the event handlers Ghidra misses, naming the runtime and
+  `{$N+}` floating point. `tools/formats/dfm.py` reads the forms (`TPF0`) of any Delphi version
+  from an NE resource table or any file, with each event's handler name.
+  `tools/dos/delphi1.py` lists a Delphi 1 program's classes, published methods and fields,
+  writes them as labels for `ghidra-export.sh --labels`, and maps each form's events to code.
+  `tests/make_delphi.py` builds the NE and form files their tests read. Know-how entries
+  `delphi` and `x87-f64-last-bit`.
 - `tools/decoders/`: decoders for the catalogue and `validate.py` for the standard formats many
   games ship. `bmp` reads every Windows and OS/2 header, 1 to 32 bits a pixel, bit fields, RLE8
   and RLE4, and keeps the rows of a file cut short; `wav` names the format and counts the
@@ -30,6 +38,10 @@ Every release of GameFrame, newest first. The format follows
 
 ### Fixed
 
+- `docs/DOS.md` and `dos_emu`'s help said `dos_emu` does not run x87 code. It runs real x87
+  instructions, as a Windows NE program holds them with their OS fixups; only the emulator
+  interrupts `INT 34h`-`3Dh` do not run. Both now say that `dos_emu` leaves the control word
+  unset: Unicorn reports 0 but computes at 64 bits until an `fldcw` loads a word.
 - NE segments stored as iterated records (flag `0x0008`, Borland's packed data segments) are
   expanded as the loader does by `ne.py` (`image`, `view`, `expand_iterated`), `readseg.py`,
   `dosinfo.py` (strings, Pascal strings and fingerprints, and the segment's size in memory),

@@ -169,6 +169,9 @@ up to its size (a variant record), so check one offset in the code before relyin
 - **Floating point by interrupt.** Borland's FPU emulator replaces each x87 instruction with
   `INT 34h`-`3Dh` followed by the instruction's bytes; disassemblers show `int 0x3c` and
   nonsense after it. Read those runs as floating-point code (Real, Double), not as interrupts.
+  A Windows (NE) program stores the real x87 instructions instead, each `fwait` with an OS
+  fixup, and Windows turns them into emulator calls only without a coprocessor: Ghidra and
+  `dos_emu` see the x87 code ([Delphi programs](engines/delphi.md#floating-point-and-win87em)).
 - **Calls through placeholders.** Disassembling the file directly shows every far call as
   `lcall 0:ffff`: the relocation fills it in. `tools/dos/nedis.py BINARY SEG:OFF LEN` applies
   the relocations and prints label names for call targets and DS globals.
@@ -217,8 +220,11 @@ emu.trace({'1040:0a12': 'Random'}, args=1)     # record calls (the random draws)
   runtime helpers that take their arguments in registers.
 - An import or interrupt without a handler stops the run with its name and the caller's
   address. Add `stubs={'KERNEL.3': fn}` or `interrupts={0x21: fn}`; a handler reads and sets registers (`emu.reg('ax')`, `emu.set(ax=...)`). An import handler returns the number of argument bytes to remove.
-- Not emulated: DOS itself, DPMI services, timers, VGA, sound, the x87 (Borland's FPU
-  emulator fixups are left alone). Code that needs them runs in DOSBox-X instead.
+- Not emulated: DOS itself, DPMI services, timers, VGA, sound, and the x87 emulator interrupts
+  (`INT 34h`-`3Dh`). Real x87 instructions run on Unicorn's FPU, as in a Windows program whose
+  OS fixups are left alone. `dos_emu` does not set the control word: Unicorn reports 0 but
+  computes at 64 bits until an `fldcw` loads a word, so set the program's own word first
+  (`fninit` gives `0x037f`). Code that needs the rest runs in DOSBox-X instead.
 
 ## 5b. Running the whole program headless: dos_env
 

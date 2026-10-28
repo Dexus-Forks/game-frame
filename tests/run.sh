@@ -675,6 +675,22 @@ g="$(mktemp -d)/globals"; "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe rust-gl
 expect "tdinfo writes Globals per unit at their DS offsets" "w.seek(0x4); w.u16(self.total);" cat "$g/sample.rs"
 expect "tdinfo writes a procedure's locals at their BP offsets" "[bp+6] range: Word" "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe rust-locals rng_next
 expect "tdinfo joins the units into Globals" "pub sample: sample::Sample," cat "$g/mod.rs"
+DL="$(mktemp -d)"; "$PYTHON" tests/make_delphi.py "$DL" > "$DL/where.tsv"
+expect "dfm reads a Delphi 1 form from an NE program's resources" "  Font.Style = [fsBold]" "$PYTHON" tools/formats/dfm.py "$DL/delphi1.exe"
+expect "dfm reads every Delphi 1 value type" "Ratio = 1.5" "$PYTHON" tools/formats/dfm.py "$DL/delphi1.exe"
+expect "dfm lists a form's events" "TFORM1	Image1	OnClick	image1click" "$PYTHON" tools/formats/dfm.py "$DL/delphi1.exe" --events
+expect "dfm finds a later Delphi's form inside other bytes, with filer flags and the newer types" "inherited Form2: TForm2
+  Alpha = 0.5
+  Price = 1.2345
+  When = 36526.0
+  Title = 'Ωx'
+  Big = 1099511627776" "$PYTHON" tools/formats/dfm.py "$DL/form.bin"
+expect "delphi1 finds the class tables and not the look-alike" "1000:0022	TImage	4	-
+1000:0048	TForm1	32	TImage" "$PYTHON" tools/dos/delphi1.py "$DL/delphi1.exe" classes
+expect "delphi1 counts what it found" "2 classes, 2 published methods" "$PYTHON" tools/dos/delphi1.py "$DL/delphi1.exe" classes
+expect "delphi1 reads a field table and its class table" "TForm1	+0x1c	Image1	TImage" "$PYTHON" tools/dos/delphi1.py "$DL/delphi1.exe" fields
+expect "delphi1 writes the published methods as labels" "$(grep FormCreate "$DL/where.tsv" | cut -f2)	TForm1_FormCreate" "$PYTHON" tools/dos/delphi1.py "$DL/delphi1.exe" labels
+expect "delphi1 finds each event's code by its method's name, in any case" "TFORM1	Image1	OnClick	TForm1.image1click	$(grep Image1Click "$DL/where.tsv" | cut -f2)" "$PYTHON" tools/dos/delphi1.py "$DL/delphi1.exe" handlers
 "$PYTHON" tools/dos/tdinfo.py $D/sample-td.exe labels > $D/labels.tsv
 expect "nedis applies relocations and names far calls" "lcall   KERNEL.3" "$PYTHON" tools/dos/nedis.py $D/sample.exe 1000:008c 6 --labels $D/labels.tsv
 expect "nedis names data in DS" "[RandSeed]" "$PYTHON" tools/dos/nedis.py $D/sample.exe 1000:0028 8 --labels $D/labels.tsv
@@ -1714,7 +1730,7 @@ out="$("$PYTHON" tests/mcp_provider_config.py 2>&1)"
   && ok "optional MCP providers use project-local settings and preserve client configuration ($out)" \
   || bad "MCP provider opt-in" "$out"
 out="$("$PYTHON" tests/mcp_tool_coverage.py 2>&1)"
-[[ $? == 0 && "$out" == *"MCP coverage: 122 catalog entries, 95 runnable tools, progress/cancel/timeout"* ]] \
+[[ $? == 0 && "$out" == *"MCP coverage: 124 catalog entries, 97 runnable tools, progress/cancel/timeout"* ]] \
   && ok "the GameFrame MCP exposes every catalog entry and runs every program and script ($out)" \
   || bad "GameFrame MCP tool coverage" "$out"
 out="$("$PYTHON" - <<'PY' 2>&1
