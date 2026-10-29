@@ -37,6 +37,12 @@ version with each capture. Treat the result as an observation of that 86Box buil
 not as physical-hardware evidence. Keep 86Box source out of a source-blind implementation task;
 pass the behavior description and its setup conditions to the implementation stage.
 
+Start DOSBox-X through `scripts/dosbox-run.sh game GAME.EXE`. It checks visible process names
+for `dosbox-x` and the basename of `DOSBOX_X_BINARY`, ignoring letter case. If an instance is
+running, it lists the PIDs and exits with status 75 before checking the version or changing
+files. The launcher leaves that instance running. Have its owner close it before retrying.
+This is a process check; two launches started at the same time can both pass.
+
 Before the first run, list what the game needs and the modules that provide it
 (`docs/harness/README.md`):
 

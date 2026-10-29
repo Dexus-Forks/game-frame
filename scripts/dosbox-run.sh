@@ -28,11 +28,13 @@
 # It writes RUN_RE.BAT into the mounted drive (removed afterwards; with --in-place that is your
 # game folder), OUT/dosbox.log (DOSBox-X's log, with the file and INT 21h logs when asked),
 # OUT/exitcode.txt (the program's exit code, read with IF ERRORLEVEL) and prints the exit code.
+# If DOSBox-X is already running, it reports the PIDs and exits 75 before probing the version
+# or changing files. It leaves the existing instance running. This check is not a launch lock.
 # Needs dosbox-x (scripts/setup.sh --install). It does not script the debugger, take
 # screenshots or feed keys: see docs/DOS.md for those.
 set -euo pipefail
 . "$(dirname "$0")/lib.sh"
-out="$PROJECT/analysis/dosbox"; time=60; window=0; inplace=0; flags=(); sets=(); after=(); prefix=""; tty=0; confs=()
+out="$PROJECT/analysis/dosbox"; time=60; window=0; inplace=0; flags=(); sets=(); after=(); prefix=""; tty=0; confs=(); mcp=0
 
 while [[ "${1:-}" == --* ]]; do
   case "$1" in
@@ -44,11 +46,7 @@ while [[ "${1:-}" == --* ]]; do
     --debug) flags+=(-break-start); window=1; tty=1; shift ;;
     --break) prefix="DEBUGBOX "; tty=1; shift ;;
     --mcp)
-      if ! dosbox_has_debug_channel; then
-        echo "--mcp needs DOSBox-X 2026.10 or later with the debugger (this one: $(dosbox_version)); see the re-setup skill" >&2
-        exit 2
-      fi
-      sets+=(-set "dosbox mcp_server=$2"); tty=1; shift 2 ;;
+      sets+=(-set "dosbox mcp_server=$2"); tty=1; mcp=1; shift 2 ;;
     --cycles) sets+=(-set "cpu cycles=fixed $2"); shift 2 ;;
     --set) sets+=(-set "$2"); shift 2 ;;
     --conf) confs+=(-conf "$(cd "$(dirname "$2")" && pwd)/$(basename "$2")"); shift 2 ;;
@@ -57,12 +55,17 @@ while [[ "${1:-}" == --* ]]; do
     *) echo "unknown option $1" >&2; exit 2 ;;
   esac
 done
-[[ $# -ge 2 ]] || { sed -n '2,31p' "$0"; exit 2; }
+[[ $# -ge 2 ]] || { sed -n '2,33p' "$0"; exit 2; }
 dbx="$(dosbox_binary || true)"
 [[ -n "$dbx" && -x "$dbx" ]] || {
   echo "DOSBox-X not found or not executable: install it or set DOSBOX_X_BINARY in .env" >&2
   exit 1
 }
+dosbox_check_idle
+if [[ $mcp == 1 ]] && ! dosbox_has_debug_channel; then
+  echo "--mcp needs DOSBox-X 2026.10 or later with the debugger (this one: $(dosbox_version)); see the re-setup skill" >&2
+  exit 2
+fi
 game="$(cd "$1" && pwd)"; shift
 mkdir -p "$out"; out="$(cd "$out" && pwd)"
 if [[ $inplace == 0 && "$out/" == "$game/"* ]]; then

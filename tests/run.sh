@@ -876,6 +876,9 @@ expect "fragments saves the open files with their positions" "5	1	sample.txt" ca
 rm -rf "$w"
 
 echo "DOSBox-X runtime"
+out="$("$PYTHON" tests/dosbox_launch.py 2>&1)"
+[[ $? == 0 ]] && ok "dosbox-run refuses a busy or unknown process state before probes and writes ($out)" \
+  || bad "DOSBox-X launch guard" "$out"
 log="$(mktemp)"
 cat > "$log" <<'LOG'
       10 DEBUG FILES:file open command 2 file C:\GAME\DATA.DAT
@@ -893,6 +896,13 @@ expect "fileio_trace groups a table of records" "0x000004: [2, 1] x 3 (stride 3)
 expect "fileio_trace follows seeks" "0x000064: 16" "$PYTHON" tools/dos/fileio_trace.py "$log" --file data.dat
 rm -f "$log"
 if command -v dosbox-x >/dev/null; then
+  idle_status=0
+  idle="$(dosbox_check_idle 2>&1)" || idle_status=$?
+  if [[ $idle_status == 75 ]]; then
+    echo "  skip  dosbox-run and dbx_control live checks ($idle)"
+  elif [[ $idle_status != 0 ]]; then
+    bad "DOSBox-X process check" "$idle"
+  else
   g="$(mktemp -d)"; mkdir "$g/game"; cp $D/sample-mz.exe "$g/game/SAMPLEMZ.EXE"   # output stays outside the game folder it copies
   expect "dosbox-run runs a DOS program and reads its exit code (= dos_emu's first draw)" "exit code 23" \
     scripts/dosbox-run.sh --out "$g/out" --time 20 "$g/game" SAMPLEMZ.EXE
@@ -914,6 +924,7 @@ print(f'AL={regs["STEP_AX"] & 0xFF} seed={seed:08x}')
 PY
   fi
   rm -rf "$g"
+  fi
 else
   echo "  skip  dosbox-run (dosbox-x is not installed: scripts/setup.sh --install)"
 fi

@@ -285,6 +285,15 @@ scripts/dosbox-run.sh --fileio --time 20 game GAME.EXE
 python3 tools/dos/fileio_trace.py analysis/dosbox/dosbox.log --game game
 ```
 
+Before launching, the script checks visible process names for `dosbox-x` and the basename of
+`DOSBOX_X_BINARY`, ignoring letter case. If either is running, it lists the PIDs and exits with
+status 75 before checking the emulator's version or changing any files. It leaves the existing
+instance running. Close that instance yourself before retrying.
+
+This checks the current process list. Two launches started at the same time can both pass.
+`tests/run.sh` skips the live runtime and debugger checks when an instance is running. Separate
+tests check that the launcher refuses to start another instance.
+
 - The game runs on a fresh copy of its folder (`analysis/dosbox/drive`), so saves and settings
   it writes never change your copy. `--in-place` mounts the folder itself.
 - `--fileio` logs every open, read, seek and write. `fileio_trace.py` turns that into a map per

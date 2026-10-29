@@ -165,9 +165,14 @@ def main():
         game.mkdir()
         (game / 'SAMPLE.EXE').write_bytes(b'sample')
         call_log = project / 'dosbox-call.txt'
+        # This is a fake-emulator launch; isolate its process list from the user's real session.
+        process_bin = project / 'process-bin'
+        process_bin.mkdir()
+        executable(process_bin / 'ps', '#!/bin/sh\nprintf "1 /sbin/init\\n"\n')
         runner = subprocess.run(['bash', 'scripts/dosbox-run.sh', '--out', str(project / 'out'),
                                  '--time', '1', str(game), 'SAMPLE.EXE'], cwd=ROOT,
                                 env={**os.environ, 'GAMEFRAME_PROJECT': str(project),
+                                     'PATH': str(process_bin) + os.pathsep + os.environ['PATH'],
                                      'FAKE_DOSBOX_LOG': str(call_log)},
                                 capture_output=True, text=True)
         assert runner.returncode == 0 and 'exit code 0' in runner.stdout, runner.stderr

@@ -54,6 +54,53 @@ dosbox_binary() {
   fi
 }
 
+# Refuse a second DOSBox-X before probing or launching it. Match executable names, not
+# command arguments: a debugger server or a shell mentioning DOSBox-X is not an instance.
+# Exit 75 means busy; exit 2 means process discovery failed.
+dosbox_check_idle() {
+  local binary processes matches pids on_linux=0 match pid target resolved selected
+  binary="$(dosbox_binary || true)"
+  processes="$(ps -A -o pid= -o comm=)" || {
+    echo 'Cannot check for a running DOSBox-X process; refusing to start it.' >&2
+    return 2
+  }
+  [[ $(uname -s) == Linux ]] && on_linux=1
+  matches="$(printf '%s\n' "$processes" | awk -v selected="${binary##*/}" -v on_linux="$on_linux" '
+    BEGIN { selected = tolower(selected) }
+    {
+      pid = $1
+      sub(/^[[:space:]]*[0-9]+[[:space:]]+/, "")
+      sub(/^.*\//, "")
+      sub(/[[:space:]]+$/, "")
+      name = tolower($0)
+      if (name == "dosbox-x" || (selected != "" && name == selected)) print pid
+      else if (on_linux && length(selected) > 15 && name == substr(selected, 1, 15))
+        print pid ":truncated"
+    }
+  ')" || return 2
+  pids=""
+  selected="$(printf '%s' "${binary##*/}" | tr '[:upper:]' '[:lower:]')"
+  for match in $matches; do
+    pid="${match%:truncated}"
+    if [[ "$match" == *:truncated ]]; then
+      # Linux comm holds only 15 characters. Confirm the executable instead of treating
+      # an unrelated program with the same prefix as DOSBox-X.
+      target="$(readlink "/proc/$pid/exe")" || {
+        echo "Cannot identify process $pid while checking DOSBox-X; refusing to start it." >&2
+        return 2
+      }
+      target="${target% (deleted)}"
+      resolved="$target"
+      target="$(printf '%s' "${target##*/}" | tr '[:upper:]' '[:lower:]')"
+      [[ "$target" == dosbox-x || "$target" == "$selected" || "$binary" -ef "$resolved" ]] || continue
+    fi
+    pids="${pids:+$pids, }$pid"
+  done
+  [[ -z "$pids" ]] && return 0
+  echo "DOSBox-X is already running (PID(s): $pids). Close it before starting another instance. It has been left running." >&2
+  return 75
+}
+
 # DOSBox-X's version as YYYY.MM.DD, or nothing when it is not installed.
 dosbox_version() {
   local binary; binary="$(dosbox_binary)" || return 0

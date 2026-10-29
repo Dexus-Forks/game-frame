@@ -220,6 +220,11 @@ Every release of GameFrame, newest first. The format follows
 
 ### Fixed
 
+- `dosbox-run.sh` refuses to start another DOSBox-X instance while one is running. It lists
+  the PIDs and exits with status 75 before probing the version or changing files. The existing
+  instance stays running. Tests cover the refusal and skip the live runtime and debugger
+  checks when DOSBox-X is already in use.
+
 - `docs/DOS.md` and `dos_emu`'s help said `dos_emu` does not run x87 code. It runs real x87
   instructions, as a Windows NE program holds them with their OS fixups; only the emulator
   interrupts `INT 34h`-`3Dh` do not run. Both now say that `dos_emu` leaves the control word
