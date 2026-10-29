@@ -22,25 +22,33 @@ show the reason. In every other case the gate exits 0 and changes nothing.
 
 | Check | It blocks |
 |---|---|
-| Commit | Staged files in `target/`, `analysis/`, `derived/`, `game-data/` or `save-game/`. Staged game binaries and data files (`.exe`, `.dll`, `.ovl`, `.pkg`, `.sav`, `.wad`, `.pak`, ROM images and others). Added lines that look like Ghidra's decompiled code. A commit made by a GameFrame agent other than `re-lander`. |
+| Commit | Staged files in `game/`, `media/`, `saves/`, `analysis/`, `derived/`, `target/`, `game-data/` or `save-game/`, or those links themselves. Staged game binaries and data files (`.exe`, `.dll`, `.ovl`, `.pkg`, `.sav`, `.wad`, `.pak`, ROM images and others). Added lines that look like Ghidra's decompiled code. A commit made by a GameFrame agent other than `re-lander`. A commit while `.claude-plugin/plugin.json` still names a release that has its `vX.Y.Z` tag: `python3 scripts/release.py next` opens the next `-dev` version first. |
 | Push | A push made by a GameFrame agent other than `re-lander`. |
-| Write | Writing two or more lines of decompiled code into a file outside `analysis/`, `derived/` and `target/`. |
-| Delete | A shell command that would delete or move a project's game folder, `target/`: `rm`, `trash`, `mv` of it or into the Trash, `find -delete`, `git clean -x`, `cargo clean` into `target/`, build-folder cleaners (`kondo`, `cargo sweep`, `npkill`) and scripts that call `rmtree` or `send2trash` on it. A command that starts with `GAMEFRAME_DELETE_GAME=1` passes. |
+| Write | Writing two or more lines of decompiled code into a file outside `analysis/`, `derived/` and `game/`. |
+| Delete | A shell command that would delete or move a game's files: a project's `game/` (or the older `target/`), or `games/ID/game/` and `games/ID/media/` in the GameFrame home. It catches `rm`, `trash`, `mv` of it or into the Trash, `find -delete`, `git clean -x`, `cargo clean` into `target/`, build-folder cleaners (`kondo`, `cargo sweep`, `npkill`) and scripts that call `rmtree` or `send2trash` on it. A command that starts with `GAMEFRAME_DELETE_GAME=1` passes. |
 
 ### The game folder
 
-A project's `target/` holds the user's own copy of the game: disc images, the installed files
-and saves. Git ignores it, so no commit keeps a copy. Cargo's build output has the same default
-name, and a project with a Rust port has a `Cargo.toml` beside it, so cleaners and agents take
-it for build output. The project's `.cargo/config.toml` sends Cargo to `build/` instead.
+A project's `game/` holds the user's own copy of the game, and `media/` the discs and
+installers it came from. Both are links into the GameFrame home (`~/gameframe/games/ID/`), so
+they sit outside every repository, and git ignores the links. No commit keeps a copy. Older
+projects keep the game in `target/` inside the project. Cargo's build output has the same
+default name, and a project with a Rust port has a `Cargo.toml` beside it, so cleaners and
+agents take it for build output. The project's `.cargo/config.toml` sends Cargo to `build/`.
 
-`scripts/hooks/gates/game_folder.py` decides which folders are game folders. A folder named
-`target` is one when it holds `GAME-FILES-NOT-BUILD-OUTPUT.txt`, when the folder above sets
-another `target-dir` in `.cargo/config.toml`, or when the folder above names GameFrame in its
-`AGENTS.md`. The delete gate (`scripts/hooks/gates/deletes.py`) blocks a command that would
-remove one, or a folder that holds one. Renaming a project folder passes. When the user wants
-the game folder gone, the command starts with `GAMEFRAME_DELETE_GAME=1`, or the user runs it
-themselves. `./gameframe doctor` reports a missing or empty game folder. See
+`scripts/hooks/gates/game_folder.py` decides which folders are game folders:
+
+- `game/` or `media/` in the home, beside a `game.json`;
+- a project's `game/` or `target/` that holds `GAME-FILES-NOT-BUILD-OUTPUT.txt`;
+- a project's `game/` or `target/` whose project names GameFrame in its `AGENTS.md`;
+- a `target/` whose project sets another `target-dir` in `.cargo/config.toml`.
+
+The delete gate (`scripts/hooks/gates/deletes.py`) blocks a command that would remove one, or
+a folder that holds one, such as the whole home. Removing a project's link (`rm game`, with no
+slash) passes, since the files stay in the home. Renaming a project folder passes. When the
+user wants the game folder gone, the command starts with `GAMEFRAME_DELETE_GAME=1`, or the
+user runs it themselves. `./gameframe doctor` reports a missing or empty game folder, and
+`./gameframe home doctor` a broken link. See
 [the know-how entry](../knowhow/game-folder-deleted-as-build-output.md) for what happened.
 
 ### What counts as decompiled code

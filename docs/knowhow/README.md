@@ -30,9 +30,7 @@ An entry has one of five statuses.
 
 | Entry | Status |
 |---|---|
-| [A game's sound effects play at volume 0 under Wine, because it reads its volume from the mixer](wine-mixer-wave-volume-zero.md) | solved |
 | [A port's floating-point result differs in the last bit from the original's x87 code](x87-f64-last-bit.md) | solved |
-| [A stand-in sound-card library starts the game, but the game turns its own sound off](sound-card-library-empty-answer-silences.md) | solved |
 | ["S3DTK Error : SetState" from a stand-in S3D Toolkit](s3dtk-error-setstate.md) | solved |
 | [16-bit Windows (Windows 3.x) programs: what to know before the first run](context-windows-3x.md) | context |
 | [8-bit textures with no palette in the file: infer it from the 16-bit copy of the same pictures](context-palette-from-16bit-twin.md) | context |
@@ -54,6 +52,7 @@ An entry has one of five statuses.
 | [A function has no callers, or no function exists, because Ghidra missed code reached through pointers](decompile-missed-pointer-functions.md) | solved |
 | [A game suspends its own thread with SuspendThread under Wine on macOS](wine-macos-suspendthread.md) | workaround |
 | [A game that loads its own x87 control word, such as 0x0c7f (single precision, truncation)](context-x87-control-word.md) | context |
+| [A game's sound effects play at volume 0 under Wine, because it reads its volume from the mixer](wine-mixer-wave-volume-zero.md) | solved |
 | [A GameFrame tool fails with "No module named unicorn", pefile or capstone](tool-without-venv.md) | solved |
 | [A helper script named like a standard module breaks imports, as dis.py broke capstone](python-script-shadows-stdlib.md) | solved |
 | [A level drawn from inside shows walls in front of the road](painter-order-big-faces.md) | solved |
@@ -81,12 +80,15 @@ An entry has one of five statuses.
 | [A scripted key tap the game never saw](capture-key-tap-missed.md) | workaround |
 | [A session in a git worktree finds no game, no Ghidra export and no Python environment](worktree-ignored-folders-missing.md) | solved |
 | [A software mixer packs both stereo gains into one double](x87-one-multiply-two-channels.md) | context |
+| [A stand-in sound-card library starts the game, but the game turns its own sound off](sound-card-library-empty-answer-silences.md) | solved |
 | [A story's "scene data" can live in its actors' AI plans](scene-data-in-plans.md) | context |
 | [A table the game builds at start-up comes out wrong under the emulator](unicorn-fpu-starts-single-precision.md) | solved |
 | [A third of HARDWARW.EXE was not in any Ghidra function](ghidra-function-recovery.md) | context |
 | [A tools/llm run is refused, though the key works and the credits are there](api-credits-refused.md) | solved |
 | [A value that comes from a register nobody set there: read the disassembly](registers-left-by-callees.md) | context |
 | [A wait loop with `pgrep -f` never ends after the process has finished](pgrep-wait-matches-itself.md) | solved |
+| [A Windows ISO times out at "Press any key to boot from CD" in VMware Fusion](fusion-boot-prompt-keys.md) | workaround |
+| [A wrapper DLL draws nothing under Wine on macOS, and its log says "version '130' is not supported"](wine-macos-opengl-2-1.md) | solved |
 | [Almost every function differs between two builds, though the game behaves the same](rebuilt-build-every-function-differs.md) | solved |
 | [An editor's save changes bytes nobody edited (fixed point through floats)](editor-float-view-changes-bytes.md) | solved |
 | [An emulated function calls a Windows import that has no handler](emu-import-no-handler.md) | solved |
@@ -96,7 +98,9 @@ An entry has one of five statuses.
 | [Before moving geometry: find the bounds and normals stored with it](context-geometry-derived-data.md) | context |
 | [CD-era games often look in their install folder before the CD: a mod can be a file, with no patch](context-mods-install-folder-first.md) | context |
 | [CD-ROM data, disc checks and audio](cd-rom.md) | context |
+| [Choosing a Windows machine for a game on an Apple-silicon Mac](context-windows-machines-apple-silicon.md) | context |
 | [Clicks and keys from the agent do not reach a Wine window on macOS](wine-input-without-accessibility.md) | workaround |
+| [Debugging a game under Wine or CrossOver through winedbg's GDB server: what works on Apple silicon](winedbg-gdb-server.md) | workaround |
 | [Delphi programs: forms, class tables and event handlers](delphi.md) | context |
 | [DirectInput ignores keys, because a window that is not foreground cannot acquire the device](directinput-not-foreground.md) | workaround |
 | [Display modes, surfaces and palettes](display.md) | context |
@@ -129,6 +133,7 @@ An entry has one of five statuses.
 | [Porting more of the original made a replay agree less with the recording](replay-stand-in-for-unported-logic.md) | solved |
 | [Porting routines that build records in their stack frame: keep the frame as an array](frames-as-arrays.md) | context |
 | [ptrace breakpoints in a Wine game leave every thread stopped](ptrace-breakpoints-wine.md) | solved |
+| [REA through Ghidra: what a session costs, what a snapshot keeps and how labels interact](context-rea-sessions-and-snapshots.md) | context |
 | [Record a whole run of the original from its memory as the reference for a port](record-a-run-from-memory.md) | context |
 | [Record a Windows game's sound in a VM that has no sound card](record-sound-without-a-sound-card.md) | context |
 | [Run the original's per-object step under the emulator on states from the running game](emulate-step-from-step-log.md) | context |
@@ -139,8 +144,8 @@ An entry has one of five statuses.
 | [S3 ViRGE builds draw 15-bit pixels: their 16-bit surfaces are 5-5-5](s3-virge-15-bit-surfaces.md) | solved |
 | [Scripted menu clicks land one time in three in a game with its own cursor](directinput-cursor-click-timing.md) | workaround |
 | [Set the game's x87 control word before each emulated run](x87-control-word-per-run.md) | context |
-| [SSH to a VM fails with "Too many authentication failures"](ssh-too-many-auth-failures.md) | solved |
 | [Sound cards and audio paths in games](sound-card.md) | context |
+| [SSH to a VM fails with "Too many authentication failures"](ssh-too-many-auth-failures.md) | solved |
 | [Start a recorder when the next race begins instead of driving the menus](wait-for-the-next-race.md) | context |
 | [The front end and the docked screens run at 640 x 400](docked-screens-640x400.md) | context |
 | [The game asks for its CD under Wine on Linux, though the disc's folder is mapped with the right label](wine-linux-cd-drive.md) | solved |
@@ -159,7 +164,9 @@ An entry has one of five statuses.
 | [Verifying a decision routine by replaying its calls](replaying-calls.md) | context |
 | [Verifying a system that calls into another, on a snapshot of the running game](snapshot-callback-oracle.md) | context |
 | [Watcom C/C++ programs: calling convention, runtime and linker quirks](context-watcom.md) | context |
+| [Windows 11 Arm Setup stops on the Windows logo in a VMware Fusion VM made with vmcli](fusion-windows-arm-setup-hangs.md) | open |
 | [Windows 95 and DirectDraw games: what to know before the first run](context-windows-9x-directdraw.md) | context |
+| [Windows Setup in QEMU says "The computer restarted unexpectedly" and will not continue](qemu-windows-setup-restarted.md) | solved |
 | [Wine on macOS with Apple silicon: what to know before running a game there](context-wine-macos.md) | context |
 | [Wine shows each palette index in a colour of its own](wine-palette-colours.md) | context |
 | [Writing a Glide 2 replacement for an early Glide game](context-glide2-wrapper.md) | context |
@@ -182,6 +189,7 @@ a log names the value. `advise` matches an alias as a whole word or phrase.
 - `early-1990s`: DOS with VGA, real mode and the first DOS extenders. Also: early 90s.
 - `late-1990s`: Windows 95 and 98, DirectX 1 to 7, the first 3D cards. Also: late 90s, 1997, 1998, 1999.
 - `2000s`: Windows XP, DirectX 8 and 9, programmable shaders. Also: windows xp era.
+- `2010s`: Windows 7 to 10, DirectX 9 to 11, 64-bit builds. Also: windows 7 era, windows 10 era.
 
 ### platform
 

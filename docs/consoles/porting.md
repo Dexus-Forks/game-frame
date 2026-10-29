@@ -13,6 +13,13 @@ start and write it in the project's `AGENTS.md`.
 | Matching decompilation, then a port | Write C that compiles to the identical original binary, then build it for a new system | the SM64 and Ocarina of Time decompilations and their PC ports | Very high | Contested: the C is derived from the original program ([Legal](../LEGAL.md)) |
 | Reimplementation | Write new code from documented behaviour, checked against the original | most projects in GameFrame's case studies | High | The new code; the player brings the game's data |
 
+An emulator can run in the browser too. TabStationToo compiles PCSX2, a PlayStation 2
+emulator, to WebAssembly with its own JITs and a WebGPU renderer
+([design notes](https://github.com/TabStationToo/TabStationToo/tree/HEAD/docs/web-port)).
+The emulator's licence covers the whole program it is linked into. PCSX2 is GPL-3.0, so
+TabStationToo is GPL-3.0 as well. GameFrame's code is Apache 2.0. It may be linked into a
+GPL-3.0 program, but GPL code cannot come into GameFrame or into an Apache-licensed port.
+
 GameFrame is designed for reimplementation. The other routes share most of its steps
 (finding functions, capturing ground truth, replacing hardware). GameFrame's toolkit helps
 with them too.

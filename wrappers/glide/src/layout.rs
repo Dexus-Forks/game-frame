@@ -11,7 +11,7 @@
 //! level 256, level 128, level 64, and levels 32 down to 1 (`GR_TEXBASE_*`). Within a range
 //! the levels follow each other from the range's first level.
 
-use gpu_1997::glide::{Format, size};
+use voodoo::formats::{Format, size};
 
 /// TMU bytes of one level: at least 2 × 2 texels.
 pub fn level_bytes(lod: u32, aspect: u32, format: Format) -> Option<usize> {

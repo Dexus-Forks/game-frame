@@ -37,12 +37,14 @@ fn with<R>(f: impl FnOnce(&mut Mp) -> R) -> R {
 
 #[unsafe(no_mangle)]
 pub extern "system" fn guMPInit() {
+    shim::call!("guMPInit");
     with(|m| *m = Mp { ids: [-1, -1], func: ADD });
 }
 
 /// Texture `id` (from `guTexAllocateMemory`) for pass 0 or pass 1.
 #[unsafe(no_mangle)]
 pub extern "system" fn guMPTexSource(pass: u32, id: i32) {
+    shim::call!("guMPTexSource", pass, id);
     // The original stores without a check; only 0 and 1 are read.
     if pass < 2 {
         with(|m| m.ids[pass as usize] = id);
@@ -51,6 +53,7 @@ pub extern "system" fn guMPTexSource(pass: u32, id: i32) {
 
 #[unsafe(no_mangle)]
 pub extern "system" fn guMPTexCombineFunction(f: u32) {
+    shim::call!("guMPTexCombineFunction", f);
     with(|m| m.func = f);
 }
 
@@ -110,6 +113,7 @@ fn check(s: &Shadow) {
 /// so. Here the game's texture combine function is put back with the rest.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn guMPDrawTriangle(a: *const Vertex, b: *const Vertex, c: *const Vertex) {
+    shim::call!("guMPDrawTriangle", crate::callargs::V(a), crate::callargs::V(b), crate::callargs::V(c));
     let (ids, func) = with(|m| (m.ids, m.func));
     let s = shadow::get();
     check(&s);

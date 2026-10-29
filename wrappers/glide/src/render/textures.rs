@@ -1,5 +1,5 @@
 //! Texture memory and the OpenGL textures made from it. Downloads land in a copy of the TMU's
-//! memory at the game's addresses; a texture is decoded (with `gpu-1997`) the first time it is
+//! memory at the game's addresses; a texture is decoded (with `gameframe-voodoo`) the first time it is
 //! drawn after its bytes, the palette or its NCC table change. Every level from the largest to
 //! the smallest is decoded, from the addresses `layout` gives, so mipmapping can use them.
 
@@ -7,9 +7,9 @@ use crate::cmd::Source;
 use crate::gl::*;
 use crate::layout;
 use crate::log::log_once;
-use gpu_1997::glide::{Format, size};
-use gpu_1997::ncc::NccTable;
-use gpu_1997::texel::{Tables, decode};
+use voodoo::formats::{Format, size};
+use voodoo::ncc::NccTable;
+use texel::{Tables, decode};
 use std::collections::HashMap;
 
 /// More than any Voodoo had (2 or 4 MB per TMU): the game lays memory out itself.
@@ -100,7 +100,7 @@ impl Textures {
         });
         unsafe { (gl.BindTexture)(TEXTURE_2D, t.id) };
         if t.stale {
-            let tables = Tables { palette: Some(&self.palette), ncc: self.ncc[src.ncc as usize & 1].as_ref() };
+            let tables = Tables { palette: Some(&self.palette), ncc: self.ncc[src.ncc as usize & 1].as_ref().map(|t| t as &dyn texel::Yiq) };
             unsafe {
                 (gl.PixelStorei)(UNPACK_ALIGNMENT, 1);
                 (gl.TexParameteri)(TEXTURE_2D, TEXTURE_BASE_LEVEL, 0);

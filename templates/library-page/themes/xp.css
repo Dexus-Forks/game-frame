@@ -1,0 +1,64 @@
+/* Windows XP (Luna): a blue title bar with round top corners, beige faces, round buttons
+   with an orange glow, green progress blocks and a sky-to-grass desktop.
+   A ready-made theme for the library page and the frame: "preset": "xp" in library.json. */
+
+#library[data-scheme] {
+  --lib-bg: radial-gradient(ellipse 150% 55% at 35% 105%, #58a632 0 58%, #7bc04a 64%, transparent 65%),
+    linear-gradient(#1f5fcf, #6da4ec 55%, #b9d7f5 75%); --lib-surface: #ece9d8; --lib-surface-2: #fff;
+  --lib-line: #aca899; --lib-text: #000; --lib-muted: #444; --lib-accent: #316ac5; --lib-accent-text: #fff;
+  --lib-danger: #c00; --lib-ok: #2f8a1f; --lib-scrim: transparent;
+  --lib-font: Tahoma, "Segoe UI", Geneva, sans-serif; --lib-font-mono: "Lucida Console", monospace;
+  --lib-text-s: 11px; --lib-text-m: 11px; --lib-text-l: 12px; --lib-text-xl: 13px; --lib-text-title: 13px;
+  --lib-weight-strong: 700; --lib-radius-s: 3px; --lib-radius-m: 3px; --lib-radius-l: 8px; --lib-radius-pill: 3px;
+  --lib-shadow: 2px 3px 8px rgb(0 0 0 / 0.45); --lib-blur: 0; --lib-width: 580px;
+  color-scheme: light;
+}
+#library[data-scheme] { background: var(--lib-bg); }
+
+/* The window: a thick blue frame and a glossy title bar. */
+#library .lib-card { padding: 0 3px 3px; border: 1px solid #0831d9; border-radius: 8px 8px 0 0;
+  background: linear-gradient(#0058ee, #0058ee) border-box; box-shadow: var(--lib-shadow); }
+#library .lib-card > :not(.lib-header) { background: #ece9d8; margin: 0; padding-left: 10px; padding-right: 10px; }
+#library .lib-card > :last-child { padding-bottom: 10px; }
+#library .lib-header { display: flex; align-items: center; gap: 8px; margin: 0; padding: 6px 6px 7px; text-align: left;
+  color: #fff; border-radius: 7px 7px 0 0; text-shadow: 1px 1px #0f1089;
+  background: linear-gradient(#0997ff, #0053ee 8%, #0050ee 40%, #06f 88%, #06f 93%, #005bff 95%, #003dd7 96%, #003dd7); }
+#library .lib-title { font: bold 13px Trebuchet MS, Tahoma, sans-serif; }
+#library .lib-tagline { margin: 0; color: #d8e4f8; font-size: 11px; text-shadow: none; }
+
+/* Tabs: white with an orange line on the chosen one. */
+#library .lib-nav, #library .lib-tabs { justify-content: flex-start; gap: 1px; margin: 0; padding-top: 8px; border: 0; }
+#library .lib-nav a, #library .lib-tabs button { padding: 3px 9px; border: 1px solid #919b9c; border-bottom: 0; border-radius: 3px 3px 0 0;
+  background: linear-gradient(#fff, #ecebe5); color: #000; text-decoration: none; }
+#library .lib-nav a[aria-current=page], #library .lib-tabs button[aria-selected=true] { background: #fcfcfe;
+  box-shadow: inset 0 2px #e68b2c, inset 0 3px #ffc73c; color: #000; }
+#library .lib-nav a:hover { box-shadow: inset 0 2px #e68b2c; background: #fff; color: #000; }
+#library .lib-section { padding-top: 12px; padding-bottom: 12px; border-top: 1px solid #919b9c; }
+#library .lib-card > .lib-section { background: #fcfcfe; }
+
+/* Buttons. */
+#library .lib-button, #library .lib-pad-key { min-height: 23px; padding: 3px 12px; border: 1px solid #003c74; border-radius: 3px;
+  background: linear-gradient(#fff, #ecebe6 86%, #d6d0c5); color: #000; font: 11px var(--lib-font); }
+#library .lib-button:hover:not(:disabled), #library .lib-pad-key:hover { box-shadow: inset 0 0 0 2px #f8b636, inset 0 -2px #e5a01a; background: linear-gradient(#fff, #ecebe6 86%, #d6d0c5); }
+#library .lib-button:active:not(:disabled), #library .lib-pad-key:active { background: linear-gradient(#e5e4de, #e3e2da 10%, #f2f1ee); box-shadow: none; }
+#library .lib-button--primary { box-shadow: inset 0 0 0 2px #98b8ea; }
+#library .lib-button:disabled { color: #aca899; border-color: #c9c7ba; background: #f5f4ea; }
+
+/* Fields and lists. */
+#library .lib-input { border: 1px solid #7f9db9; border-radius: 0; padding: 3px; background: #fff; color: #000; font: 11px var(--lib-font); }
+#library .lib-log, #library .lib-rows .lib-row { border-radius: 0; border-color: #7f9db9; background: #fff; }
+#library .lib-notice { border: 1px solid #000; border-radius: 6px; background: #ffffe1; }
+#library .lib-notice .lib-icon { color: #c08000; }
+#library .lib-renderer { border: 1px solid #aca899; border-radius: 3px; background: #fff; }
+#library .lib-renderer[aria-checked=true] { border-color: #316ac5; box-shadow: inset 0 0 0 1px #316ac5; background: #f0f4fc; }
+#library .lib-grade { border-radius: 2px; }
+
+/* Green blocks in a rounded well. */
+#library .lib-meter { height: 13px; padding: 1px; border: 1px solid #686868; border-radius: 3px; background: #fff; }
+#library .lib-meter-fill { height: 100%; border-radius: 0;
+  background: repeating-linear-gradient(90deg, transparent 0 1px, #2fc12b 1px 7px, transparent 7px 9px),
+              linear-gradient(#fff, transparent); background-blend-mode: normal; }
+#library .lib-steps li::before { background: #316ac5; }
+#library .lib-check input, #library .lib-row input[type=checkbox] { accent-color: #21a121; }
+#library a { color: #0033cc; }
+#library .lib-fine { color: #444; }

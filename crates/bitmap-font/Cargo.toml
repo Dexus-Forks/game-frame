@@ -1,0 +1,12 @@
+[package]
+name = "gameframe-bitmap-font"
+description = "An old game's bitmap font as a TrueType font, built in memory, so a launcher, a page or a tool can draw text in the game's own letters (CSS @font-face with a data URL)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["font", "truetype", "bitmap-font", "retro", "reverse-engineering"]
+categories = ["encoding", "graphics"]
+
+[dependencies]

@@ -15,7 +15,7 @@ many times, with inputs you choose, without starting the game.
 ```python
 import sys; sys.path.insert(0, 'tools/emu')
 from pe_emu import Emu, F32
-emu = Emu('target/Game.exe', ['target/Engine.dll'])  # loads, relocates, links imports by name
+emu = Emu('game/Game.exe', ['game/Engine.dll'])  # loads, relocates, links imports by name
 ```
 
 - Every module loads at its preferred base (relocated if two overlap). Imports between loaded
@@ -104,10 +104,10 @@ emu = Emu('target/Game.exe', ['target/Engine.dll'])  # loads, relocates, links i
 ```python
 import sys; sys.path.insert(0, 'tools/emu')
 from dos_emu import DosEmu, Long, FarPtr
-emu = DosEmu('target/GAME.EXE')                  # NE: 16-bit protected mode; MZ: real mode
+emu = DosEmu('game/GAME.EXE')                  # NE: 16-bit protected mode; MZ: real mode
 emu.call('1000:873a', 5, Long(100000))            # Ghidra's address or an export name; AX
 emu.call_long('RANDOM_LONG', 1000)                # DX:AX as one 32-bit value
-p = emu.bytes_in(open('target/LEVEL.DAT', 'rb').read(512)); emu.call('LOADLEVEL', p, 512)
+p = emu.bytes_in(open('game/LEVEL.DAT', 'rb').read(512)); emu.call('LOADLEVEL', p, 512)
 emu.u16(FarPtr(0x1048, 0x12de))                   # read a global afterwards
 emu.trace({'1040:0a12': 'Random'}, args=1); emu.write_trace('derived/rng.trace')
 ```

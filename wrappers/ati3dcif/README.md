@@ -4,13 +4,13 @@
 exports all 17 calls of ATI's 3D Rage Pro SDK 4.1. The other 11 are stubs. Each logs its call
 and returns `C3D_EC_NOTIMPYET` (`api.tsv`, [wrappers](../README.md)). The library draws what
 the game gives the chip in software into the game's DirectDraw back buffer, 16-bit RGB565,
-with the `raster` crate. That covers triangles and quads with solid, flat or Gouraud colour,
-blended by source alpha. Vertices are `C3D_VTCF`. In a POD race these faces are the cars'
+with GameFrame's model of the chip, `gameframe-rage` (`crates/rage`). That covers triangles
+and quads with solid, flat or Gouraud colour, blended by source alpha. Vertices are `C3D_VTCF`. In a POD race these faces are the cars'
 shadows. How POD uses each call is in POD's `docs/hardware/3d-cards.md`.
 
 Not handled (POD does not use them): textures, lines, rectangles, points, Z buffering, fog.
 A game that sets those states gets a log line for each. *Unknown*: whether the Rage rounded
-pixel edges exactly as `raster` does.
+pixel edges exactly as `gameframe-raster` does.
 
 Use it with `ddraw.dll` (`../README.md`), which gives the game its surfaces. Log:
 `ATI3DCIF_LOG`. Build: `../README.md`. Licence: Apache-2.0 (code), CC0-1.0 (this text).

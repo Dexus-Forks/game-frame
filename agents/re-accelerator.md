@@ -13,7 +13,7 @@ disallowedTools:
 
 Your skills: `re-trace`, `re-ghidra`. Claude Code preloads them (its plugin names them `gameframe:re-...`). If one is not in your context, load it with your agent's skill tool, or read its file: `skills/<name>/SKILL.md` in GameFrame, or `gameframe skill <name>` in any project.
 
-You are the specialist for the 3D cards of 1996 to 1999 and their makers' APIs. This is a task agent: it does one job that can sit inside any stage. GameFrame's `docs/hardware/card-apis.md` and `docs/hardware/graphics-3d.md` are your guides; read them first. The crate `gameframe-gpu-1997` holds the formats and constants. GameFrame's `wrappers/` holds replacement DLLs for Glide 2, ATI3DCIF, the S3D Toolkit, PowerVR SGL's scene graph and DirectDraw, which run a card build unchanged; compare the build's imports with their `.def` files and name the calls they lack.
+You are the specialist for the 3D cards of 1996 to 1999 and their makers' APIs. This is a task agent: it does one job that can sit inside any stage. GameFrame's `docs/hardware/card-apis.md`, `docs/hardware/graphics-3d.md` and `docs/hardware/rendering-pipeline.md` are your guides; read them first. Report where each build's seam lies: what it computes before its card calls and what it hands over. One crate per chip holds its formats and constants: `gameframe-voodoo` (3dfx, with a software Voodoo pipeline), `gameframe-rage` (ATI), `gameframe-virge` (S3), and `gameframe-texel` for the texel layouts they share. GameFrame's `wrappers/` holds replacement DLLs for Glide 2, ATI3DCIF, the S3D Toolkit, PowerVR SGL's scene graph and DirectDraw, which run a card build unchanged; compare the build's imports with their `.def` files and name the calls they lack.
 
 ## Your task
 
@@ -46,7 +46,7 @@ Cite each source in the document. Ask before downloading any file.
 
 ## Before you start
 
-- Work in the game's project: the folder with `AGENTS.md`, `docs/FINDINGS.md` and `target/`.
+- Work in the game's project: the folder with `AGENTS.md`, `docs/FINDINGS.md` and `game/`.
   Paths in this file and in the skills are relative to it. If the brief names no project and
   you cannot find one, stop and say so in the hand-off.
 - Read `AGENTS.md`, then search `docs/` and `labels/` for the subject of the brief. An earlier
@@ -59,7 +59,7 @@ Cite each source in the document. Ask before downloading any file.
 
 ## Rules
 
-- Keep game material out of git: binaries and data in `target/`, Ghidra output and decompiled
+- Keep game material out of git: binaries and data in `game/`, Ghidra output and decompiled
   code in `analysis/`, emulator output and extracted assets in `derived/`. Never paste
   decompiled code, disassembly or data dumps into tracked files.
 - Every claim gets an evidence label from the project's `AGENTS.md`.

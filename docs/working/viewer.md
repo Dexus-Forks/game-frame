@@ -37,9 +37,9 @@ The catalogue needs no code beyond the decoders written for `validate.py`, and t
 formats have theirs in `tools/decoders/` (`bmp.py`, `wav.py`, `midi.py`, `avi.py`):
 
 ```bash
-python3 tools/formats/catalog.py target/game derived/catalog \
+python3 tools/formats/catalog.py game derived/catalog \
     --decoder '*.dat=decoders/units.py' --decoder '*.pic=decoders/picture.py' \
-    --palette target/game/GAME.PAL
+    --palette game/GAME.PAL
 open derived/catalog/index.html
 ```
 
@@ -102,5 +102,6 @@ the person who checks it.
   with the original's (`re-verify`).
 - **A viewer can hide a short read.** Show whether every byte of a file was consumed, as
   `validate.py` does. A picture can look right while the decoder skips a field.
-- **The output holds game material.** Keep the catalogue, extracted pictures and screenshots in
-  ignored folders (`derived/`). Never commit them.
+- **The output holds game material.** Keep the catalogue and extracted pictures in ignored
+  folders (`derived/`). Never commit them. Screenshots are always fine: copy the ones a document
+  or the site uses out of `derived/`, compress them (WebP) and commit them.

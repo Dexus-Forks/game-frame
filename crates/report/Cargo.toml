@@ -1,0 +1,16 @@
+[package]
+name = "gameframe-report"
+description = "Reports from a running port: an unported path or a crash, with where it happened, the original's address, the game's context and how to start it again, written once per place and ready to open as a GitHub issue for an agent to debug"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["error-reporting", "github", "reverse-engineering", "games"]
+categories = ["development-tools::debugging"]
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# The clock in the browser too, where std's panics.
+web-time = "1"

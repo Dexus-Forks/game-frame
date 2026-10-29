@@ -10,6 +10,7 @@ use crate::consts::*;
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grColorCombine(func: u32, factor: u32, local: u32, other: u32, invert: u32) {
+    shim::call!("grColorCombine", func, factor, local, other, invert);
     shadow::set(|s| s.delta0 = 0);
     send(Cmd::ColorCombine([func, factor, local, other, invert]));
 }
@@ -18,6 +19,7 @@ pub extern "system" fn grColorCombine(func: u32, factor: u32, local: u32, other:
 /// for (the Glide 2.x reference manual's table).
 #[unsafe(no_mangle)]
 pub extern "system" fn guColorCombineFunction(f: u32) {
+    shim::call!("guColorCombineFunction", f);
     let (func, factor, local, other, invert) = match f {
         CC_ZERO => (FUNC_ZERO, FACTOR_ZERO, LOCAL_ITERATED, OTHER_ITERATED, 0),
         CC_CCRGB => (FUNC_LOCAL, FACTOR_ZERO, LOCAL_CONSTANT, OTHER_CONSTANT, 0),
@@ -53,6 +55,7 @@ pub extern "system" fn guColorCombineFunction(f: u32) {
 /// `grSstOpen`; `grAlphaCombine` itself is not imported.
 #[unsafe(no_mangle)]
 pub extern "system" fn guAlphaSource(mode: u32) {
+    shim::call!("guAlphaSource", mode);
     let c = match mode {
         ALPHASOURCE_CC_ALPHA => [FUNC_LOCAL, FACTOR_ZERO, LOCAL_CONSTANT, OTHER_CONSTANT, 0],
         ALPHASOURCE_ITERATED_ALPHA => [FUNC_LOCAL, FACTOR_ZERO, LOCAL_ITERATED, OTHER_CONSTANT, 0],
@@ -67,6 +70,7 @@ pub extern "system" fn guAlphaSource(mode: u32) {
 /// taken as the iterated alpha.
 #[unsafe(no_mangle)]
 pub extern "system" fn grAlphaCombine(func: u32, factor: u32, local: u32, other: u32, invert: u32) {
+    shim::call!("grAlphaCombine", func, factor, local, other, invert);
     if local == 2 {
         shim::gap!("grAlphaCombine local depth", "GR_COMBINE_LOCAL_DEPTH taken as iterated alpha");
     }
@@ -76,6 +80,7 @@ pub extern "system" fn grAlphaCombine(func: u32, factor: u32, local: u32, other:
 /// Only matters for `GR_COMBINE_LOCAL_ITERATED` alpha-controlled lighting; POD passes 0.
 #[unsafe(no_mangle)]
 pub extern "system" fn grAlphaControlsITRGBLighting(enable: u32) {
+    shim::call!("grAlphaControlsITRGBLighting", enable);
     if enable != 0 {
         shim::gap!("grAlphaControlsITRGBLighting", "TRUE is not handled");
     }
@@ -83,52 +88,62 @@ pub extern "system" fn grAlphaControlsITRGBLighting(enable: u32) {
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grConstantColorValue(c: u32) {
+    shim::call!("grConstantColorValue", c);
     send(Cmd::ConstantColor(argb(c)));
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grAlphaBlendFunction(rgb_sf: u32, rgb_df: u32, alpha_sf: u32, alpha_df: u32) {
+    shim::call!("grAlphaBlendFunction", rgb_sf, rgb_df, alpha_sf, alpha_df);
     send(Cmd::AlphaBlend([rgb_sf, rgb_df, alpha_sf, alpha_df]));
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grDepthBufferMode(mode: u32) {
+    shim::call!("grDepthBufferMode", mode);
     send(Cmd::DepthMode(mode));
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grDepthBufferFunction(f: u32) {
+    shim::call!("grDepthBufferFunction", f);
     send(Cmd::DepthFunc(f));
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grDepthMask(enable: u32) {
+    shim::call!("grDepthMask", enable);
     send(Cmd::DepthMask(enable != 0));
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grChromakeyMode(mode: u32) {
+    shim::call!("grChromakeyMode", mode);
     send(Cmd::ChromaMode(mode != 0));
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grChromakeyValue(c: u32) {
+    shim::call!("grChromakeyValue", c);
     send(Cmd::ChromaValue(argb(c)));
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grFogMode(mode: u32) {
+    shim::call!("grFogMode", mode);
     send(Cmd::FogMode(mode));
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grFogColorValue(c: u32) {
+    shim::call!("grFogColorValue", c);
     send(Cmd::FogColor(argb(c)));
 }
 
 /// `GR_FOG_TABLE_SIZE` (64) bytes.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grFogTable(table: *const u8) {
+    shim::call!("grFogTable", crate::callargs::Data(table, 64));
     if table.is_null() {
         return;
     }
@@ -140,30 +155,35 @@ pub unsafe extern "system" fn grFogTable(table: *const u8) {
 /// `GrCmpFnc_t`, the same numbers as the depth compare.
 #[unsafe(no_mangle)]
 pub extern "system" fn grAlphaTestFunction(f: u32) {
+    shim::call!("grAlphaTestFunction", f);
     let r = shadow::get().alpha_test[1];
     send(Cmd::AlphaTest([f & 7, r]));
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grAlphaTestReferenceValue(v: u32) {
+    shim::call!("grAlphaTestReferenceValue", v);
     let f = shadow::get().alpha_test[0];
     send(Cmd::AlphaTest([f, v & 0xff]));
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grColorMask(rgb: u32, alpha: u32) {
+    shim::call!("grColorMask", rgb, alpha);
     send(Cmd::ColorMask(rgb != 0, alpha != 0));
 }
 
 /// `GrCullMode_t`: tested by the drawing calls before a triangle is recorded.
 #[unsafe(no_mangle)]
 pub extern "system" fn grCullMode(mode: u32) {
+    shim::call!("grCullMode", mode);
     shadow::set(|s| s.cull = mode);
 }
 
 /// A signed 16-bit level added to each pixel's depth.
 #[unsafe(no_mangle)]
 pub extern "system" fn grDepthBiasLevel(level: i32) {
+    shim::call!("grDepthBiasLevel", level);
     send(Cmd::DepthBias(level as i16 as i32));
 }
 
@@ -171,6 +191,7 @@ pub extern "system" fn grDepthBiasLevel(level: i32) {
 /// Voodoo's 16-bit one that dithering hid the banding of.
 #[unsafe(no_mangle)]
 pub extern "system" fn grDitherMode(mode: u32) {
+    shim::call!("grDitherMode", mode);
     shadow::set(|s| s.dither = mode);
 }
 
@@ -178,6 +199,7 @@ pub extern "system" fn grDitherMode(mode: u32) {
 /// draws with in place of the iterated one.
 #[unsafe(no_mangle)]
 pub extern "system" fn grConstantColorValue4(a: f32, r: f32, g: f32, b: f32) {
+    shim::call!("grConstantColorValue4", a, r, g, b);
     shadow::set(|s| s.color4 = [a, r, g, b]);
 }
 
@@ -185,6 +207,7 @@ pub extern "system" fn grConstantColorValue4(a: f32, r: f32, g: f32, b: f32) {
 /// manual).
 #[unsafe(no_mangle)]
 pub extern "system" fn grDisableAllEffects() {
+    shim::call!("grDisableAllEffects");
     grAlphaBlendFunction(BLEND_ONE, BLEND_ZERO, BLEND_ONE, BLEND_ZERO);
     grAlphaTestFunction(7);
     grChromakeyMode(0);
@@ -196,6 +219,7 @@ pub extern "system" fn grDisableAllEffects() {
 /// precision, mipmap dither) have nothing to tune here.
 #[unsafe(no_mangle)]
 pub extern "system" fn grHints(kind: u32, flags: u32) {
+    shim::call!("grHints", kind, flags);
     if kind == HINT_STWHINT {
         shadow::set(|s| s.stw_hint = flags);
     }
@@ -203,11 +227,13 @@ pub extern "system" fn grHints(kind: u32, flags: u32) {
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grRenderBuffer(buffer: u32) {
+    shim::call!("grRenderBuffer", buffer);
     send(Cmd::RenderBuffer(if buffer == BUFFER_FRONT { BUFFER_FRONT } else { BUFFER_BACK }));
 }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grGlideGetState(state: *mut u8) {
+    shim::call!("grGlideGetState", state);
     if !state.is_null() {
         unsafe { shadow::save(state) };
     }
@@ -215,6 +241,7 @@ pub unsafe extern "system" fn grGlideGetState(state: *mut u8) {
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grGlideSetState(state: *const u8) {
+    shim::call!("grGlideSetState", state);
     if !state.is_null() {
         unsafe { shadow::restore(state) };
     }

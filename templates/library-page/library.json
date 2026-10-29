@@ -1,0 +1,56 @@
+{
+  "id": "example-port",
+  "title": "Example Port",
+  "tagline": "The game, rebuilt from scratch, in your browser",
+  "logo": null,
+  "backdrop": null,
+  "scheme": "dark",
+  "theme": { "accent": "#e0a84a", "radius-l": "16px" },
+  "icons": {},
+  "start": "Start the game",
+  "links": [
+    { "text": "Setup guide", "href": "https://example.org/guide" },
+    { "text": "Source code", "href": "https://example.org/source" }
+  ],
+  "fine": "A copy of the original game is required. The files stay in this browser and are never uploaded.",
+  "panels": [
+    { "type": "messages", "place": "top", "items": [
+      { "date": "2026-10-26", "title": "Welcome", "text": "Choose your game files below, then press **Start the game**." }
+    ] },
+    { "type": "markdown", "title": "What's new", "src": "news.md" },
+    { "type": "youtube", "name": "trailer", "place": "none", "title": "Trailer", "id": "VIDEO_ID" }
+  ],
+  "pages": [
+    { "path": "help", "title": "Help", "src": "help.md", "icon": "file" }
+  ],
+  "sections": [
+    {
+      "id": "game",
+      "kind": "game-data",
+      "label": "Game files",
+      "steps": [
+        "Find the folder where the game is installed.",
+        "Choose `GAME.DAT` and `LEVELS.PAK` together, or drop them on this page."
+      ],
+      "accept": [".dat", ".pak"],
+      "required": [
+        { "name": "GAME.DAT", "hint": "In the install folder." },
+        { "name": "LEVELS.PAK" }
+      ]
+    },
+    {
+      "id": "saves",
+      "kind": "saves",
+      "label": "Saves",
+      "help": ["Saves from the original game or from the desktop version can be added here."],
+      "accept": [".sav"]
+    },
+    {
+      "id": "mods",
+      "kind": "mods",
+      "label": "Mods",
+      "help": ["Mods that are on load when the game starts. A mod lower in the list wins."],
+      "accept": [".mod"]
+    }
+  ]
+}

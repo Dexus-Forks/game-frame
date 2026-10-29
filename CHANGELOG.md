@@ -5,7 +5,7 @@ Every release of GameFrame, newest first. The format follows
 [Semantic Versioning](https://semver.org/). The newest version here is the one in
 `.claude-plugin/plugin.json`, and `tests/run.sh` checks that the two match.
 
-## [1.4.0-dev] - Unreleased
+## [1.5.0-dev] - Unreleased
 
 ### Added
 
@@ -36,6 +36,184 @@ Every release of GameFrame, newest first. The format follows
   (`tools/triage/exportcov_ne.py`). `ghidra-run.sh fill-gaps` reads `seg:off` starts. The DOS
   sample has a routine reached only by a far call through a relocation, to test both.
 
+- Lessons from TabStationToo, PCSX2 compiled to WebAssembly. `re-verify` gains written lists of
+  what is compared and what is left out, lockstep (both versions run each unit, the program goes
+  on with the reference's result), fuzzing new code against a reference, a deterministic mode for
+  threads, and running WebAssembly tests in both of V8's compilers.
+  `docs/working/building-the-port.md` gains browser pitfalls (hosting headers, faults that do not
+  trap, storage limits, WebGPU readback and features, gamepads, code generated at run time) and
+  how to measure speed, starting with a check that the CPU is not capped.
+  `docs/consoles/porting.md` notes emulators in the browser and how their licence carries over.
+
+- The call log in the replacement libraries: `WRAPPER_CALLS=FILE` writes every call the game
+  makes into Glide, SGL, ATI3DCIF or the S3D Toolkit, one line each, in the format
+  `tools/verify/seqdiff.py` compares. Vertices are written as their values, texture data and
+  frame-buffer writes as a size and hash. `WRAPPER_CALLS_FRAMES` keeps a range of frames.
+  A Glide vertex is written as the fields the card reads under the current state
+  (`wrappers/glide/src/used.rs`), so leftover values in unread fields do not make two logs
+  differ. `grFogTable` writes its table as a size and hash.
+  `shim::call!` and `shim::calls` hold it, and the tests check that every export writes itself.
+- The rendering pipeline (`docs/hardware/rendering-pipeline.md`): the five stages of a frame,
+  where each ran on the CPU or the card machine by machine, what a port can check at each seam,
+  and the port built as a virtual graphics card with swappable devices, which fits the vanilla
+  and extra builds. Five new diagrams, and an interactive lab page on the site
+  (`/lab/pipeline`) that takes one frame through every stage and draws it with a software
+  renderer, a 16-bit card and a modern device side by side. `re-port` gains the device
+  interface; `re-verify` checks the renderer at its seams, earliest first.
+- `gameframe install` (`tools/install/install_app.py`): build a project's release programs from
+  its `install.json` and install them as an application in the GameFrame folder:
+  `/Applications/GameFrame/NAME.app` on macOS, `%LOCALAPPDATA%\Programs\GameFrame` on Windows,
+  `~/.local/share/GameFrame` on Linux, with the player's data kept apart. `install extra`
+  installs the vanilla build and the extra build with the additions on, side by side. GameFrame's
+  own `install.json` installs the frame demo.
+- `tools/live/winegdb.py`: attach to a game under Wine or CrossOver through `winedbg --gdb`,
+  read its registers and memory, wait at breakpoints with dumps of memory, and always detach with
+  the original code back in place. `tools/live/gdbremote.py` is its GDB remote protocol client,
+  for any GDB stub. Know-how entry `winedbg-gdb-server`: winedbg's bare `c` resumes one thread,
+  it refuses software breakpoints, and hardware breakpoints never fire under Rosetta.
+- Know-how on Windows machines for an Apple-silicon Mac: which emulator or VM suits each era
+  (86Box, QEMU with TCG, VMware Fusion and Parallels with Windows 11 Arm, Wine, a real PC), with
+  three failures met on the way: Windows Setup in QEMU stopped mid-install, Fusion's "Press any
+  key to boot from CD" prompt, and Windows 11 Arm Setup stopping on the logo in a VM made with
+  `vmcli` (open). The know-how taxonomy gains the `2010s` era.
+- `tools/rea/rea_session.py`: REA on a game's binary from a script. `fn` gives REA the project's
+  labels and prints a summary of each function's dossier (size, references, callees, memory
+  effects), `snapshot` saves REA's answers to reuse, and `labels` writes
+  `set_addresses_names` input. `tools/rea/mcp_client.py` is the small stdio MCP client under
+  it, which starts a provider from the project's `.mcp.json`. The know-how entry
+  `context-rea-sessions-and-snapshots` has what a session costs and what a snapshot keeps,
+  measured on Banished.
+- `gameframe-d3d`: Direct3D 3 immediate mode in software. It writes and parses execute buffers
+  (`Builder`, `exec::parse`: `D3DTLVERTEX`, `PROCESSVERTICES`, `STATERENDER`, `TRIANGLE`) and runs
+  them (`Device::execute`) into an RGB565 target at any multiple of the game's resolution. It
+  follows Direct3D's fill rules (integer pixel centres, top-left) and covers flat and Gouraud
+  shading, perspective-correct textures in 565, 1555 and 4444, the texture blends, colour keys,
+  the alpha test, every blend factor, the stipple pattern and vertex fog, all from Microsoft's
+  public documentation. `docs/hardware/card-apis.md` has a new section on Direct3D 3 execute
+  buffers.
+- `gameframe-powervr`: a software model of PowerVR's PCX2 as SGL 3.1 drives it. `Sgl` has the
+  calls by their names (lists, transforms, meshes, materials and texture effects, cameras,
+  fog, ambient and point lights, translucent passes, `sgl_render`) and draws into an RGB565
+  buffer at any multiple of the device's size, with the driver's lighting (`SGLMID4.dll`) and
+  the chip's per-pixel depth sort. The scene graph moved here from `wrappers/sgl`, which now
+  uses it.
+- The ATI 3D Rage and S3 ViRGE draw in their own crates: `gameframe_rage::draw`
+  (`Context`, `C3D_VTCF`, `render_prim_list`: triangles and quads, solid, flat or Gouraud,
+  alpha blended) and `gameframe_virge::draw` (`State`, the 32-byte vertex, `triangle_set`:
+  lists, strips and fans, Gouraud, source-alpha blended), both on `gameframe-raster`, the
+  triangle walker moved out of `wrappers/raster`. The `ati3dcif` and `s3dtkw` DLLs draw with
+  them, and so can a port.
+- `gameframe-report`: reports from a running port. `unported!` and `mismatch!` at the places
+  the port has not done, and panics, each written once per place with the original's address,
+  the values there, the game's state, the launch and the devices. Dev keeps them on the
+  machine; Production adds a link to a filled-in GitHub issue. The frame lists them
+  (`report.new`, `Link::send_reports`), and `tools/triage/report_issue.py` lists and files
+  them, once per place.
+- `library.json`: `issues`, one report button per repository (the game's, GameFrame's), and
+  `links` with an `icon` and a `place` (`header`, `play`, `footer`) for a row of links such as
+  GitHub and Mastodon. New icons `github`, `mastodon`, `home` and `link`.
+- The frame's setup dialog (contract 1.1): device slots beside the renderers, such as the
+  sound card and the music device, as a 1990s game's Manager or `SETUP.EXE` offered them.
+  `device.select`, `devices` in `frame.ready` and `game.start`, `Session::select_device`,
+  `Manifest::playable` and `chosen` for kernels, `{device:SLOT}` for `frame.json` games, and
+  one id per card for every game (`device::ids`, with the crate or wrapper that models each in
+  `device::known`). Play shows one drop-down per slot with a card for the chosen device. A
+  device not ported yet may name a `stand_in` that starts in its place
+  (`Manifest::stand_in`), and the kernel reports the gap.
+- `gameframe-voodoo`: a software 3dfx Voodoo Graphics pipeline driven by Glide 2.x (combine
+  units, chroma key, alpha test, table fog, Z and W buffers, blending, the 565 buffer with its
+  dither), after 3dfx's SST-1 specification, and a `Glide` context with the calls by their
+  names, drawn at any multiple of the game's resolution.
+- One crate per 3D chip: `gameframe-voodoo` (Glide's formats and NCC tables),
+  `gameframe-rage` (ATI3DCIF), `gameframe-virge` (S3D Toolkit), and `gameframe-texel` for the
+  texel layouts and the 2:1 reduction they share. Each lists the layouts its API takes
+  (`TEXTURE_FORMATS`).
+- `gameframe-frame`: `Link`, the program's end of `Process` for a Rust port (the manifest, the
+  events until a start, then `stopping()` and `status()` while the game runs), and `Respawn`,
+  a `Game` that starts the program again for each start, for ports whose winit window can be
+  made only once per process. Both come from POD's and Hardwar's launchers.
+- `gameframe-bitmap-font`: an old game's bitmap font as a TrueType font, built in memory, and
+  a CSS `@font-face` rule with a data URL, so a launcher's theme can use the game's own letters
+  read from the player's files at run time. From Hardwar's launcher.
+- `gameframe-frame-ui`: the frame names the theme it draws as `data-theme` on `#library`, so a
+  game's own styles can apply to one theme only.
+- `gameframe-library`: `Folder::link_in`, which fills a section from the player's own folder
+  by hard links.
+- `gameframe-frame`: `Manifest::resolve`, `Held` and `Setup` (`setup`). A kernel works out the
+  devices of a start in one call: the pick per slot, the stand-ins and the gaps.
+  `Setup::report_gaps` writes one report per gap at the kernel's place.
+- Building the port: "One program or two, one build or many". One build holds every device, and
+  `devices` chooses at the start. The frame and the game are two processes on the desktop, and
+  one file can hold both roles.
+
+### Removed
+
+- `gameframe-gpu-1997`: its pieces are in the per-chip crates above. `glide` is now
+  `gameframe_voodoo::formats`, `ncc` is `gameframe_voodoo::ncc`, `ati` is `gameframe_rage`,
+  `s3` is `gameframe_virge`, and `texel` and `resample` are `gameframe_texel`. The `card`
+  table became each crate's `TEXTURE_FORMATS`.
+
+- A game can give the frame a theme of its own: `FrameSetup::with_theme(name, label, css)`.
+  `"preset"` and `"presets"` in `library.json` name it as they name the ready-made themes, so
+  the player can still choose between them.
+- `scripts/release.py X.Y.Z` cuts a release. It dates the changelog's Unreleased section, sets
+  the version in `.claude-plugin/plugin.json`, commits and tags `vX.Y.Z`, then opens the next
+  minor version as `-dev`. `--push` pushes the branch and tag, and `--publish` also makes the
+  GitHub release from the changelog. `release.py next` opens the next version on its own.
+- The commit gate blocks a commit while `plugin.json` still names a release that has its tag,
+  so every change after a release lands under the next version's Unreleased section.
+- `launcher/`, gameframe-launcher: the frame in front of a game that a `frame.json` describes,
+  such as a port's own program. It hides while the game runs and comes back when
+  the game ends, or exits to the desktop if the player chose that. `--no-frame` starts the game
+  at once.
+- A choice setting can list what is on the disc. `"from": {"files": PATTERN}` lists the
+  matching files in the game's folder (`Configured::load`, `list_files`), and `"from": {"game":
+  true}` waits for the game's `config.options`. `frame.json` takes a `folder`, where the command
+  runs.
+- A way back to the launcher. `frame.open` from a running game shows the frame, "Back to the
+  game" sends `frame.close`, and `Session::hide_while_running` hides it while the game runs.
+  `FrameSetup::with_window` shows and hides a desktop window. In a page the hidden frame leaves an
+  "Open the frame" button.
+- Game exit. `frame.on-exit` chooses what happens when the game ends by itself: the launcher
+  comes back, or the program exits to the desktop. "Exit to desktop" (`Session::exit`,
+  `frame.exit`, `FrameSetup::with_exit`) stops the game, then leaves.
+- Big files in the browser library. `gameframe-library`'s `IndexedDb` streams a file of at
+  least `web::BIG` bytes (64 MiB), such as a 700 MB CD image, into the origin private file
+  system 8 MiB at a time, kept plain so it can be read in slices. `Library::add_file` and
+  `Store::write_file` take a `web_sys::File`; `Library::file` and `Store::file` give one back.
+  The game's hooks see the first 1 MiB of a big file. The frame's Library tab adds files this
+  way in the browser.
+- The GameFrame home, `~/gameframe` or `$GAMEFRAME_HOME`, outside every clone. It holds
+  `config.env` (machine-wide settings, read before a project's `.env`), the shared Python in
+  `python/`, `tools/`, `emulators/`, `machines/`, `drivers/`, `games/ID/`, `projects/ID/`,
+  `worktrees/`, `cache/` and `data/`. `gameframe home init` makes it, `gameframe home doctor`
+  checks it, and `gameframe home` lists it.
+- `gameframe game add ID FILE` keeps a disc image or installer in `games/ID/media/`, records
+  its SHA-256 in `game.json` and extracts it into `games/ID/game/`. `gameframe game link ID
+  PROJECT` links a project's `game`, `media`, `saves`, `analysis` and `derived` into the home.
+  `gameframe home adopt PROJECT --id ID` moves an older project's folders there and leaves a
+  link at each old name. It keeps a folder that git tracks files in.
+- The launcher reads a game from a disc image. `frame.json` takes `"image"`, file lists come
+  from the ISO 9660 volume (`list_image_files`), and `{image}` and `{folder}` in the arguments
+  become absolute paths.
+
+### Changed
+
+- `Session::state()` is `idle` before the first start and `starting` from `game.start` until the
+  game answers. It was `stopped`, so a test that waited for `stopped` ended before the game ran.
+
+- A project's game folder is `game/`, a link into the home. `target/` still works for older
+  projects, and the gates protect both. `scripts/new-project.sh NAME` with no slash makes the
+  project in `projects/NAME`, and `--local` keeps real folders in the project instead.
+- The README lists the tools most projects start with, by step of the method, and links to the
+  site's tools page, which is built from each tool's own help. `./gameframe tools` lists them all.
+- A site's day post no longer replaces that day's live entries. The live entries stay, the day
+  post ends with "The day's entries" linking each one, and the diary's list and sidebar show
+  only the day post for a past day. `tools/site/check.py` fails when a day post misses a link.
+- Screenshots are always fine, of the original game and of the port. The project rules, the
+  viewer guide, `re-land`, `re-site` and `re-publisher` now say so, so agents commit them and
+  put them on the site instead of leaving them out as game material.
+
 ### Fixed
 
 - `docs/DOS.md` and `dos_emu`'s help said `dos_emu` does not run x87 code. It runs real x87
@@ -54,12 +232,78 @@ Every release of GameFrame, newest first. The format follows
   every unreferenced routine after a far procedure in an NE or MZ program was reported as
   `FUNCTION <none>`. The DOS sample has three routines nothing calls, to test it.
 
+- `gameframe-report` panicked in the browser on its first report ("time not implemented on
+  this platform"): it stamped reports with `std::time::SystemTime`, which wasm32 lacks. It
+  uses `web-time` now, the same clock natively.
+- `tests/run.sh` no longer asks the wrappers workspace for `raster`, which moved to
+  `crates/raster` (`gameframe-raster`), where the crates check tests it. The wrappers check
+  failed on every run since the move.
+- The library's browser store read none of its files back: `seal` gave the browser its
+  AES-GCM nonce as a view of a Rust value dropped before `encrypt` read it, so files were
+  encrypted under another nonce than the one kept with them. Both directions now pass the nonce
+  as a JavaScript array. Files kept before this fix do not decrypt; add them again.
+- `Process` reports a game program's end once, after its last lines, where it sent `stopped`
+  again on every tick. A program that exits with an error is `failed`, with its exit status and
+  its last line on standard error, so the launcher shows why and does not leave for the desktop.
+  A program that said `stopped` or `failed` itself and then exited successfully gets no second
+  status. `Configured` reports a command that exits with an error as `failed` too.
+
+## [1.4.0] - 2026-10-26
+
+### Added
+
+- `crates/library` (`gameframe-library`) keeps a port's game data, saves and opt-in sections
+  (mods, screenshots, recordings, custom). The game declares them in one `library.json`, with
+  hooks for save cards and file checks. It has folder, memory and browser stores. In the browser,
+  files are encrypted with a non-extractable WebCrypto key.
+- `templates/library-page/` is a plain HTML page for browser ports that works with the crate.
+  It has a design system of `--lib-*` tokens, replaceable icons and named components. Panels
+  show Markdown, a changelog, messages, a click-to-load YouTube video and GitHub releases, and
+  ports can add their own. Markdown help pages sit at hash routes, with `::: tip` boxes and
+  `::: panel` slots.
+- `crates/frame` (`gameframe-frame`) is the contract between a port's core and the frame
+  around it. It has event topics, a manifest of capabilities, renderers with coverage grades,
+  settings and controls, and a session with listeners. A game joins in Rust, in any language
+  over JSON lines, or with a `frame.json` alone. A demo game stands in when there is no port and
+  presses its own controls. A minor contract version only adds fields, and older frames ignore
+  them.
+- `crates/frame-ui` (`gameframe-frame-ui`) draws the frame as Dioxus components for the browser
+  and the desktop. Its tabs are Play, Settings, Library, help pages and Console, styled by the
+  library page's tokens. `examples/frame-demo` runs it with no game, in both targets.
+- Eleven ready-made themes in `templates/library-page/themes/`: Windows 98, XP and Vista,
+  System 7, Aqua, BeOS, NeXTSTEP, CDE, GNOME 2, Amiga Workbench and Atari ST GEM. `"preset"`
+  in `library.json` picks one for the HTML page and the frame. `"presets"` lets the player choose between them in the frame's Settings tab, saved as `frame.preset`.
+- `crates/disc-image` and `crates/game-source` move from POD into GameFrame. They read CD images
+  in place, and give a game's files from a folder, a disc image or a URL, in ranges in the
+  browser.
+- `tools/llm/decision.py` routes bounded choice, yes-or-no and score questions to a user-selected
+  decision model through its native System One endpoint. `decision_feedback.py` stores explicit
+  user corrections locally and exports training examples. Neither tool selects a paid service,
+  changes model weights or uploads data.
+- The site diary is now written live and then put together by day. During the day, each
+  milestone gets a live entry named `YYYY-MM-DD-HHMM-slug.md`, which the diary shows with its
+  time. On the next run, `re-site` and `re-publisher` turn each past day's live entries into
+  one post in the style of update notes: what is new, a little detail, and a short change list.
+  The post drops the repeats. `tools/site/check.py` fails while a past day still has live
+  entries. `--days` lists those days, and `--keep-live` turns the check off.
+- The plugin check in `tests/run.sh` ignores system files that sit on disk but not in git, and a
+  new check fails if git tracks a `.DS_Store`, `Thumbs.db`, `desktop.ini` or `__MACOSX` file.
+
 ### Changed
 
+- Model-powered tools now default to the local provider. `GAMEFRAME_LLM_ENDPOINT` can point to a
+  local or compatible endpoint; hosted services are selected by name with `GAMEFRAME_LLM_PROVIDER`
+  with provider-specific model and key settings. Hosted providers and remote endpoints require
+  confirmation before a request. Image location supports local vision models; function naming
+  uses synchronous calls where a server has no batch API.
 - The REA skill now documents how to check Ghidra provider readiness, open an explicit Ghidra
   session, inspect a native function and its raw instructions, retain the Evidence bundle, and
   close the temporary project. It separates focused REA analysis from whole-program Ghidra
   searches and emulator measurements.
+- 86Box setup guidance now covers the optional GDB build, its dynamic-recompiler tradeoff and
+  the debugger tools provided by the opt-in `86box-mcp` server. The provider launcher places its
+  automation socket in a home-mounted temporary directory for Docker builds, and defaults to
+  token-protected TCP transport for container compatibility.
 
 ## [1.3.0] - 2026-10-25
 
@@ -657,7 +901,8 @@ Copilot, Cursor and OpenCode can each use the skills, the agents, the gates and 
 - The Claude Code plugin now carries version `1.0.0`. Claude Code updates it when the version
   changes, so plugin projects move from release to release.
 
-[1.4.0-dev]: https://github.com/tanepiper/game-frame/compare/v1.3.0...HEAD
+[1.5.0-dev]: https://github.com/tanepiper/game-frame/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/tanepiper/game-frame/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/tanepiper/game-frame/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/tanepiper/game-frame/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/tanepiper/game-frame/compare/v1.0.1...v1.1.0

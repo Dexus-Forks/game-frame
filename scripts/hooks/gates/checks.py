@@ -10,13 +10,16 @@ import subprocess
 from dataclasses import dataclass
 
 try:
-    from . import deletes  # imported as gates.checks (tools/site/check.py)
+    from . import deletes, version  # imported as gates.checks (tools/site/check.py)
 except ImportError:
     import deletes
+    import version
 
 # Folders that hold the game, its derivatives or decompiled code. They are ignored by git; a
-# staged path there was force-added.
-GAME_DIRS = ('target/', 'analysis/', 'derived/', 'game-data/', 'save-game/')
+# staged path there was force-added. game/, media/, saves/, analysis/ and derived/ are links into the
+# GameFrame home in a project made by new-project.sh; the links themselves never go in either.
+GAME_DIRS = ('game/', 'media/', 'saves/', 'target/', 'analysis/', 'derived/', 'game-data/', 'save-game/')
+HOME_LINKS = {'game', 'media', 'saves', 'analysis', 'derived'}
 # Extensions of game binaries and data files that never belong in a repository.
 GAME_EXTS = {
     '.exe', '.dll', '.ovl', '.com', '.sys', '.pkg', '.crs', '.rsc', '.str', '.sav', '.wad',
@@ -38,7 +41,7 @@ PSEUDOCODE = re.compile(
     r'\b(?:void|int|uint|char|short|long|bool|float|double|code)\s+\**' + GHIDRA_NAME + r'\s*\('  # declarations
 )
 # Paths where decompiled code may live (all ignored by git).
-PRIVATE_DIRS = ('analysis/', 'derived/', 'target/')
+PRIVATE_DIRS = ('analysis/', 'derived/', 'game/', 'saves/', 'target/')
 LANDER = 're-lander'
 # The variable that names the GameFrame agent where the hook input does not.
 AGENT_VAR = 'GAMEFRAME_AGENT'
@@ -100,7 +103,7 @@ def staged_reason(cwd, with_tracked=False):
     if with_tracked:
         staged += [p for p in git('diff', '--name-only', cwd=cwd).splitlines() if p]
     bad = [p for p in staged
-           if p.startswith(GAME_DIRS) or os.path.splitext(p)[1].lower() in GAME_EXTS]
+           if p.startswith(GAME_DIRS) or p in HOME_LINKS or os.path.splitext(p)[1].lower() in GAME_EXTS]
     if bad:
         return ('This commit stages game material, which never goes into git:\n  '
                 + '\n  '.join(bad[:10])
@@ -136,4 +139,4 @@ def reason(check):
     why = agent_reason(check.kind, check.agent)
     if why or check.kind == 'push':
         return why
-    return staged_reason(check.cwd, bool(COMMIT_ALL.search(check.command)))
+    return staged_reason(check.cwd, bool(COMMIT_ALL.search(check.command))) or version.reason(check.cwd)

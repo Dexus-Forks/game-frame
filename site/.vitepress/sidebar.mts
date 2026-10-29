@@ -11,7 +11,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import type { DefaultTheme } from 'vitepress'
 import { ROOT, pageUrl, skills, title } from './repo.mts'
-import { GROUP_TITLES, agents, tools } from './catalog.mts'
+import { agents, toolGroups, tools } from './catalog.mts'
 
 type Item = DefaultTheme.SidebarItem
 
@@ -49,7 +49,8 @@ export function sidebar(): Item[] {
     text: 'In your browser',
     collapsed: true,
     items: [{ text: 'Overview', link: '/lab/' }, { text: 'File explorer', link: '/lab/files' },
-      { text: 'Pixel explorer', link: '/lab/pixels' }, { text: 'Records explorer', link: '/lab/records' }],
+      { text: 'Pixel explorer', link: '/lab/pixels' }, { text: 'Records explorer', link: '/lab/records' },
+      { text: 'Rendering pipeline', link: '/lab/pipeline' }],
   })
   groups.push({
     text: 'Agents',
@@ -59,7 +60,7 @@ export function sidebar(): Item[] {
   groups.push({
     text: 'Tools',
     collapsed: true,
-    items: [{ text: 'All tools', link: '/tools/' }, ...Object.entries(GROUP_TITLES).map(([group, text]) => ({
+    items: [{ text: 'All tools', link: '/tools/' }, ...toolGroups().map(([group, text]) => ({
       text, collapsed: true,
       items: tools().filter(t => t.group === group).map(t => ({ text: t.name, link: `/tools/${t.name}` })),
     })).filter(g => g.items.length)],

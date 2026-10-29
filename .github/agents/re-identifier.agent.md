@@ -33,7 +33,7 @@ When every binary's engine, libraries and compiler are named or listed as unknow
 
 ## Before you start
 
-- Work in the game's project: the folder with `AGENTS.md`, `docs/FINDINGS.md` and `target/`.
+- Work in the game's project: the folder with `AGENTS.md`, `docs/FINDINGS.md` and `game/`.
   Paths in this file and in the skills are relative to it. If the brief names no project and
   you cannot find one, stop and say so in the hand-off.
 - Read `AGENTS.md`, then search `docs/` and `labels/` for the subject of the brief. An earlier
@@ -46,7 +46,7 @@ When every binary's engine, libraries and compiler are named or listed as unknow
 
 ## Rules
 
-- Keep game material out of git: binaries and data in `target/`, Ghidra output and decompiled
+- Keep game material out of git: binaries and data in `game/`, Ghidra output and decompiled
   code in `analysis/`, emulator output and extracted assets in `derived/`. Never paste
   decompiled code, disassembly or data dumps into tracked files.
 - Every claim gets an evidence label from the project's `AGENTS.md`.

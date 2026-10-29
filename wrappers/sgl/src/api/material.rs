@@ -11,6 +11,7 @@ fn op(o: MatOp) {
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sgl_set_ambient(colour: *const f32) {
+    shim::call!("sgl_set_ambient", colour);
     let c = unsafe { v3(colour) };
     trace!("sgl_set_ambient", "{c:?}");
     op(MatOp::Ambient(c));
@@ -18,6 +19,7 @@ pub unsafe extern "C" fn sgl_set_ambient(colour: *const f32) {
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sgl_set_diffuse(colour: *const f32) {
+    shim::call!("sgl_set_diffuse", colour);
     let c = unsafe { v3(colour) };
     trace!("sgl_set_diffuse", "{c:?}");
     op(MatOp::Diffuse(c));
@@ -25,6 +27,7 @@ pub unsafe extern "C" fn sgl_set_diffuse(colour: *const f32) {
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sgl_set_specular(colour: *const f32, shininess: i32) {
+    shim::call!("sgl_set_specular", colour, shininess);
     let c = unsafe { v3(colour) };
     trace!("sgl_set_specular", "{c:?} {shininess}");
     op(MatOp::Specular(c, shininess));
@@ -32,6 +35,7 @@ pub unsafe extern "C" fn sgl_set_specular(colour: *const f32, shininess: i32) {
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sgl_set_glow(colour: *const f32) {
+    shim::call!("sgl_set_glow", colour);
     let c = unsafe { v3(colour) };
     trace!("sgl_set_glow", "{c:?}");
     op(MatOp::Glow(c));
@@ -39,30 +43,35 @@ pub unsafe extern "C" fn sgl_set_glow(colour: *const f32) {
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_set_opacity(opacity: f32) {
+    shim::call!("sgl_set_opacity", opacity);
     trace!("sgl_set_opacity", "{opacity}");
     op(MatOp::Opacity(opacity));
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_set_texture_map(texture_name: i32, flip_u: i32, flip_v: i32) {
+    shim::call!("sgl_set_texture_map", texture_name, flip_u, flip_v);
     trace!("sgl_set_texture_map", "{texture_name} {flip_u} {flip_v}");
     op(MatOp::Texture(texture_name, flip_u != 0, flip_v != 0));
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_set_texture_effect(affect_ambient: i32, affect_diffuse: i32, affect_specular: i32, affect_glow: i32) {
+    shim::call!("sgl_set_texture_effect", affect_ambient, affect_diffuse, affect_specular, affect_glow);
     trace!("sgl_set_texture_effect", "{affect_ambient} {affect_diffuse} {affect_specular} {affect_glow}");
     op(MatOp::Effect([affect_ambient != 0, affect_diffuse != 0, affect_specular != 0, affect_glow != 0]));
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_new_translucent() {
+    shim::call!("sgl_new_translucent");
     trace!("sgl_new_translucent");
     sgl().scene.new_translucent();
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_qual_fog(enable: i32) {
+    shim::call!("sgl_qual_fog", enable);
     trace!("sgl_qual_fog", "{enable}");
     sgl().scene.qual_fog(enable != 0);
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Start a reverse-engineering project for one game, with GameFrame's toolkit and playbook.
 #
-#   scripts/new-project.sh DIR "Game Name" [PATH/TO/GAME] [--copy] [--agent LIST]
+#   scripts/new-project.sh DIR "Game Name" [PATH/TO/GAME] [--id ID] [--local] [--copy] [--agent LIST]
 #
 # Creates DIR as a git repository with:
 #   AGENTS.md (+ CLAUDE.md)   the rules, with the game's name; edit the goal paragraph first
@@ -12,9 +12,14 @@
 #                             GameFrame in a clone or in the plugin's install
 #   docs/FINDINGS.md, docs/GAME_PROFILE.md, docs/CHECKLIST.md, docs/lore.md, docs/versions.md,
 #   labels/names.tsv, labels/fields.tsv
-#   target/, analysis/, derived/   for the game, Ghidra output and ground truth: ignored by git
-#   target/GAME-FILES-NOT-BUILD-OUTPUT.txt   says target/ is the game, not Cargo's output
-#   .cargo/config.toml        Cargo builds into build/, never into target/
+#   game, media, saves, analysis, derived   links into the GameFrame home's games/ID/ (the game,
+#                             its discs, saves, Ghidra output, ground truth): ignored by git, and outside it
+#   game/GAME-FILES-NOT-BUILD-OUTPUT.txt   says game/ is the game, not build output
+#   .cargo/config.toml        Cargo builds into build/
+# DIR with no slash, such as `pod`, means $GAMEFRAME_HOME/projects/pod (~/gameframe/projects/pod).
+# --id ID names the game in the home (games/ID/); the default is DIR's folder name in lower case.
+# --local makes game/, media/, saves/, analysis/ and derived/ real folders inside the project instead:
+# for a cloud machine or Windows without links. `gameframe home adopt` moves them out later.
 # The guides stay in GameFrame (`./gameframe root` prints where), and on its website.
 # --copy instead copies GameFrame's toolkit, skills, agents, gates and guides into the project,
 # for agents that cannot use the Claude Code plugin. The skills go in skills/, with the links
@@ -25,28 +30,37 @@
 # agents, its gate hooks and its MCP servers (scripts/clients.py). Without claude there is no
 # .claude/settings.json or CLAUDE.md. In a plugin project the other agents get a copy of the
 # skills in skills/, since the plugin serves only Claude Code.
-# With PATH/TO/GAME it copies the game's executables and DLLs into target/ (data files are
-# left where they are: point the tools at them) and prints a first look at each binary.
+# With PATH/TO/GAME it adds the game to the home with `gameframe game add`: a disc image or an
+# installer is copied into games/ID/media/ and extracted into game/, and a folder is copied into
+# game/. Then it prints a first look at each binary.
 set -euo pipefail
 . "$(dirname "$0")/lib.sh"
-copy=0; agent=all; args=()
+copy=0; agent=all; args=(); id=""; local_dirs=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --copy) copy=1 ;;
     --agent) [[ $# -ge 2 ]] || { echo "--agent needs a list" >&2; exit 2; }; agent="$2"; shift ;;
     --agent=*) agent="${1#--agent=}" ;;
+    --id) [[ $# -ge 2 ]] || { echo "--id needs a name" >&2; exit 2; }; id="$2"; shift ;;
+    --local) local_dirs=1 ;;
     *) args+=("$1") ;;
   esac
   shift
 done
 set -- ${args[@]+"${args[@]}"}
-[[ $# -ge 2 ]] || { sed -n '2,28p' "$0"; exit 2; }
+[[ $# -ge 2 ]] || { sed -n '2,/^set -euo/p' "$0" | sed '$d'; exit 2; }
 # The chosen agents, checked before anything is written.
 agents="$(python3 -c 'import sys; sys.path.insert(0, sys.argv[1]); import clients; print(",".join(clients.parse(sys.argv[2])))' "$ROOT/scripts" "$agent")"
 claude=0; [[ ",$agents," == *",claude,"* ]] && claude=1
 dir="$1"; name="$2"; game="${3:-}"
+# A bare name is a project in the home.
+[[ "$dir" == */* ]] || dir="$GAMEFRAME_HOME/projects/$dir"
+[[ -n "$id" ]] || id="$(basename "$dir" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9_\n-' '-')"
 [[ -e "$dir" && -n "$(ls -A "$dir" 2>/dev/null)" ]] && { echo "$dir exists and is not empty" >&2; exit 1; }
-mkdir -p "$dir"/{target,analysis,derived,docs,labels,.claude}
+mkdir -p "$dir"/{docs,labels,.claude}
+gf() { GAMEFRAME_HOME="$GAMEFRAME_HOME" python3 "$ROOT/tools/gameframe" "$@"; }
+if [[ $local_dirs == 1 ]]; then mkdir -p "$dir"/{game,media,saves,analysis,derived}
+else gf game link "$id" "$dir" >/dev/null; fi
 if [[ $copy == 1 ]]; then
   cp -R "$ROOT/tools" "$ROOT/scripts" "$dir/"
   # The site template that scripts/new-site.sh reads (re-site).
@@ -81,12 +95,13 @@ for f in AGENTS.md README.md docs/FINDINGS.md docs/GAME_PROFILE.md docs/CHECKLIS
   sed -e "s/GAME_NAME/$name/g" -e "s/DATE/$(date +%Y-%m-%d)/" "$ROOT/templates/project/$f" > "$dir/$f"
 done
 [[ $claude == 1 ]] && printf 'The instructions for this repository are in AGENTS.md:\n\n@AGENTS.md\n' > "$dir/CLAUDE.md"
-# target/ holds the game: Cargo must build elsewhere, or `cargo clean` deletes the game.
+# Cargo builds into build/, one folder for every kind of build output.
 mkdir -p "$dir/.cargo"
-printf '[build]\n# target/ holds your copy of the game: never let Cargo build (or clean) there.\ntarget-dir = "build"\n' > "$dir/.cargo/config.toml"
-# A note in target/ itself, for people and cleaners that see a target/ beside a Cargo.toml.
+printf '[build]\n# Build output goes in build/. game/ is your copy of the game.\ntarget-dir = "build"\n' > "$dir/.cargo/config.toml"
+# A note in game/ itself, for people and cleaners that come across it.
 python3 "$ROOT/scripts/hooks/gates/game_folder.py" mark "$dir"
-[[ -f "$ROOT/.env" ]] && cp "$ROOT/.env" "$dir/.env"
+# Settings for every project live in the home's config.env; .env holds what differs.
+[[ -f "$GAMEFRAME_HOME/config.env" || ! -f "$ROOT/.env" ]] || cp "$ROOT/.env" "$dir/.env"
 # Pin a plugin project to the one GameFrame checkout that made it (docs/working/environments.md):
 # ./gameframe reads GAMEFRAME_ROOT from .env, also from the project's git worktrees. A copied
 # project carries its own tools and needs no pin.
@@ -94,9 +109,11 @@ python3 "$ROOT/scripts/hooks/gates/game_folder.py" mark "$dir"
 for copied in tools scripts; do
   [[ -d "$dir/$copied" ]] && { find "$dir/$copied" -name '__pycache__' -prune -exec rm -r {} + 2>/dev/null || true; }
 done
-if [[ -n "$game" ]]; then
-  find "$game" -maxdepth 2 -type f \( -iname '*.exe' -o -iname '*.dll' -o -iname '*.ovl' \) -exec cp {} "$dir/target/" \;
-  echo "Copied $(ls "$dir/target" | wc -l | tr -d ' ') binaries into $dir/target/"
+if [[ -n "$game" && $local_dirs == 1 ]]; then
+  if [[ -d "$game" ]]; then cp -R "$game"/. "$dir/game/"; else bash "$ROOT/scripts/extract-installer.sh" "$game" "$dir/game" >/dev/null; fi
+  echo "Copied the game into $dir/game/"
+elif [[ -n "$game" ]]; then
+  gf game add "$id" "$game"
 fi
 rmdir "$dir/.claude" 2>/dev/null || true   # left empty without Claude Code
 # The git pre-commit hook: the commit gate for people and every agent (docs/working/gates.md).
@@ -104,7 +121,8 @@ mkdir -p "$dir/.githooks" && cp "$ROOT/scripts/hooks/git/pre-commit" "$dir/.gith
 (cd "$dir" && git init -q && git add -A && git commit -qm "Start reverse engineering $name" && echo "Created $dir (git repository, first commit made)")
 git -C "$dir" config core.hooksPath .githooks
 if [[ -n "$game" && -x "$PYTHON" ]]; then
-  for b in "$dir"/target/*; do
+  for b in "$dir"/game/*; do
+    [[ -f "$b" && "$b" =~ \.([Ee][Xx][Ee]|[Dd][Ll][Ll]|[Oo][Vv][Ll]|[Cc][Oo][Mm])$ ]] || continue
     if "$PYTHON" "$ROOT/tools/pe/peinfo.py" "$b" >/dev/null 2>&1; then "$PYTHON" "$ROOT/tools/pe/peinfo.py" "$b" | head -4
     else "$PYTHON" "$ROOT/tools/dos/dosinfo.py" "$b" 2>/dev/null | head -6; fi
   done

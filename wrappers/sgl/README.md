@@ -106,7 +106,7 @@ when zig is there.
 
 | Module | Does |
 |---|---|
-| `scene/` | `tri.rs`: the immediate mode, from the game's contexts and vertices to batches; `shadow.rs`: its shadow and light volumes as planes. The graph (`graph.rs`: lists, transforms, meshes, materials, lights, cameras, textures, one method per call) and the traversal (`walk.rs`: from the root list to lit triangles in the camera's space; `convex.rs`: light volumes; `texmem.rs`: free texture memory). Plain Rust, tested on the host |
+| `scene/` | `tri.rs`: the immediate mode, from the game's contexts and vertices to batches; `shadow.rs`: its shadow and light volumes as planes; `texmem.rs`: free texture memory. The graph (`graph.rs`: lists, transforms, meshes, materials, lights, cameras, textures, one method per call) and the traversal (`walk.rs`: from the root list to lit triangles in the camera's space; `convex.rs`: light volumes) are `gameframe-powervr`'s (`crates/powervr`), which also draws them in software. Plain Rust, tested on the host |
 | `api/` | The exported calls: they read the game's pointers and edit the graph |
 | `frame.rs` | `sgl_render`: the address callback, the marker, the frame to the render thread; `sgl_wrapper_present` |
 | `immediate.rs` | `sgltri_render`: the frame through the address callback or the DirectDraw mode's 2D callback, then the end-of-render callback |

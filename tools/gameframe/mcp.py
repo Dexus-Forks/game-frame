@@ -2,8 +2,8 @@
 
 Usage:
   gameframe mcp --list
-  gameframe mcp --enable PROVIDER [PROVIDER ...]
-  gameframe mcp --disable PROVIDER [PROVIDER ...]
+  gameframe mcp --enable PROVIDER [PROVIDER ...] [--check | --stdout]
+  gameframe mcp --disable PROVIDER [PROVIDER ...] [--check | --stdout]
   gameframe mcp --emit CLIENT [--check | --stdout]
   gameframe mcp-provider PROVIDER PINNED_VERSION
 
@@ -282,7 +282,9 @@ def _provider_change(args, enable):
             entry = catalog[name]['server']
             if name in local:
                 if local[name] != entry:
-                    print(f"{NAME} mcp: {name!r} is already configured in {path}; left it unchanged.",
+                    print(f"{NAME} mcp: {name!r} is already configured in {path} with its own "
+                          f"command; left it unchanged. To use GameFrame's launcher and pin, run "
+                          f"`{NAME} mcp --disable {name}`, then `{NAME} mcp --enable {name}`.",
                           file=sys.stderr)
                     return 2
                 already.append(name)
@@ -296,6 +298,12 @@ def _provider_change(args, enable):
             else:
                 already.append(name)
 
+    if changed and args.stdout:
+        print(f'# {path.name}\n' + json.dumps(data, indent=2))
+        return 0
+    if changed and args.check:
+        print(f"{NAME} mcp: {path} would change: {', '.join(changed)}", file=sys.stderr)
+        return 1
     if changed:
         try:
             path.write_text(json.dumps(data, indent=2) + '\n', encoding='utf-8')
@@ -330,7 +338,11 @@ def list_providers(args):
     print('gameframe  enabled (GameFrame toolkit)')
     for name, info in provider_catalog().items():
         state = 'enabled' if name in active else 'off'
-        print(f'{name:<12} {state:<8} {info["version"]}  {info["description"]}')
+        note = ''
+        if name in active and active[name] != info['server']:
+            # A hand-written entry runs its own command and version, not the pin shown.
+            note = ' (own command in .mcp.json, not this pin)'
+        print(f'{name:<12} {state:<8} {info["version"]}  {info["description"]}{note}')
     extra = sorted(set(active) - {'gameframe'} - set(provider_catalog()))
     for name in extra:
         print(f'{name:<12} enabled  project-defined provider')

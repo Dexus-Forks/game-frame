@@ -22,6 +22,7 @@ fn rows(buffer: u32) -> Vec<u16> {
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grLfbGetReadPtr(buffer: u32) -> *const u16 {
+    shim::call!("grLfbGetReadPtr", buffer);
     let data = rows(buffer);
     with(|l| {
         let dst = if buffer == BUFFER_DEPTH || buffer == BUFFER_AUX { &mut l.depth } else { &mut l.front };
@@ -47,11 +48,13 @@ unsafe fn region(buffer: u32, x: u32, y: u32, w: u32, h: u32, stride: u32, dst: 
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grLfbReadRegion(buffer: u32, x: u32, y: u32, w: u32, h: u32, stride: u32, dst: *mut u8) -> u32 {
+    shim::call!("grLfbReadRegion", buffer, x, y, w, h, stride, dst);
     unsafe { region(buffer, x, y, w, h, stride, dst) as u32 }
 }
 
 /// The early Glide 2 read of a rectangle, from the back buffer the game draws in.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn guFbReadRegion(x: u32, y: u32, w: u32, h: u32, dst: *mut u8, stride: u32) {
+    shim::call!("guFbReadRegion", x, y, w, h, dst, stride);
     unsafe { region(BUFFER_BACK, x, y, w, h, stride, dst) };
 }

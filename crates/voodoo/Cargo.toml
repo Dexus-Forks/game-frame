@@ -1,0 +1,13 @@
+[package]
+name = "gameframe-voodoo"
+description = "A software model of the 3dfx Voodoo Graphics pixel pipeline as Glide 2.x drives it: combiners, chroma key, blending, W and Z buffers, table fog, 565 frame buffer with dither"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["glide", "3dfx", "voodoo", "rasteriser", "reverse-engineering"]
+categories = ["emulators", "graphics"]
+
+[dependencies]
+gameframe-texel = { path = "../texel" }

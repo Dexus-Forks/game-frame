@@ -1,0 +1,12 @@
+[package]
+name = "gameframe-texel"
+description = "Texel layouts of 1990s PC 3D chips (RGB565, ARGB1555, 4444, 332, palettes, intensity, YIQ through a table) decoded to RGBA, and the 2:1 reduction loaders used to fit texture memory"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords = ["texture", "pixel-format", "retro", "reverse-engineering"]
+categories = ["emulators", "graphics"]
+
+[dependencies]

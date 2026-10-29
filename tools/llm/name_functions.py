@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Suggest a name, a signature and a summary for every unnamed function, with the Batch API.
+"""Suggest a name, a signature and a summary for every unnamed function.
 
 Usage:
   name_functions.py prepare [--export DIR] [--binary NAME] [--min-size N] [--max N] [--all]
@@ -11,21 +11,22 @@ Usage:
   prepare   picks the functions and writes one request each to
             analysis/llm/names/<binary>/requests.jsonl, then prints how many and their size.
             Nothing is sent. Read the count before you submit.
-  submit    sends them as batches of --size requests each and records their ids in batch.txt
-            beside them, one per line. Small batches end sooner and can be fetched one by one
-  status    prints each batch's progress and the total (most small batches end within an hour)
+  submit    sends them as batches of --size requests each to APIs with batch support. With a
+            compatible local or OpenAI API, it runs requests synchronously and saves results
+            beside them. Small hosted batches end sooner and can be fetched one by one
+  status    prints batch progress or the local synchronous results
   fetch     writes the answers of every batch that has ended to
             analysis/llm/names/<binary>/suggested.tsv: address, name, confidence
             (low/medium/high), signature, summary, evidence. Run it again as more batches end
-  cancel    cancels the batches that have not ended (their finished answers can still be fetched)
+  cancel    cancels hosted batches that have not ended; local requests run synchronously
 
   --export    the Ghidra export (default: analysis/export in the project)
   --binary    the binary in the export (default: the only one, or the first .exe)
   --min-size  skip functions smaller than N bytes (default 16)
   --max       send at most N functions, the largest first (default 2000)
   --all       include functions that already have a name (to check the names)
-  --model     the model (default: GAMEFRAME_MODEL, else claude-opus-5-5)
-  --size      requests per batch for submit (default 200)
+  --model     the model (default: selected provider profile; GAMEFRAME_MODEL overrides one run)
+  --size      requests per hosted batch (default 200; ignored by synchronous local APIs)
 
 Each request holds the function's pseudocode, the names of its callers and callees, and the
 strings it uses. Functions named in labels/names.tsv are skipped.
@@ -34,8 +35,9 @@ The suggestions are guesses from pseudocode, so they stay in analysis/ (ignored 
 Confirm a suggestion as re-trace does before you copy it to labels/names.tsv, and label it
 *inferred* until you have.
 
-What it does not do: spend control. --max is the limit; set a workspace spend limit in the
-Console as well. It never writes labels/ and never applies names in Ghidra.
+What it does not do: spend control. --max limits the number of requests. Set provider spend
+limits for hosted APIs. Submitting model requests requires a typed confirmation; status, fetch
+and cancel do not run inference. It never writes labels/ and never applies names in Ghidra.
 """
 import json
 import os
@@ -123,6 +125,8 @@ def prepare(ex, min_size, limit, everything):
 
 
 def submit(binary, model, size):
+    if size < 1:
+        sys.exit('--size must be at least 1')
     out = folder(binary)
     rows = [json.loads(l) for l in open(os.path.join(out, 'requests.jsonl'), encoding='utf-8')]
     reqs = [{'custom_id': r['custom_id'], 'params': {
@@ -132,6 +136,33 @@ def submit(binary, model, size):
     # Small batches: one large batch can sit for most of the 24 hours the API allows, and
     # nothing in it can be fetched until it ends.
     ids, c = [], api()
+    if not c.supports_batches:
+        path = os.path.join(out, 'local-results.jsonl')
+        completed = {}
+        if os.path.exists(path):
+            for line in open(path, encoding='utf-8'):
+                try:
+                    result = json.loads(line)
+                    completed[result['custom_id']] = result
+                except (json.JSONDecodeError, KeyError, TypeError):
+                    continue
+        remaining = [r for r in rows if completed.get(r['custom_id'], {}).get('type') != 'succeeded']
+        params_by_id = {r['custom_id']: req['params'] for r, req in zip(rows, reqs)}
+        succeeded = sum(r.get('type') == 'succeeded' for r in completed.values())
+        with open(path, 'a', encoding='utf-8') as f:
+            for index, r in enumerate(remaining, 1):
+                try:
+                    response = c.messages.create(**params_by_id[r['custom_id']])
+                    result = {'custom_id': r['custom_id'], 'type': 'succeeded', 'text': text_of(response)}
+                    succeeded += 1
+                except Exception as error:  # keep the failed request retryable on the next submit
+                    result = {'custom_id': r['custom_id'], 'type': 'errored', 'error': str(error)}
+                f.write(json.dumps(result, ensure_ascii=False) + '\n')
+                f.flush()
+                print(f'local {index}/{len(remaining)}: {r["custom_id"]} {result["type"]}')
+        print(f'{succeeded} local results in {os.path.relpath(path, PROJECT)}; '
+              f'{max(0, len(rows) - succeeded)} pending or failed')
+        return
     with open(os.path.join(out, 'batch.txt'), 'w') as f:
         for i in range(0, len(reqs), size):
             batch = c.messages.batches.create(requests=reqs[i:i + size])
@@ -150,8 +181,27 @@ def batch_ids(binary):
 
 
 def status(binary):
+    c = api(confirm=False)
+    if not c.supports_batches:
+        path = os.path.join(folder(binary), 'local-results.jsonl')
+        latest = {}
+        if os.path.exists(path):
+            for line in open(path, encoding='utf-8'):
+                try:
+                    result = json.loads(line)
+                    latest[result['custom_id']] = result
+                except (json.JSONDecodeError, KeyError, TypeError):
+                    continue
+        succeeded = sum(r.get('type') == 'succeeded' for r in latest.values())
+        failed = sum(r.get('type') == 'errored' for r in latest.values())
+        request_path = os.path.join(folder(binary), 'requests.jsonl')
+        with open(request_path, encoding='utf-8') as f:
+            count = sum(1 for _ in f)
+        print(f'local: {succeeded} succeeded, {failed} failed, '
+              f'{max(0, count - succeeded - failed)} pending')
+        return
     total = {'processing': 0, 'succeeded': 0, 'errored': 0, 'expired': 0, 'canceled': 0}
-    ended, client = 0, api()
+    ended, client = 0, c
     ids = batch_ids(binary)
     for i in ids:
         b = client.messages.batches.retrieve(i)
@@ -166,7 +216,10 @@ def status(binary):
 
 
 def cancel(binary):
-    c = api()
+    c = api(confirm=False)
+    if not c.supports_batches:
+        print('local requests run synchronously; nothing remains to cancel')
+        return
     for i in batch_ids(binary):
         b = c.messages.batches.retrieve(i)
         if b.processing_status == 'in_progress':
@@ -180,24 +233,44 @@ def clean(text):
 
 def fetch(binary):
     rows, failed, waiting = [], 0, 0
-    # One client for every call: a client dropped while its results still stream closes
-    # the connection under them.
-    results, c = [], api()
-    for i in batch_ids(binary):
-        if c.messages.batches.retrieve(i).processing_status != 'ended':
-            waiting += 1
-            continue
-        results.extend(c.messages.batches.results(i))
-    for r in results:
-        if r.result.type != 'succeeded':
-            failed += 1
-            continue
+    c = api(confirm=False)
+    if not c.supports_batches:
+        path = os.path.join(folder(binary), 'local-results.jsonl')
+        results = {}
+        if os.path.exists(path):
+            for line in open(path, encoding='utf-8'):
+                try:
+                    result = json.loads(line)
+                    results[result['custom_id']] = result
+                except (json.JSONDecodeError, KeyError, TypeError):
+                    failed += 1
+        iterable = []
+        for custom_id, result in results.items():
+            if result.get('type') != 'succeeded':
+                failed += 1
+                continue
+            iterable.append((custom_id, result.get('text', '')))
+    else:
+        # Keep the client alive while each batch result stream is read.
+        results = []
+        for i in batch_ids(binary):
+            if c.messages.batches.retrieve(i).processing_status != 'ended':
+                waiting += 1
+                continue
+            results.extend(c.messages.batches.results(i))
+        iterable = []
+        for r in results:
+            if r.result.type != 'succeeded':
+                failed += 1
+                continue
+            iterable.append((r.custom_id, text_of(r.result.message)))
+    for custom_id, text in iterable:
         try:
-            d = json.loads(text_of(r.result.message))
+            d = json.loads(text)
         except json.JSONDecodeError:
             failed += 1
             continue
-        addr = r.custom_id.removeprefix('FUN_').replace('_', ':')
+        addr = custom_id.removeprefix('FUN_').replace('_', ':')
         rows.append([addr] + [clean(d.get(k, '')) for k in ('name', 'confidence', 'signature', 'summary', 'evidence')])
     order = {'high': 0, 'medium': 1, 'low': 2}
     rows.sort(key=lambda r: (order.get(r[2], 3), r[0]))

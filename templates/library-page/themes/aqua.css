@@ -1,0 +1,73 @@
+/* Mac OS X Aqua (10.0 to 10.4): pinstripes, a grey title bar with red, yellow and green
+   lights, pill buttons with the default one in blue gel, and a striped blue progress bar.
+   A ready-made theme for the library page and the frame: "preset": "aqua" in library.json. */
+
+#library[data-scheme] {
+  --lib-bg: radial-gradient(ellipse at 50% 120%, #9fd0ff, #3d74c7 60%, #18397a);
+  --lib-surface: repeating-linear-gradient(#f2f2f2 0 2px, #e8e8e8 2px 4px); --lib-surface-2: #fff;
+  --lib-line: #a5a5a5; --lib-text: #000; --lib-muted: #4c4c4c; --lib-accent: #3875d7; --lib-accent-text: #fff;
+  --lib-danger: #c4271c; --lib-ok: #2b8a2b; --lib-scrim: transparent;
+  --lib-font: "Lucida Grande", "Lucida Sans Unicode", Geneva, sans-serif; --lib-font-mono: Monaco, Menlo, monospace;
+  --lib-text-s: 11px; --lib-text-m: 12px; --lib-text-l: 13px; --lib-text-xl: 13px; --lib-text-title: 13px;
+  --lib-weight-strong: 700; --lib-radius-s: 4px; --lib-radius-m: 4px; --lib-radius-l: 6px; --lib-radius-pill: 999px;
+  --lib-shadow: 0 12px 36px rgb(0 0 0 / 0.55); --lib-blur: 0; --lib-width: 580px;
+  --aqua-gel: linear-gradient(#cfe5fd, #7cb7f6 45%, #3d8ee8 50%, #6fb1f9 85%, #b6dcff);
+  --aqua-glass: linear-gradient(#fff, #f3f3f3 45%, #dcdcdc 50%, #ececec 85%, #fff);
+  color-scheme: light;
+}
+#library[data-scheme] { background: var(--lib-bg); }
+
+/* The window: a pinstriped body and a grey title bar with three lights. */
+#library .lib-card { padding: 0 0 12px; border: 1px solid #7a7a7a; border-radius: 6px 6px 4px 4px; background: var(--lib-surface); }
+#library .lib-card > :not(.lib-header) { margin-left: 14px; margin-right: 14px; }
+#library .lib-header { position: relative; display: block; margin: 0 0 10px; padding: 4px 70px; text-align: center;
+  border-radius: 6px 6px 0 0; border-bottom: 1px solid #7a7a7a;
+  background: linear-gradient(#ececec, #d3d3d3 50%, #c6c6c6 50%, #dadada); }
+#library .lib-header::before { content: ""; position: absolute; left: 9px; top: 6px; width: 12px; height: 12px; border-radius: 50%;
+  background: radial-gradient(circle at 50% 30%, #ffd2c8, #f04a3a 55%, #9a1a10);
+  box-shadow: 20px 0 0 0 #f4b528, 40px 0 0 0 #5ac13b; }
+#library .lib-title { font: 13px var(--lib-font); color: #222; }
+#library .lib-tagline { display: none; }
+
+/* Tabs: one glossy pill split into segments. */
+#library .lib-nav, #library .lib-tabs { justify-content: center; gap: 0; margin-top: 0; margin-bottom: 12px; padding: 0; border: 0; }
+#library .lib-nav a, #library .lib-tabs button { padding: 2px 14px; border: 1px solid #8a8a8a; border-left-width: 0; border-radius: 0;
+  background: var(--aqua-glass); color: #000; text-decoration: none; font-size: 12px; }
+#library .lib-nav a:first-child, #library .lib-tabs button:first-child { border-left-width: 1px; border-radius: 12px 0 0 12px; }
+#library .lib-nav a:last-child, #library .lib-tabs button:last-child { border-radius: 0 12px 12px 0; }
+#library .lib-nav a[aria-current=page], #library .lib-tabs button[aria-selected=true] { background: var(--aqua-gel); color: #000; border-color: #3b5f99; }
+#library .lib-nav a:hover { color: #000; }
+#library .lib-nav .lib-icon { display: none; }
+#library .lib-section { padding: 12px; border: 1px solid #b0b0b0; border-radius: 4px; background: rgb(255 255 255 / 0.35); }
+
+/* Pill buttons: clear glass, and blue gel on the default one. */
+#library .lib-button, #library .lib-pad-key { min-height: 21px; padding: 2px 18px; border: 1px solid #8a8a8a; border-radius: 999px;
+  background: var(--aqua-glass); color: #000; font: 13px var(--lib-font); box-shadow: 0 1px 2px rgb(0 0 0 / 0.25); }
+#library .lib-button:hover:not(:disabled) { background: var(--aqua-glass); }
+#library .lib-button--primary, #library .lib-button:active:not(:disabled), #library .lib-pad-key:active {
+  background: var(--aqua-gel); border-color: #3b5f99; color: #000; }
+#library .lib-button--primary:not(:disabled) { animation: lib-aqua-pulse 1.6s ease-in-out infinite alternate; }
+@keyframes lib-aqua-pulse { to { filter: brightness(1.12) saturate(0.8); } }
+#library .lib-button:disabled { opacity: 0.55; animation: none; }
+
+/* Fields and lists. */
+#library .lib-input { border: 1px solid #9c9c9c; border-top-color: #6a6a6a; border-radius: 0; background: #fff; color: #000;
+  font: 12px var(--lib-font); box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.2); }
+#library .lib-input:focus { outline: 3px solid #7fb2ef; outline-offset: 0; }
+#library .lib-log, #library .lib-rows .lib-row { border-color: #9c9c9c; border-radius: 0; background: #fff; }
+#library .lib-rows { gap: 0; }
+#library .lib-rows .lib-row:nth-child(even) { background: #edf3fe; }
+#library .lib-notice { border: 1px solid #c9b25a; border-radius: 6px; background: #fffbd5; }
+#library .lib-notice .lib-icon { color: #b08000; }
+#library .lib-renderer { border: 1px solid #a5a5a5; border-radius: 6px; background: #fff; }
+#library .lib-renderer[aria-checked=true] { border-color: #3875d7; box-shadow: 0 0 0 3px #a6c8f4; }
+#library .lib-grade { border-radius: 999px; }
+
+/* The barber-pole bar. */
+#library .lib-meter { height: 12px; border: 1px solid #8a8a8a; border-radius: 999px; background: var(--aqua-glass); }
+#library .lib-meter-fill { border-radius: 999px;
+  background: repeating-linear-gradient(-45deg, rgb(255 255 255 / 0.35) 0 6px, transparent 6px 12px), var(--aqua-gel); }
+#library .lib-steps li::before { background: var(--aqua-gel); color: #000; border: 1px solid #3b5f99; }
+#library .lib-check input, #library .lib-row input[type=checkbox] { accent-color: #3875d7; }
+#library a { color: #1a4fbf; }
+@media (prefers-reduced-motion: reduce) { #library .lib-button--primary { animation: none; } }

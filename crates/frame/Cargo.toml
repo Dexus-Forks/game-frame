@@ -1,0 +1,18 @@
+[package]
+name = "gameframe-frame"
+description = "The contract between a port and the frame around it: events, commands, a manifest of what the game supports (renderers with coverage grades, settings), and adapters for games in Rust, in another language over JSON lines, or set up from a config file"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version = "1.85"
+keywords = ["game", "launcher", "events", "plugin", "wasm"]
+categories = ["game-development"]
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+gameframe-report = { path = "../report" }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+disc-image = { package = "gameframe-disc-image", path = "../disc-image" }

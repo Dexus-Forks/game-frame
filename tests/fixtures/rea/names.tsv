@@ -1,0 +1,4 @@
+# test labels: address, name
+140001000	sample_fn
+140001100	Thing::tick
+180001000	engine_fn

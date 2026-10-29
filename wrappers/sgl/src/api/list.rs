@@ -8,54 +8,63 @@ use crate::scene::math::Mat;
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_create_list(generate_name: i32, preserve_state: i32, separate_list: i32) -> i32 {
+    shim::call!("sgl_create_list", generate_name, preserve_state, separate_list);
     trace!("sgl_create_list", "{generate_name} {preserve_state} {separate_list}");
     sgl().scene.create_list(generate_name != 0, preserve_state != 0)
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_to_parent() {
+    shim::call!("sgl_to_parent");
     trace!("sgl_to_parent");
     sgl().scene.to_parent();
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_modify_list(name: i32, clear: i32) {
+    shim::call!("sgl_modify_list", name, clear);
     trace!("sgl_modify_list", "{name} {clear}");
     sgl().scene.modify_list(name, clear != 0);
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_delete_list(name: i32) {
+    shim::call!("sgl_delete_list", name);
     trace!("sgl_delete_list", "{name}");
     sgl().scene.delete_list(name);
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_set_ignore_list(name: i32, ignore: i32) {
+    shim::call!("sgl_set_ignore_list", name, ignore);
     trace!("sgl_set_ignore_list", "{name} {ignore}");
     sgl().scene.set_ignore_list(name, ignore != 0);
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_create_transform(generate_name: i32) -> i32 {
+    shim::call!("sgl_create_transform", generate_name);
     trace!("sgl_create_transform", "{generate_name}");
     sgl().scene.create_transform(generate_name != 0)
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_modify_transform(name: i32, clear: i32) {
+    shim::call!("sgl_modify_transform", name, clear);
     trace!("sgl_modify_transform", "{name} {clear}");
     sgl().scene.modify_transform(name, clear != 0);
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_translate(x: f32, y: f32, z: f32) {
+    shim::call!("sgl_translate", x, y, z);
     trace!("sgl_translate", "{x} {y} {z}");
     sgl().scene.transform(Mat::translate([x, y, z]));
 }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sgl_rotate(axis: *const f32, angle: f32) {
+    shim::call!("sgl_rotate", axis, angle);
     let a = unsafe { v3(axis) };
     trace!("sgl_rotate", "{a:?} {angle}");
     sgl().scene.transform(Mat::rotate(a, angle));
@@ -63,6 +72,7 @@ pub unsafe extern "C" fn sgl_rotate(axis: *const f32, angle: f32) {
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_scale(x: f32, y: f32, z: f32) {
+    shim::call!("sgl_scale", x, y, z);
     trace!("sgl_scale", "{x} {y} {z}");
     sgl().scene.transform(Mat::scale([x, y, z]));
 }

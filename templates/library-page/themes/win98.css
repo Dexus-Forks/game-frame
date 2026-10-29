@@ -1,0 +1,72 @@
+/* Windows 95/98: grey faces, bevels, a navy title bar and a teal desktop.
+   A ready-made theme for the library page and the frame. "preset": "win98" in library.json
+   draws it after library.css; "theme" tokens in library.json still win over it. */
+
+#library[data-scheme] {
+  --lib-bg: #008080; --lib-surface: #c0c0c0; --lib-surface-2: #c0c0c0; --lib-line: #808080;
+  --lib-text: #000; --lib-muted: #000; --lib-accent: #000080; --lib-accent-text: #fff;
+  --lib-danger: #800000; --lib-ok: #008000; --lib-scrim: transparent;
+  --lib-font: Tahoma, "MS Sans Serif", "Microsoft Sans Serif", Geneva, sans-serif;
+  --lib-font-mono: "Lucida Console", "Courier New", monospace;
+  --lib-text-s: 11px; --lib-text-m: 11px; --lib-text-l: 11px; --lib-text-xl: 12px; --lib-text-title: 12px;
+  --lib-weight-strong: 700;
+  --lib-radius-s: 0; --lib-radius-m: 0; --lib-radius-l: 0; --lib-radius-pill: 0;
+  --lib-shadow: none; --lib-blur: 0; --lib-width: 560px; --lib-space-4: 12px; --lib-space-5: 16px;
+  --w98-raised: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf;
+  --w98-sunken: inset -1px -1px #fff, inset 1px 1px #808080, inset -2px -2px #dfdfdf, inset 2px 2px #0a0a0a;
+  color-scheme: light;
+}
+
+/* The window and its title bar. */
+#library .lib-card { padding: 3px; border: 0; box-shadow: var(--w98-raised); }
+#library .lib-card > :not(.lib-header) { margin-left: 8px; margin-right: 8px; }
+#library .lib-header { display: flex; align-items: baseline; gap: 8px; margin: 0 0 6px; padding: 3px 4px;
+  text-align: left; background: linear-gradient(90deg, #000080, #1084d0); color: #fff; }
+#library .lib-logo { max-height: 16px; width: auto; margin: 0; }
+#library .lib-tagline { margin: 0; color: #dfe8f6; font-size: 11px; }
+
+/* Tabs, as on a property sheet. */
+#library .lib-nav, #library .lib-tabs { justify-content: flex-start; gap: 0; margin: 0; padding: 0 0 0 2px; border: 0; }
+#library .lib-nav a, #library .lib-tabs button { padding: 3px 10px 2px; border: 0; border-radius: 0;
+  background: #c0c0c0; color: #000; text-decoration: none;
+  box-shadow: inset 1px 1px #fff, inset -1px 0 #0a0a0a, inset -2px 0 #808080, inset 2px 2px #dfdfdf; }
+#library .lib-nav a[aria-current=page], #library .lib-tabs button[aria-selected=true] { margin-top: -2px; padding-bottom: 4px;
+  background: #c0c0c0; color: #000; }
+#library .lib-nav a:hover { background: #c0c0c0; color: #000; }
+#library .lib-nav .lib-icon, #library .lib-tabs .lib-icon { display: none; }
+#library .lib-section { margin-top: 0; padding: 12px; box-shadow: var(--w98-raised); }
+
+/* Buttons. */
+#library .lib-button, #library .lib-pad-key { min-height: 23px; padding: 4px 12px; border: 0; border-radius: 0;
+  background: #c0c0c0; color: #000; font: 11px var(--lib-font); box-shadow: var(--w98-raised); }
+#library .lib-button:hover:not(:disabled) { background: #c0c0c0; }
+#library .lib-button:active:not(:disabled), #library .lib-pad-key:active { box-shadow: var(--w98-sunken); padding: 5px 11px 3px 13px; }
+#library .lib-button:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+#library .lib-button--primary { font-weight: 700; box-shadow: inset 0 0 0 1px #0a0a0a, var(--w98-raised); }
+#library .lib-button:disabled { color: #808080; text-shadow: 1px 1px #fff; }
+
+/* Fields and lists: white and sunken. */
+#library .lib-input { border: 0; border-radius: 0; padding: 3px 4px; background: #fff; color: #000;
+  font: 11px var(--lib-font); box-shadow: var(--w98-sunken); }
+#library .lib-log, #library .lib-rows .lib-row { border: 0; border-radius: 0; background: #fff; box-shadow: var(--w98-sunken); }
+#library .lib-rows { gap: 0; }
+#library .lib-row.is-empty { color: #808080; }
+
+/* Notices are tooltips; renderers are option buttons. */
+#library .lib-notice { border: 0; background: #ffffe1; box-shadow: inset 0 0 0 1px #000; }
+#library .lib-notice .lib-icon { color: #000; }
+#library .lib-renderer { border: 0; border-radius: 0; background: #c0c0c0; box-shadow: var(--w98-raised); }
+#library .lib-renderer[aria-checked=true] { box-shadow: var(--w98-sunken); outline: 1px dotted #000; outline-offset: -6px; }
+#library .lib-grade { border-radius: 0; border: 1px solid #808080; background: #fff; }
+#library .lib-grade.is-exact, #library .lib-grade.is-good { color: #008000; }
+#library .lib-grade.is-partial { color: #806000; }
+#library .lib-grade.is-experimental, #library .lib-grade.is-not-started { color: #800000; }
+
+/* The progress bar: navy blocks in a sunken well. */
+#library .lib-meter { height: 14px; border-radius: 0; background: #fff; box-shadow: var(--w98-sunken); padding: 2px; }
+#library .lib-meter-fill { height: 100%; border-radius: 0; background: repeating-linear-gradient(90deg, #000080 0 8px, transparent 8px 10px); }
+
+#library .lib-steps li::before { border-radius: 0; box-shadow: var(--w98-raised); background: #c0c0c0; color: #000; }
+#library .lib-check input, #library .lib-row input[type=checkbox] { accent-color: #000; }
+#library a { color: #0000ee; }
+#library .lib-fine { color: #000; }

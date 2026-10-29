@@ -19,7 +19,7 @@ and which route is likely to work, so the later stages know where to start.
 
 1. Run `scripts/setup.sh` and report what is missing. Do not install anything: list what
    `--install` would add and put it under Open.
-2. Follow `re-inventory` on every binary in `target/`: which hold the game's own code,
+2. Follow `re-inventory` on every binary in `game/`: which hold the game's own code,
    native, managed, scripted or packed, engine and middleware, data containers, save files.
 3. Classify the game with `docs/games/README.md` and its family page: the kind of game, its
    time model, how exact the interface must be.
@@ -29,7 +29,7 @@ and which route is likely to work, so the later stages know where to start.
    (`./gameframe run sentences`). Write `docs/lore.md` with the table "in the story → in the
    code → evidence", and say in the hand-off which systems the lore marks as exact.
 6. Write the findings to `docs/FINDINGS.md`, and the first rows of `docs/CHECKLIST.md`.
-   Run the catalogue (`tools/formats/catalog.py target/game derived/catalog`, `re-browse`
+   Run the catalogue (`tools/formats/catalog.py game derived/catalog`, `re-browse`
    section 1) and copy its coverage line into the checklist.
 7. Follow `re-profile` to create `docs/GAME_PROFILE.md`: classify the game and its engine,
    separate official hardware support from observed and community-reported compatibility, list
@@ -44,7 +44,7 @@ managed game needs its own route: name it under Open.
 
 ## Before you start
 
-- Work in the game's project: the folder with `AGENTS.md`, `docs/FINDINGS.md` and `target/`.
+- Work in the game's project: the folder with `AGENTS.md`, `docs/FINDINGS.md` and `game/`.
   Paths in this file and in the skills are relative to it. If the brief names no project and you cannot find one,
   stop and say so in the hand-off.
 - Load the skills named above and follow them. They hold the exact
@@ -57,7 +57,7 @@ managed game needs its own route: name it under Open.
 
 ## Rules
 
-- Keep game material out of git: binaries and data in `target/`, Ghidra output and decompiled
+- Keep game material out of git: binaries and data in `game/`, Ghidra output and decompiled
   code in `analysis/`, emulator output and extracted assets in `derived/`. Never paste
   decompiled code, disassembly or data dumps into tracked files.
 - Every claim gets an evidence label from the project's `AGENTS.md`.

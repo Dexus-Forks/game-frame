@@ -13,6 +13,8 @@ set -uo pipefail
 cd "$ROOT"
 S=examples/sample-game; B=$S/build
 pass=0; fail=0
+# A home of its own, so the checks never touch the real ~/gameframe.
+export GAMEFRAME_HOME="$(mktemp -d)/home"
 ok() { echo "  ok    $1"; pass=$((pass + 1)); }
 bad() { echo "  FAIL  $1"; [[ -n "${2:-}" ]] && echo "$2" | sed 's/^/        /'; fail=$((fail + 1)); }
 expect() { # name expected-substring command...
@@ -35,6 +37,18 @@ vz="$(mktemp -d)"; "$PYTHON" -c "import pefile,sys;p=pefile.PE(sys.argv[1]);[set
 expect "vtable reads a PE whose sections have a VirtualSize of 0, as Watcom writes" "+0x008" "$PYTHON" tools/pe/vtable.py "$vz/game.exe" "$vt"
 expect "peinfo shows the raw size of a section with a VirtualSize of 0" "(raw size: VirtualSize 0)" "$PYTHON" tools/pe/peinfo.py "$vz/game.exe"
 rm -rf "$vz"
+RS="$(mktemp -d)"; RF=tests/fixtures/rea; RSRV="$PYTHON $RF/fake_rea.py"
+expect "rea_session labels keeps the binary's addresses, the first file winning, :: as __" '"0x140001100": "Thing__tick"' sh -c "\"$PYTHON\" tools/rea/rea_session.py labels $B/game.exe --labels $RF/names.tsv --labels $RF/more.tsv --out $RS 2>&1 && cat $RS/game.exe-names-1.json"
+expect "rea_session labels leaves out another binary's address" "4 labels in 1 files" "$PYTHON" tools/rea/rea_session.py labels $B/game.exe --labels $RF/names.tsv --labels $RF/more.tsv --out $RS
+expect "rea_session labels gives a name used twice its address" '"0x140001300": "other_140001300"' cat $RS/game.exe-names-1.json
+expect "rea_session snapshot saves dossiers through an MCP server" "wrote $RS/game.exe.snapshot.json (1 new dossiers)" "$PYTHON" tools/rea/rea_session.py snapshot $B/game.exe 0x140001000 --out $RS --server "$RSRV"
+expect "rea_session fn applies the labels and names the callee" "calls: Thing__tick" "$PYTHON" tools/rea/rea_session.py fn $B/game.exe FUN_140001000 --labels $RF/names.tsv --out $RS --server "$RSRV"
+expect "rea_session fn prints the evidence and the memory effects" "memory effects: memory_read 1, memory_write 1" "$PYTHON" tools/rea/rea_session.py fn $B/game.exe 0x140001000 --snapshot-only --labels $RF/names.tsv --out $RS --server "$RSRV"
+expect "rea_session fn writes the dossier under OUT/fn" "sample_fn" sh -c "\"$PYTHON\" tools/rea/rea_session.py fn $B/game.exe 140001000 --json --labels $RF/names.tsv --out $RS --server '$RSRV' 2>/dev/null; ls $RS/fn/game.exe/"
+expect "mcp_client says how to enable a missing provider" "run ./gameframe mcp --enable rea" "$PYTHON" -c "import sys;sys.path.insert(0,'tools/rea');import mcp_client as m
+try: m.provider_command('rea', project='$RS')
+except m.McpError as e: print(e)"
+rm -rf "$RS"
 expect "peinfo counts the base relocations" "base relocations: " "$PYTHON" tools/pe/peinfo.py $B/game.exe
 expect "dates finds a FILETIME and a DOS date" "0x00000b  filetime   2026-10-22 14:30:00" "$PYTHON" - <<'PY'
 import struct, datetime as dt, subprocess, sys, tempfile
@@ -195,6 +209,53 @@ expect "emulock refuses a second holder and names the first" 'held by a since' "
 "$PYTHON" tools/live/emulock.py free gf-vm --who a --dir "$T3/L" >/dev/null
 [[ $rc == 1 ]] && "$PYTHON" tools/live/emulock.py take gf-vm --who b --why mods --dir "$T3/L" >/dev/null \
   && ok "emulock lets only the holder free a lock, then the next one take it" || bad "emulock free and take"
+fakestub() { # LOG [flags]: start the fake GDB stub in the background, print its port
+  mkfifo "$T3/port.$$"; "$PYTHON" tests/fixtures/gdbstub_fake.py "$@" > "$T3/port.$$" & read -r port < "$T3/port.$$"; rm "$T3/port.$$"; echo "$port"
+}
+port=$(fakestub "$T3/s1.log")
+expect "winegdb reads memory through a GDB stub" "4d 5a 90 00" "$PYTHON" tools/live/winegdb.py read --connect "127.0.0.1:$port" 0x140000000 4
+port=$(fakestub "$T3/s2.log" --hit --no-z0)
+expect "winegdb waits at an int3 it writes itself when Z0 is refused, with rip moved back" "hit=1 pc=0x140001000" "$PYTHON" tools/live/winegdb.py break --connect "127.0.0.1:$port" 0x140001000 --timeout 5
+grep -qx 'M140001000,1:cc' "$T3/s2.log" && [[ $(grep -c '^G' "$T3/s2.log") == 1 && $(tail -2 "$T3/s2.log" | head -1) == M140001000,1:48 && $(tail -1 "$T3/s2.log") == D ]] \
+  && ok "winegdb puts the original byte back and detaches after a hit" || bad "winegdb after a hit" "$(cat "$T3/s2.log")"
+port=$(fakestub "$T3/s3.log")
+expect "winegdb gives up on a breakpoint that is never hit" "no hit within 1.0 s" "$PYTHON" tools/live/winegdb.py break --connect "127.0.0.1:$port" 0x140001000 --timeout 1
+grep -qxF '^C' "$T3/s3.log" && grep -qx 'z0,140001000,1' "$T3/s3.log" && [[ $(tail -1 "$T3/s3.log") == D ]] \
+  && ok "winegdb stops the program, removes the breakpoint and detaches after a timeout" || bad "winegdb after a timeout" "$(cat "$T3/s3.log")"
+port=$(fakestub "$T3/s4.log")
+"$PYTHON" -c "
+import sys; sys.path.insert(0, 'tools/live')
+from gdbremote import Remote
+with Remote.connect('127.0.0.1', $port, hw_per_thread=True) as r:
+    r.set_breakpoint(0x140001000, kind=1)
+" && [[ $(grep -c '^Z1,140001000' "$T3/s4.log") == 2 && $(grep -c '^z1,140001000' "$T3/s4.log") == 2 ]] && grep -qx 'Hg02' "$T3/s4.log" \
+  && ok "gdbremote sets and clears a hardware breakpoint in every thread for winedbg" || bad "gdbremote per-thread breakpoints" "$(cat "$T3/s4.log")"
+
+echo "Installing builds"
+TI="$(cd "$(mktemp -d)" && pwd -P)"; cp -R tests/fixtures/install-project "$TI/p"
+inst() { python3 tools/install/install_app.py --project "$TI/p" --data-root "$TI/data" --no-menu "$@"; }
+inst extra --dest "$TI/mac" --system macos >/dev/null 2>&1
+[[ "$(python3 -c 'import plistlib,sys;d=plistlib.load(open(sys.argv[1],"rb"));print(d["CFBundleExecutable"],d["CFBundleShortVersionString"])' "$TI/mac/Fixture Game.app/Contents/Info.plist")" == "gameframe-start 1.2.3" \
+   && -x "$TI/mac/Fixture Game.app/Contents/MacOS/helper" && -f "$TI/mac/Fixture Game Extra.app/Contents/Resources/library.json" ]] \
+  && ok "install writes NAME.app and NAME Extra.app with the programs, resources and Info.plist" || bad "install's macOS bundles" "$(ls -R "$TI/mac")"
+expect "install's start script runs the program in its data folder with {data}, {resources} and the player's arguments" \
+  "vanilla cwd=$TI/data/Fixture Game args=--data $TI/data/Fixture Game --look $TI/mac/Fixture Game.app/Contents/Resources/library.json --frame" \
+  "$TI/mac/Fixture Game.app/Contents/MacOS/gameframe-start" --frame
+expect "install's extra build is the extra program, with its own data folder" "extra cwd=$TI/data/Fixture Game Extra" "$TI/mac/Fixture Game Extra.app/Contents/MacOS/gameframe-start"
+echo keep > "$TI/data/Fixture Game/save.dat"
+inst --dest "$TI/mac" --system macos >/dev/null 2>&1 && [[ -f "$TI/data/Fixture Game/save.dat" && ! -e "$TI/mac/.Fixture Game.app.new" ]] \
+  && ok "install replaces its own build and keeps the data" || bad "install over its own build"
+mkdir -p "$TI/other/Fixture Game.app"
+expect "install refuses to replace a folder it did not install" "was not installed by this command" inst --dest "$TI/other" --system macos --no-build
+expect "install --list names the installed builds" "extra    Fixture Game Extra" python3 tools/install/install_app.py --list --dest "$TI/mac"
+inst --dest "$TI/lin" --system linux >/dev/null 2>&1
+expect "install writes a Linux folder with a start script and a .desktop entry" "vanilla cwd=$TI/data/Fixture Game args=--data $TI/data/Fixture Game --look $TI/lin/Fixture Game/library.json" "$TI/lin/Fixture Game/start"
+grep -qx "Exec=\"$TI/lin/Fixture Game/start\"" "$TI/lin/Fixture Game/fixture-game.desktop" && ok "install's .desktop entry starts the start script" || bad "install's .desktop entry" "$(cat "$TI/lin/Fixture Game/fixture-game.desktop")"
+inst --dest "$TI/win" --system windows --no-build >/dev/null 2>&1
+expect "install writes a Windows batch file that starts the program in its data folder" '"%~dp0game" "--data" "%data%" "--look" "%~dp0./library.json" %*' cat "$TI/win/Fixture Game/Fixture Game.cmd"
+expect "install --dry-run prints the build commands and changes nothing" "would install vanilla" inst --dest "$TI/dry" --system macos --dry-run
+[[ ! -e "$TI/dry" ]] || bad "install --dry-run made $TI/dry"
+rm -rf "$TI"
 rm -rf "$T3"
 
 T4="$(mktemp -d)"
@@ -1118,6 +1179,23 @@ echo x >> "$W/bag/data/DATA/L1.DAT"
 expect "fixity finds a changed file" "changed  data/DATA/L1.DAT" "$PYTHON" tools/triage/fixity.py verify "$W/bag"
 rm -rf "$W"
 
+echo "Reports to issues"
+RT="$(pwd)"
+R="$(mktemp -d)"; mkdir -p "$R/reports" "$R/bin"
+printf '{"id": "unported-1a2b3c4d", "kind": "unported", "what": "the sky fog", "original": "0x4a5e00", "file": "src/sky.rs", "line": 88, "count": 3, "meta": {"issues": "owner/game"}}\n' > "$R/reports/unported-1a2b3c4d.json"
+printf '# [unported] the sky fog at src/sky.rs:88 (0x4a5e00)\n\n<!-- gameframe-report: unported-1a2b3c4d -->\nBODY\n' > "$R/reports/unported-1a2b3c4d.md"
+printf '{"id": "panic-00000001", "kind": "panic", "what": "boom", "file": "src/a.rs", "line": 1, "count": 1}\n' > "$R/reports/panic-00000001.json"
+# A stand-in gh: logs each call; `issue list` answers with $GH_FOUND.
+printf '#!/bin/sh\necho "$*" >> "%s/gh.log"\ncase "$1 $2" in "issue list") echo "$GH_FOUND";; "issue create") echo https://github.com/owner/game/issues/9;; esac\n' "$R" > "$R/bin/gh"; chmod +x "$R/bin/gh"
+expect "report_issue lists the reports, most frequent first" "3  unported-1a2b3c4d  [unported] the sky fog at src/sky.rs:88 (0x4a5e00)" sh -c "cd '$R' && '$PYTHON' '$RT/tools/triage/report_issue.py' list"
+expect "report_issue shows the body the crate wrote" "BODY" sh -c "cd '$R' && '$PYTHON' '$RT/tools/triage/report_issue.py' show unported-1a2b3c4d"
+out="$(cd "$R" && PATH="$R/bin:$PATH" GH_FOUND= "$PYTHON" "$RT/tools/triage/report_issue.py" file unported-1a2b3c4d)"
+out2="$(cd "$R" && PATH="$R/bin:$PATH" GH_FOUND=9 "$PYTHON" "$RT/tools/triage/report_issue.py" file unported-1a2b3c4d)"
+log="$(cat "$R/gh.log")"
+[[ "$out" == *"issues/9"* && "$out2" == *"issue #9: added the new count"* && "$log" == *"--repo owner/game"* && "$log" == *"--label gameframe-report,unported"* && "$log" == *"issue comment 9"* && "$log" == *"unported-1a2b3c4d in:body"* ]] \
+  && ok "report_issue files a report once, to the report's repository, then comments on that issue" || bad "report_issue file" "$out / $out2 / $log"
+rm -rf "$R"
+
 echo "Ledger and coverage"
 L="$(mktemp -d)"; mkdir -p "$L/src/build" "$L/export/game.exe"
 printf '/// Original: `FUN_140001090`\nfn grow() {}\n// Deviation: the time comes in as an argument,\n// so tests can fix it.\nfn tick() {}\n// Not ported: the debug overlay.\n' > "$L/src/world.rs"
@@ -1140,14 +1218,14 @@ rm -rf "$L"
 echo "Project scaffold"
 tmp="$(mktemp -d)/re-test"
 scripts/new-project.sh "$tmp" "Test Game" $B >/dev/null 2>&1
-[[ -f "$tmp/AGENTS.md" && -f "$tmp/docs/versions.md" && -f "$tmp/docs/GAME_PROFILE.md" && -f "$tmp/README.md" && -f "$tmp/LICENSE-APACHE" && -f "$tmp/LICENSE-CC0-1.0" && ! -e "$tmp/LICENSE-CC-BY-4.0" && ! -e "$tmp/LICENSE-MIT" && -f "$tmp/.cargo/config.toml" && -f "$tmp/.claude/settings.json" && -x "$tmp/gameframe" && -f "$tmp/target/game.exe" && -d "$tmp/.git" && ! -e "$tmp/tools" && ! -e "$tmp/scripts" && ! -e "$tmp/.claude/skills" && -f "$tmp/skills/re-start/SKILL.md" && -f "$tmp/skills/re-profile/SKILL.md" && -L "$tmp/.agents/skills" && ! -e "$tmp/docs/DOS.md" ]] \
+[[ -f "$tmp/AGENTS.md" && -f "$tmp/docs/versions.md" && -f "$tmp/docs/GAME_PROFILE.md" && -f "$tmp/README.md" && -f "$tmp/LICENSE-APACHE" && -f "$tmp/LICENSE-CC0-1.0" && ! -e "$tmp/LICENSE-CC-BY-4.0" && ! -e "$tmp/LICENSE-MIT" && -f "$tmp/.cargo/config.toml" && -f "$tmp/.claude/settings.json" && -x "$tmp/gameframe" && -f "$tmp/game/game.exe" && -L "$tmp/game" && -d "$tmp/.git" && ! -e "$tmp/tools" && ! -e "$tmp/scripts" && ! -e "$tmp/.claude/skills" && -f "$tmp/skills/re-start/SKILL.md" && -f "$tmp/skills/re-profile/SKILL.md" && -L "$tmp/.agents/skills" && ! -e "$tmp/docs/DOS.md" ]] \
   && grep -q "Test Game" "$tmp/AGENTS.md" && grep -q '^# Game profile: Test Game$' "$tmp/docs/GAME_PROFILE.md" && grep -q "In the story | In the code | Evidence" "$tmp/docs/lore.md" && grep -q '"gameframe@game-frame": true' "$tmp/.claude/settings.json" && ! grep -q "gate.py" "$tmp/.claude/settings.json" \
   && grep -q 'gameframe gate cursor' "$tmp/.cursor/hooks.json" && grep -q 'gameframe\\" gate codex' "$tmp/.codex/hooks.json" && grep -q '"AGENTS.md"' "$tmp/.gemini/settings.json" \
-  && ! (cd "$tmp" && git ls-files | grep -q '^target/') \
-  && ok "new-project makes a plugin project: docs/lore.md and GAME_PROFILE.md from their templates, settings enable the plugin, no copied toolkit, the other agents' skills and hooks through ./gameframe gate, target/ out of git" || bad "new-project scaffold" "$(ls -la "$tmp" 2>&1)"
-expect "the launcher finds GameFrame and runs its tools on the project" "EXE, x64 (64-bit)" sh -c "cd '$tmp' && GAMEFRAME_ROOT='$(pwd)' ./gameframe run peinfo target/game.exe"
+  && ! (cd "$tmp" && git ls-files | grep -qE '^(game|media|saves)(/|$)') \
+  && ok "new-project makes a plugin project: docs/lore.md and GAME_PROFILE.md from their templates, settings enable the plugin, no copied toolkit, the other agents' skills and hooks through ./gameframe gate, game/ a link into the home and out of git" || bad "new-project scaffold" "$(ls -la "$tmp" 2>&1)"
+expect "the launcher finds GameFrame and runs its tools on the project" "EXE, x64 (64-bit)" sh -c "cd '$tmp' && GAMEFRAME_ROOT='$(pwd)' ./gameframe run peinfo game/game.exe"
 expect "the launcher runs a project script with the toolkit on its path" "pe_emu ok" sh -c "cd '$tmp' && printf 'import pe_emu\\nprint(\"pe_emu ok\")\\n' > probe.py && GAMEFRAME_ROOT='$(pwd)' ./gameframe python probe.py"
-out="$(cd "$tmp" && git config core.hooksPath && git add -f target/game.exe && GAMEFRAME_ROOT="$OLDPWD" git commit -qm game 2>&1; git reset -q)"
+out="$(cd "$tmp" && git config core.hooksPath && git add -f game && GAMEFRAME_ROOT="$OLDPWD" git commit -qm game 2>&1; git reset -q)"
 [[ "$out" == *".githooks"*"stages game material"* ]] && ok "a plugin project's git pre-commit hook finds GameFrame and blocks game material" || bad "plugin project pre-commit hook" "$out"
 expect "the session hook says where GameFrame's guides are" "read docs/NAME.md as" sh -c "echo '{\"cwd\": \"$tmp\"}' | python3 scripts/hooks/gate.py session"
 out="$("$PWD/scripts/update-project.sh" "$tmp" 2>&1)"
@@ -1243,11 +1321,30 @@ out="$(python3 tools/site/check.py "$S" 2>&1)"
   && ok "check.py finds commit logs, missing summaries, game files, missing includes and decompiled code in an included document" || bad "check.py problems" "$out"
 rm "$S/diary/2026-10-24-work.md" "$S/diary/2026-10-25-x.md" "$S/public.exe" "$S/missing.md"
 git -C "$sp" checkout -q docs/FINDINGS.md
+printf -- '---\ntitle: Fog\nsummary: Fog.\n---\n\nFog tables.\n' > "$S/diary/2026-10-25-0910-fog.md"
+printf -- '---\ntitle: Shadows\nsummary: Shadows.\n---\n\nShadow volumes.\n' > "$S/diary/2026-10-25-1430-shadows.md"
+printf -- '---\ntitle: Today\nsummary: Today.\n---\n\nStill going.\n' > "$S/diary/2026-10-26-0900-today.md"
+out="$(python3 tools/site/check.py "$S" --today 2026-10-26 2>&1)"; days="$(python3 tools/site/check.py "$S" --today 2026-10-26 --days 2>&1)"
+keep="$(python3 tools/site/check.py "$S" --today 2026-10-26 --keep-live 2>&1)"
+[[ "$out" == *"2 live entries from 2026-10-25 and no day post"* && "$out" == *"1 errors, 0 warnings"* && "$days" == "2026-10-25: 2 live entries"* && "$keep" == *"0 errors, 0 warnings"* ]] \
+  && ok "check.py asks for a day post for each past day's live entries, lists those days, and lets today's stay short" || bad "check.py live entries" "$out $days $keep"
+{ printf -- '---\ntitle: Fog and shadows\nsummary: Fog and shadows as the card drew them.\n---\n\n'
+  for i in 1 2 3 4 5 6 7 8; do echo "$words"; done; printf '\n## The day'"'"'s entries\n\n- [09:10 · Fog](./2026-10-25-0910-fog)\n'; } > "$S/diary/2026-10-25-fog-and-shadows.md"
+part="$(python3 tools/site/check.py "$S" --today 2026-10-26 2>&1)"
+printf -- '- [14:30 · Shadows](./2026-10-25-1430-shadows)\n' >> "$S/diary/2026-10-25-fog-and-shadows.md"
+whole="$(python3 tools/site/check.py "$S" --today 2026-10-26 2>&1)"; days="$(python3 tools/site/check.py "$S" --today 2026-10-26 --days 2>&1)"
+[[ "$part" == *"does not link 1 of its live entries: 2026-10-25-1430-shadows"* && "$whole" == *"0 errors, 0 warnings"* && -z "$days" && -f "$S/diary/2026-10-25-0910-fog.md" ]] \
+  && ok "check.py keeps a past day's live entries and wants its day post to link each of them" || bad "check.py day post links" "$part $whole $days"
+rm "$S/diary/2026-10-25-0910-fog.md" "$S/diary/2026-10-25-1430-shadows.md" "$S/diary/2026-10-26-0900-today.md" "$S/diary/2026-10-25-fog-and-shadows.md"
 if [[ -x site/node_modules/.bin/vitepress ]]; then
   ln -s "$PWD/site/node_modules" "$S/node_modules"
+  printf -- '---\ntitle: Early note\nsummary: A live entry.\n---\n\nA note.\n' > "$S/diary/2026-10-22-0910-early.md"
+  printf -- '---\ntitle: The early day\nsummary: The day post.\n---\n\n- [09:10 · Early note](./2026-10-22-0910-early)\n' > "$S/diary/2026-10-22-early-day.md"
   out="$(cd "$S" && ./node_modules/.bin/vitepress build 2>&1)"
   [[ $? == 0 ]] && grep -q "The first format</a>" "$S/.vitepress/dist/diary/index.html" && grep -q "2026-10-23 · The first format" "$S/.vitepress/dist/index.html" \
-    && ok "the new site builds with VitePress, and the diary lists its entry" || bad "new site build" "$out"
+    && grep -q "The early day" "$S/.vitepress/dist/diary/index.html" && ! grep -q "Early note</a>" "$S/.vitepress/dist/diary/index.html" \
+    && ! grep -q "09:10 · Early note" "$S/.vitepress/dist/index.html" && [[ -f "$S/.vitepress/dist/diary/2026-10-22-0910-early.html" ]] \
+    && ok "the new site builds with VitePress; the diary lists the day posts and keeps a past day's live entry as a page its post links" || bad "new site build" "$out"
 else
   echo "  skip  the new site's VitePress build (run npm install in site/)"
 fi
@@ -1277,6 +1374,11 @@ expect "cite_labels --any takes the first address above an item" $'1000:f789\tdr
 expect "cite_labels gives the file alone with --no-lines" $'1400c9560\ttick\tlib.rs\n' "$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --no-lines
 out="$("$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --existing tests/fixtures/cite/names.tsv 2>/dev/null)"
 [[ "$out" != *1400ca100* && "$out" != *1400c9460* ]] && ok "cite_labels keeps a hand-made label, and skips a module note" || bad "cite_labels existing and module notes" "$out"
+expect "cite_labels follows an Original list onto the next line" $'1400cb100\thire_2' "$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite
+expect "cite_labels --notes names a module's note after its module" $'1400c9460\tcite' "$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --notes
+expect "cite_labels --any --prefix takes a FUN_ address above a function" $'1400cc000\tdraw_town' "$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --any --prefix FUN_
+out="$("$PYTHON" tools/triage/cite_labels.py tests/fixtures/cite --any --prefix FUN_ 2>/dev/null)"
+[[ "$out" != *1400cc100* && "$out" != *1400cc200* && "$out" != *1400cc300* && "$out" != *Some* ]] && ok "cite_labels --any skips body notes, instruction addresses and fields" || bad "cite_labels --any limits" "$out"
 expect "dictionary checks a data dictionary against fields.tsv" "4 rows, 0 errors, 0 warnings; 2 of 3 fields" "$PYTHON" tools/triage/dictionary.py tests/fixtures/dictionary/dictionary.tsv --fields tests/fixtures/dictionary/fields.tsv
 out="$("$PYTHON" tools/triage/dictionary.py tests/fixtures/dictionary/bad.tsv --fields tests/fixtures/dictionary/fields.tsv 2>&1)"; code=$?
 [[ $code == 1 && "$out" == *"already on line 2"* && "$out" == *"not a kind of value"* && "$out" == *"not a known form of place"* && "$out" == *"2 columns"* && "$out" == *"int16 here and int32"* ]] && ok "dictionary reports bad rows and fails" || bad "dictionary bad rows" "$out"
@@ -1378,6 +1480,40 @@ print('commit, push, write and session gates; Codex, Gemini, Cursor and Copilot 
 PY
 )"
 [[ $? == 0 ]] && ok "the gates block game material, decompiled code and non-lander commits ($out)" || bad "gates" "$out"
+echo "Releases (scripts/release.py, scripts/hooks/gates/version.py)"
+out="$(python3 - <<'PY' 2>&1
+import json, os, subprocess, tempfile
+here = os.getcwd()
+d = tempfile.mkdtemp()
+git = lambda *a: subprocess.run(['git', *a], cwd=d, check=True, capture_output=True, text=True).stdout
+rel = lambda *a: subprocess.run(['python3', f'{here}/scripts/release.py', *a], cwd=d, capture_output=True, text=True)
+gate = lambda: subprocess.run(['python3', f'{here}/scripts/hooks/gate.py', 'staged'], cwd=d, capture_output=True, text=True).returncode
+git('init', '-q'); git('config', 'user.email', 't@example.org'); git('config', 'user.name', 'T')
+os.makedirs(f'{d}/.claude-plugin')
+plugin = lambda: json.load(open(f'{d}/.claude-plugin/plugin.json'))['version']
+json.dump({'name': 'x', 'version': '1.1.0-dev'}, open(f'{d}/.claude-plugin/plugin.json', 'w'))
+open(f'{d}/CHANGELOG.md', 'w').write('# Changelog\n\n## [1.1.0-dev] - Unreleased\n\n- A change.\n\n## [1.0.0] - 2026-01-01\n\n- First.\n\n'
+    '[1.1.0-dev]: https://example.org/r/compare/v1.0.0...HEAD\n[1.0.0]: https://example.org/r/releases/tag/v1.0.0\n')
+git('add', '.'); git('commit', '-qm', 'start'); git('tag', 'v1.0.0')
+r = rel('1.1.0', '--no-next'); assert r.returncode == 0, r.stderr
+assert plugin() == '1.1.0' and git('tag', '-l', 'v1.1.0').strip() == 'v1.1.0', 'released and tagged'
+log = open(f'{d}/CHANGELOG.md').read()
+assert '## [1.1.0] - ' in log and '[1.1.0]: https://example.org/r/compare/v1.0.0...v1.1.0' in log, log
+open(f'{d}/a.txt', 'w').write('a'); git('add', 'a.txt')
+assert gate() == 2, 'a commit on top of a tagged release is blocked'
+git('reset', '-q', 'a.txt')
+r = rel('next'); assert r.returncode == 0, r.stderr
+log = open(f'{d}/CHANGELOG.md').read()
+assert plugin() == '1.2.0-dev' and log.index('## [1.2.0-dev] - Unreleased') < log.index('## [1.1.0]'), log
+assert '[1.2.0-dev]: https://example.org/r/compare/v1.1.0...HEAD' in log, log
+git('add', 'a.txt'); assert gate() == 0, 'a commit on a -dev version passes'
+r = rel('next'); assert r.returncode == 2, 'next twice is refused'
+print('release 1.1.0, tag, the gate, next opens 1.2.0-dev')
+PY
+)"
+[[ $? == 0 ]] && ok "releases: $out" || bad "releases" "$out"
+expect "release.py prints its usage" "Cut a GameFrame release" python3 scripts/release.py --help
+
 echo "Game folder (scripts/hooks/gates/game_folder.py, deletes.py)"
 out="$("$PYTHON" - <<'PY' 2>&1
 import json, os, subprocess, tempfile
@@ -1419,19 +1555,54 @@ PY
 [[ $? == 0 ]] && ok "$out" || bad "game folder" "$out"
 tmp="$(mktemp -d)/proj"
 scripts/new-project.sh "$tmp" "Test Game" --agent claude >/dev/null 2>&1
-if [[ -f "$tmp/target/GAME-FILES-NOT-BUILD-OUTPUT.txt" ]] && grep -q 'target-dir = "build"' "$tmp/.cargo/config.toml"; then
-  rm -rf "$tmp/target" "$tmp/.cargo"
+if [[ -f "$tmp/game/GAME-FILES-NOT-BUILD-OUTPUT.txt" ]] && grep -q 'target-dir = "build"' "$tmp/.cargo/config.toml"; then
+  rm "$tmp/game"; rm -rf "$tmp/.cargo"; mkdir "$tmp/target"
   out="$(scripts/update-project.sh "$tmp" 2>&1)"
-  [[ -f "$tmp/target/GAME-FILES-NOT-BUILD-OUTPUT.txt" ]] && grep -q 'target-dir = "build"' "$tmp/.cargo/config.toml" \
-    && ok "new-project marks target/ as the game; update-project adds the marker and .cargo/config.toml to an older project" \
+  [[ -f "$tmp/target/GAME-FILES-NOT-BUILD-OUTPUT.txt" ]] && grep -q 'target-dir = "build"' "$tmp/.cargo/config.toml" && [[ "$out" == *"home adopt"* ]] \
+    && ok "new-project marks game/ as the game; update-project marks an older project's target/, adds .cargo/config.toml and points to home adopt" \
     || bad "update-project game folder" "$out"
-else bad "new-project game folder marker" "$(ls -la "$tmp" "$tmp/target" 2>&1)"; fi
+else bad "new-project game folder marker" "$(ls -la "$tmp" "$tmp/game/" 2>&1)"; fi
 rm -rf "$(dirname "$tmp")"
 cfg=0
 for f in .codex/hooks.json .cursor/hooks.json .github/hooks/gameframe.json hooks/gemini-settings.json; do
   "$PYTHON" -m json.tool "$f" >/dev/null 2>&1 && grep -q "gate.py" "$f" || { bad "hook config $f is valid JSON and runs gate.py"; cfg=1; }
 done
 [[ $cfg == 0 ]] && ok "the hook configs for Codex, Cursor, Copilot and Gemini CLI are valid JSON and run gate.py"
+
+echo "GameFrame home (gameframe home, gameframe game)"
+HT="$(mktemp -d)"; hh="$HT/home"
+out="$(GAMEFRAME_HOME="$hh" ./gameframe home init --no-python 2>&1)"
+[[ -d "$hh/games" && -d "$hh/machines/os" && -f "$hh/README.md" ]] && grep -qx "GAMEFRAME_ROOT=$PWD" "$hh/config.env" \
+  && ok "home init makes the folders and writes GAMEFRAME_ROOT to config.env" || bad "home init" "$out"
+"$PYTHON" tests/make_disc.py "$HT" >/dev/null
+out="$(GAMEFRAME_HOME="$hh" ./gameframe game add demo "$HT/test.iso" 2>&1)"
+[[ -f "$hh/games/demo/media/test.iso" && -n "$(ls "$hh/games/demo/game")" ]] && grep -q '"sha256"' "$hh/games/demo/game.json" \
+  && ok "game add keeps the image in media/, records its SHA-256 and extracts it into game/" || bad "game add" "$out"
+po="$HT/old"; mkdir -p "$po/target" "$po/truth" "$po/save-game"; git -C "$po" init -q
+echo x > "$po/target/GAME.EXE"; echo s > "$po/save-game/S1.SAV"; echo 'print(1)' > "$po/truth/run.py"; git -C "$po" add truth/run.py
+out="$(GAMEFRAME_HOME="$hh" ./gameframe home adopt "$po" --id old 2>&1)"
+[[ -L "$po/game" && -L "$po/target" && -f "$po/target/GAME.EXE" && -f "$hh/games/old/game/GAME.EXE" && -f "$po/save-game/S1.SAV" \
+   && -f "$hh/games/old/saves/S1.SAV" && -d "$po/truth" && ! -L "$po/truth" && "$out" == *"kept truth/"* ]] && grep -qx /save-game "$po/.gitignore" \
+  && ! grep -qx /truth "$po/.gitignore" \
+  && ok "home adopt moves target/ and save-game/ into the home, leaves links at the old names, keeps a folder git tracks" || bad "home adopt" "$out"
+ln -s "$po" "$hh/projects/old"
+out="$(GAMEFRAME_HOME="$hh" ./gameframe home doctor 2>&1)"
+[[ "$out" == *"games/demo"*"1 media files"* && "$out" == *"projects/old"*"links in place"* ]] && ok "home doctor checks each game and each project's links" || bad "home doctor" "$out"
+out="$(HOME_DIR="$hh" PROJ="$po" "$PYTHON" - <<'PY' 2>&1
+import json, os, subprocess
+G = os.path.abspath('scripts/hooks/gate.py'); h = os.environ['HOME_DIR']; p = os.environ['PROJ']
+def run(cmd, cwd=p):
+    ev = {'cwd': cwd, 'tool_input': {'command': cmd}}
+    return subprocess.run(['python3', G, 'delete'], input=json.dumps(ev), capture_output=True, text=True).returncode
+blocked = ['rm -rf game/', 'rm -rf game/*', 'rm -rf media/', f'rm -rf {h}', f'rm -rf {h}/games/old/game', f'rm -rf {h}/games/demo/media']
+passed = ['rm game', 'rm -f media', 'ls game/', f'rm -rf {h}/cache']
+assert [c for c in blocked if run(c) != 2] == [], [c for c in blocked if run(c) != 2]
+assert [c for c in passed if run(c) != 0] == [], [c for c in passed if run(c) != 0]
+print('the delete gate lets a link go and blocks the game and media it points to, and the home')
+PY
+)"
+[[ $? == 0 ]] && ok "$out" || bad "home delete gate" "$out"
+rm -rf "$HT"
 
 echo "Agent Skills (agentskills.io): one copy in skills/, found by every agent"
 out="$("$PYTHON" - <<'PY' 2>&1
@@ -1553,12 +1724,17 @@ if command -v claude >/dev/null; then
   # plugin.json carries the release's version: Claude Code updates the plugin when it changes.
   # The one warning allowed: this repository is both the plugin and GameFrame's own working copy,
   # whose CLAUDE.md is for developing GameFrame, never plugin context. Count the validator's own
-  # "Found N warning" lines: its output also has informational lines that start with ❯.
+  # "Found N warning" lines: its output also has informational lines that start with ❯. Its
+  # "plugin directory" warnings read the folder on disk, where an ignored .DS_Store may sit, and
+  # do not change the result; the next check covers what git would submit.
   out="$(claude plugin validate . 2>&1)"
-  warnings="$(echo "$out" | sed -n 's/.*Found \([0-9][0-9]*\) .*warning.*/\1/p' | awk '{s += $1} END {print s + 0}')"
+  warnings="$(echo "$out" | sed -n 's/.*Found \([0-9][0-9]*\) warnings*:.*/\1/p' | awk '{s += $1} END {print s + 0}')"
   claude_md="$(echo "$out" | grep -c 'CLAUDE.md at the plugin root' || true)"
   [[ "$out" == *"Validation passed"* && $((warnings - claude_md)) == 0 ]] \
     && ok "claude plugin validate passes; the only warning allowed is GameFrame's own CLAUDE.md ($warnings)" || bad "claude plugin validate" "$out"
+  tracked="$(git ls-files | grep -iE '(^|/)(\.DS_Store|Thumbs\.db|desktop\.ini)$|(^|/)__MACOSX/' || true)"
+  [[ -z "$tracked" ]] && ok "git tracks no macOS or Windows system file, so the plugin directory can list the plugin" \
+    || bad "system files in git" "$tracked"
 else
   echo "  skip  claude plugin validate (no claude command)"
 fi
@@ -1734,9 +1910,17 @@ out="$("$PYTHON" tests/mcp_provider_config.py 2>&1)"
   && ok "optional MCP providers use project-local settings and preserve client configuration ($out)" \
   || bad "MCP provider opt-in" "$out"
 out="$("$PYTHON" tests/mcp_tool_coverage.py 2>&1)"
-[[ $? == 0 && "$out" == *"MCP coverage: 124 catalog entries, 97 runnable tools, progress/cancel/timeout"* ]] \
+[[ $? == 0 && "$out" == *"MCP coverage: 136 catalog entries, 103 runnable tools, progress/cancel/timeout"* ]] \
   && ok "the GameFrame MCP exposes every catalog entry and runs every program and script ($out)" \
   || bad "GameFrame MCP tool coverage" "$out"
+out="$("$PYTHON" tests/decision_adapter.py "$B/game.exe" 2>&1)"
+[[ $? == 0 && "$out" == *"Decision adapter: bounded questions, explicit route/model/key, derived route, no paid fallback"* ]] \
+  && ok "the generic decision tool routes bounded questions to a selected local endpoint ($out)" \
+  || bad "decision model adapter" "$out"
+out="$("$PYTHON" tests/decision_feedback.py "$B/game.exe" 2>&1)"
+[[ $? == 0 && "$out" == *"Decision feedback: explicit corrections, user-local file, dedupe, chat export, grouped holdout"* ]] \
+  && ok "decision corrections stay per-user and export a grouped training set ($out)" \
+  || bad "decision feedback export" "$out"
 out="$("$PYTHON" - <<'PY' 2>&1
 import json, re, subprocess, tomllib
 src = json.load(open('.mcp.json'))['mcpServers']
@@ -1781,6 +1965,24 @@ else
   echo "  skip  the crates (cargo is not installed)"
 fi
 
+echo "Library page"
+if command -v node >/dev/null; then
+  out="$(for f in templates/library-page/*.js; do node --check "$f" 2>&1 || echo "FAIL $f"; done; python3 -c "import json; json.load(open('templates/library-page/library.json')); json.load(open('examples/frame-demo/library.json'))" 2>&1)"
+  [[ -z "$out" ]] && ok "the library page's scripts parse and its library.json reads (the crates' tests check it against the spec)" \
+    || bad "library page" "$out"
+else
+  echo "  skip  the library page's scripts (node is not installed)"
+fi
+# Every theme file is built into the frame, and the frame builds in no theme that is missing.
+out=""
+for f in templates/library-page/themes/*.css; do
+  n="$(basename "$f" .css)"
+  grep -q "(\"$n\", \"[^\"]*\", include_str!(\"../../../templates/library-page/themes/$n.css\"))" crates/frame-ui/src/themes.rs || out+="$n is not in frame-ui's THEMES; "
+  grep -q "\`$n\`" templates/library-page/README.md || out+="$n is not in the page's README; "
+done
+[[ -z "$out" ]] && ok "the ready-made themes ($(ls templates/library-page/themes/*.css | wc -l | tr -d ' ')) are built into the frame and listed in the README" \
+  || bad "themes" "$out"
+
 echo "Wrappers"
 if command -v cargo >/dev/null; then
   WT="$(mktemp -d)"
@@ -1789,8 +1991,26 @@ if command -v cargo >/dev/null; then
   [[ $? == 0 && "$out" == *"s3dtkw: 6 of 6 calls implemented"* ]] \
     && ok "stubgen: each wrapper's .def and stubs match its API table, every call with the original's convention ($(echo "$out" | grep -o '[0-9]* of [0-9]*' | paste -sd, - | sed 's/,/, /g'))" \
     || bad "stubgen --check" "$out"
-  out="$(cd wrappers && cargo test --release --target "$host" --target-dir "$WT" -p raster -p scalers -p pixels -p shim -p sgl -p maxi94 -p glide 2>&1)"
-  [[ $? == 0 ]] && ok "the wrappers' host tests pass: rasteriser, scalers, pixels, settings, SGL scene graph and immediate mode, Maxi Sound 64 streams and mixer, Glide clipping, mip layout, fog tables and 3DF files ($(echo "$out" | grep -o '[0-9]* passed' | awk '{s+=$1} END {print s}') tests)" \
+  expect "every export of glide, sgl, ati3dcif and s3dtkw writes itself to the call log first (shim::call!, WRAPPER_CALLS)" "missing: none" "$PYTHON" -c "
+import glob, re
+missing, n = [], 0
+for f in sorted(glob.glob('wrappers/glide/src/api/*.rs') + glob.glob('wrappers/sgl/src/api/*.rs') + ['wrappers/ati3dcif/src/api.rs', 'wrappers/s3dtkw/src/api.rs']):
+    lines = open(f).read().split(chr(10))
+    for i, line in enumerate(lines):
+        if line.strip() != '#[unsafe(no_mangle)]':
+            continue
+        j = i + 1
+        while not lines[j].rstrip().endswith('{'):
+            j += 1
+        name = re.search(r'fn (\\w+)', ' '.join(lines[i + 1:j + 1])).group(1)
+        if name == 'DllMain' or name.startswith('sgl_wrapper_'):
+            continue
+        n += 1
+        if 'shim::call!(\\\"' + name + '\\\"' not in lines[j + 1]:
+            missing.append(name)
+print('missing: ' + (', '.join(missing) or 'none'))"
+  out="$(cd wrappers && cargo test --release --target "$host" --target-dir "$WT" -p scalers -p pixels -p shim -p sgl -p maxi94 -p glide 2>&1)"
+  [[ $? == 0 ]] && ok "the wrappers' host tests pass: scalers, pixels, settings, SGL scene graph and immediate mode, Maxi Sound 64 streams and mixer, Glide clipping, mip layout, fog tables and 3DF files ($(echo "$out" | grep -o '[0-9]* passed' | awk '{s+=$1} END {print s}') tests)" \
     || bad "wrappers host tests" "$(echo "$out" | grep -E 'FAILED|panicked|error' | head -8)"
   if rustup target list --installed 2>/dev/null | grep -q i686-pc-windows-gnu && command -v zig >/dev/null; then
     out="$(cd wrappers && cargo build -q --release --target-dir "$WT" 2>&1)"
@@ -1864,6 +2084,10 @@ else
 fi
 
 echo "API credit tools (tools/llm), against fake_api.py: nothing is sent"
+out="$("$PYTHON" tests/llm_protocols.py 2>&1)"
+[[ $? == 0 && "$out" == *"OpenAI-compatible calls: text, schema, images, synchronous naming, key isolation, hosted confirmation"* ]] \
+  && ok "model tools can route local and named hosted providers without sharing keys ($out)" \
+  || bad "OpenAI-compatible model client" "$out"
 if "$PYTHON" -c "import anthropic" 2>/dev/null; then
   L="$(mktemp -d)"
   "$PYTHON" tools/llm/fake_api.py serve "$L/port" & fake=$!
@@ -1872,7 +2096,7 @@ if "$PYTHON" -c "import anthropic" 2>/dev/null; then
   printf '401000\t40\tFUN_00401000\t\n401040\t60\tFUN_00401040\t\n401090\t8\tFUN_00401090\t\n' > "$L/analysis/export/demo.exe/functions.tsv"
   printf '// ==== 401000 FUN_00401000\nvoid FUN_00401000(void) { FUN_00401040("SAVE0001.DAT"); }\n// ==== 401040 FUN_00401040\nint FUN_00401040(char *p) { return fopen(p, "rb") != 0; }\n// ==== 401090 FUN_00401090\nvoid FUN_00401090(void) { }\n' > "$L/analysis/export/demo.exe/decomp.c"
   printf '402000\tSAVE0001.DAT\n' > "$L/analysis/export/demo.exe/strings.txt"
-  llm() { ANTHROPIC_BASE_URL="http://127.0.0.1:$(cat "$L/port")" ANTHROPIC_API_KEY=fake GAMEFRAME_NO_DOTENV=1 GAMEFRAME_PROJECT="$L" \
+  llm() { GAMEFRAME_LLM_ENDPOINT="http://127.0.0.1:$(cat "$L/port")" GAMEFRAME_LOCAL_LLM_API_KEY=fake GAMEFRAME_LLM_PROVIDER=local GAMEFRAME_LLM_PROTOCOL=anthropic GAMEFRAME_MODEL=claude-opus-5-5 GAMEFRAME_LLM_BATCHES=1 GAMEFRAME_NO_DOTENV=1 GAMEFRAME_PROJECT="$L" \
           GAMEFRAME_CLAUDE="$PYTHON $ROOT/tools/llm/fake_api.py claude" "$PYTHON" "$@"; }
   expect "name_functions prepare picks the unnamed functions above --min-size and sends nothing" "2 functions" llm tools/llm/name_functions.py prepare
   expect "name_functions puts a function's callers and strings in its request" 'Called by: FUN_00401000' grep -o 'Called by: FUN_00401000' "$L/analysis/llm/names/demo.exe/requests.jsonl"
@@ -1886,12 +2110,15 @@ if "$PYTHON" -c "import anthropic" 2>/dev/null; then
   expect "ask --show lists the entries and spends nothing" "wine-privileged-instruction" "$PYTHON" tools/llm/ask.py --show privileged instruction under wine
   expect "headless runs an agent and writes its report" "## re-decoder (done" env CLAUDECODE=1 CLAUDE_CODE_ENTRYPOINT=test bash -c "$(declare -f llm); L='$L' PYTHON='$PYTHON' ROOT='$ROOT'; llm tools/llm/headless.py re-decoder 'decode build/sample.dat' --dir '$L' >/dev/null; cat '$L'/analysis/llm/runs/*-re-decoder.md"
   expect "headless gives claude the prompt on stdin, without the calling session's CLAUDE* variables" "fake run: decode build/sample.dat; CLAUDE variables: 0" cat "$L"/analysis/llm/runs/*-re-decoder.md
+  expect "headless sends calls to the configured Anthropic-compatible endpoint" "Anthropic endpoint: http://127.0.0.1" cat "$L"/analysis/llm/runs/*-re-decoder.md
   expect "headless docs-check runs re-checker and re-editor" "## re-editor (done" bash -c "$(declare -f llm); L='$L' PYTHON='$PYTHON' ROOT='$ROOT'; llm tools/llm/headless.py docs-check docs/knowhow --report '$L/dc.md' >/dev/null; cat '$L/dc.md'"
   expect "skillcheck passes a skill whose answer holds the ground truth" "1 of 1 skills passed" env FAKE_ANSWER="1 0.5 oak
 2 1.25 birch
 3 2.0 pine" bash -c "$(declare -f llm); L='$L' PYTHON='$PYTHON' ROOT='$ROOT'; llm tools/llm/skillcheck.py --skill re-format"
   expect "skillcheck fails a skill whose answer misses it" "missing: 18467, 6334" env FAKE_ANSWER="41" bash -c "$(declare -f llm); L='$L' PYTHON='$PYTHON' ROOT='$ROOT'; llm tools/llm/skillcheck.py --skill re-emulate"
-  expect "the API tools refuse to run without a key" "ANTHROPIC_API_KEY is not set" env -u ANTHROPIC_API_KEY GAMEFRAME_NO_DOTENV=1 ANTHROPIC_BASE_URL=http://127.0.0.1:9 "$PYTHON" tools/llm/ask.py privileged instruction
+  expect "paid API use requires a key after choosing its provider" "Set GAMEFRAME_ANTHROPIC_API_KEY" env -u GAMEFRAME_ANTHROPIC_API_KEY -u GAMEFRAME_OPENAI_API_KEY -u GAMEFRAME_OPENAI_COMPATIBLE_API_KEY -u GAMEFRAME_LOCAL_LLM_API_KEY GAMEFRAME_LLM_PROVIDER=anthropic GAMEFRAME_NO_DOTENV=1 "$PYTHON" tools/llm/ask.py privileged instruction
+  expect "hosted providers require their named key; the generic key is not a fallback" "Set GAMEFRAME_ANTHROPIC_API_KEY" env -u GAMEFRAME_ANTHROPIC_API_KEY GAMEFRAME_LLM_API_KEY=legacy-key GAMEFRAME_LLM_PROVIDER=anthropic GAMEFRAME_NO_DOTENV=1 "$PYTHON" tools/llm/ask.py privileged instruction
+  expect "a saved hosted API key does not change the local provider" "Set GAMEFRAME_LLM_ENDPOINT to a model server" env -u GAMEFRAME_LLM_ENDPOINT GAMEFRAME_LLM_PROVIDER=local GAMEFRAME_ANTHROPIC_API_KEY=fake GAMEFRAME_NO_DOTENV=1 "$PYTHON" tools/llm/ask.py privileged instruction
   "$PYTHON" - "$L" <<'PY'
 import sys; sys.path.insert(0, 'tools/formats')
 from pngio import write_png
@@ -1900,10 +2127,10 @@ PY
   expect "locate --find gives an element's centre in the capture's pixels" "0 0   (fake_note)" llm tools/llm/locate.py "$L/shot.png" --find "the Exit button"
   llm tools/llm/locate.py "$L/shot.png" --ref "$L/shot.png" --save "$L/loc.json" >/dev/null
   expect "locate --ref saves a result align.py map reads" "0.0 0.0" "$PYTHON" tools/live/align.py map "$L/loc.json" 5 5
-  printf 'ANTHROPIC_API_KEY="from-dotenv"\n' > "$L/.env"
-  expect "client reads the key from the project's .env" "ANTHROPIC_API_KEY: set" env -u ANTHROPIC_API_KEY GAMEFRAME_PROJECT="$L" "$PYTHON" tools/llm/client.py
+  printf 'GAMEFRAME_LOCAL_LLM_API_KEY="from-dotenv"\nGAMEFRAME_LLM_ENDPOINT=http://127.0.0.1:9\nGAMEFRAME_LLM_PROVIDER=local\nGAMEFRAME_LLM_PROTOCOL=anthropic\nGAMEFRAME_LOCAL_MODEL=local-profile-model\nGAMEFRAME_MODEL=legacy-model\n' > "$L/.env"
+  ( cd "$L" && expect "client reads the selected profile model from the project's .env" "model: local-profile-model" env -u GAMEFRAME_LOCAL_LLM_API_KEY -u GAMEFRAME_ANTHROPIC_API_KEY -u GAMEFRAME_LLM_ENDPOINT -u GAMEFRAME_LLM_PROVIDER -u GAMEFRAME_LLM_PROTOCOL -u GAMEFRAME_LOCAL_MODEL -u GAMEFRAME_MODEL GAMEFRAME_PROJECT="$L" "$PYTHON" "$ROOT/tools/llm/client.py" )
   mkdir -p "$L/here" && printf 'GHIDRA_INSTALL_DIR=/x\n' > "$L/here/.env"
-  expect "client reads on past a .env without the key" "ANTHROPIC_API_KEY: set" bash -c "cd '$L/here' && env -u ANTHROPIC_API_KEY GAMEFRAME_PROJECT='$L' '$PYTHON' '$PWD/tools/llm/client.py'"
+  expect "client reads on past a .env without the key" "model: local-profile-model" bash -c "cd '$L/here' && env -u GAMEFRAME_LOCAL_LLM_API_KEY -u GAMEFRAME_ANTHROPIC_API_KEY -u GAMEFRAME_LLM_ENDPOINT -u GAMEFRAME_LLM_PROVIDER -u GAMEFRAME_LLM_PROTOCOL -u GAMEFRAME_LOCAL_MODEL -u GAMEFRAME_MODEL GAMEFRAME_PROJECT='$L' '$PYTHON' '$PWD/tools/llm/client.py'"
   kill $fake 2>/dev/null; rm -rf "$L"
 else
   echo "  skip  tools/llm (the anthropic package is missing: pip install -r requirements-llm.txt)"

@@ -7,23 +7,25 @@ Usage:
 
   --tasks   the tasks (default: tests/skill-tasks.json)
   --skill   run only the tasks for this skill (repeat for more)
-  --budget  the most one task may spend, in US dollars (default 1.00)
-  --model   the model (default: GAMEFRAME_MODEL, else claude-opus-5-5)
+  --budget  the most one task may spend, in US dollars (default 1.00; provider-reported cost)
+  --model   the model (default: selected provider profile; GAMEFRAME_MODEL overrides one run)
   --keep    keep each task's folder and print where it is
   --report  also write the results as Markdown to FILE
 
 AGENTS.md rule 4 says an agent that loads one skill must be able to do that step from it
 alone. For each task this tool makes an empty folder holding only the sample game's built
 binaries (examples/sample-game/build, never its C sources), then runs `claude -p --bare` there
-with the skill's SKILL.md as the whole system prompt. The agent writes its answer to
+with the skill's SKILL.md as the whole system prompt. Configure an Anthropic-compatible
+provider, including a local server, for this agent run. The agent writes its answer to
 answer.txt. The task passes when answer.txt holds every string in the task's "expect" list
 (case is ignored). Build the sample first (tests/run.sh or examples/sample-game/build.sh).
 
 A task is {"skill": "re-format", "task": "what to do", "expect": ["strings", "in the answer"]}.
 Each expected string comes from the sample's ground truth, never from the agent.
 
-It uses the API key (client.py), so it spends credits; three tasks at the default budget can
-spend up to 3 US dollars. Exits 1 when a task fails.
+It uses the configured provider (client.py). Hosted providers may spend credits; three tasks
+at the default budget can spend up to 3 US dollars. Local servers may report no meaningful
+cost. Exits 1 when a task fails.
 
 What it does not do: stop an agent from reading GameFrame's own files. The prompt asks it not
 to read examples/, where the sources are; a pass with a cheat would show in the transcript

@@ -1,0 +1,61 @@
+/* Macintosh System 7: black on white, one-pixel lines, a striped title bar, round buttons
+   with a thick ring on the default one, and a grey patterned desktop.
+   A ready-made theme for the library page and the frame: "preset": "system7" in library.json.
+   Chicago and Geneva are used when the player has them; Charcoal, then the system font, if not. */
+
+#library[data-scheme] {
+  --lib-bg: repeating-conic-gradient(#808080 0 25%, #a8a8a8 0 50%) 0 0 / 2px 2px;
+  --lib-surface: #fff; --lib-surface-2: #fff; --lib-line: #000; --lib-text: #000; --lib-muted: #000;
+  --lib-accent: #000; --lib-accent-text: #fff; --lib-danger: #000; --lib-ok: #000; --lib-scrim: transparent;
+  --lib-font: Geneva, "ChicagoFLF", Charcoal, system-ui, sans-serif;
+  --lib-font-display: Chicago, "ChicagoFLF", Charcoal, var(--lib-font);
+  --lib-font-mono: Monaco, "Courier New", monospace;
+  --lib-text-s: 11px; --lib-text-m: 12px; --lib-text-l: 12px; --lib-text-xl: 12px; --lib-text-title: 12px;
+  --lib-weight-strong: 700; --lib-radius-s: 0; --lib-radius-m: 0; --lib-radius-l: 0; --lib-radius-pill: 8px;
+  --lib-shadow: 1px 1px 0 #000; --lib-blur: 0; --lib-width: 540px;
+  color-scheme: light;
+}
+#library[data-scheme] { background: var(--lib-bg); }
+
+/* The window: a black line, a drop shadow, a striped title bar with the name on a white box. */
+#library .lib-card { padding: 0 0 10px; border: 1px solid #000; box-shadow: 1px 1px 0 #000; }
+#library .lib-card > :not(.lib-header) { margin-left: 10px; margin-right: 10px; }
+#library .lib-header { position: relative; display: flex; justify-content: center; margin: 0 0 8px; padding: 3px 24px;
+  border-bottom: 1px solid #000; background: repeating-linear-gradient(#000 0 1px, #fff 1px 2px) 0 4px / 100% 11px no-repeat, #fff; }
+#library .lib-header::before { content: ""; position: absolute; left: 8px; top: 3px; width: 11px; height: 11px;
+  border: 1px solid #000; background: #fff; box-shadow: 0 0 0 1px #fff; }
+#library .lib-title { padding: 0 6px; background: #fff; font: 12px var(--lib-font-display); }
+#library .lib-tagline { display: none; }
+
+/* The tabs are a row of plain words; the chosen one is inverted. */
+#library .lib-nav, #library .lib-tabs { justify-content: flex-start; gap: 0; margin: 0 10px 8px; padding: 0 0 4px;
+  border: 0; border-bottom: 1px solid #000; }
+#library .lib-nav a, #library .lib-tabs button { padding: 1px 8px; border: 0; border-radius: 0; background: #fff; color: #000;
+  text-decoration: none; font: 12px var(--lib-font-display); }
+#library .lib-nav a[aria-current=page], #library .lib-tabs button[aria-selected=true], #library .lib-nav a:hover { background: #000; color: #fff; }
+#library .lib-icon { display: none; }
+#library .lib-section h2 { font: 12px var(--lib-font-display); }
+
+/* Buttons: round rectangles; the default one has a thick ring around it. */
+#library .lib-button, #library .lib-pad-key { min-height: 20px; padding: 2px 14px; border: 1px solid #000; border-radius: 8px;
+  background: #fff; color: #000; font: 12px var(--lib-font-display); }
+#library .lib-button:hover:not(:disabled) { background: #fff; }
+#library .lib-button:active:not(:disabled), #library .lib-pad-key:active { background: #000; color: #fff; }
+#library .lib-button--primary { box-shadow: 0 0 0 2px #fff, 0 0 0 5px #000; border-radius: 8px; margin: 5px; }
+#library .lib-button:disabled { color: #888; border-color: #888; }
+
+/* Fields and lists: a single black line. */
+#library .lib-input { border: 1px solid #000; border-radius: 0; background: #fff; color: #000; font: 12px var(--lib-font); }
+#library .lib-log, #library .lib-rows .lib-row { border: 1px solid #000; border-radius: 0; background: #fff; }
+#library .lib-notice { border: 1px solid #000; border-radius: 0; background: #fff; box-shadow: 2px 2px 0 #000; }
+#library .lib-renderer { border: 1px solid #000; border-radius: 0; background: #fff; color: #000; }
+#library .lib-renderer[aria-checked=true] { box-shadow: inset 0 0 0 2px #000; }
+#library .lib-grade { border: 1px solid #000; border-radius: 0; background: #fff; color: #000; }
+
+/* The bar: black filling a white box, as in the Finder's copy window. */
+#library .lib-meter { height: 12px; border: 1px solid #000; border-radius: 0; background: #fff; }
+#library .lib-meter-fill { border-radius: 0; background: repeating-conic-gradient(#000 0 25%, #555 0 50%) 0 0 / 2px 2px; }
+#library .lib-steps li::before { border-radius: 0; background: #000; color: #fff; }
+#library .lib-check input, #library .lib-row input[type=checkbox] { accent-color: #000; }
+#library a { color: #000; }
+#library .lib-fine { color: #000; }

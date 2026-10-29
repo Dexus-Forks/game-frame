@@ -579,7 +579,7 @@ def working():
     a.add('<rect x="60" y="30" width="700" height="340" rx="12" fill="#020617" stroke="#334155" stroke-width="2"/>'
           '<circle cx="86" cy="54" r="7" fill="#f87171"/><circle cx="108" cy="54" r="7" fill="#fbbf24"/>'
           '<circle cx="130" cy="54" r="7" fill="#4ade80"/>')
-    lines = [('$ ', 'tools/pe/peinfo.py target/GAME.EXE', '#e2e8f0'), ('  ', 'MSVC 6.0, DirectDraw, 1 PDB path', '#64748b'),
+    lines = [('$ ', 'tools/pe/peinfo.py game/GAME.EXE', '#e2e8f0'), ('  ', 'MSVC 6.0, DirectDraw, 1 PDB path', '#64748b'),
              ('> ', 're-tracer: rng_next at 0x413a10', '#5eead4'), ('> ', 're-measurer: 1000 draws captured', '#5eead4'),
              ('> ', 're-porter: crates/game/src/rng.rs', '#5eead4'), ('$ ', 'cargo test rng', '#e2e8f0'),
              ('  ', 'test rng_matches_original ... ok', '#4ade80'), ('> ', 're-lander: committed 3 files', '#fde68a')]

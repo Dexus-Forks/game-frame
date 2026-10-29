@@ -24,7 +24,6 @@ The shared crates:
 | Crate | Does | Tested on the host |
 |---|---|---|
 | [shim](shim/README.md) | The shared settings (`WRAPPER_*`), Windows 95 port I/O emulated, in-memory patches from a file, the log of what is not implemented | the settings' parsers and the log's counts |
-| [raster](raster/README.md) | A small software triangle rasteriser into 8-, 15- and 16-bit frame buffers | yes |
 | [scalers](scalers/README.md) | Whole-multiple, Scale2x and CRT-style scalers for a finished frame | yes |
 | [pixels](pixels/README.md) | RGB555 and RGB565 to 8-bit colour | yes |
 
@@ -91,7 +90,7 @@ each DLL's exports from its crate's `.def` file (`glide/glide2x.def`, `sgl/sgl.d
 tests:
 
 ```bash
-cd wrappers && cargo test --release --target "$(rustc -vV | sed -n 's/^host: //p')" -p raster -p scalers -p pixels -p shim -p sgl -p maxi94
+cd wrappers && cargo test --release --target "$(rustc -vV | sed -n 's/^host: //p')" -p scalers -p pixels -p shim -p sgl -p maxi94
 ```
 
 `tests/run.sh` runs them, builds both kinds of DLL, checks each export table against its `.def`
@@ -119,6 +118,8 @@ file, and runs `python3 wrappers/stubgen.py --check`.
    | `WRAPPER_WINDOW_CLASS` | The class name of the game's main window. `glide` and `sgl` draw into that window. Find it with `./gameframe run strings GAME.EXE` near `RegisterClassA`, or in the game's `CreateWindowExA` call | the first visible top-level window of the process |
    | `WRAPPER_MARKER` | The RGB565 colour that means "not drawn" in a 2D picture laid over the 3D frame (hex `0x0821` or decimal). Choose another when the game draws this exact colour | `0x0821`, almost black |
    | `WRAPPER_PATCHES` | A file of patches to the game's code, applied in memory at load ([shim](shim/README.md)) | none |
+   | `WRAPPER_CALLS` | A file to write every call the game makes to, one line each, for `tools/verify/seqdiff.py` ([shim](shim/README.md)) | none |
+   | `WRAPPER_CALLS_FRAMES` | Only these frames of the call log: `100-102`, or `100` for frame 100 on | every frame |
 
    Each library's own variables are in its README: `GLIDE_*`, `DDRAW_*`, `SGL_*`, and the log
    files `GLIDE_LOG`, `DDRAW_LOG`, `ATI3DCIF_LOG`, `S3DTK_LOG`, `SGL_LOG` and `MAXI94_LOG`.

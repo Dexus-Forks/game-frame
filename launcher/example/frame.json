@@ -1,0 +1,18 @@
+{
+  "manifest": {
+    "contract": "1.0",
+    "name": "Example",
+    "capabilities": ["start", "settings", "renderers"],
+    "renderers": [
+      { "id": "software", "label": "Software", "grade": "exact", "default": true },
+      { "id": "glide", "label": "3dfx Glide", "grade": "partial" }
+    ],
+    "settings": [
+      { "key": "race.track", "label": "Track", "type": "choice",
+        "from": { "files": "TRACKS/*.TRK" }, "default": "", "group": "Race" },
+      { "key": "race.laps", "label": "Laps", "type": "range", "min": 1, "max": 9, "step": 1, "default": 3, "group": "Race" }
+    ]
+  },
+  "start": { "command": "sh", "args": ["-c", "echo 'Racing {setting:race.laps} laps of {setting:race.track} with {renderer}'; sleep 3"] },
+  "folder": "game"
+}

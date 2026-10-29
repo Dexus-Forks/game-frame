@@ -12,10 +12,11 @@ of game, and how to connect Ghidra's debugger to an emulator.
 |---|---|---|
 | DOS | DOSBox-X's debugger | Breakpoints on addresses, interrupts and memory changes, memory dumps. `tools/dos/dbx_control.py` drives it from a script |
 | Windows 3.x | CodeView for Windows (CVW), WDEB386 | Windows 3.1 driver kits document both. WDEB386 uses a serial terminal; CVW needs debug symbols and may need a second display. The tool media and VM wiring must be confirmed for the chosen setup. |
-| Windows 3.x on 86Box | 86Box's optional GDB stub, plus a guest debugger for Win16 symbols | The GDB stub can inspect emulated CPU and machine state. It is a source-build option, not a GameFrame MCP integration. |
+| Windows 3.x on 86Box | The optional GDB stub through the `86box-mcp` provider, plus a guest debugger for Win16 symbols | Build 86Box with `AUTOMATION=ON` and `GDBSTUB=ON`; start the VM with `debugger=true`. The stub inspects emulated CPU and machine state. It does not expose guest Win16 symbols. |
 | DOS, early PC, booters | Bochs | A built-in debugger. Bochs can also be built with a GDB stub |
 | Any PC, raw machine | QEMU | `-s -S` waits for a GDB connection on port 1234 before it starts |
 | Windows | x64dbg, WinDbg | On Windows itself. Under Wine, `winedbg --gdb game.exe` serves the process to GDB |
+| Windows, under Wine or CrossOver | `tools/live/winegdb.py` | Attaches winedbg's GDB server to a running game: registers, memory, breakpoints that are always removed. On Apple silicon only int3 breakpoints work ([winedbg's GDB server](../knowhow/winedbg-gdb-server.md)) |
 | Arcade and many consoles and computers | MAME | A built-in debugger with memory views and watchpoints. `-debugger gdbstub` serves GDB for some CPUs |
 | Game Boy Advance | mGBA | `-g` starts a GDB stub |
 | Nintendo DS | DeSmuME | `--arm9gdb=PORT` and `--arm7gdb=PORT` start GDB stubs for the two CPUs |

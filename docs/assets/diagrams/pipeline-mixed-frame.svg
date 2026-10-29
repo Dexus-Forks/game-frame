@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="340" viewBox="0 0 900 340" role="img" aria-label="One frame drawn by the card and the CPU together: the card clears and draws the 3D scene, the CPU locks the frame buffer and writes the interface into it, then the buffers swap">
+<title>One frame drawn by the card and the CPU together: the card clears and draws the 3D scene, the CPU locks the frame buffer and writes the interface into it, then the buffers swap</title>
+<rect x="0.5" y="0.5" width="899" height="339" rx="10" fill="#0d1b1e" stroke="#1f3d40"/>
+<defs><marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" fill="#8fa9a5"/></marker></defs>
+<rect x="30.0" y="84.0" width="420.0" height="46.0" rx="6" fill="#60a5fa" stroke="none" fill-opacity="0.18"/>
+<rect x="30.0" y="140.0" width="420.0" height="46.0" rx="6" fill="#60a5fa" stroke="none" fill-opacity="0.18"/>
+<rect x="30.0" y="196.0" width="420.0" height="46.0" rx="6" fill="#2dd4bf" stroke="none" fill-opacity="0.18"/>
+<rect x="30.0" y="252.0" width="420.0" height="46.0" rx="6" fill="#60a5fa" stroke="none" fill-opacity="0.18"/>
+<rect x="27" y="81" width="426" height="52" rx="8" fill="none" stroke="#f59e0b" stroke-width="2.5"><animateTransform attributeName="transform" type="translate" values="0 0;0 56;0 112;0 168" calcMode="discrete" dur="8.0s" repeatCount="indefinite"/></rect>
+<rect x="520.0" y="84.0" width="340.0" height="214.0" rx="4" fill="#05090a" stroke="#1f3d40"/>
+<g opacity="1"><animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.000;0.000;1" dur="8.0s" repeatCount="indefinite"/><rect x="522" y="86" width="336" height="210" fill="#16313a"/></g>
+<g opacity="0"><animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.250;0.250;1" dur="8.0s" repeatCount="indefinite"/><polygon points="522,296 858,296 720.0,188 660.0,188" fill="#60a5fa" fill-opacity="0.55"/><polygon points="600,234 660,154 710,234" fill="#c084fc" fill-opacity="0.7"/><polygon points="720,224 770,174 810,224" fill="#4ade80" fill-opacity="0.6"/></g>
+<g opacity="0"><animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.500;0.500;1" dur="8.0s" repeatCount="indefinite"/><rect x="522" y="264" width="336" height="32" fill="#2dd4bf" fill-opacity="0.85"/><rect x="532" y="272" width="90" height="16" fill="#05090a"/><rect x="534" y="274" width="62" height="12" fill="#f59e0b"/><rect x="790" y="94" width="58" height="14" fill="#2dd4bf" fill-opacity="0.85"/></g>
+<g opacity="0"><animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.750;0.750;1" dur="8.0s" repeatCount="indefinite"/><rect x="520" y="84" width="340" height="214" rx="4" fill="none" stroke="#f59e0b" stroke-width="3"/></g>
+<text x="24.0" y="34.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf" text-anchor="start" letter-spacing="0.08em">A FRAME THE CARD AND THE CPU DRAW TOGETHER</text>
+<text x="24.0" y="54.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#8fa9a5" text-anchor="start">A Glide game often draws its 3D on the card and its interface with the CPU, into the same frame buffer.</text>
+<text x="46.0" y="104.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="600" fill="#e2ece9" text-anchor="start">grBufferClear</text>
+<text x="46.0" y="121.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="start">clear colour and depth</text>
+<text x="436.0" y="112.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#60a5fa" text-anchor="end">card</text>
+<text x="46.0" y="160.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="600" fill="#e2ece9" text-anchor="start">grDrawTriangle  x N</text>
+<text x="46.0" y="177.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="start">the 3D scene, textured and fogged</text>
+<text x="436.0" y="168.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#60a5fa" text-anchor="end">card</text>
+<text x="46.0" y="216.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="600" fill="#e2ece9" text-anchor="start">grLfbLock ... grLfbUnlock</text>
+<text x="46.0" y="233.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="start">the interface, written as pixels</text>
+<text x="436.0" y="224.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#2dd4bf" text-anchor="end">CPU</text>
+<text x="46.0" y="272.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="600" fill="#e2ece9" text-anchor="start">grBufferSwap</text>
+<text x="46.0" y="289.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="start">show the finished frame</text>
+<text x="436.0" y="280.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#60a5fa" text-anchor="end">card</text>
+<text x="690.0" y="318.0" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#8fa9a5" text-anchor="middle">Port each layer from its own code: the card calls and the CPU's pixel writes.</text>
+</svg>

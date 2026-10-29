@@ -48,15 +48,20 @@ What 35 countries allow is in GameFrame's `docs/preservation/law/README.md`.
 These are the project's defaults. They keep the work exact and the repository publishable. The
 user may change any of them.
 
-1. **Keep game material out of git.** The game's binaries and data stay in `target/`, Ghidra
-   output and decompiled code in `analysis/`, emulator output and extracted assets in
-   `derived/`. All three are ignored by git; never force-add past `.gitignore`. Do not paste
+1. **Keep game material out of git.** The game's binaries and data stay in `game/`, its discs
+   and installers in `media/`, saves in `saves/`, Ghidra output and decompiled code in
+   `analysis/`, emulator output and extracted assets in `derived/`. Each is a link into the
+   GameFrame home (`~/gameframe/games/ID/`), outside the repository, and git ignores the links;
+   never force-add past `.gitignore`. Do not paste
    decompiled code, disassembly or data dumps into tracked files: describe findings in prose,
    tables, addresses (`FUN_1400be770`), field offsets (`+0x44`) and constants.
-   `target/` is your copy of the game, not build output: Cargo builds into `build/`
-   (`.cargo/config.toml`). Git keeps no copy of it, so never delete, move or clean it, and
-   never run `git clean -x` here. `target/GAME-FILES-NOT-BUILD-OUTPUT.txt` says so, and the
-   gates block such commands. A folder with a `CACHEDIR.TAG` is Cargo's; this one has none.
+   Screenshots are always fine, of the original game and of the port. Commit them and put them
+   on the site: copy each one out of `derived/`, compress it (WebP) and caption it.
+   `game/` and `media/` are your copy of the game, and git keeps none. Never delete, move or
+   clean them, and never run `git clean -x` here. `game/GAME-FILES-NOT-BUILD-OUTPUT.txt` says
+   so, and the gates block such commands. Removing the link itself (`rm game`) is harmless.
+   Cargo builds into `build/` (`.cargo/config.toml`). Add a game with
+   `./gameframe game add ID DISC.iso`, and check the links with `./gameframe home doctor`.
 2. **Evidence before code.** Every finding and every reimplemented behaviour names the original
    function it came from, and says how it is known: *observed* (read in code or data),
    *measured* (emulated or run), *inferred* (a reasoned guess) or *unknown* (an open question).
@@ -91,7 +96,7 @@ user may change any of them.
 
 | Path | What |
 |---|---|
-| `target/` | Your copy of the game (ignored, and the only copy: never delete or clean it) |
+| `game/` | Your copy of the game (ignored, and the only copy: never delete or clean it) |
 | `build/` | Cargo's build output (ignored, safe to clean) |
 | `analysis/export/<binary>/` | Ghidra's text export: decomp.c, functions.tsv, strings.txt, imports, exports (ignored) |
 | `derived/` | Ground truth from the emulator, extracted files (ignored) |
@@ -101,7 +106,7 @@ user may change any of them.
 | `docs/lore.md` | The game's world from its manual and its own text, and what it says each system is for ("in the story → in the code → evidence"). Read it again when a system's purpose is unclear |
 | `labels/names.tsv`, `labels/fields.tsv` | Names for original functions and struct fields, read by the tools |
 | `labels/dictionary.tsv` | The data dictionary: the meaning, unit, range and evidence of each value the rules use |
-| `./gameframe` | Runs GameFrame's toolkit here: `run NAME ARGS`, `python FILE`, `doctor`, and help on the method: `steps`, `skills`, `agents`, `tools`, `tool NAME`, `find WORD`. `root` prints where GameFrame is |
+| `./gameframe` | Runs GameFrame's toolkit here: `run NAME ARGS`, `python FILE`, `doctor`, and help on the method: `steps`, `skills`, `agents`, `tools`, `tool NAME`, `find WORD`. `root` prints where GameFrame is. `install [extra]` builds the port's release programs from `install.json` and installs them in the GameFrame folder (GameFrame's `docs/working/building-the-port.md`) |
 | `.claude/settings.json` | Enables GameFrame's plugin: the skills, the agents, the gates, and the MCP servers (REA, and `dosbox` for DOS games) |
 | `skills/`, `.agents/skills` | The skills, for the coding agents other than Claude Code |
 | `.codex/`, `.gemini/`, `.github/agents/`, `.github/hooks/`, `.cursor/`, `.vscode/mcp.json`, `.opencode/`, `opencode.json` | Each other agent's agents, gate hooks (through `./gameframe gate`) and MCP servers, for the agents the project was set up for |
@@ -118,7 +123,7 @@ fails, or the work turns to a new era, runtime or kind of hardware, run
 ends with what was tried. Record this game's own in `docs/knowhow/` (`re-land`, "Know-how").
 
 Keep a resource viewer from the first day (`re-browse`): the catalogue
-(`./gameframe run catalog target/game derived/catalog --decoder GLOB=DECODER.py`) until the
+(`./gameframe run catalog game derived/catalog --decoder GLOB=DECODER.py`) until the
 port has readers, then the project's own viewer on them. Look at every decoder's output there
 before porting it, and copy the catalogue's coverage line into `docs/CHECKLIST.md`.
 

@@ -2,8 +2,8 @@
 
     from dos_emu import DosEmu, ProgramStopped
     from dos_env import DosEnv
-    emu = DosEmu('target/game/GAME.EXE')
-    env = DosEnv(emu, root='target/game', overlay='derived/run')   # files, KERNEL, ports, BIOS
+    emu = DosEmu('game/GAME.EXE')
+    env = DosEnv(emu, root='game', overlay='derived/run')   # files, KERNEL, ports, BIOS
     try:
         emu.run_range(emu.entry, '1000:ca59')      # from the program's entry to a chosen point
         emu.run_to('1000:ca59')                    # then carry on (run_range resets the stack)

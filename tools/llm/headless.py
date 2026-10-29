@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run one of GameFrame's agents unattended, with the API key, and save its report.
+"""Run one of GameFrame's agents through Claude Code and save its report.
 
 Usage:
   headless.py AGENT TASK [--dir DIR] [--write] [--budget USD] [--model ID] [--report FILE]
@@ -20,13 +20,13 @@ Usage:
               the two (default 5.00 in all)
 
 The agent's system prompt is its agents/<name>.md file plus the SKILL.md of every skill it
-names, as Claude Code with --bare loads no skills or settings of its own. The run ends when
+names, as Claude Code with --bare loads no skills or settings of its own. Configure an
+Anthropic-compatible provider, which may be a local model server. The run ends when
 the agent ends its turn or the budget runs out. The report is the agent's final message, under a
 line with the agent, the model and the cost.
 
-Schedule it with cron or launchd, for example on the last days of a billing cycle, when unused
-credits would expire. It uses the API key (client.py), so the Claude Code GitHub Action is
-not needed.
+Schedule it with cron or launchd only when requested. It uses the configured provider through
+client.py, so the Claude Code GitHub Action is not needed.
 
 What it does not do: commit, push or merge. It never runs without a budget.
 """

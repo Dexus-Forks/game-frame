@@ -32,6 +32,11 @@ pub fn init(name: &'static str, env: &str) {
     }
 }
 
+/// The DLL's name, as `init` gave it ("wrapper" before `init`).
+pub fn name() -> &'static str {
+    NAME.get().map(|(n, _)| *n).unwrap_or("wrapper")
+}
+
 pub fn write(msg: std::fmt::Arguments) {
     let (name, path) = NAME.get().map(|(n, p)| (*n, p.as_deref())).unwrap_or(("wrapper", None));
     let mut f = FILE.lock().unwrap_or_else(|e| e.into_inner());
@@ -127,7 +132,7 @@ macro_rules! gap {
 }
 
 /// A stub for an export of the original library, written by `wrappers/stubgen.py`. Each
-/// argument is a 32-bit stack word. The forms: `stub!(system NAME(a0, a1) -> VALUE)` removes
+/// argument is a 32-bit stack word. The call is written to the call log too (`calls`). The forms: `stub!(system NAME(a0, a1) -> VALUE)` removes
 /// its arguments (`__stdcall`); `stub!(C NAME(a0) -> VALUE)` leaves them to the caller
 /// (`__cdecl`); `float` before the name returns 0.0 in st0, as a C `float` function does.
 #[macro_export]
@@ -135,6 +140,7 @@ macro_rules! stub {
     (system $name:ident($($a:ident),*) -> $ret:expr) => {
         #[unsafe(no_mangle)]
         pub extern "system" fn $name($($a: u32),*) -> u32 {
+            $crate::call!(stringify!($name) $(, $a)*);
             $crate::log::unhandled(stringify!($name), &[$($a),*]);
             $ret
         }
@@ -142,6 +148,7 @@ macro_rules! stub {
     (system float $name:ident($($a:ident),*)) => {
         #[unsafe(no_mangle)]
         pub extern "system" fn $name($($a: u32),*) -> f32 {
+            $crate::call!(stringify!($name) $(, $a)*);
             $crate::log::unhandled(stringify!($name), &[$($a),*]);
             0.0
         }
@@ -149,6 +156,7 @@ macro_rules! stub {
     (C $name:ident($($a:ident),*) -> $ret:expr) => {
         #[unsafe(no_mangle)]
         pub extern "C" fn $name($($a: u32),*) -> u32 {
+            $crate::call!(stringify!($name) $(, $a)*);
             $crate::log::unhandled(stringify!($name), &[$($a),*]);
             $ret
         }
@@ -156,6 +164,7 @@ macro_rules! stub {
     (C float $name:ident($($a:ident),*)) => {
         #[unsafe(no_mangle)]
         pub extern "C" fn $name($($a: u32),*) -> f32 {
+            $crate::call!(stringify!($name) $(, $a)*);
             $crate::log::unhandled(stringify!($name), &[$($a),*]);
             0.0
         }

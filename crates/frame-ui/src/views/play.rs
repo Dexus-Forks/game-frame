@@ -1,0 +1,245 @@
+//! Play: the game's setup, as the Manager or SETUP.EXE of a 1990s game showed it: one drop-down
+//! per hardware slot (graphics, sound card, music) with how complete each device is. Then the
+//! start and stop buttons, "Back to the game" while it runs, the game's status, and whether the
+//! frame opens at start.
+
+use crate::state::use_frame;
+use crate::Icon;
+use dioxus::prelude::*;
+use gameframe_frame::report::{Mode, Report};
+use gameframe_frame::{capabilities, device, topics, Grade, ON_EXIT, SHOW_AT_START};
+use gameframe_library::IssueTarget;
+use serde_json::json;
+
+fn grade_label(g: Grade) -> &'static str {
+    match g {
+        Grade::Exact => "Exact",
+        Grade::Good => "Good",
+        Grade::Partial => "Partial",
+        Grade::Experimental => "Experimental",
+        Grade::Missing => "Not started",
+    }
+}
+
+#[component]
+pub fn Play() -> Element {
+    let frame = use_frame();
+    let reports = frame.with(|s| s.reports().to_vec());
+    let spec = frame.spec();
+    let issues = spec.issues.clone();
+    let ribbon: Vec<_> = spec.links.iter().filter(|l| l.is_in("play")).cloned().collect();
+    let (manifest, slots, chosen, state, detail) = frame.with(|s| {
+        let detail = s
+            .log()
+            .iter()
+            .rev()
+            .find(|e| e.topic == "game.status")
+            .and_then(|e| e.str("detail").map(String::from))
+            .unwrap_or_default();
+        // The slots the manifest opts into: graphics with `renderers`, the rest with `devices`.
+        let m = s.manifest();
+        let slots: Vec<_> = m
+            .slots()
+            .into_iter()
+            .filter(|slot| !slot.options.is_empty())
+            .filter(|slot| m.can(if slot.slot == device::slots::VIDEO { capabilities::RENDERERS } else { capabilities::DEVICES }))
+            .collect();
+        let chosen: Vec<_> = slots.iter().map(|slot| (slot.slot.clone(), s.device(&slot.slot).map(String::from))).collect();
+        (m.clone(), slots, chosen, s.state().to_string(), detail)
+    });
+    let show_at_start = frame.setting(SHOW_AT_START).and_then(|v| v.as_bool()).unwrap_or(true);
+    let on_exit = frame.setting(ON_EXIT).and_then(|v| v.as_str().map(String::from)).unwrap_or_else(|| "launcher".into());
+    let can_exit = frame.has_exit();
+    let preference = move |key: &'static str, value: serde_json::Value| frame.update(|s| s.send(topics::FRAME_PREFERENCE, json!({ "key": key, "value": value })));
+    let running = matches!(state.as_str(), "loading" | "running" | "paused");
+    let missing = use_resource(move || async move {
+        let _ = frame.revision();
+        match frame.library() {
+            Some(lib) => lib.missing_game_data().await.map(|m| m.into_iter().map(|m| m.name).collect::<Vec<_>>()).unwrap_or_default(),
+            None => Vec::new(),
+        }
+    });
+    let missing = missing.read().clone().unwrap_or_default();
+
+    rsx! {
+        section { class: "lib-section",
+            h2 { Icon { name: "game" } "{manifest.name}" }
+            if !missing.is_empty() {
+                ul { class: "lib-notice",
+                    for name in missing.iter() {
+                        li { Icon { name: "missing" } span { "Missing " code { "{name}" } ". Add it in the Library tab." } }
+                    }
+                }
+            }
+            // One row per slot, as a 1990s setup dialog had it: a drop-down the theme draws as its
+            // own control, and beside it a card for the chosen device that changes with it.
+            div { class: "lib-setup",
+                for slot in slots.iter().cloned() {
+                    {
+                        let chosen = chosen.iter().find(|(k, _)| *k == slot.slot).and_then(|(_, v)| v.clone());
+                        let current = slot.options.iter().find(|d| Some(d.id.as_str()) == chosen.as_deref()).cloned();
+                        let which = slot.slot.clone();
+                        let field = format!("set-device-{}", slot.slot);
+                        rsx! {
+                            div { class: "lib-setup-row",
+                                div { class: "lib-setup-choice",
+                                    label { class: "lib-row-name", r#for: "{field}", "{slot.label}" }
+                                    select { id: "{field}", class: "lib-input", disabled: running,
+                                        onchange: move |e| { let _ = frame.update(|s| s.select_device(&which, &e.value())); },
+                                        for d in slot.options.iter() {
+                                            option { value: "{d.id}", selected: Some(d.id.as_str()) == chosen.as_deref(),
+                                                if d.stand_in.is_some() { "{d.label} (stand-in)" } else if d.grade == Grade::Missing { "{d.label} (not started)" } else { "{d.label}" }
+                                            }
+                                        }
+                                    }
+                                }
+                                if let Some(r) = current {
+                                    DeviceCard {
+                                        stand_in: r.stand_in.as_ref().and_then(|id| slot.options.iter().find(|o| &o.id == id)).map(|o| o.label.clone()),
+                                        device: r,
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if manifest.can(capabilities::START) {
+                if running {
+                    div { class: "lib-actions",
+                        button { r#type: "button", class: "lib-button lib-button--primary lib-start",
+                            onclick: move |_| frame.update(|s| s.back_to_game()),
+                            Icon { name: "start" } "Back to the game"
+                        }
+                        button { r#type: "button", class: "lib-button lib-start",
+                            onclick: move |_| frame.update(|s| s.stop()),
+                            Icon { name: "stop" } "Stop"
+                        }
+                    }
+                } else {
+                    button { r#type: "button", class: "lib-button lib-button--primary lib-start",
+                        disabled: !missing.is_empty(),
+                        onclick: move |_| frame.update(|s| s.start(Vec::new())),
+                        Icon { name: "start" } "Start the game"
+                    }
+                }
+            }
+            crate::shell::Ribbon { links: ribbon }
+            // A stopped game needs no line; the live region stays so a screen reader hears changes.
+            div { class: "lib-status", role: "status", "aria-live": "polite",
+                if !matches!(state.as_str(), "idle" | "stopped") {
+                    "The game is {state}."
+                    if !detail.is_empty() { " {detail}" }
+                }
+            }
+            // What the game reached that the port has not done, and its crashes (`report.new`).
+            if !reports.is_empty() {
+                div { class: "lib-reports", role: "region", "aria-label": "Reports",
+                    h3 { class: "lib-slot", "Reports" }
+                    p { class: "lib-row-meta",
+                        "The game reached places this port has not done yet. Each is written down with what the game was doing."
+                    }
+                    ul { class: "lib-notice",
+                        for r in reports.iter() {
+                            li {
+                                Icon { name: "missing" }
+                                span { class: "lib-report",
+                                    span { class: "lib-row-name", "{r.what}" }
+                                    span { class: "lib-row-meta",
+                                        "{r.kind.name()}, {r.count}×"
+                                        if let Some(o) = &r.original { ", original " code { "{o}" } }
+                                    }
+                                    if r.mode == Mode::Production {
+                                        div { class: "lib-actions",
+                                            for (text, url) in issue_buttons(r, &issues) {
+                                                a { class: "lib-button lib-button--quiet", href: "{url}", target: "_blank", rel: "noopener", "{text}" }
+                                            }
+                                        }
+                                    } else {
+                                        span { class: "lib-row-meta", "Saved as " code { "{r.id}.md" } " in the reports folder." }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            label { class: "lib-check",
+                input {
+                    r#type: "checkbox",
+                    checked: show_at_start,
+                    onchange: move |e| preference(SHOW_AT_START, json!(e.checked())),
+                }
+                "Open this window when the game starts. "
+                span { class: "lib-row-meta", "Start the game with --frame to open it again." }
+            }
+            if can_exit {
+                div { class: "lib-row lib-setting",
+                    div { class: "lib-row-text",
+                        label { class: "lib-row-name", r#for: "set-frame-on-exit", "When the game ends" }
+                        span { class: "lib-row-meta", "Stopping it here always comes back to this window." }
+                    }
+                    div { class: "lib-setting-input",
+                        select { id: "set-frame-on-exit", class: "lib-input",
+                            onchange: move |e| preference(ON_EXIT, json!(e.value())),
+                            option { value: "launcher", selected: on_exit != "desktop", "Come back here" }
+                            option { value: "desktop", selected: on_exit == "desktop", "Exit to desktop" }
+                        }
+                    }
+                }
+                button { r#type: "button", class: "lib-button lib-exit",
+                    onclick: move |_| frame.update(|s| s.exit()),
+                    Icon { name: "stop" } "Exit to desktop"
+                }
+            }
+        }
+    }
+}
+
+/// The report's GitHub buttons: one per repository `library.json`'s `issues` names that takes
+/// its kind, else the report's own link.
+fn issue_buttons(r: &Report, targets: &[IssueTarget]) -> Vec<(String, String)> {
+    if targets.is_empty() {
+        return r.issue.iter().map(|url| ("Open a GitHub issue".to_string(), url.clone())).collect();
+    }
+    targets
+        .iter()
+        .filter(|t| t.kinds.is_empty() || t.kinds.iter().any(|k| k == r.kind.name()))
+        .filter_map(|t| Some((t.text.clone(), r.issue_url_for(&t.repo)?)))
+        .collect()
+}
+
+/// What the chosen device is and how complete: its grade, what it stands for, how many of its
+/// calls are done, and its known gaps.
+#[component]
+fn DeviceCard(device: gameframe_frame::Device, stand_in: Option<String>) -> Element {
+    let r = device;
+    let share = match (r.done, r.total) {
+        (Some(d), Some(t)) if t > 0 => Some((d, t, d as f64 * 100.0 / t as f64)),
+        _ => None,
+    };
+    let grade = grade_label(r.grade);
+    rsx! {
+        div { class: "lib-renderer lib-device-card", role: "status", "aria-live": "polite",
+            div { class: "lib-renderer-head",
+                span { class: "lib-row-name", "{r.label}" }
+                span { class: "lib-grade is-{grade.to_lowercase().replace(' ', \"-\")}", "{grade}" }
+            }
+            if let Some(detail) = &r.detail {
+                span { class: "lib-row-meta", "{detail}" }
+            }
+            if let Some((d, t, pct)) = share {
+                div { class: "lib-meter", title: "{d} of {t}",
+                    div { class: "lib-meter-fill", style: "width: {pct:.0}%" }
+                }
+                span { class: "lib-row-meta", "{d} of {t} calls" }
+            }
+            if let Some(other) = stand_in {
+                span { class: "lib-row-meta", "Starts on {other} until it is ported, and reports the gap." }
+            }
+            for n in r.notes.iter() {
+                span { class: "lib-row-meta", "{n}" }
+            }
+        }
+    }
+}

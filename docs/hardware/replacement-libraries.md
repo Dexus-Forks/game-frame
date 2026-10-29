@@ -67,8 +67,8 @@ surface layouts of two APIs this way.
 4. **Generate the first probe.** `tools/pe/probegen.py` writes one from the import table:
 
    ```bash
-   ./gameframe run probegen target/GAME.EXE glide.dll derived/probe          # NAME.c, NAME.def, build.sh
-   ./gameframe run probegen target/GAME.EXE S3DTKW.DLL derived/probe --stdcall S3DTK_InitLib=0
+   ./gameframe run probegen game/GAME.EXE glide.dll derived/probe          # NAME.c, NAME.def, build.sh
+   ./gameframe run probegen game/GAME.EXE S3DTKW.DLL derived/probe --stdcall S3DTK_InitLib=0
    sh derived/probe/build.sh                                               # zig cc: glide.dll
    ```
 

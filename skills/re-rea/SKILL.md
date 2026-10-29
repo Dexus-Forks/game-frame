@@ -63,6 +63,25 @@ Before closing, use `export_evidence_bundle(path=...)` when the evidence must pe
 provider's imported program and project are temporary; closing the session removes them. Store
 target-derived evidence under an ignored analysis directory, never in tracked files.
 
+## From a script, with the project's labels
+
+`./gameframe run rea_session` (`tools/rea/rea_session.py`) starts its own REA from the project's
+`.mcp.json`, so a script uses the same version as the agent:
+
+```bash
+./gameframe run rea_session fn game/GAME.EXE 0x401a30 0x401b00   # labels from labels/, a summary each
+./gameframe run rea_session snapshot game/GAME.EXE --file analysis/notes/hot.txt
+./gameframe run rea_session labels game/GAME.EXE                # set_addresses_names input, in chunks
+```
+
+`fn` gives REA the labels from `labels/names.tsv`, `names-from-port.tsv` and `library.tsv`,
+writes each dossier to `analysis/rea/fn/`, and prints its size, what refers to it, its callees
+and its memory effects. The first question of a session waits for Ghidra (about 50 s for a 2 MB
+binary). A saved snapshot answers only the questions asked before, and any rename makes its
+answers stale, so `snapshot` renames nothing and `fn --snapshot-only` skips the renames. The
+know-how entry `context-rea-sessions-and-snapshots` has the measured times.
+`tools/rea/mcp_client.py` is the small client underneath, for other providers too.
+
 ## Rules that carry over
 
 - REA's evidence labels match ours: observations, inferences and unknowns stay separate; static

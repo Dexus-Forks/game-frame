@@ -34,7 +34,7 @@ python3 tools/triage/fixity.py bag ~/Downloads/game-setup derived/bags/game-1.2 
     --info "External-Description=GOG release 1.2, installer setup_game_1.2.exe" \
     --info "Source-Organization=bought from GOG on 2026-10-01"
 python3 tools/triage/fixity.py verify derived/bags/game-1.2
-python3 tools/triage/fixity.py manifest target/game          # checksums of the working copy, in place
+python3 tools/triage/fixity.py manifest game          # checksums of the working copy, in place
 ```
 
 - Make a bag of each copy as received, before anything else. The checksums prove later that

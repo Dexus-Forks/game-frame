@@ -1,13 +1,21 @@
-# The card makers' 3D APIs: Glide, ATI3DCIF, S3D
+# The card makers' 3D APIs: Glide, ATI3DCIF, S3D, SGL, and Direct3D 3
 
 In 1996 and 1997 each 3D chip had its own programming interface, and a game that wanted to run
 well on several cards shipped one renderer, often one whole executable, per card. This page
 covers the three most common of them in detail: 3dfx Glide 2.x, ATI's ATI3DCIF for the
-3D Rage, and S3's S3D Toolkit for the ViRGE. It says how to find each in a game, how to read
+3D Rage, and S3's S3D Toolkit for the ViRGE, with VideoLogic's SGL for the PowerVR in less
+detail. It says how to find each in a game, how to read
 the calls, how textures reach the card, and what the per-card builds tend to differ in.
 [3D accelerators](graphics-3d.md) has the overview of the cards and of Direct3D and OpenGL.
-The crate `gameframe-gpu-1997` ([crates](../crates/README.md)) holds the formats and
-constants named here.
+One crate per chip holds the formats and constants named here ([crates](../crates/README.md)):
+`gameframe-voodoo` for 3dfx, `gameframe-rage` for ATI, `gameframe-virge` for S3,
+`gameframe-powervr` for PowerVR, with the texel
+decoder they share in `gameframe-texel`. Each chip crate lists the texel layouts its API takes
+(`TEXTURE_FORMATS`), and each also draws: `gameframe-voodoo` runs the whole Voodoo pipeline,
+while `gameframe_rage::draw` and `gameframe_virge::draw` draw the untextured, blended faces
+the ATI and S3 builds of the period gave their chips. Those two crates share
+`gameframe-raster`. `gameframe-d3d` runs Direct3D 3 execute buffers the same way
+("Direct3D 3 execute buffers" below).
 
 ## Find the API
 
@@ -18,6 +26,7 @@ List the imports (`tools/pe/peinfo.py GAME.EXE`):
 | `glide.dll`, `glide2x.dll` | Glide 2.x | Many decorated names: `_grSstOpen@24`, `_grTexDownloadMipMap@16`, `_grDrawTriangle@12` |
 | `glide3x.dll` | Glide 3 (1998 on) | `grSstWinOpen`, `grDrawVertexArray`: a different API from Glide 2 |
 | `ati3dcif.dll` | ATI3DCIF | A few functions: `ATI3DCIF_Init`, `ContextCreate`, `ContextSetState`, `TextureReg`, `RenderBegin`, `RenderPrimList`, `RenderEnd` |
+| `sgl.dll` | PowerVR SGL | Undecorated `__cdecl` names: `sgl_create_list`, `sgl_add_vertices`, `sgl_set_texture_effect`, `sgl_render` |
 | `S3DTKW.dll` | S3D Toolkit (Windows) | Four functions: `S3DTK_InitLib`, `S3DTK_CreateRenderer`, `S3DTK_DestroyRenderer`, `S3DTK_LinearToPhysical`; the rest come through a function table |
 
 Games linked these at load time, or loaded them with `LoadLibrary` and `GetProcAddress` so one
@@ -100,6 +109,63 @@ linear DirectDraw addresses into the chip's offsets with `S3DTK_LinearToPhysical
 texture is `SetState(S3DTK_TEXTUREACTIVE, &surface)`; the drawing kind is
 `SetState(S3DTK_RENDERINGTYPE, …)`.
 
+### PowerVR SGL
+
+VideoLogic's SGL (`sgl.dll`, version 3.1 in 1997) is a scene graph, not a triangle API. The
+game builds display lists of transforms, materials, meshes, lights and cameras once
+(`sgl_create_list`, `sgl_create_mesh`, `sgl_add_vertices`, `sgl_set_texture_map`), and each
+frame only edits a few of them (`sgl_modify_transform`, `sgl_set_ignore_list`,
+`sgl_set_point_light`) and calls `sgl_render(viewport, camera, swap)`. A texture is made from
+an "intermediate map" of RGBA bytes, alpha 0 for opaque, by `sgl_preprocess_texture` and
+`sgl_create_texture` (`sgl_map_16bit`, `sgl_map_trans16`, sizes 32 to 256). The finished
+picture goes back to the game through an address callback (`sgl_use_address_mode`), which
+hands over the DirectDraw surface's memory. Find the game's scene builder from the first
+`sgl_modify_list(SGL_DEFAULT_LIST, clear)`: what follows is the scene, in order.
+
+`gameframe-powervr` keeps the same graph and draws it in software, with the PCX2's per-pixel
+rules (the nearest opaque surface per pixel, fog, translucent passes, light volumes) and the
+lighting of PowerVR's own driver (`SGLMID4.dll`: the texture effects, the spot light's
+fall-off): `Sgl` has the calls by their names. `wrappers/sgl` keeps the same graph and draws it
+with OpenGL for the game's own build.
+
+### Direct3D 3 execute buffers
+
+Direct3D is not a card maker's API, but in 1997 a game's "Direct3D build" was written like
+the others: one renderer per interface. Direct3D 3 has no import of its own. The build imports
+only `DirectDrawCreate` (and often `DirectDrawEnumerateA`), and everything else goes through
+COM interfaces it gets with `QueryInterface`. That means `IDirect3D` from the `IDirectDraw`
+object, and the device itself (`IDirect3DDevice`) from the back-buffer surface, by the GUID
+that `IDirect3D::FindDevice` or `EnumDevices` chose. In the decompiler the calls show as
+indirect calls through a vtable: `(*(*p + 0x20))(p, …)`. Name them by their offsets in the
+SDK's header order: `IDirect3D` +0x20 is `FindDevice`, `IDirect3DDevice` +0x18
+`CreateExecuteBuffer`, +0x20 `Execute`, +0x38 `EnumTextureFormats`, +0x4c `BeginScene`, +0x50
+`EndScene`. Read the `dwSize` the game writes first into each structure. It tells you which
+SDK the game was built with (`D3DDEVICEDESC` was 0xac bytes in DirectX 3 and grew in 5).
+
+The drawing is in the execute buffer the game fills between `Lock` and `Unlock`. That buffer
+holds the vertices (`D3DTLVERTEX`, 32 bytes, when the game transforms and lights them itself)
+and a stream of `D3DINSTRUCTION` headers (`bOpcode`, `bSize`, `wCount`), each followed by
+its records: `D3DOP_PROCESSVERTICES` with `COPY`, `D3DOP_STATERENDER` pairs and
+`D3DOP_TRIANGLE` index triples. Find the code that writes opcode bytes (3 triangles, 8 render
+states, 9 process vertices, 11 exit) beside a moving write pointer: it is the game's whole
+renderer. The render states it writes are the table to document, by their
+`D3DRENDERSTATETYPE` numbers. Two things to check:
+
+- **The order the stream is written in.** A game can write its stream from the end of the
+  buffer backwards, so that a batch's states, which are written when the next batch starts,
+  land in front of it. The batches then run in the reverse of the order they were written in.
+- **The capability bits behind each state.** Games chose states by the device's
+  `D3DPRIMCAPS` (alpha compare, blend factors, texture caps such as `TRANSPARENCY`), so
+  every card gets its own variant of the stream. Pick one card and document the stream for
+  it.
+
+`gameframe-d3d` runs such buffers in software. `Builder` writes them, `exec::parse` reads
+them back (including a buffer dumped from the running game), and `Device::execute` draws them
+into an RGB565 target at any multiple of the game's resolution. It follows Direct3D's
+documented rasterisation rules: pixel centres at integer coordinates and the top-left fill
+convention. It also covers the texture blends, the alpha test, blending, the stipple
+pattern and vertex fog. Its rules come from Microsoft's public documentation, read as prose.
+
 ## One game, one build per card
 
 When a game ships a build per card, the builds share most of their code: the game logic, the
@@ -122,12 +188,20 @@ file loaders, the sound. Compare them before you trace each:
 
 ## Show what each card drew
 
+In a port, each card is a device behind one interface, and the game's calls stay the same
+([The rendering pipeline](rendering-pipeline.md), "The port as a virtual graphics card").
 The player saw a different picture on each card: 8-bit software textures, 16-bit filtered
 textures on a Voodoo, affine textures on a ViRGE, halved texture pages where memory was short.
 A viewer or a port can offer the same choice as a setting: a "renderer profile" per card that
 uses the file variant, the texture formats and sizes, and the effects (reflections, fog)
-that card's build used. `gameframe-gpu-1997`'s `card` module lists what each chip accepts;
-the game's own differences come from tracing its builds. Record which profile is the
+that card's build used. each chip crate's `TEXTURE_FORMATS` lists what that chip accepts;
+the game's own differences come from tracing its builds. `gameframe-voodoo` draws a 3dfx
+profile in software: hand it the triangles and Glide states the game's 3dfx build sends and it
+gives the picture at any size, with no Glide library. Its arithmetic follows 3dfx's register
+specifications (SST-1 / Voodoo Graphics revision 1.61, Voodoo2 revision 1.16; 3dfx allowed them
+to be copied whole and not for profit, so keep them beside the project, not in its
+repository): the combine units, the W buffer's floating format, fog and dither are drawn
+there as diagrams. Record which profile is the
 reference for exact comparisons ([3D accelerators](graphics-3d.md), "How to approach a game
 with several renderers").
 
@@ -140,4 +214,9 @@ with the same name and exports: [Replacement libraries for a 1990s game](replace
 
 - 3dfx, Glide 2.x SDK and `glide.h`.
 - ATI Technologies, *3D RAGE Windows 95 Programmer's Guide*, SDK-C02700 rev. 1.30, 1997.
+- VideoLogic, PowerVR driver package 3.10 (`sgl.h`, `sglwin32.h`, `SGLMID4.dll`), as shipped
+  on POD Gold's disc (`POWERVR/310C3.ZIP`).
 - S3, S3D ToolKit SDK 2.6, `S3DTK.H` (published copy: https://github.com/kytulendu/S3DTK).
+- Microsoft, DirectX 3 and DirectX 5 SDK documentation, Direct3D Immediate Mode (execute
+  buffers, `D3DRENDERSTATETYPE`, `D3DTLVERTEX`); and the Direct3D 9 pages "Rasterization Rules"
+  and "Directly Mapping Texels to Pixels" for the fill convention and pixel centres.

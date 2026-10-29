@@ -1,0 +1,609 @@
+//! The contract: events, the manifest's checks, a session driving the demo game, the first-run
+//! rule, and the adapters for games outside Rust.
+
+use gameframe_frame::{topics, Configured, Demo, Event, Game, Manifest, Origin, Outbox, Session, Settings};
+use serde_json::json;
+use std::cell::RefCell;
+use std::rc::Rc;
+
+fn demo() -> Session {
+    let mut s = Session::new(Box::new(Demo::default()), Settings::new()).unwrap();
+    s.ready();
+    s
+}
+
+#[test]
+fn topics_match_patterns() {
+    let e = Event::new("game.start", Origin::Frame, json!(null));
+    assert!(e.matches("game.start") && e.matches("game.*") && e.matches("*"));
+    assert!(!e.matches("game") && !e.matches("gamex.*") && !e.matches("game.stop"));
+    assert!(gameframe_frame::valid_topic("pod.ghost.load"));
+    assert!(!gameframe_frame::valid_topic("Game.Start") && !gameframe_frame::valid_topic("start"));
+}
+
+#[test]
+fn events_have_one_wire_form() {
+    let e = Event::new("config.set", Origin::Frame, json!({"key": "fog", "value": true}));
+    let text = serde_json::to_string(&e).unwrap();
+    assert_eq!(text, r#"{"topic":"config.set","data":{"key":"fog","value":true},"from":"frame","id":0}"#);
+    assert_eq!(serde_json::from_str::<Event>(&text).unwrap(), e);
+}
+
+#[test]
+fn a_session_fills_defaults_and_keeps_state() {
+    let mut s = demo();
+    assert_eq!(s.settings().get("video.fog"), Some(&json!(true)));
+    assert_eq!(s.renderer(), Some("software"));
+    assert!(s.set("video.fog", json!("yes")).is_err(), "a toggle takes a bool");
+    assert!(s.set("nothing", json!(1)).is_err());
+    s.set("sound.volume", json!(40)).unwrap();
+    s.select_renderer("glide").unwrap();
+    assert!(s.select_renderer("vulkan").is_err());
+    assert!(s.settings_changed());
+    assert_eq!(s.settings().get("frame.renderer"), Some(&json!("glide")));
+    // Saved settings come back, with the chosen renderer.
+    let again = Session::new(Box::new(Demo::default()), Settings::from_json(&s.settings().to_text())).unwrap();
+    assert_eq!(again.renderer(), Some("glide"));
+    assert_eq!(again.settings().get("sound.volume"), Some(&json!(40)));
+}
+
+#[test]
+fn the_demo_answers_on_the_console() {
+    let mut s = demo();
+    let seen = Rc::new(RefCell::new(Vec::new()));
+    let log = seen.clone();
+    s.on("game.*", move |e| log.borrow_mut().push(e.topic.clone()));
+    s.press("fire", true);
+    s.start(vec![]);
+    assert_eq!(s.state(), "loading");
+    for _ in 0..30 {
+        s.tick();
+    }
+    assert_eq!(s.state(), "running");
+    s.press("fire", true);
+    s.stop();
+    assert_eq!(s.state(), "stopped");
+    let lines: Vec<String> = s.log().iter().filter(|e| e.topic == topics::LOG).filter_map(|e| e.str("text").map(String::from)).collect();
+    assert!(lines.iter().any(|l| l == "pressed fire: the game is not running"));
+    assert!(lines.iter().any(|l| l == "pressed fire: the game reacts"));
+    assert_eq!(*seen.borrow(), ["game.start", "game.status", "game.status", "game.stop", "game.status"]);
+    let ids: Vec<u64> = s.log().iter().map(|e| e.id).collect();
+    assert!(ids.windows(2).all(|w| w[1] == w[0] + 1), "events are numbered in order");
+}
+
+#[test]
+fn the_demo_presses_its_own_controls() {
+    let mut s = demo();
+    for _ in 0..gameframe_frame::DEMO_PRESS_TICKS * 2 {
+        s.tick();
+    }
+    let presses: Vec<&str> = s.log().iter().filter(|e| e.topic == "demo.press").filter_map(|e| e.str("control")).collect();
+    assert_eq!(presses, ["up", "right"]);
+    assert!(s.log().iter().filter(|e| e.topic == "demo.press").all(|e| e.origin == Origin::Game));
+}
+
+#[test]
+fn a_newer_minor_contract_still_reads() {
+    let m: Manifest = serde_json::from_value(serde_json::json!({
+        "contract": "1.7", "name": "Later", "viewer": { "decoders": [] },
+        "renderers": [{ "id": "soft", "label": "Software", "grade": "exact", "shader": "crt" }]
+    }))
+    .unwrap();
+    assert!(m.check().is_ok());
+    assert_eq!(m.renderers[0].id, "soft");
+}
+
+#[test]
+fn bad_topics_and_contracts_are_refused() {
+    struct Loud;
+    impl Game for Loud {
+        fn manifest(&self) -> Manifest {
+            Manifest { contract: "1.0".into(), ..Manifest::default() }
+        }
+        fn on_event(&mut self, _: &Event, out: &mut Outbox) {
+            out.send("NOT A TOPIC", json!(null));
+        }
+    }
+    let mut s = Session::new(Box::new(Loud), Settings::new()).unwrap();
+    s.send("frame.ready", json!(null));
+    assert!(s.log().iter().any(|e| e.str("text").is_some_and(|t| t.contains("dropped an event"))));
+    assert!(Manifest::from_json(r#"{"contract": "2.0", "name": "x"}"#).is_err());
+    let bad_default = r#"{"contract": "1.0", "settings": [{"key": "a", "label": "A", "type": "toggle", "default": 3}]}"#;
+    assert!(Manifest::from_json(bad_default).unwrap_err().contains("default"));
+}
+
+#[test]
+fn the_frame_opens_on_the_first_run_until_turned_off() {
+    let args = |a: &[&str]| a.iter().map(|s| s.to_string()).collect::<Vec<_>>();
+    let mut settings = Settings::new();
+    assert!(settings.show_at_start(&args(&[])));
+    settings.set(gameframe_frame::SHOW_AT_START, json!(false));
+    assert!(!settings.show_at_start(&args(&[])));
+    assert!(settings.show_at_start(&args(&["--frame"])) && settings.show_at_start(&args(&["--launcher"])));
+    assert!(!Settings::new().show_at_start(&args(&["--no-frame"])));
+}
+
+#[test]
+fn a_config_game_fills_its_arguments() {
+    let text = r#"{
+        "manifest": {"contract": "1.0", "name": "x", "capabilities": ["start"],
+                     "settings": [{"key": "video.scale", "label": "Scale", "type": "text", "default": "2"}]},
+        "start": {"command": "true", "args": ["--renderer={renderer}", "--scale", "{setting:video.scale}"]}
+    }"#;
+    let game = Configured::from_json(text).unwrap();
+    let start = Event::new(topics::GAME_START, Origin::Frame, json!({"renderer": "glide", "settings": {"video.scale": "3"}, "args": ["--vanilla"]}));
+    assert_eq!(game.arguments(&start), ["--renderer=glide", "--scale", "3", "--vanilla"]);
+    let mut s = Session::new(Box::new(game), Settings::new()).unwrap();
+    s.start(vec![]);
+    assert_eq!(s.state(), "running");
+    for _ in 0..200 {
+        s.tick();
+        if s.state() == "stopped" {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    }
+    assert_eq!(s.state(), "stopped", "`true` ends at once and the frame sees it");
+}
+
+#[test]
+fn a_game_in_another_language_speaks_json_lines() {
+    // A whole game in a shell script: its manifest, then an answer to each event it reads.
+    let script = r#"echo '{"contract":"1.0","name":"sh","capabilities":["start","input"]}'
+while read -r line; do
+  case "$line" in
+    *'"game.start"'*) echo '{"topic":"game.status","data":{"state":"running"},"from":"game"}' ;;
+    *'"input.press"'*) echo "pressed" >&2 ;;
+  esac
+done"#;
+    let game = gameframe_frame::Process::spawn("sh", &["-c".into(), script.into()]).unwrap();
+    let mut s = Session::new(Box::new(game), Settings::new()).unwrap();
+    assert_eq!(s.manifest().name, "sh");
+    s.start(vec![]);
+    s.press("fire", true);
+    for _ in 0..200 {
+        s.tick();
+        if s.state() == "running" && s.log().iter().any(|e| e.str("text") == Some("pressed")) {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    }
+    assert_eq!(s.state(), "running");
+    assert!(s.log().iter().any(|e| e.str("text") == Some("pressed")), "standard error goes to the console");
+}
+
+#[test]
+fn the_game_fills_a_choice_from_its_data() {
+    let s = demo();
+    let track = s.manifest().setting("race.track").unwrap();
+    let gameframe_frame::Kind::Choice { options, .. } = &track.kind else { panic!("a choice") };
+    assert_eq!(options.iter().map(|o| o.value.as_str()).collect::<Vec<_>>(), ["CANYON", "HARBOUR", "SNOWLINE"]);
+    assert_eq!(s.settings().get("race.track"), Some(&json!("CANYON")), "an empty saved value moves to the first track");
+
+    let mut saved = Settings::new();
+    saved.set("race.track", json!("SNOWLINE"));
+    let mut s = Session::new(Box::new(Demo::default()), saved).unwrap();
+    assert_eq!(s.settings().get("race.track"), Some(&json!("SNOWLINE")), "kept while the list is not filled");
+    s.ready();
+    assert_eq!(s.settings().get("race.track"), Some(&json!("SNOWLINE")), "kept, since it is in the list");
+    assert!(s.set("race.track", json!("MOON")).is_err());
+    assert!(s.set("race.track", json!("HARBOUR")).is_ok());
+}
+
+#[test]
+fn the_frame_hides_while_the_game_runs_and_comes_back() {
+    let mut s = demo();
+    s.hide_while_running(true);
+    assert!(s.shown());
+    s.start(vec![]);
+    for _ in 0..30 {
+        s.tick();
+    }
+    assert_eq!(s.state(), "running");
+    assert!(!s.shown(), "hidden once the game runs");
+    s.open_frame();
+    assert!(s.shown(), "the game or the player asked for the frame");
+    s.back_to_game();
+    assert!(!s.shown());
+    s.stop();
+    assert!(s.shown(), "a stopped game brings the frame back");
+}
+
+#[test]
+fn a_running_game_asks_for_the_frame() {
+    // The game's own menu has a "Launcher" item: it sends `frame.open`.
+    let script = r#"echo '{"contract":"1.0","name":"sh","capabilities":["start","input"]}'
+while read -r line; do
+  case "$line" in
+    *'"game.start"'*) echo '{"topic":"game.status","data":{"state":"running"},"from":"game"}' ;;
+    *'"input.press"'*) echo '{"topic":"frame.open","data":null,"from":"game"}' ;;
+  esac
+done"#;
+    let game = gameframe_frame::Process::spawn("sh", &["-c".into(), script.into()]).unwrap();
+    let mut s = Session::new(Box::new(game), Settings::new()).unwrap();
+    s.hide_while_running(true);
+    s.start(vec![]);
+    for _ in 0..200 {
+        s.tick();
+        if s.state() == "running" {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    }
+    assert!(!s.shown(), "the game has the screen");
+    s.press("menu", true);
+    for _ in 0..200 {
+        s.tick();
+        if s.shown() {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    }
+    assert!(s.shown(), "frame.open from the game shows the frame");
+}
+
+#[test]
+fn a_config_game_lists_files_and_runs_in_its_folder() {
+    let dir = std::env::temp_dir().join(format!("frame-load-{}", std::process::id()));
+    let tracks = dir.join("game/Data/TRACKS");
+    std::fs::create_dir_all(&tracks).unwrap();
+    for f in ["canyon.trk", "HARBOUR.TRK", "notes.txt"] {
+        std::fs::write(tracks.join(f), b"").unwrap();
+    }
+    std::fs::write(
+        dir.join("frame.json"),
+        r#"{
+        "manifest": {"contract": "1.0", "name": "x", "capabilities": ["start", "settings"],
+                     "settings": [{"key": "race.track", "label": "Track", "type": "choice",
+                                   "from": {"files": "DATA/tracks/*.TRK"}, "default": ""}]},
+        "start": {"command": "sh", "args": ["-c", "echo {setting:race.track} > chosen.txt"]},
+        "folder": "game"
+    }"#,
+    )
+    .unwrap();
+    let game = Configured::load(&dir.join("frame.json")).unwrap();
+    let mut s = Session::new(Box::new(game), Settings::new()).unwrap();
+    let gameframe_frame::Kind::Choice { options, .. } = &s.manifest().setting("race.track").unwrap().kind else { panic!() };
+    assert_eq!(options.iter().map(|o| o.value.as_str()).collect::<Vec<_>>(), ["HARBOUR", "canyon"]);
+    s.set("race.track", json!("canyon")).unwrap();
+    s.start(vec![]);
+    for _ in 0..200 {
+        s.tick();
+        if s.state() == "stopped" {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    }
+    assert_eq!(std::fs::read_to_string(dir.join("game/chosen.txt")).unwrap().trim(), "canyon");
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+/// A JSON-lines game that prints its manifest, runs `then`, and exits; the session's `game.status`
+/// events once it has gone quiet.
+fn ended_program(then: &str) -> Vec<Event> {
+    let script = format!(r#"echo '{{"contract":"1.0","name":"sh","capabilities":["start"]}}'
+{then}"#);
+    let game = gameframe_frame::Process::spawn("sh", &["-c".into(), script]).unwrap();
+    let mut s = Session::new(Box::new(game), Settings::new()).unwrap();
+    for _ in 0..100 {
+        s.tick();
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    }
+    s.log().iter().filter(|e| e.topic == topics::GAME_STATUS).cloned().collect()
+}
+
+#[test]
+fn a_program_that_ends_is_reported_once() {
+    let ends = ended_program("exit 0");
+    assert_eq!(ends.len(), 1, "one end, not one each tick: {ends:?}");
+    assert_eq!(ends[0].str("state"), Some("stopped"));
+}
+
+#[test]
+fn a_program_that_fails_says_why() {
+    let ends = ended_program("echo 'no disc in the drive' >&2; exit 3");
+    assert_eq!(ends.len(), 1, "{ends:?}");
+    assert_eq!(ends[0].str("state"), Some("failed"));
+    assert!(ends[0].str("detail").unwrap().ends_with(": no disc in the drive"), "{ends:?}");
+}
+
+#[test]
+fn a_program_that_said_it_stopped_is_not_reported_again() {
+    let said = r#"echo '{"topic":"game.status","data":{"state":"stopped","detail":"the race ended"},"from":"game"}'; exit 0"#;
+    let ends = ended_program(said);
+    assert_eq!(ends.len(), 1, "{ends:?}");
+    assert_eq!(ends[0].str("detail"), Some("the race ended"));
+    // An error after its own `stopped` is still a failure.
+    let crashed = r#"echo '{"topic":"game.status","data":{"state":"stopped"},"from":"game"}'; exit 1"#;
+    let ends = ended_program(crashed);
+    assert_eq!(ends.iter().filter_map(|e| e.str("state")).collect::<Vec<_>>(), ["stopped", "failed"]);
+}
+
+#[test]
+fn a_config_game_that_fails_says_failed() {
+    let text = r#"{"manifest": {"contract": "1.0", "name": "x", "capabilities": ["start"]},
+                   "start": {"command": "false"}}"#;
+    let mut s = Session::new(Box::new(Configured::from_json(text).unwrap()), Settings::new()).unwrap();
+    s.start(vec![]);
+    for _ in 0..200 {
+        s.tick();
+        if s.state() == "failed" {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    }
+    assert_eq!(s.state(), "failed");
+}
+
+/// A game whose program ends at once, as if the player quit it from its own menu.
+fn ending_game(on_exit: &str) -> Session {
+    let text = r#"{"manifest": {"contract": "1.0", "name": "x", "capabilities": ["start"]},
+                   "start": {"command": "true"}}"#;
+    let mut saved = Settings::new();
+    saved.set(gameframe_frame::ON_EXIT, json!(on_exit));
+    let mut s = Session::new(Box::new(Configured::from_json(text).unwrap()), saved).unwrap();
+    s.hide_while_running(true);
+    s.start(vec![]);
+    for _ in 0..200 {
+        s.tick();
+        if s.state() == "stopped" {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    }
+    assert_eq!(s.state(), "stopped");
+    s
+}
+
+#[test]
+fn a_game_that_ends_returns_to_the_launcher_or_the_desktop() {
+    let s = ending_game("launcher");
+    assert!(s.shown() && !s.wants_exit(), "the default brings the launcher back");
+    let s = ending_game("desktop");
+    assert!(s.wants_exit(), "frame.on-exit desktop leaves the program");
+}
+
+#[test]
+fn the_player_stops_or_exits() {
+    let mut s = demo();
+    s.send(topics::FRAME_PREFERENCE, json!({"key": "frame.on-exit", "value": "desktop"}));
+    s.start(vec![]);
+    for _ in 0..30 {
+        s.tick();
+    }
+    s.stop();
+    for _ in 0..30 {
+        s.tick();
+    }
+    assert_eq!(s.state(), "stopped");
+    assert!(!s.wants_exit(), "a stop the player asked for keeps the launcher");
+    s.start(vec![]);
+    for _ in 0..30 {
+        s.tick();
+    }
+    s.exit();
+    assert!(s.wants_exit());
+    assert!(s.log().iter().rev().any(|e| e.topic == topics::GAME_STOP), "the game is stopped first, so it can save");
+}
+
+/// A tiny ISO 9660 image: TRACKS/CANYON.TRK, TRACKS/HARBOUR.TRK and README.TXT.
+fn tiny_iso() -> Vec<u8> {
+    const S: usize = 2048;
+    let record = |name: &[u8], lba: u32, size: u32, dir: bool| {
+        let len = 33 + name.len() + (name.len() + 1) % 2;
+        let mut r = vec![0u8; len];
+        r[0] = len as u8;
+        r[2..6].copy_from_slice(&lba.to_le_bytes());
+        r[6..10].copy_from_slice(&lba.to_be_bytes());
+        r[10..14].copy_from_slice(&size.to_le_bytes());
+        r[14..18].copy_from_slice(&size.to_be_bytes());
+        r[25] = if dir { 2 } else { 0 };
+        r[28] = 1;
+        r[32] = name.len() as u8;
+        r[33..33 + name.len()].copy_from_slice(name);
+        r
+    };
+    let dir = |me: u32, parent: u32, entries: Vec<Vec<u8>>| {
+        let mut d = record(&[0], me, S as u32, true);
+        d.extend(record(&[1], parent, S as u32, true));
+        entries.into_iter().for_each(|e| d.extend(e));
+        d.resize(S, 0);
+        d
+    };
+    let mut img = vec![0u8; 24 * S];
+    let mut pvd = vec![0u8; S];
+    pvd[0] = 1;
+    pvd[1..6].copy_from_slice(b"CD001");
+    pvd[6] = 1;
+    pvd[80..84].copy_from_slice(&24u32.to_le_bytes());
+    pvd[128..130].copy_from_slice(&(S as u16).to_le_bytes());
+    let root = record(&[0], 18, S as u32, true);
+    pvd[156..156 + root.len()].copy_from_slice(&root);
+    img[16 * S..17 * S].copy_from_slice(&pvd);
+    img[17 * S] = 255;
+    img[17 * S + 1..17 * S + 6].copy_from_slice(b"CD001");
+    let root = dir(18, 18, vec![record(b"README.TXT;1", 20, 2, false), record(b"TRACKS", 19, S as u32, true)]);
+    img[18 * S..19 * S].copy_from_slice(&root);
+    let tracks = dir(19, 18, vec![record(b"CANYON.TRK;1", 20, 2, false), record(b"HARBOUR.TRK;1", 20, 2, false)]);
+    img[19 * S..20 * S].copy_from_slice(&tracks);
+    img[20 * S..20 * S + 2].copy_from_slice(b"hi");
+    img
+}
+
+#[test]
+fn a_config_game_lists_files_from_its_disc_image() {
+    let dir = std::env::temp_dir().join(format!("frame-image-{}", std::process::id()));
+    std::fs::create_dir_all(dir.join("media")).unwrap();
+    std::fs::write(dir.join("media/GAME.ISO"), tiny_iso()).unwrap();
+    std::fs::write(
+        dir.join("frame.json"),
+        r#"{"manifest": {"contract": "1.0", "name": "x", "capabilities": ["start", "settings"],
+            "settings": [{"key": "race.track", "label": "Track", "type": "choice",
+                          "from": {"files": "tracks/*.trk"}, "default": ""}]},
+            "start": {"command": "sh", "args": ["-c", "echo {setting:race.track} {image} > chosen.txt"]},
+            "image": "media/GAME.ISO"}"#,
+    )
+    .unwrap();
+    let game = Configured::load(&dir.join("frame.json")).unwrap();
+    let track = game.manifest().settings[0].clone();
+    let gameframe_frame::Kind::Choice { options, .. } = &track.kind else { panic!("a choice") };
+    assert_eq!(options.iter().map(|o| o.value.as_str()).collect::<Vec<_>>(), ["CANYON", "HARBOUR"]);
+    let mut s = Session::new(Box::new(game), Settings::new()).unwrap();
+    s.start(vec![]);
+    for _ in 0..200 {
+        s.tick();
+        if s.state() == "stopped" {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    }
+    let chosen = std::fs::read_to_string(dir.join("chosen.txt")).unwrap();
+    assert!(chosen.starts_with("CANYON /") && chosen.trim_end().ends_with("media/GAME.ISO"), "{chosen}");
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn a_session_keeps_a_device_per_slot() {
+    use gameframe_frame::device::{ids, slots};
+    let mut s = demo();
+    assert_eq!(s.device(slots::VIDEO), Some("software"));
+    assert_eq!(s.device(slots::SOUND), Some(ids::DIRECTSOUND), "the default sound card");
+    let ready = s.log().iter().find(|e| e.topic == topics::FRAME_READY).unwrap().clone();
+    assert_eq!(gameframe_frame::chosen(&ready.data, slots::SOUND), Some(ids::DIRECTSOUND));
+    s.select_device(slots::SOUND, ids::NONE).unwrap();
+    s.select_device(slots::VIDEO, "glide").unwrap();
+    assert!(s.select_device(slots::SOUND, "glide").is_err() && s.select_device("music", "adlib").is_err());
+    assert_eq!(s.settings().get("frame.device.sound"), Some(&json!("none")));
+    assert_eq!(s.settings().get("frame.renderer"), Some(&json!("glide")));
+    s.start(vec![]);
+    let start = s.log().iter().rev().find(|e| e.topic == topics::GAME_START).unwrap();
+    assert_eq!(start.data["devices"], json!({"video": "glide", "sound": "none"}));
+    // The choice is saved: a new session over the same settings starts with it.
+    let again = Session::new(Box::new(Demo::default()), s.settings().clone()).unwrap();
+    assert_eq!(again.device(slots::SOUND), Some(ids::NONE));
+}
+
+#[test]
+fn the_graphics_slot_comes_first_and_missing_devices_are_refused() {
+    let m = Manifest::from_json(r#"{"contract": "1.1", "name": "Game", "renderers": [{"id": "software", "label": "Software"}],
+        "devices": [{"slot": "sound", "label": "Sound card", "options": [
+            {"id": "directsound", "label": "DirectSound", "default": true},
+            {"id": "maxi-sound-64", "label": "Maxi Sound 64", "detail": "PODMAX64.EXE", "grade": "missing"}]}]}"#).unwrap();
+    let order: Vec<_> = m.slots().into_iter().map(|s| s.slot).collect();
+    assert_eq!(order, ["video", "sound"]);
+    assert!(m.playable("sound", "directsound").is_ok() && m.playable("video", "software").is_ok());
+    let why = m.playable("sound", "maxi-sound-64").unwrap_err();
+    assert!(why.contains("Maxi Sound 64 (PODMAX64.EXE) is not ported yet") && why.contains("Sound card"), "{why}");
+    assert!(m.playable("sound", "adlib").is_err() && m.playable("music", "adlib").is_err());
+    // A repeated slot, a second graphics slot, or a repeated device is refused.
+    let bad = |devices: &str| Manifest::from_json(&format!(r#"{{"contract": "1.1", "name": "x", "renderers": [{{"id": "s", "label": "S"}}], "devices": {devices}}}"#)).is_err();
+    assert!(bad(r#"[{"slot": "sound", "options": []}, {"slot": "sound", "options": []}]"#));
+    assert!(bad(r#"[{"slot": "video", "options": []}]"#));
+    assert!(bad(r#"[{"slot": "sound", "options": [{"id": "a"}, {"id": "a"}]}]"#));
+}
+
+#[test]
+fn a_config_game_fills_in_its_devices() {
+    let text = r#"{
+        "manifest": {"contract": "1.1", "name": "x", "capabilities": ["start", "devices"],
+                     "devices": [{"slot": "sound", "label": "Sound", "options": [{"id": "sound-blaster", "label": "SB"}]}]},
+        "start": {"command": "true", "args": ["--sound={device:sound}", "--video={device:video}"]}
+    }"#;
+    let game = Configured::from_json(text).unwrap();
+    let start = Event::new(topics::GAME_START, Origin::Frame, json!({"renderer": "glide", "devices": {"sound": "sound-blaster"}, "settings": {}}));
+    assert_eq!(game.arguments(&start), ["--sound=sound-blaster", "--video=glide"]);
+}
+
+#[test]
+fn the_session_keeps_one_report_per_place() {
+    let mut s = demo();
+    let mut r = gameframe_frame::report::Report { id: "unported-1".into(), what: "fog".into(), count: 1, ..Default::default() };
+    let send = |s: &mut Session, r: &gameframe_frame::report::Report| {
+        let e = Event::new(topics::REPORT_NEW, Origin::Game, serde_json::to_value(r).unwrap());
+        s.send(&e.topic, e.data); // as the game's event would arrive
+    };
+    send(&mut s, &r);
+    r.count = 4;
+    send(&mut s, &r);
+    assert_eq!(s.reports().len(), 1);
+    assert_eq!(s.reports()[0].count, 4);
+}
+
+#[test]
+fn a_device_not_ported_starts_on_its_stand_in() {
+    let text = |stand_in: &str| format!(r#"{{"contract": "1.1", "name": "Game", "renderers": [
+        {{"id": "software", "label": "Software", "default": true}},
+        {{"id": "glide", "label": "3dfx Glide", "grade": "missing", "stand_in": "{stand_in}"}},
+        {{"id": "powervr", "label": "PowerVR", "grade": "missing"}}]}}"#);
+    let m = Manifest::from_json(&text("software")).unwrap();
+    assert!(m.playable("video", "glide").is_ok(), "a stand-in makes it startable");
+    assert_eq!(m.stand_in("video", "glide").as_deref(), Some("software"));
+    assert_eq!(m.stand_in("video", "software"), None);
+    assert!(m.playable("video", "powervr").is_err(), "no stand-in, no start");
+    assert!(Manifest::from_json(&text("voodoo")).is_err(), "the stand-in must be in the slot");
+    assert!(Manifest::from_json(&text("glide")).is_err(), "not itself");
+}
+
+fn setup_manifest() -> Manifest {
+    Manifest::from_json(
+        r#"{"contract": "1.1", "name": "Game", "renderers": [
+        {"id": "software", "label": "Software", "grade": "good", "default": true},
+        {"id": "glide", "label": "3dfx Glide", "grade": "missing", "detail": "GAME3DFX.EXE", "stand_in": "software"},
+        {"id": "powervr", "label": "PowerVR", "grade": "missing"}],
+        "devices": [{"slot": "sound", "label": "Sound card", "options": [
+        {"id": "directsound", "label": "DirectSound", "grade": "good", "default": true},
+        {"id": "none", "label": "No sound", "grade": "exact"}]}]}"#,
+    )
+    .unwrap()
+}
+
+#[test]
+fn a_start_resolves_its_devices_and_their_gaps() {
+    use gameframe_frame::{Gap, Held};
+    let m = setup_manifest();
+    let mut held = Held::default();
+    let defaults = m.resolve(&json!({}), &held).unwrap();
+    assert_eq!((defaults.used("video"), defaults.used("sound")), (Some("software"), Some("directsound")));
+    assert!(defaults.gaps.is_empty());
+
+    held.note(&Event::new(topics::FRAME_READY, Origin::Frame, json!({"renderer": "glide", "devices": {"sound": "none"}})));
+    let s = m.resolve(&json!({}), &held).unwrap();
+    assert_eq!(s.asked_json(), json!({"video": "glide", "sound": "none"}));
+    assert_eq!((s.used("video"), s.used("sound")), (Some("software"), Some("none")));
+    assert_eq!(s.gaps, [Gap { slot: "video".into(), asked: "glide".into(), used: "software".into() }]);
+
+    // `game.start`'s pick wins over the held one; a select changes the held one.
+    held.note(&Event::new(topics::DEVICE_SELECT, Origin::Frame, json!({"slot": "sound", "device": "directsound"})));
+    let s = m.resolve(&json!({"devices": {"video": "software"}}), &held).unwrap();
+    assert_eq!(s.asked_json(), json!({"video": "software", "sound": "directsound"}));
+    assert!(m.resolve(&json!({"devices": {"video": "powervr"}}), &held).is_err(), "no stand-in, no start");
+    assert!(m.resolve(&json!({"devices": {"sound": "gravis"}}), &held).is_err(), "an unknown id");
+}
+
+#[test]
+fn each_gap_is_one_report_at_the_kernels_place() {
+    use gameframe_frame::report;
+    let m = setup_manifest();
+    let s = m.resolve(&json!({"devices": {"video": "glide"}}), &Default::default()).unwrap();
+    report::set_mode(report::Mode::Dev);
+    s.report_gaps(&m);
+    let r = report::reports().into_iter().find(|r| r.original.as_deref() == Some("GAME3DFX.EXE")).expect("a report");
+    assert_eq!((r.context["asked"].as_str(), r.context["used"].as_str()), (Some("glide"), Some("software")));
+    assert!(r.file.ends_with("tests/frame.rs"), "the caller's place: {}", r.file);
+}
+
+#[test]
+fn a_session_is_idle_then_starting_until_the_game_answers() {
+    /// A game that never answers.
+    struct Mute(Manifest);
+    impl Game for Mute {
+        fn manifest(&self) -> Manifest {
+            self.0.clone()
+        }
+        fn on_event(&mut self, _: &Event, _: &mut Outbox) {}
+    }
+    let mut s = Session::new(Box::new(Mute(setup_manifest())), Settings::new()).unwrap();
+    assert_eq!(s.state(), "idle");
+    s.start(vec![]);
+    assert_eq!(s.state(), "starting", "a wait for `stopped` must not end before the game says so");
+}

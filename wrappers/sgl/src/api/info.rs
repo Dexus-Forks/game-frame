@@ -21,6 +21,7 @@ pub fn record(e: i32) {
 /// module record their errors.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sgl_get_errors(earliest: *mut i32, most_recent: *mut i32) {
+    shim::call!("sgl_get_errors", earliest, most_recent);
     let (e, r) = std::mem::take(&mut *ERRORS.lock().unwrap_or_else(|p| p.into_inner()));
     trace!("sgl_get_errors", "-> {e} {r}");
     unsafe {
@@ -43,6 +44,7 @@ static VERSIONS: Strings<2> = Strings([c"3.1.0c3".as_ptr().cast(), c"1.27".as_pt
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_get_versions() -> *const Strings<2> {
+    shim::call!("sgl_get_versions");
     trace!("sgl_get_versions");
     &VERSIONS
 }
@@ -75,6 +77,7 @@ static WIN_DDRAW: Strings<13> = win_versions!(c"direct draw");
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_get_win_versions() -> *const Strings<13> {
+    shim::call!("sgl_get_win_versions");
     trace!("sgl_get_win_versions");
     if crate::immediate::ddraw_mode() { &WIN_DDRAW } else { &WIN_ADDRESS }
 }
@@ -83,6 +86,7 @@ pub extern "C" fn sgl_get_win_versions() -> *const Strings<13> {
 /// (`scene::texmem`, with its deviations). Original: `sgl_get_free_texture_mem` at `10015830`.
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_get_free_texture_mem() -> u32 {
+    shim::call!("sgl_get_free_texture_mem");
     let free = sgl().texmem.free();
     trace!("sgl_get_free_texture_mem", "-> {free}");
     error(0);
@@ -93,6 +97,7 @@ pub extern "C" fn sgl_get_free_texture_mem() -> u32 {
 /// (*inferred* from its name).
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_delete_all_textures() {
+    shim::call!("sgl_delete_all_textures");
     let names: Vec<u32> = {
         let mut s = sgl();
         let names: Vec<u32> = s.scene.textures.keys().copied().collect();
@@ -113,6 +118,7 @@ const ERR_MODE_ALREADY_DEFINED: i32 = -1023;
 /// (`immediate`).
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_use_ddraw_mode(hwnd: usize, proc_2d: usize) -> i32 {
+    shim::call!("sgl_use_ddraw_mode", hwnd, proc_2d);
     shim::log!("sgl_use_ddraw_mode window {hwnd:#x} 2D callback {proc_2d:#x}");
     if !crate::immediate::set_ddraw(hwnd, proc_2d) {
         error(ERR_MODE_ALREADY_DEFINED);
@@ -123,6 +129,7 @@ pub extern "C" fn sgl_use_ddraw_mode(hwnd: usize, proc_2d: usize) -> i32 {
 
 #[unsafe(no_mangle)]
 pub extern "C" fn sgl_use_eor_callback(eor: usize) -> i32 {
+    shim::call!("sgl_use_eor_callback", eor);
     shim::log!("sgl_use_eor_callback {eor:#x}");
     crate::immediate::set_eor(eor);
     0

@@ -30,6 +30,8 @@ work.
   Functions the port cites with `Original: FUN_…` get labels automatically:
   `tools/triage/cite_labels.py SRC --existing labels/names.tsv --out labels/names-from-port.tsv`,
   then `decomp_query.py --labels labels/names.tsv --labels labels/names-from-port.tsv`.
+  Add `--notes` to name module notes after their module. Add `--any --prefix FUN_` when the port
+  also cites functions as a `FUN_` address in the comment above an item, without "Original:".
 - **Checklist:** tick or add the items in `docs/CHECKLIST.md` and update its date.
 - **Ledgers:** if the change adds or removes a `Deviation:` or `not ported` comment, regenerate
   the ledger (`tools/triage/deviations.py --out docs/DEVIATIONS.md SOURCE_DIR`) and commit it
@@ -66,11 +68,11 @@ git status --short
 git diff --stat
 ```
 
-Never stage anything from `target/`, `analysis/` or `derived/`, game files (`.exe .dll .pak
+Never stage anything from `game/`, `analysis/` or `derived/`, game files (`.exe .dll .pak
 .sav` and the game's own extensions), decompiled code, disassembly, emulator output or
-extracted assets. `.gitignore` covers the folders: never force-add. Screenshots chosen for a
-document or the site may be committed: copy each one out of `derived/`, compress it (WebP)
-and caption it where it is used.
+extracted assets. `.gitignore` covers the folders: never force-add. Screenshots are always
+fine, of the original game and of the port: copy each one out of `derived/`, compress it
+(WebP), caption it where it is used and commit it. Never leave one out for being game material.
 
 ## 3. Stage only your own work
 

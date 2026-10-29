@@ -58,11 +58,14 @@ proposed again.
 - [x] Antialiased lines
 - [x] Polygons that are not convex: even-odd and non-zero rules
 - [x] Hidden surfaces: z-buffer compare, sorted spans, BSP, portals, PVS
-- [x] The card makers' 3D APIs in detail: Glide 2.x, ATI3DCIF, S3D Toolkit; one build per card ([card-apis.md](docs/hardware/card-apis.md), `gameframe-gpu-1997`, `re-accelerator`)
+- [x] The card makers' 3D APIs in detail: Glide 2.x, ATI3DCIF, S3D Toolkit; one build per card ([card-apis.md](docs/hardware/card-apis.md), `gameframe-voodoo`, `gameframe-rage`, `gameframe-virge`, `gameframe-texel`, `re-accelerator`)
 - [x] Hand-written MMX code: finding it, matching it to the plain build, measuring, porting ([simd.md](docs/hardware/simd.md), `gameframe-mmx`, `re-vectoriser`)
 - [x] PowerVR SGL's scene-graph half: the 46 calls of POD's PowerVR build, a stand-in `sgl.dll` on OpenGL ([wrappers/sgl](wrappers/sgl/README.md))
 - [x] PowerVR SGL's immediate-mode half (`sgltri_*`), which Hardwar's PowerVR mode uses. The 13 calls it lacked, and `sgltri_rerender`, are in `wrappers/sgl` ([sgl](wrappers/sgl/README.md), `test/sgltritest.c`). `sgltri_shadow` draws shadow volumes; Hardwar has not been run against it
 - [ ] Rendition RRedline and Matrox MSI in the same detail
+- [x] The rendering pipeline: the five stages of a frame, where each ran on each card, what each seam lets a port check, and the port built as a virtual card with devices ([rendering-pipeline.md](docs/hardware/rendering-pipeline.md), the lab page `site/lab/pipeline.md`, `re-port`, `re-verify`)
+- [x] A call-stream log in the replacement libraries: each call and its arguments, one a line, in the format `seqdiff.py` reads, so the original's seam can be compared with the port's device interface (`WRAPPER_CALLS`, `wrappers/shim/src/calls.rs`; Glide, SGL, ATI3DCIF, S3D Toolkit)
+- [ ] The call log in `ddraw.dll` (its COM methods), and the arrays behind SGL's scene-graph calls
 
 ## Sound ([sound.md](docs/hardware/sound.md), [audio coverage](docs/hardware/audio-coverage.md))
 
@@ -180,7 +183,8 @@ proposed again.
 - [x] 86Box control has an optional external provider, [`86box-mcp`](https://github.com/dafugg/86box-mcp).
   It uses 86Box's merged automation socket, which must be enabled in a custom build. GameFrame
   leaves it opt-in, checks its source revision and local emulator path, and does not proxy its
-  tools through the GameFrame MCP server.
+  tools through the GameFrame MCP server. The provider also exposes CPU debugger tools when the
+  local 86Box build enables `GDBSTUB=ON`; see `docs/working/mcp-toolchain.md`.
 
 - [x] `tools/pe/relocs.py`: pointers in data from base relocations
 - [x] `tools/pe/peinfo.py`: delay-loaded imports, relocation count
@@ -338,6 +342,10 @@ From POD's move to POD Gold and the vehicle creator (its `docs/gameframe-lessons
   palette from the same picture in 16 bits. Test: a generated pair recovers the palette
 - [ ] A line follower that drives a port along a recorded path through its probe, to compare
   two versions of a vehicle or a level
+- [x] Lockstep against a reference inside the port, with written lists of what is compared
+  ([re-verify](skills/re-verify/SKILL.md), section 6)
+- [x] Browser pitfalls for WebAssembly cores and measuring speed on a capped CPU
+  ([Building the port](docs/working/building-the-port.md))
 
 ## Out of scope
 

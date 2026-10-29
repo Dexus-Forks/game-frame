@@ -134,6 +134,28 @@ If REA tools do not appear: restart the agent (MCP servers start with the sessio
 
 For the opt-in CPU and whole-PC providers, follow [the MCP tool surface guide](../../docs/working/mcp-toolchain.md).
 
+For 86Box GDB debugging, the local build needs both `-D AUTOMATION=ON` and `-D GDBSTUB=ON`.
+Enable the separate server with `./gameframe mcp --enable 86box`, then restart the agent session.
+In the pinned MCP checkout, run `docker/build.sh -D GDBSTUB=ON`; it enables automation itself.
+For a native build, add that option to the CMake command with `AUTOMATION=ON`. Check the build
+cache for `AUTOMATION:BOOL=ON`, `GDBSTUB:BOOL=ON` and `DYNAREC:BOOL=OFF`. The provider's `vm_start`
+tool must use `debugger=true` to attach. The MCP tool surface guide has the pinned server, local
+settings and platform build instructions. Reuse one `86box-mcp` checkout per host. Put only VM
+profiles and disks in separate game projects. Make another build directory only when you need a
+different CMake configuration, such as a faster run without the GDB stub.
+
+The server creates its automation socket in the host's temporary directory. GameFrame sets
+`TMPDIR` to `$HOME/.cache/gameframe/86box-tmp`, a path the Docker wrapper mounts into the
+container. Set `GAMEFRAME_86BOX_TMPDIR` in the project's ignored `.env` to another directory under
+`$HOME` or the shared MCP checkout. Restart the agent session after changing it. This avoids the
+macOS default under `/var/folders`, which the container cannot see.
+
+GameFrame uses loopback TCP with the provider token by default. Set
+`GAMEFRAME_86BOX_TRANSPORT=unix` only when the shared filesystem passes Unix sockets. The GDB
+stub uses a separate dynamic TCP port. The Docker wrapper uses host networking; Docker Desktop
+needs host networking enabled in Settings > Resources > Network. Check that the port reported by
+86Box is reachable from the host if startup stalls at debugger attach.
+
 ## Common problems
 
 - `dosbox-x not found` after `brew install --HEAD`: run `brew link dosbox-x`.
@@ -154,6 +176,9 @@ For the opt-in CPU and whole-PC providers, follow [the MCP tool surface guide](.
 
 ## Working in a git worktree
 
-A worktree has no `target/`, `analysis/` or `.venv`. Symlink them from the main checkout and add
-them to `$(git rev-parse --git-common-dir)/info/exclude` (a symlink is not matched by a
-`/target/` rule in `.gitignore`).
+A worktree has no `game/`, `media/`, `saves/`, `analysis/` or `derived/`, since git keeps
+none of them. Run `./gameframe game link ID .` in the worktree: it makes the same links into the
+GameFrame home as the main checkout has, and `.gitignore` already ignores them. An older
+project with real folders links them from the main checkout and adds the links to
+`$(git rev-parse --git-common-dir)/info/exclude`. The shared Python is in the home's
+`python/`, so a worktree needs no `.venv` of its own.

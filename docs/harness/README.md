@@ -19,9 +19,9 @@ There are three parts:
    `--script` it writes the set-up steps as one shell script for you to read and run.
 
 ```bash
-./gameframe run needs target/                         # what the game needs
-./gameframe run harness plan target/                  # which modules cover it, and what is missing
-./gameframe run harness plan target/ --runtime emupc-wine --with silent-audio --script derived/harness.sh
+./gameframe run needs game/                         # what the game needs
+./gameframe run harness plan game/                  # which modules cover it, and what is missing
+./gameframe run harness plan game/ --runtime emupc-wine --with silent-audio --script derived/harness.sh
 ./gameframe run harness modules                       # every module
 ```
 

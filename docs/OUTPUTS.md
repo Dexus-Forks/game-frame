@@ -21,6 +21,11 @@ contains the game's own files: every output reads the player's own copy (see
 
 ![What a project ships: documents, a website, programs, a browser version and a server](assets/diagrams/outputs-map.svg)
 
+A reimplementation is an exact core with a frame around it. The core is the game. The frame
+is GameFrame's launcher, library of game files and saves, settings, renderer choice, help pages
+and console. The two talk only through a versioned contract of events, so the same frame ships
+with every port ([Building the port](working/building-the-port.md#the-frame)).
+
 ### Ready-made programs for each system
 
 Most players will not build from source. A CI workflow can build the program on each system
@@ -84,6 +89,8 @@ If the reimplementation compiles to WebAssembly, it can run in a browser on the 
 files: the page asks for them, keeps them in the browser's storage, and never uploads them.
 Host it on the project's website. Check that the browser and the desktop compute the same game
 (`re-verify`, "Every platform").
+GameFrame's [library page](../templates/library-page/README.md) is the start page for a browser
+version. It keeps the player's files, saves and mods, and shows news and help pages.
 
 ### Additions to the original
 

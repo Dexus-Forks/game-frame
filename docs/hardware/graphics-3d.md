@@ -72,6 +72,9 @@ machine. They are the best reference for the port's renderer, and the easiest to
 
 ## How to approach a game with several renderers
 
+[The rendering pipeline](rendering-pipeline.md) explains why these steps work: the stages of a
+frame, where each stage ran on each card, and how to build the port as a virtual card.
+
 ![One game with Glide, Direct3D, OpenGL and software renderers](../assets/diagrams/renderer-paths.svg)
 
 1. List the renderers: separate DLLs (Unreal's `GlideDrv.dll`, `D3DDrv.dll`, `SoftDrv.dll`) or

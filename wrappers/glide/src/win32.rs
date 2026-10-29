@@ -1,5 +1,5 @@
 //! The few Win32 calls the library needs (user32, gdi32, kernel32, opengl32), declared by hand
-//! so the crate has no dependencies beyond `gpu-1997`.
+//! so the crate has no dependencies beyond `gameframe-voodoo` and `gameframe-texel`.
 
 #![allow(non_snake_case, clippy::upper_case_acronyms)]
 

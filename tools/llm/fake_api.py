@@ -3,7 +3,7 @@
 
 Usage:
   fake_api.py serve PORTFILE     serve on a free port on 127.0.0.1 and write the port to
-                                 PORTFILE; point ANTHROPIC_BASE_URL at http://127.0.0.1:PORT
+                                 PORTFILE; point GAMEFRAME_LLM_ENDPOINT at it
   fake_api.py claude ARGS...     act as `claude -p --output-format json`: print a JSON result
 
 The server answers POST /v1/messages, and creates, reports and returns Message Batches
@@ -114,7 +114,9 @@ def main(argv):
             open('answer.txt', 'w').write(os.environ['FAKE_ANSWER'])
         print(json.dumps({'type': 'result', 'is_error': False, 'total_cost_usd': 0.01,
                           'result': 'fake run: ' + prompt[:60] + '; CLAUDE variables: '
-                                    + str(sum(k.startswith('CLAUDE') for k in os.environ))}))
+                                    + str(sum(k.startswith('CLAUDE') for k in os.environ))
+                                    + '; Anthropic endpoint: '
+                                    + os.environ.get('ANTHROPIC_BASE_URL', 'default')}))
     else:
         print(__doc__)
     return 0

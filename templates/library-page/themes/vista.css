@@ -1,0 +1,66 @@
+/* Windows Vista and 7 (Aero): a glass frame over an aurora desktop, glossy buttons that glow
+   blue, and a shining green progress bar.
+   A ready-made theme for the library page and the frame: "preset": "vista" in library.json. */
+
+#library[data-scheme] {
+  --lib-bg: radial-gradient(ellipse at 30% 110%, #2a9c6a, transparent 55%),
+            radial-gradient(ellipse at 80% -10%, #3a7bd5, transparent 60%), #0b1f33;
+  --lib-surface: #f0f0f0; --lib-surface-2: #fff; --lib-line: #d5dfe5; --lib-text: #1e1e1e; --lib-muted: #5a5a5a;
+  --lib-accent: #3399ff; --lib-accent-text: #fff; --lib-danger: #c42b1c; --lib-ok: #258a2c; --lib-scrim: transparent;
+  --lib-font: "Segoe UI", "Helvetica Neue", Arial, sans-serif; --lib-font-mono: Consolas, monospace;
+  --lib-text-s: 11px; --lib-text-m: 12px; --lib-text-l: 12px; --lib-text-xl: 14px; --lib-text-title: 13px;
+  --lib-weight-strong: 600; --lib-radius-s: 3px; --lib-radius-m: 3px; --lib-radius-l: 7px; --lib-radius-pill: 3px;
+  --lib-shadow: 0 0 0 1px rgb(0 0 0 / 0.6), 0 8px 30px rgb(0 0 0 / 0.6); --lib-width: 600px;
+  color-scheme: light;
+}
+#library[data-scheme] { background: var(--lib-bg); }
+
+/* The glass frame: a see-through border with a sheen, and the content on a light pane. */
+#library .lib-card { padding: 0 8px 8px; border: 1px solid rgb(255 255 255 / 0.55); border-radius: 7px;
+  background: linear-gradient(rgb(255 255 255 / 0.45), rgb(255 255 255 / 0.12) 40px, rgb(120 170 210 / 0.25));
+  backdrop-filter: blur(10px) saturate(1.4); box-shadow: var(--lib-shadow), inset 0 0 0 1px rgb(255 255 255 / 0.3); }
+#library .lib-card > :not(.lib-header) { background: #f0f0f0; margin: 0; padding-left: 12px; padding-right: 12px; }
+#library .lib-card > .lib-nav { padding-top: 8px; border-radius: 0; box-shadow: 0 -1px rgb(0 0 0 / 0.35); }
+#library .lib-card > :last-child { padding-bottom: 12px; }
+#library .lib-header { display: flex; align-items: baseline; gap: 10px; margin: 0; padding: 7px 4px; text-align: left; color: #000;
+  text-shadow: 0 0 10px #fff, 0 0 10px #fff; }
+#library .lib-title { font-weight: 400; font-size: 13px; }
+#library .lib-tagline { margin: 0; color: #222; font-size: 12px; }
+
+/* Tabs. */
+#library .lib-nav, #library .lib-tabs { justify-content: flex-start; gap: 2px; margin: 0; border: 0; }
+#library .lib-nav a, #library .lib-tabs button { padding: 3px 10px; border: 1px solid #898c95; border-bottom: 0; border-radius: 3px 3px 0 0;
+  background: linear-gradient(#f2f2f2 50%, #e5e5e5 50%, #dcdcdc); color: #000; text-decoration: none; }
+#library .lib-nav a:hover { background: linear-gradient(#eaf6fd 50%, #bee6fd 50%, #a7d9f5); color: #000; border-color: #3c7fb1; }
+#library .lib-nav a[aria-current=page], #library .lib-tabs button[aria-selected=true] { background: #fff; color: #000; }
+#library .lib-section { padding-top: 14px; padding-bottom: 12px; border-top: 1px solid #898c95; }
+#library .lib-card > .lib-section { background: #fff; }
+
+/* Glossy buttons: a light top half, a darker bottom half, a blue glow on hover. */
+#library .lib-button, #library .lib-pad-key { min-height: 23px; padding: 3px 14px; border: 1px solid #707070; border-radius: 3px; color: #000;
+  font: 12px var(--lib-font); background: linear-gradient(#f2f2f2, #ebebeb 50%, #ddd 50%, #cfcfcf);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.7); }
+#library .lib-button:hover:not(:disabled), #library .lib-pad-key:hover { border-color: #3c7fb1;
+  background: linear-gradient(#eaf6fd, #d9f0fc 50%, #bee6fd 50%, #a7d9f5); }
+#library .lib-button:active:not(:disabled), #library .lib-pad-key:active { border-color: #2c628b;
+  background: linear-gradient(#e5f4fc, #c4e5f6 50%, #98d1ef 50%, #68b3db); box-shadow: inset 1px 1px 2px rgb(0 0 0 / 0.3); }
+#library .lib-button--primary { border-color: #3c7fb1; box-shadow: inset 0 0 0 1px #48d8fb; }
+#library .lib-button:disabled { color: #838383; border-color: #adb2b5; background: #f4f4f4; box-shadow: none; }
+
+/* Fields and lists. */
+#library .lib-input { border: 1px solid #abadb3; border-top-color: #707070; border-radius: 2px; background: #fff; color: #000; font: 12px var(--lib-font); }
+#library .lib-input:focus { border-color: #3d7bad; }
+#library .lib-log, #library .lib-rows .lib-row { border-color: #d5dfe5; border-radius: 2px; background: #fff; }
+#library .lib-rows .lib-row:hover { background: linear-gradient(#f2f9fd, #e5f3fb); border-color: #b8d6fb; }
+#library .lib-notice { border: 1px solid #e3c06b; border-radius: 3px; background: linear-gradient(#fffbe5, #fff2bf); }
+#library .lib-notice .lib-icon { color: #c08000; }
+#library .lib-renderer { border: 1px solid #d5dfe5; border-radius: 3px; background: #fff; }
+#library .lib-renderer:hover:not(:disabled) { border-color: #b8d6fb; background: linear-gradient(#fafbfd, #ebf3fd); }
+#library .lib-renderer[aria-checked=true] { border-color: #7da2ce; background: linear-gradient(#dcebfc, #c1dbfc); }
+
+/* The shining green bar. */
+#library .lib-meter { height: 14px; padding: 0; border: 1px solid #bcbcbc; border-radius: 2px; background: linear-gradient(#f3f3f3, #e0e0e0); }
+#library .lib-meter-fill { height: 100%; border-radius: 1px;
+  background: linear-gradient(#e2ffe2, #a8f0a8 45%, #06b025 46%, #36d14e); }
+#library .lib-check input, #library .lib-row input[type=checkbox] { accent-color: #3399ff; }
+#library a { color: #0066cc; }

@@ -12,6 +12,9 @@ with the same rules, so a result here matches the one the tool gives in a projec
 - [Records explorer](/lab/records): a table of records or a capture of network messages, one
   row each, with the counters, lengths and types marked. The same as `tools/formats/fields.py`
   and `tools/formats/pcap.py`.
+- [Rendering pipeline](/lab/pipeline): one frame through the five stages, drawn by a software
+  renderer, a 16-bit card and a modern device side by side, with the difference between them.
+  Needs no file. The guide is [The rendering pipeline](/hardware/rendering-pipeline).
 
 Files from a game are the game's own material. Use your own copy, and keep what you make from
 it in your project's ignored folders.

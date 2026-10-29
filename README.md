@@ -3,6 +3,12 @@
 GameFrame is an agentic framework for reverse engineering games. Its playbook of skills and agents runs inside your coding agent. Its toolkit of tested tools checks every result against the original. AI agents and people use it to study a game from its shipped files. They
 document its formats and rules, and reimplement it so it behaves exactly like the original.
 
+Each reimplementation is an exact core with a frame around it. The core is the game, ported
+from the original and checked against it. The frame is GameFrame's launcher, the player's
+library of game files and saves, the settings, the renderer choice, help pages and an event
+console. Every port gets the same frame. The core and the frame talk only through a versioned
+contract of events ([Building the port](docs/working/building-the-port.md#the-frame)).
+
 The toolkit works with [Ghidra](https://ghidra-sre.org), the
 [Unicorn](https://www.unicorn-engine.org) emulator and [REA](https://github.com/morluto/rea)
 (Reverse Engineer Anything). It uses [DOSBox-X](https://dosbox-x.com) and its debugger for DOS
@@ -30,9 +36,14 @@ Set up GameFrame on this computer for me.
 5. Run tests/run.sh --ghidra and report how many checks passed. If any failed, show the
    failures and fix the setup before going on.
 6. Run scripts/setup.sh --rea and help me register REA with this agent.
-7. Ask me for the name of the game and the folder of my own copy of it. Then run
-   scripts/new-project.sh ~/re/<short-name> "<Game Name>" "<path to the game>".
-8. Open the new project, read its AGENTS.md, and start with the re-start skill.
+7. Run ./gameframe home init. It makes the GameFrame home, ~/gameframe, where the games, the
+   projects, the virtual machines and the shared settings (config.env) live.
+8. Ask me for the name of the game and where my own copy of it is: a disc image, an installer
+   or a folder. Then run
+   scripts/new-project.sh <short-name> "<Game Name>" "<path to the game>".
+   It copies the game into ~/gameframe/games/<short-name>/ and makes the project in
+   ~/gameframe/projects/<short-name>/.
+9. Open the new project, read its AGENTS.md, and start with the re-start skill.
 
 Never copy the game's files, extracted assets or decompiled code into a git repository.
 ```
@@ -67,7 +78,8 @@ cd game-frame
 scripts/setup.sh --install          # Ghidra, JDK 21, objdump, Node, Zig, and .venv (unicorn, pefile, capstone)
 tests/run.sh --ghidra               # proves every tool on the sample game (about 1½ minutes)
 
-scripts/new-project.sh ~/re/mygame "My Game" "/path/to/My Game"   # a project for one game
+./gameframe home init               # ~/gameframe: games, projects, machines, config.env, shared Python
+scripts/new-project.sh mygame "My Game" "/path/to/disc.iso"   # the game in games/mygame, the repository in projects/mygame
 ```
 
 Then open the new project with your agent and ask it to start with the **re-start** skill.
@@ -109,7 +121,7 @@ project (`./gameframe run NAME`, `./gameframe python FILE`, `./gameframe root`).
 ./gameframe skill re-trace --sections  # a skill's headings; --section TITLE prints one part
 ./gameframe tools                      # every tool and script, with its first line of help
 ./gameframe tool decomp_query          # one tool's full help
-./gameframe run peinfo target/game.exe # run a tool with GameFrame's .venv
+./gameframe run peinfo game/game.exe # run a tool with GameFrame's .venv
 ./gameframe find vtable                # which skills and tools mention a word
 ./gameframe advise "<error text>"      # known failures, fixes and dead ends (docs/knowhow/)
 ./gameframe doctor                     # the toolchain check (scripts/setup.sh)
@@ -124,6 +136,31 @@ scripts.
 
 Write each claim with its evidence (an address, a value, a measurement) and one label:
 *observed*, *measured*, *inferred* or *unknown*. Measure each number the reimplementation must match by running the original function under the emulator. The reimplementation must give the same result bit for bit.
+
+## How a port is built
+
+A port has three layers.
+
+- **The core** is the game: its rules, formats and simulation. It matches the original bit
+  for bit, and has no platform code. Reusable libraries plug into it: the chip and runtime
+  [crates](#crates) and the [replacement 3D-card libraries](#replacement-libraries).
+- **The platform layer** gives the core a window, drawing, sound, input, time and files. It
+  behaves like the original wherever the player can see the difference.
+- **The frame** is GameFrame's program around the game. It opens on the first run, and
+  `--frame` opens it again. It holds the player's library, the settings from the game's
+  manifest, a choice of renderer with a coverage grade for each (exact, good, partial,
+  experimental or missing), help pages and a console of every event.
+
+The game opts into each part of the frame by naming a capability in its manifest. It can add
+event topics of its own. A Rust port implements the `Game` trait. A port in any other language
+speaks JSON lines on standard input and output. A game the frame only starts needs a
+`frame.json` and no code. The frame takes its look from design tokens in one `library.json`.
+[Building the port](docs/working/building-the-port.md) has the contract, and
+[the library page](templates/library-page/README.md) has the tokens. A ready-made desktop
+launcher and the viewer as a tab of the frame are planned.
+
+When a game needs something the frame lacks, it adds it to GameFrame with a pull request, or
+opens an issue.
 
 ## Skills
 
@@ -188,7 +225,7 @@ hand-offs, the data passed between agents, the outcome, and the failure path.
 |---|---|
 | `scripts/setup.sh [--install] [--rea]` | Checks every tool; installs what is missing; shows REA's registration plan |
 | `source scripts/env.sh` | Sets `GAMEFRAME_ROOT`, loads `.env`, puts `gameframe` and the `.venv` Python on `PATH`, for each shell or agent session |
-| `scripts/new-project.sh DIR "Name" [GAME] [--copy] [--agent LIST]` | Creates a project for one game: rules, the plugin enabled, the `./gameframe` launcher, ignored folders for the game and its derivatives. `--copy` copies the toolkit, skills and guides instead. `--agent` names the coding agents to set it up for (`claude,codex,gemini,copilot,cursor,opencode`, or `all`, the default): each gets its skill link, agents, gate hooks and MCP servers |
+| `scripts/new-project.sh DIR "Name" [GAME] [--id ID] [--local] [--copy] [--agent LIST]` | Creates a project for one game: rules, the plugin enabled, the `./gameframe` launcher, and links into the GameFrame home for the game and its derivatives. A `DIR` with no slash goes in the home's `projects/`. `--local` keeps real, ignored folders in the project instead. `--copy` copies the toolkit, skills and guides instead. `--agent` names the coding agents to set it up for (`claude,codex,gemini,copilot,cursor,opencode`, or `all`, the default): each gets its skill link, agents, gate hooks and MCP servers |
 | `scripts/update-project.sh DIR [--plugin] [--agent LIST] [--dry-run]` | Keeps a project current. For a plugin project, refreshes the launcher, settings and each agent's files. For a copied project, adds what is missing, replaces older copies and keeps the project's own edits; `--plugin` moves it to the plugin and removes only GameFrame's own files. `--agent` adds agents; without it, the agents the project already has are refreshed |
 | `scripts/new-site.sh NAME "Title" ["Description"] [--single] [--repo URL]` | Starts a project's website in `sites/NAME/` (or `site/`): the front page, the diary, the findings and status pages through `@include`, and a GitHub Pages workflow (`re-site`) |
 | `scripts/ghidra-export.sh [--labels FILE] BINARY...` | Headless Ghidra analysis and a text export: pseudocode, functions, strings, imports, exports; names applied from a labels file |
@@ -197,115 +234,46 @@ hand-offs, the data passed between agents, the outcome, and the failure path.
 | `scripts/zcc.sh` | rustc's linker for 32-bit Windows DLLs through `zig cc`, with no MinGW, exporting exactly the names in a `.def` file: replacement libraries a 1990s game imports by name |
 | `scripts/dosbox-run.sh [--fileio] [--break] [--mcp PORT] DIR PROGRAM` | Runs a DOS program in DOSBox-X without a window: exit code, file I/O log, debugger control |
 | `./gameframe COMMAND` | Help and discovery: the steps, the skills, every tool's own help; runs a tool with the `.venv` |
-| `tests/run.sh [--ghidra]` | 381 checks against the two sample games (399 with `--ghidra`) |
+| `tests/run.sh [--ghidra]` | The checks against the two sample games; `--ghidra` adds the Ghidra ones |
 
 ## Tools
 
-| Tool | What it answers |
-|---|---|
-| `tools/disc/discinfo.py` | A CD image (CUE/BIN, ISO): tracks, CD audio, Mode 2 sectors, ISO 9660, Joliet, HFS, El Torito, dates; copies files and audio out |
-| `tools/triage/filetypes.py` | What each file is from its bytes: signature, entropy, compressed or packed |
-| `tools/triage/similar.py` | How much two files or two releases share, even when they differ; renamed files |
-| `tools/triage/binview.py` | A file drawn as a picture, one pixel per byte, by kind of byte or by entropy |
-| `tools/triage/tables.py` | Sine and cosine lookup tables, with their steps, scale, type and rounding |
-| `tools/triage/sigscan.py` | Byte signatures with wildcards: make them from named functions, find them in another build or a game |
-| `tools/triage/insns.py` | Every instruction of a kind: port access, interrupts, timers, divisions |
-| `tools/triage/buildid.py` | Which build a copy is: the disc's mastering date, each executable's link date and VERSIONINFO, version strings, readme and setup version lines; written into `docs/versions.md` |
-| `tools/triage/versiondiff.py` | Two editions compared, as folders or disc images read in place: files added, removed and changed by folder, the executables' link dates, the languages; Markdown for `docs/versions.md` |
-| `tools/triage/exportcov.py` | How much code a Ghidra export covers, its largest gaps, and the likely starts of the functions it missed, for a batch decompile; for a PE and for a 16-bit NE (`seg:off`, far targets from the relocation tables) |
-| `tools/triage/refs.py` | Every instruction that refers to an address, found in the raw code bytes (32-bit and RIP-relative), read, write or value, with hits in no function marked |
-| `tools/triage/pointerpaths.py` | A chain of pointers from a global to a value that moves between runs |
-| `tools/triage/coverdiff.py` | The code that ran only with an action: two coverage logs (drcov or address lists) compared, by function |
-| `tools/triage/fixity.py` | A BagIt bag of a game copy with checksums; manifests in place; verification over time |
-| `tools/triage/constants.py` | Random generators, checksums, hashes, ciphers and decompressors named by their constants, with addresses; Park–Miller when its modulus is beside its multiplier |
-| `tools/triage/sentences.py` | The sentences in a program or a Ghidra `strings.txt`: messages, descriptions and notes, for reading the game's story (`docs/working/lore.md`) |
-| `tools/triage/hashnames.py` | Which hash function names things, and the name behind each hash constant |
-| `tools/triage/match_functions.py` | The same functions in two builds, from two Ghidra exports; your labels carried to the new addresses |
-| `tools/triage/memscan.py` | Where a running game keeps a value, from memory dumps taken as it changes; pointers to it |
-| `tools/triage/axes.py` | Which axis is up in a 3D game, its sign, and the handedness, from a recorded path over the level's vertices |
-| `tools/triage/compare_trees.py` | Two copies or releases compared file by file (SHA-256, case-insensitive paths); hashes to publish |
-| `tools/pe/peinfo.py` | What is this binary: architecture, compiler, PDB path, imports, exports, RTTI, engine and packer fingerprints |
-| `tools/pe/probegen.py` | A probe library for a DLL a 32-bit game imports: the same export names, and a log of every call with its arguments |
-| `tools/pe/apitable.py` | The API table of a 32-bit DLL or import library: every export with its calling convention and argument bytes, read from its code, and its parameters from a header |
-| `tools/pe/peres.py` | Version information, string tables, dialogs, bitmaps and data inside a Windows executable |
-| `tools/pe/stackstrings.py` | Text the code builds on the stack, which no string list shows |
-| `tools/pe/readdata.py` | The real value of a `DAT_` constant or table |
-| `tools/pe/vtable.py` | The functions in a table of function pointers |
-| `tools/pe/relocs.py` | The pointers in a PE's data, from its base relocations: vtables and tables of functions, strings and records |
-| `tools/triage/screenmarks.py` | Marks positions read from memory on a screenshot, through the camera's view and projection matrices |
-| `tools/triage/dates.py` | Dates and times in a file, in nine stored forms (Unix, FILETIME, DOS, HFS, OLE, ISO 9660, SYSTEMTIME), near a date you give |
-| `tools/live/memrec.py` | Snapshots of a running game's writable memory for `memscan.py`, and recordings of named values as JSON Lines, from `/proc/PID/mem` (Wine on Linux, or in a VM); `--wait` starts at a phase |
-| `tools/live/shot.py` | A capture of the screen, a window or a file kept under a name of its own in `derived/captures/DATE/`, with its text, never overwritten |
-| `tools/live/modfolder.py` | Installs a folder of changed files into a game's install folder, lists it and takes it out again, with no stale files |
-| `tools/live/emupc.py` | Writes an emulated PC for the original: QEMU, a Debian cloud image, cloud-init with Wine and 32-bit Mesa, Xvfb and openbox, SSH, the disc as a CD-ROM |
-| `tools/live/memlog.py` | Reads a `memrec` recording back: a summary of ranges and changes, CSV with arrays split and 16.16 values as decimals, or the sample nearest a time |
-| `tools/live/emulock.py` | A note of who uses a shared emulator or VM, since when and for what; a second session is refused and told who holds it |
-| `tools/live/loopcut.py` | Cuts a recorded path at its first return to the start, so a racing line or patrol is one closed loop; refuses a path shorter than a loop |
-| `tools/live/winput.py` | Keys, mouse moves and clicks sent to a game from inside Wine with `SendInput`, for macOS, where synthetic input needs a permission and Wine windows belong to no app. Builds `winput.c` with zig |
-| `tools/live/align.py` | Lines up a known picture of a screen with a capture of it now (window frame, title bar, scale) and maps click points between them, with a picture to check before clicking |
-| `tools/live/harness.py` | Puts together the modules a game needs from `docs/harness/modules/`: a runtime, a layer for each need, the gaps, and the set-up steps as one script to read |
-| `tools/triage/needs.py` | What a game needs to run, from an executable, a folder or a disc image: CPU features, OS, graphics and sound APIs, libraries, extenders, DRM and media, each with its evidence |
-| `tools/formats/pngio.py` | Reads and writes PNG pictures with the standard library alone |
-| `tools/live/frida_trace.py` | Calls to chosen functions, and accesses to chosen memory, in a running game, with Frida. Calls use the same format as the emulator's call traces |
-| `tools/emu/mem_trace.py` | Which instructions read and write chosen memory while an emulated function runs. It is the first step of taint analysis |
-| `tools/triage/decomp_query.py` | A function with your labels; callers; callees; who uses a string; who writes a field; where the work is |
-| `tools/triage/decomp_query.py layout` | A structure's fields from the functions that use it, merged, with a draft C struct |
-| `tools/triage/cite_labels.py` | Function labels made from the port's own `Original: FUN_…` citations, for the decompiled code |
-| `tools/triage/dictionary.py` | Checks the data dictionary (`labels/dictionary.tsv`) against the kinds, the evidence labels and `labels/fields.tsv`, and prints it as a table |
-| `tools/triage/deviations.py` | Every `Deviation:` and `not ported` comment in the reimplementation, as one ledger; `--check` for tests |
-| `tools/triage/coverage.py` | How much of the original (by count and by size) the reimplementation cites, and the largest functions nobody cites yet |
-| `tools/emu/pe_emu.py` | Call any function of a Windows x64 EXE or DLL with chosen inputs and read the result |
-| `tools/emu/pe32_emu.py` | Call a routine of a 32-bit (x86) Windows EXE or DLL, with arguments on the stack or inputs in registers, MMX and x87 included; each import stops the run with its name |
-| `tools/emu/call_trace.py` | The calls an emulated function makes (random draws), in order, with call sites |
-| `tools/formats/reader.py`, `validate.py` | Prototype a format decoder; prove it consumes every byte of every file, and with `--write` that every file writes back identical |
-| `tools/decoders/` | Ready decoders for the standard formats many games ship: `bmp` (every Windows and OS/2 variant, RLE8, RLE4, bit fields), `wav`, `midi` (also RIFF `.rmi`), `avi` (headers and streams), for `validate.py` and the catalogue |
-| `tools/formats/derived.py` | Which unexplained fields next to geometry are computed from it: bounds, centres, Newell and cross-product normals, plane distances |
-| `tools/formats/xorscan.py` | The key of a simply obfuscated file: XOR, add, stepping and chained keys; a key XORed into one field of every directory record, from the names' zero padding, found again in the executable |
-| `tools/formats/rawimage.py` | Raw pixels to PNG: VGA 13h, Mode X, EGA planes, CGA, packed and 16-bit, with palettes (6-bit values scaled or shifted, `--dac`) |
-| `tools/formats/shadetable.py` | A palette game's shade, fog or light table: the black, unchanged and white levels, the colour it fades toward, a picture |
-| `tools/formats/markers.py` | Unique values planted in a file's fields, then found in memory dumps |
-| `tools/dos/omf.py` | OMF object files and libraries (.OBJ, .LIB): publics, and signatures of the runtime for `sigscan.py` |
-| `tools/formats/pcap.py` | A network capture (pcap, pcapng) split into flows and messages, or joined into TCP streams |
-| `tools/formats/fields.py` | Many records or messages side by side: constants, counters, lengths and types, and a heatmap |
-| `tools/formats/skeleton.py` | Skeletons in a model file: parent index arrays as trees, runs of quaternions, joint names |
-| `tools/formats/shaders.py` | Shaders inside a file: Direct3D 9 bytecode, DXBC, DXIL, SPIR-V, GLSL, HLSL and ARB, with their names |
-| `tools/formats/swfinfo.py` | A Flash game: SWF version, compression, ActionScript version, classes, content; the movie inside a projector |
-| `tools/formats/timestamps.py` | A number read as every common timestamp; timestamps found inside a file |
-| `tools/formats/dfm.py` | Delphi and C++Builder forms (`TPF0`) from a program or a file, as text, with every event and its handler's name |
-| `tools/verify/bitcompare.py` | Ground truth against reimplementation, bit for bit, with ULP distance |
-| `tools/verify/ramdiff.py` | Memory frame by frame from the original and the port: the first frame and address that differ, named from a RAM map |
-| `tools/verify/seqdiff.py` | The first random draw (or any event) where two traces differ |
-| `tools/verify/replay.py` | A port's trace against a recording read from outside: a value passes when any state in its sample's window holds it |
-| `tools/site/check.py SITE_DIR` | Checks a project's site before it is published: no game files or decompiled code, includes that resolve, diary entries with a title and summary that do not read like a commit log |
-| `tools/ghidra/*.java` | The Ghidra scripts the shell scripts run (`ApplyLabels.java` names functions and creates missed ones) |
-| `tools/dos/dosinfo.py` | What is this DOS binary: MZ, NE or LE; segments with Ghidra's selectors; imports; compiler, extender, packer fingerprints; debug symbols; Pascal strings |
-| `tools/dos/tdinfo.py` | Borland Turbo Debugger symbols: original procedure, global and type names, parameters, record layouts, source lines, labels for Ghidra, Rust readers for records |
-| `tools/dos/nedis.py` | 16-bit disassembly with relocations applied: far calls and DS globals by name |
-| `tools/dos/readseg.py` | Typed values at `seg:off`, including Turbo Pascal `Real` and Pascal strings |
-| `tools/dos/delphi1.py` | A Delphi 1 program's class tables: classes, published methods and fields, labels for Ghidra, each form's events mapped to code |
-| `tools/emu/dos_emu/` | Call any function of a 16-bit NE (protected mode) or MZ (real mode) program, at Ghidra's addresses |
-| `tools/emu/dos_env/` | A small DOS, BIOS, DPMI host and PC for dos_emu: run a whole DOS program headless, with files, timer interrupts, keys, and screenshots |
-| `tools/emu/fragments.py` | Capture fragments of a DOS program's main loop from one headless run: DS, stack, screens, open files and heap blocks before and after each fragment, for the port's tests |
-| `tools/dos/fileio_trace.py` | From a DOSBox-X file log: every file's reads in order, with record patterns |
-| `tools/dos/dbx_control.py` | Drive DOSBox-X's debugger from a script: breakpoints, registers, memory |
+GameFrame has over a hundred tools. Each one documents itself: `--help` prints its usage, and
+`./gameframe tools` lists them all by folder. The [tools page](https://tanepiper.github.io/game-frame/tools/)
+on the site is built from that same help, with a page for every tool. These are the ones most
+projects start with, in the order of the method.
 
-The tools in `tools/llm/` call Claude with an API key, so they spend Claude Platform credits,
-such as a Max or Team plan's monthly credits ([API credits](docs/working/api-credits.md)).
+| Step | Tool | What it answers |
+|---|---|---|
+| Inventory | `tools/disc/discinfo.py` | A CD image's tracks, file systems and dates; copies files and audio out |
+| Inventory | `tools/triage/filetypes.py` | What each file is from its bytes: signature, entropy, compressed or packed |
+| Inventory | `tools/triage/buildid.py` | Which build a copy is, from dates, VERSIONINFO and version strings |
+| Inventory | `tools/pe/peinfo.py`, `tools/dos/dosinfo.py` | What a Windows or DOS binary is: compiler, engine, imports, packer, debug symbols |
+| Inventory | `tools/triage/needs.py` | What a game needs to run: CPU, OS, graphics and sound APIs, DRM, media |
+| Trace | `tools/triage/decomp_query.py` | A function with your labels, its callers and callees, who uses a string or writes a field |
+| Trace | `tools/triage/exportcov.py` | How much code a Ghidra export covers, and the functions it missed, for PE and 16-bit NE programs |
+| Trace | `tools/triage/sigscan.py` | Byte signatures, to find known library code in a game |
+| Trace | `tools/dos/delphi1.py` | A Delphi 1 program's classes, published methods and fields, with forms mapped to code |
+| Measure | `tools/emu/pe32_emu.py`, `pe_emu.py`, `dos_emu/` | Any function of a 32-bit, 64-bit or 16-bit program, run with chosen inputs |
+| Measure | `tools/emu/call_trace.py` | The calls an emulated function makes, such as random draws, in order |
+| Formats | `tools/formats/reader.py`, `validate.py` | A decoder prototype, proved to read every byte of every file |
+| Formats | `tools/decoders/` | Ready decoders for BMP, WAV, MIDI (also RIFF `.rmi`) and AVI headers and streams, for validation and the catalogue |
+| Formats | `tools/formats/dfm.py` | Delphi and C++Builder forms, with every event and its handler's name |
+| Formats | `tools/formats/rawimage.py` | Raw pixels to PNG: VGA, Mode X, EGA, CGA and packed formats, with palettes |
+| Observe | `tools/live/memrec.py`, `tools/triage/memscan.py` | Where a running game keeps a value, and recordings of named values |
+| Verify | `tools/verify/bitcompare.py`, `seqdiff.py` | Ground truth against the port, bit for bit, and the first random draw that differs |
+| Verify | `tools/triage/coverage.py`, `deviations.py` | How much of the original the port cites, and every marked deviation |
+| Ship | `tools/install/install_app.py` (`gameframe install`) | The port's release build, vanilla and extra, installed as an application in the GameFrame folder |
 
-| Tool | What it does |
-|---|---|
-| `tools/llm/name_functions.py` | A suggested name, signature and summary for every unnamed function in a Ghidra export, in one Message Batch, written to `analysis/` for you to confirm |
-| `tools/llm/skillcheck.py` | Gives an agent one skill and a task on the sample game, and checks its answer against the ground truth: is each skill enough on its own? |
-| `tools/llm/headless.py` | Optional paid API run of one agent under a budget; requires the user's opt-in and saves its report; `docs-check` runs `re-checker` and `re-editor` over the documents |
-| `tools/llm/locate.py` | Finds a screen element, or a reference screen, in a capture by asking a model, when `align.py` cannot line them up |
-| `tools/llm/ask.py` | A question answered from the know-how entries `gameframe advise` finds, naming each entry it uses |
-| `tools/llm/client.py` | The shared client; run it to check the SDK, the key and the `claude` command |
+Model-powered tools in `tools/llm/` use a local model by default. A hosted provider is chosen by
+name and asks before each request ([model providers](docs/working/api-credits.md)).
 
 ## Crates
 
 Clean Rust implementations of chips and runtimes that many old games need, each checked against
-an original program in one of the case studies. They live in `crates/`, a Cargo workspace,
-under Apache 2.0. See [docs/crates](docs/crates/README.md).
+an original program in one of the case studies. The same workspace holds the pieces every port
+shares: reading the player's files, the player's library and the frame. They live in `crates/`,
+a Cargo workspace, under Apache 2.0. See [docs/crates](docs/crates/README.md).
 
 | Crate | What it is |
 |---|---|
@@ -315,6 +283,13 @@ under Apache 2.0. See [docs/crates](docs/crates/README.md).
 | [gameframe-turbo-pascal](crates/turbo-pascal/README.md) | Turbo Pascal's 6-byte `Real`, `Random` and Pascal data layouts |
 | [gameframe-x87](crates/x87/README.md) | The x87 FPU's 80-bit arithmetic, rounding and stores in integers, bit for bit |
 | [gameframe-indeo](crates/indeo/README.md) | An Indeo Video Interactive 4.1 (`IV41`) decoder, picture for picture as Intel's own codec (clean room) |
+| [gameframe-disc-image](crates/disc-image/README.md) | Reads CD images in place (CUE/BIN, ISO, ISO 9660 and Joliet), with no dependencies |
+| [gameframe-game-source](crates/game-source/README.md) | A game's files from a folder, a CD image or a URL, read in ranges in the browser |
+| [gameframe-library](crates/library/README.md) | The player's game data, saves and mods, kept on the desktop or encrypted in the browser, with an [HTML page](templates/library-page/README.md) to manage them |
+| [gameframe-frame](crates/frame/README.md) | The contract between a port and the frame: event topics, the manifest with capabilities, renderers and their grades, settings and controls, adapters for games in other languages or set up from `frame.json`, and the port's own end of that link |
+| [gameframe-frame-ui](crates/frame-ui/README.md) | The frame's views as Dioxus components for the browser and the desktop: play, settings, library, help pages and console, with ready-made themes ([demo](examples/frame-demo/README.md), and [gameframe-launcher](launcher/README.md) for a game described by `frame.json`) |
+| [gameframe-report](crates/report/README.md) | Reports from a running port: each unported path the game reaches, and each crash, with its context, as a local file in Dev and a filled-in GitHub issue link in Production |
+| [gameframe-bitmap-font](crates/bitmap-font/README.md) | An old game's bitmap font as a TrueType font, built in memory, for a launcher's theme in the game's own letters |
 
 ## Replacement libraries
 
@@ -400,7 +375,7 @@ GameFrame uses two licences, one for each kind of work.
 
 | What | Licence |
 |---|---|
-| **Code**: `tools/`, `scripts/`, `tests/`, `examples/`, `crates/`, `wrappers/`, `templates/`, `site/` (its configuration and code), `.claude-plugin/`, the Ghidra scripts | [Apache License 2.0](LICENSE-APACHE) |
+| **Code**: `tools/`, `scripts/`, `tests/`, `examples/`, `crates/`, `launcher/`, `wrappers/`, `templates/`, `site/` (its configuration and code), `.claude-plugin/`, the Ghidra scripts | [Apache License 2.0](LICENSE-APACHE) |
 | **Content**: the documentation (`docs/`), the skills (`skills/`), the agents (`agents/`, and their generated copies in `.codex/`, `.gemini/`, `.github/agents/` and `.opencode/`), the READMEs, `AGENTS.md` and `CHANGELOG.md`, and the website's text | [CC0 1.0](LICENSE-CC0-1.0), dedicated to the public domain |
 
 CC0 1.0 gives up all copyright in the content, as far as the law allows. Anyone may copy,

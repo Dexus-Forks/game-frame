@@ -20,6 +20,9 @@ runs.
 Prefer headless and scripted runs for evidence: they repeat exactly and run in tests. Use the
 windowed runs to see what happens and to find where to look.
 
+On an Apple-silicon Mac, choose the machine by the game's era: what runs where, and what
+each cannot do, is in [Choosing a Windows machine on Apple silicon](../knowhow/context-windows-machines-apple-silicon.md).
+
 Use DOSBox-X for a quick DOS run with its debugger and file logging. Use 86Box when the question
 depends on a particular motherboard, BIOS, Windows version, expansion bus or card resource
 assignment. Record the full machine profile with each capture ([86Box guide](86box.md)).

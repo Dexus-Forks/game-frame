@@ -57,13 +57,34 @@ after a year.
 - **A headless runner.** A command-line mode that loads a save or starts a seeded game, runs a
   fixed number of updates or seconds with scripted input at fixed times, then prints digests or
   writes a save and a picture. Every whole-system check in `re-verify` is built on it.
+- **A device interface at the renderer's seam.** Find where the original hands a frame over to
+  its renderer or card library: a table of renderer functions, a renderer DLL's exports, or the
+  calls into Glide, ATI3DCIF, the S3D Toolkit, SGL or Direct3D. Port everything before that
+  point into the core: game state, geometry, the order of the calls. Make the calls themselves
+  one interface (set state, upload a texture, draw triangles, lock the frame buffer, swap)
+  named after the original's calls. Put each way of drawing behind it as a device: the game's
+  own software rasteriser ported exactly, a card profile from the chip crates
+  (`gameframe-voodoo`, `-rage`, `-virge`, `-powervr`), and a modern renderer. The core never
+  asks a device how it drew. A pixel the original read back (`grLfbReadRegion`) is an input of
+  the core. Hooks for the extra build (record the calls, replace textures, add draws) sit on
+  the interface. Make one hook write each call in the format of GameFrame's call log
+  (`WRAPPER_CALLS`, `docs/hardware/wrappers.md`), so the port's calls compare line for line
+  with the original's. Write a Glide vertex by the same rules as the library: only the fields
+  the current state reads (`wrappers/glide/src/used.rs`). `docs/hardware/rendering-pipeline.md`
+  explains the stages, where each ran on each card, and what to check at each seam.
 - **A query layer for tests.** A way to ask the running program what it shows (interface
   elements by name or text, the world's counts) and to press things by name. Tests that find a
   button by its name survive layout changes; tests that click pixel positions or wait fixed
   times do not.
 
 The platform layer around the core (time, input, drawing, sound, the player's files, the
-browser build) is in `docs/working/building-the-port.md`. Shaders and fixed-function state are
+browser build) is in `docs/working/building-the-port.md`. For the player's files (game data,
+saves, mods) use GameFrame's `gameframe-library` crate and its HTML page in
+`templates/library-page/`, set up from one `library.json`. A disc image read in place goes
+through `gameframe-game-source`. The launcher, settings, renderer choice and console around the
+core are GameFrame's frame: implement `gameframe_frame::Game` (or speak its JSON lines, or
+write a `frame.json`) and give each renderer an honest grade (`crates/frame/README.md`). The
+frame is an addition, so it never changes what the core computes. Shaders and fixed-function state are
 part of what the player sees: port them exactly (`docs/hardware/shaders.md`).
 
 ## Additions the original does not have
@@ -94,7 +115,7 @@ metering and floats switched off does all of this.
 `python3 tools/dos/tdinfo.py BINARY rust TYPE ...` writes Rust structs and readers for Pascal
 record types in the original's field order (with `rust-reader` for the `PascalReader` they
 use). Generate the code instead of copying it by hand. Keep the generated file unedited: regenerate it when the
-toolkit improves. Rust projects made by new-project.sh build into `build/`: `target/` holds the game. `cargo clean` would delete it.
+toolkit improves. Rust projects made by new-project.sh build into `build/`. The game is in `game/`, a link into the GameFrame home. An older project keeps the game in `target/`, where `cargo clean` would delete it.
 
 ## Exactness checklist
 
@@ -154,6 +175,18 @@ gets a comment containing `Deviation:` and the reason; a piece left out gets `no
 `tools/triage/deviations.py --out docs/DEVIATIONS.md src/` lists them all in one ledger, and
 `--check` fails a test when the ledger is out of date. A deviation is a decision; an accidental
 difference is a bug.
+
+Where the game can reach a `not ported` piece while it runs, call GameFrame's
+`gameframe_report::unported!` there as well, with the original's address, one line, and the
+values at the place: `unported!("0x5898b4", "the hit's material", material = m)`. The game goes
+on as before. The first time it gets there, a report is written with the place, the values, the
+game's state and the launch, so the run can be repeated. A check against the original that can
+run in the game uses `mismatch!`. In `main`, call `report::install` with the game's name and
+its GitHub repository, `report::set_dir`, `report::set_launch`, and `report::flush` at the end;
+a kernel also calls `Link::send_reports`, and `Setup::report_gaps` for the devices running on a
+stand-in (`gameframe-frame`'s README, "Devices"). Debug builds keep the reports on the machine (Dev).
+Release builds give each one a filled-in GitHub issue link that the frame shows (Production).
+Tests set `GAMEFRAME_STRICT=1` to fail at an unported path. The crate's README has the rest.
 
 `tools/triage/coverage.py SOURCE_DIR` reads the `Original:` citations and says how much of the
 original's code (by count and by size) the reimplementation has ported from, with the largest

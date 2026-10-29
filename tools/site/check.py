@@ -4,9 +4,15 @@
 Usage:
     tools/site/check.py SITE_DIR [SITE_DIR ...]       for example sites/pod, or site
     tools/site/check.py SITE_DIR --json
+    tools/site/check.py SITE_DIR --days               list the past days that still need a day post
+    options: --today YYYY-MM-DD (the default is the local date), --keep-live
 
 Inputs: one or more VitePress site folders made by scripts/new-site.sh (or written by hand in
-the same shape: Markdown pages, a diary/ folder of YYYY-MM-DD-slug.md entries).
+the same shape: Markdown pages, a diary/ folder of entries). The diary has two kinds of entry:
+live entries, written during the day and named YYYY-MM-DD-HHMM-slug.md (the time they were
+written), and one day post per past day, named YYYY-MM-DD-slug.md, which gathers that day's
+live entries and links each of them. The live entries stay; the diary lists only the day post
+for a past day (the re-site skill, "Consolidate each past day").
 
 Errors (exit status 1):
 - a game file in the site (an .exe, .dll, .pak, ROM image and the other extensions the commit
@@ -14,13 +20,18 @@ Errors (exit status 1):
 - lines that look like Ghidra's decompiled code, in a page or in a document a page includes;
 - an <!--@include: PATH--> whose file does not exist;
 - a diary entry without a title or a summary in its front matter, or with a file name that is
-  not YYYY-MM-DD-slug.md;
+  not YYYY-MM-DD-slug.md or YYYY-MM-DD-HHMM-slug.md;
+- live entries from a day before today with no day post: write that day's post. --keep-live
+  turns this off, for a project that writes no day posts;
+- a day post that does not link each of its day's live entries (by file name, such as
+  ./2026-10-25-1430-fog-tables);
 - a TODO(site) line left from the template.
 Warnings (printed, exit status 0):
 - a diary entry that reads like a commit log: three or more commit hashes, or more than half
   of its lines are bullets that start with a commit verb (Add, Fix, Update, Merge ...);
-- a diary entry under 120 words (a note, not an entry: fold it into the next one) or over
-  2,500 words (split it, or move the reference part into docs/);
+- a day post under 120 words (a note, not a post: fold it into the next one) or over 2,500 words
+  (split it, or move the reference part into docs/). Live entries may be short;
+- two day posts for the same day;
 - a picture over 1 MB.
 Output: one line per problem, `error` or `warn`, with the file. With --json, a list of
 {level, file, message}.
@@ -30,6 +41,7 @@ or check that a picture was made by the project's own code: that is the re-site 
 """
 import json
 import os
+from datetime import date
 import re
 import sys
 
@@ -41,6 +53,8 @@ SKIP_DIRS = {'node_modules', 'dist', 'cache', '.git'}
 PICTURES = {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg', '.avif', '.mp4', '.webm'}
 INCLUDE = re.compile(r'<!--\s*@include:\s*([^\s>]+?)\s*-->')
 ENTRY_NAME = re.compile(r'^\d{4}-\d{2}-\d{2}-[a-z0-9][a-z0-9-]*\.md$')
+# A live entry: the date, then the time it was written (HHMM, 24-hour clock), then the slug.
+LIVE_NAME = re.compile(r'^(\d{4}-\d{2}-\d{2})-([01]\d|2[0-3])[0-5]\d-[a-z0-9][a-z0-9-]*\.md$')
 HASH = re.compile(r'\b[0-9a-f]{7,40}\b')
 COMMIT_BULLET = re.compile(r'^\s*[-*]\s+(Add|Adds|Added|Fix|Fixes|Fixed|Update|Updates|Updated|Remove|Removed|'
                            r'Merge|Merged|Bump|Refactor|Rename|Move|Moved|Revert|WIP|Chore|feat|fix|chore)\b')
@@ -66,7 +80,20 @@ def site_files(site):
             yield os.path.join(base, f)
 
 
-def check(site):
+def diary_days(site, today):
+    """The live entries of past days, {date: [file, ...]}, and the day posts by date."""
+    diary = os.path.join(site, 'diary')
+    live, posts = {}, {}
+    for name in sorted(os.listdir(diary)) if os.path.isdir(diary) else []:
+        m = LIVE_NAME.match(name)
+        if m and m.group(1) < today:
+            live.setdefault(m.group(1), []).append(os.path.join(diary, name))
+        elif not m and ENTRY_NAME.match(name):
+            posts.setdefault(name[:10], []).append(os.path.join(diary, name))
+    return live, posts
+
+
+def check(site, today=None, keep_live=False):
     problems = []
     say = lambda level, path, msg: problems.append({'level': level, 'file': os.path.relpath(path), 'message': msg})
     for path in site_files(site):
@@ -97,13 +124,29 @@ def check(site):
             say('error', path, 'a TODO(site) line from the template is still there')
         if os.path.basename(os.path.dirname(path)) == 'diary' and os.path.basename(path) != 'index.md':
             problems += diary_entry(path, text, say)
+    live, posts = diary_days(site, today or date.today().isoformat())
+    for day, files in live.items():
+        if day not in posts:
+            if not keep_live:
+                say('error', files[0], f'{len(files)} live entries from {day} and no day post: write one post for that day, '
+                                       'YYYY-MM-DD-slug.md, that links each of them (re-site, "Consolidate each past day")')
+            continue
+        text = ''.join(open(p, encoding='utf-8', errors='replace').read() for p in posts[day])
+        missing = [os.path.basename(f)[:-3] for f in files if os.path.basename(f)[:-3] not in text]
+        if missing:
+            say('error', posts[day][0], f'the day post does not link {len(missing)} of its live entries: '
+                                        + ', '.join(missing[:5]) + ' (link each, such as ./' + missing[0] + ')')
+    for day, files in posts.items():
+        if len(files) > 1:
+            say('warn', files[1], f'{len(files)} day posts for {day}: a day has one post')
     return problems
 
 
 def diary_entry(path, text, say):
     name = os.path.basename(path)
+    is_live = bool(LIVE_NAME.match(name))
     if not ENTRY_NAME.match(name):
-        say('error', path, 'a diary entry is named YYYY-MM-DD-slug.md')
+        say('error', path, 'a diary entry is named YYYY-MM-DD-slug.md, or YYYY-MM-DD-HHMM-slug.md for a live entry')
     keys, body = front_matter(text)
     for k in ('title', 'summary'):
         if not keys.get(k):
@@ -115,7 +158,7 @@ def diary_entry(path, text, say):
     if hashes >= 3 or (lines and bullets * 2 > len(lines)):
         say('warn', path, 'reads like a commit log: say what changed for a reader and how it is known, '
                           'and link the commits instead of listing them')
-    if words < 120:
+    if words < 120 and not is_live:
         say('warn', path, f'{words} words: a note, not an entry; fold it into the next entry')
     elif words > 2500:
         say('warn', path, f'{words} words: split it, or move the reference part into docs/')
@@ -126,15 +169,34 @@ def main(argv):
     if not argv or argv[0] in ('-h', '--help'):
         print(__doc__.strip())
         return 0 if argv else 2
-    as_json = '--json' in argv
-    sites = [a for a in argv if a != '--json']
+    argv = list(argv)
+    today = None
+    if '--today' in argv:
+        i = argv.index('--today')
+        today = argv[i + 1] if i + 1 < len(argv) else ''
+        if not re.match(r'^\d{4}-\d{2}-\d{2}$', today):
+            print('--today needs a date, YYYY-MM-DD', file=sys.stderr)
+            return 2
+        del argv[i:i + 2]
+    flags = {a for a in argv if a.startswith('--')}
+    sites = [a for a in argv if not a.startswith('--')]
+    if '--days' in flags:
+        for site in sites:
+            live, posts = diary_days(site, today or date.today().isoformat())
+            for day, files in live.items():
+                if day in posts:
+                    continue
+                print(f'{day}: {len(files)} live entries to consolidate')
+                for f in files:
+                    print(f'  {f}')
+        return 0
     problems = []
     for site in sites:
         if not os.path.isdir(site):
             problems.append({'level': 'error', 'file': site, 'message': 'not a folder'})
             continue
-        problems += check(site)
-    if as_json:
+        problems += check(site, today, '--keep-live' in flags)
+    if '--json' in flags:
         print(json.dumps(problems, indent=2))
     else:
         for p in problems:

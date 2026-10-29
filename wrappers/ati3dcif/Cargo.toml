@@ -9,7 +9,6 @@ version.workspace = true
 crate-type = ["cdylib"]
 
 [dependencies]
-gpu-1997 = { package = "gameframe-gpu-1997", path = "../../crates/gpu-1997" }
+rage = { package = "gameframe-rage", path = "../../crates/rage" }
 pixels = { path = "../pixels" }
-raster = { path = "../raster" }
 shim = { path = "../shim" }

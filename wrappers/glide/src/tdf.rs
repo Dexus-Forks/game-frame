@@ -18,7 +18,7 @@
 //! values, each a big-endian 16-bit word. Then the levels follow, largest first, packed. Texels
 //! of 16 bits are big-endian in the file and little-endian in memory.
 
-use gpu_1997::glide::{Format, size};
+use voodoo::formats::{Format, size};
 
 /// The format names, indexed by `GR_TEXFMT_*` (6 and 7 are reserved).
 pub const FORMATS: [&str; 15] =
@@ -148,7 +148,7 @@ pub fn ncc_bytes(v: &[i16]) -> Vec<u8> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use gpu_1997::ncc::NccTable;
+    use voodoo::ncc::NccTable;
 
     fn file(head: &str, body: &[u8]) -> Vec<u8> {
         let mut f = head.as_bytes().to_vec();

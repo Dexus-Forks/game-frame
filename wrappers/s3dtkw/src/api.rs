@@ -12,6 +12,7 @@ unsafe fn words(p: *const u32, n: usize) -> String {
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn S3DTK_InitLib(init: *const u32) -> i32 {
+    shim::call!("S3DTK_InitLib", init);
     if !init.is_null() {
         log!("S3DTK_InitLib {}", unsafe { words(init, 4) });
     }
@@ -21,6 +22,7 @@ pub unsafe extern "C" fn S3DTK_InitLib(init: *const u32) -> i32 {
 /// Fills `*table` with the function list; the game checks for 1 (`0x4a64d1`).
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn S3DTK_CreateRenderer(init: *const u32, table: *mut *mut crate::table::Table) -> i32 {
+    shim::call!("S3DTK_CreateRenderer", init, table);
     if !init.is_null() {
         log!("S3DTK_CreateRenderer {}", unsafe { words(init, 4) });
     }
@@ -32,6 +34,7 @@ pub unsafe extern "C" fn S3DTK_CreateRenderer(init: *const u32, table: *mut *mut
 
 #[unsafe(no_mangle)]
 pub extern "C" fn S3DTK_DestroyRenderer(_table: *mut *mut crate::table::Table) -> i32 {
+    shim::call!("S3DTK_DestroyRenderer", _table);
     1
 }
 
@@ -40,12 +43,14 @@ pub extern "C" fn S3DTK_DestroyRenderer(_table: *mut *mut crate::table::Table) -
 /// in `sfOffset` (`0x4a5fd6`).
 #[unsafe(no_mangle)]
 pub extern "C" fn S3DTK_LinearToPhysical(linear: u32) -> u32 {
+    shim::call!("S3DTK_LinearToPhysical", linear);
     linear
 }
 
 /// The original returns 1 (its code sets the result to 1 before it frees its mappings).
 #[unsafe(no_mangle)]
 pub extern "C" fn S3DTK_ExitLib() -> i32 {
+    shim::call!("S3DTK_ExitLib");
     1
 }
 
@@ -53,5 +58,6 @@ pub extern "C" fn S3DTK_ExitLib() -> i32 {
 /// (function 0x800); here physical addresses are linear ones, as in `S3DTK_LinearToPhysical`.
 #[unsafe(no_mangle)]
 pub extern "C" fn S3DTK_PhysicalToLinear(physical: u32, _size: u32) -> u32 {
+    shim::call!("S3DTK_PhysicalToLinear", physical, _size);
     physical
 }

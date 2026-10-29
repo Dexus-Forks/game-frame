@@ -7,7 +7,7 @@
 use super::shadow::{self, send};
 use crate::cmd::{Cmd, TexInfo, push};
 use crate::layout;
-use gpu_1997::glide::{Format, TEXTABLE_PALETTE, size};
+use voodoo::formats::{Format, TEXTABLE_PALETTE, size};
 
 /// The TMU's memory as `grSstQueryHardware` reports it: 4 MB.
 pub const TMU_MEMORY: u32 = 4 << 20;
@@ -30,6 +30,7 @@ impl GrTexInfo {
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grTexMinAddress(_tmu: u32) -> u32 {
+    shim::call!("grTexMinAddress", _tmu);
     0
 }
 
@@ -37,11 +38,13 @@ pub extern "system" fn grTexMinAddress(_tmu: u32) -> u32 {
 /// `grTexMaxAddress` in the Win95 `glide2x.dll`).
 #[unsafe(no_mangle)]
 pub extern "system" fn grTexMaxAddress(_tmu: u32) -> u32 {
+    shim::call!("grTexMaxAddress", _tmu);
     TMU_MEMORY - 8
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grTexCalcMemRequired(small_lod: u32, large_lod: u32, aspect: u32, format: u32) -> u32 {
+    shim::call!("grTexCalcMemRequired", small_lod, large_lod, aspect, format);
     Format::from_u32(format).map_or(0, |f| layout::mem_required(small_lod, large_lod, aspect, f))
 }
 
@@ -49,12 +52,14 @@ pub extern "system" fn grTexCalcMemRequired(small_lod: u32, large_lod: u32, aspe
 /// made, so the whole chain is counted.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grTexTextureMemRequired(_even_odd: u32, info: *const GrTexInfo) -> u32 {
+    shim::call!("grTexTextureMemRequired", _even_odd, info);
     let Some(i) = (unsafe { info.as_ref() }) else { return 0 };
     grTexCalcMemRequired(i.small_lod, i.large_lod, i.aspect, i.format)
 }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grTexSource(tmu: u32, start: u32, _even_odd: u32, info: *const GrTexInfo) {
+    shim::call!("grTexSource", tmu, start, _even_odd, crate::callargs::Info(info, false));
     if tmu != 0 || info.is_null() {
         return;
     }
@@ -87,6 +92,7 @@ pub unsafe fn download_chain(start: u32, small: u32, large: u32, aspect: u32, fo
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grTexDownloadMipMap(tmu: u32, start: u32, _even_odd: u32, info: *const GrTexInfo) {
+    shim::call!("grTexDownloadMipMap", tmu, start, _even_odd, crate::callargs::Info(info, true));
     let Some(i) = (unsafe { info.as_ref() }) else { return };
     if tmu == 0 {
         unsafe { download_chain(start, i.small_lod, i.large_lod, i.aspect, i.format, i.data) };
@@ -97,6 +103,7 @@ pub unsafe extern "system" fn grTexDownloadMipMap(tmu: u32, start: u32, _even_od
 pub unsafe extern "system" fn grTexDownloadMipMapLevel(
     tmu: u32, start: u32, lod: u32, large_lod: u32, aspect: u32, format: u32, even_odd: u32, data: *const u8,
 ) {
+    shim::call!("grTexDownloadMipMapLevel", tmu, start, lod, large_lod, aspect, format, even_odd, crate::callargs::level(data, lod, aspect, format, None));
     let h = size(lod, aspect).map_or(1, |(_, h)| h as i32);
     unsafe { grTexDownloadMipMapLevelPartial(tmu, start, lod, large_lod, aspect, format, even_odd, data, 0, h - 1) };
 }
@@ -107,6 +114,7 @@ pub unsafe extern "system" fn grTexDownloadMipMapLevel(
 pub unsafe extern "system" fn grTexDownloadMipMapLevelPartial(
     tmu: u32, start: u32, lod: u32, large_lod: u32, aspect: u32, format: u32, _even_odd: u32, data: *const u8, first: i32, last: i32,
 ) {
+    shim::call!("grTexDownloadMipMapLevelPartial", tmu, start, lod, large_lod, aspect, format, _even_odd, crate::callargs::level(data, lod, aspect, format, Some((first, last))), first, last);
     let (Some(f), Some((w, h))) = (Format::from_u32(format), size(lod, aspect)) else { return };
     if tmu != 0 || data.is_null() || first < 0 || last < first || last as usize >= h {
         return;
@@ -122,6 +130,7 @@ pub unsafe extern "system" fn grTexDownloadMipMapLevelPartial(
 /// `GuNccTable`, of which the first 64 bytes are read.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grTexDownloadTable(tmu: u32, kind: u32, data: *const u32) {
+    shim::call!("grTexDownloadTable", tmu, kind, crate::callargs::table(kind, data, 0, 255));
     unsafe { grTexDownloadTablePartial(tmu, kind, data, 0, 255) };
 }
 
@@ -129,6 +138,7 @@ pub unsafe extern "system" fn grTexDownloadTable(tmu: u32, kind: u32, data: *con
 /// table is always loaded whole.
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grTexDownloadTablePartial(tmu: u32, kind: u32, data: *const u32, first: i32, last: i32) {
+    shim::call!("grTexDownloadTablePartial", tmu, kind, crate::callargs::table(kind, data, first, last), first, last);
     if tmu != 0 || data.is_null() {
         return;
     }
@@ -148,6 +158,7 @@ pub unsafe extern "system" fn grTexDownloadTablePartial(tmu: u32, kind: u32, dat
 /// Which NCC table (`GR_NCCTABLE_NCC0` or `NCC1`) the NCC formats read.
 #[unsafe(no_mangle)]
 pub extern "system" fn grTexNCCTable(tmu: u32, table: u32) {
+    shim::call!("grTexNCCTable", tmu, table);
     if tmu == 0 {
         shadow::set(|s| s.ncc = table & 1);
         shadow::resend_source();
@@ -156,6 +167,7 @@ pub extern "system" fn grTexNCCTable(tmu: u32, table: u32) {
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grTexMultibase(tmu: u32, enable: u32) {
+    shim::call!("grTexMultibase", tmu, enable);
     if tmu == 0 {
         shadow::set(|s| s.multibase = (enable != 0) as u32);
         shadow::resend_source();
@@ -165,6 +177,7 @@ pub extern "system" fn grTexMultibase(tmu: u32, enable: u32) {
 /// The address of one multibase range (`GR_TEXBASE_256`, `_128`, `_64`, `_32_TO_1`).
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn grTexMultibaseAddress(tmu: u32, range: u32, start: u32, _even_odd: u32, _info: *const GrTexInfo) {
+    shim::call!("grTexMultibaseAddress", tmu, range, start, _even_odd, _info);
     if tmu == 0 && range < 4 {
         shadow::set(|s| s.bases[range as usize] = start);
         shadow::resend_source();
@@ -173,6 +186,7 @@ pub unsafe extern "system" fn grTexMultibaseAddress(tmu: u32, range: u32, start:
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grTexFilterMode(tmu: u32, min: u32, mag: u32) {
+    shim::call!("grTexFilterMode", tmu, min, mag);
     if tmu == 0 {
         send(Cmd::TexFilter(min, mag));
     }
@@ -180,6 +194,7 @@ pub extern "system" fn grTexFilterMode(tmu: u32, min: u32, mag: u32) {
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grTexClampMode(tmu: u32, s: u32, t: u32) {
+    shim::call!("grTexClampMode", tmu, s, t);
     if tmu == 0 {
         send(Cmd::TexClamp(s, t));
     }
@@ -190,6 +205,7 @@ pub extern "system" fn grTexClampMode(tmu: u32, s: u32, t: u32) {
 /// (trilinear).
 #[unsafe(no_mangle)]
 pub extern "system" fn grTexMipMapMode(tmu: u32, mode: u32, lod_blend: u32) {
+    shim::call!("grTexMipMapMode", tmu, mode, lod_blend);
     if tmu == 0 {
         send(Cmd::MipMap(mode, lod_blend != 0));
     }
@@ -197,6 +213,7 @@ pub extern "system" fn grTexMipMapMode(tmu: u32, mode: u32, lod_blend: u32) {
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grTexLodBiasValue(tmu: u32, bias: f32) {
+    shim::call!("grTexLodBiasValue", tmu, bias);
     if tmu == 0 {
         send(Cmd::LodBias(bias));
     }
@@ -206,11 +223,13 @@ pub extern "system" fn grTexLodBiasValue(tmu: u32, bias: f32) {
 /// second TMU; with one, nothing changes.
 #[unsafe(no_mangle)]
 pub extern "system" fn grTexDetailControl(_tmu: u32, _lod_bias: i32, _scale: u32, _max: f32) {
+    shim::call!("grTexDetailControl", _tmu, _lod_bias, _scale, _max);
     shim::gap!("grTexDetailControl", "detail textures need a second TMU; ignored");
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn grTexCombineFunction(tmu: u32, f: u32) {
+    shim::call!("grTexCombineFunction", tmu, f);
     if tmu == 0 {
         send(Cmd::TexCombine(f));
     }
@@ -219,6 +238,7 @@ pub extern "system" fn grTexCombineFunction(tmu: u32, f: u32) {
 /// `guTexCombineFunction`: the same `GR_TEXTURECOMBINE_*` values as `grTexCombineFunction`.
 #[unsafe(no_mangle)]
 pub extern "system" fn guTexCombineFunction(tmu: u32, f: u32) {
+    shim::call!("guTexCombineFunction", tmu, f);
     grTexCombineFunction(tmu, f);
 }
 
@@ -227,6 +247,7 @@ pub extern "system" fn guTexCombineFunction(tmu: u32, f: u32) {
 /// Gold's `(SCALE_MINUS_LOCAL_ADD_LOCAL, LOD_FRACTION)` is the texel (decal).
 #[unsafe(no_mangle)]
 pub extern "system" fn grTexCombine(tmu: u32, rgb_func: u32, rgb_factor: u32, _alpha_func: u32, _alpha_factor: u32, rgb_invert: u32, _alpha_invert: u32) {
+    shim::call!("grTexCombine", tmu, rgb_func, rgb_factor, _alpha_func, _alpha_factor, rgb_invert, _alpha_invert);
     if tmu != 0 {
         return;
     }

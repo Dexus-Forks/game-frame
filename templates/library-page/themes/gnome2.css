@@ -1,0 +1,60 @@
+/* GNOME 2 with Clearlooks, the Linux desktop of the 2000s: a blue title bar, soft grey faces,
+   rounded buttons with a light sheen, and a striped blue progress bar.
+   A ready-made theme for the library page and the frame: "preset": "gnome2". */
+
+#library[data-scheme] {
+  --lib-bg: linear-gradient(#2e5b8f, #6d93c2); --lib-surface: #ededed; --lib-surface-2: #fff; --lib-line: #a6a6a6;
+  --lib-text: #1a1a1a; --lib-muted: #555; --lib-accent: #86abd9; --lib-accent-text: #000;
+  --lib-danger: #a40000; --lib-ok: #4e9a06; --lib-scrim: transparent;
+  --lib-font: "DejaVu Sans", "Bitstream Vera Sans", Verdana, sans-serif; --lib-font-mono: "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace;
+  --lib-text-s: 11px; --lib-text-m: 12px; --lib-text-l: 12px; --lib-text-xl: 13px; --lib-text-title: 12px;
+  --lib-weight-strong: 700; --lib-radius-s: 3px; --lib-radius-m: 4px; --lib-radius-l: 5px; --lib-radius-pill: 4px;
+  --lib-shadow: 0 3px 12px rgb(0 0 0 / 0.4); --lib-blur: 0; --lib-width: 580px;
+  color-scheme: light;
+}
+#library[data-scheme] { background: var(--lib-bg); }
+
+/* The window: a Metacity title bar with its three buttons on the right. */
+#library .lib-card { padding: 0 0 12px; border: 1px solid #3a5f8f; border-radius: 5px 5px 0 0; box-shadow: var(--lib-shadow); }
+#library .lib-card > :not(.lib-header) { margin-left: 12px; margin-right: 12px; }
+#library .lib-header { position: relative; display: flex; align-items: center; gap: 8px; margin: 0 0 10px; padding: 4px 64px 4px 8px;
+  text-align: left; border-radius: 4px 4px 0 0; color: #fff; text-shadow: 0 1px #2c4e7c;
+  background: linear-gradient(#94b6dd, #6a95c8 50%, #5a86bd 50%, #4c7ab6); }
+#library .lib-header::after { content: "_ □ ×"; position: absolute; right: 8px; top: 4px; font: bold 12px var(--lib-font); letter-spacing: 6px; }
+#library .lib-title { font: bold 12px var(--lib-font); }
+#library .lib-tagline { margin: 0; color: #e3ecf7; font-size: 11px; text-shadow: none; }
+
+/* Notebook tabs. */
+#library .lib-nav, #library .lib-tabs { justify-content: flex-start; gap: 0; margin-top: 0; margin-bottom: 0; padding: 0 0 0 4px; border: 0; }
+#library .lib-nav a, #library .lib-tabs button { padding: 4px 12px; margin-right: -1px; border: 1px solid #a6a6a6; border-bottom: 0;
+  border-radius: 3px 3px 0 0; background: linear-gradient(#e6e6e6, #d4d4d4); color: #1a1a1a; text-decoration: none; }
+#library .lib-nav a[aria-current=page], #library .lib-tabs button[aria-selected=true] { background: #fcfcfc; color: #1a1a1a; box-shadow: inset 0 2px #86abd9; }
+#library .lib-nav a:hover { background: linear-gradient(#f4f4f4, #e2e2e2); color: #1a1a1a; }
+#library .lib-section { margin-top: 0; padding: 12px; border: 1px solid #a6a6a6; border-radius: 0 3px 3px 3px; background: #fcfcfc; }
+
+/* Clearlooks buttons. */
+#library .lib-button, #library .lib-pad-key { min-height: 26px; padding: 4px 14px; border: 1px solid #8a8a8a; border-radius: 4px;
+  background: linear-gradient(#fff, #f2f2f2 40%, #dedede); color: #1a1a1a; font: 12px var(--lib-font); box-shadow: inset 0 1px #fff; }
+#library .lib-button:hover:not(:disabled), #library .lib-pad-key:hover { background: linear-gradient(#fff, #f9f9f9 40%, #ebebeb); }
+#library .lib-button:active:not(:disabled), #library .lib-pad-key:active { background: linear-gradient(#cfcfcf, #dcdcdc); box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.25); }
+#library .lib-button--primary { border-color: #4c7ab6; box-shadow: 0 0 0 1px #c5d6ec; }
+#library .lib-button:disabled { color: #9a9a9a; background: #f2f2f2; }
+
+/* Fields and lists. */
+#library .lib-input { border: 1px solid #a6a6a6; border-radius: 2px; padding: 4px; background: #fff; color: #1a1a1a; font: 12px var(--lib-font);
+  box-shadow: inset 0 1px 1px rgb(0 0 0 / 0.1); }
+#library .lib-input:focus { border-color: #4c7ab6; outline: 1px solid #86abd9; }
+#library .lib-log, #library .lib-rows .lib-row { border-color: #a6a6a6; border-radius: 0; background: #fff; }
+#library .lib-rows { gap: 0; }
+#library .lib-rows .lib-row:nth-child(even) { background: #f2f5fa; }
+#library .lib-notice { border: 1px solid #c4a000; border-radius: 4px; background: #fcf3c4; }
+#library .lib-notice .lib-icon { color: #c4a000; }
+#library .lib-renderer { border: 1px solid #a6a6a6; border-radius: 4px; background: #fff; }
+#library .lib-renderer[aria-checked=true] { border-color: #4c7ab6; background: #e2ebf6; }
+
+#library .lib-meter { height: 14px; border: 1px solid #8a8a8a; border-radius: 3px; background: linear-gradient(#e0e0e0, #f2f2f2); }
+#library .lib-meter-fill { border-radius: 2px;
+  background: repeating-linear-gradient(45deg, rgb(255 255 255 / 0.25) 0 5px, transparent 5px 10px), linear-gradient(#a7c4e6, #6a95c8 50%, #4c7ab6); }
+#library .lib-steps li::before { background: #86abd9; color: #000; }
+#library .lib-check input, #library .lib-row input[type=checkbox] { accent-color: #4c7ab6; }
+#library a { color: #204a87; }

@@ -21,8 +21,8 @@ GAMEFRAME = ROOT / 'gameframe'
 CATALOG = json.loads((ROOT / 'tools/gameframe/mcp_providers.json').read_text())
 
 
-def run(project, *args):
-    env = {**os.environ, 'GAMEFRAME_PROJECT': str(project)}
+def run(project, *args, extra_env=None):
+    env = {**os.environ, **(extra_env or {}), 'GAMEFRAME_PROJECT': str(project)}
     return subprocess.run([str(GAMEFRAME), *args], cwd=ROOT, env=env,
                           capture_output=True, text=True)
 
@@ -33,6 +33,12 @@ def executable(path, text):
 
 
 def main():
+    assert 'AUTOMATION=ON' in CATALOG['86box']['install']
+    assert 'GDBSTUB=ON' in CATALOG['86box']['install']
+    assert 'optional GDB debugger tools' in CATALOG['86box']['description']
+    assert 'one shared checkout' in CATALOG['86box']['install'].lower()
+    assert 'TCP transport is default' in CATALOG['86box']['install']
+    assert 'GAMEFRAME_86BOX_TRANSPORT' in CATALOG['86box']['install']
     launcher = (ROOT / 'scripts/mcp-provider.sh').read_text()
     assert 'python_version="${MCP_EMULATE_PYTHON:-3.11}"' in launcher
     assert 'sdk_version="$(version "${MCP_EMULATE_SDK_VERSION:-1.30.0}" MCP_EMULATE_SDK_VERSION)"' in launcher
@@ -94,6 +100,14 @@ def main():
         assert '<!-- project customization -->' in customized.read_text()
         assert 'rea/*' not in customized.read_text()
 
+        before = (project / '.mcp.json').read_text()
+        shown = run(project, 'mcp', '--disable', 'rea', '--stdout')
+        assert shown.returncode == 0 and '"mcp-emulate"' in shown.stdout, shown.stderr
+        assert (project / '.mcp.json').read_text() == before, '--stdout must write nothing'
+        checked = run(project, 'mcp', '--disable', 'rea', '--check')
+        assert checked.returncode == 1 and 'would change: rea' in checked.stderr, checked.stderr
+        assert (project / '.mcp.json').read_text() == before, '--check must write nothing'
+
         disabled = run(project, 'mcp', '--disable', 'rea')
         assert disabled.returncode == 0, disabled.stderr
         assert 'rea' not in json.loads((project / '.mcp.json').read_text())['mcpServers']
@@ -102,6 +116,16 @@ def main():
         refreshed_tools = (copilot / 're-accelerator.agent.md').read_text()
         assert '"mcp-emulate/*"' in refreshed_tools and '"86box/*"' in refreshed_tools
         assert '"rea/*"' not in refreshed_tools
+
+        own = json.loads((project / '.mcp.json').read_text())
+        own['mcpServers']['rea'] = {'command': 'npx', 'args': ['-y', 'rea-agents@6.4.0', 'mcp']}
+        (project / '.mcp.json').write_text(json.dumps(own))
+        listed = run(project, 'mcp', '--list')
+        assert 'own command in .mcp.json, not this pin' in listed.stdout, listed.stdout
+        refused = run(project, 'mcp', '--enable', 'rea')
+        assert refused.returncode == 2 and '--disable rea' in refused.stderr, refused.stderr
+        del own['mcpServers']['rea']
+        (project / '.mcp.json').write_text(json.dumps(own))
 
         # Adding a client after provider opt-in generates both its server config and Copilot allowlist.
         late = project / 'late-copilot'
@@ -161,15 +185,29 @@ def main():
         revision = subprocess.run(['git', '-C', str(source), 'rev-parse', 'HEAD'], check=True,
                                   capture_output=True, text=True).stdout.strip()
         fake_box_server = project / 'fake-86box-mcp'
-        executable(fake_box_server, '#!/bin/sh\nprintf "custom-86box:%s\\n" "$BOX86_BINARY"\n')
+        executable(fake_box_server,
+                   '#!/bin/sh\nprintf "custom-86box:%s:%s:%s\\n" "$BOX86_BINARY" "$TMPDIR" "$BOX86_TRANSPORT"\n')
         fake_box = project / '86Box'
         executable(fake_box, '#!/bin/sh\nexit 0\n')
         (project / '.env').write_text(
             f'BOX86_MCP_DIR={source}\nBOX86_MCP_REVISION={revision}\n'
             f'BOX86_MCP_SERVER={fake_box_server}\nBOX86_BINARY={fake_box}\n')
-        launched = run(project, 'mcp-provider', '86box', CATALOG['86box']['source_revision'])
+        home = project / 'home'
+        launched = run(project, 'mcp-provider', '86box', CATALOG['86box']['source_revision'],
+                       extra_env={'HOME': str(home)})
         assert launched.returncode == 0, launched.stderr
-        assert f'custom-86box:{fake_box}' in launched.stdout, launched.stdout
+        default_tmp = home / '.cache/gameframe/86box-tmp'
+        assert f'custom-86box:{fake_box}:{default_tmp}:tcp' in launched.stdout, launched.stdout
+        assert default_tmp.is_dir()
+
+        custom_tmp = home / 'custom-temp'
+        with (project / '.env').open('a') as env_file:
+            env_file.write(f'GAMEFRAME_86BOX_TMPDIR={custom_tmp}\n'
+                            'GAMEFRAME_86BOX_TRANSPORT=unix\n')
+        launched = run(project, 'mcp-provider', '86box', CATALOG['86box']['source_revision'],
+                       extra_env={'HOME': str(home)})
+        assert launched.returncode == 0, launched.stderr
+        assert f'custom-86box:{fake_box}:{custom_tmp}:unix' in launched.stdout, launched.stdout
 
     print('MCP providers: opt-in, generated clients, version pins, project .env and local builds')
 

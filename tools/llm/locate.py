@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Find a screen element, or a reference screen, in a capture by asking Claude to look at it.
+"""Find a screen element, or a reference screen, in a capture with a vision model.
 
 Usage:
   locate.py NOW --find "the Exit button" [--units F]
@@ -18,8 +18,8 @@ For an exact offset, run tools/live/align.py first: it measures, and this tool g
 this one when align.py reports a weak match: another menu is open, the theme changed, or a
 dialog covers part of the screen.
 
-It uses the API key (client.py): one Messages call with one or two pictures, about 2,000 to
-4,000 input tokens. A picture must be under 5 MB.
+It uses the configured model API (client.py): one call with one or two pictures, about 2,000 to
+4,000 input tokens. A picture must be under 5 MB. The selected model must accept images.
 
 What it does not do: click. Give the point to winput or the VM's input tool yourself.
 """

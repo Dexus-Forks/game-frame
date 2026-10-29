@@ -1,0 +1,25 @@
+[package]
+name = "gameframe-frame-demo"
+description = "The frame with no game: the demo game, the player's library and the console, for the browser or the desktop"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+publish = false
+
+# Its own workspace, so the desktop's dependencies stay out of crates/.
+[workspace]
+
+[features]
+default = ["desktop"]
+web = ["dioxus/web"]
+desktop = ["dioxus/desktop"]
+
+[dependencies]
+gameframe-frame = { path = "../../crates/frame" }
+gameframe-frame-ui = { path = "../../crates/frame-ui" }
+gameframe-library = { path = "../../crates/library" }
+dioxus = { version = "0.7.10", default-features = false, features = ["lib", "launch"] }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+# dioxus-web 0.7.10 calls Window::location without asking web-sys for Location.
+web-sys = { version = "0.3", features = ["Window", "Storage", "Location"] }

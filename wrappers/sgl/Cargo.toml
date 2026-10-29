@@ -12,3 +12,4 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 shim = { path = "../shim" }
+powervr = { package = "gameframe-powervr", path = "../../crates/powervr" }

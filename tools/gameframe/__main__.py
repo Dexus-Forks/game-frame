@@ -29,7 +29,18 @@ Commands:
       --table           the Markdown table that docs/working/agents.md holds
       --emit CLIENT     write the agents in a client's format: codex, gemini, copilot, opencode or all
       --out DIR         where --emit writes (default: the repository root)
+  home                  the GameFrame home ($GAMEFRAME_HOME, ~/gameframe): games, projects, machines
+      init              make its folders, write config.env, build python/ (--no-python, --live, --llm)
+      doctor            check the folders, config.env, each game and each project's links (--hashes)
+      adopt PROJECT --id ID   move a project's game folders into the home and link them (--move-project)
+  game add ID FILE...   copy discs or installers into games/ID/media/ and extract into game/
+      --version NAME, --move, --no-extract
+  game list             every game in the home
+  game link ID PROJECT  make a project's game, media, saves, analysis and derived links
   doctor [ARGS]         check the toolchain (scripts/setup.sh; ARGS such as --install pass on)
+  install [extra]       build the project's release programs from install.json and install them
+                        in the GameFrame folder as applications (tools/install/install_app.py;
+                        its options pass on: --dest, --no-build, --dry-run, --list)
   mcp --list            show providers enabled in this project and their pinned versions
   mcp --enable NAME     opt this project into external provider(s); refresh client settings
   mcp --disable NAME    remove external provider(s) from this project
@@ -43,7 +54,7 @@ Examples:
   gameframe steps
   gameframe skill re-emulate --section pitfalls
   gameframe tool peinfo
-  gameframe run peinfo target/game.exe --imports
+  gameframe run peinfo game/game.exe --imports
   gameframe find vtable
   gameframe advise "A privileged instruction was executed at 004a88cd"
   wine game.exe 2>&1 | tail -50 | gameframe advise -
@@ -53,10 +64,10 @@ Inputs: the skills (skills/re-*/SKILL.md), the tools (tools/, scripts/) and thei
 help, and the know-how entries (docs/knowhow/, GameFrame's and the project's), read from the files. The same command works in GameFrame and in a project made by
 scripts/new-project.sh. Standard library only; it needs no .venv itself.
 
-It does not install anything or keep its own copy of the skills or the help: `run` and
-`doctor` start the tool or script, which does its own work. The one command that writes files
-is `agents --emit`. It writes .codex/agents/*.toml, .gemini/agents/*.md,
-.github/agents/*.agent.md and .opencode/agents/*.md from agents/re-*.md
+It keeps no copy of the skills or the help: `run`, `doctor` and `install` start the tool or
+script, which does its own work. `install` builds and installs the project's own programs.
+The other command that writes files is `agents --emit`. It writes .codex/agents/*.toml,
+.gemini/agents/*.md, .github/agents/*.agent.md and .opencode/agents/*.md from agents/re-*.md
 (docs/working/agents.md, "Agents in every client").
 """
 import argparse
@@ -66,12 +77,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import commands  # noqa: E402
+import games  # noqa: E402
+import home  # noqa: E402
 import mcp  # noqa: E402
 import progress  # noqa: E402
 import serve  # noqa: E402
 from paths import NAME  # noqa: E402
 
-PASS_ON = {'run', 'doctor'}      # commands whose arguments belong to the tool they start
+PASS_ON = {'run', 'doctor', 'install'}      # commands whose arguments belong to the tool they start
 
 
 def parser():
@@ -124,6 +137,30 @@ def parser():
     action.add_argument('--list', action='store_true', help='list provider availability and versions')
     s.add_argument('--check', action='store_true', help='write nothing; exit 1 when a file is not current')
     s.add_argument('--stdout', action='store_true', help='print the files instead of writing them')
+    s = sub.add_parser('home', help='the GameFrame home (see tools/gameframe/home.py)')
+    h = s.add_subparsers(dest='action')
+    s = h.add_parser('init', help='make the folders, config.env and python/')
+    s.add_argument('--no-python', action='store_true', help='skip the shared Python environment')
+    s.add_argument('--live', action='store_true', help='also install requirements-live.txt (Frida)')
+    s.add_argument('--llm', action='store_true', help='also install requirements-llm.txt')
+    s = h.add_parser('doctor', help='check the home')
+    s.add_argument('--hashes', action='store_true', help="check every image's SHA-256 (slow)")
+    s = h.add_parser('adopt', help="move a project's game folders into the home and link them")
+    s.add_argument('project')
+    s.add_argument('--id', required=True, help='the game id, such as pod')
+    s.add_argument('--move-project', action='store_true', help='also move the repository to projects/ID/')
+    s = sub.add_parser('game', help="one game's files in the home (see tools/gameframe/games.py)")
+    g = s.add_subparsers(dest='action', required=True)
+    s = g.add_parser('add', help='copy discs or installers in and extract them')
+    s.add_argument('id')
+    s.add_argument('files', nargs='+')
+    s.add_argument('--version', help='keep these files in media/NAME/')
+    s.add_argument('--move', action='store_true', help='move the files instead of copying them')
+    s.add_argument('--no-extract', action='store_true', help='do not extract into game/')
+    g.add_parser('list', help='every game in the home')
+    s = g.add_parser('link', help="make a project's links into games/ID/")
+    s.add_argument('id')
+    s.add_argument('project')
     s = sub.add_parser('mcp-provider', help='start an opt-in provider through the project environment')
     s.add_argument('provider')
     s.add_argument('version')
@@ -141,6 +178,8 @@ def main(argv):
         return commands.run(argv[1], argv[2:])
     if argv[0] == 'doctor':
         return commands.doctor(argv[1:])
+    if argv[0] == 'install':
+        return commands.install(argv[1:])
     p, sub = parser()
     args = p.parse_args(argv)
     if args.command == 'help':
@@ -151,6 +190,15 @@ def main(argv):
         else:
             print(__doc__.rstrip())
         return 0
+    if args.command in ('home', 'game'):
+        actions = {('home', None): home.show, ('home', 'init'): home.init, ('home', 'doctor'): home.doctor,
+                   ('home', 'adopt'): games.adopt, ('game', 'add'): games.add, ('game', 'list'): games.list_games,
+                   ('game', 'link'): games.link_cmd}
+        try:
+            return actions[(args.command, args.action)](args)
+        except games.Stop as e:
+            print(f'{NAME}: {e}', file=sys.stderr)
+            return 2
     return {'steps': commands.steps, 'skills': commands.list_skills, 'skill': commands.skill,
             'agents': commands.list_agents, 'tools': commands.list_tools, 'tool': commands.tool, 'find': commands.find, 'advise': commands.advise,
             'progress': progress.show, 'mcp': mcp.emit, 'mcp-provider': mcp.run_provider,

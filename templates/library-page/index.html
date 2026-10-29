@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Example Port</title>
+  <!-- The library page (GameFrame templates/library-page). Change the words, pictures, icons
+       and tokens in library.json; add a theme.css after library.css for more. The other files
+       need no edits. -->
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="library.css">
+</head>
+<body>
+  <!-- The game draws here. It listens for `gameframe-library:start`. -->
+  <canvas id="game" tabindex="0"></canvas>
+  <div id="library" data-config="library.json"></div>
+  <script src="library-store.js"></script>
+  <script src="library-panels.js"></script>
+  <script src="library-pages.js"></script>
+  <script src="library.js"></script>
+  <!-- Load the game after the page, for example with Trunk:
+       <link data-trunk rel="rust" data-bin="game" /> -->
+</body>
+</html>

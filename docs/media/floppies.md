@@ -35,7 +35,7 @@ by country ([Legal](../LEGAL.md)). You decide which route to take.
 ## Games that use DOS's files
 
 Most DOS games keep their data in ordinary files. Copy the files out of the image with
-`mtools` (`mcopy -i disk.img -s ::* target/disk1/`) or mount the image. Then work on the files
+`mtools` (`mcopy -i disk.img -s ::* game/disk1/`) or mount the image. Then work on the files
 as with any other release. Note which disk each file came from. An installer may combine or
 decompress them, and the game may ask for a disk by its volume label.
 

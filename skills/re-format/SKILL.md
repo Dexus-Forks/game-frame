@@ -11,7 +11,7 @@ sample proves little: optional fields, versions and rare cases show up in a few 
 ## 1. Look at the bytes
 
 ```bash
-xxd target/data/units.dat | head -20
+xxd game/data/units.dat | head -20
 ```
 
 Look for: a magic number at the start; counts and sizes (small integers that match the file's
@@ -21,19 +21,19 @@ records of a fixed stride; float values (`0000803f` is 1.0, `0000003f` is 0.5). 
 (`re-inventory` section 4): near 8.0 means compressed or encrypted.
 
 ```bash
-python3 tools/triage/filetypes.py target/data/units.dat --blocks 4096   # where the dense parts are
-python3 tools/formats/xorscan.py target/data/script.dat                 # a simple XOR or add key?
-python3 tools/formats/xorscan.py target/data.pak --records DIR:28:4:16 --key-in target/GAME.EXE   # names XORed in each directory record
-python3 tools/formats/shadetable.py target/data/shade.rmp --offset 14 --levels 64 --palette PAL --png derived/shade.png   # a light or fog table
+python3 tools/triage/filetypes.py game/data/units.dat --blocks 4096   # where the dense parts are
+python3 tools/formats/xorscan.py game/data/script.dat                 # a simple XOR or add key?
+python3 tools/formats/xorscan.py game/data.pak --records DIR:28:4:16 --key-in game/GAME.EXE   # names XORed in each directory record
+python3 tools/formats/shadetable.py game/data/shade.rmp --offset 14 --levels 64 --palette PAL --png derived/shade.png   # a light or fog table
 python3 tools/formats/timestamps.py --scan saves/slot1.sav --from 1996 --to 1998   # a saved date?
 python3 tools/triage/similar.py saves/before.sav saves/after.sav                  # how much changed
-python3 tools/triage/constants.py target/GAME.EXE        # the decompressor or checksum, by its constants
-python3 tools/triage/binview.py target/data/units.dat derived/units.png --width 24   # records show as stripes
-python3 tools/formats/rawimage.py target/data/TITLE.SCR derived/title.png --mode linear8   # a raw picture?
+python3 tools/triage/constants.py game/GAME.EXE        # the decompressor or checksum, by its constants
+python3 tools/triage/binview.py game/data/units.dat derived/units.png --width 24   # records show as stripes
+python3 tools/formats/rawimage.py game/data/TITLE.SCR derived/title.png --mode linear8   # a raw picture?
 python3 tools/formats/markers.py plant saves/slot1.sav derived/marked.sav --from 0x40   # follow fields into memory
-python3 tools/formats/fields.py target/data/units.dat --stride 24 --png derived/units.png   # what each offset holds
-python3 tools/formats/skeleton.py target/models/hero.mdl    # parent arrays, quaternions, joint names
-python3 tools/formats/shaders.py target/data/shaders.pak --dump derived/shaders   # compiled and source shaders
+python3 tools/formats/fields.py game/data/units.dat --stride 24 --png derived/units.png   # what each offset holds
+python3 tools/formats/skeleton.py game/models/hero.mdl    # parent arrays, quaternions, joint names
+python3 tools/formats/shaders.py game/data/shaders.pak --dump derived/shaders   # compiled and source shaders
 ```
 
 Text that turns readable under one XOR byte or a short key is a common way games hid their
@@ -63,8 +63,8 @@ Write down each read in order: offset, type, meaning, and the condition under wh
 Run the original under DOSBox-X with the file log, then map the reads per file:
 
 ```bash
-scripts/dosbox-run.sh --fileio --time 30 target/game GAME.EXE
-python3 tools/dos/fileio_trace.py analysis/dosbox/dosbox.log --game target/game --file LEVELS.DAT
+scripts/dosbox-run.sh --fileio --time 30 game GAME.EXE
+python3 tools/dos/fileio_trace.py analysis/dosbox/dosbox.log --game game --file LEVELS.DAT
 ```
 
 A program that reads a file field by field shows its record layout in the read sizes:
@@ -126,7 +126,7 @@ Then look at what the decoder found (`re-browse`). Add `images(result)` to the d
 format holds pictures, and run the catalogue with it:
 
 ```bash
-python3 tools/formats/catalog.py target/game derived/catalog --decoder '*.unit=decoders/units.py'
+python3 tools/formats/catalog.py game derived/catalog --decoder '*.unit=decoders/units.py'
 ```
 
 Open `derived/catalog/index.html`: a wrong width slants a picture, a wrong palette changes its
