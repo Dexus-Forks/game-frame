@@ -247,6 +247,51 @@ player's files. Points to plan for:
   original's maths functions computes the same game in both. Test it: run the same inputs
   natively and in the browser and compare the state.
 
+### Browser pitfalls
+
+TabStationToo, PCSX2 compiled to WebAssembly, met these and recorded them in its
+[porting plan](https://github.com/TabStationToo/TabStationToo/blob/HEAD/docs/web-port/PLAN.md)
+(§2) and its [agent notes](https://github.com/TabStationToo/TabStationToo/blob/HEAD/AGENTS.md).
+Most apply to any core in WebAssembly. The Emscripten ones are marked.
+
+- **Hosting.** Shared memory needs the headers `Cross-Origin-Opener-Policy: same-origin` and
+  `Cross-Origin-Embedder-Policy: require-corp`. Safari has no `credentialless` mode. A core that
+  generates code at run time also needs `wasm-unsafe-eval` in its content security policy.
+  GitHub Pages cannot send headers. The `coi-serviceworker` script adds them there, and it
+  cannot share its scope with another service worker, so merge the two.
+- **Faults that do not trap.** A read or write through a null pointer reaches address 0 of
+  linear memory and goes on silently. Corruption that should have crashed often means this.
+  Build with the address sanitizer to find it. Safe Rust is not affected. Unsafe Rust, C and
+  C++ are.
+- **Calls through the wrong type.** A call through a function pointer whose type does not
+  match the function traps at run time. Treat the linker's "function signature mismatch"
+  warning as an error.
+- **Thread stacks (Emscripten).** A new thread gets 64 KB of stack by default, and an overflow
+  corrupts memory silently. Set `-sDEFAULT_PTHREAD_STACK_SIZE` and turn on
+  `-sSTACK_OVERFLOW_CHECK` in development builds.
+- **Files.** Chrome caps one file in the origin private file system at 2000 MiB, so read a
+  large disc image in place. Safari deletes a site's storage after seven days without a visit,
+  unless the page is installed, so give the player export and import of saves. Write saves on
+  `pagehide` too. With Emscripten, `WORKERFS` does not work under `-sPROXY_TO_PTHREAD`. A
+  worker that reads the player's file and hands ranges over through shared memory and
+  `Atomics` does work.
+- **Hidden tabs.** `requestAnimationFrame` stops in a hidden tab. A thread that waits only for
+  it never wakes.
+- **Reading pixels back.** WebGPU reads textures back only asynchronously (`mapAsync`). A game
+  API that reads the frame buffer at once, such as a Glide frame-buffer lock, needs the frame
+  kept on the CPU too, or a way to suspend the core (Emscripten's JSPI).
+- **WebGPU features.** There are no geometry shaders and no push constants. Dual-source blending
+  is optional, and WebKit lacks it, which means every browser on iOS. Firefox drops a canvas's
+  configuration when a frame is handed to the page, so configure it again after each frame.
+  Firefox also copies every frame back from the GPU. Present at the game's own size and scale
+  the picture up with CSS.
+- **Gamepads.** A gamepad appears only after a button press while the page has focus, and
+  Chrome lists at most four. In Firefox, quick taps can be lost unless
+  `dom.gamepad.non_standard_events.enabled` is set.
+- **Code generated at run time.** Compile and instantiate a generated module on the thread that
+  runs it. Each thread has its own function table. Test in Node 24 or later: Node 22 copies the
+  whole function table into every generated module, and the heap runs out.
+
 ## Writing the original's formats
 
 ![Read, write and compare every file to prove a writer](../assets/diagrams/round-trip.svg)
@@ -264,7 +309,24 @@ rounded on the way). Then load the written files in the original, where that is 
   ([What a project can ship](../OUTPUTS.md)).
 - Install a release build on this computer with `./gameframe install` (below).
 - Measure performance on the slowest system you support. Profile before changing anything,
-  and check that an optimisation leaves the game's results unchanged.
+  and check that an optimisation leaves the game's results unchanged (below).
+
+### Measuring speed
+
+- **Check that the CPU runs at full power first.** A laptop's power manager can cap the CPU
+  even on mains power, and then every number is too low. On Linux,
+  `/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq` must equal `cpuinfo_max_freq`, and
+  `tlp-stat -p` or `powerprofilesctl` must show no power-saving profile. On macOS, Low Power
+  Mode must be off (`pmset -g` shows `lowpowermode 0`). Comparisons of two builds run in turn
+  under the same cap stay valid. Absolute speeds do not.
+- **Measure a fixed run.** Use a headless run from a save with scripted input, or a scene the
+  project builds itself, so no game data is needed. Count from after the warm-up, when caches
+  are full and shaders and generated code are compiled.
+- **Repeat and alternate.** Run the old and the new build in turn, several times each, and
+  report the median.
+- **Keep a record.** Keep one file, such as `docs/performance.md`, with a row for each
+  optimisation: what changed, where, the gain, the commit, and how its results were checked as
+  unchanged. Note the machine. When a measuring error turns up, mark the numbers it affects.
 
 ### Installing a build on this computer
 

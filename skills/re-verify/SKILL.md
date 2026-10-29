@@ -45,6 +45,14 @@ Turn this into a test in the reimplementation's test suite: it loads the ground-
 **skips with a clear message when `derived/` is missing** (other machines and CI have no game
 files), compares exactly, and on failure reports the first mismatching index and the count.
 
+### Write down what is compared
+
+Before the first comparison, write two lists next to the test. The first holds the state that
+must match after each unit of work (a call, a block, a frame). The second holds the state left
+out, each item with its reason: a dead pipeline slot, a position in a ring buffer, a counter an
+interrupt owns, a pointer the allocator chose. A field on neither list is a gap in the test.
+When a difference appears, the lists tell at once whether it matters.
+
 For a DOS game, also compare against the whole original running in DOSBox-X: its exit code
 (`scripts/dosbox-run.sh`), its file reads (`--fileio`), or memory read with the debugger at a
 breakpoint (`tools/dos/dbx_control.py`). Fix the CPU speed (`--cycles N`) for any comparison
@@ -174,6 +182,16 @@ different CPUs, a 32-bit build, the browser (WebAssembly). Run one seeded game o
 compare. Differences usually come from the platform's maths library, from fused multiply-add
 on one target only, or from a different iteration order of a hash map.
 
+In the browser, a WebAssembly module runs first in a quick compiler (V8's Liftoff) and later in
+an optimising one (TurboFan). A short test never leaves the quick one. Run the tests again with
+`node --no-liftoff` so the optimising compiler is tested too.
+
+**Threads.** A port with threads can give different frames from run to run with no bug at all,
+because one thread sees another's events at different moments. Give it a mode where the threads
+hand over at fixed points (one waits for the other's events before it reads them). First check
+that two runs in that mode match each other, once on an idle machine and once on a busy one.
+Then compare builds in that mode.
+
 **Recordings.** Record a game's commands with the digest at each checkpoint, then replay the
 recording and check every digest. A recording made today is a regression test for every later change. It is also how a lockstep multiplayer game is checked: two players are two replays of
 the same commands.
@@ -266,6 +284,39 @@ When saves are identical and only a frame differs slightly, run that scenario ag
 with both builds. If each build also differs from itself, it is the driver; record the case
 (how often, how large) so the next person does not chase it. If the difference repeats every
 time, it is real.
+
+### Lockstep: run both, keep the reference's result
+
+Sometimes the port holds a slower reference inside it: an interpreter beside a JIT, the
+original's routine under the emulator beside the ported one, the plain version beside the
+optimised one. Then run every unit of work on both, from the same snapshot:
+
+1. Save the state the unit reads.
+2. Run the new code with its side effects (drawing, sound, interrupts raised, files written)
+   sent to recorders. Save its result, then restore the state.
+3. Run the reference with its side effects passed through.
+4. Compare the two results and the two recordings by the written lists (section 1). On a
+   difference, log the unit, its starting state and the first field that differs. Write the
+   case to a folder that a replay test reads. From then on, send that unit to the reference.
+
+The program goes on with the reference's results. So a lockstep run behaves like a reference
+run, and one bad unit cannot spoil the frames after it. Each unit is compared on its own,
+which finds bugs that whole frames hide. Each unit copies its state twice, so lockstep is a
+debugging mode. Cases dumped while a game runs hold the game's data: keep them outside the
+repository.
+
+When you fuzz new code against a reference:
+
+- start some runs after a random number of the reference's steps, so the new code is entered
+  in the middle of a state;
+- force an exit to the reference at random points, so every way back is tested;
+- give each optimisation its own switch, so a difference can be narrowed to one of them;
+- for floats, draw denormals, both zeros, infinities, NaNs and the largest and smallest values
+  often.
+
+TabStationToo's VU1 JIT design ([§9](https://github.com/TabStationToo/TabStationToo/blob/HEAD/docs/web-port/VU1-JIT-DESIGN.md))
+is a full worked example: a written contract, a fuzzer, lockstep, corpus replay and a
+deterministic mode for threads.
 
 ## 7. Test tiers
 

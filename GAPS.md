@@ -331,6 +331,10 @@ From POD's move to POD Gold and the vehicle creator (its `docs/gameframe-lessons
   palette from the same picture in 16 bits. Test: a generated pair recovers the palette
 - [ ] A line follower that drives a port along a recorded path through its probe, to compare
   two versions of a vehicle or a level
+- [x] Lockstep against a reference inside the port, with written lists of what is compared
+  ([re-verify](skills/re-verify/SKILL.md), section 6)
+- [x] Browser pitfalls for WebAssembly cores and measuring speed on a capped CPU
+  ([Building the port](docs/working/building-the-port.md))
 
 ## Out of scope
 

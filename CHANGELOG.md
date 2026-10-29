@@ -9,6 +9,15 @@ Every release of GameFrame, newest first. The format follows
 
 ### Added
 
+- Lessons from TabStationToo, PCSX2 compiled to WebAssembly. `re-verify` gains written lists of
+  what is compared and what is left out, lockstep (both versions run each unit, the program goes
+  on with the reference's result), fuzzing new code against a reference, a deterministic mode for
+  threads, and running WebAssembly tests in both of V8's compilers.
+  `docs/working/building-the-port.md` gains browser pitfalls (hosting headers, faults that do not
+  trap, storage limits, WebGPU readback and features, gamepads, code generated at run time) and
+  how to measure speed, starting with a check that the CPU is not capped.
+  `docs/consoles/porting.md` notes emulators in the browser and how their licence carries over.
+
 - The call log in the replacement libraries: `WRAPPER_CALLS=FILE` writes every call the game
   makes into Glide, SGL, ATI3DCIF or the S3D Toolkit, one line each, in the format
   `tools/verify/seqdiff.py` compares. Vertices are written as their values, texture data and
