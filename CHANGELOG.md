@@ -199,6 +199,10 @@ Every release of GameFrame, newest first. The format follows
 
 ### Changed
 
+- REA is pinned to `rea-agents` 6.8.0 in the provider catalog, setup command and setup
+  permission patterns. The guides use the same version and explain how to refresh an
+  existing project's REA registration. Node.js requirements are unchanged.
+
 - `Session::state()` is `idle` before the first start and `starting` from `game.start` until the
   game answers. It was `stopped`, so a test that waited for `stopped` ended before the game ran.
 

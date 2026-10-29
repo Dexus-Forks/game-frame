@@ -78,13 +78,24 @@ unchanged generated Copilot agent allowlists. It preserves unrelated client sett
 edited Copilot agent files. Restart the agent session after enabling or disabling a server. No
 provider is installed by these commands.
 
+For an existing REA entry created by GameFrame, refresh its old pin after updating GameFrame:
+
+```bash
+./gameframe mcp --disable rea
+./gameframe mcp --enable rea
+```
+
+Restart the agent session. `--emit` keeps the old pin; `--enable` refuses to overwrite it. If the project
+uses a custom REA command, update that command directly instead. A `REA_MCP_VERSION` value in
+`.env` still overrides the generated pin.
+
 `mcp-provider.sh` reads the project's ignored `.env` before starting an opted-in provider. The
 catalog pins each package or source revision. Use `.env` to select a different exact package
 version or a local executable. The project commits only the provider choice and default pin.
 
 | Provider | Pin | Setup and local settings |
 |---|---|---|
-| REA | `rea-agents` 6.7.0 | Node.js 22.23.4+, 24.22.1+, or 26.12.1+. `.env` can set `REA_MCP_VERSION`. |
+| REA | `rea-agents` 6.8.0 | Node.js 22.23.4+, 24.22.1+, or 26.12.1+. `.env` can set `REA_MCP_VERSION`. |
 | DOSBox-X debugger | `dosbox-x-mcp-server` tag v0.1.2 | Install with the pinned Cargo command in [re-setup](../../skills/re-setup/SKILL.md). `.env` can set `DOSBOX_X_MCP_SERVER` to a local server. Set `DOSBOX_X_BINARY` to use a custom DOSBox-X build; `scripts/setup.sh` checks its version. |
 | MCPEmulate | PyPI 0.1.0 | Requires `uv`. Its launcher pins MCP SDK 1.30.0 because newer SDK 2.x releases removed the API this server uses. It defaults to Python 3.11 because its Keystone binding still imports `distutils`; `.env` can set `MCP_EMULATE_SDK_VERSION`, `MCP_EMULATE_PYTHON` and `MCP_EMULATE_VERSION`. On macOS, install the native Keystone library and set `DYLD_LIBRARY_PATH` to its library directory if the binding cannot load it. This GPL-2.0-only server complements `pe32_emu`; it is a CPU emulator, not a Windows system or GameFrame's PE call harness. |
 | 86Box | `86box-mcp` 0.1.0 at commit `9e6cdd02f6956e3ff32ec99c1dd4b0be7798d3ca` | No packaged release is published. Build 86Box at or after `1be46d317107f5219f160547d77614ff8e19a7c7` with `-D AUTOMATION=ON`. Add `-D GDBSTUB=ON` when using its debugger tools. Set `BOX86_MCP_DIR`, `BOX86_MCP_REVISION`, `BOX86_MCP_SERVER` and `BOX86_BINARY` in `.env`. The launcher checks the selected source revision and executable path. |

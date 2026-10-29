@@ -22,7 +22,7 @@
     "ask": [
       "Bash(git push *)",
       "Bash(scripts/setup.sh --install *)",
-      "Bash(npx -y rea-agents@6.4.0 setup *)",
+      "Bash(npx -y rea-agents@6.8.0 setup *)",
       "Bash(brew install *)",
       "Bash(sudo *)",
       "Bash(curl *)",

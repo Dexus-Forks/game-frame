@@ -54,7 +54,7 @@ counts the checks that passed and failed. With `--ghidra` the run has more check
 | Python 3.10+ with unicorn, pefile, capstone | Emulation, PE reading, disassembly | `requirements.txt` into `.venv` |
 | objdump (binutils or LLVM) | Reading instructions exactly | Homebrew `binutils`/`llvm`, apt `binutils`; Xcode's on macOS |
 | Node.js 18+ | VitePress and other Node tools | https://nodejs.org |
-| Node.js 22.23.4+, 24.22.1+, or 26.12.1+ | Optional REA MCP (`rea-agents` 6.7.0) | https://nodejs.org |
+| Node.js 22.23.4+, 24.22.1+, or 26.12.1+ | Optional REA MCP (`rea-agents` 6.8.0) | https://nodejs.org |
 | Zig (optional) | Building the sample game for Windows from any host | https://ziglang.org |
 | Frida (optional, about 40 MB) | Tracing calls in a running game (`tools/live/frida_trace.py`) | `requirements-live.txt` into `.venv` |
 | REA (optional) | Evidence-backed inspection of binaries, packages, apps, runtimes; enable with `./gameframe mcp --enable rea` | https://github.com/morluto/rea |

@@ -1,11 +1,11 @@
 {
   "rea": {
-    "version": "6.7.0",
+    "version": "6.8.0",
     "description": "REA: binary, package, browser and runtime analysis",
     "install": "Node.js 22.23.4+, 24.22.1+, or 26.12.1+; the launcher uses npx and the pinned package version",
     "server": {
       "command": "./gameframe",
-      "args": ["mcp-provider", "rea", "6.7.0"]
+      "args": ["mcp-provider", "rea", "6.8.0"]
     }
   },
   "dosbox": {

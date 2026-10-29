@@ -39,7 +39,7 @@ Never put game files, extracted assets or decompiled code inside a git checkout.
 | Zig | 0.14 | building the sample game in the tests |
 | DOSBox-X | 2026.10 or later, with the heavy debugger | DOS games, the debugger tests |
 | innoextract, 7-Zip | any recent | unpacking installers |
-| REA | 6.7.0 | optional MCP server for agents; enable with `./gameframe mcp --enable rea` |
+| REA | 6.8.0 | optional MCP server for agents; enable with `./gameframe mcp --enable rea` |
 
 `scripts/setup.sh` checks each one and prints a table. External MCP servers are off by default.
 Use `./gameframe mcp --list` and `./gameframe mcp --enable NAME` to add one to a project.

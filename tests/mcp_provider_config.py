@@ -77,7 +77,7 @@ def main():
 
         enabled = run(project, 'mcp', '--enable', 'rea', 'mcp-emulate', '86box')
         assert enabled.returncode == 0, enabled.stderr
-        assert 'rea (6.7.0)' in enabled.stdout and 'mcp-emulate (0.1.0)' in enabled.stdout
+        assert 'rea (6.8.0)' in enabled.stdout and 'mcp-emulate (0.1.0)' in enabled.stdout
         assert 'Refreshed Copilot MCP access in 1 generated agent files.' in enabled.stdout, enabled.stdout
         assert 'Kept customized Copilot agent files:' in enabled.stdout, enabled.stdout
         config = json.loads((project / '.mcp.json').read_text())['mcpServers']

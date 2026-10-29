@@ -10,7 +10,7 @@ tools and records every result as Evidence with an ID, coverage and limits. Its 
 `reverse-engineer-anything`, documents each tool in detail: install it with REA's setup
 (`re-setup`) and read it before a large REA investigation. This skill says how REA fits into
 the playbook's loop. REA is opt-in for each project. Enable it with `./gameframe mcp --enable rea`;
-the project launcher uses the pinned `rea-agents` 6.7.0 and reads local overrides from `.env`.
+the project launcher uses the pinned `rea-agents` 6.8.0 and reads local overrides from `.env`.
 
 ## REA or the text export?
 

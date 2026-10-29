@@ -175,7 +175,7 @@ none of the lists follows the session's permission mode.
 | Allow | `./gameframe`, the scripts in `scripts/` (Ghidra export and run, DOSBox, the installer extractor, `setup.sh` without `--install`), `tests/run.sh`, the tools under `.venv/bin/python tools/` and `truth/` | The toolkit's own commands. They read the game and write only to ignored folders. |
 | Allow | `git status`, `diff`, `log`, `show`, `add`, `commit`, `pull` | Every slice ends with a commit. The commit gate checks each one. |
 | Ask | `git push` | A push publishes the work. The user sees each one. |
-| Ask | `scripts/setup.sh --install`, `brew install`, `cargo install`, `npx -y rea-agents@6.7.0 setup`, `sudo`, `curl`, `wget` | These install software or download files. The project asks before any download. |
+| Ask | `scripts/setup.sh --install`, `brew install`, `cargo install`, `npx -y rea-agents@6.8.0 setup`, `sudo`, `curl`, `wget` | These install software or download files. The project asks before any download. |
 | Deny | `git add -f`, `git add --force`, `git push --force`, `git push -f` | A forced add is the usual way game material reaches git. A forced push can destroy another session's work. |
 
 Everything else, such as reading files, running `cargo`, `objdump` or `python3`, is left to the

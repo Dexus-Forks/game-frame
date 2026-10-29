@@ -123,7 +123,7 @@ fi
 if [[ $rea == 1 ]]; then
   echo
   echo "REA registration plan (dry run; nothing is changed):"
-  npx -y rea-agents@6.7.0 setup --client "$client" --dry-run || \
+  npx -y rea-agents@6.8.0 setup --client "$client" --dry-run || \
     echo "  could not run REA's setup; see docs/SETUP.md"
 fi
 

@@ -52,11 +52,22 @@ See `re-rea` for when to use it. External MCPs are opt-in. Start with:
 ./gameframe mcp --enable rea
 ```
 
-This pins REA to `rea-agents` 6.7.0 in the project config and refreshes client settings already
+This pins REA to `rea-agents` 6.8.0 in the project config and refreshes client settings already
 present in the project. It needs Node.js 22.23.4+, 24.22.1+, or 26.12.1+. Restart the agent
 session; Claude Code may ask to approve the project's MCP server.
 
-- **Project settings:** the generated entry calls `./gameframe mcp-provider rea 6.7.0`. The
+For an existing REA entry created by GameFrame, refresh its old pin after updating GameFrame:
+
+```bash
+./gameframe mcp --disable rea
+./gameframe mcp --enable rea
+```
+
+Restart the agent session. `--emit` keeps the old pin; `--enable` refuses to overwrite it. If the project
+uses a custom REA command, update that command directly instead. A `REA_MCP_VERSION` value in
+`.env` still overrides the generated pin.
+
+- **Project settings:** the generated entry calls `./gameframe mcp-provider rea 6.8.0`. The
   launcher reads `GHIDRA_INSTALL_DIR`, `JAVA_HOME` and `REA_MCP_VERSION` from the project's
   ignored `.env`. To use another exact REA version, set `REA_MCP_VERSION` there, then restart the
   agent. GameFrame's own MCP server does not proxy REA tools.
@@ -84,7 +95,7 @@ session; Claude Code may ask to approve the project's MCP server.
   ```bash
   scripts/setup.sh --rea                          # dry run: shows the plan for Claude Code
   scripts/setup.sh --rea --client codex           # the plan for another client
-  npx -y rea-agents@6.7.0 setup --client codex --yes   # apply, after the user agrees
+  npx -y rea-agents@6.8.0 setup --client codex --yes   # apply, after the user agrees
   ```
 - REA's own skill (`reverse-engineer-anything`) explains every tool. Install it with REA's setup,
   or from its repository.
@@ -98,7 +109,7 @@ tool call. Raise the client's tool timeout for REA (in Codex, `tool_timeout_sec`
 server's entry).
 
 If REA tools do not appear: restart the agent (MCP servers start with the session), then check
-`npx -y rea-agents@6.7.0 doctor --client claude_code --json`. A tool that reports
+`npx -y rea-agents@6.8.0 doctor --client claude_code --json`. A tool that reports
 `provider_unavailable` usually means Ghidra or Java is not where `.env` says.
 
 ## 4. DOS games: DOSBox-X and its debugger
